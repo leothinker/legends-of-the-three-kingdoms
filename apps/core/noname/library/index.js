@@ -6244,7 +6244,7 @@ export class Library {
 				},
 				auto_mark_identity: {
 					name: "自动标记身份",
-					init: false,
+					init: true,
 					intro: "根据角色的出牌行为自动标记可能的身份",
 				},
 				enhance_zhu: {

@@ -50,7 +50,7 @@ const translates = {
 	re_sunshangxiang_prefix: "界",
 	re_zhugeliang: "界诸葛亮",
 	re_zhugeliang_prefix: "界",
-	re_zhenji: "界甄宓",
+	re_zhenji: "界甄姬",
 	re_zhenji_prefix: "界",
 	re_huaxiong: "界华雄",
 	re_huaxiong_prefix: "界",

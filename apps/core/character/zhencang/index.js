@@ -1,9 +1,7 @@
 import { lib, game, ui, get, ai, _status } from "noname";
 import characters from "./character.js";
 import skills from "./skill.js";
-import translates from "./translate.js";
 import { characterSort, characterSortTranslate } from "./sort.js";
-import voices from "./voices.js";
 
 game.import("character", function () {
 	return {
@@ -14,6 +12,6 @@ game.import("character", function () {
 			zhencang: characterSort,
 		},
 		skill: { ...skills },
-		translate: { ...translates, ...voices, ...characterSortTranslate },
+		translate: { ...characterSortTranslate },
 	};
 });

@@ -5508,9 +5508,9 @@ export class Library {
 					init: "normal",
 					item: {
 						normal: "标准",
-						zhong: "明忠",
-						stratagem: "谋攻",
-						purple: "3v3v2",
+						
+						
+						
 					},
 					restart: true,
 					frequent: true,
@@ -5863,9 +5863,9 @@ export class Library {
 					init: "normal",
 					item: {
 						normal: "标准",
-						zhong: "明忠",
-						stratagem: "谋攻",
-						purple: "3v3v2",
+						
+						
+						
 					},
 					restart: true,
 					frequent: true,

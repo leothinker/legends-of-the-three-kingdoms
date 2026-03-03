@@ -1,10 +1,10 @@
 window.noname_package = {
 	character: {
 		//经典标包
-		standard: "标准",
+		standard: "标准版",
 	},
 	card: {
-		standard: "标准",
+		standard: "标准版",
 	},
 	mode: {
 		identity: "身份",

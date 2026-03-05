@@ -3,7 +3,7 @@ export default {
 	simayi: "狼顾之鬼",
 	xiahoudun: "独眼的罗刹",
 	zhangliao: "前将军",
-	xuzhu: "虎痴",
+	xuchu: "虎痴",
 	guojia: "早终的先知",
 	zhenji: "薄幸的美人",
 	liubei: "乱世的枭雄",

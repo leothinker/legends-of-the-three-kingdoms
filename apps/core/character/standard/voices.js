@@ -18,7 +18,7 @@ export default {
 	"#zhangliao:die": "真的没想到……",
 	"#luoyi1": "脱！",
 	"#luoyi2": "谁来与我大战三百回合？",
-	"#xuzhu:die": "冷，好冷啊……",
+	"#xuchu:die": "冷，好冷啊……",
 	"#tiandu1": "罢了。",
 	"#tiandu2": "也好。",
 	"#yiji1": "就这样吧。",

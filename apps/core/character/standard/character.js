@@ -122,7 +122,7 @@ const characters = {
 		hp: 4,
 		skills: ["tuxi"],
 	},
-	xuzhu: {
+	xuchu: {
 		sex: "male",
 		group: "wei",
 		hp: 4,

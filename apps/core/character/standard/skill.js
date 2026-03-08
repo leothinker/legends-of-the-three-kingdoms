@@ -317,7 +317,6 @@ const skills = {
 		},
 		group: "kongcheng1",
 		audio: 2,
-		audioname: ["re_zhugeliang"],
 		ai: {
 			noh: true,
 			skillTagFilter(player, tag) {
@@ -334,7 +333,6 @@ const skills = {
 		trigger: { player: "loseEnd" },
 		forced: true,
 		firstDo: true,
-		audioname: ["re_zhugeliang"],
 		sourceSkill: "kongcheng",
 		filter(event, player) {
 			if (player.countCards("h")) {
@@ -353,8 +351,6 @@ const skills = {
 	// 龙胆
 	longdan: {
 		audio: 2,
-		audioname: ["re_zhaoyun"],
-		audioname2: { old_zhaoyun: "longdan_sha_re_zhaoyun" },
 		group: ["longdan_sha", "longdan_shan", "longdan_draw"],
 		subSkill: {
 			draw: {
@@ -373,9 +369,7 @@ const skills = {
 				},
 			},
 			sha: {
-				audio: 2,
-				audioname: ["re_zhaoyun"],
-				audioname2: { old_zhaoyun: "longdan_sha_re_zhaoyun" },
+				audio: "longdan",
 				enable: ["chooseToUse", "chooseToRespond"],
 				filterCard: { name: "shan" },
 				viewAs: { name: "sha" },
@@ -411,9 +405,7 @@ const skills = {
 				},
 			},
 			shan: {
-				audio: "longdan_sha",
-				audioname: ["re_zhaoyun"],
-				audioname2: { old_zhaoyun: "longdan_sha_re_zhaoyun" },
+				audio: "longdan",
 				enable: ["chooseToRespond", "chooseToUse"],
 				filterCard: { name: "sha" },
 				viewAs: { name: "shan" },
@@ -491,12 +483,7 @@ const skills = {
 		ai: {
 			directHit_ai: true,
 			skillTagFilter(player, tag, arg) {
-				if (
-					get.attitude(player, arg.target) > 0 ||
-					arg.card.name != "sha" ||
-					!ui.cardPile.firstChild ||
-					get.color(ui.cardPile.firstChild, player) != "red"
-				) {
+				if (get.attitude(player, arg.target) > 0 || arg.card.name != "sha" || !ui.cardPile.firstChild || get.color(ui.cardPile.firstChild, player) != "red") {
 					return false;
 				}
 			},
@@ -506,10 +493,6 @@ const skills = {
 	// 集智
 	jizhi: {
 		audio: 2,
-		audioname: ["jianyong"],
-		audioname2: {
-			xin_simayi: "jilue_jizhi",
-		},
 		trigger: { player: "useCard" },
 		frequent: true,
 		preHidden: true,
@@ -566,7 +549,7 @@ const skills = {
 			var cards = player.getCards("h");
 			event.bool = cards.length > player.hp;
 			player.discard(cards);
-			("step 1");
+			"step 1";
 			if (event.bool) {
 				player.recover();
 			}
@@ -595,10 +578,6 @@ const skills = {
 	// 制衡
 	zhiheng: {
 		audio: 2,
-		audioname: ["gz_jun_sunquan"],
-		audioname2: {
-			xin_simayi: "jilue_zhiheng",
-		},
 		mod: {
 			aiOrder(player, card, num) {
 				if (num <= 0 || get.itemtype(card) !== "card" || get.type(card) !== "equip") {
@@ -665,8 +644,6 @@ const skills = {
 	// 奇袭
 	qixi: {
 		audio: 2,
-		audioname: ["re_ganning"],
-		audioname2: { re_heqi: "duanbing_heqi" },
 		enable: "chooseToUse",
 		filterCard(card) {
 			return get.color(card) == "black";
@@ -687,7 +664,6 @@ const skills = {
 	// 克己
 	keji: {
 		audio: 2,
-		audioname: ["re_lvmeng", "sp_lvmeng"],
 		trigger: { player: "phaseDiscardBefore" },
 		frequent(event, player) {
 			return player.needsToDiscard();
@@ -743,7 +719,6 @@ const skills = {
 	// 英姿
 	yingzi: {
 		audio: 2,
-		audioname: ["sp_lvmeng"],
 		trigger: { player: "phaseDrawBegin2" },
 		frequent: true,
 		filter(event, player) {
@@ -841,7 +816,6 @@ const skills = {
 	// 流离
 	liuli: {
 		audio: 2,
-		audioname: ["re_daqiao", "daxiaoqiao"],
 		trigger: { target: "useCardToTarget" },
 		preHidden: true,
 		filter(event, player) {
@@ -852,12 +826,7 @@ const skills = {
 				return false;
 			}
 			return game.hasPlayer(current => {
-				return (
-					player.inRange(current) &&
-					current != event.player &&
-					current != player &&
-					lib.filter.targetEnabled(event.card, event.player, current)
-				);
+				return player.inRange(current) && current != event.player && current != player && lib.filter.targetEnabled(event.card, event.player, current);
 			});
 		},
 		async cost(event, trigger, player) {
@@ -948,7 +917,6 @@ const skills = {
 				}
 			},
 		},
-		audio: 2,
 	},
 	// 连营
 	lianying: {
@@ -1046,7 +1014,6 @@ const skills = {
 	// 枭姬
 	xiaoji: {
 		audio: 2,
-		audioname: ["sp_sunshangxiang", "re_sunshangxiang"],
 		trigger: {
 			player: "loseAfter",
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -1078,7 +1045,6 @@ const skills = {
 	// 奸雄
 	jianxiong: {
 		audio: 2,
-		audioname2: { caoying: "lingren_jianxiong" },
 		preHidden: true,
 		trigger: { player: "damageEnd" },
 		filter(event, player) {
@@ -1105,10 +1071,6 @@ const skills = {
 	// 护驾
 	hujia: {
 		audio: 2,
-		audioname: ["re_caocao"],
-		audioname2: {
-			pe_jun_caocao: "sbhujia",
-		},
 		zhuSkill: true,
 		trigger: { player: ["chooseToRespondBefore", "chooseToUseBefore"] },
 		filter(event, player) {
@@ -1216,7 +1178,6 @@ const skills = {
 	// 鬼才
 	guicai: {
 		audio: 2,
-		audioname2: { xin_simayi: "jilue_guicai" },
 		trigger: { global: "judge" },
 		preHidden: true,
 		filter(event, player) {
@@ -1224,22 +1185,18 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
-				.chooseCard(
-					`${get.translation(trigger.player)}的${trigger.judgestr || ""}判定为${get.translation(trigger.player.judging[0])}，${get.prompt(event.skill)}`,
-					get.mode() == "guozhan" ? "hes" : "hs",
-					card => {
-						const player = get.player();
-						const mod2 = game.checkMod(card, player, "unchanged", "cardEnabled2", player);
-						if (mod2 != "unchanged") {
-							return mod2;
-						}
-						const mod = game.checkMod(card, player, "unchanged", "cardRespondable", player);
-						if (mod != "unchanged") {
-							return mod;
-						}
-						return true;
+				.chooseCard(`${get.translation(trigger.player)}的${trigger.judgestr || ""}判定为${get.translation(trigger.player.judging[0])}，${get.prompt(event.skill)}`, get.mode() == "guozhan" ? "hes" : "hs", card => {
+					const player = get.player();
+					const mod2 = game.checkMod(card, player, "unchanged", "cardEnabled2", player);
+					if (mod2 != "unchanged") {
+						return mod2;
 					}
-				)
+					const mod = game.checkMod(card, player, "unchanged", "cardRespondable", player);
+					if (mod != "unchanged") {
+						return mod;
+					}
+					return true;
+				})
 				.set("ai", card => {
 					const trigger = get.event().getTrigger();
 					const { player, judging } = get.event();
@@ -1321,17 +1278,17 @@ const skills = {
 				source.countCards("h") < 2
 					? { bool: false }
 					: await source
-						.chooseToDiscard(2, `弃置两张手牌，否则${get.translation(player)}对你造成1点伤害`)
-						.set("ai", card => {
-							if (card.name == "tao") {
-								return -10;
-							}
-							if (card.name == "jiu" && get.player().hp == 1) {
-								return -10;
-							}
-							return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp);
-						})
-						.forResult();
+							.chooseToDiscard(2, `弃置两张手牌，否则${get.translation(player)}对你造成1点伤害`)
+							.set("ai", card => {
+								if (card.name == "tao") {
+									return -10;
+								}
+								if (card.name == "jiu" && get.player().hp == 1) {
+									return -10;
+								}
+								return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp);
+							})
+							.forResult();
 			if (!result?.bool) {
 				await source.damage();
 			}
@@ -1376,18 +1333,15 @@ const skills = {
 			if (judge < 2) {
 				return;
 			}
-			const { bool: chooseToDiscardResultBool } = await event.target
-				.chooseToDiscard(2)
-				.set("ai", card => {
-					if (card.name == "tao") {
-						return -10;
-					}
-					if (card.name == "jiu" && _status.event.player.hp == 1) {
-						return -10;
-					}
-					return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp);
-				})
-				.forResult();
+			const { bool: chooseToDiscardResultBool } = await event.target.chooseToDiscard(2).set("ai", card => {
+				if (card.name == "tao") {
+					return -10;
+				}
+				if (card.name == "jiu" && _status.event.player.hp == 1) {
+					return -10;
+				}
+				return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp);
+			}).forResult();
 			if (chooseToDiscardResultBool === false) {
 				event.target.damage();
 			}
@@ -1468,11 +1422,11 @@ const skills = {
 			return !event.numFixed && event.num > 0;
 		},
 		async content(event, trigger, player) {
-			player.addTempSkill("luoyi2", "phaseJieshuBegin");
+			player.addTempSkill("luoyi1", "phaseJieshuBegin");
 			trigger.num--;
 		},
 	},
-	luoyi2: {
+	luoyi1: {
 		trigger: { source: "damageBegin1" },
 		sourceSkill: "luoyi",
 		filter(event) {
@@ -1491,7 +1445,6 @@ const skills = {
 	// 天妒
 	tiandu: {
 		audio: 2,
-		audioname: ["re_guojia", "xizhicai", "gz_nagisa"],
 		trigger: { player: "judgeEnd" },
 		preHidden: true,
 		frequent(event) {
@@ -1536,15 +1489,12 @@ const skills = {
 				const { bool, links } =
 					cards.length == 1
 						? { links: cards.slice(0), bool: true }
-						: await player
-							.chooseCardButton("遗计：请选择要分配的牌", true, cards, [1, cards.length])
-							.set("ai", () => {
+						: await player.chooseCardButton("遗计：请选择要分配的牌", true, cards, [1, cards.length]).set("ai", () => {
 								if (ui.selected.buttons.length == 0) {
 									return 1;
 								}
 								return 0;
-							})
-							.forResult();
+						  }).forResult();
 				if (!bool) {
 					return;
 				}
@@ -1657,10 +1607,6 @@ const skills = {
 		},
 		locked: false,
 		audio: 2,
-		audioname: ["sb_zhenji"],
-		audioname2: {
-			re_zhenji: "reqingguo",
-		},
 		enable: ["chooseToRespond", "chooseToUse"],
 		filterCard(card) {
 			return get.color(card) == "black";
@@ -1742,7 +1688,7 @@ const skills = {
 	// 乐进
 	// 骁果
 	xiaoguo: {
-		audio: "xiaoguo",
+		audio: 2,
 		trigger: { global: "phaseJieshuBegin" },
 		filter(event, player) {
 			return (
@@ -1822,8 +1768,6 @@ const skills = {
 		},
 		locked: false,
 		audio: 2,
-		audioname: ["re_huatuo"],
-		audioname2: { old_huatuo: "jijiu_re_huatuo" },
 		enable: "chooseToUse",
 		viewAsFilter(player) {
 			return player != _status.currentPhase && player.countCards("hes", { color: "red" }) > 0;
@@ -1879,8 +1823,6 @@ const skills = {
 	// 无双
 	wushuang: {
 		audio: 2,
-		audioname: ["re_lvbu", "shen_lvbu", "lvlingqi"],
-		audioname2: { sb_lvbu: "sbliyu_effect" },
 		forced: true,
 		locked: true,
 		group: ["wushuang1", "wushuang2"],
@@ -1888,8 +1830,6 @@ const skills = {
 	},
 	wushuang1: {
 		audio: "wushuang",
-		audioname: ["re_lvbu", "shen_lvbu", "lvlingqi"],
-		audioname2: {
 			sb_lvbu: "sbliyu_effect",
 			gz_lvlingqi: "wushuang_lvlingqi",
 		},
@@ -1924,8 +1864,6 @@ const skills = {
 	},
 	wushuang2: {
 		audio: "wushuang",
-		audioname: ["re_lvbu", "shen_lvbu", "lvlingqi"],
-		audioname2: {
 			sb_lvbu: "sbliyu_effect",
 			gz_lvlingqi: "wushuang_lvlingqi",
 		},
@@ -1967,7 +1905,6 @@ const skills = {
 	// 离间
 	lijian: {
 		audio: 2,
-		audioname: ["re_diaochan"],
 		enable: "phaseUse",
 		usable: 1,
 		filter(event, player) {
@@ -2085,7 +2022,6 @@ const skills = {
 			player: ["changeHp"],
 		},
 		audio: 2,
-		audioname: ["re_gongsunzan"],
 		forced: true,
 		filter(event, player) {
 			return get.sgn(player.hp - 2.5) != get.sgn(player.hp - 2.5 - event.num);

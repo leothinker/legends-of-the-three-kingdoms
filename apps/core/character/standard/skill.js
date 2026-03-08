@@ -13,6 +13,7 @@ const skills = {
 		discard: false,
 		lose: false,
 		delay: 0,
+		group: ["rende1"],
 		filterTarget(card, player, target) {
 			return player != target;
 		},
@@ -27,13 +28,7 @@ const skills = {
 				return 20;
 			}
 			const player = get.owner(card);
-			let num = 0;
-			const evt2 = _status.event.getParent();
-			player.getHistory("lose", evt => {
-				if (evt.getParent().skill == "rende" && evt.getParent(3) == evt2) {
-					num += evt.cards.length;
-				}
-			});
+			let num = player.storage.rende;
 			if (player.hp == player.maxHp || num > 1 || player.countCards("h") <= 1) {
 				if (ui.selected.cards.length) {
 					return -1;
@@ -55,15 +50,10 @@ const skills = {
 			return 10 - get.value(card);
 		},
 		async content(event, trigger, player) {
-			const evt2 = event.getParent(3);
-			let num = 0;
-			player.getHistory("lose", evt => {
-				if (evt.getParent(2).name == "rende" && evt.getParent(5) == evt2) {
-					num += evt.cards.length;
-				}
-			});
+			let num = player.storage.rende;
 			player.give(event.cards, event.target);
-			if (num < 2 && num + event.cards.length > 1) {
+			player.storage.rende += event.cards.length;
+			if (num < 2 && player.storage.rende > 1) {
 				player.recover();
 			}
 		},
@@ -87,7 +77,7 @@ const skills = {
 					}
 					const nh = target.countCards("h");
 					const np = player.countCards("h");
-					if (player.hp == player.maxHp || player.storage.rende < 0 || player.countCards("h") <= 1) {
+					if (player.hp == player.maxHp || player.storage.rende > 1 || player.countCards("h") <= 1) {
 						if (nh >= np - 1 && np <= player.hp && !target.hasSkill("haoshi")) {
 							return 0;
 						}
@@ -378,7 +368,7 @@ const skills = {
 			}
 			return false;
 		},
-		async content() {},
+		async content() { },
 	},
 	// 赵云
 	// 龙胆
@@ -1352,17 +1342,17 @@ const skills = {
 				source.countCards("h") < 2
 					? { bool: false }
 					: await source
-							.chooseToDiscard(2, `弃置两张手牌，否则${get.translation(player)}对你造成1点伤害`)
-							.set("ai", card => {
-								if (card.name == "tao") {
-									return -10;
-								}
-								if (card.name == "jiu" && get.player().hp == 1) {
-									return -10;
-								}
-								return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp);
-							})
-							.forResult();
+						.chooseToDiscard(2, `弃置两张手牌，否则${get.translation(player)}对你造成1点伤害`)
+						.set("ai", card => {
+							if (card.name == "tao") {
+								return -10;
+							}
+							if (card.name == "jiu" && get.player().hp == 1) {
+								return -10;
+							}
+							return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp);
+						})
+						.forResult();
 			if (!result?.bool) {
 				await source.damage();
 			}
@@ -1568,14 +1558,14 @@ const skills = {
 					cards.length == 1
 						? { links: cards.slice(0), bool: true }
 						: await player
-								.chooseCardButton("遗计：请选择要分配的牌", true, cards, [1, cards.length])
-								.set("ai", () => {
-									if (ui.selected.buttons.length == 0) {
-										return 1;
-									}
-									return 0;
-								})
-								.forResult();
+							.chooseCardButton("遗计：请选择要分配的牌", true, cards, [1, cards.length])
+							.set("ai", () => {
+								if (ui.selected.buttons.length == 0) {
+									return 1;
+								}
+								return 0;
+							})
+							.forResult();
 				if (!bool) {
 					return;
 				}
@@ -2121,7 +2111,7 @@ const skills = {
 		filter(event, player) {
 			return get.sgn(player.hp - 2.5) != get.sgn(player.hp - 2.5 - event.num);
 		},
-		content() {},
+		content() { },
 		mod: {
 			globalFrom(from, to, current) {
 				if (from.hp > 2) {

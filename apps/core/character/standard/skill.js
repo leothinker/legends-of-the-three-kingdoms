@@ -52,8 +52,8 @@ const skills = {
 		async content(event, trigger, player) {
 			let num = player.storage.rende;
 			player.give(event.cards, event.target);
-			player.storage.rende += event.cards.length;
-			if (num < 2 && player.storage.rende > 1) {
+			player.storage.rende = num + event.cards.length;
+			if (num < 2 && num + event.cards.length > 1) {
 				player.recover();
 			}
 		},

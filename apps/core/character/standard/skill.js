@@ -208,13 +208,6 @@ const skills = {
 	// 武圣
 	wusheng: {
 		audio: 2,
-		audioname2: {
-			old_guanzhang: "wusheng_old_guanzhang",
-			old_guanyu: "wusheng_re_guanyu",
-			guanzhang: "wusheng_guanzhang",
-			guansuo: "wusheng_guansuo",
-		},
-		audioname: ["re_guanyu", "jsp_guanyu", "re_guanzhang", "dc_jsp_guanyu"],
 		enable: ["chooseToRespond", "chooseToUse"],
 		filterCard(card, player) {
 			if (get.zhu(player, "shouyue")) {
@@ -263,11 +256,6 @@ const skills = {
 	paoxiao: {
 		audio: 2,
 		firstDo: true,
-		audioname: ["re_zhangfei", "xiahouba"],
-		audioname2: {
-			old_guanzhang: "paoxiao_old_guanzhang",
-			guanzhang: "paoxiao_guanzhang",
-		},
 		trigger: { player: "useCard1" },
 		forced: true,
 		filter(event, player) {

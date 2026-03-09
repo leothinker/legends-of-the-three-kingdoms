@@ -1925,7 +1925,7 @@ const skills = {
 		selectTarget: 2,
 		multitarget: true,
 		async content(event, trigger, player) {
-			const useCardEvent = event.targets[1].useCard({ name: "juedou", isCard: true }, "nowuxie", event.targets[0], "noai");
+			const useCardEvent = event.targets[1].useCard({ name: "juedou", isCard: true }, event.targets[0], "noai");
 			useCardEvent.animate = false;
 			await game.delay(0.5);
 		},

@@ -1961,13 +1961,13 @@ const skills = {
 		trigger: { source: "damageSource" },
 		forced: true,
 		filter(event, player) {
-			if (player.hasSkill("stdkuangfu_used")) {
+			if (player.hasSkill("kuangfu_used")) {
 				return false;
 			}
 			return player.isPhaseUsing() && event.card && event.card.name == "sha" && event.player != player && event.player.isIn();
 		},
 		async content(event, trigger, player) {
-			player.addTempSkill("stdkuangfu_used", "phaseChange");
+			player.addTempSkill("kuangfu_used", "phaseChange");
 			if (trigger.player.hp < player.hp) {
 				player.draw(2);
 			} else {

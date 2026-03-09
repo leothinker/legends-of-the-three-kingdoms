@@ -12,7 +12,7 @@
 					"sgscards": ["standard"],
 					"sgsmodes": ["identity"],
 					"layout": ["default", "long", "long2", "newlayout", "nova", "mobile"],
-					"theme": ["woodden", "music", "simple"],
+					"theme": ["simple"],
 					"card_font": ["xiaozhuan", "xinwei", "huangcao", "yuanli", "xingkai", "shousha"],
 					"image_background_filter": ["default", "blur", "gray", "sepia", "invert", "saturate", "contrast", "hue", "brightness"]
 			},	"game": "sgs",

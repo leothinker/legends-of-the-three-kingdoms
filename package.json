@@ -5,7 +5,6 @@
     "scripts": {
         "dev": "tsx scripts/dev.ts",
         "build": "tsx scripts/build.ts",
-        "init:extension": "tsx scripts/initExtension.ts",
         "serve": "pnpm -F @noname/fs dev --dirname=../../dist",
         "start": "pnpm build && pnpm serve",
         "generateTestPack": "pnpm build && tsx scripts/generateTestPack.ts",

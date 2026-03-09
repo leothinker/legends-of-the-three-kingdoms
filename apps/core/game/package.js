@@ -1,10 +1,12 @@
 window.noname_package = {
 	character: {
-		//经典标包
+		//经典标包＋神话再临
 		standard: "标准版",
 	},
 	card: {
 		standard: "标准版",
+	},
+	play: {
 	},
 	mode: {
 		identity: "身份",
@@ -17,7 +19,8 @@ window.noname_package = {
 	background: {
 		ol_bg: "龙纹",
 	},
-	music: {},
+	music: {
+	},
 	font: {
 		xiaozhuan: "方正小篆体",
 		xinwei: "华文新魏_GBK",

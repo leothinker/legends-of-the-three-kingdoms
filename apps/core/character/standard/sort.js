@@ -3,7 +3,7 @@ const characterSort = {
 };
 
 const characterSortTranslate = {
-	standard_2025: "标准版2025",
+	standard_2025: "标准版（2025）",
 };
 
 export { characterSort, characterSortTranslate };

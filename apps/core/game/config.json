@@ -7,15 +7,16 @@
 	"extension_source": "GitHub Proxy",
 	"forbidai": ["ns_liuzhang"],
 	"forbidai_user": [],
-			"all": {
-					"sgscharacters": ["standard"],
-					"sgscards": ["standard"],
-					"sgsmodes": ["identity"],
-					"layout": ["default", "long", "long2", "newlayout", "nova", "mobile"],
-					"theme": ["simple"],
-					"card_font": ["xiaozhuan", "xinwei", "huangcao", "yuanli", "xingkai", "shousha"],
-					"image_background_filter": ["default", "blur", "gray", "sepia", "invert", "saturate", "contrast", "hue", "brightness"]
-			},	"game": "sgs",
+	"all": {
+		"sgscharacters": ["standard"],
+		"sgscards": ["standard"],
+		"sgsmodes": ["identity"],
+		"layout": ["default", "long", "long2", "newlayout", "nova", "mobile"],
+		"theme": ["simple"],
+		"card_font": ["xiaozhuan", "xinwei", "huangcao", "yuanli", "xingkai", "shousha"],
+		"image_background_filter": ["default", "blur", "gray", "sepia", "invert", "saturate", "contrast", "hue", "brightness"]
+	},
+	"game": "sgs",
 	"duration": 500,
 	"hoveration": 1000,
 	"doubleclick_intro": true,
@@ -60,6 +61,7 @@
 	"max_loadtime": "20000",
 	"theme": "simple",
 	"layout": "long2",
+	"card_style": "ol",
 	"cardback_style": "ol",
 	"cardshape": "oblong",
 	"hp_style": "glass",

@@ -585,10 +585,6 @@ export async function boot() {
 		}
 	}
 
-	if (Array.isArray(lib.extensions)) {
-		await Promise.allSettled(lib.extensions.map(loadExtension));
-	}
-
 	if (lib.init.startBefore) {
 		lib.init.startBefore();
 		delete lib.init.startBefore;

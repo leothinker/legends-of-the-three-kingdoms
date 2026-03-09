@@ -343,6 +343,8 @@ export async function boot() {
 		toLoad.push(importCharacterPack(characterPack));
 	}
 	toLoad.push(lib.init.promises.js(`${lib.assetURL}character`, "rank"));
+	toLoad.push(lib.init.promises.js(`${lib.assetURL}character`, "replace"));
+	toLoad.push(lib.init.promises.js(`${lib.assetURL}character`, "perfectPairs"));
 
 	await Promise.allSettled(toLoad);
 

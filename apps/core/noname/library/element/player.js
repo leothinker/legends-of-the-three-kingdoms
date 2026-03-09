@@ -541,65 +541,6 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	/**
-	 * 是否拥有对应战法
-	 * @param {string} id 战法的id
-	 */
-	hasZhanfa(id) {
-		return this.getStorage("zhanfa").includes(id);
-	}
-	/**
-	 * 获得对应战法
-	 * @param {string} id 战法的id
-	 */
-	addZhanfa(id) {
-		const skill = lib.zhanfa.getSkill(id);
-		if (!skill) {
-			console.warn(`不存在战法: ${id}`);
-			return;
-		} else if (this.hasZhanfa(id)) {
-			return;
-		}
-		game.log(this, "获得战法", `#g【${get.translation(id)}】`);
-		const card = game.createCard(id, "战法", "");
-		this.$draw(card, void 0, void 0, false);
-		this.addAdditionalSkill("zhanfa", skill, true);
-		this.markAuto("zhanfa", id);
-		const next = game.createEvent("addZhanfa", false, get.event());
-		next.player = this;
-		next.zhanfaId = id;
-		next.forceDie = true;
-		next.includeOut = true;
-		next.setContent(async (event, trigger, player) => {
-			await event.trigger(event.name);
-		});
-	}
-	/**
-	 * 失去对应战法
-	 * @param {string} id 战法的id
-	 */
-	removeZhanfa(id) {
-		const skill = lib.zhanfa.getSkill(id);
-		if (!skill) {
-			console.warn(`不存在战法: ${id}`);
-			return;
-		} else if (!this.hasZhanfa(id)) {
-			return;
-		}
-		game.log(this, "失去战法", `#g【${get.translation(id)}】`);
-		const card = game.createCard(id, "战法", "");
-		this.$throw(card, 1000, void 0, void 0, false);
-		this.removeAdditionalSkill("zhanfa", skill);
-		this.unmarkAuto("zhanfa", id);
-		const next = game.createEvent("removeZhanfa", false, get.event());
-		next.player = this;
-		next.zhanfaId = id;
-		next.forceDie = true;
-		next.includeOut = true;
-		next.setContent(async (event, trigger, player) => {
-			await event.trigger(event.name);
-		});
-	}
-	/**
 	 * 获取一名角色的名字翻译
 	 * @param {boolean} forDialog 是否用于对话框显示，如【五谷丰登】/【惠民】之类多名角色选择卡牌的卡牌/技能的content中，方便知晓卡牌和角色的对应关系。默认为false。
 	 * @returns { string } 角色名字翻译，forDialog为true会返回HTML字符串，为对话框中的卡牌呈现类似卡牌动画信息的效果，否则根据player._tempTranslate、lib.translate[`${player.name}_ab`]、get.translation(player.name)的优先级返回纯文本。
@@ -5885,7 +5826,7 @@ export class Player extends HTMLDivElement {
 
 	/**
 	 * @param {Player | Player[]} targetOrTargets
-	 * @param {(card: Card) => number} check
+	 * @param {(card: Card) => number} [check]
 	 * @returns
 	 */
 	chooseToCompare(targetOrTargets, check) {
@@ -6060,6 +6001,8 @@ export class Player extends HTMLDivElement {
 		let prompt;
 		let forced;
 		let select;
+		let filter;
+		let ai;
 
 		const args = [...arguments];
 		if (args.length === 1 && get.is.object(params) && get.itemtype(params) == null) {
@@ -6067,6 +6010,8 @@ export class Player extends HTMLDivElement {
 			prompt = params.prompt;
 			forced = params.forced;
 			select = params.select;
+			filter = params.filter;
+			ai = params.ai;
 		} else {
 			for (const arg of args) {
 				if (get.itemtype(arg) == "cards") {
@@ -6077,6 +6022,12 @@ export class Player extends HTMLDivElement {
 					prompt = arg;
 				} else if (get.itemtype(arg) == "select" || typeof arg == "number") {
 					select = arg;
+				} else if (typeof arg == "function") {
+					if (ai) {
+						filter = arg;
+					} else {
+						ai = arg;
+					}
 				}
 			}
 		}
@@ -6087,6 +6038,8 @@ export class Player extends HTMLDivElement {
 			forced,
 			selectButton: select,
 			createDialog: [prompt, cards, "hidden"],
+			filterButton: filter,
+			ai
 		});
 	}
 	/**
@@ -6100,6 +6053,8 @@ export class Player extends HTMLDivElement {
 		let forced;
 		let select;
 		let notype = false;
+		let filter;
+		let ai;
 
 		const args = [...arguments];
 		if (args.length === 1 && get.is.object(params) && get.itemtype(params) == null) {
@@ -6108,6 +6063,8 @@ export class Player extends HTMLDivElement {
 			forced = params.forced;
 			select = params.select;
 			notype = params.notype ?? false;
+			filter = params.filter;
+			ai = params.ai;
 		} else {
 			for (const arg of args) {
 				if (Array.isArray(arg)) {
@@ -6120,6 +6077,12 @@ export class Player extends HTMLDivElement {
 					prompt = arg;
 				} else if (get.itemtype(arg) == "select" || typeof arg == "number") {
 					select = arg;
+				} else if (typeof arg == "function") {
+					if (ai) {
+						filter = arg;
+					} else {
+						ai = arg;
+					}
 				}
 			}
 		}
@@ -6137,6 +6100,8 @@ export class Player extends HTMLDivElement {
 			forced,
 			selectButton: select,
 			createDialog: [prompt, [list, "vcard"], "hidden"],
+			filterButton: filter,
+			ai
 		});
 	}
 	/**

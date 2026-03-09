@@ -544,6 +544,15 @@ function mixinLibrary(config, lib) {
 	lib.rank = window.noname_character_rank;
 	// @ts-expect-error ignore
 	delete window.noname_character_rank;
+	// @ts-expect-error ignore
+	Object.keys(window.noname_character_replace).forEach(i => (lib.characterReplace[i] = window.noname_character_replace[i]));
+	// @ts-expect-error ignore
+	delete window.noname_character_replace;
+	// @ts-expect-error ignore
+	Object.keys(window.noname_character_perfectPairs).forEach(i => (lib.perfectPair[i] = window.noname_character_perfectPairs[i]));
+	// @ts-expect-error ignore
+	delete window.noname_character_perfectPairs;
+
 
 	for (let name in config) {
 		if (KeptWords.includes(name)) {

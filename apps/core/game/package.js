@@ -2,9 +2,11 @@ window.noname_package = {
 	character: {
 		//经典标包＋神话再临
 		standard: "标准版",
+		shenhua: "神话再临",
 	},
 	card: {
 		standard: "标准版",
+		extra: "军争篇",
 	},
 	play: {
 	},

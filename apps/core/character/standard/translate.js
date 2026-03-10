@@ -35,12 +35,6 @@ const translates = {
 	qicai: "奇才",
 	qicai_info: "锁定技，你使用锦囊牌无距离限制。",
 
-	ganfuren: "甘夫人",
-	shenzhi: "神智",
-	shenzhi_info: "你的回合开始时，你可以弃置所有手牌，然后若你弃置的牌数大于你的体力值，你回复1点体力。",
-	shushen: "淑慎",
-	shushen_info: "当你回复1点体力后，你可以令一名其他角色摸一张牌，若其没有手牌，改为摸两张牌。",
-
 	sunquan: "孙权",
 	zhiheng: "制衡",
 	zhiheng_info: "出牌阶段限一次，你可以弃置任意张牌，然后摸等量的牌。",
@@ -119,10 +113,6 @@ const translates = {
 	luoshen: "洛神",
 	luoshen_info: "准备阶段，你可以进行判定，若结果为黑色，你获得之并可以重复此流程。",
 
-	yuejin: "乐进",
-	xiaoguo: "骁果",
-	xiaoguo_info: "其他角色的回合结束时，你可以弃置一张基本牌，若如此做，其需弃置一张装备牌，否则你对其造成1点伤害。",
-
 	huatuo: "华佗",
 	jijiu: "急救",
 	jijiu_info: "你的回合外，你可以将一张红色牌当【桃】使用。",
@@ -139,10 +129,6 @@ const translates = {
 	biyue: "闭月",
 	biyue_info: "结束阶段，你可以摸一张牌。",
 
-	panfeng: "潘凤",
-	kuangfu: "狂斧",
-	kuangfu_info: "锁定技，出牌阶段限一次，你使用【杀】对其他角色造成伤害后，若其体力值小于你，你摸两张牌，若其体力值不小于你，你失去1点体力。",
-
 	huaxiong: "华雄",
 	yaowu: "耀武",
 	yaowu_info: "锁定技，当一名角色使用红色【杀】对你造成伤害时，该角色回复1点体力或摸一张牌。",
@@ -150,6 +136,20 @@ const translates = {
 	gongsunzan: "公孙瓒",
 	yicong: "义从",
 	yicong_info: "锁定技，当你的体力值大于2时，你计算与其他角色的距离-1；当你的体力值不大于2时，其他角色计算与你的距离+1。",
+
+	panfeng: "潘凤",
+	kuangfu: "狂斧",
+	kuangfu_info: "锁定技，出牌阶段限一次，你使用【杀】对其他角色造成伤害后，若其体力值小于你，你摸两张牌，若其体力值不小于你，你失去1点体力。",
+
+	ganfuren: "甘夫人",
+	shenzhi: "神智",
+	shenzhi_info: "你的回合开始时，你可以弃置所有手牌，然后若你弃置的牌数大于你的体力值，你回复1点体力。",
+	shushen: "淑慎",
+	shushen_info: "当你回复1点体力后，你可以令一名其他角色摸一张牌，若其没有手牌，改为摸两张牌。",
+
+	yuejin: "乐进",
+	xiaoguo: "骁果",
+	xiaoguo_info: "其他角色的回合结束时，你可以弃置一张基本牌，若如此做，其需弃置一张装备牌，否则你对其造成1点伤害。",
 };
 
 export default translates;

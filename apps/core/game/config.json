@@ -22,7 +22,7 @@
 	"doubleclick_intro": true,
 	"choose_all_button": true,
 	"cheat": false,
-	"volumn_background": 1,
+	"volumn_background": 0,
 	"volumn_audio": 4,
 	"connect_avatar": "caocao",
 	"connect_nickname": "无名玩家",

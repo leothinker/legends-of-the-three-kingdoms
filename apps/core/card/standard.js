@@ -44,42 +44,6 @@ game.import("card", function () {
 					},
 				},
 			},
-			firedamage: {
-				ai: {
-					result: {
-						target: -1.5,
-					},
-					tag: {
-						damage: 1,
-						fireDamage: 1,
-						natureDamage: 1,
-					},
-				},
-			},
-			thunderdamage: {
-				ai: {
-					result: {
-						target: -1.5,
-					},
-					tag: {
-						damage: 1,
-						thunderDamage: 1,
-						natureDamage: 1,
-					},
-				},
-			},
-			icedamage: {
-				ai: {
-					result: {
-						target: -1.5,
-					},
-					tag: {
-						damage: 1,
-						iceDamage: 1,
-						natureDamage: 1,
-					},
-				},
-			},
 			respondShan: {
 				ai: {
 					result: {
@@ -798,7 +762,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip2",
-				bingzhu: ["诸葛亮", "黄月英", "黄承彦"],
 				ai: {
 					basic: {
 						equipValue: 7.5,
@@ -810,7 +773,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip3",
-				bingzhu: ["曹操"],
 				distance: { globalTo: 1 },
 				battleOfWancheng() {
 					// 宛城之战
@@ -833,42 +795,36 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip3",
-				bingzhu: ["刘备"],
 				distance: { globalTo: 1 },
 			},
 			zhuahuang: {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip3",
-				bingzhu: ["曹操"],
 				distance: { globalTo: 1 },
 			},
 			chitu: {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip4",
-				bingzhu: ["吕布", "关羽"],
 				distance: { globalFrom: -1 },
 			},
 			dayuan: {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip4",
-				bingzhu: ["曹操"],
 				distance: { globalFrom: -1 },
 			},
 			zixing: {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip4",
-				bingzhu: ["曹操"],
 				distance: { globalFrom: -1 },
 			},
 			zhuge: {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",
-				bingzhu: ["诸葛亮", "马钧"],
 				ai: {
 					order() {
 						return get.order({ name: "sha" }) - 0.1;
@@ -913,7 +869,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",
-				bingzhu: ["刘备"],
 				distance: { attackFrom: -1 },
 				ai: {
 					basic: {
@@ -926,7 +881,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",
-				bingzhu: ["赵云", "曹操"],
 				distance: { attackFrom: -1 },
 				ai: {
 					basic: {
@@ -939,7 +893,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",
-				bingzhu: ["关羽", "关兴", "张苞", "关银屏"],
 				distance: { attackFrom: -2 },
 				ai: {
 					equipValue(card, player) {
@@ -955,7 +908,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",
-				bingzhu: ["张飞", "关兴", "张苞", "张星彩"],
 				distance: { attackFrom: -2 },
 				ai: {
 					equipValue(card, player) {
@@ -972,7 +924,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",
-				bingzhu: ["徐晃"],
 				distance: { attackFrom: -2 },
 				ai: {
 					equipValue(card, player) {
@@ -989,7 +940,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",
-				bingzhu: ["吕布"],
 				distance: { attackFrom: -3 },
 				ai: {
 					basic: {
@@ -1002,7 +952,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",
-				bingzhu: ["吕布"],
 				distance: { attackFrom: -4 },
 				ai: {
 					basic: {

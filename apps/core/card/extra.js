@@ -4,53 +4,27 @@ game.import("card", function () {
 		name: "extra",
 		connect: true,
 		card: {
-			muniu: {
-				fullskin: true,
-				type: "equip",
-				subtype: "equip5",
-				nomod: true,
-				onEquip() {
-					if (card && card.storages?.length) {
-						player.directgains(card.storages, null, "muniu");
-					}
-					player.markSkill("muniu_skill");
-				},
-				forceDie: true,
-				onLose() {
-					if (card?.storage?.used) {
-						card.storage.used = 0;
-					}
-					if (!player.getVCards("e", i => i.name == "muniu").length) {
-						player.unmarkSkill("muniu_skill");
-					} else {
-						player.markSkill("muniu_skill");
-					}
-					if (!card || !card.storages || !card.storages.length) {
-						return;
-					}
-					if ((!event.getParent(3) || event.getParent(3).name != "swapEquip") && (event.getParent().type != "equip" || event.getParent().swapEquip)) {
-						player.lose(card.storages, ui.discardPile);
-						player.$throw(card.storages, 1000);
-						player.popup("muniu");
-						game.log(card, "掉落了", card.storages);
-						card.storages.length = 0;
-					} else {
-						player.lose(card.storages, ui.special);
-					}
-				},
-				clearLose: true,
-				equipDelay: false,
-				loseDelay: false,
-				skills: ["muniu_skill", "muniu_skill7"],
+			firedamage: {
 				ai: {
-					equipValue(card) {
-						if (card.storages) {
-							return 7 + card.storages.length;
-						}
-						return 7;
+					result: {
+						target: -1.5,
 					},
-					basic: {
-						equipValue: 7,
+					tag: {
+						damage: 1,
+						fireDamage: 1,
+						natureDamage: 1,
+					},
+				},
+			},
+			thunderdamage: {
+				ai: {
+					result: {
+						target: -1.5,
+					},
+					tag: {
+						damage: 1,
+						thunderDamage: 1,
+						natureDamage: 1,
 					},
 				},
 			},
@@ -603,14 +577,12 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip3",
-				bingzhu: ["徐晃"],
 				distance: { globalTo: 1 },
 			},
 			zhuque: {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",
-				bingzhu: ["周瑜"],
 				distance: { attackFrom: -3 },
 				ai: {
 					basic: {
@@ -623,7 +595,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",
-				bingzhu: ["孙坚"],
 				distance: { attackFrom: -1 },
 				ai: {
 					basic: {
@@ -636,7 +607,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip2",
-				bingzhu: ["兀突骨", "孟获", "祝融"],
 				ai: {
 					value(card, player, index, method) {
 						if (player.isDisabled(2)) {
@@ -730,7 +700,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip2",
-				bingzhu: ["马超"],
 				loseDelay: false,
 				onLose() {
 					player.addTempSkill("baiyin_skill_lose");

@@ -1204,29 +1204,6 @@ export class Get {
 		}
 	}
 	/**
-	 * 获取一张装备牌的兵主
-	 * @param { string | Card | VCard  } name
-	 * @returns {String[]}
-	 */
-	bingzhu(name) {
-		if (typeof name != "string") {
-			name = get.name(name);
-		}
-		const list = [],
-			info = lib.card[name];
-		if (lib.cardBingzhu[name]) {
-			list.addArray(lib.cardBingzhu[name]);
-		}
-		if (info.derivation) {
-			const names = get.characterSurname(info.derivation).map(list => list.join(""));
-			list.addArray(names);
-		}
-		if (info.bingzhu) {
-			list.addArray(info.bingzhu);
-		}
-		return list.filter(surname => surname !== "某");
-	}
-	/**
 	 * @overload
 	 * @param { string } name
 	 * @returns { import("../library/element/character").Character }

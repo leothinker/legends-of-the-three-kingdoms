@@ -229,6 +229,7 @@ const translates = {
 	le_lvbu: "神吕布",
 	le_lvbu_prefix: "神",
 	kuangbao: "狂暴",
+	kuangbao_bg: "暴",
 	kuangbao_info: "锁定技，游戏开始时，你获得2枚“暴怒”标记；当你造成或受到1点伤害后，你获得1枚“暴怒”。",
 	wumou: "无谋",
 	wumou_info: "锁定技，当你使用普通锦囊牌时，你失去1点体力或移去1枚“暴怒”。",
@@ -242,16 +243,19 @@ const translates = {
 	juejing: "绝境",
 	juejing_info: "锁定技，摸牌阶段，你摸牌的数量改为你已损失的体力值+2；你的手牌上限+2。",
 	longhun: "龙魂",
+	longhun1: "龙魂♥︎",
+	longhun2: "龙魂♦︎",
+	longhun3: "龙魂♣︎",
+	longhun4: "龙魂♠︎",
 	longhun_info: "你可以将同花色的X张牌按下列规则使用或打出：♥当【桃】，♦当火【杀】，♣当【闪】，♠当【无懈可击】（X为你当前体力值且至少为1）。",
 
 	le_simayi: "神司马懿",
 	le_simayi_prefix: "神",
 	renjie: "忍戒",
+	renjie2: "忍戒",
 	renjie_info: "锁定技，当你受到1点伤害或于弃牌阶段弃置一张手牌后，你获得1枚“忍”标记。",
 	sbaiyin: "拜印",
 	sbaiyin_info: `觉醒技，准备阶段，若“忍”的数量大于3，你减少1点体力上限并获得${get.poptip("jilue")}。`,
-	lianpo: "连破",
-	lianpo_info: "每回合结束后，若你本回合杀死过其他角色，你可以执行一个额外的回合。",
 	jilue: "极略",
 	jilue_info: `出牌阶段各限一次，你可以移去1枚“忍”并获得${get.poptip("jilue_wansha")}直到本回合结束，或发动${get.poptip("jilue_zhiheng")}；一名角色的判定牌生效前，你可以移去1枚“忍”并发动${get.poptip("jilue_guicai")}；当你受到伤害后，你可以移去1枚“忍”并发动${get.poptip("jilue_fangzhu")}；当你使用非转化普通锦囊牌时，你可以移去1枚“忍”并发动${get.poptip("jilue_jizhi")}。`,
 	jilue_wansha: "完杀",
@@ -264,6 +268,8 @@ const translates = {
 	jilue_fangzhu_info: "当你受到伤害后，你可令一名其他角色摸X张牌（X为你已损失的体力值），然后该角色将武将牌翻面。",
 	jilue_jizhi: "集智",
 	jilue_jizhi_info: "当你使用锦囊牌时，你可以摸一张牌。若此牌为基本牌，则你可以弃置之，然后令本回合手牌上限+1。",
+	lianpo: "连破",
+	lianpo_info: "每回合结束后，若你本回合杀死过其他角色，你可以执行一个额外的回合。",
 };
 
 export default translates;

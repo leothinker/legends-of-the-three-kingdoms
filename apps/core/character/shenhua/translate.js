@@ -11,6 +11,8 @@ const translates = {
 
 	xiahouyuan: "夏侯渊",
 	shensu: "神速",
+	shensu1: "神速",
+	shensu2: "神速",
 	shensu_info: "你可以做出如下选择：1.跳过判定阶段和摸牌阶段；2.跳过出牌阶段并弃置一张装备牌。你每选择一项，便视为你使用一张无距离限制的【杀】。",
 
 	caoren: "曹仁",
@@ -248,10 +250,20 @@ const translates = {
 	renjie_info: "锁定技，当你受到1点伤害或于弃牌阶段弃置一张手牌后，你获得1枚“忍”标记。",
 	sbaiyin: "拜印",
 	sbaiyin_info: `觉醒技，准备阶段，若“忍”的数量大于3，你减少1点体力上限并获得${get.poptip("jilue")}。`,
-	jilue: "极略",
-	jilue_info: `出牌阶段各限一次，你可以移去1枚“忍”并获得${get.poptip("wansha")}直到本回合结束，或发动${get.poptip("zhiheng")}；一名角色的判定牌生效前，你可以移去1枚“忍”并发动${get.poptip("guicai")}；当你受到伤害后，你可以移去1枚“忍”并发动${get.poptip("fangzhu")}；当你使用非转化普通锦囊牌时，你可以移去1枚“忍”并发动${get.poptip("jizhi")}。`,
 	lianpo: "连破",
 	lianpo_info: "每回合结束后，若你本回合杀死过其他角色，你可以执行一个额外的回合。",
+	jilue: "极略",
+	jilue_info: `出牌阶段各限一次，你可以移去1枚“忍”并获得${get.poptip("jilue_wansha")}直到本回合结束，或发动${get.poptip("jilue_zhiheng")}；一名角色的判定牌生效前，你可以移去1枚“忍”并发动${get.poptip("jilue_guicai")}；当你受到伤害后，你可以移去1枚“忍”并发动${get.poptip("jilue_fangzhu")}；当你使用非转化普通锦囊牌时，你可以移去1枚“忍”并发动${get.poptip("jilue_jizhi")}。`,
+	jilue_wansha: "完杀",
+	jilue_wansha_info: "锁定技。①你的回合内，不处于濒死状态的其他角色不能使用【桃】。②当有角色于你的回合内进入濒死状态时，你令其以外的所有其他角色的非锁定技失效直到此濒死状态结算结束。",
+	jilue_zhiheng: "制衡",
+	jilue_zhiheng_info: "出牌阶段限一次，你可以弃置任意张牌并摸等量的牌，若你在发动〖制衡〗时弃置了所有手牌，则你多摸一张牌。",
+	jilue_guicai: "鬼才",
+	jilue_guicai_info: "在任意角色的判定牌生效前，你可以打出一张牌代替之。",
+	jilue_fangzhu: "放逐",
+	jilue_fangzhu_info: "当你受到伤害后，你可令一名其他角色摸X张牌（X为你已损失的体力值），然后该角色将武将牌翻面。",
+	jilue_jizhi: "集智",
+	jilue_jizhi_info: "当你使用锦囊牌时，你可以摸一张牌。若此牌为基本牌，则你可以弃置之，然后令本回合手牌上限+1。",
 };
 
 export default translates;

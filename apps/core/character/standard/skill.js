@@ -1365,11 +1365,11 @@ const skills = {
 			return !event.numFixed && event.num > 0;
 		},
 		async content(event, trigger, player) {
-			player.addTempSkill("luoyi1", "phaseJieshuBegin");
+			player.addTempSkill("luoyi2", "phaseJieshuBegin");
 			trigger.num--;
 		},
 	},
-	luoyi1: {
+	luoyi2: {
 		trigger: { source: "damageBegin1" },
 		sourceSkill: "luoyi",
 		filter(event) {

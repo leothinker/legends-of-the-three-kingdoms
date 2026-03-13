@@ -5785,7 +5785,7 @@ const skills = {
 	// 神司马懿
 	// 忍戒
 	renjie: {
-		audio: "renjie2",
+		audio: 2,
 		trigger: { player: "damageEnd" },
 		forced: true,
 		group: "renjie2",
@@ -5826,7 +5826,7 @@ const skills = {
 		},
 	},
 	renjie2: {
-		audio: 2,
+		audio: "renjie",
 		mod: {
 			aiOrder: (player, card, num) => {
 				if (num <= 0 || typeof card !== "object" || !player.isPhaseUsing()) {

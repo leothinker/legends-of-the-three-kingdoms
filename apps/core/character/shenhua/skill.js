@@ -5683,7 +5683,7 @@ const skills = {
 		},
 	},
 	longhun1: {
-		audio: true,
+		audio: "longhun",
 		enable: ["chooseToUse", "chooseToRespond"],
 		sourceSkill: "longhun",
 		prompt() {
@@ -5708,7 +5708,7 @@ const skills = {
 		},
 	},
 	longhun2: {
-		audio: true,
+		audio: "longhun",
 		enable: ["chooseToUse", "chooseToRespond"],
 		sourceSkill: "longhun",
 		prompt() {
@@ -5733,7 +5733,7 @@ const skills = {
 		},
 	},
 	longhun3: {
-		audio: true,
+		audio: "longhun",
 		enable: ["chooseToUse", "chooseToRespond"],
 		sourceSkill: "longhun",
 		prompt() {
@@ -5758,7 +5758,7 @@ const skills = {
 		},
 	},
 	longhun4: {
-		audio: true,
+		audio: "longhun",
 		enable: ["chooseToUse", "chooseToRespond"],
 		sourceSkill: "longhun",
 		prompt() {

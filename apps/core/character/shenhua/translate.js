@@ -35,6 +35,7 @@ const translates = {
 	guidao: "鬼道",
 	guidao_info: "一名角色的判定牌生效前，你可以打出一张黑色牌替换之。",
 	huangtian: "黄天",
+	huangtian2: "黄天",
 	huangtian_info: "主公技，每阶段限一次，其他群势力角色于其出牌阶段可以展示一张【闪】或【闪电】，并将此牌交给你。",
 
 	yuji: "于吉",
@@ -87,6 +88,7 @@ const translates = {
 
 	xuhuang: "徐晃",
 	duanliang: "断粮",
+	duanliang1: "断粮",
 	duanliang_info: "你可以将一张黑色基本牌或黑色装备牌当【兵粮寸断】使用；你可以对距离为2的角色使用【兵粮寸断】。",
 
 	caopi: "曹丕",
@@ -95,6 +97,7 @@ const translates = {
 	fangzhu: "放逐",
 	fangzhu_info: "当你受到伤害后，你可以令一名其他角色翻面，然后其摸X张牌（X为你已损失的体力值）。",
 	songwei: "颂威",
+	songwei2: "颂威",
 	songwei_info: "主公技，其他魏势力角色的黑色判定牌生效后，其可以令你摸一张牌。",
 
 	sunjian: "孙坚",
@@ -109,16 +112,21 @@ const translates = {
 	benghuai: "崩坏",
 	benghuai_info: "锁定技，结束阶段，若你不是体力最小的角色，你失去1点体力或减少1点体力上限。",
 	baonue: "暴虐",
+	baonue2: "暴虐",
 	baonue_info: "主公技，其他群势力角色造成伤害后，其可以进行判定，若结果为♠，你回复1点体力。",
 
 	zhurong: "祝融",
 	juxiang: "巨象",
+	juxiang1: "巨象",
+	juxiang2: "巨象",
 	juxiang_info: "锁定技，【南蛮入侵】对你无效；其他角色使用的【南蛮入侵】结算完成后，你获得之。",
 	lieren: "烈刃",
 	lieren_info: "当你使用【杀】对目标角色造成伤害后，你可以与其拼点：若你赢，你获得其一张牌。",
 
 	menghuo: "孟获",
 	huoshou: "祸首",
+	huoshou1: "祸首",
+	huoshou2: "祸首",
 	huoshou_info: "锁定技，【南蛮入侵】对你无效；其他角色使用【南蛮入侵】指定目标后，你代替其成为此牌的伤害来源。",
 	zaiqi: "再起",
 	zaiqi_info: "摸牌阶段，若你已受伤，你可以改为亮出牌堆顶的X张牌（X为你已损失的体力值），然后回复等同于其中♥牌数的体力，并获得其余的牌。",
@@ -181,7 +189,7 @@ const translates = {
 	xinsheng: "新生",
 	xinsheng_info: "当你受到1点伤害后，你获得一张新的化身牌。",
 	huashen: "化身",
-	huale_info: "游戏开始时，你随机获得两张武将牌作为化身牌，然后亮出其中一张，你获得亮出化身牌的一个技能（主公技、觉醒技、限定技除外），且性别和势力视为与化身牌相同。回合开始时或结束时，你可以更改亮出的化身牌。",
+	huashen_info: "游戏开始时，你随机获得两张武将牌作为化身牌，然后亮出其中一张，你获得亮出化身牌的一个技能（主公技、觉醒技、限定技除外），且性别和势力视为与化身牌相同。回合开始时或结束时，你可以更改亮出的化身牌。",
 
 	caiwenji: "蔡文姬",
 	beige: "悲歌",
@@ -265,7 +273,7 @@ const translates = {
 	jilue_guicai: "鬼才",
 	jilue_guicai_info: "在任意角色的判定牌生效前，你可以打出一张牌代替之。",
 	jilue_fangzhu: "放逐",
-	jilue_fangzhu_info: "当你受到伤害后，你可令一名其他角色摸X张牌（X为你已损失的体力值），然后该角色将武将牌翻面。",
+	jilue_fangzhu_info: "当你受到伤害后，你可以令一名其他角色翻面，然后其摸X张牌（X为你已损失的体力值）。",
 	jilue_jizhi: "集智",
 	jilue_jizhi_info: "当你使用锦囊牌时，你可以摸一张牌。若此牌为基本牌，则你可以弃置之，然后令本回合手牌上限+1。",
 	lianpo: "连破",

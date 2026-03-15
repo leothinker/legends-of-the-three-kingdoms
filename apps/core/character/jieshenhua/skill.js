@@ -2181,6 +2181,151 @@ const skills = {
 			threaten: 0.8,
 		},
 	},
+	// 潘凤
+	// 狂斧
+	kuangfu: {
+		audio: 2,
+		trigger: { source: "damageSource" },
+		forced: true,
+		filter(event, player) {
+			if (player.hasSkill("kuangfu_used")) {
+				return false;
+			}
+			return player.isPhaseUsing() && event.card && event.card.name == "sha" && event.player != player && event.player.isIn();
+		},
+		async content(event, trigger, player) {
+			player.addTempSkill("kuangfu_used", "phaseChange");
+			if (trigger.player.hp < player.hp) {
+				player.draw(2);
+			} else {
+				player.loseHp();
+			}
+		},
+		ai: {
+			halfneg: true,
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+			},
+		},
+	},
+	// 甘夫人
+	// 神智
+	shenzhi: {
+		audio: 2,
+		trigger: { player: "phaseBegin" },
+		check(event, player) {
+			if (player.hp > 2) {
+				return false;
+			}
+			var cards = player.getCards("h");
+			if (cards.length <= player.hp) {
+				return false;
+			}
+			if (cards.length > 3) {
+				return false;
+			}
+			for (var i = 0; i < cards.length; i++) {
+				if (get.value(cards[i]) > 7 || get.tag(cards[i], "recover") >= 1) {
+					return false;
+				}
+			}
+			return true;
+		},
+		filter(event, player) {
+			return player.countCards("h") > 0;
+		},
+		preHidden: true,
+		content() {
+			"step 0";
+			var cards = player.getCards("h");
+			event.bool = cards.length > player.hp;
+			player.discard(cards);
+			"step 1";
+			if (event.bool) {
+				player.recover();
+			}
+		},
+	},
+	// 淑慎
+	shushen: {
+		audio: 2,
+		trigger: { player: "recoverEnd" },
+		getIndex(event) {
+			return event.num || 1;
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt2(event.skill), lib.filter.notMe)
+				.set("ai", target => get.attitude(_status.event.player, target))
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			await target.draw(target.countCards("h") > 0 ? 1 : 2);
+		},
+		ai: { threaten: 0.8, expose: 0.1 },
+	},
+	// 乐进
+	// 骁果
+	xiaoguo: {
+		audio: 2,
+		trigger: { global: "phaseEnd" },
+		filter(event, player) {
+			return (
+				event.player.isIn() &&
+				event.player != player &&
+				player.countCards("h", card => {
+					if (_status.connectMode) {
+						return true;
+					}
+					return get.type(card) == "basic" && lib.filter.cardDiscardable(card, player);
+				})
+			);
+		},
+		async cost(event, trigger, player) {
+			const target = trigger.player;
+			const next = player.chooseToDiscard(get.prompt(event.name.slice(0, -5)), (card, player) => {
+				return get.type(card) == "basic";
+			});
+			next.set("ai", card => {
+				return get.event().eff - get.useful(card);
+			});
+			next.set(
+				"eff",
+				(function () {
+					if (target.hasSkillTag("noe")) {
+						return get.attitude(_status.event.player, target);
+					}
+					return get.damageEffect(target, player, _status.event.player);
+				})()
+			);
+			next.set("logSkill", [event.name.slice(0, -5), target]);
+			event.result = await next.forResult();
+		},
+		popup: false,
+		async content(event, trigger, player) {
+			const target = trigger.player;
+			const { bool } = await target
+				.chooseToDiscard("he", "弃置一张装备牌，或受到1点伤害", { type: "equip" })
+				.set("ai", card => {
+					if (get.event().damage > 0) {
+						return 0;
+					}
+					if (get.event().noe) {
+						return 12 - get.value(card);
+					}
+					return -get.event().damage - get.value(card);
+				})
+				.set("damage", get.damageEffect(target, player, target))
+				.set("noe", target.hasSkillTag("noe"))
+				.forResult();
+			if (!bool) {
+				await target.damage();
+			}
+		},
+	},
 };
 
 export default skills;

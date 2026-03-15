@@ -2,6 +2,8 @@ const translates = {
 	jx_liubei: "刘备",
 	jx_rende: "仁德",
 	jx_rende_info: "出牌阶段对每名角色限一次，你可以将任意张手牌交给一名其他角色，当此阶段内你以此法给出第二张牌时，你可以视为使用一张基本牌。",
+	jijiang: "激将",
+	jijiang_info: "主公技，当你需要使用或打出【杀】时，你可以令其他蜀势力角色选择是否替你使用或打出（视为由你使用或打出）。",
 
 	jx_guanyu: "关羽",
 	jx_wusheng: "武圣",

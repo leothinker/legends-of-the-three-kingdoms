@@ -113,7 +113,7 @@ const skills = {
 	// 激将
 	jijiang: {
 		audio: 2,
-		audioname: ["liushan"],
+		audioname: ["liushan", "jx_liubei"],
 		group: ["jijiang1"],
 		zhuSkill: true,
 		filter(event, player) {
@@ -320,6 +320,7 @@ const skills = {
 		},
 		group: "kongcheng1",
 		audio: 2,
+		audioname: ["jx_zhugeliang"],
 		ai: {
 			noh: true,
 			skillTagFilter(player, tag) {
@@ -354,6 +355,7 @@ const skills = {
 	// 龙胆
 	longdan: {
 		audio: 2,
+		audioname: ["jx_zhaoyun"],
 		group: ["longdan_sha", "longdan_shan", "longdan_draw"],
 		subSkill: {
 			draw: {

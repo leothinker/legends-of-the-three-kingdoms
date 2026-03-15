@@ -5895,7 +5895,7 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			player.removeMark("renjie", 1);
-			player.addTempSkill("rewansha");
+			player.addTempSkill("wansha");
 		},
 		ai: {
 			order: () => {
@@ -5920,7 +5920,7 @@ const skills = {
 			},
 			effect: {
 				player(card, player, target) {
-					if (target && player.hasSkill("rewansha") && target.hp <= 1 && get.tag(card, "damage")) {
+					if (target && player.hasSkill("wansha") && target.hp <= 1 && get.tag(card, "damage")) {
 						return [1, 0, 1.5, -1.5];
 					}
 				},
@@ -5930,11 +5930,11 @@ const skills = {
 	jilue_zhiheng: {
 		audio: 1,
 		audioname2: {},
-		inherit: "rezhiheng",
+		inherit: "zhiheng",
 		filter(event, player) {
 			return player.hasMark("renjie");
 		},
-		prompt: "弃置一枚“忍”，然后弃置任意张牌并摸等量的牌。若弃置了所有的手牌，则可以多摸一张牌。",
+		prompt: "弃置一枚“忍”，然后弃置任意张牌并摸等量的牌。",
 		async content(event, trigger, player) {
 			player.removeMark("renjie", 1);
 

@@ -13532,7 +13532,7 @@ export const Content = {
 					game.playAudio("effect", "link" + (isLinked ? "_clear" : ""));
 				}
 				player.classList.remove("target");
-				player.classList.toggle(get.is.linked2(player) ? "linked2" : "linked");
+				player.classList.toggle("linked2");
 				ui.updatej(player);
 				ui.updatem(player);
 			},

@@ -8,6 +8,12 @@
 	"forbidai": ["ns_liuzhang"],
 	"forbidai_user": [],
 	"all": {
+		"characters": [],
+		"cards": [],
+		"plays": [],
+		"mode": [],
+		"stockmode": [],
+		"stockextension": [],
 		"sgscharacters": [],
 		"sgscards": [],
 		"sgsmodes": [],

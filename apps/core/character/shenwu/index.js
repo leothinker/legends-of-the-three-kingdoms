@@ -14,11 +14,11 @@ import { characterSort, characterSortTranslate } from "./sort.js";
 
 game.import("character", function () {
 	return {
-		name: "refresh",
+		name: "shenwu",
 		connect: true,
 		character: { ...characters },
 		characterSort: {
-			refresh: characterSort,
+			shenwu: characterSort,
 		},
 		characterFilter: { ...characterFilters },
 		characterTitle: { ...characterTitles },

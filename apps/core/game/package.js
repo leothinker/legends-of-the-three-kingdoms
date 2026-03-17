@@ -4,7 +4,7 @@ window.noname_package = {
         standard: "标准版",
         shenhua: "神话再临",
         jiexian: "界限突破",
-        // jieshenhua: "界神话再临",
+        jieshenhua: "界神话再临",
         // shenwu: "神武再世",
     },
     card: {

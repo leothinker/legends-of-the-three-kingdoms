@@ -2453,7 +2453,7 @@ const skills = {
 		logAudio: index => (typeof index === "number" ? "jiangchi" + index + ".mp3" : 2),
 		content() {
 			"step 0";
-			var list = ["弃牌", "摸牌", "取消"];
+			var list = ["摸牌", "弃牌", "取消"];
 			if (!player.countCards("he")) {
 				list.remove("弃牌");
 			}
@@ -2475,7 +2475,7 @@ const skills = {
 				})
 				.set("prompt", get.prompt2("jiangchi"));
 			"step 1";
-			player.logSkill("jiangchi", null, null, null, [result.control == "弃牌" ? 2 : 1]);
+			player.logSkill("jiangchi", null, null, null, [result.control == "弃牌" ? 1 : 2]);
 			if (result.control == "弃牌") {
 				player.chooseToDiscard(true, "he");
 				player.addTempSkill("jiangchi2", "phaseUseEnd");

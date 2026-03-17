@@ -4588,8 +4588,7 @@ const skills = {
 	// 攻心
 	gongxin: {
 		audio: 2,
-		audioname: ["re_lvmeng"],
-		audioname2: { gexuan: "gongxin_gexuan" },
+		audioname: ["jx_lvmeng"],
 		enable: "phaseUse",
 		usable: 1,
 		filterTarget(card, player, target) {

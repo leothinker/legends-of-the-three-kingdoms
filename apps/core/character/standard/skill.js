@@ -113,7 +113,7 @@ const skills = {
 	// 激将
 	jijiang: {
 		audio: 2,
-		audioname: ["liushan", "jx_liubei"],
+		audioname: ["liushan", "jx_liubei", "jx_liushan"],
 		group: ["jijiang1"],
 		zhuSkill: true,
 		filter(event, player) {
@@ -142,7 +142,7 @@ const skills = {
 	},
 	jijiang1: {
 		audio: "jijiang",
-		audioname: ["liushan"],
+		audioname: ["liushan", "jx_liubei", "jx_liushan"],
 		trigger: { player: ["useCardBegin", "respondBegin"] },
 		logTarget: "targets",
 		sourceSkill: "jijiang",
@@ -592,6 +592,7 @@ const skills = {
 	// 奇袭
 	qixi: {
 		audio: 2,
+		audioname: ["jx_ganning"],
 		enable: "chooseToUse",
 		filterCard(card) {
 			return get.color(card) == "black";
@@ -612,6 +613,7 @@ const skills = {
 	// 克己
 	keji: {
 		audio: 2,
+		audioname: ["jx_lvmeng"],
 		trigger: { player: "phaseDiscardBefore" },
 		frequent(event, player) {
 			return player.needsToDiscard();
@@ -765,6 +767,7 @@ const skills = {
 	// 流离
 	liuli: {
 		audio: 2,
+		audioname: ["jx_daqiao"],
 		trigger: { target: "useCardToTarget" },
 		preHidden: true,
 		filter(event, player) {
@@ -963,6 +966,7 @@ const skills = {
 	// 枭姬
 	xiaoji: {
 		audio: 2,
+		audioname: ["jx_sunshangxiang"],
 		trigger: {
 			player: "loseAfter",
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -1020,6 +1024,7 @@ const skills = {
 	// 护驾
 	hujia: {
 		audio: 2,
+		audioname: ["jx_caocao"],
 		zhuSkill: true,
 		trigger: { player: ["chooseToRespondBefore", "chooseToUseBefore"] },
 		filter(event, player) {
@@ -1394,6 +1399,7 @@ const skills = {
 	// 天妒
 	tiandu: {
 		audio: 2,
+		audioname: ["jx_guojia"],
 		trigger: { player: "judgeEnd" },
 		preHidden: true,
 		frequent(event) {
@@ -1591,6 +1597,7 @@ const skills = {
 	// 洛神
 	luoshen: {
 		audio: 2,
+		audioname: ["jx_zhenji"],
 		trigger: { player: "phaseZhunbeiBegin" },
 		frequent: true,
 		preHidden: true,
@@ -1658,6 +1665,7 @@ const skills = {
 		},
 		locked: false,
 		audio: 2,
+		audioname: ["jx_huatuo"],
 		enable: "chooseToUse",
 		viewAsFilter(player) {
 			return player != _status.currentPhase && player.countCards("hes", { color: "red" }) > 0;
@@ -1713,7 +1721,7 @@ const skills = {
 	// 无双
 	wushuang: {
 		audio: 2,
-		audioname: ["le_lvbu"],
+		audioname: ["le_lvbu", "jx_lvbu"],
 		forced: true,
 		locked: true,
 		group: ["wushuang1", "wushuang2"],
@@ -1790,6 +1798,7 @@ const skills = {
 	// 离间
 	lijian: {
 		audio: 2,
+		audioname: ["jx_diaochan"],
 		enable: "phaseUse",
 		usable: 1,
 		filter(event, player) {
@@ -1878,6 +1887,7 @@ const skills = {
 			player: ["changeHp"],
 		},
 		audio: 2,
+		audioname: ["jx_gongsunzan"],
 		forced: true,
 		filter(event, player) {
 			return get.sgn(player.hp - 2.5) != get.sgn(player.hp - 2.5 - event.num);

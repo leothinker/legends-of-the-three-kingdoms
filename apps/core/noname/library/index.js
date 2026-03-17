@@ -13154,6 +13154,13 @@ export class Library {
 	natureSeparator = "|";
 	namePrefix = new Map([
 		[
+			"界",
+			{
+				color: "#fdd559",
+				nature: "soilmm",
+			},
+		],
+		[
 			"神",
 			{
 				color: "#faecd1",
@@ -13161,10 +13168,10 @@ export class Library {
 			},
 		],
 		[
-			"界",
+			"晋",
 			{
-				color: "#fdd559",
-				nature: "soilmm",
+				color: "#f3c5ff",
+				nature: "blackmm",
 			},
 		],
 	]);

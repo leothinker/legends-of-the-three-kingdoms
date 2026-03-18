@@ -8,16 +8,16 @@ import voices from "./voices.js";
 import { characterSort, characterSortTranslate } from "./sort.js";
 
 game.import("character", function () {
-	return {
-		name: "tianshui",
-		connect: true,
-		character: { ...characters },
-		characterSort: {
-			tianshui: characterSort,
-		},
-		characterTitle: { ...characterTitles },
-		characterIntro: { ...characterIntros },
-		skill: { ...skills },
-		translate: { ...translates, ...voices, ...characterSortTranslate },
-	};
+    return {
+        name: "tianshui",
+        connect: true,
+        character: { ...characters },
+        characterSort: {
+            tianshui: characterSort,
+        },
+        characterTitle: { ...characterTitles },
+        characterIntro: { ...characterIntros },
+        skill: { ...skills },
+        translate: { ...translates, ...voices, ...characterSortTranslate },
+    };
 });

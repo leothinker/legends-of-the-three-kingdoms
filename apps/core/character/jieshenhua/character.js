@@ -345,7 +345,7 @@ const characters = {
 		sex: "male",
 		group: "shen",
 		hp: 2,
-		skills: ["juejing", "longhun"],
+		skills: ["jx_juejing", "jx_longhun"],
 		groupInGuozhan: "shu",
 		img: "image/character/le_zhaoyun.jpg",
 		dieAudios: ["le_zhaoyun"],

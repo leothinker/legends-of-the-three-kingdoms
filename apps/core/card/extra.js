@@ -1132,7 +1132,7 @@ game.import("card", function () {
 			huogong_info: "出牌阶段，对一名有手牌的角色使用。该角色展示一张手牌，然后若你弃置与之花色相同的一张手牌，则你对其造成1点火焰伤害。",
 			huogong_append: '<span class="text" style="font-family: yuanli">“行火必有因，烟火必素具。”——《孙子·火攻》</span>',
 			tiesuo: "铁索连环",
-			tiesuo_info: "出牌阶段，对一至两名角色使用。目标角色横置或重置。（被横置的角色处于“连环状态”）\n重铸：出牌阶段，你可以将此牌放入弃牌堆，然后摸一张牌。",
+			tiesuo_info: "出牌阶段，对一至两名角色使用。目标角色横置或重置。（被横置的角色处于“连环状态”）<br>重铸：出牌阶段，你可以将此牌放入弃牌堆，然后摸一张牌。",
 			tiesuo_bg: "索",
 			tiesuo_append: '<span class="text" style="font-family: yuanli">“或三十为一排，或五十为一排，首尾用铁环连锁，上铺阔板，休言人可渡，马亦可走矣。乘此而行，任他风浪潮水上下，复何惧哉？”——《三国演义》</span>',
 

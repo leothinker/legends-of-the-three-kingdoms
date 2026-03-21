@@ -1,3 +1,5 @@
+import { lib, game, ui, get, ai, _status } from "noname";
+
 const translates = {
 	jx_liubei: "界刘备",
 	jx_liubei_prefix: "界",
@@ -24,14 +26,20 @@ const translates = {
 	jx_zhugeliang_prefix: "界",
 	jx_guanxing: "观星",
 	jx_guanxing_info: "准备阶段，你可以观看牌堆顶的五张牌（若存活人数小于4则改为三张），然后将其中任意张牌以任意顺序置于牌堆顶，其余以任意顺序置于牌堆底。若你将这些牌均放至牌堆底，则结束阶段你可以再进行一次“观星”。",
+	kongcheng: "空城",
+	kongcheng_info: "锁定技，若你没有手牌，你不能成为【杀】或【决斗】的目标。",
 
 	jx_zhaoyun: "界赵云",
 	jx_zhaoyun_prefix: "界",
+	longdan: "龙胆",
+	longdan_info: "你可以将一张【杀】当【闪】、【闪】当【杀】使用或打出。",
 	yajiao: "涯角",
 	yajiao_info: "当你于回合外使用或打出手牌时，你可以展示牌堆顶的一张牌并交给一名角色。若此牌与你使用或打出的牌类别不同，你弃置一张牌。",
 
 	jx_machao: "界马超",
 	jx_machao_prefix: "界",
+	mashu: "马术",
+	mashu_info: "锁定技，你计算与其他角色的距离-1。",
 	jx_tieji: "铁骑",
 	jx_tieji_info: "当你使用【杀】指定目标后，你可以令该角色的非锁定技于此回合内失效，然后你进行判定，除非其弃置一张与结果花色相同的牌，否则其不能使用【闪】响应此【杀】。",
 
@@ -51,6 +59,8 @@ const translates = {
 
 	jx_ganning: "界甘宁",
 	jx_ganning_prefix: "界",
+	qixi: "奇袭",
+	qixi_info: "你可以将一张黑色牌当【过河拆桥】使用。",
 	fenwei: "奋威",
 	fenwei_info: "限定技，当一张锦囊牌指定不少于两个目标后，你可令此牌对其中任意名目标角色无效。",
 
@@ -59,7 +69,7 @@ const translates = {
 	keji: "克己",
 	keji_info: "若你未于出牌阶段内使用或打出过【杀】，则你可以跳过弃牌阶段。",
 	qinxue: "勤学",
-	qinxue_info: "觉醒技，准备阶段，若你的手牌数比你的体力值多3或更多（若游戏人数不小于7则改为2），你减1点体力上限，然后获得“攻心”。",
+	qinxue_info: `觉醒技，准备阶段，若你的手牌数比你的体力值多3或更多（若游戏人数不小于7则改为2），你减1点体力上限，然后获得${get.poptip("gongxin")}。`,
 
 	jx_huanggai: "界黄盖",
 	jx_huanggai_prefix: "界",

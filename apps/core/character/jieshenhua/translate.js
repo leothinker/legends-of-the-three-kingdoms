@@ -216,7 +216,7 @@ const translates = {
     jiang: "激昂",
     jiang_info: "每当你使用（指定目标后）或被使用（成为目标后）一张【决斗】或红色的【杀】时，你可以摸一张牌。",
     jx_hunzi: "魂姿",
-    jx_hunzi_info: `觉醒技，准备阶段，若你的体力值不大于2，你减1点体力上限，然后获得${get.poptip("jx_yingzi")}和${get.poptip("jx_yinghun")}。`,
+    jx_hunzi_info: `觉醒技，准备阶段，若你的体力值不大于2，你减1点体力上限，然后获得${get.poptip("jx_yingzi")}和${get.poptip("yinghun")}。`,
     zhiba: "制霸",
     zhiba_info: "主公技，每名其他吴势力角色的出牌阶段限一次，该角色可以与你拼点（若你已发动过“魂姿”，则你可以拒绝此次拼点）：若其没赢，你可以获得你与其此次拼点的牌。",
 

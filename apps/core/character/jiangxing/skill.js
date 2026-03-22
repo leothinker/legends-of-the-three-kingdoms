@@ -1060,7 +1060,7 @@ const skills = {
             const result = await player
                 .chooseTarget(
                     `置民：请选择至多${get.cnNumber(player.getHp())}名其他角色`,
-                    "你获得这些角色各自手牌中的随机一张点数最小的牌",
+                    "你获得这些角色各自手牌中的随机一张牌",
                     (card, player, target) => {
                         return target !== player && target.countCards("h");
                     },
@@ -1079,11 +1079,10 @@ const skills = {
             player.line(targets, "thunder");
             const toGain = [];
             for (const target of targets) {
-                const cards = target.getCards("h"),
-                    minNumber = cards.map(card => get.number(card)).sort((a, b) => a - b)[0];
+                const cards = target.getCards("h");
                 const gainableCards = cards
                     .filter(card => {
-                        return get.number(card) === minNumber && lib.filter.canBeGained(card, player, target);
+                        return lib.filter.canBeGained(card, player, target);
                     })
                     .randomSort();
                 toGain.push(gainableCards[0]);
@@ -1112,13 +1111,14 @@ const skills = {
             mark: {
                 audio: "zhimin",
                 trigger: {
-                    player: "gainAfter",
-                    global: "loseAsyncAfter",
+                    player: "loseAfter",
+                    global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
                 },
                 forced: true,
+                silent: true,
                 filter(event, player) {
                     if (
-                        _status.currentPhase === player ||
+                        !event.getl(player).hs.length &&
                         !event.getg(player).some(card => get.position(card) === "h" && get.owner(card) === player)
                     ) {
                         return false;
@@ -1126,8 +1126,11 @@ const skills = {
                     return true;
                 },
                 async content(event, trigger, player) {
+                    player.removeGaintag("zhimin_tag");
+                    const cards = player.getCards("h"),
+                        minNumber = cards.map(card => get.number(card)).sort((a, b) => a - b)[0];
                     player.addGaintag(
-                        trigger.getg(player).filter(card => get.position(card) === "h" && get.owner(card) === player),
+                        cards.filter(card => get.number(card) === minNumber),
                         "zhimin_tag"
                     );
                 },
@@ -1138,7 +1141,6 @@ const skills = {
                     player: "loseAfter",
                     global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
                 },
-                forced: true,
                 filter(event, player) {
                     const evt = event.getl(player);
                     if (!evt.hs.length || player.maxHp <= player.countCards("h")) {
@@ -1147,6 +1149,7 @@ const skills = {
                     return Object.values(evt.gaintag_map).flat().includes("zhimin_tag");
                 },
                 async content(event, trigger, player) {
+                    player.showHandcards(get.translation(player) + "发动了【置民】");
                     await player.drawTo(player.maxHp);
                 },
             },

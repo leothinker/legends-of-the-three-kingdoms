@@ -116,7 +116,7 @@
 	"right_click": "pause",
 	"sort": "type_sort",
 	"cards": ["standard", "extra", "refresh"],
-	"characters": ["jiexian", "jieshenhua", "zhencang"],
+	"characters": ["jiexian", "jieshenhua", "jiangxing", "zhencang"],
 	"plays": [],
 	"extensions": [],
 	"banned": [],

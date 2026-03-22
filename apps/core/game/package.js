@@ -5,8 +5,9 @@ window.noname_package = {
         shenhua: "神话再临",
         jiexian: "界限突破",
         jieshenhua: "界神话再临",
-        // shenwu: "神武再世",
+        jiangxing: "将星",
         zhencang: "珍藏版",
+        // shenwu: "神武再世",
         tianshui: "天水濯名",
     },
     card: {

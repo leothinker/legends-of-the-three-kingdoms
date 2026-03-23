@@ -2055,6 +2055,7 @@ const skills = {
     },
     jx_xingshang: {
         audio: 2,
+        audioname: ["caoying"],
         trigger: { global: "die" },
         filter(event, player) {
             return player.isDamaged() || event.player.countCards("he") > 0;

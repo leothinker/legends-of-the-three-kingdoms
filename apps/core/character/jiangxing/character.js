@@ -99,6 +99,12 @@ const characters = {
         skills: ["qianchong", "shangjian"],
         groupBorder: "jin",
     },
+    caoying: {
+        sex: "female",
+        group: "wei",
+        hp: 4,
+        skills: ["lingren", "fujian"],
+    },
 };
 
 export default characters;

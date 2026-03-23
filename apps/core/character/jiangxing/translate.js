@@ -117,8 +117,8 @@ const translates = {
     mingzhe_info: "锁定技，当你于出牌阶段外失去红色牌后，你展示之并摸一张牌。",
 
     caoying: "曹婴",
-    xinfu_lingren: "凌人",
-    xinfu_lingren_info: `每回合限一次，当你使用伤害类牌指定目标后，你可以猜测其中一个目标的手牌中是否有基本牌、锦囊牌或装备牌。然后其展示手牌，若至少猜对：一项，此牌对其伤害+1；两项，你摸两张牌；三项，你获得${get.poptip("jx_jianxiong")}和${get.poptip("jx_xingshang")}直到你下回合开始。`,
+    lingren: "凌人",
+    lingren_info: `每回合限一次，当你使用伤害类牌指定目标后，你可以猜测其中一个目标的手牌中是否有基本牌、锦囊牌或装备牌。然后其展示手牌，若至少猜对：一项，此牌对其伤害+1；两项，你摸两张牌；三项，你获得${get.poptip("jx_jianxiong")}和${get.poptip("jx_xingshang")}直到你下回合开始。`,
     fujian: "伏间",
     fujian_info: "锁定技，准备阶段和结束阶段，你观看一名手牌数最少的其他角色的所有手牌。",
 

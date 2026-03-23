@@ -67,6 +67,7 @@ const skills = {
                         break;
                     }
                 } else {
+                    cards.push(card)
                     break;
                 }
             }
@@ -84,7 +85,7 @@ const skills = {
                 if (
                     cards.every(card => {
                         const name = ["tao", "wuzhong"];
-                        if (name.includes(card.name) || get.type(card) == "equip") {
+                        if (name.includes(card.name) || get.type(card) == "equip" && get.color(card) == "red") {
                             return !game.hasPlayer(target => lib.filter.targetEnabled2(card, player, target));
                         }
                         return true;
@@ -98,7 +99,7 @@ const skills = {
                         prompt: "思泣：请选择要使用的牌",
                         filter(button) {
                             const card = button.link;
-                            if (["tao", "wuzhong"].includes(card.name) || get.type(card) == "equip") {
+                            if (["tao", "wuzhong"].includes(card.name) || get.type(card) == "equip" && get.color(card) == "red") {
                                 return game.hasPlayer(target => lib.filter.targetEnabled2(card, get.player(), target));
                             }
                             return false;
@@ -142,6 +143,9 @@ const skills = {
             if (cards.length) {
                 await player.draw({
                     num: cards.filter(card => {
+                        if (!(get.color(card) == "red")) {
+                            return false;
+                        }
                         const name = ["tao", "wuzhong"];
                         if (name.includes(card.name) || get.type(card) == "equip") {
                             return !game.hasPlayer(target => lib.filter.targetEnabled2(card, player, target));
@@ -558,33 +562,7 @@ const skills = {
                     if (!history.length) {
                         return false;
                     }
-                    var color = false;
-                    for (var evt of history) {
-                        var list = [player];
-                        list.addArray(evt.targets);
-                        for (var target of list) {
-                            target.getHistory("lose", function (evtx) {
-                                if (color === true || evtx.getParent(2).name != "qingyi") {
-                                    return false;
-                                }
-                                for (var card of evtx.cards) {
-                                    if (color === true || get.position(card, true) != "d") {
-                                        continue;
-                                    }
-                                    var color2 = get.color(card, false);
-                                    if (!color) {
-                                        color = color2;
-                                    } else if (color != color2) {
-                                        color = true;
-                                    }
-                                }
-                            });
-                            if (color === true) {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
+                    return true;
                 },
                 content() {
                     "step 0";
@@ -3135,6 +3113,150 @@ const skills = {
             const num = get.info(event.name).getNum(player);
             if (num > 0) {
                 await player.draw(num);
+            }
+        },
+    },
+    // 曹婴
+    // 凌人
+    lingren: {
+        audio: 2,
+        trigger: { player: "useCardToPlayered" },
+        filter(event, player) {
+            if (event.getParent().triggeredTargets3.length > 1) {
+                return false;
+            }
+            if (!["basic", "trick"].includes(get.type(event.card))) {
+                return false;
+            }
+            return get.tag(event.card, "damage");
+        },
+        usable: 1,
+        derivation: ["jx_jianxiong", "jx_xingshang"],
+        async cost(event, trigger, player) {
+            event.result = await player
+                .chooseTarget(get.prompt(event.name.slice(0, -5)), "选择一名目标角色并猜测其手牌构成", (card, player, target) => {
+                    return _status.event.targets.includes(target);
+                })
+                .set("ai", target => {
+                    return 2 - get.attitude(get.player(), target);
+                })
+                .set("targets", trigger.targets)
+                .forResult();
+        },
+        async content(event, trigger, player) {
+            const {
+                targets: [target],
+            } = event;
+            const list = ["basic", "trick", "equip"].map(type => ["", "", "caoying_" + type]);
+            const result = await player
+                .chooseButton(["凌人：猜测其有哪些类别的手牌", [list, "vcard"]], [0, 3], true)
+                .set("ai", button => {
+                    return get.event().choice.includes(button.link[2].slice(8));
+                })
+                .set(
+                    "choice",
+                    (() => {
+                        if (!target.countCards("h")) {
+                            return [];
+                        }
+                        let choice = [],
+                            known = target.getKnownCards(player),
+                            unknown = target.getCards("h", i => !known.includes(i));
+                        for (let i of known) {
+                            choice.add(get.type2(i, target));
+                        }
+                        if (!unknown.length || choice.length > 2) {
+                            return choice;
+                        }
+                        let rand = 0.05;
+                        if (!choice.includes("basic")) {
+                            if (unknown.some(i => get.type(i, null, target) === "basic")) {
+                                rand = 0.95;
+                            }
+                            if (Math.random() < rand) {
+                                choice.push("basic");
+                            }
+                        }
+                        if (!choice.includes("trick")) {
+                            if (unknown.some(i => get.type(i, "trick", target) === "trick")) {
+                                rand = 0.9;
+                            } else {
+                                rand = 0.1;
+                            }
+                            if (Math.random() < rand) {
+                                choice.push("trick");
+                            }
+                        }
+                        if (!choice.includes("equip")) {
+                            if (unknown.some(i => get.type(i, null, target) === "equip")) {
+                                rand = 0.75;
+                            } else {
+                                rand = 0.25;
+                            }
+                            if (Math.random() < rand) {
+                                choice.push("equip");
+                            }
+                        }
+                        return choice;
+                    })()
+                )
+                .forResult();
+            if (!result?.bool) {
+                return;
+            }
+            const choices = result.links.map(i => i[2].slice(8));
+            if (!event.isMine() && !event.isOnline()) {
+                await game.delayx();
+            }
+            let num = 0;
+            ["basic", "trick", "equip"].forEach(type => {
+                if (choices.includes(type) == target.hasCard(card => get.type2(card, target) === type, "h")) {
+                    num++;
+                }
+            });
+            player.popup("猜对" + get.cnNumber(num) + "项");
+            game.log(player, "猜对了" + get.cnNumber(num) + "项");
+            if (num > 0) {
+                const map = trigger.customArgs;
+                const id = target.playerid;
+                map[id] ??= {};
+                if (typeof map[id].extraDamage != "number") {
+                    map[id].extraDamage = 0;
+                }
+                map[id].extraDamage++;
+            }
+            if (num > 1) {
+                await player.draw(2);
+            }
+            if (num > 2) {
+                await player.addTempSkills(get.info(event.name).derivation, { player: "phaseBegin" });
+            }
+        },
+        ai: { threaten: 2.4 },
+    },
+    // 伏间
+    fujian: {
+        audio: 2,
+        trigger: { player: ["phaseZhunbeiBegin", "phaseJieshuBegin"] },
+        filter(event, player) {
+            return !game.hasPlayer(target => target != player && target.countCards("h") == 0);
+        },
+        forced: true,
+        async content(event, trigger, player) {
+            const result = await player.chooseTarget(
+                "伏间：请选择一名手牌数最少的其他角色",
+                (card, player, target) => {
+                    return target != player && target.isMinHandcard(null, current => current != player);
+                },
+                true
+            ).set('ai', target => {
+                return -get.attitude(player, target);
+            }).forResult();
+            if (result.bool) {
+                const target = result.targets[0];
+                player.line(target);
+                game.log(player, "观看了", target, "的手牌");
+                await player.viewHandcards(target);
             }
         },
     },

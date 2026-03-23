@@ -2,312 +2,377 @@
  * 从读取的内容中获取数据
  */
 
-import { lib, game, get, _status, ui, ai } from "noname";
-import { isClass } from "@/util/index.js";
+import { ai, game, get, lib, ui } from "noname"
 
 /**
  * 读取导入的卡牌包信息
  */
 export function loadCard(cardConfig: importCardConfig) {
-	const cardConfigName = cardConfig.name;
+  const cardConfigName = cardConfig.name
 
-	lib.cardPack[cardConfigName] ??= [];
-	if (cardConfig.card) {
-		for (let [cardPackName, cardPack2] of Object.entries(cardConfig.card)) {
-			if (!(!cardPack2.hidden && cardConfig.translate[`${cardPackName}_info`])) {
-				continue;
-			}
-			lib.cardPack[cardConfigName].add(cardPackName);
-		}
-	}
+  lib.cardPack[cardConfigName] ??= []
+  if (cardConfig.card) {
+    for (const [cardPackName, cardPack2] of Object.entries(cardConfig.card)) {
+      if (
+        !(!cardPack2.hidden && cardConfig.translate[`${cardPackName}_info`])
+      ) {
+        continue
+      }
+      lib.cardPack[cardConfigName].add(cardPackName)
+    }
+  }
 
-	for (const [configName, configItem] of Object.entries(cardConfig)) {
-		switch (configName) {
-			case "name":
-			case "mode":
-			case "forbid":
-				break;
-			case "connect":
-				// @ts-expect-error ignore
-				lib.connectCardPack.push(cardConfigName);
-				break;
-			case "list":
-				if (lib.config.mode === "connect") {
-					// @ts-expect-error ignore
-					lib.cardPackList[cardConfigName] ??= [];
-					// @ts-expect-error ignore
-					lib.cardPackList[cardConfigName].addArray(configItem);
-				} else if (lib.config.cards.includes(cardConfigName)) {
-					/**
-					 * @type {any[]}
-					 */
-					let pile = typeof configItem == "function" ? configItem() : configItem;
+  for (const [configName, configItem] of Object.entries(cardConfig)) {
+    switch (configName) {
+      case "name":
+      case "mode":
+      case "forbid":
+        break
+      case "connect":
+        // @ts-expect-error ignore
+        lib.connectCardPack.push(cardConfigName)
+        break
+      case "list":
+        if (lib.config.mode === "connect") {
+          // @ts-expect-error ignore
+          lib.cardPackList[cardConfigName] ??= []
+          // @ts-expect-error ignore
+          lib.cardPackList[cardConfigName].addArray(configItem)
+        } else if (lib.config.cards.includes(cardConfigName)) {
+          /**
+           * @type {any[]}
+           */
+          let pile =
+            typeof configItem === "function" ? configItem() : configItem
 
-					lib.cardPile[cardConfigName] ??= [];
-					lib.cardPile[cardConfigName].addArray(pile);
+          lib.cardPile[cardConfigName] ??= []
+          lib.cardPile[cardConfigName].addArray(pile)
 
-					if (lib.config.bannedpile[cardConfigName]) {
-						pile = pile.filter((_value, index) => !lib.config.bannedpile[cardConfigName].includes(index));
-					}
+          if (lib.config.bannedpile[cardConfigName]) {
+            pile = pile.filter(
+              (_value, index) =>
+                !lib.config.bannedpile[cardConfigName].includes(index),
+            )
+          }
 
-					if (lib.config.addedpile[cardConfigName]) {
-						pile = [...pile, ...lib.config.addedpile[cardConfigName]];
-					}
+          if (lib.config.addedpile[cardConfigName]) {
+            pile = [...pile, ...lib.config.addedpile[cardConfigName]]
+          }
 
-					lib.card.list.addArray(pile);
-				}
-				break;
-			default:
-				for (const [itemName, item] of Object.entries(configItem)) {
-					if (configName === "skill" && itemName[0] === "_" && !item.forceLoad && (lib.config.mode !== "connect" ? !lib.config.cards.includes(cardConfigName) : !cardConfig.connect)) {
-						continue;
-					}
+          lib.card.list.addArray(pile)
+        }
+        break
+      default:
+        for (const [itemName, item] of Object.entries(configItem)) {
+          if (
+            configName === "skill" &&
+            itemName[0] === "_" &&
+            !item.forceLoad &&
+            (lib.config.mode !== "connect"
+              ? !lib.config.cards.includes(cardConfigName)
+              : !cardConfig.connect)
+          ) {
+            continue
+          }
 
-					if (configName === "translate" && itemName === cardConfigName) {
-						lib[configName][`${itemName}_card_config`] = item;
-					} else {
-						if (lib[configName][itemName] == null) {
-							if (configName === "skill" && !item.forceLoad && lib.config.mode === "connect" && !cardConfig.connect) {
-								lib[configName][itemName] = {
-									nopop: item.nopop,
-									derivation: item.derivation,
-								};
-							} else {
-								// @ts-expect-error ignore
-								Object.defineProperty(lib[configName], itemName, Object.getOwnPropertyDescriptor(configItem, itemName));
-							}
-						} else {
-							console.log(`duplicated ${configName} in card ${cardConfigName}:\n${itemName}:\nlib.${configName}.${itemName}`, lib[configName][itemName], `\ncard.${cardConfigName}.${configName}.${itemName}`, item);
-						}
+          if (configName === "translate" && itemName === cardConfigName) {
+            lib[configName][`${itemName}_card_config`] = item
+          } else {
+            if (lib[configName][itemName] == null) {
+              if (
+                configName === "skill" &&
+                !item.forceLoad &&
+                lib.config.mode === "connect" &&
+                !cardConfig.connect
+              ) {
+                lib[configName][itemName] = {
+                  nopop: item.nopop,
+                  derivation: item.derivation,
+                }
+              } else {
+                // @ts-expect-error ignore
+                Object.defineProperty(
+                  lib[configName],
+                  itemName,
+                  Object.getOwnPropertyDescriptor(configItem, itemName),
+                )
+              }
+            } else {
+              console.log(
+                `duplicated ${configName} in card ${cardConfigName}:\n${itemName}:\nlib.${configName}.${itemName}`,
+                lib[configName][itemName],
+                `\ncard.${cardConfigName}.${configName}.${itemName}`,
+                item,
+              )
+            }
 
-						if (configName === "card" && lib[configName][itemName].derivation) {
-							// @ts-expect-error ignore
-							lib.cardPack.mode_derivation ??= [];
-							// @ts-expect-error ignore
-							lib.cardPack.mode_derivation.push(itemName);
-						}
-					}
-				}
-				break;
-		}
-	}
+            if (configName === "card" && lib[configName][itemName].derivation) {
+              // @ts-expect-error ignore
+              lib.cardPack.mode_derivation ??= []
+              // @ts-expect-error ignore
+              lib.cardPack.mode_derivation.push(itemName)
+            }
+          }
+        }
+        break
+    }
+  }
 }
 
 /**
  * 读取牌堆信息
  */
 export function loadCardPile() {
-	if (lib.config.mode === "connect") {
-		// @ts-expect-error ignore
-		lib.cardPackList = {};
-	} else {
-		let pilecfg = lib.config.customcardpile[get.config("cardpilename") || "当前牌堆"];
-		if (pilecfg) {
-			lib.config.bannedpile = get.copy(pilecfg[0] || {});
-			lib.config.addedpile = get.copy(pilecfg[1] || {});
-		} else {
-			lib.config.bannedpile = {};
-			lib.config.addedpile = {};
-		}
-	}
+  if (lib.config.mode === "connect") {
+    // @ts-expect-error ignore
+    lib.cardPackList = {}
+  } else {
+    const pilecfg =
+      lib.config.customcardpile[get.config("cardpilename") || "当前牌堆"]
+    if (pilecfg) {
+      lib.config.bannedpile = get.copy(pilecfg[0] || {})
+      lib.config.addedpile = get.copy(pilecfg[1] || {})
+    } else {
+      lib.config.bannedpile = {}
+      lib.config.addedpile = {}
+    }
+  }
 }
 
 /**
  * 读取导入的武将包信息
  */
 export function loadCharacter(character: importCharacterConfig) {
-	let name = character.name;
+  const name = character.name
 
-	if (character.character) {
-		const characterPack = lib.characterPack[name];
-		if (characterPack) {
-			Object.assign(characterPack, character.character);
-		} else {
-			lib.characterPack[name] = character.character;
-		}
-	}
+  if (character.character) {
+    const characterPack = lib.characterPack[name]
+    if (characterPack) {
+      Object.assign(characterPack, character.character)
+    } else {
+      lib.characterPack[name] = character.character
+    }
+  }
 
-	// 摆了
-	for (let key in character) {
-		let value = character[key];
+  // 摆了
+  for (const key in character) {
+    const value = character[key]
 
-		switch (key) {
-			case "name":
-			case "mode":
-			case "forbid":
-				break;
-			case "connect":
-				// @ts-expect-error ignore
-				lib.connectCharacterPack.push(name);
-				break;
-			case "character":
-				if (!lib.config.characters.includes(name) && lib.config.mode !== "connect") {
-					if (lib.config.mode === "chess" && get.config("chess_mode") === "leader" && get.config("chess_leader_allcharacter")) {
-						for (const charaName in value) {
-							// @ts-expect-error ignore
-							lib.hiddenCharacters.push(charaName);
-						}
-					} else if (lib.config.mode !== "boss" || name !== "boss") {
-						break;
-					}
-				}
-			// [falls through]
-			default:
-				if (Array.isArray(lib[key]) && Array.isArray(value)) {
-					lib[key].addArray(value);
-					break;
-				}
+    switch (key) {
+      case "name":
+      case "mode":
+      case "forbid":
+        break
+      case "connect":
+        // @ts-expect-error ignore
+        lib.connectCharacterPack.push(name)
+        break
+      case "character":
+        if (
+          !lib.config.characters.includes(name) &&
+          lib.config.mode !== "connect"
+        ) {
+          if (
+            lib.config.mode === "chess" &&
+            get.config("chess_mode") === "leader" &&
+            get.config("chess_leader_allcharacter")
+          ) {
+            for (const charaName in value) {
+              // @ts-expect-error ignore
+              lib.hiddenCharacters.push(charaName)
+            }
+          } else if (lib.config.mode !== "boss" || name !== "boss") {
+            break
+          }
+        }
+      // [falls through]
+      default:
+        if (Array.isArray(lib[key]) && Array.isArray(value)) {
+          lib[key].addArray(value)
+          break
+        }
 
-				for (let key2 in value) {
-					let value2 = value[key2];
+        for (const key2 in value) {
+          const value2 = value[key2]
 
-					if (key === "character") {
-						if (lib.config.forbidai_user && lib.config.forbidai_user.includes(key2)) {
-							lib.config.forbidai.add(key2);
-						}
-						if (Array.isArray(value2)) {
-							if (!value2[4]) {
-								value2[4] = [];
-							}
-							if (value2[4].includes("boss") || value2[4].includes("hiddenboss")) {
-								lib.config.forbidai.add(key2);
-							}
-							for (const skill of value2[3]) {
-								lib.skilllist.add(skill);
-							}
-						} else {
-							if (value2.isBoss || value2.isHiddenBoss) {
-								lib.config.forbidai.add(key2);
-							}
-							if (value2.skills) {
-								for (const skill of value2.skills) {
-									lib.skilllist.add(skill);
-								}
-							}
-						}
-					}
+          if (key === "character") {
+            if (lib.config.forbidai_user?.includes(key2)) {
+              lib.config.forbidai.add(key2)
+            }
+            if (Array.isArray(value2)) {
+              if (!value2[4]) {
+                value2[4] = []
+              }
+              if (
+                value2[4].includes("boss") ||
+                value2[4].includes("hiddenboss")
+              ) {
+                lib.config.forbidai.add(key2)
+              }
+              for (const skill of value2[3]) {
+                lib.skilllist.add(skill)
+              }
+            } else {
+              if (value2.isBoss || value2.isHiddenBoss) {
+                lib.config.forbidai.add(key2)
+              }
+              if (value2.skills) {
+                for (const skill of value2.skills) {
+                  lib.skilllist.add(skill)
+                }
+              }
+            }
+          }
 
-					if (key === "skill" && key2[0] === "_" && (lib.config.mode !== "connect" ? !lib.config.characters.includes(name) : !character.connect)) {
-						continue;
-					}
+          if (
+            key === "skill" &&
+            key2[0] === "_" &&
+            (lib.config.mode !== "connect"
+              ? !lib.config.characters.includes(name)
+              : !character.connect)
+          ) {
+            continue
+          }
 
-					if (key === "translate" && key2 === name) {
-						lib[key][`${key2}_character_config`] = value2;
-					} else {
-						if (lib[key][key2] == null) {
-							if (key === "skill" && !value2.forceLoad && lib.config.mode === "connect" && !character.connect) {
-								lib[key][key2] = {
-									nopop: value2.nopop,
-									derivation: value2.derivation,
-								};
-							} else if (key === "character") {
-								lib.character[key2] = value2;
-							} else {
-								// @ts-expect-error ignore
-								Object.defineProperty(lib[key], key2, Object.getOwnPropertyDescriptor(character[key], key2));
-							}
-							if (key === "card" && lib[key][key2].derivation) {
-								// @ts-expect-error ignore
-								if (!lib.cardPack.mode_derivation) {
-									// @ts-expect-error ignore
-									lib.cardPack.mode_derivation = [key2];
-								} else {
-									// @ts-expect-error ignore
-									lib.cardPack.mode_derivation.push(key2);
-								}
-							}
-						} else if (Array.isArray(lib[key][key2]) && Array.isArray(value2)) {
-							lib[key][key2].addArray(value2);
-						} else {
-							console.log(`duplicated ${key} in character ${name}:\n${key2}:\nlib.${key}.${key2}`, lib[key][key2], `\ncharacter.${name}.${key}.${key2}`, value2);
-						}
-					}
-				}
-				break;
-		}
-	}
+          if (key === "translate" && key2 === name) {
+            lib[key][`${key2}_character_config`] = value2
+          } else {
+            if (lib[key][key2] == null) {
+              if (
+                key === "skill" &&
+                !value2.forceLoad &&
+                lib.config.mode === "connect" &&
+                !character.connect
+              ) {
+                lib[key][key2] = {
+                  nopop: value2.nopop,
+                  derivation: value2.derivation,
+                }
+              } else if (key === "character") {
+                lib.character[key2] = value2
+              } else {
+                // @ts-expect-error ignore
+                Object.defineProperty(
+                  lib[key],
+                  key2,
+                  Object.getOwnPropertyDescriptor(character[key], key2),
+                )
+              }
+              if (key === "card" && lib[key][key2].derivation) {
+                // @ts-expect-error ignore
+                if (!lib.cardPack.mode_derivation) {
+                  // @ts-expect-error ignore
+                  lib.cardPack.mode_derivation = [key2]
+                } else {
+                  // @ts-expect-error ignore
+                  lib.cardPack.mode_derivation.push(key2)
+                }
+              }
+            } else if (Array.isArray(lib[key][key2]) && Array.isArray(value2)) {
+              lib[key][key2].addArray(value2)
+            } else {
+              console.log(
+                `duplicated ${key} in character ${name}:\n${key2}:\nlib.${key}.${key2}`,
+                lib[key][key2],
+                `\ncharacter.${name}.${key}.${key2}`,
+                value2,
+              )
+            }
+          }
+        }
+        break
+    }
+  }
 }
 
 /**
  * 读取当前的模式信息
  */
 export function loadMode(mode: importModeConfig) {
-	mixinLibrary(mode, lib);
-	mixinGeneral(mode, "game", game);
-	mixinGeneral(mode, "ui", ui);
-	mixinGeneral(mode, "get", get);
-	mixinGeneral(mode, "ai", ai);
+  mixinLibrary(mode, lib)
+  mixinGeneral(mode, "game", game)
+  mixinGeneral(mode, "ui", ui)
+  mixinGeneral(mode, "get", get)
+  mixinGeneral(mode, "ai", ai)
 
-	["onwash", "onover"].forEach(name => {
-		if (game[name]) {
-			lib[name]?.push(game[name]);
-			delete game[name];
-		}
-	});
+  ;["onwash", "onover"].forEach((name) => {
+    if (game[name]) {
+      lib[name]?.push(game[name])
+      delete game[name]
+    }
+  })
 
-	if (typeof mode.init == "function") {
-		mode.init();
-	}
+  if (typeof mode.init === "function") {
+    mode.init()
+  }
 }
 
 /**
  * 读取导入的play信息
  */
 export function loadPlay(playConfig: importPlayConfig) {
-	const i = playConfig.name;
+  const i = playConfig.name
 
-	if (lib.config.hiddenPlayPack.includes(i)) {
-		return;
-	}
-	if (playConfig.forbid && playConfig.forbid.includes(lib.config.mode)) {
-		return;
-	}
-	if (playConfig.mode && !playConfig.mode.includes(lib.config.mode)) {
-		return;
-	}
+  if (lib.config.hiddenPlayPack.includes(i)) {
+    return
+  }
+  if (playConfig.forbid?.includes(lib.config.mode)) {
+    return
+  }
+  if (playConfig.mode && !playConfig.mode.includes(lib.config.mode)) {
+    return
+  }
 
-	// @ts-expect-error ignore
-	lib.element = mixinElement(playConfig, lib.element);
-	mixinGeneral(playConfig, "game", game);
-	mixinGeneral(playConfig, "ui", ui);
-	mixinGeneral(playConfig, "get", get);
-	for (const [configName, configItem] of Object.entries(playConfig)) {
-		switch (configName) {
-			case "name":
-			case "mode":
-			case "forbid":
-			case "init":
-			case "element":
-			case "game":
-			case "get":
-			case "ui":
-			case "arenaReady":
-				break;
-			default:
-				for (const [itemName, item] of Object.entries(configItem)) {
-					if (configName !== "translate" || itemName !== i) {
-						if (lib[configName][itemName] != null) {
-							console.log(`duplicated ${configName} in play ${i}:\n${itemName}:\nlib.${configName}.${itemName}`, lib[configName][itemName], `\nplay.${i}.${configName}.${itemName}`, item);
-						}
-						lib[configName][itemName] = item;
-					}
-				}
-				break;
-		}
-	}
+  // @ts-expect-error ignore
+  lib.element = mixinElement(playConfig, lib.element)
+  mixinGeneral(playConfig, "game", game)
+  mixinGeneral(playConfig, "ui", ui)
+  mixinGeneral(playConfig, "get", get)
+  for (const [configName, configItem] of Object.entries(playConfig)) {
+    switch (configName) {
+      case "name":
+      case "mode":
+      case "forbid":
+      case "init":
+      case "element":
+      case "game":
+      case "get":
+      case "ui":
+      case "arenaReady":
+        break
+      default:
+        for (const [itemName, item] of Object.entries(configItem)) {
+          if (configName !== "translate" || itemName !== i) {
+            if (lib[configName][itemName] != null) {
+              console.log(
+                `duplicated ${configName} in play ${i}:\n${itemName}:\nlib.${configName}.${itemName}`,
+                lib[configName][itemName],
+                `\nplay.${i}.${configName}.${itemName}`,
+                item,
+              )
+            }
+            lib[configName][itemName] = item
+          }
+        }
+        break
+    }
+  }
 
-	if (typeof playConfig.init == "function") {
-		playConfig.init();
-	}
-	if (typeof playConfig.arenaReady == "function") {
-		lib.arenaReady?.push(playConfig.arenaReady);
-	}
+  if (typeof playConfig.init === "function") {
+    playConfig.init()
+  }
+  if (typeof playConfig.arenaReady === "function") {
+    lib.arenaReady?.push(playConfig.arenaReady)
+  }
 }
 
-function extSkillInject(extName, skillInfo) {
-	if (typeof skillInfo.audio == "number" || typeof skillInfo.audio == "boolean") {
-		skillInfo.audio = `ext:${extName}:${Number(skillInfo.audio)}`;
-	}
+function _extSkillInject(extName, skillInfo) {
+  if (
+    typeof skillInfo.audio === "number" ||
+    typeof skillInfo.audio === "boolean"
+  ) {
+    skillInfo.audio = `ext:${extName}:${Number(skillInfo.audio)}`
+  }
 }
 
 /**
@@ -322,27 +387,27 @@ function extSkillInject(extName, skillInfo) {
  * @return {void}
  */
 function mixinGeneral(config, name, where) {
-	if (!config[name]) {
-		return;
-	}
+  if (!config[name]) {
+    return
+  }
 
-	for (let [key, value] of Object.entries(config[name])) {
-		if (["ui", "ai"].includes(name)) {
-			if (typeof value == "object") {
-				// 我甚至不敢把这个双等于改了，怕了
-				if (where[key] == undefined) {
-					where[key] = {};
-				}
-				for (let [key2, value2] of Object.entries(value)) {
-					where[key][key2] = value2;
-				}
-			} else {
-				where[key] = value;
-			}
-		} else {
-			where[key] = value;
-		}
-	}
+  for (const [key, value] of Object.entries(config[name])) {
+    if (["ui", "ai"].includes(name)) {
+      if (typeof value === "object") {
+        // 我甚至不敢把这个双等于改了，怕了
+        if (where[key] === undefined) {
+          where[key] = {}
+        }
+        for (const [key2, value2] of Object.entries(value)) {
+          where[key][key2] = value2
+        }
+      } else {
+        where[key] = value
+      }
+    } else {
+      where[key] = value
+    }
+  }
 }
 
 /**
@@ -353,28 +418,38 @@ function mixinGeneral(config, name, where) {
  * @return {void}
  */
 function mixinLibrary(config, lib) {
-	const KeptWords = ["name", "element", "game", "ai", "ui", "get", "config", "onreinit", "start", "startBefore"];
+  const KeptWords = [
+    "name",
+    "element",
+    "game",
+    "ai",
+    "ui",
+    "get",
+    "config",
+    "onreinit",
+    "start",
+    "startBefore",
+  ]
 
-	// @ts-expect-error ignore
-	lib.element = mixinElement(config, lib.element);
-	lib.config.banned = lib.config[`${lib.config.mode}_banned`] || [];
-	lib.config.bannedcards = lib.config[`${lib.config.mode}_bannedcards`] || [];
-	// @ts-expect-error ignore
-	lib.rank = window.noname_character_rank;
-	// @ts-expect-error ignore
-	delete window.noname_character_rank;
+  // @ts-expect-error ignore
+  lib.element = mixinElement(config, lib.element)
+  lib.config.banned = lib.config[`${lib.config.mode}_banned`] || []
+  lib.config.bannedcards = lib.config[`${lib.config.mode}_bannedcards`] || []
+  // @ts-expect-error ignore
+  lib.rank = window.noname_character_rank
+  // @ts-expect-error ignore
+  delete window.noname_character_rank
 
+  for (const name in config) {
+    if (KeptWords.includes(name)) {
+      continue
+    }
+    if (lib[name] == null) {
+      lib[name] = Array.isArray(config[name]) ? [] : {}
+    }
 
-	for (let name in config) {
-		if (KeptWords.includes(name)) {
-			continue;
-		}
-		if (lib[name] == null) {
-			lib[name] = Array.isArray(config[name]) ? [] : {};
-		}
-
-		Object.assign(lib[name], config[name]);
-	}
+    Object.assign(lib[name], config[name])
+  }
 }
 
 /**
@@ -385,29 +460,29 @@ function mixinLibrary(config, lib) {
  * @return {Record<string, Object>}
  */
 function mixinElement(config, element) {
-	let newElement = { ...element };
+  const newElement = { ...element }
 
-	if (config.element) {
-		for (let name in config.element) {
-			if (!newElement[name]) {
-				newElement[name] = [];
-			}
+  if (config.element) {
+    for (const name in config.element) {
+      if (!newElement[name]) {
+        newElement[name] = []
+      }
 
-			let source = config.element[name];
-			let target = newElement[name];
+      const source = config.element[name]
+      const target = newElement[name]
 
-			for (let key in source) {
-				if (key === "init") {
-					if (!target.inits) {
-						target.inits = [];
-					}
-					target.inits.push(source[key]);
-				} else {
-					target[key] = source[key];
-				}
-			}
-		}
-	}
+      for (const key in source) {
+        if (key === "init") {
+          if (!target.inits) {
+            target.inits = []
+          }
+          target.inits.push(source[key])
+        } else {
+          target[key] = source[key]
+        }
+      }
+    }
+  }
 
-	return newElement;
+  return newElement
 }

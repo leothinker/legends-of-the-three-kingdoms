@@ -1,5 +1,3 @@
-import { lib, game, ui, get, ai, _status } from "noname";
+const characterFilters = {}
 
-const characterFilters = {};
-
-export default characterFilters;
+export default characterFilters

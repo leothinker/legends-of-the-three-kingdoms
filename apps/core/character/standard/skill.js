@@ -349,7 +349,7 @@ const skills = {
 			}
 			return false;
 		},
-		async content() {},
+		async content() { },
 	},
 	// 赵云
 	// 龙胆
@@ -1232,17 +1232,17 @@ const skills = {
 				source.countCards("h") < 2
 					? { bool: false }
 					: await source
-							.chooseToDiscard(2, `弃置两张手牌，否则${get.translation(player)}对你造成1点伤害`)
-							.set("ai", card => {
-								if (card.name == "tao") {
-									return -10;
-								}
-								if (card.name == "jiu" && get.player().hp == 1) {
-									return -10;
-								}
-								return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp);
-							})
-							.forResult();
+						.chooseToDiscard(2, `弃置两张手牌，否则${get.translation(player)}对你造成1点伤害`)
+						.set("ai", card => {
+							if (card.name == "tao") {
+								return -10;
+							}
+							if (card.name == "jiu" && get.player().hp == 1) {
+								return -10;
+							}
+							return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp);
+						})
+						.forResult();
 			if (!result?.bool) {
 				await source.damage();
 			}
@@ -1399,7 +1399,7 @@ const skills = {
 	// 天妒
 	tiandu: {
 		audio: 2,
-		audioname: ["jx_guojia"],
+		audioname: ["jx_guojia", "xizhicai"],
 		trigger: { player: "judgeEnd" },
 		preHidden: true,
 		frequent(event) {
@@ -1445,11 +1445,11 @@ const skills = {
 					cards.length == 1
 						? { links: cards.slice(0), bool: true }
 						: await player.chooseCardButton("遗计：请选择要分配的牌", true, cards, [1, cards.length]).set("ai", () => {
-								if (ui.selected.buttons.length == 0) {
-									return 1;
-								}
-								return 0;
-						  }).forResult();
+							if (ui.selected.buttons.length == 0) {
+								return 1;
+							}
+							return 0;
+						}).forResult();
 				if (!bool) {
 					return;
 				}
@@ -1892,7 +1892,7 @@ const skills = {
 		filter(event, player) {
 			return get.sgn(player.hp - 2.5) != get.sgn(player.hp - 2.5 - event.num);
 		},
-		content() {},
+		content() { },
 		mod: {
 			globalFrom(from, to, current) {
 				if (from.hp > 2) {

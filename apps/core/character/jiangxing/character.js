@@ -36,6 +36,56 @@ const characters = {
         skills: ["zhimin", "jujian"],
         isZhugong: true,
     },
+    duyu: {
+        sex: "male",
+        group: "wei",
+        hp: 4,
+        skills: ["jianguo", "qingshi"],
+        groupBorder: "jin",
+    },
+    huanfan: {
+        sex: "male",
+        group: "wei",
+        hp: 3,
+        skills: ["jianzheng", "fumou"],
+    },
+    zhenghun: {
+        sex: "male",
+        group: "wei",
+        hp: 3,
+        skills: ["qiangzhi", "pitian"],
+    },
+    zhaoyan: {
+        sex: "male",
+        group: "wei",
+        hp: 3,
+        skills: ["funing", "bingji"],
+    },
+    wenqin: {
+        sex: "male",
+        group: "wei",
+        hp: 4,
+        skills: ["guangao", "huiqi"],
+    },
+    jx_zhonghui: {
+        sex: "male",
+        group: "wei",
+        hp: 4,
+        skills: ["jx_quanji", "zili"],
+    },
+    yanghuiyu: {
+        sex: "female",
+        group: "wei",
+        hp: 3,
+        skills: ["hongyi", "quanfeng"],
+        groupBorder: "jin",
+    },
+    xizhicai: {
+        sex: "male",
+        group: "wei",
+        hp: 3,
+        skills: ["tiandu", "xianfu", "chouce"],
+    },
 };
 
 export default characters;

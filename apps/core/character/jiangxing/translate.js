@@ -99,8 +99,8 @@ const translates = {
     chouce: "筹策",
     chouce_info: "当你受到1点伤害后，你可以进行判定，若结果为：红色，你令一名角色摸一张牌，若其为“先辅”角色，改为摸两张；黑色，你弃置一名角色区域里的一张牌。",
 
-    ol_zhangchunhua: "界张春华",
-    ol_zhangchunhua_prefix: "界",
+    jx_zhangchunhua: "界张春华",
+    jx_zhangchunhua_prefix: "界",
     jueqing: "绝情",
     jueqing_info: "锁定技，你即将造成的伤害视为失去体力。",
     shangshi: "伤逝",
@@ -109,10 +109,12 @@ const translates = {
     jianmie_info: "出牌阶段限一次，你可与一名其他角色同时选择一种颜色，你与其展示手牌并弃置各自选择颜色的手牌，然后弃置牌较多的角色视为对对方使用一张【决斗】。",
 
     wangyuanji: "王元姬",
-    xinfu_qianchong: "谦冲",
-    xinfu_qianchong_info: `锁定技，若你装备区里的牌均为黑色，你获得${get.poptip("jx_weimu")}，红色，你获得${get.poptip("mingzhe")}，否则出牌阶段开始时，你声明一种类别，本回合你使用该类别的牌无距离次数限制。`,
-    xinfu_shangjian: "尚俭",
-    xinfu_shangjian_info: "锁定技，一名角色的结束阶段，若X不大于你的体力值，你摸X张牌（X为你本回合失去过的牌数）。",
+    qianchong: "谦冲",
+    qianchong_info: `锁定技，若你装备区里的牌均为黑色，你获得${get.poptip("jx_weimu")}，红色，你获得${get.poptip("mingzhe")}，否则出牌阶段开始时，你声明一种类别，本回合你使用该类别的牌无距离次数限制。`,
+    shangjian: "尚俭",
+    shangjian_info: "锁定技，一名角色的结束阶段，若X不大于你的体力值，你摸X张牌（X为你本回合失去过的牌数）。",
+    mingzhe: "明哲",
+    mingzhe_info: "锁定技，当你于出牌阶段外失去红色牌后，你展示之并摸一张牌。",
 
     caoying: "曹婴",
     xinfu_lingren: "凌人",

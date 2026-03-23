@@ -2206,6 +2206,8 @@ const skills = {
             },
         },
     },
+    // 界钟会
+    // 权计
     quanji: {
         audio: 2,
         trigger: { player: "damageEnd" },
@@ -2365,6 +2367,7 @@ const skills = {
             },
         },
     },
+    // 自立
     zili: {
         skillAnimation: true,
         animationColor: "thunder",
@@ -2390,6 +2393,7 @@ const skills = {
         },
         ai: { combo: "quanji" },
     },
+    // 排异
     paiyi: {
         enable: "phaseUse",
         usable: 1,
@@ -2453,6 +2457,8 @@ const skills = {
             },
         },
     },
+    // 羊徽瑜
+    // 弘仪
     hongyi: {
         audio: 2,
         enable: "phaseUse",
@@ -2517,6 +2523,7 @@ const skills = {
             },
         },
     },
+    // 劝封
     quanfeng: {
         audio: 2,
         enable: "chooseToUse",
@@ -2599,6 +2606,8 @@ const skills = {
             },
         },
     },
+    // 戏志才
+    // 先辅
     xianfu: {
         trigger: {
             global: "phaseBefore",
@@ -2722,6 +2731,7 @@ const skills = {
             }
         },
     },
+    // 筹策
     chouce: {
         audio: 2,
         trigger: { player: "damageEnd" },
@@ -2825,6 +2835,307 @@ const skills = {
                     }
                 },
             },
+        },
+    },
+    // 界张春华
+    // 绝情
+    jueqing: {
+        audio: 2,
+        audioname: ["jx_zhangchunhua"],
+        trigger: { source: "damageBefore" },
+        forced: true,
+        content() {
+            trigger.cancel();
+            trigger.player.loseHp(trigger.num);
+        },
+        ai: {
+            jueqing: true,
+        },
+    },
+    // 伤逝
+    shangshi: {
+        audio: 2,
+        audioname: ["jx_zhangchunhua"],
+        trigger: {
+            player: ["loseAfter", "changeHp", "gainMaxHpAfter", "loseMaxHpAfter"],
+            global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
+        },
+        frequent: true,
+        filter(event, player) {
+            if (event.getl && !event.getl(player)) {
+                return false;
+            }
+            return player.countCards("h") < player.getDamagedHp();
+        },
+        content() {
+            player.draw(player.getDamagedHp() - player.countCards("h"));
+        },
+        ai: {
+            noh: true,
+            freeSha: true,
+            freeShan: true,
+            skillTagFilter(player, tag) {
+                if (player.maxHp - player.hp < player.countCards("h")) {
+                    return false;
+                }
+            },
+        },
+    },
+    // 翦灭
+    jianmie: {
+        audio: 2,
+        enable: "phaseUse",
+        filterTarget: lib.filter.notMe,
+        usable: 1,
+        async content(event, trigger, player) {
+            const target = event.target,
+                targets = [player, target];
+            const map = await game.chooseAnyOL(targets, get.info(event.name).chooseControl, [targets]).forResult();
+            const getColor = result => {
+                return result.control == "none2" ? "none" : result.control;
+            },
+                cards_player = player.getDiscardableCards(player, "h", card => get.color(card) == getColor(map.get(player))),
+                cards_target = target.getDiscardableCards(target, "h", card => get.color(card) == getColor(map.get(target)));
+            if (cards_player.length && cards_target.length) {
+                await game
+                    .loseAsync({
+                        lose_list: [
+                            [player, cards_player],
+                            [target, cards_target],
+                        ],
+                    })
+                    .setContent("discardMultiple");
+            } else if (cards_player.length) {
+                await player.discard(cards_player);
+            } else if (cards_target.length) {
+                await target.discard(cards_target);
+            }
+            if (cards_player.length != cards_target.length) {
+                const user = cards_player.length > cards_target.length ? player : target;
+                const aim = user == player ? target : player;
+                const juedou = new lib.element.VCard({ name: "juedou", isCard: true });
+                if (user.canUse(juedou, aim, false)) {
+                    await user.useCard(juedou, aim, false);
+                }
+            }
+        },
+        ai: {
+            order: 1,
+            result: {
+                player(player, target) {
+                    let num =
+                        (player.hasSkill("shangshi") ? Math.max(0, player.getDamagedHp() - player.countCards("h") / 2) : 0) -
+                        player.countDiscardableCards(player, "h") / 2;
+                    return get.effect(player, { name: "juedou" }, target, player) + get.effect(player, { name: "draw" }, player, player) * num;
+                },
+                target(player, target) {
+                    return (
+                        get.effect(target, { name: "juedou" }, player, target) -
+                        (get.effect(target, { name: "draw" }, target, target) * target.countDiscardableCards(target, "h")) / 2
+                    );
+                },
+            },
+        },
+        chooseControl(player, targets, eventId) {
+            let colors = ["red", "black"];
+            if (player.getDiscardableCards(player, "h").some(card => get.color(card) == "none")) {
+                colors.push("none2");
+            }
+            const str = get.translation(targets[0] == player ? targets[1] : targets[0]);
+            return player
+                .chooseControl(colors)
+                .set("prompt", "翦灭：请选择一个颜色")
+                .set("prompt2", "弃置选择颜色的手牌，然后若你/" + str + "弃置的牌更多，则你/" + str + "视为对" + str + "/你使用【决斗】")
+                .set("ai", () => {
+                    const player = get.event().player;
+                    let controls = get.event().controls.slice();
+                    return controls.sort((a, b) => {
+                        return (
+                            player
+                                .getDiscardableCards(player, "h")
+                                .filter(card => {
+                                    return get.color(card) == (a == "none2" ? "none" : a);
+                                })
+                                .reduce((sum, card) => sum + get.value(card, player), 0) -
+                            player
+                                .getDiscardableCards(player, "h")
+                                .filter(card => {
+                                    return get.color(card) == (b == "none2" ? "none" : b);
+                                })
+                                .reduce((sum, card) => sum + get.value(card, player), 0)
+                        );
+                    })[0];
+                })
+                .set("id", eventId)
+                .set("_global_waiting", true);
+        },
+    },
+    // 王元姬
+    // 谦冲
+    qianchong: {
+        audio: 1,
+        init(player, skill) {
+            const es = player.getCards("e");
+            if (es.length) {
+                if (es.every(card => get.color(card) == "red")) {
+                    player.addAdditionalSkill(skill, "mingzhe");
+                } else if (es.every(card => get.color(card) == "black")) {
+                    player.addAdditionalSkill(skill, "jx_weimu");
+                } else {
+                    player.removeAdditionalSkill(skill);
+                }
+            } else {
+                player.removeAdditionalSkill(skill);
+            }
+        },
+        onremove(player, skill) {
+            player.removeAdditionalSkill(skill);
+        },
+        trigger: { player: "phaseUseBegin" },
+        filter(event, player) {
+            if (["basic", "trick", "equip"].every(type => player.getStorage("qianchong_effect").includes(type))) {
+                return false;
+            }
+            const es = player.getCards("e");
+            if (!es.length) {
+                return true;
+            }
+            const col = get.color(es[0]);
+            for (let i = 0; i < es.length; i++) {
+                if (get.color(es[i]) != col) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        locked: true,
+        async cost(event, trigger, player) {
+            const list = ["basic", "trick", "equip", "cancel2"];
+            list.removeArray(player.getStorage("qianchong_effect"));
+            const result = await player
+                .chooseControl(list)
+                .set("ai", () => {
+                    const player = get.player();
+                    const choices = get.event().controls.slice().remove("cancel2");
+                    return choices.includes("basic") ? "basic" : choices.includes("trick") ? "trick" : choices.randomGet();
+                })
+                .set("prompt", get.prompt(event.skill))
+                .set("prompt2", "你可以选择一种类别的牌，然后你本回合内使用该类别的牌时没有次数和距离限制。")
+                .forResult();
+            event.result = {
+                bool: result?.control != "cancel2",
+                cost_data: result?.control,
+            };
+        },
+        async content(event, trigger, player) {
+            const { cost_data: type } = event;
+            player.addTempSkill(event.name + "_effect");
+            player.markAuto(event.name + "_effect", [type]);
+            const str = get.translation(type) + "牌";
+            game.log(player, "声明了", "#y" + str);
+            player.popup(str, "thunder");
+        },
+        derivation: ["jx_weimu", "mingzhe"],
+        group: "qianchong_change",
+        subSkill: {
+            effect: {
+                charlotte: true,
+                onremove: true,
+                intro: { content: "本回合内使用$牌没有次数和距离限制" },
+                mod: {
+                    cardUsable(card, player) {
+                        const type = get.type2(card);
+                        if (player.getStorage("qianchong_effect").includes(type)) {
+                            return Infinity;
+                        }
+                    },
+                    targetInRange(card, player) {
+                        const type = get.type2(card);
+                        if (player.getStorage("qianchong_effect").includes(type)) {
+                            return true;
+                        }
+                    },
+                },
+            },
+            change: {
+                trigger: {
+                    player: "loseAfter",
+                    global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
+                },
+                filter(event, player) {
+                    if (event.name == "equip" && event.player == player) {
+                        return true;
+                    }
+                    return event.getl?.(player)?.es?.length;
+                },
+                forced: true,
+                popup: false,
+                async content(event, trigger, player) {
+                    const skill = "qianchong";
+                    get.info(skill).init(player, skill);
+                },
+            },
+        },
+    },
+    mingzhe: {
+        audio: 2,
+        audioname: ["wangyuanji"],
+        trigger: {
+            player: "loseAfter",
+            global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
+        },
+        forced: true,
+        filter(event, player) {
+            if (player.isPhaseUsing()) {
+                return false;
+            }
+            var evt = event.getl(player);
+            for (var i of evt.cards2) {
+                if (get.color(i, player) == "red") {
+                    return true;
+                }
+            }
+            return false;
+        },
+        content() {
+            if (!trigger.visible) {
+                var cards = trigger.getl(player).hs.filter(function (i) {
+                    return get.color(i, player) == "red";
+                });
+                if (cards.length > 0) {
+                    player.showCards(cards, get.translation(player) + "发动了【明哲】");
+                }
+            }
+            player.draw();
+        },
+    },
+    // 尚俭
+    shangjian: {
+        audio: 2,
+        getNum(player) {
+            let num = 0;
+            player.getHistory("lose", evt => {
+                const evt2 = evt.relatedEvent || evt.getParent();
+                if (evt2.name == "useCard" && evt2.player == player && get.type(evt2.card, null, false) == "equip") {
+                    return;
+                }
+                if (evt.cards2?.length) {
+                    num += evt.cards2.length;
+                }
+            });
+            return num;
+        },
+        trigger: { global: "phaseJieshuBegin" },
+        filter(event, player) {
+            const num = get.info("shangjian").getNum(player);
+            return num > 0 && num <= player.hp;
+        },
+        forced: true,
+        async content(event, trigger, player) {
+            const num = get.info(event.name).getNum(player);
+            if (num > 0) {
+                await player.draw(num);
+            }
         },
     },
 };

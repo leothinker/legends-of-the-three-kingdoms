@@ -86,6 +86,19 @@ const characters = {
         hp: 3,
         skills: ["tiandu", "xianfu", "chouce"],
     },
+    jx_zhangchunhua: {
+        sex: "female",
+        group: "wei",
+        hp: 3,
+        skills: ["jueqing", "shangshi", "jianmie"],
+    },
+    wangyuanji: {
+        sex: "female",
+        group: "wei",
+        hp: 3,
+        skills: ["qianchong", "shangjian"],
+        groupBorder: "jin",
+    },
 };
 
 export default characters;

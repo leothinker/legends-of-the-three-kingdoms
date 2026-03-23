@@ -430,7 +430,7 @@ const skills = {
             return player.hp == 1;
         },
         forced: true,
-        async content(event, trigger, player) {},
+        async content(event, trigger, player) { },
     },
     guhuo_phase: {},
     jx_leiji: {
@@ -671,7 +671,7 @@ const skills = {
             }
             event.result = { bool: true, skill_popup: false }; // 好像在content里面不能中断getIndex喵
         },
-        async content(event, trigger, player) {},
+        async content(event, trigger, player) { },
     },
     qimou: {
         limited: true,
@@ -2447,6 +2447,8 @@ const skills = {
         },
     },
     jx_weimu: {
+        audio: 2,
+        audioname: ["wangyuanji"],
         trigger: {
             target: "useCardToTarget",
             player: "addJudgeBefore",
@@ -2481,6 +2483,7 @@ const skills = {
         group: ["jx_weimu_effect"],
         subSkill: {
             effect: {
+                audio: "jx_weimu",
                 enable: "chooseToUse",
                 viewAs: {
                     name: "jiedao",

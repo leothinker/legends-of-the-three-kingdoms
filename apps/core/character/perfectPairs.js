@@ -1,2 +1,1 @@
-window.noname_character_perfectPairs = {
-};
+window.noname_character_perfectPairs = {}

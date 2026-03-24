@@ -1,4 +1,3 @@
-const characterIntro = {
-};
+const characterIntro = {}
 
-export default characterIntro;
+export default characterIntro

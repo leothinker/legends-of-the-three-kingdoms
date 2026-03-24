@@ -1,1 +1,1 @@
-window.noname_character_replace = {};
+window.noname_character_replace = {}

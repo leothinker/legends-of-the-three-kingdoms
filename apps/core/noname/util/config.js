@@ -1,15 +1,15 @@
-import { lib, game } from "noname";
+import { lib, game } from "noname"
 
 /**
  * @param {string} name
  * @returns {any}
  */
 export function get(name) {
-	const config = lib.config;
-	if (!config) {
-		return null;
-	}
-	return Reflect.get(config, name);
+  const config = lib.config
+  if (!config) {
+    return null
+  }
+  return Reflect.get(config, name)
 }
 
 /**
@@ -18,11 +18,11 @@ export function get(name) {
  * @returns {void}
  */
 export function set(name, value) {
-	const config = lib.config;
-	if (!config) {
-		return;
-	}
-	Reflect.set(config, name, value);
+  const config = lib.config
+  if (!config) {
+    return
+  }
+  Reflect.set(config, name, value)
 }
 
 /**
@@ -30,11 +30,11 @@ export function set(name, value) {
  * @returns {boolean}
  */
 export function has(name) {
-	const config = lib.config;
-	if (!config) {
-		return false;
-	}
-	return Reflect.has(config, name);
+  const config = lib.config
+  if (!config) {
+    return false
+  }
+  return Reflect.has(config, name)
 }
 
 /**
@@ -50,33 +50,35 @@ export function has(name) {
  * @return {Promise<any>}
  */
 export function load(name, type, reinitLocalStorage = true, reinitIndexedDB = undefined) {
-	if (lib.db) {
-		let result = game.getDB(type, name);
+  if (lib.db) {
+    let result = game.getDB(type, name)
 
-		if (typeof reinitIndexedDB != "undefined") {
-			result = result.catch(() => game.putDB(type, name, reinitIndexedDB).then(() => reinitIndexedDB));
-		}
+    if (typeof reinitIndexedDB != "undefined") {
+      result = result.catch(() =>
+        game.putDB(type, name, reinitIndexedDB).then(() => reinitIndexedDB),
+      )
+    }
 
-		return result;
-	}
+    return result
+  }
 
-	let config;
-	try {
-		let json = localStorage.getItem(`${lib.configprefix}${type === "data" ? name : type}`);
-		if (!json) {
-			throw new Error();
-		}
-		config = JSON.parse(json);
-		if (typeof config != "object" || config == null) {
-			throw new Error();
-		}
-	} catch (err) {
-		config = {};
-		if (reinitLocalStorage) {
-			localStorage.setItem(`${lib.configprefix}${name}`, "{}");
-		}
-	}
-	return Promise.resolve(type === "data" ? config : config[name]);
+  let config
+  try {
+    let json = localStorage.getItem(`${lib.configprefix}${type === "data" ? name : type}`)
+    if (!json) {
+      throw new Error()
+    }
+    config = JSON.parse(json)
+    if (typeof config != "object" || config == null) {
+      throw new Error()
+    }
+  } catch (err) {
+    config = {}
+    if (reinitLocalStorage) {
+      localStorage.setItem(`${lib.configprefix}${name}`, "{}")
+    }
+  }
+  return Promise.resolve(type === "data" ? config : config[name])
 }
 
 /**
@@ -91,44 +93,44 @@ export function load(name, type, reinitLocalStorage = true, reinitIndexedDB = un
  * @return {Promise<void>}
  */
 export function save(name, type, value) {
-	let noValue = typeof value == "undefined";
+  let noValue = typeof value == "undefined"
 
-	if (lib.db) {
-		return noValue ? game.deleteDB(type, name) : game.putDB(type, name, value);
-	}
+  if (lib.db) {
+    return noValue ? game.deleteDB(type, name) : game.putDB(type, name, value)
+  }
 
-	let database = type === "data";
-	let key = database ? name : type;
+  let database = type === "data"
+  let key = database ? name : type
 
-	let config;
-	if (database) {
-		if (noValue) {
-			localStorage.removeItem(`${lib.configprefix}${key}`);
-			return Promise.resolve();
-		} else {
-			config = value;
-		}
-	} else {
-		try {
-			let json = localStorage.getItem(`${lib.configprefix}${key}`);
-			if (!json) {
-				throw new Error();
-			}
-			config = JSON.parse(json);
-			if (typeof config != "object" || config == null) {
-				throw new Error();
-			}
-		} catch (err) {
-			config = {};
-		}
+  let config
+  if (database) {
+    if (noValue) {
+      localStorage.removeItem(`${lib.configprefix}${key}`)
+      return Promise.resolve()
+    } else {
+      config = value
+    }
+  } else {
+    try {
+      let json = localStorage.getItem(`${lib.configprefix}${key}`)
+      if (!json) {
+        throw new Error()
+      }
+      config = JSON.parse(json)
+      if (typeof config != "object" || config == null) {
+        throw new Error()
+      }
+    } catch (err) {
+      config = {}
+    }
 
-		if (noValue) {
-			delete config[name];
-		} else {
-			config[name] = value;
-		}
-	}
+    if (noValue) {
+      delete config[name]
+    } else {
+      config[name] = value
+    }
+  }
 
-	localStorage.setItem(`${lib.configprefix}${key}`, JSON.stringify(config));
-	return Promise.resolve();
+  localStorage.setItem(`${lib.configprefix}${key}`, JSON.stringify(config))
+  return Promise.resolve()
 }

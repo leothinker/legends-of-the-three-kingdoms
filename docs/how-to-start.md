@@ -11,10 +11,10 @@
 
 验证（输出版本号）：
 
-   ```bash
-   node -v
-   npm -v
-   ```
+```bash
+node -v
+npm -v
+```
 
 ### pnpm (>=8)
 
@@ -43,29 +43,28 @@ pnpm install
 - ### 开发环境
 
   执行：
-  
+
   ```bash
   pnpm dev
   ```
-  
+
   使用vite服务器开发。浏览器会自动打开，占用本地的8080端口和8089端口。
 
 - ### 构建项目
-
   - 打包代码（只包含运行时必要的代码）：
-  
+
     ```bash
     pnpm build
     ```
-  
+
   - 打包离线包（包含完整源代码以及这个版本更新的素材）：
-  
+
     ```bash
     pnpm build:diff
     ```
-  
+
   - 打包完整包（包含完整源代码、所有素材和所有内置扩展）：
-  
+
     ```bash
     pnpm build:full
     ```
@@ -85,7 +84,7 @@ pnpm install
 - ### 生产环境
 
   执行：
-  
+
   ```bash
   pnpm start
   ```
@@ -95,29 +94,29 @@ pnpm install
   ```bash
   pnpm serve
   ```
-  
+
   浏览器会自动打开，占用本地的8080端口。
 
 - ### 语法检查
 
   执行：
-  
+
   ```bash
   pnpm lint
   ```
-  
+
   进行eslint检查，如果没有任何输出即可提交，否则请检查提示位置。
 
 ## Q&A
 
 1. **Q:** 执行npm命令的时候提示:
 
-    ```powershell
-    无法加载文件 path/to/your/nodejs/npm.ps1, 因为在此系统上禁止运行脚本。
-    ```
+   ```powershell
+   无法加载文件 path/to/your/nodejs/npm.ps1, 因为在此系统上禁止运行脚本。
+   ```
 
-    **A:** 使用管理员权限打开VSCode。如果仍未解决，请先在命令行输入以下命令：
+   **A:** 使用管理员权限打开VSCode。如果仍未解决，请先在命令行输入以下命令：
 
-    ```powershell
-    set-executionpolicy remotesigned -scope currentuser
-    ```
+   ```powershell
+   set-executionpolicy remotesigned -scope currentuser
+   ```

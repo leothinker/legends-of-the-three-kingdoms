@@ -365,9 +365,13 @@ export interface EventChooseTargetParams extends ChooseBase, CheckTargetParams {
   dialog?: Dialog
 }
 
-export interface EventChooseCardTargetParams extends ChooseBase, CheckCardTargetParams {}
+export interface EventChooseCardTargetParams
+  extends ChooseBase,
+    CheckCardTargetParams {}
 
-export interface EventChooseButtonTargetParams extends ChooseBase, CheckButtonTargetParams {}
+export interface EventChooseButtonTargetParams
+  extends ChooseBase,
+    CheckButtonTargetParams {}
 
 export interface EventChooseControlListParams extends ChooseBase {
   list?: string[]

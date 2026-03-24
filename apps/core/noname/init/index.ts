@@ -763,11 +763,11 @@ function initSheet() {
       `#window .player>.framebg,
 			#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg {
 				display:block;
-				background-image:url("${lib.assetURL + "theme/style/player/" + bstyle + "1.png"}")
+				background-image:url("${`${lib.assetURL}theme/style/player/${bstyle}1.png`}")
 			}`,
       `#window #arena.long:not(.fewplayer) .player>.framebg,
 			#arena.oldlayout .player>.framebg {
-				background-image: url("${lib.assetURL + "theme/style/player/" + bstyle + "3.png"}")
+				background-image: url("${`${lib.assetURL}theme/style/player/${bstyle}3.png`}")
 			}`,
       `.player>.count {
 				z-index: 3 !important;

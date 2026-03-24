@@ -17,3 +17,5 @@ package-lock.json
 # Windows
 ehthumbs.db
 Thumbs.db
+
+pnpm-lock.yaml

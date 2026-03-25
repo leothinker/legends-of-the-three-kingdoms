@@ -339,9 +339,7 @@
   opacity: 0.6;
 }
 
-#window:not(.nopointer)
-  .menubg.charactercard
-  .menubutton:not(.ava):not(.intro):not(.unselectable),
+#window:not(.nopointer) .menubg.charactercard .menubutton:not(.ava):not(.intro):not(.unselectable),
 #window:not(.nopointer) .menubg.charactercard > .ava > .avatars > div {
   cursor: pointer;
 }
@@ -1401,11 +1399,7 @@ input.fileinput::-webkit-file-upload-button {
   border-radius: 4px;
 }
 
-#window[data-radius_size="off"]
-  .menu-buttons
-  > .new_character
-  > .avatar
-  > input,
+#window[data-radius_size="off"] .menu-buttons > .new_character > .avatar > input,
 #window[data-radius_size="off"] .menu-buttons > .new_character > .card > input {
   border-radius: 0px;
 }

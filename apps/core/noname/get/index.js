@@ -5453,7 +5453,6 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         td.innerHTML = node.phaseNumber
         tr.appendChild(td)
         td = document.createElement("td")
-
         ;(function () {
           let num = 0
           for (var j = 0; j < node.stat.length; j++) {

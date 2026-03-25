@@ -4,7 +4,6 @@ import { userAgentLowerCase, device } from "@/util/index.js"
 import "core-js-bundle"
 // 保证打包时存在(importmap)
 import "vue/dist/vue.esm-browser.js"
-
 ;(async () => {
   try {
     lib.device = device

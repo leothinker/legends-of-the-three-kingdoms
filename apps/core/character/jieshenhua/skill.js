@@ -4787,7 +4787,7 @@ const skills = {
   },
   cunmu: {
     audio: 2,
-    audioname: ["ol_pengyang"],
+    audioname: ["pengyang"],
     trigger: {
       player: "drawBegin",
     },

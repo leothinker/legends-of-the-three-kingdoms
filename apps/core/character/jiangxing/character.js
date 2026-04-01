@@ -209,6 +209,18 @@ const characters = {
     hp: 4,
     skills: ["shuangrui", "fuxie"],
   },
+  shamoke: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["jili"],
+  },
+  wolongfengchu: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["youlong", "luanfeng"],
+  },
 }
 
 export default characters

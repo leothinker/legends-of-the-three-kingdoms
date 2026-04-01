@@ -6967,6 +6967,421 @@ const skills = {
       }
     },
   },
+  // 沙摩柯
+  // 蒺藜
+  jili: {
+    mod: {
+      aiOrder(player, card, num) {
+        if (player.isPhaseUsing() && get.subtype(card) == "equip1" && !get.cardtag(card, "gifts")) {
+          var range0 = player.getAttackRange()
+          var range = 0
+          var info = get.info(card)
+          if (info && info.distance && info.distance.attackFrom) {
+            range -= info.distance.attackFrom
+          }
+          if (player.getEquip(1)) {
+            var num = 0
+            var info = get.info(player.getEquip(1))
+            if (info && info.distance && info.distance.attackFrom) {
+              num -= info.distance.attackFrom
+            }
+            range0 -= num
+          }
+          range0 += range
+          if (
+            range0 ==
+              player.getHistory("useCard").length + player.getHistory("respond").length + 2 &&
+            player.countCards("h", function (cardx) {
+              return get.subtype(cardx) != "equip1" && player.getUseValue(cardx) > 0
+            })
+          ) {
+            return num + 10
+          }
+        }
+      },
+    },
+    trigger: { player: ["useCard", "respond"] },
+    frequent: true,
+    locked: false,
+    preHidden: true,
+    onremove(player) {
+      player.removeTip("jili")
+    },
+    filter(event, player) {
+      let count = player.getHistory("useCard").length + player.getHistory("respond").length
+      player.addTip("jili", "蒺藜 " + count, true)
+      return count == player.getAttackRange()
+    },
+    audio: 2,
+    content() {
+      player.draw(player.getHistory("useCard").length + player.getHistory("respond").length)
+    },
+    ai: {
+      threaten: 1.8,
+      effect: {
+        target_use(card, player, target, current) {
+          let used = target.getHistory("useCard").length + target.getHistory("respond").length
+          if (get.subtype(card) == "equip1" && !get.cardtag(card, "gifts")) {
+            if (player != target || !player.isPhaseUsing()) {
+              return
+            }
+            let range0 = player.getAttackRange()
+            let range = 0
+            let info = get.info(card)
+            if (info && info.distance && info.distance.attackFrom) {
+              range -= info.distance.attackFrom
+            }
+            if (player.getEquip(1)) {
+              let num = 0
+              let info = get.info(player.getEquip(1))
+              if (info && info.distance && info.distance.attackFrom) {
+                num -= info.distance.attackFrom
+              }
+              range0 -= num
+            }
+            range0 += range
+            let delta = range0 - used
+            if (delta < 0) {
+              return
+            }
+            let num = player.countCards("h", function (card) {
+              return (
+                (get.cardtag(card, "gifts") || get.subtype(card) != "equip1") &&
+                player.getUseValue(card) > 0
+              )
+            })
+            if (delta == 2 && num > 0) {
+              return [1, 3]
+            }
+            if (num >= delta) {
+              return "zeroplayertarget"
+            }
+          } else if (get.tag(card, "respondShan") > 0) {
+            if (current < 0 && used == target.getAttackRange() - 1) {
+              if (card.name === "sha") {
+                if (!target.mayHaveShan(player, "use")) {
+                  return
+                }
+              } else if (!target.mayHaveShan(player)) {
+                return 0.9
+              }
+              return [1, (used + 1) / 2]
+            }
+          } else if (get.tag(card, "respondSha") > 0) {
+            if (current < 0 && used == target.getAttackRange() - 1 && target.mayHaveSha(player)) {
+              return [1, (used + 1) / 2]
+            }
+          }
+        },
+      },
+    },
+  },
+  youlong: {
+    enable: "chooseToUse",
+    audio: 2,
+    zhuanhuanji: true,
+    marktext: "☯",
+    mark: true,
+    intro: {
+      content(storage, player) {
+        return `每轮限一次，你可以废除你的一个装备栏，视为使用一张未以此法使用过的${storage ? "基本" : "普通锦囊"}牌。`
+      },
+    },
+    init(player) {
+      player.storage.youlong = false
+      if (!player.storage.youlong2) {
+        player.storage.youlong2 = []
+      }
+    },
+    hiddenCard(player, name) {
+      if (player.storage.youlong2.includes(name) || !player.hasEnabledSlot()) {
+        return false
+      }
+      if (player.getStorage("youlong_used").includes(player.storage.youlong || false)) {
+        return false
+      }
+      const type = get.type(name)
+      if (player.storage.youlong) {
+        return type == "basic"
+      }
+      return type == "trick"
+    },
+    filter(event, player) {
+      if (player.storage.youlong2.includes(name) || !player.hasEnabledSlot()) {
+        return false
+      }
+      if (player.getStorage("youlong_used").includes(player.storage.youlong || false)) {
+        return false
+      }
+      const type = player.storage.youlong ? "basic" : "trick"
+      return get.inpileVCardList((info) => {
+        if (info[0] != type) {
+          return false
+        }
+        if (player.storage.youlong2.includes(info[2])) {
+          return false
+        }
+        return event.filterCard({ name: info[2], nature: info[3], isCard: true }, player, event)
+      }).length
+    },
+    chooseButton: {
+      dialog(event, player) {
+        const dialog = ui.create.dialog("游龙", "hidden")
+        const equips = []
+        for (let i = 1; i < 6; i++) {
+          if (!player.hasEnabledSlot(i)) {
+            continue
+          }
+          equips.push([i, get.translation("equip" + i)])
+        }
+        if (equips.length > 0) {
+          dialog.add([equips, "tdnodes"])
+        }
+        const type = player.storage.youlong ? "basic" : "trick"
+        const list = get.inpileVCardList((info) => {
+          if (info[0] != type) {
+            return false
+          }
+          if (player.storage.youlong2.includes(info[2])) {
+            return false
+          }
+          return event.filterCard({ name: info[2], nature: info[3], isCard: true }, player, event)
+        })
+        dialog.add([list, "vcard"])
+        return dialog
+      },
+      filter(button) {
+        if (
+          ui.selected.buttons.length &&
+          typeof button.link == typeof ui.selected.buttons[0].link
+        ) {
+          return false
+        }
+        return true
+      },
+      select: 2,
+      check(button) {
+        const player = get.player()
+        if (typeof button.link == "number") {
+          const card = player.getEquip(button.link)
+          if (card) {
+            const val = get.value(card)
+            if (val > 0) {
+              return 0
+            }
+            return 5 - val
+          }
+          switch (button.link) {
+            case 3:
+              return 4.5
+            case 4:
+              return 4.4
+            case 5:
+              return 4.3
+            case 2:
+              return (3 - player.hp) * 1.5
+            case 1: {
+              if (
+                game.hasPlayer((current) => {
+                  return (
+                    (get.realAttitude || get.attitude)(player, current) < 0 &&
+                    get.distance(player, current) > 1
+                  )
+                })
+              ) {
+                return 0
+              }
+              return 3.2
+            }
+          }
+        }
+        const name = button.link[2]
+        const evt = get.event().getParent()
+        if (evt.type == "phase") {
+          const card = { name: name, nature: button.link[3], isCard: true }
+          if (name == "shan") {
+            return 2
+          }
+          if (evt.type == "dying") {
+            if (get.attitude(player, evt.dying) < 2) {
+              return false
+            }
+            if (name == "jiu") {
+              return 2.1
+            }
+            return 1.9
+          }
+          return player.getUseValue(card)
+        }
+        return 1
+      },
+      backup(links, player) {
+        if (typeof links[1] == "number") {
+          links.reverse()
+        }
+        const equip = links[0]
+        const name = links[1][2]
+        const nature = links[1][3]
+        return {
+          filterCard: () => false,
+          selectCard: -1,
+          equip: equip,
+          viewAs: {
+            name: name,
+            nature: nature,
+            isCard: true,
+          },
+          popname: true,
+          log: false,
+          precontent() {
+            player.logSkill("youlong")
+            player.disableEquip(lib.skill.youlong_backup.equip)
+            player.addTempSkill("youlong_used", "roundStart")
+            player.markAuto("youlong_used", [player.storage.youlong || false])
+            player.changeZhuanhuanji("youlong")
+            player.storage.youlong2.add(event.result.card.name)
+          },
+        }
+      },
+      prompt(links, player) {
+        if (typeof links[1] == "number") {
+          links.reverse()
+        }
+        const equip = "equip" + links[0]
+        const name = links[1][2]
+        const nature = links[1][3]
+        return (
+          "废除自己的" +
+          get.translation(equip) +
+          "栏，视为使用" +
+          (get.translation(nature) || "") +
+          get.translation(name)
+        )
+      },
+    },
+    ai: {
+      respondSha: true,
+      respondShan: true,
+      skillTagFilter(player, tag, arg) {
+        if (arg == "respond") {
+          return false
+        }
+        if (!player.storage.youlong || player.getStorage("youlong_used").includes(true)) {
+          return false
+        }
+        const name = tag == "respondSha" ? "sha" : "shan"
+        return !player.storage.youlong2.includes(name)
+      },
+      order(item, player) {
+        if (player && _status.event.type == "phase") {
+          let max = 0,
+            add = false
+          const type = player.storage.youlong ? "basic" : "trick"
+          let list = lib.inpile.filter(
+            (name) => get.type(name) == type && !player.storage.youlong2.includes(name),
+          )
+          if (list.includes("sha")) {
+            add = true
+          }
+          list = list.map((namex) => {
+            return { name: namex, isCard: true }
+          })
+          if (add) {
+            lib.inpile_nature.forEach((naturex) =>
+              list.push({ name: "sha", nature: naturex, isCard: true }),
+            )
+          }
+          for (const card of list) {
+            if (player.getUseValue(card) > 0) {
+              const temp = get.order(card)
+              if (temp > max) {
+                max = temp
+              }
+            }
+          }
+          if (max > 0) {
+            max += 0.3
+          }
+          return max
+        }
+        return 1
+      },
+      result: {
+        player(player) {
+          if (_status.event.dying) {
+            return get.attitude(player, _status.event.dying)
+          }
+          return 1
+        },
+      },
+    },
+    subSkill: { used: { charlotte: true, onremove: true } },
+  },
+  luanfeng: {
+    audio: 2,
+    trigger: { global: "dying" },
+    filter(event, player) {
+      return event.player.maxHp >= player.maxHp && event.player.hp < 1
+    },
+    limited: true,
+    skillAnimation: true,
+    animationColor: "soil",
+    logTarget: "player",
+    check(event, player) {
+      if (get.attitude(player, event.player) < 4) {
+        return false
+      }
+      if (
+        player.countCards("h", function (card) {
+          var mod2 = game.checkMod(card, player, "unchanged", "cardEnabled2", player)
+          if (mod2 != "unchanged") {
+            return mod2
+          }
+          var mod = game.checkMod(card, player, event.player, "unchanged", "cardSavable", player)
+          if (mod != "unchanged") {
+            return mod
+          }
+          var savable = get.info(card).savable
+          if (typeof savable == "function") {
+            savable = savable(card, player, event.player)
+          }
+          return savable
+        }) >=
+        1 - event.player.hp
+      ) {
+        return false
+      }
+      if (event.player == player || event.player == get.zhu(player)) {
+        return true
+      }
+      return !player.hasUnknown()
+    },
+    content() {
+      "step 0"
+      player.awakenSkill(event.name)
+      trigger.player.recover(3 - trigger.player.hp)
+      ;("step 1")
+      var list = [],
+        target = trigger.player
+      for (var i = 1; i < 6; i++) {
+        for (var j = 0; j < target.countDisabledSlot(i); j++) {
+          list.push(i)
+        }
+      }
+      if (list.length > 0) {
+        target.enableEquip(list)
+      }
+      if (list.length < 6) {
+        target.drawTo(6 - list.length)
+      }
+      if (target.storage.kotarou_rewrite) {
+        target.storage.kotarou_rewrite = []
+      }
+      if (player == target) {
+        player.storage.youlong2 = []
+      }
+    },
+  },
 }
 
 export default skills

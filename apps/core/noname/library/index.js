@@ -13561,6 +13561,13 @@ export class Library {
       },
     ],
     [
+      "谋",
+      {
+        color: "#def7ca",
+        nature: "woodmm",
+      },
+    ],
+    [
       "神",
       {
         color: "#faecd1",

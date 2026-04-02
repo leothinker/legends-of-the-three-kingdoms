@@ -99,7 +99,6 @@ const translates = {
   jx_fanjian: "反间",
   jx_fanjian_card: "弃牌",
   jx_fanjian_hp: "失去体力",
-
   jx_fanjian_info:
     "出牌阶段限一次，你可以展示一张手牌并交给一名角色，令其选择一项：1.展示所有手牌，然后弃置与此牌花色相同的所有牌；2.失去1点体力。",
 

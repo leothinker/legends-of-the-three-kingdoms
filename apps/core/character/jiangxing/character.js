@@ -221,6 +221,24 @@ const characters = {
     hp: 4,
     skills: ["youlong", "luanfeng"],
   },
+  md_guanping: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["wuwei"],
+  },
+  panghong: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["pingzhi", "gangjian"],
+  },
+  dengzhi: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["jianliang", "weimeng"],
+  },
 }
 
 export default characters

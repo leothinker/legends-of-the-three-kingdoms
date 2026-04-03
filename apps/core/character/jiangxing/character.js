@@ -47,7 +47,7 @@ const characters = {
     sex: "male",
     group: "wei",
     hp: 3,
-    skills: ["jianzheng", "fumou"],
+    skills: ["sp_jianzheng", "fumou"],
   },
   zhenghun: {
     sex: "male",
@@ -238,6 +238,30 @@ const characters = {
     group: "shu",
     hp: 3,
     skills: ["jianliang", "weimeng"],
+  },
+  hujinding: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["qingyuan", "chongshen"],
+  },
+  wuban: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["youzhan"],
+  },
+  qinmi: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["zhuandui", "jianzheng", "tianbian"],
+  },
+  jx_wuyi: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["jx_benxi"],
   },
 }
 

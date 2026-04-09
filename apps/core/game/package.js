@@ -9,6 +9,8 @@ window.noname_package = {
     zhencang: "珍藏版",
     // shenwu: "神武再世",
     tianshui: "天水濯名",
+    jsrg: "江山如故",
+    sxrm: "蚀心入魔",
   },
   card: {
     standard: "标准版",

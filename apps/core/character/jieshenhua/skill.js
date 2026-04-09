@@ -4032,6 +4032,29 @@ const skills = {
     },
     ai: { combo: "feijun" },
   },
+  huaiju_ai: {
+    charlotte: true,
+    ai: {
+      filterDamage: true,
+      skillTagFilter(player, tag, arg) {
+        if (!player.hasMark("huaiju")) {
+          return false
+        }
+        if (
+          !game.hasPlayer(function (current) {
+            return current.hasSkill("tachibana_effect")
+          })
+        ) {
+          return false
+        }
+        if (arg && arg.player) {
+          if (arg.player.hasSkillTag("jueqing", false, player)) {
+            return false
+          }
+        }
+      },
+    },
+  },
   huaiju: {
     marktext: "橘",
     intro: {
@@ -4053,6 +4076,27 @@ const skills = {
       player.addSkill("huaiju_ai")
     },
     group: ["tachibana_effect"],
+  },
+  //没错 这是个橘
+  tachibana_effect: {
+    audio: "huaiju",
+    sourceSkill: "huaiju",
+    trigger: {
+      global: ["damageBegin4", "phaseDrawBegin2"],
+    },
+    forced: true,
+    filter(event, player) {
+      return event.player.hasMark("huaiju") && (event.name == "damage" || !event.numFixed)
+    },
+    async content(event, trigger, player) {
+      player.line(trigger.player, "green")
+      if (trigger.name == "damage") {
+        trigger.cancel()
+        trigger.player.removeMark("huaiju", 1)
+      } else {
+        trigger.num++
+      }
+    },
   },
   yili: {
     audio: 2,

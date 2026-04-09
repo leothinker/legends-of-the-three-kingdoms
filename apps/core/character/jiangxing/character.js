@@ -53,7 +53,7 @@ const characters = {
     sex: "male",
     group: "wei",
     hp: 3,
-    skills: ["qiangzhi", "pitian"],
+    skills: ["dcqiangzhi", "pitian"],
   },
   zhaoyan: {
     sex: "male",
@@ -262,6 +262,62 @@ const characters = {
     group: "shu",
     hp: 4,
     skills: ["jx_benxi"],
+  },
+  re_zhangsong: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["qiangzhi", "rexiantu"],
+  },
+  zhangxingcai: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["oldshenxian", "qiangwu"],
+    dieAudios: ["zhangxingcai"],
+  },
+  dc_huojun: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["dcgue", "dcsigong"],
+  },
+  ol_zhouqun: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["oltianhou", "olchenshuo"],
+  },
+  mb_ganfuren: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["mbzhijie", "mbshushen"],
+  },
+  re_liuchen: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["rezhanjue", "reqinwang"],
+    isZhugong: true,
+  },
+  qiaozhou: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["zhiming", "xingbu"],
+  },
+  v_sunquan: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["dcwoheng", "dcyuhui"],
+  },
+  sb_luxun: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["sbqianxun", "sblianying"],
   },
 }
 

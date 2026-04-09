@@ -13581,6 +13581,13 @@ export class Library {
         nature: "blackmm",
       },
     ],
+    [
+      "威",
+      {
+        color: "#ff9966",
+        nature: "glodenmm",
+      },
+    ],
   ])
   groupnature = {
     shen: "shen",

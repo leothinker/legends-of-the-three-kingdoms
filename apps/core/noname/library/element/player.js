@@ -501,6 +501,9 @@ export class Player extends HTMLDivElement {
         }
       })
     }
+    if (this.getCards("h").every((card, index) => hs[index] == card)) {
+      return false
+    }
 
     this.node.handcards1.style.visibility = "hidden"
     this.node.handcards2.style.visibility = "hidden"
@@ -528,7 +531,7 @@ export class Player extends HTMLDivElement {
    * @param {(a: Card, b: Card) => number|Card[]} [sort] 排序方法，如果传的牌数组，就按数组顺序排
    */
   sortHandcardOL(sort) {
-    const bool = game.me.sortHandcard(sort)
+    const bool = this.sortHandcard(sort)
     //联机要同步手牌状态
     if (_status.connectMode && bool !== false) {
       if (game.online) {
@@ -538,11 +541,70 @@ export class Player extends HTMLDivElement {
         )
       } else {
         game.syncHandcard(
-          game.me,
+          this,
           this.getCards("h").map((i) => i.cardid),
         )
       }
     }
+  }
+  /**
+   * 是否拥有对应战法
+   * @param {string} id 战法的id
+   */
+  hasZhanfa(id) {
+    return this.getStorage("zhanfa").includes(id)
+  }
+  /**
+   * 获得对应战法
+   * @param {string} id 战法的id
+   */
+  addZhanfa(id) {
+    const skill = lib.zhanfa.getSkill(id)
+    if (!skill) {
+      console.warn(`不存在战法: ${id}`)
+      return
+    } else if (this.hasZhanfa(id)) {
+      return
+    }
+    game.log(this, "获得战法", `#g【${get.translation(id)}】`)
+    const card = game.createCard(id, "战法", "")
+    this.$draw(card, void 0, void 0, false)
+    this.addAdditionalSkill("zhanfa", skill, true)
+    this.markAuto("zhanfa", id)
+    const next = game.createEvent("addZhanfa", false, get.event())
+    next.player = this
+    next.zhanfaId = id
+    next.forceDie = true
+    next.includeOut = true
+    next.setContent(async (event, trigger, player) => {
+      await event.trigger(event.name)
+    })
+  }
+  /**
+   * 失去对应战法
+   * @param {string} id 战法的id
+   */
+  removeZhanfa(id) {
+    const skill = lib.zhanfa.getSkill(id)
+    if (!skill) {
+      console.warn(`不存在战法: ${id}`)
+      return
+    } else if (!this.hasZhanfa(id)) {
+      return
+    }
+    game.log(this, "失去战法", `#g【${get.translation(id)}】`)
+    const card = game.createCard(id, "战法", "")
+    this.$throw(card, 1000, void 0, void 0, false)
+    this.removeAdditionalSkill("zhanfa", skill)
+    this.unmarkAuto("zhanfa", id)
+    const next = game.createEvent("removeZhanfa", false, get.event())
+    next.player = this
+    next.zhanfaId = id
+    next.forceDie = true
+    next.includeOut = true
+    next.setContent(async (event, trigger, player) => {
+      await event.trigger(event.name)
+    })
   }
   /**
    * 获取一名角色的名字翻译
@@ -2800,10 +2862,10 @@ export class Player extends HTMLDivElement {
       }
     }
     next.setContent("chooseToMove_new")
-    next.filterOk = function () {
+    next.filterOk ??= function () {
       return true
     }
-    next.filterMove = function () {
+    next.filterMove ??= function () {
       return true
     }
     next._args = Array.from(arguments)
@@ -4950,8 +5012,8 @@ export class Player extends HTMLDivElement {
     }
   }
   /**
-   * 获得蓄力点
-   * @param { number } [num = 1] 获得蓄力点数
+   * 获得蓄力值
+   * @param { number } [num = 1] 获得蓄力值数
    * @param { boolean } [log] false: 不进行广播
    */
   addCharge(num, log) {
@@ -4969,8 +5031,8 @@ export class Player extends HTMLDivElement {
     }
   }
   /**
-   * 移去蓄力点
-   * @param { number } [num = 1] 移去蓄力点数
+   * 移去蓄力值
+   * @param { number } [num = 1] 移去蓄力值数
    * @param { boolean } [log] false: 不进行广播
    */
   removeCharge(num, log) {
@@ -4983,8 +5045,8 @@ export class Player extends HTMLDivElement {
     }
   }
   /**
-   * 返回玩家的蓄力点数
-   * @param { boolean } [max] true: 返回当前蓄力点与上限之差
+   * 返回玩家的蓄力值数
+   * @param { boolean } [max] true: 返回当前蓄力值与上限之差
    * @returns { number }
    */
   countCharge(max) {
@@ -4997,7 +5059,7 @@ export class Player extends HTMLDivElement {
     return this.countMark("charge")
   }
   /**
-   * 获取蓄力点上限
+   * 获取蓄力值上限
    */
   getMaxCharge() {
     let skills = game.expandSkills(this.getSkills(null, null, false).concat(lib.skill.global))
@@ -7781,7 +7843,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家摸牌
    *
-   * @param { import("./Player/type.d").EventDrawParams } [params]
+   * @param { number | import("./Player/type.d").EventDrawParams } [params]
    * @returns { GameEvent }
    */
   draw(params) {
@@ -7791,7 +7853,14 @@ export class Player extends HTMLDivElement {
     const args = [...arguments]
     const event = _status.event
     // 就算是drawDeck项，由于已经判断了参数长度，不会出现不同的地方
-    if (args.length === 1 && get.is.object(params) && get.itemtype(params) == null) {
+    if (args.length === 1 && typeof params === "number") {
+      next.num = params
+    } else if (
+      args.length === 1 &&
+      typeof params === "object" &&
+      !Array.isArray(params) &&
+      get.itemtype(params) == null
+    ) {
       Object.assign(next, params)
       if (params.nodelay) {
         delete next.nodelay
@@ -8577,7 +8646,7 @@ export class Player extends HTMLDivElement {
         gaintag_map: {},
         vcard_map: new Map(),
       }
-      player.checkHistory("lose", function (evt) {
+      player.checkAllHistory("lose", function (evt) {
         if (evt.parent == that) {
           map.hs.addArray(evt.hs)
           map.es.addArray(evt.es)
@@ -8708,7 +8777,7 @@ export class Player extends HTMLDivElement {
         gaintag_map: {},
         vcard_map: new Map(),
       }
-      player.checkHistory("lose", function (evt) {
+      player.checkAllHistory("lose", function (evt) {
         if (evt.parent == that) {
           map.hs.addArray(evt.hs)
           map.es.addArray(evt.es)
@@ -9339,7 +9408,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * 令玩家死亡或进入休整状态
+   * 令玩家死亡
    * @param { GameEvent } [reason] 导致角色死亡的事件
    * @returns { GameEvent }
    */
@@ -9571,7 +9640,7 @@ export class Player extends HTMLDivElement {
         gaintag_map: {},
         vcard_map: new Map(),
       }
-      player.checkHistory("lose", function (evt) {
+      player.checkAllHistory("lose", function (evt) {
         if (evt.parent == that) {
           map.hs.addArray(evt.hs)
           map.es.addArray(evt.es)
@@ -9659,7 +9728,7 @@ export class Player extends HTMLDivElement {
         gaintag_map: {},
         vcard_map: new Map(),
       }
-      player.checkHistory("lose", function (evt) {
+      player.checkAllHistory("lose", function (evt) {
         if (evt.parent == that) {
           map.hs.addArray(evt.hs)
           map.es.addArray(evt.es)
@@ -10000,9 +10069,9 @@ export class Player extends HTMLDivElement {
   }
   /**
    * @param { string | string[] } name
-   * @param { Player | Player[] } [targets]
-   * @param { boolean | string } [nature]
-   * @param { boolean } [logv]
+   * @param { Player | Player[] | null } [targets]
+   * @param { boolean | string | null } [nature]
+   * @param { boolean | null } [logv]
    * @param { * } [args]
    */
   logSkill(name, targets, nature, logv, args) {
@@ -10542,7 +10611,7 @@ export class Player extends HTMLDivElement {
             this.storage[name].length = 0
           }
         } else if (typeof info.intro.onunmark == "function") {
-          info.intro.onunmark(this.storage[name], this)
+          info.intro.onunmark(this.storage[name], this, name)
         } else {
           delete this.storage[name]
         }
@@ -10719,10 +10788,18 @@ export class Player extends HTMLDivElement {
     }
   }
   addLink() {
-    this.classList.add("linked2")
+    if (get.is.linked2(this)) {
+      this.classList.add("linked2")
+    } else {
+      this.classList.add("linked")
+    }
   }
   removeLink() {
-    this.classList.remove("linked2")
+    if (get.is.linked2(this)) {
+      this.classList.remove("linked2")
+    } else {
+      this.classList.remove("linked")
+    }
   }
   /**
    * 能否对target使用card
@@ -12042,29 +12119,15 @@ export class Player extends HTMLDivElement {
     }
     return 0
   }
-  clearSkills(all) {
-    var list = []
-    var exclude = []
-    for (const arg of arguments) {
-      exclude.push(arg)
+  clearSkills(all, ...skills) {
+    if (!all) return this.removeSkills(this.getSkills(null, false, false).removeArray(skills))
+    var list = this.skills.filter((skill) => {
+      return !lib.skill[skill]?.superCharlotte && !skills.includes(skill)
+    })
+    for (var i in this.additionalSkills) {
+      this.removeAdditionalSkill(i)
     }
-    for (i = 0; i < this.skills.length; i++) {
-      if (lib.skill[this.skills[i]].superCharlotte) {
-        continue
-      }
-      if (!all && (lib.skill[this.skills[i]].temp || lib.skill[this.skills[i]].charlotte)) {
-        continue
-      }
-      if (!exclude.includes(this.skills[i])) {
-        list.push(this.skills[i])
-      }
-    }
-    if (all) {
-      for (var i in this.additionalSkills) {
-        this.removeAdditionalSkill(i)
-      }
-    }
-    this[all ? "removeSkill" : "removeSkills"](list)
+    this.removeSkill(list)
     this.checkConflict()
     this.checkMarks()
     return list
@@ -12487,7 +12550,7 @@ export class Player extends HTMLDivElement {
   }
   /**
    * 返回玩家的攻击距离
-   * @param { boolean } raw
+   * @param { boolean } [raw]
    * @returns { number }
    */
   getAttackRange(raw) {
@@ -12516,6 +12579,7 @@ export class Player extends HTMLDivElement {
       range = player.getEquipRange()
     }
     range = game.checkMod(player, range, "attackRange", player)
+    range = game.checkMod(player, range, "attackRangeFinal", player)
     return range
   }
   /**
@@ -13093,7 +13157,10 @@ export class Player extends HTMLDivElement {
    * @returns { boolean }
    */
   isLinked() {
-    return this.classList.contains("linked2")
+    if (get.is.linked2(this)) {
+      return this.classList.contains("linked2")
+    }
+    return this.classList.contains("linked")
   }
   /**
    * 返回玩家是否是翻面状态
@@ -15940,7 +16007,7 @@ export class Player extends HTMLDivElement {
     }
     if (init !== false) {
       game.broadcast(
-        function (player, card, init) {
+        function (player, card, init, cardsetion) {
           player.$gain(card, false, init, cardsetion)
         },
         this,

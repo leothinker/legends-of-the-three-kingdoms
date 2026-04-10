@@ -1215,7 +1215,7 @@ export class Game {
         gaintag_map: {},
         vcard_map: new Map(),
       }
-      player.checkHistory("lose", function (evt) {
+      player.checkAllHistory("lose", function (evt) {
         if (evt.parent == that) {
           map.hs.addArray(evt.hs)
           map.es.addArray(evt.es)
@@ -2323,6 +2323,7 @@ export class Game {
     // }
 
     game.#skillSyncDebounceMap[skill] ??= {}
+
     ;(game.#skillSyncDebounceMap[skill][sync] ??= debounce((...args) => {
       game.send("dataSync", { type: "skill", name: skill, key: sync, args }, null)
     }))(...args)
@@ -6315,27 +6316,20 @@ ${e instanceof Error ? e.stack : String(e)}`)
      */
     function processCharacter(content) {
       for (const name in content) {
-        const character = get.convertedCharacter(content[name])
+        const character = (content[name] = get.convertedCharacter(content[name]))
 
         // 处理武将图像和阵亡音效
-        const audiosrc = `die:ext:${extname}/${name}.mp3`
-        let imgsrc
-        if (_status.evaluatingExtension) {
-          imgsrc = `db:extension-${extname}:${name}.jpg`
-        } else {
-          imgsrc = `ext:${extname}/${name}.jpg`
-        }
-
-        character.img ??= imgsrc
         if (character.dieAudios.length === 0) {
-          character.dieAudios.push(audiosrc)
+          character.dieAudios.push(`ext:${extname}/audio/die:true`)
         }
+        character.img ??= `extension/${extname}/${name}.jpg`
 
         // 处理AI禁用
-        if (character.isBoss || character.isHiddenBoss) {
-          lib.config.forbidai.add(name)
-        }
-        if (lib.config.forbidai_user && lib.config.forbidai_user.includes(name)) {
+        if (
+          character.isBoss ||
+          character.isHiddenBoss ||
+          lib.config.forbidai_user?.includes(name)
+        ) {
           lib.config.forbidai.add(name)
         }
 
@@ -8283,12 +8277,15 @@ ${e instanceof Error ? e.stack : String(e)}`)
     return next
   }
   /**
-   * @param { Player } [player]
+   * @param { Player } player
+   * @param { number } num
+   * @param { Player[] } targets
    */
-  gameDraw(player, num = 4) {
+  gameDraw(player = game.me, num = 4, targets = game.players) {
     let next = game.createEvent("gameDraw")
-    next.player = player || game.me
+    next.player = player
     next.num = num
+    next.targets = targets
     next.setContent("gameDraw")
     return next
   }
@@ -10594,7 +10591,7 @@ ${e instanceof Error ? e.stack : String(e)}`)
   }
   /**
    * @overload
-   * @param { (player: Player) => boolean } func
+   * @param { (player: Player) => boolean } [func]
    * @param { Player[] } [list]
    * @param { boolean } [includeOut]
    * @returns { Player[] }
@@ -10863,9 +10860,6 @@ ${e instanceof Error ? e.stack : String(e)}`)
   syncHandcard(player, id_list) {
     game.broadcastAll(
       (player, id_list) => {
-        if (game.me == player) {
-          return
-        }
         const sortFunc = (a, b) => id_list.indexOf(a.cardid) - id_list.indexOf(b.cardid)
         player.sortHandcard(sortFunc)
       },

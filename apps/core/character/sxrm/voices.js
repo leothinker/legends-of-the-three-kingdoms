@@ -1,2 +1,2 @@
-const voices = {};
-export default voices;
+const voices = {}
+export default voices

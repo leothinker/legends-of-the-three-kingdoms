@@ -3934,7 +3934,7 @@ export const Content = {
     //if (cards.length && get.position(cards[0], true) == "o") target.equip(cards[0]);
   },
   async gameDraw(event, trigger, player) {
-    const { num } = event
+    const { num, targets } = event
     if (_status.brawl && _status.brawl.noGameDraw) {
       return
     }
@@ -3944,40 +3944,42 @@ export const Content = {
 
     const waitings = []
     do {
-      if (typeof num == "function") {
-        numx = num(player)
-      }
+      if (targets.includes(player)) {
+        if (typeof num == "function") {
+          numx = num(player)
+        }
 
-      /*otherPile主要是针对那些用专属牌堆，不从一般牌堆摸牌的角色（如陈寿），该属性目前只有两个键值对，且都为函数
-       *getCards函数与获得牌相关，只传入要获得的牌数num作为参数
-       *discard与手气卡换牌后弃置牌相关，只传入要弃置的牌card作为参数
-       */
-      const cards = []
-      const otherGetCards = event.otherPile?.[player.playerid]?.getCards
-      //先看有没有专属牌堆，再看其他的
-      if (otherGetCards) {
-        cards.addArray(otherGetCards(numx))
-      } else if (player.getTopCards) {
-        cards.addArray(player.getTopCards(numx))
-      } else {
-        cards.addArray(get.cards(numx))
-      }
-      //别问，问就是初始手牌要有标记 by 星の语
-      //event.gaintag支持函数、字符串、数组。数组就是添加一连串的标记；函数的返回格式为[[cards1,gaintag1],[cards2,gaintag2]...]
-      if (event.gaintag?.[player.playerid]) {
-        const gaintag = event.gaintag[player.playerid]
-        const list = typeof gaintag == "function" ? gaintag(numx, cards) : [[cards, gaintag]]
-        game.broadcastAll(
-          (player, list) => {
-            for (let i = list.length - 1; i >= 0; i--) {
-              player.directgain(list[i][0], null, list[i][1])
-            }
-          },
-          player,
-          list,
-        )
-      } else {
-        player.directgain(cards)
+        /*otherPile主要是针对那些用专属牌堆，不从一般牌堆摸牌的角色（如陈寿），该属性目前只有两个键值对，且都为函数
+         *getCards函数与获得牌相关，只传入要获得的牌数num作为参数
+         *discard与手气卡换牌后弃置牌相关，只传入要弃置的牌card作为参数
+         */
+        const cards = []
+        const otherGetCards = event.otherPile?.[player.playerid]?.getCards
+        //先看有没有专属牌堆，再看其他的
+        if (otherGetCards) {
+          cards.addArray(otherGetCards(numx))
+        } else if (player.getTopCards) {
+          cards.addArray(player.getTopCards(numx))
+        } else {
+          cards.addArray(get.cards(numx))
+        }
+        //别问，问就是初始手牌要有标记 by 星の语
+        //event.gaintag支持函数、字符串、数组。数组就是添加一连串的标记；函数的返回格式为[[cards1,gaintag1],[cards2,gaintag2]...]
+        if (event.gaintag?.[player.playerid]) {
+          const gaintag = event.gaintag[player.playerid]
+          const list = typeof gaintag == "function" ? gaintag(numx, cards) : [[cards, gaintag]]
+          game.broadcastAll(
+            (player, list) => {
+              for (let i = list.length - 1; i >= 0; i--) {
+                player.directgain(list[i][0], null, list[i][1])
+              }
+            },
+            player,
+            list,
+          )
+        } else {
+          player.directgain(cards)
+        }
       }
 
       if (
@@ -3988,6 +3990,7 @@ export const Content = {
         const next = player.doubleDraw()
         waitings.push(next)
       }
+
       player._start_cards = player.getCards("h")
       player = player.next
     } while (player != end)
@@ -4007,7 +4010,12 @@ export const Content = {
 
     await Promise.all(waitings)
 
-    if (event.changeCard == "disabled" || _status.auto || !game.me.countCards("h")) {
+    if (
+      !targets.includes(game.me) ||
+      event.changeCard == "disabled" ||
+      _status.auto ||
+      !game.me.countCards("h")
+    ) {
       return
     }
 
@@ -4198,7 +4206,10 @@ export const Content = {
               if (character.isBoss || character.isHiddenBoss) {
                 lib.config.forbidai.add(termName)
               }
-              if (lib.config.forbidai_user && lib.config.forbidai_user.includes(termName)) {
+              if (
+                lib.config[`forbidai_user_${charaPackName}`] &&
+                lib.config.forbidai_user?.includes(termName)
+              ) {
                 lib.config.forbidai.add(termName)
               }
               for (const skill of character.skills) {
@@ -4391,7 +4402,10 @@ export const Content = {
   async createTrigger(event, trigger, player) {
     const info = get.info(event.skill)
 
-    if (!game.expandSkills(player.getSkills().concat(lib.skill.global)).includes(event.skill)) {
+    if (
+      !game.expandSkills(player.getSkills().concat(lib.skill.global)).includes(event.skill) &&
+      !event.uncheckHasSkill
+    ) {
       const hidden = player.hiddenSkills.slice(0)
       const invisible = player.invisibleSkills.slice(0)
       game.expandSkills(hidden)
@@ -8777,21 +8791,22 @@ export const Content = {
               replace: {},
             }
           }
-          if (event.custom.add.confirm == undefined) {
-            //如果有人canHidden是true然后还动了这部分请把一部分代码复制过去适配一下，不然隐藏的按钮不会关闭
-            event.custom.add.confirm = function (bool) {
-              if (bool != true) {
-                return
-              }
-              const event = get.event()
-              if (event.controls) {
-                event.controls.forEach((i) => i.close())
-              }
-              if (ui.confirm) {
-                ui.confirm.close()
-              }
-              game.uncheck()
+          const addConfirm = event.custom.add.confirm
+          event.custom.add.confirm = function (bool) {
+            if (typeof bool != "boolean") {
+              return
             }
+            const event = get.event()
+            if (event.controls) {
+              event.controls.forEach((i) => i.close())
+            }
+            if (ui.confirm) {
+              ui.confirm.close()
+            }
+            if (typeof addConfirm == "function") {
+              addConfirm.call(this, bool)
+            }
+            game.uncheck()
           }
         }
         ui.create.buttonChooseAll()
@@ -12124,29 +12139,29 @@ export const Content = {
     }
   },
   async gainMultiple(event, trigger, player) {
-    const { targets } = event
-    let delayed = false
-    const cards = []
+    const targets = [...event.targets].sortBySeat()
+    const map = new Map([])
 
-    for (let i = 0; i < targets.length; ++i) {
-      const target = targets[i]
+    for (const target of targets.sortBySeat()) {
       const result = await player
-        .gainPlayerCard(targets[i], event.position, true)
+        .gainPlayerCard(target, event.position, true)
         .set("boolline", false)
-        .set("delay", i == targets.length - 1)
+        .set("delay", false)
         .forResult()
-
-      if (result.bool) {
-        cards.addArray(result.cards)
-        if (i == targets.length - 1) {
-          delayed = true
-        }
+      if (result?.bool && result.cards?.length) {
+        map.set(target, result.cards)
       }
     }
 
-    if (!delayed) {
-      await game.delay()
+    event.cards = Array.from(map.values()).flat()
+    event.result = {
+      bool: true,
+      cards: event.cards,
+      targets: targets,
+      gain_map: map,
     }
+
+    await game.delay()
   },
   gain: [
     async (event, trigger, player) => {
@@ -13308,6 +13323,11 @@ export const Content = {
   },
   async loseMaxHp(event) {
     const { player, num } = event
+    game.broadcastAll(function () {
+      if (lib.config.background_audio) {
+        game.playAudio("effect", "loseMaxHp")
+      }
+    })
     game.log(player, "减少了" + get.cnNumber(num) + "点体力上限")
     player.maxHp -= num
     if (isNaN(player.maxHp)) {
@@ -14175,7 +14195,7 @@ export const Content = {
           game.playAudio("effect", "link" + (isLinked ? "_clear" : ""))
         }
         player.classList.remove("target")
-        player.classList.toggle("linked2")
+        player.classList.toggle(get.is.linked2(player) ? "linked2" : "linked")
         ui.updatej(player)
         ui.updatem(player)
       },
@@ -14348,6 +14368,7 @@ export const Content = {
         setTimeout(function () {
           ui.arena.classList.remove("choose-to-move")
         }, 500)
+        resolve(event._result)
       }
       //创造dialog
       event.dialog = ui.create.dialog()

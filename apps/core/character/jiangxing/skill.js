@@ -10640,7 +10640,7 @@ const skills = {
     },
     frequent: true,
     async content(event, trigger, player) {
-      let num = 1
+      let num = 0
       player.getHistory("lose", (evt) => {
         if (evt.cards2) {
           num += evt.cards2.length

@@ -27,6 +27,7 @@ import {
 import { defaultSplashs } from "@/init/onload/index.js"
 import dedent from "dedent"
 import { PoptipManager, HTMLPoptipElement } from "./poptip.js"
+import { ZhanfaManager } from "./zhanfa.js"
 import skills from "./skill.js"
 
 const html = dedent
@@ -312,9 +313,72 @@ export class Library {
     function () {
       let url = ""
       switch (lib.config.cardback_style) {
+        case "official":
+          url = "theme/style/cardback/image/official.png"
+          break
+        case "feicheng":
+          url = "theme/style/cardback/image/feicheng.png"
+          break
+        case "liusha":
+          url = "theme/style/cardback/image/liusha.png"
+          break
         case "ol":
           url = "theme/style/cardback/image/ol.png"
           break
+        case "new":
+          url = "theme/style/cardback/image/new.png"
+          break
+        case "wood":
+          url = "theme/woodden/wood.jpg"
+          break
+        case "music":
+          url = "theme/music/wood3.png"
+          break
+        case "custom":
+          game.getDB("image", "cardback_style", function (fileToLoad) {
+            if (!fileToLoad) {
+              return
+            }
+            var fileReader = new FileReader()
+            fileReader.onload = function (fileLoadedEvent) {
+              if (ui.css.cardback_stylesheet) {
+                ui.css.cardback_stylesheet.remove()
+              }
+              ui.css.cardback_stylesheet = lib.init.sheet(
+                ".card:empty,.card.infohidden{background-image:url(" +
+                  fileLoadedEvent.target.result +
+                  ")}",
+              )
+              document.documentElement.style.setProperty(
+                "--cardback-url",
+                `url(${fileLoadedEvent.target.result})`,
+              )
+              game.getDB("image", "cardback_style2", function (fileToLoad) {
+                if (!fileToLoad) {
+                  return
+                }
+                var fileReader = new FileReader()
+                fileReader.onload = function (fileLoadedEvent) {
+                  if (ui.css.cardback_stylesheet2) {
+                    ui.css.cardback_stylesheet2.remove()
+                  }
+                  ui.css.cardback_stylesheet2 = lib.init.sheet(
+                    ".card.infohidden:not(.infoflip){background-image:url(" +
+                      fileLoadedEvent.target.result +
+                      ")}",
+                  )
+                  document.documentElement.style.setProperty(
+                    "--cardback-url",
+                    `url(${fileLoadedEvent.target.result})`,
+                  )
+                }
+                fileReader.readAsDataURL(fileToLoad, "UTF-8")
+              })
+            }
+            fileReader.readAsDataURL(fileToLoad, "UTF-8")
+          })
+          return
+        case "default":
         default:
           document.documentElement.style.removeProperty("--cardback-url")
           return
@@ -1821,8 +1885,12 @@ export class Library {
           name: "布局",
           init: "mobile",
           item: {
+            //default:'旧版',
+            newlayout: "对称",
             mobile: "默认",
+            long: "宽屏",
             long2: "手杀",
+            nova: "新版",
           },
           visualMenu: function (node, link) {
             node.className = "button character themebutton " + lib.config.theme
@@ -2505,7 +2573,15 @@ export class Library {
           intro: "设置背面朝上的卡牌的样式",
           init: "default",
           item: {
+            // wood:'木纹',
+            // music:'音乐',
+            official: "原版",
+            // new:'新版',
+            feicheng: "废城",
+            liusha: "流沙",
             ol: "手杀",
+            custom: "自定",
+            default: "默认",
           },
           visualBar(node, item, create, switcher) {
             if (node.created) {
@@ -2727,7 +2803,15 @@ export class Library {
           name: "体力条样式",
           init: "default",
           item: {
+            default: "默认",
+            // official:'勾玉',
+            emotion: "表情",
             glass: "勾玉",
+            round: "国战",
+            ol: "手杀",
+            xinglass: "双鱼",
+            xinround: "OL",
+            custom: "自定",
           },
           visualBar: function (node, item, create, switcher) {
             if (node.created) {
@@ -3266,7 +3350,7 @@ export class Library {
         autoborder_count: {
           name: "边框升级方式",
           intro:
-            "<strong>击杀</strong> 每击杀一人，边框提升两级<br><strong>伤害</strong> 每造成两点伤害，边框提升一级<br><strong>混合</strong> 击杀量决定边框颜色，伤害量决定边框装饰",
+            "<strong>击杀</strong> 每击杀一人，边框提升两级<br><strong>伤害</strong> 每造成2点伤害，边框提升一级<br><strong>混合</strong> 击杀量决定边框颜色，伤害量决定边框装饰",
           init: "kill",
           item: {
             kill: "击杀",
@@ -3917,6 +4001,41 @@ export class Library {
             }
           },
         },
+        link_style2: {
+          name: "横置样式",
+          intro: "设置角色被横置时的样式",
+          init: "chain",
+          unfrequent: true,
+          item: {
+            chain: "铁索",
+            rotate: "横置",
+            mark: "标记",
+          },
+          onclick(style) {
+            var list = []
+            for (var i = 0; i < game.players.length; i++) {
+              if (game.players[i].isLinked()) {
+                list.push(game.players[i])
+              }
+            }
+            game.saveConfig("link_style2", style)
+            for (var i = 0; i < list.length; i++) {
+              if (get.is.linked2(list[i])) {
+                list[i].classList.add("linked2")
+                list[i].classList.remove("linked")
+              } else {
+                list[i].classList.add("linked")
+                list[i].classList.remove("linked2")
+              }
+            }
+            if (style == "chain") {
+              ui.arena.classList.remove("nolink")
+            } else {
+              ui.arena.classList.add("nolink")
+            }
+            ui.updatem()
+          },
+        },
         cardshape: {
           name: "手牌显示",
           intro: "将手牌设置为正方形或长方形",
@@ -3946,8 +4065,13 @@ export class Library {
               ui.window.classList.remove("oblongcard")
             }
             if (linked) {
-              game.me.classList.remove("linked")
-              game.me.classList.add("linked2")
+              if (get.is.linked2(game.me)) {
+                game.me.classList.remove("linked")
+                game.me.classList.add("linked2")
+              } else {
+                game.me.classList.add("linked")
+                game.me.classList.remove("linked2")
+              }
             }
           },
         },
@@ -4605,32 +4729,39 @@ export class Library {
         recent_character_number: {
           name: "最近使用武将",
           intro: "自由选将对话框中最近使用武将的数量",
-          init: "12",
-          item: {
-            5: "5",
-            6: "6",
-            10: "10",
-            12: "12",
-            20: "20",
-            30: "30",
+          init: 12,
+          input: true,
+          restart: true,
+          onblur(e) {
+            let text = e.target,
+              num = Number(text.innerText)
+            if (isNaN(num) || num < 1) {
+              num = 1
+            } else if (!Number.isInteger(num)) {
+              num = Math.round(num)
+            }
+            text.innerText = num
+            game.saveConfig("recent_character_number", num)
           },
-          unfrequent: true,
         },
         showMax_character_number: {
           name: "最大武将数显示",
           intro:
             "设置自由选将对话框一页显示的最大武将数<br><span class=firetext>注意事项：<br><li>更改此选项后，需要重启游戏以使用新选项配置<br><li>推荐将此选项设置为偏小数值，可降低加载过多武将时导致的性能损耗</span>",
-          init: "10",
-          item: {
-            5: "5",
-            6: "6",
-            10: "10",
-            12: "12",
-            20: "20",
-            24: "24",
-            0: "∞",
+          init: 10,
+          input: true,
+          restart: true,
+          onblur(e) {
+            let text = e.target,
+              num = Number(text.innerText)
+            if (isNaN(num) || num < 1) {
+              num = 1
+            } else if (!Number.isInteger(num)) {
+              num = Math.round(num)
+            }
+            text.innerText = num
+            game.saveConfig("showMax_character_number", num)
           },
-          unfrequent: true,
         },
         popequip: {
           name: "触屏装备选择",
@@ -5449,7 +5580,275 @@ export class Library {
       },
     },
   }
-  extensionMenu = {}
+  extensionMenu = {
+    cardpile: {
+      enable: {
+        name: "开启",
+        init: false,
+        restart: true,
+      },
+      intro: {
+        name: "将杀闪等牌在牌堆中的比例维持在与军争牌堆相同，防止开启扩展包后被过多地稀释",
+        clear: true,
+        nopointer: true,
+      },
+      sha: {
+        name: "杀",
+        init: "1",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      huosha: {
+        name: "火杀",
+        init: "1",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      leisha: {
+        name: "雷杀",
+        init: "1",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      shan: {
+        name: "闪",
+        init: "1",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      tao: {
+        name: "桃",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      jiu: {
+        name: "酒",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      wuxie: {
+        name: "无懈可击",
+        init: "0.5",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      nanman: {
+        name: "南蛮入侵",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      wanjian: {
+        name: "万箭齐发",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      guohe: {
+        name: "过河拆桥",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      shunshou: {
+        name: "顺手牵羊",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      tiesuo: {
+        name: "铁索连环",
+        init: "0",
+        item: {
+          1: "补充全部",
+          0.5: "补充一半",
+          0: "不补充",
+        },
+      },
+      hide: {
+        name: "隐藏此扩展",
+        clear: true,
+        onclick() {
+          if (this.firstChild.innerHTML == "隐藏此扩展") {
+            this.firstChild.innerHTML = "此扩展将在重启后隐藏"
+            lib.config.hiddenPlayPack.add("cardpile")
+            if (!lib.config.prompt_hidepack) {
+              alert("隐藏的扩展包可通过选项-其它-重置隐藏内容恢复")
+              game.saveConfig("prompt_hidepack", true)
+            }
+          } else {
+            this.firstChild.innerHTML = "隐藏此扩展"
+            lib.config.hiddenPlayPack.remove("cardpile")
+          }
+          game.saveConfig("hiddenPlayPack", lib.config.hiddenPlayPack)
+        },
+      },
+    },
+    boss: {
+      enable: {
+        name: "开启",
+        init: false,
+        restart: true,
+        onswitch: function (bool) {
+          if (bool) {
+            var storage = { boss: {}, versus: {}, translate: {} }
+            var loadversus = function () {
+              game.loadModeAsync("versus", function (mode) {
+                for (var i in mode.translate) {
+                  storage.translate[i] = mode.translate[i]
+                }
+                for (var i in mode.jiangeboss) {
+                  if (mode.jiangeboss[i].isBossAllowed) {
+                    storage.versus[i] = mode.jiangeboss[i]
+                  }
+                }
+                localStorage.setItem("boss_storage_playpackconfig", JSON.stringify(storage))
+              })
+            }
+            game.loadModeAsync("boss", function (mode) {
+              for (var i in mode.translate) {
+                storage.translate[i] = mode.translate[i]
+              }
+              for (var i in mode.characterPack.mode_boss) {
+                if (mode.characterPack.mode_boss[i].isBossAllowed) {
+                  storage.boss[i] = mode.characterPack.mode_boss[i]
+                }
+              }
+              loadversus()
+            })
+          } else {
+            localStorage.removeItem("boss_storage_playpackconfig")
+          }
+        },
+      },
+      intro: {
+        name: "将剑阁和挑战模式的武将添加到其它模式",
+        clear: true,
+        nopointer: true,
+      },
+      enableai: {
+        name: "随机选将可用",
+        init: false,
+      },
+      hide: {
+        name: "隐藏此扩展",
+        clear: true,
+        onclick() {
+          if (this.firstChild.innerHTML == "隐藏此扩展") {
+            this.firstChild.innerHTML = "此扩展将在重启后隐藏"
+            lib.config.hiddenPlayPack.add("boss")
+            if (!lib.config.prompt_hidepack) {
+              alert("隐藏的扩展包可通过选项-其它-重置隐藏内容恢复")
+              game.saveConfig("prompt_hidepack", true)
+            }
+          } else {
+            this.firstChild.innerHTML = "隐藏此扩展"
+            lib.config.hiddenPlayPack.remove("boss")
+          }
+          game.saveConfig("hiddenPlayPack", lib.config.hiddenPlayPack)
+        },
+      },
+    },
+    coin: {
+      enable: {
+        name: "开启",
+        init: false,
+        restart: true,
+        onclick(bool) {
+          if (bool) {
+            lib.config.plays.add("coin")
+          } else {
+            lib.config.plays.remove("coin")
+          }
+          game.saveConfig("plays", lib.config.plays)
+        },
+      },
+      intro: {
+        name: "每完成一次对局，可获得一定数量的金币；金币可用于购买游戏特效",
+        clear: true,
+        nopointer: true,
+      },
+      display: {
+        name: "金币显示",
+        init: "text",
+        item: {
+          symbol: "符号",
+          text: "文字",
+        },
+        onclick(item) {
+          game.saveConfig("coin_display_playpackconfig", item)
+          if (game.changeCoin) {
+            game.changeCoin(0)
+          }
+        },
+      },
+      canvas: {
+        name: "特效置顶",
+        init: false,
+        onclick(bool) {
+          game.saveConfig("coin_canvas_playpackconfig", bool)
+          if (bool) {
+            ui.window.classList.add("canvas_top")
+          } else {
+            ui.window.classList.remove("canvas_top")
+          }
+        },
+      },
+      hide: {
+        name: "隐藏此扩展",
+        clear: true,
+        onclick() {
+          if (this.firstChild.innerHTML == "隐藏此扩展") {
+            this.firstChild.innerHTML = "此扩展将在重启后隐藏"
+            lib.config.hiddenPlayPack.add("coin")
+            if (!lib.config.prompt_hidepack) {
+              alert("隐藏的扩展包可通过选项-其它-重置隐藏内容恢复")
+              game.saveConfig("prompt_hidepack", true)
+            }
+          } else {
+            this.firstChild.innerHTML = "隐藏此扩展"
+            lib.config.hiddenPlayPack.remove("coin")
+          }
+          game.saveConfig("hiddenPlayPack", lib.config.hiddenPlayPack)
+        },
+      },
+    },
+  }
   mode = {
     identity: {
       name: "身份",
@@ -5542,6 +5941,9 @@ export class Library {
           init: "normal",
           item: {
             normal: "标准",
+            zhong: "明忠",
+            stratagem: "谋攻",
+            purple: "3v3v2",
           },
           restart: true,
           frequent: true,
@@ -5564,8 +5966,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 3
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -5580,10 +5982,27 @@ export class Library {
           item: {
             off: "不限制",
             group: "按势力筛选",
-            3: "三",
-            4: "四",
-            6: "六",
-            8: "八",
+            number: "自选数值",
+          },
+          onclick(item) {
+            if (item !== "number") {
+              game.saveConfig("connect_limit_zhu", item, "identity")
+              return
+            }
+            const result = prompt("请输入常备主候选武将数")
+            if (/^-?\d+(\.\d+)?$/.test(result)) {
+              const number = Number(result)
+              if (number > 0) {
+                if (Number.isInteger(number)) {
+                  this.querySelector("div").innerHTML = result
+                  game.saveConfig("connect_limit_zhu", result, "identity")
+                } else {
+                  alert("请输入整数")
+                }
+                return
+              }
+            }
+            alert("请输入大于0的整数")
           },
         },
         connect_choice_zhong: {
@@ -5594,8 +6013,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 4
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -5617,8 +6036,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 3
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -5634,8 +6053,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 6
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -5669,8 +6088,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 4
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -5899,6 +6318,9 @@ export class Library {
           init: "normal",
           item: {
             normal: "标准",
+            zhong: "明忠",
+            stratagem: "谋攻",
+            purple: "3v3v2",
           },
           restart: true,
           frequent: true,
@@ -6233,8 +6655,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 3
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -6249,10 +6671,27 @@ export class Library {
           item: {
             off: "不限制",
             group: "按势力筛选",
-            3: "三",
-            4: "四",
-            6: "六",
-            8: "八",
+            number: "自选数值",
+          },
+          onclick(item) {
+            if (item !== "number") {
+              game.saveConfig("limit_zhu", item, "identity")
+              return
+            }
+            const result = prompt("请输入常备主候选武将数")
+            if (/^-?\d+(\.\d+)?$/.test(result)) {
+              const number = Number(result)
+              if (number > 0) {
+                if (Number.isInteger(number)) {
+                  this.querySelector("div").innerHTML = result
+                  game.saveConfig("limit_zhu", result, "identity")
+                } else {
+                  alert("请输入整数")
+                }
+                return
+              }
+            }
+            alert("请输入大于0的整数")
           },
         },
         choice_zhong: {
@@ -6263,8 +6702,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 4
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -6280,8 +6719,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 6
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -6297,8 +6736,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 3
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -6321,8 +6760,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 4
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -7511,8 +7950,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 5
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -7528,8 +7967,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 3
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -7665,8 +8104,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 5
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -7682,8 +8121,8 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 2) {
-              num = 3
+            if (isNaN(num) || num < 1) {
+              num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
             }
@@ -10398,6 +10837,11 @@ export class Library {
       stratagem_fury: "怒气",
       _stratagem_add_buff: "强化",
       danqi_hufu: "虎符",
+      zhanfa: "战法",
+      zf_common: "普通",
+      zf_rare: "稀有",
+      zf_epic: "史诗",
+      zf_legend: "传说",
       assigned_tag: "已分配",
 
       phaseZhunbei: "准备阶段",
@@ -11943,6 +12387,11 @@ export class Library {
   )
   perfectPair = {}
   cardPile = {}
+
+  #zhanfa = new ZhanfaManager(this)
+  get zhanfa() {
+    return this.#zhanfa
+  }
 
   message = {
     server: {
@@ -13568,10 +14017,31 @@ export class Library {
       },
     ],
     [
+      "武",
+      {
+        color: "#fd8359",
+        nature: "soilmm",
+      },
+    ],
+    [
+      "乐",
+      {
+        color: "#f7f4fc",
+        nature: "keymm",
+      },
+    ],
+    [
       "神",
       {
         color: "#faecd1",
         nature: "orangemm",
+      },
+    ],
+    [
+      "族",
+      {
+        color: "#ee9ac7",
+        nature: "firemm",
       },
     ],
     [
@@ -13582,10 +14052,957 @@ export class Library {
       },
     ],
     [
+      "侠",
+      {
+        color: "#eeeeee",
+        nature: "qunmm",
+      },
+    ],
+    [
+      "起",
+      {
+        color: "#c3f9ff",
+        nature: "thundermm",
+      },
+    ],
+    [
+      "承",
+      {
+        color: "#c3f9ff",
+        nature: "thundermm",
+      },
+    ],
+    [
+      "转",
+      {
+        color: "#c3f9ff",
+        nature: "thundermm",
+      },
+    ],
+    [
+      "合",
+      {
+        color: "#c3f9ff",
+        nature: "thundermm",
+      },
+    ],
+    [
+      "衰",
+      {
+        color: "#c3f9ff",
+        nature: "thundermm",
+      },
+    ],
+    [
+      "兴",
+      {
+        color: "#c3f9ff",
+        nature: "thundermm",
+      },
+    ],
+    [
+      "梦",
+      {
+        color: "#6affe2",
+        nature: "watermm",
+      },
+    ],
+    [
+      "疑",
+      {
+        color: "#5a6968",
+        nature: "graymm",
+      },
+    ],
+    [
+      "慢",
+      {
+        color: "#5a6968",
+        nature: "graymm",
+      },
+    ],
+    [
+      "用间",
+      {
+        color: "#c3f9ff",
+        nature: "thundermm",
+      },
+    ],
+    [
+      "战役篇",
+      {
+        color: "#c3f9ff",
+        nature: "thundermm",
+        showName: "战",
+      },
+    ],
+    [
+      "武将传",
+      {
+        color: "#c3f9ff",
+        nature: "thundermm",
+        showName: "传",
+      },
+    ],
+    [
+      "将",
+      {
+        nature: "firemm",
+      },
+    ],
+    [
+      "新杀",
+      {
+        color: "#fefedc",
+        nature: "metalmm",
+        showName: "新",
+      },
+    ],
+    [
+      "旧",
+      {
+        color: "#a4a4a4",
+        nature: "blackmm",
+      },
+    ],
+    [
+      "旧界",
+      {
+        color: "#a4a4a4",
+        nature: "blackmm",
+      },
+    ],
+    [
+      "节钺",
+      {
+        color: "#a4a4a4",
+        nature: "blackmm",
+      },
+    ],
+    [
+      "毅重",
+      {
+        color: "#a4a4a4",
+        nature: "blackmm",
+      },
+    ],
+    [
+      "★SP",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("SP")}`,
+      },
+    ],
+    [
+      "☆SP",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("SP")}`,
+      },
+    ],
+    [
+      "J.SP",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("SP")}`,
+      },
+    ],
+    [
+      "K系列",
+      {
+        showName: "Ｋ",
+      },
+    ],
+    [
+      "经典",
+      {
+        showName: "典",
+      },
+    ],
+    [
+      "君",
+      {
+        color: "#fefedc",
+        nature: "shenmm",
+      },
+    ],
+    [
+      "骰子",
+      {
+        getSpan: () => {
+          const span = document.createElement("span")
+          span.style.fontFamily = "NonameSuits"
+          span.textContent = "🎲"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "蛇",
+      {
+        getSpan: () => {
+          const span = document.createElement("span")
+          span.style.fontFamily = "NonameSuits"
+          span.textContent = "🐍"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "骏骊",
+      {
+        getSpan: () => {
+          const span = document.createElement("span")
+          span.style.fontFamily = "NonameSuits"
+          span.textContent = "🐎"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "赛马",
+      {
+        getSpan: () => {
+          const span = document.createElement("span")
+          span.style.fontFamily = "NonameSuits"
+          span.textContent = "🏇"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "SP",
+      {
+        getSpan: () => {
+          const span = document.createElement("span"),
+            style = span.style
+          style.writingMode = style.webkitWritingMode = "horizontal-tb"
+          style.fontFamily = "MotoyaLMaru"
+          style.transform = "scaleY(0.85)"
+          span.textContent = "SP"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "OL",
+      {
+        getSpan: () => {
+          const span = document.createElement("span"),
+            style = span.style
+          style.writingMode = style.webkitWritingMode = "horizontal-tb"
+          style.fontFamily = "MotoyaLMaru"
+          style.transform = "scaleY(0.85)"
+          span.textContent = "OL"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "RE",
+      {
+        getSpan: () => {
+          const span = document.createElement("span"),
+            style = span.style
+          style.writingMode = style.webkitWritingMode = "horizontal-tb"
+          style.fontFamily = "MotoyaLMaru"
+          style.transform = "scaleY(0.85)"
+          span.textContent = "RE"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "手杀",
+      {
+        getSpan: (prefix, name) => {
+          const simple = lib.config.buttoncharacter_prefix == "simple",
+            span = document.createElement("span")
+          if (lib.characterPack.shiji && name in lib.characterPack.shiji) {
+            for (const entry of Object.entries(lib.characterSort.shiji)) {
+              if (!entry[1].includes(name)) {
+                continue
+              }
+              prefix = get.translation(entry[0]).slice(-1)
+              break
+            }
+            if (!simple) {
+              span.style.color = "#def7ca"
+              span.dataset.nature = "watermm"
+            }
+            span.innerHTML = prefix
+          } else if (simple) {
+            span.textContent = "手杀"
+          } else {
+            span.style.fontFamily = "NonameSuits"
+            span.textContent = "📱"
+          }
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "礼",
+      {
+        color: "#f0cf13",
+        nature: "shenmm",
+      },
+    ],
+    [
+      "射",
+      {
+        color: "#f0cf13",
+        nature: "shenmm",
+      },
+    ],
+    [
+      "书",
+      {
+        color: "#f0cf13",
+        nature: "shenmm",
+      },
+    ],
+    [
+      "数",
+      {
+        color: "#f0cf13",
+        nature: "shenmm",
+      },
+    ],
+    [
+      "御",
+      {
+        color: "#f0cf13",
+        nature: "shenmm",
+      },
+    ],
+    [
+      "手杀乐",
+      {
+        showName: "乐",
+        color: "#f0cf13",
+        nature: "shenmm",
+      },
+    ],
+    [
+      "TW",
+      {
+        getSpan: () => {
+          const span = document.createElement("span"),
+            style = span.style
+          style.writingMode = style.webkitWritingMode = "horizontal-tb"
+          style.fontFamily = "MotoyaLMaru"
+          style.transform = "scaleY(0.85)"
+          span.textContent = "TW"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "汉末",
+      {
+        showName: "汉",
+        color: "#fefedc",
+        nature: "shenmm",
+      },
+    ],
+    [
+      "汉末神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("汉末")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "长安",
+      {
+        showName: "镐",
+        color: "#40e0d0",
+        nature: "shenmm",
+      },
+    ],
+    [
+      "长安神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("长安")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "渭南",
+      {
+        showName: "渭",
+        color: "#2a17d5",
+        nature: "shenmm",
+      },
+    ],
+    [
+      "渭南神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("渭南")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "TW神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("TW")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "TW将",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("TW")}${get.prefixSpan("将")}`,
+      },
+    ],
+    [
+      "OL神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("OL")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "旧神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("旧")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "旧晋",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("旧")}${get.prefixSpan("晋")}`,
+      },
+    ],
+    [
+      "新杀SP",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("新杀")}${get.prefixSpan("SP")}`,
+      },
+    ],
+    [
+      "界SP",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("界")}${get.prefixSpan("SP")}`,
+      },
+    ],
+    [
+      "S特神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("★")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "手杀界",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("手杀")}${get.prefixSpan("界")}`,
+      },
+    ],
+    [
+      "手杀SP",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("手杀")}${get.prefixSpan("SP")}`,
+      },
+    ],
+    [
+      "战役篇神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("战役篇")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "星",
+      {
+        color: "#ffd700",
+        nature: "glodenmm",
+      },
+    ],
+    [
+      "OL界",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("OL")}${get.prefixSpan("界")}`,
+      },
+    ],
+    [
+      "OL谋",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("OL")}${get.prefixSpan("谋")}`,
+      },
+    ],
+    [
+      "新杀谋",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("新杀")}${get.prefixSpan("谋")}`,
+      },
+    ],
+    [
+      "经典神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("经典")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "旧谋",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("旧")}${get.prefixSpan("谋")}`,
+      },
+    ],
+    [
+      "手杀神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("手杀")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "龙",
+      {
+        color: "#ff0000",
+        nature: "firemm",
+      },
+    ],
+    [
+      "桃",
+      {
+        color: "#FFC0CB",
+        nature: "firemm",
+      },
+    ],
+    [
+      "桃神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("桃")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "玄",
+      {
+        color: "#000000",
+        nature: "metalmm",
+      },
+    ],
+    [
+      "荆",
+      {
+        color: "#00ff00",
+        nature: "firemm",
+      },
+    ],
+    [
+      "荆神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("荆")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "魂",
+      {
+        color: "#ffff99",
+        nature: "firemm",
+      },
+    ],
+    [
+      "韩氏",
+      {
+        color: "#ffff99",
+        nature: "firemm",
+      },
+    ],
+    [
+      "幻",
+      {
+        color: "#ffff99",
+        nature: "firemm",
+      },
+    ],
+    [
+      "标",
+      {
+        color: "#912cee",
+        nature: "metalmm",
+      },
+    ],
+    [
+      "牢",
+      {
+        color: "#EEEE00",
+        nature: "blackmm",
+      },
+    ],
+    [
+      "牢神",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("牢")}${get.prefixSpan("神")}`,
+      },
+    ],
+    [
+      "友",
+      {
+        color: "#AAABFF",
+        nature: "blackmm",
+      },
+    ],
+    [
+      "骥",
+      {
+        color: "#AAABFF",
+        nature: "blackmm",
+      },
+    ],
+    [
+      "九鼎",
+      {
+        showName: "鼎",
+        color: "#ffccff",
+        nature: "blackmm",
+      },
+    ],
+    [
+      "SCL",
+      {
+        showName: "競",
+        color: "#fefedc",
+        nature: "soilmm",
+      },
+    ],
+    [
+      "汉",
+      {
+        color: "#ffd700",
+        nature: "metalmm",
+      },
+    ],
+    [
+      "OL乐",
+      {
+        showName: "乐",
+        color: "#dab71b",
+        nature: "firemm",
+      },
+    ],
+    [
+      "烈",
+      {
+        color: "#8B0000",
+        nature: "firemm",
+      },
+    ],
+    [
+      "燕幽",
+      {
+        showName: "幽",
+        color: "#ff6a6a",
+        nature: "redmm",
+      },
+    ],
+    [
       "威",
       {
         color: "#ff9966",
         nature: "glodenmm",
+      },
+    ],
+    [
+      "势",
+      {
+        color: "#7d26cd",
+        nature: "purplemm",
+      },
+    ],
+    [
+      "TW谋",
+      {
+        /**
+         * @returns {string}
+         */
+        getSpan: () => `${get.prefixSpan("TW")}${get.prefixSpan("谋")}`,
+      },
+    ],
+    [
+      "闪",
+      {
+        color: "#00bfff",
+        nature: "watermm",
+      },
+    ],
+    [
+      "ddd",
+      {
+        showName: "3D",
+        color: "#edb5b5",
+        nature: "watermm",
+      },
+    ],
+    [
+      "荆扬",
+      {
+        showName: "扬",
+        color: "#ffcc99",
+        nature: "thundermm",
+      },
+    ],
+    [
+      "魔",
+      {
+        color: "#2e002e",
+        nature: "firemm",
+      },
+    ],
+    [
+      "青史",
+      {
+        getSpan: () => {
+          const span = document.createElement("span")
+          span.style.fontFamily = "NonameSuits"
+          span.textContent = "📚"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "风云",
+      {
+        getSpan: () => {
+          const span = document.createElement("span")
+          span.style.fontFamily = "NonameSuits"
+          span.textContent = "☁️"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "爻",
+      {
+        getSpan: () => {
+          const span = document.createElement("span")
+          span.style.fontFamily = "NonameSuits"
+          span.textContent = "☯"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "忍",
+      {
+        color: "#180a29",
+        nature: "thundermm",
+      },
+    ],
+    [
+      "狂",
+      {
+        color: "#8B00FF",
+        nature: "firemm",
+      },
+    ],
+    [
+      "绶",
+      {
+        color: "#8B00FF",
+        nature: "shenmm",
+      },
+    ],
+    [
+      "欧陆",
+      {
+        getSpan: () => {
+          const span = document.createElement("span"),
+            style = span.style
+          style.writingMode = style.webkitWritingMode = "horizontal-tb"
+          style.fontFamily = "MotoyaLMaru"
+          style.transform = "scaleY(0.85)"
+          span.textContent = "EU"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "PE",
+      {
+        getSpan: () => {
+          const span = document.createElement("span"),
+            style = span.style
+          style.writingMode = style.webkitWritingMode = "horizontal-tb"
+          style.fontFamily = "MotoyaLMaru"
+          style.transform = "scaleY(0.85)"
+          span.textContent = "PE"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "智将",
+      {
+        showName: "智",
+        color: "#99e2ff",
+        nature: "firemm",
+      },
+    ],
+    [
+      "闪耀",
+      {
+        showName: "闪",
+        color: "#c282b2",
+        nature: "keymm",
+      },
+    ],
+    [
+      "闪耀战姬",
+      {
+        getSpan: () => {
+          const span = document.createElement("span")
+          span.style.fontFamily = "NonameSuits"
+          span.style.color = "#c282b2"
+          span.dataset.nature = "keymm"
+          span.textContent = "★"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "领主",
+      {
+        color: "#2e002e",
+        nature: "firemm",
+      },
+    ],
+    [
+      "徐兖",
+      {
+        showName: "徐",
+        color: "#ff0000",
+        nature: "firemm",
+      },
+    ],
+    [
+      "有",
+      {
+        color: "#dd9420",
+        nature: "firemm",
+      },
+    ],
+    [
+      "文心雕龙",
+      {
+        showName: "文",
+        color: "#ffffff",
+        nature: "firemm",
+      },
+    ],
+    [
+      "26",
+      {
+        getSpan: () => {
+          const span = document.createElement("span"),
+            style = span.style
+          style.writingMode = style.webkitWritingMode = "horizontal-tb"
+          style.fontFamily = "MotoyaLMaru"
+          style.transform = "scaleY(0.85)"
+          span.textContent = "26"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "集蜜",
+      {
+        color: "#e3d660",
+        nature: "metalmm",
+      },
+    ],
+    [
+      "雁翎",
+      {
+        getSpan: () => {
+          const span = document.createElement("span")
+          span.style.fontFamily = "NonameSuits"
+          span.textContent = "🪶"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "缘",
+      {
+        color: "#e8a0b7",
+        nature: "woodmm",
+      },
+    ],
+    [
+      "虎牢",
+      {
+        color: "#5A2A1C",
+        nature: "firemm",
       },
     ],
   ])

@@ -619,6 +619,25 @@ export class Is {
     )
   }
   /**
+   * @param { Player } player
+   */
+  linked2(player) {
+    if (game.chess) {
+      return true
+    }
+    if (lib.config.link_style2 != "rotate") {
+      return true
+    }
+    // if(game.chess) return false;
+    if (game.layout == "long" || game.layout == "long2" || game.layout == "nova") {
+      return true
+    }
+    if (player.dataset.position == "0") {
+      return ui.arena.classList.contains("oblongcard")
+    }
+    return false
+  }
+  /**
    * @param { {} } obj
    */
   empty(obj) {
@@ -641,7 +660,7 @@ export class Is {
   }
   /**
    * @param { string } skill
-   * @param { Player } player
+   * @param { Player } [player]
    * @returns
    */
   locked(skill, player) {

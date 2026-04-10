@@ -568,6 +568,7 @@ export const cardPackMenu = function (connectMenu) {
     active._initLink()
   }
   rightPane.appendChild(active.link)
+
   ;(function () {
     if (connectMenu) {
       return

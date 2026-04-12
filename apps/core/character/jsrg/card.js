@@ -56,5 +56,18 @@ const cards = {
       },
     },
   },
+  chixueqingfeng: {
+    derivation: "ol_puyuan",
+    cardcolor: "spade",
+    type: "equip",
+    fullskin: true,
+    modeimage: "boss",
+    subtype: "equip1",
+    distance: { attackFrom: -1 },
+    skills: ["chixueqingfeng"],
+    ai: {
+      equipValue: 6.7,
+    },
+  },
 }
 export default cards

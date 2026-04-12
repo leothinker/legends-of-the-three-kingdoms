@@ -19,6 +19,7 @@ window.noname_package = {
     wangzhe: "王者之战",
     simplified: "精简版",
     yongjian: "用间篇",
+    zhulu: "逐鹿天下",
     seal: "珍藏封印",
   },
   play: {},

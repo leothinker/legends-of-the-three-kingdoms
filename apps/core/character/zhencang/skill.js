@@ -241,44 +241,63 @@ const skills = {
       _status.characterlist.randomSort()
 
       const list = []
-      outer: for (const name of _status.characterlist) {
-        const info = lib.character[name]
-
-        for (const skill of info[3]) {
-          const info = get.skillInfoTranslation(skill)
-          if (!info.includes("【杀】")) {
-            continue outer
-          }
-
-          const list = get.skillCategoriesOf(skill, player)
-          list.remove("锁定技")
-          if (list.length == 0) {
+      for (const name of _status.characterlist) {
+        if (
+          get.character(name, 3).some((skill) => {
+            const info = get.plainText(get.skillInfoTranslation(skill))
+            if (!info.includes("【杀】")) {
+              return false
+            }
+            const list = get.skillCategoriesOf(skill, player)
+            list.remove("锁定技")
+            return list.length == 0
+          })
+        ) {
+          list.push(name)
+          if (list.length >= 5) {
             break
           }
-          continue outer
-        }
-
-        list.push(name)
-        if (list.length >= 5) {
-          break
         }
       }
-      if (!list.length) {
+      const num = player.countEmptySlot(1)
+      if (!list.length || !num) {
         return
       }
-
-      const num = player.countEmptySlot(1)
-      const vcards = [list, createCard]
-      const title = `挈挟：选择${num > 1 ? "至多" : ""}${get.cnNumber(num)}张武将置入武器栏`
-
-      const page = [title, vcards]
-      const next = player.chooseButton(page, [1, num], true, "allowChooseAll")
-      next.set("ai", processAI)
-
-      const result = await next.forResult()
-      if (result.bool) {
+      const result = await player
+        .chooseButton(
+          [
+            "挈挟：选择" + (num > 1 ? "至多" : "") + get.cnNumber(num) + "张武将置入武器栏",
+            [
+              list,
+              (item, type, position, noclick, node) => {
+                return lib.skill.qiexie.$createButton(item, type, position, noclick, node)
+              },
+            ],
+          ],
+          [1, num],
+          true,
+        )
+        .set("ai", (button) => {
+          const name = button.link
+          const skills = get.character(name, 3).filter((skill) => {
+            const info = get.plainText(get.skillInfoTranslation(skill))
+            if (!info.includes("【杀】")) {
+              return false
+            }
+            const list = get.skillCategoriesOf(skill, get.player())
+            list.remove("锁定技")
+            return list.length == 0
+          })
+          let eff = 0.2
+          for (const skill of skills) {
+            eff += get.skillRank(skill, "in")
+          }
+          return eff
+        })
+        .forResult()
+      if (result?.bool) {
         const list = result.links
-        game.addVideo("skill", player, ["qiexie", [list]])
+        game.addVideo("skill", player, [event.name, [list]])
         _status.characterlist.removeArray(list)
         game.broadcastAll(
           (player, list) => {
@@ -296,35 +315,9 @@ const skills = {
         })
         player.$gain2(cards)
         await game.delayx()
-        // player.equip(cards);
         for (const card of cards) {
-          player.equip(card)
+          await player.equip(card)
         }
-      }
-
-      return
-
-      function createCard(item, type, position, noclick, node) {
-        return lib.skill.qiexie.$createButton(item, type, position, noclick, node)
-      }
-
-      function processAI(button) {
-        const name = button.link
-        const info = lib.character[name]
-        const skills = info[3].filter((skill) => {
-          const info = get.skillInfoTranslation(skill)
-          if (!info.includes("【杀】")) {
-            return false
-          }
-          const list = get.skillCategoriesOf(skill, get.player())
-          list.remove("锁定技")
-          return list.length == 0
-        })
-        let eff = 0.2
-        for (const skill of skills) {
-          eff += get.skillRank(skill, "in")
-        }
-        return eff
       }
     },
     $createButton(item, type, position, noclick, node) {

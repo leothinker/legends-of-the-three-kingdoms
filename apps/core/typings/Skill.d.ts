@@ -932,7 +932,7 @@ declare interface Skill {
   viewAs?:
     | string
     | CardBaseUIData
-    | ((cards: Card[], player: Player) => VCard | CardBaseUIData | null)
+    | ((cards: Card[], player: Player) => string | VCard | CardBaseUIData | null)
   /**
    * 视为技按钮出现条件（即发动条件）
    * @param player

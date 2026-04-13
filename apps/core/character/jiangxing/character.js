@@ -462,6 +462,33 @@ const characters = {
     hp: 3,
     skills: ["sbqianxun", "sblianying"],
   },
+  zerong: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["dccansi", "dcfozong"],
+  },
+  ol_hanfu: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["olshuzi", "olkuangshou"],
+  },
+  liubian: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["shiyuan", "dushi", "yuwei"],
+    isZhugong: true,
+  },
+  xin_jushou: {
+    sex: "male",
+    group: "qun",
+    hp: 2,
+    maxHp: 3,
+    hujia: 3,
+    skills: ["xinjianying", "shibei"],
+  },
 }
 
 export default characters

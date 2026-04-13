@@ -1,8 +1,8 @@
-import { lib, game, ui, get, ai, _status } from "noname";
+import { lib, game, ui, get, ai, _status } from "noname"
 game.import("card", function () {
-	return {
-		name: "zhulu",
-		connect: true,
+  return {
+    name: "zhulu",
+    connect: true,
     card: {
       jiejia: {
         fullskin: true,

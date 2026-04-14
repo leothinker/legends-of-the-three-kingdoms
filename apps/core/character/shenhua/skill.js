@@ -4076,7 +4076,7 @@ const skills = {
             dialog.addSmall([
               [character],
               (item, type, position, noclick, node) =>
-                lib.skill.huashen.$createButton(item, type, position, noclick, node),
+                lib.skill.jx_huashen.$createButton(item, type, position, noclick, node),
             ])
             dialog.add(
               '<div><div class="skill">【' +
@@ -4093,7 +4093,7 @@ const skills = {
             dialog.addSmall([
               list,
               (item, type, position, noclick, node) =>
-                lib.skill.huashen.$createButton(item, type, position, noclick, node),
+                lib.skill.jx_huashen.$createButton(item, type, position, noclick, node),
             ])
           } else {
             dialog.addText("共有" + get.cnNumber(list.length) + "张“化身”")
@@ -4106,8 +4106,6 @@ const skills = {
         return Object.keys(storage.owned).length
       },
     },
-    banned: [],
-    bannedType: ["Charlotte", "主公技", "觉醒技", "限定技", "隐匿技", "使命技"],
     addHuashen(player) {
       if (!player.storage.huashen) {
         return
@@ -4122,14 +4120,14 @@ const skills = {
           name.indexOf("zuoci") != -1 ||
           name.indexOf("key_") == 0 ||
           name.indexOf("sp_key_") == 0 ||
-          lib.skill.huashen.banned.includes(name) ||
+          lib.skill.jx_huashen.banned.includes(name) ||
           player.storage.huashen.owned[name]
         ) {
           continue
         }
         let skills = lib.character[name][3].filter((skill) => {
           const categories = get.skillCategoriesOf(skill, player)
-          return !categories.some((type) => lib.skill.huashen.bannedType.includes(type))
+          return !categories.some((type) => lib.skill.jx_huashen.bannedType.includes(type))
         })
         if (skills.length) {
           player.storage.huashen.owned[name] = skills
@@ -4150,96 +4148,8 @@ const skills = {
         player.syncStorage("huashen")
         player.markSkill("huashen")
         game.log(player, "获得了", get.cnNumber(list.length) + "张", "#g化身")
-        lib.skill.huashen.drawCharacter(player, list)
+        lib.skill.jx_huashen.drawCharacter(player, list)
       }
-    },
-    drawCharacter(player, list) {
-      game.broadcastAll(
-        function (player, list) {
-          if (player.isUnderControl(true)) {
-            var cards = []
-            for (var i = 0; i < list.length; i++) {
-              var cardname = "huashen_card_" + list[i]
-              lib.card[cardname] = {
-                fullimage: true,
-                image: "character:" + list[i],
-              }
-              lib.translate[cardname] = get.rawName2(list[i])
-              cards.push(game.createCard(cardname, "", ""))
-            }
-            player.$draw(cards, "nobroadcast")
-          }
-        },
-        player,
-        list,
-      )
-    },
-    $createButton(item, type, position, noclick, node) {
-      node = ui.create.buttonPresets.character(item, "character", position, noclick)
-      const info = lib.character[item]
-      const skills = info[3].filter(function (skill) {
-        const categories = get.skillCategoriesOf(skill, get.player())
-        return !categories.some((type) => lib.skill.huashen.bannedType.includes(type))
-      })
-      if (skills.length) {
-        const skillstr = skills.map((i) => `[${get.translation(i)}]`).join("<br>")
-        const skillnode = ui.create.caption(
-          `<div class="text" data-nature=${get.groupnature(info[1], "raw")}m style="font-family: ${lib.config.name_font || "xinwei"},xinwei">${skillstr}</div>`,
-          node,
-        )
-        skillnode.style.left = "2px"
-        skillnode.style.bottom = "2px"
-      }
-      node._customintro = function (uiintro, evt) {
-        const character = node.link,
-          characterInfo = get.character(node.link)
-        let capt = get.translation(character)
-        if (characterInfo) {
-          capt += `&nbsp;&nbsp;${get.translation(characterInfo.sex)}`
-          let charactergroup
-          const charactergroups = get.is.double(character, true)
-          if (charactergroups) {
-            charactergroup = charactergroups.map((i) => get.translation(i)).join("/")
-          } else {
-            charactergroup = get.translation(characterInfo.group)
-          }
-          capt += `&nbsp;&nbsp;${charactergroup}`
-        }
-        uiintro.add(capt)
-
-        if (lib.characterTitle[node.link]) {
-          uiintro.addText(get.colorspan(lib.characterTitle[node.link]))
-        }
-        for (let i = 0; i < skills.length; i++) {
-          if (lib.translate[skills[i] + "_info"]) {
-            let translation =
-              lib.translate[skills[i] + "_ab"] || get.translation(skills[i]).slice(0, 2)
-            if (lib.skill[skills[i]] && lib.skill[skills[i]].nobracket) {
-              uiintro.add(
-                '<div><div class="skilln">' +
-                  get.translation(skills[i]) +
-                  "</div><div>" +
-                  get.skillInfoTranslation(skills[i], null, false) +
-                  "</div></div>",
-              )
-            } else {
-              uiintro.add(
-                '<div><div class="skill">【' +
-                  translation +
-                  "】</div><div>" +
-                  get.skillInfoTranslation(skills[i], null, false) +
-                  "</div></div>",
-              )
-            }
-            if (lib.translate[skills[i] + "_append"]) {
-              uiintro._place_text = uiintro.add(
-                '<div class="text">' + lib.translate[skills[i] + "_append"] + "</div>",
-              )
-            }
-          }
-        }
-      }
-      return node
     },
     trigger: {
       global: "phaseBefore",
@@ -4311,7 +4221,7 @@ const skills = {
         const dialog = ui.create.dialog(prompt, [
           list,
           (item, type, position, noclick, node) =>
-            lib.skill.huashen.$createButton(item, type, position, noclick, node),
+            lib.skill.jx_huashen.$createButton(item, type, position, noclick, node),
         ])
         event.dialog = dialog
         event.forceMine = true
@@ -4584,7 +4494,7 @@ const skills = {
         player.syncStorage("huashen")
         player.updateMarks("huashen")
         await player.addAdditionalSkills("huashen", skill)
-        // lib.skill.huashen.createAudio(character,skill,'zuoci');
+        // lib.skill.jx_huashen.createAudio(character,skill,'zuoci');
       }
     },
   },

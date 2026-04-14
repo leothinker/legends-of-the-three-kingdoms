@@ -6684,7 +6684,7 @@ const skills = {
       "xinfu_guhuo",
       "reguhuo",
       "huashen",
-      "rehuashen",
+      "jx_huashen",
       "old_guhuo",
       "shouxi",
       "xinpojun",

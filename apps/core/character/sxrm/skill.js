@@ -1924,7 +1924,7 @@ const skills = {
       "jilei",
       "benyu",
       "chouce",
-      "new_wuhun",
+      "wuhun",
     ],
   },
   //刘备

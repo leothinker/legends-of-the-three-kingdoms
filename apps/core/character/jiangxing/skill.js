@@ -11204,7 +11204,7 @@ const skills = {
     },
   },
   recanshi: {
-    audio: "canshi",
+    audio: 2,
     trigger: { player: "phaseDrawBegin2" },
     check(event, player) {
       if (
@@ -11651,6 +11651,131 @@ const skills = {
         intro: { content: "本回合无法成为牌的目标" },
         mod: { targetEnabled: () => false },
       },
+    },
+  },
+  xunshi: {
+    audio: 2,
+    mod: {
+      cardname(card) {
+        if (lib.skill.xunshi.isXunshi(card)) {
+          return "sha"
+        }
+      },
+      cardnature(card) {
+        if (lib.skill.xunshi.isXunshi(card)) {
+          return false
+        }
+      },
+      suit(card) {
+        if (lib.skill.xunshi.isXunshi(card)) {
+          return "none"
+        }
+      },
+      targetInRange(card) {
+        const suit = get.color(card)
+        if (suit == "none" || suit == "unsure") {
+          return true
+        }
+      },
+      cardUsable(card) {
+        const suit = get.color(card)
+        if (suit == "none" || suit == "unsure") {
+          return Infinity
+        }
+      },
+    },
+    isXunshi(card) {
+      var info = lib.card[card.name]
+      if (!info || (info.type != "trick" && info.type != "delay")) {
+        return false
+      }
+      if (info.notarget) {
+        return false
+      }
+      if (info.selectTarget != undefined) {
+        if (Array.isArray(info.selectTarget)) {
+          if (info.selectTarget[0] < 0) {
+            return !info.toself
+          }
+          return info.selectTarget[0] != 1 || info.selectTarget[1] != 1
+        } else {
+          if (info.selectTarget < 0) {
+            return !info.toself
+          }
+          return info.selectTarget != 1
+        }
+      }
+      return false
+    },
+    trigger: { player: "useCard2" },
+    forced: true,
+    filter(event, player) {
+      return get.color(event.card) == "none"
+    },
+    async content(event, trigger, player) {
+      if (player.countMark("shencai") < 4 && player.hasSkill("shencai", null, null, false)) {
+        player.addMark("shencai", 1, false)
+      }
+
+      if (trigger.addCount !== false) {
+        trigger.addCount = false
+        const stat = player.getStat().card
+        const name = trigger.card.name
+        if (typeof stat[name] == "number") {
+          stat[name]--
+        }
+      }
+
+      const info = get.info(trigger.card)
+      if (info.allowMultiple == false) {
+        return
+      }
+
+      if (!trigger.targets || info.multitarget) {
+        return
+      }
+
+      if (
+        !game.hasPlayer(
+          (current) =>
+            !trigger.targets.includes(current) &&
+            lib.filter.targetEnabled2(trigger.card, player, current),
+        )
+      ) {
+        return
+      }
+
+      const prompt2 = "为" + get.translation(trigger.card) + "增加任意个目标"
+      const result = await player
+        .chooseTarget(
+          get.prompt("xunshi"),
+          (card, _player, target) => {
+            const player = get.player()
+            return (
+              !_status.event.targets.includes(target) &&
+              lib.filter.targetEnabled2(_status.event.card, player, target)
+            )
+          },
+          [1, Infinity],
+        )
+        .set("prompt2", prompt2)
+        .set("ai", function (target) {
+          var trigger = _status.event.getTrigger()
+          var player = _status.event.player
+          return get.effect(target, trigger.card, player, player)
+        })
+        .set("card", trigger.card)
+        .set("targets", trigger.targets)
+        .forResult()
+
+      if (!result.bool || !result.targets?.length) {
+        return
+      }
+      if (!event.isMine() && !event.isOnline()) {
+        await game.delayx()
+      }
+      player.line(result.targets, "fire")
+      trigger.targets.addArray(result.targets)
     },
   },
   //OL孙茹
@@ -15823,6 +15948,131 @@ const skills = {
                   return 0
                 }
               }
+            }
+          }
+        },
+      },
+    },
+  },
+  xinfu_limu: {
+    mod: {
+      targetInRange(card, player, target) {
+        if (player.countCards("j") && player.inRange(target)) {
+          return true
+        }
+      },
+      cardUsableTarget(card, player, target) {
+        if (player.countCards("j") && player.inRange(target)) {
+          return true
+        }
+      },
+      aiOrder(player, card, num) {
+        if (
+          get.type(card, null, player) == "trick" &&
+          player.canUse(card, player) &&
+          player.canAddJudge(card)
+        ) {
+          return 15
+        }
+      },
+    },
+    locked: false,
+    audio: 2,
+    enable: "phaseUse",
+    discard: false,
+    filter(event, player) {
+      if (player.hasJudge("lebu")) {
+        return false
+      }
+      return player.countCards("hes", { suit: "diamond" }) > 0
+    },
+    viewAs: { name: "lebu" },
+    //prepare:"throw",
+    position: "hes",
+    filterCard(card, player, event) {
+      const lebu = get.autoViewAs({ name: "lebu", cards: [card] }, [card])
+      return get.suit(card) == "diamond" && lib.filter.judge(lebu, player, player)
+    },
+    selectTarget: -1,
+    filterTarget(card, player, target) {
+      return player == target
+    },
+    check(card) {
+      var player = _status.event.player
+      if (!player.getEquip("zhangba")) {
+        let damaged = player.maxHp - player.hp - 1
+        if (
+          player.countCards("h", function (cardx) {
+            if (cardx == card) {
+              return false
+            }
+            if (cardx.name == "tao") {
+              if (damaged < 1) {
+                return true
+              }
+              damaged--
+            }
+            return ["shan", "jiu"].includes(cardx.name)
+          }) > 0
+        ) {
+          return 0
+        }
+      }
+      if (card.name == "shan") {
+        return 15
+      }
+      if (card.name == "tao" || card.name == "jiu") {
+        return 10
+      }
+      return 9 - get.value(card)
+    },
+    onuse(links, player) {
+      var next = game.createEvent("limu_recover", false, _status.event.getParent())
+      next.player = player
+      next.setContent(function () {
+        player.recover()
+      })
+    },
+    ai: {
+      result: {
+        target(player, target) {
+          if (player.countCards("hes", "zhangba")) {
+            return player.countCards("h", { type: "basic" })
+          }
+          let res = lib.card.lebu.ai.result.target(player, target)
+          if (player.countCards("hs", "sha") >= player.hp) {
+            res++
+          }
+          if (target.isDamaged()) {
+            return res + 2 * Math.abs(get.recoverEffect(target, player, target))
+          }
+          return res
+        },
+        ignoreStatus: true,
+      },
+      order(item, player) {
+        if (player.hp > 1 && player.countCards("j")) {
+          return 0
+        }
+        return 12
+      },
+      effect: {
+        target(card, player, target) {
+          if (
+            target.isPhaseUsing() &&
+            typeof card === "object" &&
+            get.type(card, null, target) === "delay" &&
+            !target.countCards("j")
+          ) {
+            let shas =
+              target.getCards("hs", (i) => {
+                if (card === i || (card.cards && card.cards.includes(i))) {
+                  return false
+                }
+                return get.name(i, target) === "sha" && target.getUseValue(i) > 0
+              }) - target.getCardUsable("sha")
+            if (shas > 0) {
+              return [1, 1.5 * shas]
             }
           }
         },

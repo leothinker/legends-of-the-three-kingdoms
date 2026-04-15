@@ -67,8 +67,8 @@ const translates = {
 
   jx_wolongzhuge: "界卧龙诸葛",
   jx_wolongzhuge_prefix: "界",
-  jx_bazhen: "八阵",
-  jx_bazhen_info: "锁定技，若你的装备区里没有防具牌，你视为装备着【八卦阵】。",
+  bazhen: "八阵",
+  bazhen_info: "锁定技，若你的装备区里没有防具牌，你视为装备着【八卦阵】。",
   jx_huoji: "火计",
   jx_huoji_info: "你可以将一张红色牌当【火攻】使用。",
   jx_kanpo: "看破",

@@ -88,6 +88,17 @@ const translates = {
   oltianhou_diamond: "凝雾",
   oltianhou_diamond_info:
     "锁定技，当其他角色使用【杀】指定非相邻角色为唯一目标时，其判定，若结果点数大于此【杀】，此【杀】无效。",
+
+  de_diaochan: "魔貂蝉",
+  de_diaochan_prefix: "魔",
+  huanhuo: "幻惑",
+  huanhuo_info:
+    "每轮开始时，你摸两张牌，然后弃置至多两张牌并选择等量其他角色。其下回合出牌阶段强制选中一张可用的手牌，且每使用一张牌后随机弃一张牌，直到其使用了两张牌后。",
+  de_qingshi: "倾世",
+  de_qingshi_info: `准备阶段，你可${get.poptip("rule_rumo")}，令所有角色获得一张单目标伤害牌。其他角色使用此牌指定唯一目标时，你可弃置一张牌，重新指定牌的目标（无距离限制）。这些牌：造成伤害后，你摸一张牌；未因使用进入弃牌堆后，你获得之。（准备阶段，若这些牌均离开其手牌区，你再令所有角色获得牌。）`,
+
+  rumo: "入魔",
+  rumo_info: "入魔后，每轮结束时，若本轮你未造成过伤害，你失去1点体力。",
 }
 
 export default translates

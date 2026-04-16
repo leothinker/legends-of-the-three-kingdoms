@@ -27,6 +27,12 @@ const characters = {
     skills: ["cangqiao", "shenji", "huaxiu"],
     groupInGuozhan: "shu",
   },
+  de_diaochan: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["huanhuo", "de_qingshi"],
+  },
 }
 
 export default characters

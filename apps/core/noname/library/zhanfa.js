@@ -3311,7 +3311,7 @@ export class ZhanfaManager {
    * @returns {string[]}
    */
   getList(includeBan, player) {
-    let list = [...Object.keys(this.#zhanfa)] //, ...Object.keys(this.#customZhanfa)
+    let list = Object.keys(this.#zhanfa) //, ...Object.keys(this.#customZhanfa)
     if (!includeBan) {
       list = list.filter((i) => !this.get(i)?.filterBan?.(player))
     }

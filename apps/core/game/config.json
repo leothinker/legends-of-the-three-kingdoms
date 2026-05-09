@@ -185,7 +185,7 @@
   "right_click": "pause",
   "sort": "type_sort",
   "cards": ["standard", "extra"],
-  "characters": ["jiexian", "jieshenhua", "jiangxing", "zhencang", "tianshui", "jsrg", "sxrm"],
+  "characters": ["refresh", "jieshenhua", "jiangxing", "zhencang", "tianshui", "jsrg", "sxrm"],
   "moderned_characters": [
     "bingshi",
     "clan",

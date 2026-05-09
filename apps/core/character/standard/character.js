@@ -23,6 +23,7 @@ const characters = {
     group: "shu",
     hp: 3,
     skills: ["guanxing", "kongcheng"],
+    names: "诸葛|亮",
   },
   zhaoyun: {
     sex: "male",
@@ -78,12 +79,14 @@ const characters = {
     group: "wu",
     hp: 3,
     skills: ["guose", "liuli"],
+    names: "桥|null",
   },
   luxun: {
     sex: "male",
     group: "wu",
     hp: 3,
     skills: ["qianxun", "lianying"],
+    clans: ["吴郡陆氏"],
   },
   sunshangxiang: {
     sex: "female",
@@ -174,7 +177,8 @@ const characters = {
     sex: "female",
     group: "shu",
     hp: 3,
-    skills: ["shenzhi", "shushen"],
+    skills: ["shushen", "shenzhi"],
+    names: "甘|null",
   },
   yuejin: {
     sex: "male",

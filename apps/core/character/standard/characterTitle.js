@@ -6,6 +6,7 @@ export default {
   zhaoyun: "少年将军",
   machao: "一骑当千",
   huangyueying: "归隐的杰女",
+
   sunquan: "年轻的贤君",
   ganning: "锦帆游侠",
   lvmeng: "白衣渡江",
@@ -14,6 +15,7 @@ export default {
   daqiao: "矜持之花",
   luxun: "儒生雄才",
   sunshangxiang: "弓腰姬",
+
   caocao: "魏武帝",
   simayi: "狼顾之鬼",
   xiahoudun: "独眼的罗刹",
@@ -21,11 +23,15 @@ export default {
   xuchu: "虎痴",
   guojia: "早终的先知",
   zhenji: "薄幸的美人",
+
   huatuo: "神医",
   lvbu: "武的化身",
   diaochan: "绝世的舞姬",
+
   huaxiong: "飞扬跋扈",
+
   gongsunzan: "白马义从",
+
   panfeng: "联军上将",
   ganfuren: "昭烈皇后",
   yuejin: "奋强突固",

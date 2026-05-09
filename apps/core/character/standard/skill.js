@@ -1,6 +1,6 @@
 import { lib, game, ui, get, ai, _status } from "noname"
 
-/** @type { importCharacterConfig['skill'] } */
+/** @type { importCharacterConfig["skill"] } */
 const skills = {
   // 刘备
   // 仁德
@@ -13,7 +13,6 @@ const skills = {
     discard: false,
     lose: false,
     delay: 0,
-    group: ["rende1"],
     filterTarget(card, player, target) {
       return player != target
     },
@@ -28,7 +27,13 @@ const skills = {
         return 20
       }
       const player = get.owner(card)
-      let num = player.storage.rende
+      let num = 0
+      const evt2 = _status.event.getParent()
+      player.getHistory("lose", (evt) => {
+        if (evt.getParent().skill == "rende" && evt.getParent(3) == evt2) {
+          num += evt.cards.length
+        }
+      })
       if (player.hp == player.maxHp || num > 1 || player.countCards("h") <= 1) {
         if (ui.selected.cards.length) {
           return -1
@@ -56,11 +61,16 @@ const skills = {
       return 10 - get.value(card)
     },
     async content(event, trigger, player) {
-      let num = player.storage.rende
-      player.give(event.cards, event.target)
-      player.storage.rende = num + event.cards.length
+      const evt2 = event.getParent(3)
+      let num = 0
+      player.getHistory("lose", (evt) => {
+        if (evt.getParent(2).name == "rende" && evt.getParent(5) == evt2) {
+          num += evt.cards.length
+        }
+      })
+      await player.give(event.cards, event.target)
       if (num < 2 && num + event.cards.length > 1) {
-        player.recover()
+        await player.recover()
       }
     },
     ai: {
@@ -85,7 +95,7 @@ const skills = {
           const np = player.countCards("h")
           if (
             player.hp == player.maxHp ||
-            player.storage.rende > 1 ||
+            player.storage.rende < 0 ||
             player.countCards("h") <= 1
           ) {
             if (nh >= np - 1 && np <= player.hp && !target.hasSkill("haoshi")) {
@@ -112,18 +122,9 @@ const skills = {
       threaten: 0.8,
     },
   },
-  rende1: {
-    trigger: { player: "phaseBeginStart" },
-    silent: true,
-    sourceSkill: "rende",
-    async content(event, trigger, player) {
-      player.storage.rende = 0
-    },
-  },
   // 激将
   jijiang: {
     audio: 2,
-    audioname: ["liushan", "jx_liubei", "jx_liushan"],
     group: ["jijiang1"],
     zhuSkill: true,
     filter(event, player) {
@@ -133,7 +134,7 @@ const skills = {
       ) {
         return false
       }
-      return !event.jijiang && (event.type != "phase" || !player.hasSkill("jijiang2"))
+      return !event.jijiang && (event.type != "phase" || !player.hasSkill("jijiang3"))
     },
     enable: ["chooseToUse", "chooseToRespond"],
     viewAs: { name: "sha" },
@@ -158,7 +159,6 @@ const skills = {
   },
   jijiang1: {
     audio: "jijiang",
-    audioname: ["liushan", "jx_liubei", "jx_liushan"],
     trigger: { player: ["useCardBegin", "respondBegin"] },
     logTarget: "targets",
     sourceSkill: "jijiang",
@@ -174,7 +174,7 @@ const skills = {
           event.current = player.next
         }
         if (event.current == player) {
-          player.addTempSkill("jijiang2")
+          player.addTempSkill("jijiang3")
           trigger.cancel()
           trigger.getParent().goto(0)
           return
@@ -213,7 +213,7 @@ const skills = {
       }
     },
   },
-  jijiang2: {
+  jijiang3: {
     trigger: { global: ["useCardAfter", "useSkillAfter", "phaseAfter"] },
     silent: true,
     charlotte: true,
@@ -222,7 +222,7 @@ const skills = {
       return event.skill != "jijiang" && event.skill != "qinwang"
     },
     async content(event, trigger, player) {
-      player.removeSkill("jijiang2")
+      player.removeSkill("jijiang3")
     },
   },
   // 关羽
@@ -315,7 +315,6 @@ const skills = {
   guanxing_fail: {},
   guanxing: {
     audio: 2,
-    audioname: ["jiangwei"],
     trigger: { player: "phaseZhunbeiBegin" },
     frequent: true,
     preHidden: true,
@@ -350,7 +349,6 @@ const skills = {
     },
     group: "kongcheng1",
     audio: 2,
-    audioname: ["jx_zhugeliang"],
     ai: {
       noh: true,
       skillTagFilter(player, tag) {
@@ -385,7 +383,6 @@ const skills = {
   // 龙胆
   longdan: {
     audio: 2,
-    audioname: ["jx_zhaoyun"],
     group: ["longdan_sha", "longdan_shan", "longdan_draw"],
     subSkill: {
       draw: {
@@ -627,7 +624,6 @@ const skills = {
   // 奇袭
   qixi: {
     audio: 2,
-    audioname: ["jx_ganning"],
     enable: "chooseToUse",
     filterCard(card) {
       return get.color(card) == "black"
@@ -648,7 +644,6 @@ const skills = {
   // 克己
   keji: {
     audio: 2,
-    audioname: ["jx_lvmeng"],
     trigger: { player: "phaseDiscardBefore" },
     frequent(event, player) {
       return player.needsToDiscard()
@@ -704,7 +699,6 @@ const skills = {
   // 英姿
   yingzi: {
     audio: 2,
-    audioname: ["sunce"],
     trigger: { player: "phaseDrawBegin2" },
     frequent: true,
     filter(event, player) {
@@ -802,7 +796,6 @@ const skills = {
   // 流离
   liuli: {
     audio: 2,
-    audioname: ["jx_daqiao"],
     trigger: { target: "useCardToTarget" },
     preHidden: true,
     filter(event, player) {
@@ -1010,7 +1003,6 @@ const skills = {
   // 枭姬
   xiaoji: {
     audio: 2,
-    audioname: ["jx_sunshangxiang"],
     trigger: {
       player: "loseAfter",
       global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -1068,7 +1060,6 @@ const skills = {
   // 护驾
   hujia: {
     audio: 2,
-    audioname: ["jx_caocao"],
     zhuSkill: true,
     trigger: { player: ["chooseToRespondBefore", "chooseToUseBefore"] },
     filter(event, player) {
@@ -1319,62 +1310,6 @@ const skills = {
       },
     },
   },
-  ganglie_three: {
-    audio: "ganglie",
-    trigger: { player: "damageEnd" },
-    async cost(event, trigger, player) {
-      const result = await player
-        .chooseTarget(get.prompt2(event.skill), (card, player, target) => {
-          return target.isEnemyOf(player)
-        })
-        .set("ai", (target) => {
-          return -get.attitude(_status.event.player, target) / Math.sqrt(1 + target.countCards("h"))
-        })
-        .forResult()
-      event.result = result
-    },
-    async content(event, trigger, player) {
-      event.target = event.targets[0]
-      const judgeEvent = player.judge((card) => {
-        if (get.suit(card) == "heart") {
-          return -2
-        }
-        return 2
-      })
-      judgeEvent.judge2 = (result) => result.bool
-      const { judge } = await judgeEvent.forResult()
-      if (judge < 2) {
-        return
-      }
-      const { bool: chooseToDiscardResultBool } = await event.target
-        .chooseToDiscard(2)
-        .set("ai", (card) => {
-          if (card.name == "tao") {
-            return -10
-          }
-          if (card.name == "jiu" && _status.event.player.hp == 1) {
-            return -10
-          }
-          return get.unuseful(card) + 2.5 * (5 - get.owner(card).hp)
-        })
-        .forResult()
-      if (chooseToDiscardResultBool === false) {
-        event.target.damage()
-      }
-    },
-    ai: {
-      maixie_defend: true,
-      effect: {
-        target(card, player, target) {
-          if (player.hasSkillTag("jueqing", false, target)) {
-            return [1, -1]
-          }
-          return 0.8
-          // if(get.tag(card,'damage')&&get.damageEffect(target,player,player)>0) return [1,0,0,-1.5];
-        },
-      },
-    },
-  },
   // 张辽
   // 突袭
   tuxi: {
@@ -1468,7 +1403,6 @@ const skills = {
   // 天妒
   tiandu: {
     audio: 2,
-    audioname: ["jx_guojia", "xizhicai"],
     trigger: { player: "judgeEnd" },
     preHidden: true,
     frequent(event) {
@@ -1674,7 +1608,6 @@ const skills = {
   // 洛神
   luoshen: {
     audio: 2,
-    audioname: ["jx_zhenji"],
     trigger: { player: "phaseZhunbeiBegin" },
     frequent: true,
     preHidden: true,
@@ -1748,7 +1681,6 @@ const skills = {
     },
     locked: false,
     audio: 2,
-    audioname: ["jx_huatuo"],
     enable: "chooseToUse",
     viewAsFilter(player) {
       return player != _status.currentPhase && player.countCards("hes", { color: "red" }) > 0
@@ -1804,7 +1736,6 @@ const skills = {
   // 无双
   wushuang: {
     audio: 2,
-    audioname: ["le_lvbu", "jx_lvbu"],
     forced: true,
     locked: true,
     group: ["wushuang1", "wushuang2"],
@@ -1884,7 +1815,7 @@ const skills = {
   // 离间
   lijian: {
     audio: 2,
-    audioname: ["jx_diaochan"],
+    audioname: ["re_diaochan"],
     enable: "phaseUse",
     usable: 1,
     filter(event, player) {
@@ -1977,7 +1908,6 @@ const skills = {
       player: ["changeHp"],
     },
     audio: 2,
-    audioname: ["jx_gongsunzan"],
     forced: true,
     filter(event, player) {
       return get.sgn(player.hp - 2.5) != get.sgn(player.hp - 2.5 - event.num)
@@ -2038,7 +1968,7 @@ const skills = {
   // 神智
   shenzhi: {
     audio: 2,
-    trigger: { player: "phaseBegin" },
+    trigger: { player: "phaseZhunbeiBegin" },
     check(event, player) {
       if (player.hp > 2) {
         return false
@@ -2095,7 +2025,7 @@ const skills = {
   // 骁果
   xiaoguo: {
     audio: 2,
-    trigger: { global: "phaseEnd" },
+    trigger: { global: "phaseJieshuBegin" },
     filter(event, player) {
       return (
         event.player.isIn() &&

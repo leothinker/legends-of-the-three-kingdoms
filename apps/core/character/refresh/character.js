@@ -1,11 +1,11 @@
 const characters = {
-	jx_liubei: {
-		sex: "male",
-		group: "shu",
-		hp: 4,
-		skills: ["jx_rende", "jijiang"],
-		isZhugong: true,
-	},
+  jx_liubei: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["jx_rende", "jijiang"],
+    isZhugong: true,
+  },
   jx_guanyu: {
     sex: "male",
     group: "shu",

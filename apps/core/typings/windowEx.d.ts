@@ -1,9 +1,9 @@
 //一些附加到window的对象的提示
 declare interface Window {
   /** 初始界面的暂时配置？ */
-  tempSetNoname?: string
+  tempSetWTK?: string
   /** 游戏更新信息配置 */
-  noname_update?: {
+  wtk_update?: {
     version: string
     update: string
     changeLog: string[]
@@ -16,13 +16,13 @@ declare interface Window {
   // config: Record<string, any>,
 
   // /** 游戏源列表（预加载资源列表，待验证） */
-  // noname_source_list?: string[],
+  // wtk_source_list?: string[],
 
   // /** 游戏懒加载资源列表(外部扩展资源列表，待验证) */
-  // noname_asset_list?: string[],
+  // wtk_asset_list?: string[],
 
   // /** 默认皮肤列表 */
-  // noname_skin_list?: Record<string, number>;
+  // wtk_skin_list?: Record<string, number>;
 
   /** codeMirror,一个代码编辑器库 */
   // CodeMirror: typeof import('codemirror/index');
@@ -49,7 +49,7 @@ declare interface Window {
   get: Get
   ai: AI
 
-  saveNonameInput?: Function
+  saveWTKInput?: Function
   /** 是否处于启动页 */
   inSplash: boolean
   /** 游戏是否正常启动？ */
@@ -73,9 +73,9 @@ declare interface Window {
 
   device: Device
 
-  NonameAndroidBridge: NonameAndroidBridge
+  WTKAndroidBridge: WTKAndroidBridge
 
-  noname_shijianInterfaces: NonameAndroidBridge & {
+  wtk_shijianInterfaces: WTKAndroidBridge & {
     /**
      * 获取存储的APK的版本号
      */

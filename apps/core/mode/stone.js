@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "noname"
+import { lib, game, ui, get, ai, _status } from "wtk"
 export const type = "mode"
 /**
  * @type { () => importModeConfig }
@@ -9161,7 +9161,7 @@ export default () => {
         forced: true,
         unique: true,
         filter(event) {
-          return event.num != 0
+          return event.changedHp != 0
         },
         content() {
           player.draw(Math.abs(trigger.num))

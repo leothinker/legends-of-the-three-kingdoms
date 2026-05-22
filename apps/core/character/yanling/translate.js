@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "noname"
+import { lib, game, ui, get, ai, _status } from "wtk"
 
 const translates = {
   yl_xiaoqiao: "界小乔",

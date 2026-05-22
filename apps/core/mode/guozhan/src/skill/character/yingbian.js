@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "noname"
+import { lib, game, ui, get, ai, _status } from "wtk"
 
 export default {
   //手杀杜预
@@ -3965,6 +3965,9 @@ export default {
           return player.storage.fakeqimei_draw
         },
         filter(event, player) {
+          if (event.changedHp == 0) {
+            return false
+          }
           var target = player.storage.fakeqimei_draw
           if (!target || !target.isIn()) {
             return false

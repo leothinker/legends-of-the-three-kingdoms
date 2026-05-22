@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "noname"
+import { lib, game, ui, get, ai, _status } from "wtk"
 
 const translates = {
   le_diaochan: "神貂蝉",

@@ -12,8 +12,8 @@ export default defineConfig({
   base: "./",
   resolve: {
     alias: {
-      "@": "/noname",
-      noname: "/noname.js",
+      "@": "/wtk",
+      wtk: "/wtk.js",
     },
   },
   plugins: [vue()],

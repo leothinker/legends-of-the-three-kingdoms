@@ -133,10 +133,10 @@ pnpm install
    然后在项目根目录执行打包命令：
 
    ```bash
-   pnpm -F @noname/electron build:win
+   pnpm -F @wtk/electron build:win
    ```
 
-   这条命令构建结果会输出到`./output/`文件夹，其中`./output/win-uppackd/noname.exe`目录中的文件可以直接运行。
+   这条命令构建结果会输出到`./output/`文件夹，其中`./output/win-uppackd/wtk.exe`目录中的文件可以直接运行。
 
    注意：若构建时有网络问题，请设置mirror或添加代理，相关操作请自行百度。
 
@@ -152,7 +152,7 @@ pnpm install
    然后在项目根目录执行打包命令：
 
    ```bash
-   pnpm -F @noname/electron build:mac
+   pnpm -F @wtk/electron build:mac
    ```
 
    这条命令构建结果会输出到`./output/`文件夹。
@@ -183,7 +183,7 @@ pnpm install
    **A:** 在项目根目录执行命令，启动ws服务：
 
    ```bash
-   pnpm -F @noname/server dev
+   pnpm -F @wtk/server dev
    ```
 
    这条命令启动ws服务，监听本地的8082端口。

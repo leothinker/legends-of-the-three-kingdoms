@@ -1,4 +1,4 @@
-window.noname_package = {
+window.wtk_package = {
   character: {
     //经典标包＋神话再临
     standard: "标准版",
@@ -75,7 +75,7 @@ window.noname_package = {
     kyoani_bg: "京都",
     key_bg: "键社",
     xiaowu_bg: "小无",
-    noname_bg: "璀璨",
+    wtk_bg: "璀璨",
     wuming_bg: "无名",
     zhulin_bg: "竹林",
     shengshi_bg: "盛世",

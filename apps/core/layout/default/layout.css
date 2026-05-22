@@ -6241,7 +6241,7 @@ progress.progress::-webkit-progress-value {
   background: rgb(0, 117, 255);
 }
 /* 给poptip增加下划线和加粗 */
-#window noname-poptip {
+#window wtk-poptip {
   text-decoration: underline;
   font-weight: bolder;
 }

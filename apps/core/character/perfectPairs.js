@@ -1,1 +1,1 @@
-window.noname_character_perfectPairs = {}
+window.wtk_character_perfectPairs = {}

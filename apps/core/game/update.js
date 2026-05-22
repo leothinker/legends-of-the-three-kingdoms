@@ -1,4 +1,4 @@
-window.noname_update = {
+window.wtk_update = {
   version: "1.11.3",
   update: "NULL",
   changeLog: [

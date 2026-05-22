@@ -1,4 +1,4 @@
-// noname内扩展的一些array方法：
+// wtk内扩展的一些array方法：
 declare interface Array<T> {
   // /**
   //  * @deprecated 已废弃，请使用includes

@@ -1,21 +1,21 @@
-import { lib, game, ui, get, ai, _status } from "noname"
+import { lib, game, ui, get, ai, _status } from "wtk"
 
 const cards = {
   suits_spade: {
     fullskin: true,
-    noname: true,
+    wtk: true,
   },
   suits_heart: {
     fullskin: true,
-    noname: true,
+    wtk: true,
   },
   suits_diamond: {
     fullskin: true,
-    noname: true,
+    wtk: true,
   },
   suits_club: {
     fullskin: true,
-    noname: true,
+    wtk: true,
   },
 }
 

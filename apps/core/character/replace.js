@@ -1,1 +1,1 @@
-window.noname_character_replace = {}
+window.wtk_character_replace = {}

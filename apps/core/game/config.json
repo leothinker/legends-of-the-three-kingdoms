@@ -1,10 +1,4 @@
 {
-  "extension_sources": {
-    "GitHub Proxy": "https://mirror.ghproxy.com/https://raw.githubusercontent.com/libccy/noname-extension/master/",
-    "FastGit": "https://raw.fgit.cf/libccy/noname-extension/master/",
-    "GitHub": "https://raw.githubusercontent.com/libccy/noname-extension/master/"
-  },
-  "extension_source": "GitHub Proxy",
   "forbidai": ["ns_liuzhang"],
   "forbidai_user": [],
   "forbidall": [],
@@ -97,7 +91,7 @@
   "doubleclick_intro": true,
   "choose_all_button": true,
   "cheat": false,
-  "volumn_background": 0,
+  "volumn_background": 4,
   "volumn_audio": 4,
   "connect_avatar": "caocao",
   "connect_nickname": "无名玩家",

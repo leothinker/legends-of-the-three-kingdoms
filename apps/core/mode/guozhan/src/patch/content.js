@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "noname"
+import { lib, game, ui, get, ai, _status } from "wtk"
 import { broadcast, broadcastAll } from "./game.js"
 
 import { PlayerGuozhan as Player } from "./player.js"

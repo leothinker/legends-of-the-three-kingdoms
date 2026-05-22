@@ -74,12 +74,12 @@ declare type ContentFuncsByAll = ((
 
 declare type OldContentFuncByAll = () => void
 
-declare type Game = typeof import("noname").game
-declare type Library = typeof import("noname").lib
-declare type Status = typeof import("noname")._status
-declare type UI = typeof import("noname").ui
-declare type Get = typeof import("noname").get
-declare type AI = typeof import("noname").ai
+declare type Game = typeof import("wtk").game
+declare type Library = typeof import("wtk").lib
+declare type Status = typeof import("wtk")._status
+declare type UI = typeof import("wtk").ui
+declare type Get = typeof import("wtk").get
+declare type AI = typeof import("wtk").ai
 
 declare type Button = import("@/library/index.js").Button
 declare type Card = import("@/library/index.js").Card
@@ -761,7 +761,7 @@ declare interface PackageData {
   translation?: string
   /**
    * 不将package中的character、card、skill自动拆包导入
-   * @see {@link /apps/core/noname/init/loading.ts} loadExtension `if (extension[4] && !extension[4].nopack)`
+   * @see {@link /apps/core/wtk/init/loading.ts} loadExtension `if (extension[4] && !extension[4].nopack)`
    */
   nopack?: boolean
 

@@ -1,4 +1,4 @@
-import { lib } from "noname"
+import { lib } from "wtk"
 const Character = lib.element.Character
 
 import normal from "./normal.js"

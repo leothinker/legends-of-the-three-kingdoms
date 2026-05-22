@@ -124,7 +124,7 @@ export default function vitePluginJIT(importMap: Record<string, string> = {}): P
 
 	const script = document.createElement("script");
 	script.type = "module";
-	script.src = "/noname/entry.js";
+	script.src = "/wtk/entry.js";
 	document.head.appendChild(script);
 })();`,
       )

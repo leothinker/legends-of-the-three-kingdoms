@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "noname"
+import { lib, game, ui, get, ai, _status } from "wtk"
 import characters from "./character.js"
 import cards from "./card.js"
 import pinyins from "./pinyin.js"

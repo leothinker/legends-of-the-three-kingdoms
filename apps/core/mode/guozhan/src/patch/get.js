@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { lib, game, ui, get, Get, ai, _status } from "noname"
+import { lib, game, ui, get, Get, ai, _status } from "wtk"
 import { showYexingsContent, chooseCharacterContent, chooseCharacterOLContent } from "./content.js"
 
 export class GetGuozhan extends Get {

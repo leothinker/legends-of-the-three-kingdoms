@@ -1,4 +1,4 @@
-window.noname_character_rank = {
+window.wtk_character_rank = {
   s: [],
   ap: [],
   a: [],

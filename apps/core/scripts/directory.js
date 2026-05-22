@@ -9,7 +9,7 @@ global.window = global
 require(__dirname + "/update.js")
 require(__dirname + "/asset.js")
 
-var updates = window.noname_update
+var updates = window.wtk_update
 var newversion = false
 var commit = false
 if (process.argv[2]) {
@@ -23,7 +23,7 @@ if (process.argv[2]) {
   }
 }
 var assetlist = ""
-var skinlist = "window.noname_skin_list={\n"
+var skinlist = "window.wtk_skin_list={\n"
 var entrylist = []
 var entrymap = {}
 var get = function (dir, callback) {
@@ -76,22 +76,22 @@ var get = function (dir, callback) {
 
 get(path.dirname(__dirname), function () {
   var diff = false
-  if (window.noname_asset_list.length == entrylist.length + 1) {
+  if (window.wtk_asset_list.length == entrylist.length + 1) {
     for (var i = 0; i < entrylist.length; i++) {
-      if (entrylist[i] != window.noname_asset_list[i + 1]) {
+      if (entrylist[i] != window.wtk_asset_list[i + 1]) {
         diff = true
         break
       }
     }
     if (!diff) {
       for (var i in entrymap) {
-        if (window.noname_skin_list[i] !== entrymap[i]) {
+        if (window.wtk_skin_list[i] !== entrymap[i]) {
           diff = true
           break
         }
       }
-      for (var i in noname_skin_list) {
-        if (window.noname_skin_list[i] !== entrymap[i]) {
+      for (var i in wtk_skin_list) {
+        if (window.wtk_skin_list[i] !== entrymap[i]) {
           diff = true
           break
         }
@@ -102,7 +102,7 @@ get(path.dirname(__dirname), function () {
   }
   var next = function () {
     exec("git diff --name-only", (error, stdout, stderr) => {
-      var updatelist = "window.noname_update={\n\tversion:'" + updates.version + "',"
+      var updatelist = "window.wtk_update={\n\tversion:'" + updates.version + "',"
       updatelist += "\n\tupdate:'" + (updates.update || "") + "',"
       var apply = function (name, list) {
         updatelist += "\n\t" + name + ":[\n"
@@ -169,7 +169,7 @@ get(path.dirname(__dirname), function () {
     })
   }
   if (diff) {
-    var assetversion = "window.noname_asset_list=[\n\t'" + updates.version + "'"
+    var assetversion = "window.wtk_asset_list=[\n\t'" + updates.version + "'"
     fs.writeFile(
       "game/asset.js",
       assetversion + assetlist + "\n];\n" + skinlist.slice(0, skinlist.length - 2) + "\n};",

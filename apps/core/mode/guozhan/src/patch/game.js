@@ -1,4 +1,4 @@
-import { lib, game, Game, ui, get, ai, _status } from "noname"
+import { lib, game, Game, ui, get, ai, _status } from "wtk"
 import { showYexingsContent, chooseCharacterContent, chooseCharacterOLContent } from "./content.js"
 
 export class GameGuozhan extends Game {

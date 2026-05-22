@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "noname"
+import { lib, game, ui, get, ai, _status } from "wtk"
 
 import { start, startBefore, onreinit } from "./src/main.js"
 import { pack, intro, sort, yingbian } from "./src/character/index.js"

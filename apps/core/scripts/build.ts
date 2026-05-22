@@ -4,14 +4,14 @@ import { moveSync } from "fs-extra/esm"
 import { existsSync, readdirSync, rmdirSync } from "fs"
 import { Target, viteStaticCopy } from "vite-plugin-static-copy"
 import generateImportMap from "./vite-plugin-importmap"
-import jit from "@noname/jit"
+import jit from "@wtk/jit"
 
 import { moderned_characters } from "../game/config.json"
 const root = join(import.meta.dirname, "..")
 
 const target = ["chrome91", "safari16.4"]
 const importMap: Record<string, string> = {
-  noname: "/noname.js",
+  wtk: "/wtk.js",
   vue: "vue/dist/vue.esm-browser.js",
   "pinyin-pro": "pinyin-pro",
   dedent: "dedent",
@@ -26,9 +26,9 @@ const staticModules: Target[] = [
   { src: "font", dest: "" },
   { src: "theme", dest: "" },
   { src: "game", dest: "" },
-  { src: "noname", dest: "src" },
+  { src: "wtk", dest: "src" },
   { src: "typings", dest: "src" },
-  { src: "noname.js", dest: "src" },
+  { src: "wtk.js", dest: "src" },
 ]
 
 const charaDist = join(root, "character")
@@ -65,7 +65,7 @@ await build({
       external: ["vue"],
       input: {
         index: "index.html",
-        noname: "noname.js",
+        wtk: "wtk.js",
       },
       output: {
         preserveModules: true, // 保留文件结构

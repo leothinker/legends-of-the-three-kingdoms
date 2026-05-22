@@ -10,5 +10,5 @@
     "skipLibCheck": true,
     "preserveSymlinks": false
   },
-  "files": ["noname.js"]
+  "files": ["wtk.js"]
 }

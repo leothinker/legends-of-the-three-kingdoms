@@ -1,4 +1,4 @@
-//noname内扩展的一些HTMLDivElement方法：
+//wtk内扩展的一些HTMLDivElement方法：
 interface HTMLDivElement {
   _link: any
   timeout?: number

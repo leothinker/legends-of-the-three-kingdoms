@@ -47,7 +47,7 @@ async function main(platform) {
     }
 
     // determine target executable name & extra postject args per platform
-    let targetExe = "output/noname-server"
+    let targetExe = "output/wtk-server"
     const sentinelFuse = "NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2"
     const sentinelKey = "NODE_SEA_BLOB"
 

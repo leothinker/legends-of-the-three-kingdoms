@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "noname"
+import { lib, game, ui, get, ai, _status } from "wtk"
 export const type = "mode"
 /**
  * @type { () => importModeConfig }
@@ -6166,10 +6166,12 @@ export default () => {
             line8.style.display = "none"
             line8.style.marginTop = "10px"
             line8.style.marginBottom = "10px"
-            var turnslist = Array.from({ length: 10 }).map((_, i) => [
-              (i + 1).toString(),
-              get.cnNumber(i + 1),
-            ])
+            var turnslist = [
+              ...Array.from({ length: 10 }).map((_, i) => [
+                (i + 1).toString(),
+                get.cnNumber(i + 1),
+              ]),
+            ]
             var results = [
               ["none", "无"],
               ["win", "胜利"],

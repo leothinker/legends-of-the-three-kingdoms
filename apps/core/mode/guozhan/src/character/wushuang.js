@@ -1,4 +1,4 @@
-import { Character } from "../../../../noname/library/element/index.js"
+import { Character } from "../../../../wtk/library/element/index.js"
 
 export default {
   //国战无双

@@ -114,7 +114,7 @@ function readPackageVersion(pkgPath: string): string {
   return version.trim()
 }
 function main(): void {
-  // 上级 noname 目录
+  // 上级 wtk 目录
   const basePath = cwd()
   const outputPath = path.join(basePath, "game", "asset.json")
 

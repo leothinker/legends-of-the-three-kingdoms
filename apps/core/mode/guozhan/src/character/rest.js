@@ -1,4 +1,4 @@
-import { _status, get, lib } from "noname"
+import { _status, get, lib } from "wtk"
 const Character = lib.element.Character
 
 const bool = _status.connectMode ? lib.configOL.jinEx : get.config("jinEx")

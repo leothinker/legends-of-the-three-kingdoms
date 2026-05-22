@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "tsx scripts/dev.ts",
     "build": "tsx scripts/build.ts",
-    "serve": "pnpm -F @noname/fs dev --dirname=../../dist",
+    "serve": "pnpm -F @wtk/fs dev --dirname=../../dist",
     "start": "pnpm build && pnpm serve",
     "generateTestPack": "pnpm build && tsx scripts/generateTestPack.ts",
     "lint": "run-s lint:*",

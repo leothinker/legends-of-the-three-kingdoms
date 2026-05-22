@@ -579,7 +579,7 @@ export const extensionMenu = function (connectMenu) {
         ) {
           const extName = inputExtName.value
           if (!extName) {
-            alert("未检测到扩展名，将使用无名杀自带的导出功能")
+            alert("未检测到扩展名，将使用三国杀自带的导出功能")
             oldExport()
             return
           }
@@ -595,7 +595,7 @@ export const extensionMenu = function (connectMenu) {
               }
             },
             () => {
-              alert("未检测到扩展文件，将使用无名杀自带的导出功能")
+              alert("未检测到扩展文件，将使用三国杀自带的导出功能")
               oldExport()
             },
           )
@@ -633,7 +633,7 @@ export const extensionMenu = function (connectMenu) {
       shareExtLine.querySelectorAll("span")[0].onclick = function () {
         //这个链接404了
         //game.open('https://tieba.baidu.com/p/5439380222');
-        //无名杀贴吧首页
+        //三国杀贴吧首页
         game.open("https://tieba.baidu.com/f?ie=utf-8&kw=%E6%97%A0%E5%90%8D%E6%9D%80")
       }
       shareExtLine.querySelectorAll("span")[1].onclick = function () {

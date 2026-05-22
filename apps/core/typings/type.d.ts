@@ -1362,7 +1362,7 @@ type EnableSignal = "phaseUse" | EnableSignal1 | EnableSignal1[]
 
 interface CheckMod {
   <T extends string & keyof Mod>(
-    ...args: [...Parameters<Required<Mod>[T]>, name: T, skills: string[]]
+    ...args: [...Parameters<Required<Mod>[T]>, name: T, player: Player | string[]]
   ): ReturnType<Required<Mod>[T]>
 }
 

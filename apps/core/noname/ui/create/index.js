@@ -2360,8 +2360,9 @@ export class Create {
       game.check()
 
       const selectables = get.selectableCards()
-      // @ts-expect-error 啊至少垫片函数是接受数组的喵
-      const cards = selecteds.length ? [...new Set(selectables).difference(selecteds)] : selectables
+      const cards = selecteds.length
+        ? [...new Set(selectables).difference(new Set(selecteds))]
+        : selectables
 
       if (cards.length <= range[1]) {
         // 如果可以就全选喵
@@ -2427,9 +2428,8 @@ export class Create {
       game.check()
 
       const selectables = get.selectableButtons()
-      // @ts-expect-error 啊至少垫片函数是接受数组的喵
       const buttons = selecteds.length
-        ? [...new Set(selectables).difference(selecteds)]
+        ? [...new Set(selectables).difference(new Set(selecteds))]
         : selectables
 
       if (buttons.length <= range[1]) {
@@ -3966,7 +3966,7 @@ export class Create {
       "分享房间",
       ui.window,
       function () {
-        var text = `无名杀-联机-${lib.translate[get.mode()]}-${game.connectPlayers.filter((p) => p.avatar).length}/${game.connectPlayers.filter((p) => !p.classList.contains("unselectable2")).length}\n${get.connectNickname()}邀请你加入${game.roomId}房间\n联机地址:${game.ip}\n请先通过游戏内菜单-开始-联机中启用“读取邀请链接”选项`
+        var text = `三国杀-联机-${lib.translate[get.mode()]}-${game.connectPlayers.filter((p) => p.avatar).length}/${game.connectPlayers.filter((p) => !p.classList.contains("unselectable2")).length}\n${get.connectNickname()}邀请你加入${game.roomId}房间\n联机地址:${game.ip}\n请先通过游戏内菜单-开始-联机中启用“读取邀请链接”选项`
         window.focus()
         const fallbackCopyTextToClipboard = function (text) {
           const textArea = document.createElement("textarea")

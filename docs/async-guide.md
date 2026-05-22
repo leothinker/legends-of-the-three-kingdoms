@@ -1,6 +1,6 @@
 # Async 章节
 
-无名杀在v1.10.6的时候由 @nonameShijian 引入了一种全新的技能效果代码写法，这种写法与原有写法最大的区别在于，这种写法的content函数是一个带有 `async`标识符的函数，而不是原来存在 `step`字样的普通函数。
+三国杀在v1.10.6的时候由 @nonameShijian 引入了一种全新的技能效果代码写法，这种写法与原有写法最大的区别在于，这种写法的content函数是一个带有 `async`标识符的函数，而不是原来存在 `step`字样的普通函数。
 
 比如原来的写法是：
 
@@ -28,7 +28,7 @@ let skill = {
 
 我们称这种新的写法叫做 `Async Content`；为了区分，我们将原来那种写法称作 `Step Content`
 
-相比于原来的 `Step Content`，`Async Content`在设计上更加贴近原有的Javascript语法，并且能很方便的实现之前 `Step Content`无法做到或很难做到的事情，故无名杀未来更新武将的技能代码中将主要使用这种形式，这也将成为无名杀未来的开发方向
+相比于原来的 `Step Content`，`Async Content`在设计上更加贴近原有的Javascript语法，并且能很方便的实现之前 `Step Content`无法做到或很难做到的事情，故三国杀未来更新武将的技能代码中将主要使用这种形式，这也将成为三国杀未来的开发方向
 
 本章节将简单的介绍：
 
@@ -65,7 +65,7 @@ Promise是JavaScript中的一种异步编程解决方案，它允许你以一种
 
 我们会在后文需要用到 `Promise`的地方再介绍这个概念，这里仅作提出
 
-由于无名杀编写技能并不会出现回调地狱的情况，所以这里我们不会对Promise进行过多的介绍，如果你对Promise感兴趣，可以参考[Promise对象](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+由于三国杀编写技能并不会出现回调地狱的情况，所以这里我们不会对Promise进行过多的介绍，如果你对Promise感兴趣，可以参考[Promise对象](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 
 ### `await`
 
@@ -75,7 +75,7 @@ Promise是JavaScript中的一种异步编程解决方案，它允许你以一种
 
 事实上，`await`不仅会等待一个 `Promise`事件，它还能等待别的符合要求的东西，这类东西我们称作可 `await`的东西；我们将在后文再次介绍这个概念
 
-如果你对 `await`感兴趣，可以参考[async 和 await](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Asynchronous/Promises#async_%E5%92%8C_await)，本章节仅针对无名杀技能中使用的 `await`进行介绍
+如果你对 `await`感兴趣，可以参考[async 和 await](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/Asynchronous/Promises#async_%E5%92%8C_await)，本章节仅针对三国杀技能中使用的 `await`进行介绍
 
 ## 二、`Async Content`的形式与使用
 
@@ -125,13 +125,13 @@ let skill = {
 
 例如，函数 `filter`要求你写出 `(event, player, name)`参数，然后你才可以用 `event`/`player`/`name`三个变量
 
-而 `Async Content`也是如此，你需要写出 `(event, trigger, player)`三个由无名杀提供的参数才能使用 `event`/`trigger`/`player`三个变量
+而 `Async Content`也是如此，你需要写出 `(event, trigger, player)`三个由三国杀提供的参数才能使用 `event`/`trigger`/`player`三个变量
 
 这样的好处是统一规范了函数写法，减少了新开发者的疑惑，你所使用的 `event`/`trigger`/`player`都是你看得到的
 
 到这里你可能会反应过来，平常在 `step`写法中经常直接使用 `card`/`target`/`num`等变量，现在参数里面没有这些变量，要怎么样引用这些变量呢？
 
-如果你稍微了解过Javascript的语法，你应该明白 `Step Content`的 `step x`本应该没任何作用，而无名杀中则通过动态编译使 `step x`转换成了普通的Javascript代码，而这一过程中同时将 `card`/`target`/`num`等变量注入在函数参数内，使得我们能直接调用
+如果你稍微了解过Javascript的语法，你应该明白 `Step Content`的 `step x`本应该没任何作用，而三国杀中则通过动态编译使 `step x`转换成了普通的Javascript代码，而这一过程中同时将 `card`/`target`/`num`等变量注入在函数参数内，使得我们能直接调用
 
 而 `card`/`target`/`num`等变量，均为 `event`的属性；换言之，我们用 `event.card`/`event.target`/`event.num`就可以代替原本的 `card`/`target`/`num`这些变量了
 
@@ -200,7 +200,7 @@ let skill = {
 
 很抱歉我在此处使用了很丑陋的代码，但这确实是编译后理应拥有的结果。
 
-我们发现，编译后的 `content`函数，在 `event.step == 0`时，会只执行到 `player.draw(2);`，然后结束函数的执行；无名杀引擎会自动让 `event.step++`，然后等待摸牌结束后，再次执行这个函数。此时我们的 `event.step == 1`，就会开始检查手牌是否大于5，然后根据情况决定是否执行弃牌。
+我们发现，编译后的 `content`函数，在 `event.step == 0`时，会只执行到 `player.draw(2);`，然后结束函数的执行；三国杀引擎会自动让 `event.step++`，然后等待摸牌结束后，再次执行这个函数。此时我们的 `event.step == 1`，就会开始检查手牌是否大于5，然后根据情况决定是否执行弃牌。
 
 此时如果我们要在弃牌后才开始获得标记，就需要在选择弃牌和获得标记间添加新的 `step`，这样就会变成下面的情况：
 
@@ -259,7 +259,7 @@ let result = await player.draw(2).forResult()
 let cards = result.cards
 ```
 
-你或许也发现了，无论是无名杀的分步，还是Javascript原来的回调异步，都会存在“结果”。就好比你做一件事，就算最后没有因为这件事得到任何东西，此时的情况也是一种“结果”
+你或许也发现了，无论是三国杀的分步，还是Javascript原来的回调异步，都会存在“结果”。就好比你做一件事，就算最后没有因为这件事得到任何东西，此时的情况也是一种“结果”
 
 `await`也同理，在等待事件结束后，便会得到这个“结果”。而对于 `player.draw(2)`这种常见的，需要分步得到 `result`的，我们称之为“事件”的东西，其结果是该事件的 `result`属性，而我们可以通过`forResult()`来获取这个结果。
 
@@ -285,13 +285,13 @@ await player.addTempSkill("jiang")
 
 ### 4. 一些原有操作的代替品
 
-如果你了解无名杀的技能代码，你一定会知道下面三个函数:
+如果你了解三国杀的技能代码，你一定会知道下面三个函数:
 
 - `event.goto`: 跳转到指定步
 - `event.redo`: 重新执行当前步
 - `event.finish`: 结束当前事件
 
-如果要使用 `Async Content`，那么这些函数自然需要替换，因为已经不再需要 `step`这个概念了；至于 `event.finish`，因为 `Async Content`的机制很复杂，故将 `event.finish`的操作交给无名杀会是个更好的选择
+如果要使用 `Async Content`，那么这些函数自然需要替换，因为已经不再需要 `step`这个概念了；至于 `event.finish`，因为 `Async Content`的机制很复杂，故将 `event.finish`的操作交给三国杀会是个更好的选择
 
 #### 代替 `event.finish`
 
@@ -317,7 +317,7 @@ if (!result.bool) return
 
 而 `return`会立刻停止函数执行，不需要你再额外进行处理
 
-当然你可能会问，`Async Content`需不需要确切的返回值？不需要，甚至不应该要，因为实现的复杂性，如果你返回了一个可 `await`的东西，那么无名杀也会等后面的东西执行完毕才认为这个函数执行完毕，而这可能会导致这个函数循环等待而永远无法执行完毕；故在任何情况下，`Async Content`的 `return`后面都不应该跟任何东西
+当然你可能会问，`Async Content`需不需要确切的返回值？不需要，甚至不应该要，因为实现的复杂性，如果你返回了一个可 `await`的东西，那么三国杀也会等后面的东西执行完毕才认为这个函数执行完毕，而这可能会导致这个函数循环等待而永远无法执行完毕；故在任何情况下，`Async Content`的 `return`后面都不应该跟任何东西
 
 如果你因为一些操作必须得有，请使用 `void`语句，这个语句会无视后面的值，一律返回 `undefined`，比如：
 
@@ -370,13 +370,13 @@ for (let target of event.targets) {
 
 我们都知道，在Javascript中，`await`一个不需要 `await`的东西不会有任何问题，故你可以在任何操作下都尝试 `await`。但这会让代码的无用 `await`变得很多，所以我们需要判断什么时候该用 `await`
 
-非常幸运，在无名杀中，你可以查看操作是否有以下情况:
+非常幸运，在三国杀中，你可以查看操作是否有以下情况:
 
 1. 会触发时机。触发时机意味着可能进行插入结算，你需要等待所有插入结算的完成，故而使用 `await`(包括使用 `event.trigger`来主动触发时机也需要 `await`)
 2. 等待玩家确认。如果有个操作需要玩家点击确认，或者会弹出窗口给玩家查看时，你需要等待玩家确认完毕，所以也使用 `await`
 3. `asyncDraw`等带 `async`字符的函数，这些操作一般都会返回一个可 `await`的东西，故我们需要 `await`来保证函数执行完毕
 
-顺带一提，有些异步的情况不能用 `await`来等待，或者说使用 `await`并不会起到效果。这类情况基本上都是无名杀的古老异步代码，因为在那个时代并不存在 `Promise`，且没人尝试在后来适配这些异步代码，所以你只能通过原先给定的特殊方式来等待，比如说回调函数
+顺带一提，有些异步的情况不能用 `await`来等待，或者说使用 `await`并不会起到效果。这类情况基本上都是三国杀的古老异步代码，因为在那个时代并不存在 `Promise`，且没人尝试在后来适配这些异步代码，所以你只能通过原先给定的特殊方式来等待，比如说回调函数
 
 #### 2. delay与delayx
 
@@ -393,7 +393,7 @@ await game.delayx()
 
 **Promise的概念**
 
-在之前介绍async函数的时候，我们就稍微提到过这个概念；我们当时说 `Promise`是无名杀的一种异步解决方案；这里我们不得不简单说明下 `Promise`的历史，来理解 `Promise`的诞生
+在之前介绍async函数的时候，我们就稍微提到过这个概念；我们当时说 `Promise`是三国杀的一种异步解决方案；这里我们不得不简单说明下 `Promise`的历史，来理解 `Promise`的诞生
 
 当时人们为了解决回调地狱，就开始着手设计新的异步形态，同时要比较方便的兼容原有异步；此时就有人尝试提出了这样的概念：
 
@@ -500,7 +500,7 @@ setTimeout(resolve, 5000) // 将resolve传递给setTimeout，setTimeout是一个
 await promise // 等待直到resolve在5秒后被调用
 ```
 
-你有没有发现，我们已经实现了类似 `game.delay`的功能了；而事实上无名杀本体的 `game.delay`也就是使用这种方式实现的功能
+你有没有发现，我们已经实现了类似 `game.delay`的功能了；而事实上三国杀本体的 `game.delay`也就是使用这种方式实现的功能
 
 当你掌握了 `Promise`的使用时，你就可以进入下面的一节了
 
@@ -567,7 +567,7 @@ function funA() {
 
 ## 三、`Async Content`相比原有形式的优势
 
-`Async Content`相比 `Step Content`的优势上文已经说明，但无名杀实际还存在其他的content形式，故我们再看看其他的content形式与 `Async Content`的对比
+`Async Content`相比 `Step Content`的优势上文已经说明，但三国杀实际还存在其他的content形式，故我们再看看其他的content形式与 `Async Content`的对比
 
 ### `Generator Content`
 
@@ -597,7 +597,7 @@ function funA() {
 
 ### `Array Content`
 
-在v1.10.15中，由于旧的`Array Content`并没有人用，故新的`Array Content`取代了原有的`Array Content`，成为了目前无名杀解决跳步残留的方法之一
+在v1.10.15中，由于旧的`Array Content`并没有人用，故新的`Array Content`取代了原有的`Array Content`，成为了目前三国杀解决跳步残留的方法之一
 
 比如之前的技能，就可以这么写：
 
@@ -627,6 +627,6 @@ function funA() {
 
 好了，到此你就已经彻底的把 `Async Content`的关键知识浏览了一遍，如果要更好的巩固它，可以试着把你之前的技能改成 `Async Content`试试
 
-未来可以遇见的是，`Asnyc Content`必将慢慢成为主流，而无名杀的代码环境也会逐渐使用async函数——这是Javascript的选择，也将是无名杀的选择
+未来可以遇见的是，`Asnyc Content`必将慢慢成为主流，而三国杀的代码环境也会逐渐使用async函数——这是Javascript的选择，也将是三国杀的选择
 
 感谢你的阅读，希望你能通过本章节来创作出更好的扩展

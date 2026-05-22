@@ -1,8 +1,8 @@
 declare interface NonameAnnounceType {
   // Apperaence 外观区域
-  // 用于关于无名杀外观方面的通知
+  // 用于关于三国杀外观方面的通知
 
-  // Apperaence.Theme 无名杀主题区域
+  // Apperaence.Theme 三国杀主题区域
   /**
    * 主题正在被切换时通知
    *

@@ -560,7 +560,7 @@ export const characterPackMenu = function (connectMenu) {
     if ([...start.firstChild.children].map((node) => node.mode).includes(packName)) {
       return
     }
-    // 显示不是无名杀自带的武将包
+    // 显示不是三国杀自带的武将包
     if (
       !lib.connectCharacterPack.includes(packName) &&
       !lib.config.all.characters.includes(packName)

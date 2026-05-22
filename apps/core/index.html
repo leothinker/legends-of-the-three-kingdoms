@@ -12,12 +12,12 @@
   <script>
     "use strict"
     ;(() => {
-      window.onerror = (msg, src, line, column, err) => {
-        let str = `错误文件: ${typeof src === "string" && src.length > 0 ? decodeURI(src) : "未知文件"}`
+      window.onerror = function (msg, src, line, column, err) {
+        let str = `错误文件: ${typeof src == "string" && src.length > 0 ? decodeURI(src) : "未知文件"}`
         str += `\n错误信息: ${msg}`
         str += `\n行号: ${line}`
         str += `\n列号: ${column}`
-        if (err?.stack) str += `\n${decodeURI(err.stack)}`
+        if (err && err.stack) str += "\n" + decodeURI(err.stack)
         console.error(str)
         alert(str)
       }
@@ -48,7 +48,7 @@
             if (typeof error.stack === "string" && STACK_REGEXP.test(error.stack)) {
               // 获取符合栈堆信息的字符串，一般来说就是从第二行开始的所有行
               // 为了处理eval的情况，故必须获取完行数
-              const lines = error.stack.split("\n").filter((line) => STACK_REGEXP.test(line))
+              let lines = error.stack.split("\n").filter((line) => STACK_REGEXP.test(line))
 
               // 提供类型信息防止vscode报错
               /**
@@ -97,11 +97,11 @@
                 // @ts-ignore
                 let [_, src = void 0, line = void 0, column = void 0] =
                   /at\s+.*\s+\((.*):(\d*):(\d*)\)/i.exec(error.stack.split("\n")[1])
-                if (typeof line === "string") line = Number(line)
-                if (typeof column === "string") column = Number(column)
+                if (typeof line == "string") line = Number(line)
+                if (typeof column == "string") column = Number(column)
                 // @ts-ignore
                 window.onerror(error.message, src, line, column, error)
-              } catch (_e) {
+              } catch (e) {
                 window.onerror(error.message, "", 0, 0, error)
               }
             }

@@ -110,7 +110,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
     var li3 = document.createElement("li")
     li1.innerHTML = "游戏版本：" + lib.version + ""
     li3.innerHTML =
-      "由于无名杀正在重构项目结构，在线更新暂时无法使用，请访问github主页获取最新版本。"
+      "由于三国杀正在重构项目结构，在线更新暂时无法使用，请访问github主页获取最新版本。"
 
     /** @type { HTMLParagraphElement } */
     var updatepx = ui.create.node("p")
@@ -1037,7 +1037,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
             if (current) {
               game.export(
                 lib.init.encode(JSON.stringify(current.link)),
-                "无名杀 - 录像 - " + current.link.name[0] + " - " + current.link.name[1],
+                "三国杀 - 录像 - " + current.link.name[0] + " - " + current.link.name[1],
               )
             }
           })

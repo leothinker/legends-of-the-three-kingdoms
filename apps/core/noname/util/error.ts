@@ -133,10 +133,10 @@ export function setOnError({ lib, game, get, _status }) {
     log.push(`列号: ${frame.columnNumber}`)
     const version = typeof lib.version != "undefined" ? lib.version : ""
     const match = version.match(/[^\d.]/) != null
-    log.push(`${match ? "游戏" : "无名杀"}版本: ${version || "未知版本"}`)
+    log.push(`${match ? "游戏" : "三国杀"}版本: ${version || "未知版本"}`)
     if (match) {
       log.push(
-        "⚠️您使用的游戏代码不是源于libnoname/noname无名杀官方仓库，请自行寻找您所使用的游戏版本开发者反馈！",
+        "⚠️您使用的游戏代码不是源于libnoname/noname三国杀官方仓库，请自行寻找您所使用的游戏版本开发者反馈！",
       )
     }
     log.push(getStatusInfo({ lib, get, _status }))

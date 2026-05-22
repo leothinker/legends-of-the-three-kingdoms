@@ -568,6 +568,7 @@ export const cardPackMenu = function (connectMenu) {
     active._initLink()
   }
   rightPane.appendChild(active.link)
+
   ;(function () {
     if (connectMenu) {
       return
@@ -729,7 +730,7 @@ export const cardPackMenu = function (connectMenu) {
     if ([...start.firstChild.children].map((node) => node.mode).includes(packName)) {
       return
     }
-    // 显示不是无名杀自带的卡牌包
+    // 显示不是三国杀自带的卡牌包
     if (!lib.connectCardPack.includes(packName) && !lib.config.all.cards.includes(packName)) {
       if (!(connectMenu && ["mode_derivation", "mode_banned"].includes(packName))) {
         createModeConfig(packName, start.firstChild, node1)

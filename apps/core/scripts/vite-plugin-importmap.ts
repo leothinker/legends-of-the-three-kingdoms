@@ -37,7 +37,7 @@ export default function vitePluginJIT(importMap: Record<string, string> = {}): P
         `"use strict";
 (() => {
 	if (location.protocol.startsWith("file")) {
-		alert("您使用的浏览器或客户端正在使用不受支持的file协议运行无名杀\\n请检查浏览器或客户端是否需要更新");
+		alert("您使用的浏览器或客户端正在使用不受支持的file协议运行三国杀\\n请检查浏览器或客户端是否需要更新");
 		return;
 	}
 

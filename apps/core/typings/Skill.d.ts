@@ -168,14 +168,24 @@ declare interface Mod {
    * @param player 源玩家（使用牌的角色）
    * @param target 目标玩家
    */
-  playerEnabled?(card: Card, player: Player, target: Player, result: boolean): boolean | void
+  playerEnabled?(
+    card: Card,
+    player: Player,
+    target: Player,
+    result: boolean | "unchanged",
+  ): boolean | "unchanged" | void
   /**
    * 【表示你能否成为其他角色的目标】
    * @param card
    * @param player 使用牌的角色
    * @param target 玩家
    */
-  targetEnabled?(card: Card, player: Player, target: Player, result: boolean): boolean | void
+  targetEnabled?(
+    card: Card,
+    player: Player,
+    target: Player,
+    result: boolean | "unchanged",
+  ): boolean | "unchanged" | void
 
   /**
    * 可以指定任意（范围内）目标
@@ -348,7 +358,7 @@ declare interface Skill {
    *
    * 主要分为：audioname（默认技能名），audioinfo（默认info.audio）
    *
-   * 若为字符串时，带有“ext:”，则使用无名杀录目\extension\扩展名内的配音（扩展的配音）
+   * 若为字符串时，带有“ext:”，则使用三国杀录目\extension\扩展名内的配音（扩展的配音）
    *
    * ，命名方法：技能名+这是第几个配音
    *
@@ -357,9 +367,9 @@ declare interface Skill {
    *
    * 若为数组，则是[audioname,audioinfo]，分布覆盖原有的值。
    *
-   * audioinfo为数字时，数字为配音数量索引（同一技能有多个配音），从1开始，使用无名杀目录\audio\skill内的配音（audioname1~audioinfo序号）;
+   * audioinfo为数字时，数字为配音数量索引（同一技能有多个配音），从1开始，使用三国杀目录\audio\skill内的配音（audioname1~audioinfo序号）;
    *
-   * audioinfo为布尔值true或者字符串非空时，执行game.playSkillAudio(audioname)，使用无名杀目录\audio\skill内的配音;
+   * audioinfo为布尔值true或者字符串非空时，执行game.playSkillAudio(audioname)，使用三国杀目录\audio\skill内的配音;
    *
    * 否则，若为false，空字符串，null结果，则不播音，
    *
@@ -385,7 +395,7 @@ declare interface Skill {
    *
    * 强制使用该audioname覆盖上面解析出来的audioname，其解析出来的audioname为“audioname_玩家武将名”,
    *
-   * 最终路径为：无名杀目录\audio\“audioname_玩家武将名”
+   * 最终路径为：三国杀目录\audio\“audioname_玩家武将名”
    *
    * 扩展：
    *  若info.audioname存在，且是数组，且方法参数有player，则播放"audioname_玩家名"的声音（即可同一个技能，不同人播放不同声音）
@@ -1513,7 +1523,7 @@ declare interface Skill {
    *
    * “按点卖血”类技能和“同时机多个目标分别结算”的技能。
    *
-   * 现在，无名杀的“按点卖血”技能可以和OL线上一样，在同时触发多个技能时，自选技能的顺序了。
+   * 现在，三国杀的“按点卖血”技能可以和OL线上一样，在同时触发多个技能时，自选技能的顺序了。
    *
    * 用例见郭嘉【遗计】
    *
@@ -1804,7 +1814,7 @@ declare interface SkillAI {
    * ai发动技能的优先度 【也用于卡牌的优先度】
    * 要具体比什么先发发动，可以使用函数返回结果
    */
-  order?: number | ((item: string | Card | { name: string }, player: Player) => number | void)
+  order?: number | ((item?: string | Card | { name: string }, player?: Player) => number | void)
   /**
    * 发动技能是身份暴露度（0~1，相当于概率）
    * 取值范围为0~1,用于帮助AI判断身份,AI中未写expose其他AI将会无法判断其身份

@@ -55,9 +55,9 @@ declare interface Window {
   /** 游戏是否正常启动？ */
   resetExtension: Function
 
-  /** 【应用配置扩展】从该路径获取无名杀的变量信息 */
+  /** 【应用配置扩展】从该路径获取三国杀的变量信息 */
   newExtApiUrl: string
-  /** 【应用配置扩展】全局变量获取无名杀的变量 */
+  /** 【应用配置扩展】全局变量获取三国杀的变量 */
   newExtensionApi: {
     game: Game
     lib: Library

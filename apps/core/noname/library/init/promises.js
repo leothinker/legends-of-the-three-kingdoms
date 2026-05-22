@@ -67,7 +67,7 @@ export class LibInitPromises {
   /**
    * @async
    * @param {string | URL} link - 需要解析的路径
-   * @param {((item: string) => string) | null} [defaultHandle] - 在给定路径不符合可用情况（或基于无名杀相关默认情况）时，处理路径的函数，返回的路径应是相对于根目录的相对路径，默认为`null`，当且仅当无法解析成`URL`时会调用该回调
+   * @param {((item: string) => string) | null} [defaultHandle] - 在给定路径不符合可用情况（或基于三国杀相关默认情况）时，处理路径的函数，返回的路径应是相对于根目录的相对路径，默认为`null`，当且仅当无法解析成`URL`时会调用该回调
    * @param {boolean} [forceLoadAsDataUrl] - 是否将资源加载为[Data URL](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/Data_URLs)，默认为`false`
    * @returns {Promise<URL>}
    */
@@ -84,7 +84,7 @@ export class LibInitPromises {
   /**
    * @async
    * @param {string | URL} link - 需要解析的路径
-   * @param {((item: string) => string) | null} [defaultHandle] - 在给定路径不符合可用情况（或基于无名杀相关默认情况）时，处理路径的函数，返回的路径应是相对于根目录的相对路径，默认为`null`，当且仅当无法解析成`URL`时会调用该回调
+   * @param {((item: string) => string) | null} [defaultHandle] - 在给定路径不符合可用情况（或基于三国杀相关默认情况）时，处理路径的函数，返回的路径应是相对于根目录的相对路径，默认为`null`，当且仅当无法解析成`URL`时会调用该回调
    * @returns {Promise<[origin: URL, data: URL]>}
    */
   async parseResourceAddressExt(link, defaultHandle = null) {

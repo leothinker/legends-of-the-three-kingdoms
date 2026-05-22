@@ -1196,7 +1196,7 @@ export class Library {
         },
         auto_confirm: {
           name: "自动确认",
-          init: true,
+          init: false,
           unfrequent: true,
           intro: "当候选目标只有1个时，点击目标后无需再点击确认",
         },
@@ -1208,7 +1208,7 @@ export class Library {
         },
         unauto_choose: {
           name: "拆顺手牌选择",
-          init: false,
+          init: true,
           unfrequent: true,
           intro: "拆牌或者顺牌时，就算只能选择对方的手牌依然手动选择",
         },
@@ -2426,7 +2426,7 @@ export class Library {
         },
         card_style: {
           name: "卡牌样式",
-          init: "default",
+          init: "ol",
           intro: "设置正面朝上的卡牌的样式",
           item: {
             wood: "木纹",
@@ -6444,7 +6444,7 @@ export class Library {
         },
         auto_mark_identity: {
           name: "自动标记身份",
-          init: false,
+          init: true,
           intro: "根据角色的出牌行为自动标记可能的身份",
         },
         enhance_zhu: {

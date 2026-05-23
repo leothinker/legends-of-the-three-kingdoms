@@ -573,12 +573,18 @@ game.import("card", function () {
           },
         },
       },
-      hualiu: {
+      guding: {
         fullskin: true,
         type: "equip",
-        subtype: "equip3",
-        bingzhu: ["徐晃"],
-        distance: { globalTo: 1 },
+        subtype: "equip1",
+        bingzhu: ["孙坚"],
+        distance: { attackFrom: -1 },
+        ai: {
+          basic: {
+            equipValue: 2,
+          },
+        },
+        skills: ["guding_skill"],
       },
       zhuque: {
         fullskin: true,
@@ -592,19 +598,6 @@ game.import("card", function () {
           },
         },
         skills: ["zhuque_skill"],
-      },
-      guding: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip1",
-        bingzhu: ["孙坚"],
-        distance: { attackFrom: -1 },
-        ai: {
-          basic: {
-            equipValue: 2,
-          },
-        },
-        skills: ["guding_skill"],
       },
       tengjia: {
         fullskin: true,
@@ -775,29 +768,15 @@ game.import("card", function () {
           },
         },
       },
+      hualiu: {
+        fullskin: true,
+        type: "equip",
+        subtype: "equip3",
+        bingzhu: ["徐晃"],
+        distance: { globalTo: 1 },
+      },
     },
     skill: {
-      bingliang_changban: {
-        cardSkill: true,
-        unique: true,
-        trigger: { player: "phaseDrawBegin" },
-        silent: true,
-        content() {
-          trigger.num--
-        },
-        group: "bingliang_changban2",
-      },
-      bingliang_changban2: {
-        cardSkill: true,
-        trigger: { player: "phaseDrawAfter" },
-        silent: true,
-        content() {
-          if (player.enemy) {
-            player.enemy.draw()
-          }
-        },
-      },
-      huogong2: { charlotte: true },
       jiu: {
         trigger: { player: "useCard1" },
         filter(event) {
@@ -868,6 +847,27 @@ game.import("card", function () {
           game.addVideo("jiuNode", player, false)
         },
       },
+      huogong2: { charlotte: true },
+      bingliang_changban: {
+        cardSkill: true,
+        unique: true,
+        trigger: { player: "phaseDrawBegin" },
+        silent: true,
+        content() {
+          trigger.num--
+        },
+        group: "bingliang_changban2",
+      },
+      bingliang_changban2: {
+        cardSkill: true,
+        trigger: { player: "phaseDrawAfter" },
+        silent: true,
+        content() {
+          if (player.enemy) {
+            player.enemy.draw()
+          }
+        },
+      },
       guding_skill: {
         equipSkill: true,
         audio: true,
@@ -903,6 +903,51 @@ game.import("card", function () {
               }
             },
           },
+        },
+      },
+      zhuque_skill: {
+        equipSkill: true,
+        trigger: { player: "useCard1" },
+        //priority:7,
+        filter(event, player) {
+          if (event.card.name == "sha" && !game.hasNature(event.card)) {
+            return true
+          }
+        },
+        audio: true,
+        check(event, player) {
+          let eff = 0,
+            nature = event.card.nature
+          for (let i = 0; i < event.targets.length; i++) {
+            eff -= get.effect(event.targets[i], event.card, player, player)
+            event.card.nature = "fire"
+            eff += get.effect(event.targets[i], event.card, player, player)
+            event.card.nature = nature
+          }
+          return eff > 0
+        },
+        prompt2(event, player) {
+          return "将" + get.translation(event.card) + "改为火属性"
+        },
+        content() {
+          game.setNature(trigger.card, "fire")
+          if (get.itemtype(trigger.card) == "card") {
+            var next = game.createEvent("zhuque_clear")
+            next.card = trigger.card
+            event.next.remove(next)
+            trigger.after.push(next)
+            next.setContent(function () {
+              game.setNature(trigger.card, [])
+            })
+          }
+        },
+      },
+      zhuque_skill2: {
+        trigger: { player: "useCardAfter" },
+        forced: true,
+        popup: false,
+        content() {
+          delete player.storage.zhuque_skill.nature
         },
       },
       tengjia1: {
@@ -1142,52 +1187,6 @@ game.import("card", function () {
           },
         },
       },
-      zhuque_skill: {
-        equipSkill: true,
-        trigger: { player: "useCard1" },
-        //priority:7,
-        filter(event, player) {
-          if (event.card.name == "sha" && !game.hasNature(event.card)) {
-            return true
-          }
-        },
-        audio: true,
-        check(event, player) {
-          let eff = 0,
-            nature = event.card.nature
-          for (let i = 0; i < event.targets.length; i++) {
-            eff -= get.effect(event.targets[i], event.card, player, player)
-            event.card.nature = "fire"
-            eff += get.effect(event.targets[i], event.card, player, player)
-            event.card.nature = nature
-          }
-          return eff > 0
-        },
-        prompt2(event, player) {
-          return "将" + get.translation(event.card) + "改为火属性"
-        },
-        content() {
-          game.setNature(trigger.card, "fire")
-          if (get.itemtype(trigger.card) == "card") {
-            var next = game.createEvent("zhuque_clear")
-            next.card = trigger.card
-            event.next.remove(next)
-            trigger.after.push(next)
-            next.setContent(function () {
-              game.setNature(trigger.card, [])
-            })
-          }
-        },
-      },
-      zhuque_skill2: {
-        trigger: { player: "useCardAfter" },
-        forced: true,
-        popup: false,
-        content() {
-          delete player.storage.zhuque_skill.nature
-        },
-      },
-      huogon2: {},
     },
     translate: {
       jiu: "酒",

@@ -573,22 +573,18 @@ game.import("card", function () {
           },
         },
       },
-      guding: {
+      hualiu: {
         fullskin: true,
         type: "equip",
-        subtype: "equip1",
-        distance: { attackFrom: -1 },
-        ai: {
-          basic: {
-            equipValue: 2,
-          },
-        },
-        skills: ["guding_skill"],
+        subtype: "equip3",
+        bingzhu: ["徐晃"],
+        distance: { globalTo: 1 },
       },
       zhuque: {
         fullskin: true,
         type: "equip",
         subtype: "equip1",
+        bingzhu: ["周瑜"],
         distance: { attackFrom: -3 },
         ai: {
           basic: {
@@ -597,10 +593,24 @@ game.import("card", function () {
         },
         skills: ["zhuque_skill"],
       },
+      guding: {
+        fullskin: true,
+        type: "equip",
+        subtype: "equip1",
+        bingzhu: ["孙坚"],
+        distance: { attackFrom: -1 },
+        ai: {
+          basic: {
+            equipValue: 2,
+          },
+        },
+        skills: ["guding_skill"],
+      },
       tengjia: {
         fullskin: true,
         type: "equip",
         subtype: "equip2",
+        bingzhu: ["兀突骨", "孟获", "祝融"],
         ai: {
           value(card, player, index, method) {
             if (player.isDisabled(2)) {
@@ -698,6 +708,7 @@ game.import("card", function () {
         fullskin: true,
         type: "equip",
         subtype: "equip2",
+        bingzhu: ["马超"],
         loseDelay: false,
         onLose() {
           player.addTempSkill("baiyin_skill_lose")
@@ -764,14 +775,29 @@ game.import("card", function () {
           },
         },
       },
-      hualiu: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip3",
-        distance: { globalTo: 1 },
-      },
     },
     skill: {
+      bingliang_changban: {
+        cardSkill: true,
+        unique: true,
+        trigger: { player: "phaseDrawBegin" },
+        silent: true,
+        content() {
+          trigger.num--
+        },
+        group: "bingliang_changban2",
+      },
+      bingliang_changban2: {
+        cardSkill: true,
+        trigger: { player: "phaseDrawAfter" },
+        silent: true,
+        content() {
+          if (player.enemy) {
+            player.enemy.draw()
+          }
+        },
+      },
+      huogong2: { charlotte: true },
       jiu: {
         trigger: { player: "useCard1" },
         filter(event) {
@@ -842,27 +868,6 @@ game.import("card", function () {
           game.addVideo("jiuNode", player, false)
         },
       },
-      huogong2: { charlotte: true },
-      bingliang_changban: {
-        cardSkill: true,
-        unique: true,
-        trigger: { player: "phaseDrawBegin" },
-        silent: true,
-        content() {
-          trigger.num--
-        },
-        group: "bingliang_changban2",
-      },
-      bingliang_changban2: {
-        cardSkill: true,
-        trigger: { player: "phaseDrawAfter" },
-        silent: true,
-        content() {
-          if (player.enemy) {
-            player.enemy.draw()
-          }
-        },
-      },
       guding_skill: {
         equipSkill: true,
         audio: true,
@@ -898,51 +903,6 @@ game.import("card", function () {
               }
             },
           },
-        },
-      },
-      zhuque_skill: {
-        equipSkill: true,
-        trigger: { player: "useCard1" },
-        //priority:7,
-        filter(event, player) {
-          if (event.card.name == "sha" && !game.hasNature(event.card)) {
-            return true
-          }
-        },
-        audio: true,
-        check(event, player) {
-          let eff = 0,
-            nature = event.card.nature
-          for (let i = 0; i < event.targets.length; i++) {
-            eff -= get.effect(event.targets[i], event.card, player, player)
-            event.card.nature = "fire"
-            eff += get.effect(event.targets[i], event.card, player, player)
-            event.card.nature = nature
-          }
-          return eff > 0
-        },
-        prompt2(event, player) {
-          return "将" + get.translation(event.card) + "改为火属性"
-        },
-        content() {
-          game.setNature(trigger.card, "fire")
-          if (get.itemtype(trigger.card) == "card") {
-            var next = game.createEvent("zhuque_clear")
-            next.card = trigger.card
-            event.next.remove(next)
-            trigger.after.push(next)
-            next.setContent(function () {
-              game.setNature(trigger.card, [])
-            })
-          }
-        },
-      },
-      zhuque_skill2: {
-        trigger: { player: "useCardAfter" },
-        forced: true,
-        popup: false,
-        content() {
-          delete player.storage.zhuque_skill.nature
         },
       },
       tengjia1: {
@@ -1182,84 +1142,115 @@ game.import("card", function () {
           },
         },
       },
+      zhuque_skill: {
+        equipSkill: true,
+        trigger: { player: "useCard1" },
+        //priority:7,
+        filter(event, player) {
+          if (event.card.name == "sha" && !game.hasNature(event.card)) {
+            return true
+          }
+        },
+        audio: true,
+        check(event, player) {
+          let eff = 0,
+            nature = event.card.nature
+          for (let i = 0; i < event.targets.length; i++) {
+            eff -= get.effect(event.targets[i], event.card, player, player)
+            event.card.nature = "fire"
+            eff += get.effect(event.targets[i], event.card, player, player)
+            event.card.nature = nature
+          }
+          return eff > 0
+        },
+        prompt2(event, player) {
+          return "将" + get.translation(event.card) + "改为火属性"
+        },
+        content() {
+          game.setNature(trigger.card, "fire")
+          if (get.itemtype(trigger.card) == "card") {
+            var next = game.createEvent("zhuque_clear")
+            next.card = trigger.card
+            event.next.remove(next)
+            trigger.after.push(next)
+            next.setContent(function () {
+              game.setNature(trigger.card, [])
+            })
+          }
+        },
+      },
+      zhuque_skill2: {
+        trigger: { player: "useCardAfter" },
+        forced: true,
+        popup: false,
+        content() {
+          delete player.storage.zhuque_skill.nature
+        },
+      },
+      huogon2: {},
     },
     translate: {
-      huosha: "火杀",
-      huosha_info:
-        "出牌阶段，对你攻击范围内的一名其他角色使用。若命中，则对目标角色造成1点火焰伤害。",
-      leisha: "雷杀",
-      leisha_info:
-        "出牌阶段，对你攻击范围内的一名其他角色使用。若命中，则对目标角色造成1点雷电伤害。",
       jiu: "酒",
-      jiu_info:
-        "出牌阶段，对自己使用，令下一张你使用的【杀】造成的基础伤害+1（每回合限使用1次）；当你处于濒死阶段时，对自己使用，回复1点体力值。",
+      jiu_info: "出牌阶段令你本回合使用的下一张【杀】伤害+1或令处于濒死状态的你回复1点体力。",
+      leisha: "雷杀",
+      leisha_info: "出牌阶段限一次，对你攻击范围内的一名其他角色使用。你对其造成1点雷电伤害。",
+      huosha: "火杀",
+      huosha_info: "出牌阶段限一次，对你攻击范围内的一名其他角色使用。你对其造成1点火焰伤害。",
 
       huogong: "火攻",
       huogong_bg: "攻",
       huogong_info:
-        "出牌阶段，对一名有手牌的角色使用。该角色展示一张手牌，然后若你弃置与之花色相同的一张手牌，则你对其造成1点火焰伤害。",
+        "出牌阶段，对一名有手牌的角色使用。目标角色展示一张手牌，然后你可以弃置一张与其展示牌花色相同的手牌，对其造成1点火焰伤害。",
       huogong_append:
-        '<span class="text" style="font-family: yuanli">“行火必有因，烟火必素具。”——《孙子·火攻》</span>',
+        '<span class="text" style="font-family: yuanli">行火必有因，烟火必素具。——《孙子·火攻》</span>',
       tiesuo: "铁索连环",
       tiesuo_info:
-        "出牌阶段，对一至两名角色使用。目标角色横置或重置。（被横置的角色处于“连环状态”）<br>重铸：出牌阶段，你可以将此牌放入弃牌堆，然后摸一张牌。",
+        "出牌阶段，对一至两名角色使用。目标角色横置或重置。<br>重铸：出牌阶段，你可以将此牌置入弃牌堆，然后摸一张牌。",
       tiesuo_bg: "索",
       tiesuo_append:
-        '<span class="text" style="font-family: yuanli">“或三十为一排，或五十为一排，首尾用铁环连锁，上铺阔板，休言人可渡，马亦可走矣。乘此而行，任他风浪潮水上下，复何惧哉？”——《三国演义》</span>',
+        '<span class="text" style="font-family: yuanli">或三十为一排，或五十为一排，首尾用铁环连锁，上铺阔板，休言人可渡，马亦可走矣。乘此而行，任他风浪潮水上下，复何惧哉？——《三国演义》</span>',
 
       bingliang: "兵粮寸断",
       bingliang_bg: "粮",
       bingliang_info:
-        "出牌阶段，对距离为1的一名其他角色使用，将【兵粮寸断】放入该角色的判断区。若判定结果不为♣，则其跳过摸牌阶段。",
+        "出牌阶段，对距离为1的一名其他角色使用。将【兵粮寸断】置入该角色的判定区，若判定结果不为梅花，其跳过本回合的摸牌阶段。",
+      bingliang_append:
+        '<span class="text" style="font-family: yuanli">人是铁，饭是钢，一顿不吃……</span>',
 
       guding: "古锭刀",
-      guding_info: "锁定技，当你使用【杀】对目标角色造成伤害时，若其没有手牌，则此伤害+1。",
+      guding_info: "锁定技，当你使用【杀】对目标角色造成伤害时，若该角色没有手牌，则此伤害+1。",
       guding_skill: "古锭刀",
       guding_append:
-        '<span class="text" style="font-family: yuanli">“孙坚披烂银铠，裹赤帻，横古锭刀，骑花鬃马…”——《三国演义》</span>',
+        '<span class="text" style="font-family: yuanli">孙坚披烂银铠，裹赤帻，横古锭刀，骑花鬃马……——《三国演义》</span>',
       zhuque: "朱雀羽扇",
       zhuque_bg: "扇",
       zhuque_skill: "朱雀羽扇",
       zhuque_info: "当你使用普通【杀】时，你可以将此【杀】改为火【杀】。",
       zhuque_append:
-        '<span class="text" style="font-family: yuanli">“羽扇纶巾，谈笑间，樯橹灰飞烟灭。”——《念奴娇·赤壁怀古》</span>',
+        '<span class="text" style="font-family: yuanli">羽扇纶巾，谈笑间，樯橹灰飞烟灭。——《念奴娇·赤壁怀古》</span>',
 
       tengjia: "藤甲",
       tengjia_info:
-        "锁定技，【南蛮入侵】、【万箭齐发】和普通【杀】对你无效；当你受到火焰伤害时，此伤害+1。",
+        "锁定技，【南蛮入侵】、【万箭齐发】和普【杀】对你无效；当你受到火焰伤害时，你令伤害值+1。",
       tengjia1: "藤甲",
       tengjia2: "藤甲",
       tengjia3: "藤甲",
       tengjia_append:
-        '<span class="text" style="font-family: yuanli">“…穿在身上，渡江不沉，经水不湿，刀箭皆不能入…”——《三国演义》</span>',
+        '<span class="text" style="font-family: yuanli">……穿在身上，渡江不沉，经水不湿，刀箭皆不能入……——《三国演义》</span>',
       baiyin: "白银狮子",
       baiyin_info:
-        "锁定技，当你受到伤害时，若伤害值大于1，则你将此伤害值改为1；当你失去装备区里的【白银狮子】后，你回复1点体力。",
+        "锁定技，当你受到大于1点的伤害时，你将伤害值改为1；当你失去装备区里的【白银狮子】后，你回复1点体力。",
       baiyin_skill: "白银狮子",
       baiyin_append:
-        '<span class="text" style="font-family: yuanli">“马超纵骑持枪而出；狮盔兽带，银甲白袍：一来结束非凡，二者人才出众。”——《三国演义》</span>',
+        '<span class="text" style="font-family: yuanli">马超纵骑持枪而出；狮盔兽带，银甲白袍：一来结束非凡，二者人才出众。——《三国演义》</span>',
 
       hualiu: "骅骝",
       hualiu_bg: "+马",
-      hualiu_info: "当其他角色计算与你距离时，始终+1。",
+      hualiu_info: "锁定技，其他角色计算与你的距离+1。",
       hualiu_append:
-        '<span class="text" style="font-family: yuanli">“枥上骅骝嘶鼓角，门前老将识风云。”——《上将行》</span>',
+        '<span class="text" style="font-family: yuanli">枥下骅骝思鼓角，门前老将识风云。——《上将行》</span>',
     },
     list: [
-      ["spade", 1, "guding"],
-      ["spade", 2, "tengjia"],
-      ["spade", 3, "jiu"],
-      ["spade", 4, "sha", "thunder"],
-      ["spade", 5, "sha", "thunder"],
-      ["spade", 6, "sha", "thunder"],
-      ["spade", 7, "sha", "thunder"],
-      ["spade", 8, "sha", "thunder"],
-      ["spade", 9, "jiu"],
-      ["spade", 10, "bingliang"],
-      ["spade", 11, "tiesuo"],
-      ["spade", 12, "tiesuo"],
-      ["spade", 13, "wuxie"],
-
       ["heart", 1, "wuxie"],
       ["heart", 2, "huogong"],
       ["heart", 3, "huogong"],
@@ -1273,6 +1264,20 @@ game.import("card", function () {
       ["heart", 11, "shan"],
       ["heart", 12, "shan"],
       ["heart", 13, "wuxie"],
+
+      ["diamond", 1, "zhuque"],
+      ["diamond", 2, "tao"],
+      ["diamond", 3, "tao"],
+      ["diamond", 4, "sha", "fire"],
+      ["diamond", 5, "sha", "fire"],
+      ["diamond", 6, "shan"],
+      ["diamond", 7, "shan"],
+      ["diamond", 8, "shan"],
+      ["diamond", 9, "jiu"],
+      ["diamond", 10, "shan"],
+      ["diamond", 11, "shan"],
+      ["diamond", 12, "huogong"],
+      ["diamond", 13, "hualiu"],
 
       ["club", 1, "baiyin"],
       ["club", 2, "tengjia"],
@@ -1288,19 +1293,19 @@ game.import("card", function () {
       ["club", 12, "tiesuo"],
       ["club", 13, "tiesuo"],
 
-      ["diamond", 1, "zhuque"],
-      ["diamond", 2, "tao"],
-      ["diamond", 3, "tao"],
-      ["diamond", 4, "sha", "fire"],
-      ["diamond", 5, "sha", "fire"],
-      ["diamond", 6, "shan"],
-      ["diamond", 7, "shan"],
-      ["diamond", 8, "shan"],
-      ["diamond", 9, "jiu"],
-      ["diamond", 10, "shan"],
-      ["diamond", 11, "shan"],
-      ["diamond", 12, "huogong"],
-      ["diamond", 13, "hualiu"],
+      ["spade", 1, "guding"],
+      ["spade", 2, "tengjia"],
+      ["spade", 3, "jiu"],
+      ["spade", 4, "sha", "thunder"],
+      ["spade", 5, "sha", "thunder"],
+      ["spade", 6, "sha", "thunder"],
+      ["spade", 7, "sha", "thunder"],
+      ["spade", 8, "sha", "thunder"],
+      ["spade", 9, "jiu"],
+      ["spade", 10, "bingliang"],
+      ["spade", 11, "tiesuo"],
+      ["spade", 12, "tiesuo"],
+      ["spade", 13, "wuxie"],
     ],
   }
 })

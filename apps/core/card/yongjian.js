@@ -843,51 +843,85 @@ game.import("card", function () {
         discard: false,
         lose: false,
         delay: false,
-        check: (card) => {
-          const player = _status.event.player
-          if (
-            game.hasPlayer(
-              (current) =>
-                player.canGift(card, current, true) &&
-                !current.refuseGifts(card, player) &&
-                get.effect(current, card, player, player) > 0,
-            )
-          ) {
-            return 2
-          }
+        check(card) {
+          const player = get.player()
           if (!player.needsToDiscard() && get.position(card) == "h") {
             return 0
           }
-          return 1 + Math.random()
+          const cache = lib.skill._gifting.selectTargetAi(_status.event, player)
+          if (cache?.length) {
+            let max = 0,
+              temp = 0,
+              cardx
+            for (let i = 0; i < cache.length; i++) {
+              const data = cache[i]
+              const list = data[1]
+              const element = list.find((item) => item.card === card)
+              if (element) {
+                temp = Math.abs(element.value)
+                if (temp > max) {
+                  max = temp
+                  cardx = element.card
+                }
+              }
+            }
+            if (cardx == card) {
+              return 1
+            }
+            return 0
+          }
+          return 0
         },
         prompt:
           "出牌阶段，你可将一张拥有“赠”标签的手牌区装备牌置于一名其他角色的装备区内，或将一张拥有“赠”标签的手牌区非装备牌正面朝上交给一名其他角色。",
-        content: () => {
-          player.gift(cards, target)
+        selectTargetAi(event, player) {
+          let cache = _status.event.getTempCache("_gifting", player.playerid)
+          if (Array.isArray(cache)) {
+            return cache
+          }
+          const map = new Map()
+          const targets = game.filterPlayer((current) =>
+            player.hasCard(
+              (card) => lib.skill._gifting.filterCard(card, player),
+              lib.skill._gifting.position,
+            ),
+          )
+          const cards = player.getCards("he")
+          targets.forEach((current) => {
+            const result = []
+            cards.forEach((card) => {
+              const value = player.getGiftAIResultTarget(card, current)
+              result.push({ card, value })
+            })
+            result.sort((a, b) => b.value - a.value)
+            map.set(current, result)
+          })
+          const sortedTargets = Array.from(map.entries()).sort(
+            (a, b) => (b[1][0]?.value || 0) - (a[1][0]?.value || 0),
+          )
+          event.putTempCache("_gifting", player.playerid, sortedTargets)
+          return sortedTargets
+        },
+        async content(event, trigger, player) {
+          const { cards, target } = event
+          await player.gift(cards, target)
         },
         ai: {
-          order: (item, player) =>
-            player.hasCard(
-              (card) =>
-                game.hasPlayer(
-                  (current) =>
-                    player.canGift(card, current, true) &&
-                    !current.refuseGifts(card, player) &&
-                    get.effect(current, card, player, player) > 0,
-                ),
-              "h",
-            )
-              ? 7
-              : 0.51,
+          order(item, player) {
+            return Math.max(get.order({ name: "sha" }), 0.5) - 0.1
+          },
           result: {
-            target: (player, target) => {
-              const result = ui.selected.cards.map((value) =>
-                player.getGiftAIResultTarget(value, target),
-              )
-              return (
-                result.reduce((previousValue, currentValue) => previousValue + currentValue, 0) /
-                result.length
-              )
+            target(player, target) {
+              let cache = _status.event.getTempCache("_gifting", player.playerid)
+              if (Array.isArray(cache)) {
+                for (let arr of cache) {
+                  if (target === arr[0]) {
+                    const element = arr[1].find((item) => item.card === ui.selected.cards[0])
+                    return element?.value || 0
+                  }
+                }
+              }
+              return 0
             },
           },
         },
@@ -942,48 +976,75 @@ game.import("card", function () {
     },
     translate: {
       gifts_tag: "赠",
+      _gifting: "赠予",
+
       du: "毒",
       du_info:
-        "①当此牌正面向上离开你的手牌区，或作为你的拼点牌而亮出时，你失去1点体力。②当你因摸牌或分发起始手牌而获得【毒】后，你可展示之并交给其他角色（不触发〖毒①〗）。",
+        "当此牌正面朝上离开你的手牌区时，你失去1点体力；当你因摸牌或分发起始手牌而获得【毒】后，你可以将之交给其他角色（正面朝上移动且不触发前一个效果）。",
       g_du: "毒",
       g_du_give: "赠毒",
       du_given: "已分配",
+      cisha: "刺杀",
+      cisha_info:
+        "出牌阶段限一次，对你攻击范围内的一名其他角色使用。你对其造成1点伤害（当目标角色使用【闪】抵消刺【杀】时，若其有手牌，其需弃置一张手牌，否则此刺【杀】依然造成伤害）。",
+
       guaguliaodu: "刮骨疗毒",
       guaguliaodu_info:
-        "出牌阶段，对一名已受伤的角色使用。目标角色回复1点体力，然后其可以弃置一张【毒】（不触发〖毒①〗失去体力的效果）。",
-      chenghuodajie: "趁火打劫",
-      chenghuodajie_info:
-        "出牌阶段，对一名有手牌的其他角色使用。你展示其一张手牌，然后令其选择一项：①将此牌交给你。②你对其造成1点伤害。",
+        "出牌阶段，对一名已受伤的角色使用。该角色回复1点体力，然后其可以弃置一张【毒】（以此法弃置【毒】无须失去体力）。",
+      guaguliaodu_append:
+        '<span class="text" style="font-family: yuanli">吾用尖刀隔开皮肉，直至于骨，刮去骨上箭毒，用药敷之，以线缝其口，方可无事。——华佗</span>',
       tuixinzhifu: "推心置腹",
       tuixinzhifu_info:
-        "出牌阶段，对一名距离为1的其他角色使用。你获得其区域内的至多两张牌，然后交给其等量的牌。",
-      yitianjian: "倚天剑",
-      yitianjian_info:
-        "当你因执行【杀】的效果而造成伤害后，若你已受伤，则你可弃置一张手牌，然后回复1点体力。",
-      qixingbaodao: "七星宝刀",
-      qixingbaodao_info: "锁定技。当此牌进入你的装备区后，你弃置装备区和判定区内的所有其他牌。",
+        "出牌阶段，对距离为1的一名其他角色使用。你获得目标角色区域里至多两张牌，然后交给其等量的手牌。",
+      tuixinzhifu_append:
+        '<span class="text" style="font-family: yuanli">萧王推赤心置人腹中，安得不报死！——《后汉书》</span>',
+      chenghuodajie: "趁火打劫",
+      chenghuodajie_info:
+        "出牌阶段，对一名其他角色使用。你展示其一张手牌并令其选择一项：1.将此牌交给你；2.受到你造成的1点伤害。",
+      chenghuodajie_append:
+        '<span class="text" style="font-family: yuanli">使贼得利恣意劫掠，失利便投降：此长寇之志，非良策也。——朱儁</span>',
+      kaihua: "树上开花",
+      kaihua_info:
+        "出牌阶段，对你使用。你弃置至多两张牌，然后摸等量的牌。若你以此法弃置了装备牌，则多摸一张牌。",
+      kaihua_append:
+        '<span class="text" style="font-family: yuanli">借局布势，力小势大；鸿渐于陆，其羽可用为仪也。——《三十六计》</span>',
+
       duanjian: "折戟",
       duanjian_info: "这是一把坏掉的武器……",
       duanjian_append:
-        '<span class="text" style="font-family: yuanli">不要因为手快而装给自己。</span>',
+        '<span class="text" style="font-family: yuanli">折戟沉沙铁未销，自将磨洗认前朝。东风不与周郎便，铜雀春深锁二乔。——《赤壁》</span>',
+      qixingbaodao: "七星宝刀",
+      qixingbaodao_info: "锁定技，当此牌置入你的装备区时，你弃置你判定区和装备区里所有的其他牌。",
+      qixingbaodao_append:
+        '<span class="text" style="font-family: yuanli">卓接视之，见其刀长尺余，七宝嵌饰，及其锋利，果宝刀也。——《三国演义》</span>',
+      yitianjian: "倚天剑",
+      yitianjian_info: "当你使用【杀】造成伤害后，你可以弃置一张手牌，然后回复1点体力。",
+      yitianjian_append:
+        '<span class="text" style="font-family: yuanli">曹操有宝剑二口：一名‘倚天’，一名‘青釭’；倚天剑自佩之，青釭剑令夏侯恩佩之。——《三国演义》</span>',
+
+      yinfengyi: "引蜂衣",
+      yinfengyi_info: "锁定技，你受到锦囊牌的伤害+1；当你因【毒】失去体力时，失去的体力值+1。",
+      yinfengyi_append:
+        '<span class="text" style="font-family: yuanli">淮北蜂毒，尾能杀人…——《江淮之蜂蟹》</span>',
       serafuku: "女装",
       serafuku_info:
-        "锁定技，当你成为【杀】的目标后，若你是男性角色，你进行判定，若结果为黑色，此【杀】伤害+1。",
+        "锁定技，若你是男性角色，当你成为【杀】的目标后，你进行判定：若结果为黑色，此【杀】伤害+1。",
       serafuku_append:
-        '<span class="text" style="font-family: yuanli">セーラー服だからです、<br>結論！ </span>',
-      yinfengyi: "引蜂衣",
-      yinfengyi_info:
-        "锁定技。当你受到渠道为锦囊牌的伤害时，此伤害+1。当你因〖毒①〗而失去体力时，失去体力的量值+1。",
-      yonglv: "驽马",
-      yonglv_info: "锁定技，其他角色计算与你的距离始终为1。",
-      yonglv_append: '<span class="text" style="font-family: yuanli">它旁边的就是王仲宣。</span>',
-      zhanxiang: "战象",
-      zhanxiang_info: "锁定技。①其他角色至你的距离+1。②其他角色对你赠予的牌视为赠予失败。",
-      xinge: "信鸽",
-      xinge_info: "出牌阶段限一次。你可以将一张手牌交给一名其他角色。",
-      xinge_append: '<span class="text" style="font-family: yuanli">咕咕咕。</span>',
+        '<span class="text" style="font-family: yuanli">司马懿受了巾帼女衣，看了书札，并不嗔怒，只问丞相寝食及事之烦简，绝不提起军旅之事。——《三国演义》</span>',
 
-      _gifting: "赠予",
+      yonglv: "驽马",
+      yonglv_info: "锁定技，你计算与其他角色的距离-1；其他角色计算与你的距离视为1。",
+      yonglv_append:
+        '<span class="text" style="font-family: yuanli">以某比之，譬犹驽马并麒麟，寒鸦配鸾凤耳。——徐庶</span>',
+      zhanxiang: "战象",
+      zhanxiang_info: "锁定技，其他角色计算与你的距离+1；其他角色对你赠予的牌视为赠予失败。",
+      zhanxiang_append:
+        '<span class="text" style="font-family: yuanli">出则骑象，能呼风唤雨，常有虎豹豺狼、毒蛇恶蝎跟随。——《三国演义》</span>',
+
+      xinge: "信鸽",
+      xinge_info: "出牌阶段限一次，你可以将一张手牌交给一名其他角色。",
+      xinge_append:
+        '<span class="text" style="font-family: yuanli">万鸽飞翔绕帝都，朝昏收放费功夫。何如养取云边雁，沙漠能传二圣书。——《讽养鸽》</span>',
     },
     list: [
       ["spade", 1, "guaguliaodu"],

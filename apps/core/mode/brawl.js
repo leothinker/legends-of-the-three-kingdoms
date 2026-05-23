@@ -2812,7 +2812,7 @@ export default () => {
             ui.refresh(card)
           }
 
-          var list2 = ["qilin", "dawan", "zhuahuang"]
+          var list2 = ["qilin", "dayuan", "zhuahuang"]
           var func2 = function () {
             var card = game.createCard(list2.shift(), "noclick")
             node.nodes.push(card)
@@ -2878,7 +2878,7 @@ export default () => {
               list.push([
                 ["heart", "diamond", "club", "spade"].randomGet(),
                 Math.ceil(Math.random() * 13),
-                "dawan",
+                "dayuan",
               ])
             }
             return list

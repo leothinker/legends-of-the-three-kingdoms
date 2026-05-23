@@ -3497,6 +3497,7 @@ game.import("card", function () {
         fullskin: true,
         type: "equip",
         subtype: "equip1",
+        bingzhu: ["诸葛亮", "马钧"],
         ai: {
           order() {
             return get.order({ name: "sha" }) - 0.1
@@ -3548,6 +3549,7 @@ game.import("card", function () {
         fullskin: true,
         type: "equip",
         subtype: "equip1",
+        bingzhu: ["赵云", "曹操"],
         distance: { attackFrom: -1 },
         ai: {
           basic: {
@@ -3560,6 +3562,7 @@ game.import("card", function () {
         fullskin: true,
         type: "equip",
         subtype: "equip1",
+        bingzhu: ["刘备"],
         distance: { attackFrom: -1 },
         ai: {
           basic: {
@@ -3584,6 +3587,7 @@ game.import("card", function () {
         fullskin: true,
         type: "equip",
         subtype: "equip1",
+        bingzhu: ["关羽", "关兴", "张苞", "关银屏"],
         distance: { attackFrom: -2 },
         ai: {
           equipValue(card, player) {
@@ -3599,6 +3603,7 @@ game.import("card", function () {
         fullskin: true,
         type: "equip",
         subtype: "equip1",
+        bingzhu: ["张飞", "关兴", "张苞", "张星彩"],
         distance: { attackFrom: -2 },
         ai: {
           equipValue(card, player) {
@@ -3615,6 +3620,7 @@ game.import("card", function () {
         fullskin: true,
         type: "equip",
         subtype: "equip1",
+        bingzhu: ["徐晃"],
         distance: { attackFrom: -2 },
         ai: {
           equipValue(card, player) {
@@ -3631,6 +3637,7 @@ game.import("card", function () {
         fullskin: true,
         type: "equip",
         subtype: "equip1",
+        bingzhu: ["吕布"],
         distance: { attackFrom: -3 },
         ai: {
           basic: {
@@ -3643,6 +3650,7 @@ game.import("card", function () {
         fullskin: true,
         type: "equip",
         subtype: "equip1",
+        bingzhu: ["吕布"],
         distance: { attackFrom: -4 },
         ai: {
           basic: {
@@ -3655,6 +3663,7 @@ game.import("card", function () {
         fullskin: true,
         type: "equip",
         subtype: "equip2",
+        bingzhu: ["诸葛亮", "黄月英", "黄承彦"],
         ai: {
           basic: {
             equipValue: 7.5,
@@ -3677,6 +3686,7 @@ game.import("card", function () {
         fullskin: true,
         type: "equip",
         subtype: "equip3",
+        bingzhu: ["曹操"],
         distance: { globalTo: 1 },
         battleOfWancheng() {
           // 宛城之战
@@ -3699,30 +3709,35 @@ game.import("card", function () {
         fullskin: true,
         type: "equip",
         subtype: "equip3",
+        bingzhu: ["刘备"],
         distance: { globalTo: 1 },
       },
       zhuahuang: {
         fullskin: true,
         type: "equip",
         subtype: "equip3",
+        bingzhu: ["曹操"],
         distance: { globalTo: 1 },
       },
       chitu: {
         fullskin: true,
         type: "equip",
         subtype: "equip4",
+        bingzhu: ["吕布", "关羽"],
         distance: { globalFrom: -1 },
       },
       dayuan: {
         fullskin: true,
         type: "equip",
         subtype: "equip4",
+        bingzhu: ["曹操"],
         distance: { globalFrom: -1 },
       },
       zixing: {
         fullskin: true,
         type: "equip",
         subtype: "equip4",
+        bingzhu: ["曹操"],
         distance: { globalFrom: -1 },
       },
     },
@@ -4797,12 +4812,12 @@ game.import("card", function () {
             if (!cards.length) {
               return
             }
-            for (var i = 0; i < cards.length; i++) {
-              if (cards[i].classList.contains("selected") === false) {
-                return
-              }
+            if (
+              cards.every((card) => ui.selected.cards.includes(card)) &&
+              ui.selected.cards.length === cards.length
+            ) {
+              range[1] += 2
             }
-            range[1] += 2
           },
         },
       },
@@ -5127,142 +5142,285 @@ game.import("card", function () {
     },
     translate: {
       sha: "杀",
-      sha_info: "出牌阶段，对你攻击范围内的一名其他角色使用。若命中，则对目标角色造成1点伤害。",
+      sha_info: "出牌阶段限一次，对你攻击范围内的一名其他角色使用。你对其造成1点伤害。",
       sha_notshan: "invisible",
       shan: "闪",
-      shan_info: "当一张【杀】对你生效前，可响应此【杀】——对此【杀】使用，抵消其的效果。",
+      shan_info: "抵消【杀】的效果。",
       tao: "桃",
-      tao_info:
-        "出牌阶段，若你已受伤，对自己使用，令自己回复一点体力。当一名角色处于濒死阶段时，对其使用，令其回复1点体力值。",
+      tao_info: "出牌阶段回复已受伤的你1点体力或令一名处于濒死状态的角色回复1点体力。 ",
 
-      guohe: "过河拆桥",
-      guohe_bg: "拆",
-      guohe_info: "出牌阶段，对一名其他角色使用。弃置其所属区域里的一张牌。",
-      shunshou: "顺手牵羊",
-      shunshou_info: "出牌阶段，对距离为1的一名其他角色使用。获得其所属区域里的一张牌。",
       juedou: "决斗",
       juedou_bg: "斗",
       juedou_info:
-        "出牌阶段，对一名其他角色使用。从该角色开始，你与其轮流打出一张【杀】，首先不打出【杀】的角色受到1点伤害。",
-      wuzhong: "无中生有",
-      wuzhong_bg: "生",
-      wuzhong_info: "出牌阶段，你摸两张牌。",
+        "出牌阶段，对一名其他角色使用。由该角色开始，其与你轮流打出一张【杀】，然后首先未打出【杀】的角色受到另一名角色造成的1点伤害。",
+      juedou_append: '<span class="text" style="font-family: yuanli">谁来与我大战三百回合！</span>',
       jiedao: "借刀杀人",
       jiedao_info:
-        "出牌阶段，对一名装备区里有武器牌的其他角色使用。除非该角色对其攻击范围内，由你选择的另一名角色使用一张【杀】，否则将其装备区里的武器牌交给你。",
+        "出牌阶段，对一名装备区里有武器牌的其他角色使用。除非其对其攻击范围内你选择的一名角色使用一张【杀】，否则其将其装备区里的武器牌交给你。",
       jiedao_append:
-        '<span class="text" style="font-family: yuanli">这是一种十分含蓄的计谋。</span>',
-      nanman: "南蛮入侵",
-      nanman_bg: "蛮",
-      nanman_info: "出牌阶段，对所有其他角色使用。每人需打出一张【杀】，否则受到1点伤害。",
+        '<span class="text" style="font-family: yuanli">敌已明，友未定，引友杀敌，不自出力，以《损》推演。——《三十六计》</span>',
       wanjian: "万箭齐发",
       wanjian_bg: "箭",
-      wanjian_info: "出牌阶段，对所有其他角色使用。每人需打出一张【闪】，否则受到1点伤害。",
-      taoyuan: "桃园结义",
-      taoyuan_bg: "园",
-      taoyuan_info: "出牌阶段，对所有角色使用。每人回复1点体力。",
+      wanjian_info:
+        "出牌阶段，对所有其他角色使用。每名目标角色需打出一张【闪】，否则受到你造成的1点伤害。",
+      wanjian_append:
+        '<span class="text" style="font-family: yuanli">安得夫差水犀手，三千强弩射潮低。——苏轼</span>',
+      nanman: "南蛮入侵",
+      nanman_bg: "蛮",
+      nanman_info:
+        "出牌阶段，对所有其他角色使用。每名目标角色需打出一张【杀】，否则受到你造成的1点伤害。",
+      nanman_append:
+        '<span class="text" style="font-family: yuanli">南蛮一人持矛入侵，川兵百人见而奔逃。——无名氏</span>',
+      guohe: "过河拆桥",
+      guohe_bg: "拆",
+      guohe_info: "出牌阶段，对一名区域里有牌的其他角色使用。你弃置其区域里的一张牌。",
+      guohe_append:
+        '<span class="text" style="font-family: yuanli">你休得顺水推船，偏不许我过河拆桥。——康进之</span>',
+      shunshou: "顺手牵羊",
+      shunshou_info:
+        "出牌阶段，对距离为1的一名区域里有牌的其他角色使用。你获得该角色区域内的一张牌。",
+      shunshou_append:
+        '<span class="text" style="font-family: yuanli">效马效羊者右牵之。——《礼记·曲礼上》</span>',
+      wuzhong: "无中生有",
+      wuzhong_bg: "生",
+      wuzhong_info: "出牌阶段，对你使用。你摸两张牌。",
+      wuzhong_append:
+        '<span class="text" style="font-family: yuanli">天下万物生于有，有生于无。——《老子》</span>',
       wugu: "五谷丰登",
       wugu_bg: "谷",
-      wugu_info: "出牌阶段，对所有角色使用。从牌堆顶亮出等同于目标角色数的牌，每人获得其中一张。",
+      wugu_info:
+        "出牌阶段，对所有角色使用。你亮出牌堆顶等同于目标角色数的牌，每名目标角色选择并获得其中的一张。",
+      wugu_append:
+        '<span class="text" style="font-family: yuanli">是故风雨时节，五谷丰熟，社稷安宁。——《六韬·龙韬·立将》</span>',
+      taoyuan: "桃园结义",
+      taoyuan_bg: "园",
+      taoyuan_info: "出牌阶段，对所有角色使用。每名目标角色回复1点体力。",
+      taoyuan_append:
+        '<span class="text" style="font-family: yuanli">既结为兄弟，则同心协力，救困扶危；上报国家，下安黎庶；不求同年同月同日生，只愿同年同月同日死，皇天后土，实鉴此心，背义忘恩，天人共戮！——《三国演义》</span>',
       wuxie: "无懈可击",
       wuxie_bg: "懈",
       wuxie_info:
         "当一张锦囊牌对一名角色生效前，抵消此牌对该角色的效果；或抵消另一张【无懈可击】的效果。",
+      wuxie_append:
+        '<span class="text" style="font-family: yuanli">击其懈怠，出其空虚。——曹操</span>',
 
       lebu: "乐不思蜀",
       lebu_info:
-        "出牌阶段，对一名其他角色使用，将【乐不思蜀】放入该角色的判定区。若判定结果不为♥，则其跳过出牌阶段。",
+        "出牌阶段，对一名其他角色使用。将【乐不思蜀】置入该角色的判定区，若判定结果不为红桃，其跳过本回合的出牌阶段。",
+      lebu_append:
+        '<span class="text" style="font-family: yuanli">问禅曰：“颇思蜀否？”，禅曰：“此间乐，不思蜀。”——《三国志·后主传》</span>',
       shandian: "闪电",
       shandian_bg: "电",
       shandian_info:
-        "出牌阶段，将【闪电】放入你的判定区。若判定结果为♠2~9，则目标角色受到3点雷电伤害；若为其他结果，则将【闪电】放入其下家的判定区。",
+        "出牌阶段，对你使用。将【闪电】置入你的判定区。若判定结果为黑桃2-9，则目标角色受到3点雷电伤害，否则将之置入其下家的判定区。",
+      shandian_append: '<span class="text" style="font-family: yuanli">啊啊啊！！！</span>',
 
       zhuge: "诸葛连弩",
       zhuge_bg: "弩",
       zhuge_skill: "诸葛连弩",
       zhuge_skill_info: "锁定技，你使用【杀】无次数限制。",
       zhuge_info: "锁定技，你使用【杀】无次数限制。",
-      qinggang: "青釭剑",
-      qinggang_skill: "青釭剑",
-      qinggang_skill_info: "锁定技，你的【杀】指定目标后，令其防具无效。",
-      qinggang_info: "锁定技，你的【杀】指定目标后，令其防具无效。",
-      qinggang2: "破防",
+      zhuge_append:
+        '<span class="text" style="font-family: yuanli">又损益连弩，谓之元戎，以铁为矢，矢长八寸，一弩十矢俱发。——《魏氏春秋》</span>',
       cixiong: "雌雄双股剑",
       cixiong_bg: "双",
       cixiong_skill: "雌雄双股剑",
       cixiong_skill_info:
-        "你的【杀】指定异性角色为目标后，你可以令其选择一项：弃一张手牌，或令你摸一张牌。",
+        "当你使用【杀】指定一名与你性别不同的角色为目标后，你可以令其选择一项：1.弃置一张手牌；2.令你摸一张牌。",
       cixiong_info:
-        "你的【杀】指定异性角色为目标后，你可以令其选择一项：弃一张手牌，或令你摸一张牌。",
+        "当你使用【杀】指定一名与你性别不同的角色为目标后，你可以令其选择一项：1.弃置一张手牌；2.令你摸一张牌。",
+      cixiong_append:
+        '<span class="text" style="font-family: yuanli">又名鸳鸯剑，鸳剑长三尺七寸，鸯剑长三尺四寸，利可断金。——《三国演义》</span>',
       hanbing: "寒冰剑",
       hanbing_bg: "冰",
       hanbing_skill: "寒冰剑",
-      hanbing_info: "你的【杀】造成伤害时，你可以防止此伤害改为弃置目标角色两张牌。",
-      hanbing_skill_info: "你的【杀】造成伤害时，你可以防止此伤害改为弃置目标角色两张牌。",
-      qinglong: "青龙偃月刀",
-      qinglong_bg: "偃",
-      qinglong_skill: "青龙偃月刀",
-      qinglong_guozhan: "青龙偃月刀",
-      qinglong_skill_info: "你的【杀】被抵消时，可以对相同目标继续使用【杀】。",
-      qinglong_info: "你的【杀】被抵消时，可以对相同目标继续使用【杀】。",
-      qinglong_info_guozhan:
-        "锁定技，当你使用【杀】时，所有目标角色不能明置武将牌直到此【杀】结算完毕。",
+      hanbing_info:
+        "当你使用【杀】对目标角色造成伤害时，若该角色有牌，你可以防止此伤害，改为依次弃置其两张牌。",
+      hanbing_skill_info:
+        "当你使用【杀】对目标角色造成伤害时，若该角色有牌，你可以防止此伤害，改为依次弃置其两张牌。",
+      hanbing_append:
+        '<span class="text" style="font-family: yuanli">轻挥寒光泠，踽闻叶落声。</span>',
+      qinggang: "青釭剑",
+      qinggang_skill: "青釭剑",
+      qinggang_skill_info: "锁定技，当你使用【杀】指定一名角色为目标后，此【杀】无视其防具。",
+      qinggang_info: "锁定技，当你使用【杀】指定一名角色为目标后，此【杀】无视其防具。",
+      qinggang2: "破防",
+      qinggang_append:
+        '<span class="text" style="font-family: yuanli">云乃拔青釭剑乱砍，手起处，衣甲平过，血如涌泉。——《三国演义》</span>',
       zhangba: "丈八蛇矛",
       zhangba_bg: "蛇",
       zhangba_skill: "丈八蛇矛",
       zhangba_skill_info: "你可以将两张手牌当【杀】使用或打出。",
       zhangba_info: "你可以将两张手牌当【杀】使用或打出。",
+      zhangba_append:
+        '<span class="text" style="font-family: yuanli">马上所持，言其俏俏便杀也；又曰激矛，激截也，可以激截敌阵之矛也。——《释名·释兵》</span>',
       guanshi: "贯石斧",
       guanshi_skill: "贯石斧",
-      guanshi_skill_info: "你的【杀】被抵消时，你可以弃置两张牌使此【杀】依然造成伤害。",
-      guanshi_info: "你的【杀】被抵消时，你可以弃置两张牌使此【杀】依然造成伤害。",
+      guanshi_skill_info: "当你使用的【杀】被抵消时，你可以弃置两张牌，令此【杀】依然造成伤害。",
+      guanshi_info: "当你使用的【杀】被抵消时，你可以弃置两张牌，令此【杀】依然造成伤害。",
+      guanshi_append:
+        '<span class="text" style="font-family: yuanli">斧，甫也，甫，始也。凡将制器，始用斧伐木，已乃制之也。——《释名·释用器》</span>',
+      qinglong: "青龙偃月刀",
+      qinglong_bg: "偃",
+      qinglong_skill: "青龙偃月刀",
+      qinglong_guozhan: "青龙偃月刀",
+      qinglong_skill_info: "当你使用的【杀】被目标角色使用的【闪】抵消时，你可以对其使用【杀】。",
+      qinglong_info: "当你使用的【杀】被目标角色使用的【闪】抵消时，你可以对其使用【杀】。",
+      qinglong_guozhan_info:
+        "锁定技，当你使用【杀】指定一名角色为目标后，该角色不能明置武将牌直到此【杀】结算结束。",
+      qinglong_info_guozhan:
+        "锁定技，当你使用【杀】指定一名角色为目标后，该角色不能明置武将牌直到此【杀】结算结束。",
+      qinglong_append:
+        '<span class="text" style="font-family: yuanli">刀势即大，其三十六刀法，兵仗遇之，无不屈者，刀类中以此为第一。——《三才图会·器用》</span>',
       fangtian: "方天画戟",
       fangtian_skill: "方天画戟",
-      fangtian_skill_info: "若你使用的【杀】是你最后的手牌，则你可以多选择两个目标。",
-      fangtian_info: "若你使用的【杀】是你最后的手牌，则你可以多选择两个目标。",
+      fangtian_skill_info: "锁定技，若你使用的【杀】是你最后的手牌，则此【杀】可以多选择两个目标。",
+      fangtian_info: "锁定技，若你使用的【杀】是你最后的手牌，则此【杀】可以多选择两个目标。",
       fangtian_info_guozhan:
-        "你使用【杀】可以选择任意名势力各不相同或未确定势力的角色为目标，若任意一名目标角色使用【闪】抵消了此【杀】，则此【杀】对剩余的目标角色无效。",
+        "你使用的【杀】可以指定任意名势力各不相同的角色及未确定势力的角色为目标。当此【杀】被一名目标角色使用【闪】抵消时，此【杀】对其他目标角色无效。",
+      fangtian_append:
+        '<span class="text" style="font-family: yuanli">豹子尾摇穿画戟，雄兵十万脱征衣。——《三国演义·第十六回》</span>',
       qilin: "麒麟弓",
       qilin_bg: "弓",
       qilin_skill: "麒麟弓",
-      qilin_skill_info: "你的【杀】造成伤害时，你可以弃置目标角色装备区里的一张坐骑牌。",
-      qilin_info: "你的【杀】造成伤害时，你可以弃置目标角色装备区里的一张坐骑牌。",
+      qilin_skill_info: "当你使用【杀】对目标角色造成伤害时，你可以弃置其装备区里的一张坐骑牌。",
+      qilin_info: "当你使用【杀】对目标角色造成伤害时，你可以弃置其装备区里的一张坐骑牌。",
+      qilin_append:
+        '<span class="text" style="font-family: yuanli">虎筋弦响弓开处，雕羽翅飞箭到时。——《三国演义》</span>',
 
       bagua: "八卦阵",
       bagua_bg: "卦",
       bagua_skill: "八卦阵",
       bagua_info:
-        "当你需要使用或打出【闪】时，你可以进行判定，若结果为红色，则你视为使用或打出一张【闪】。",
+        "当你需要使用或打出【闪】时，你可以进行判定，若结果为红色，你视为使用或打出一张【闪】。",
       bagua_skill_info:
-        "当你需要使用或打出【闪】时，你可以进行判定，若结果为红色，则你视为使用或打出一张【闪】。",
+        "当你需要使用或打出【闪】时，你可以进行判定，若结果为红色，你视为使用或打出一张【闪】。",
+      bagua_append:
+        '<span class="text" style="font-family: yuanli">乾三连，坤六断。震仰盂，艮覆碗。离中虚，坎中满。兑上缺，巽下断。——《八卦歌诀》</span>',
       renwang: "仁王盾",
       renwang_bg: "盾",
       renwang_skill: "仁王盾",
-      renwang_info: "锁定技，黑色【杀】对你无效。",
-      renwang_skill_info: "锁定技，黑色【杀】对你无效。",
+      renwang_info: "锁定技，黑色的【杀】对你无效。",
+      renwang_skill_info: "锁定技，黑色的【杀】对你无效。",
+      renwang_append:
+        '<span class="text" style="font-family: yuanli">握仁王之宝镜，日月重光；驱梵帝之金轮，雷霆静祲。——王勃</span>',
+
+      dayuan: "大宛",
+      dayuan_bg: "-马",
+      dayuan_info: "你计算与其他角色的距离-1。",
+      dayuan_append:
+        '<span class="text" style="font-family: yuanli">大宛汗血古共知，青海龙种骨更奇，网丝旧画昔尝见，不意人间今见之。——《天马歌》</span>',
+      chitu: "赤兔",
+      chitu_bg: "-马",
+      chitu_info: "你计算与其他角色的距离-1。",
+      chitu_append:
+        '<span class="text" style="font-family: yuanli">人中吕布，马中赤兔！——《三国演义》</span>',
+      zixing: "紫骍",
+      zixing_bg: "-马",
+      zixing_info: "你计算与其他角色的距离-1。",
+      zixing_append:
+        '<span class="text" style="font-family: yuanli">怀夏后之九代，想陈王之紫骍。——《梁书·张率传》</span>',
 
       jueying: "绝影",
       jueying_bg: "+马",
-      jueying_info: "当其他角色计算与你距离时，始终+1。",
-      dilu: "的卢",
-      dilu_bg: "+马",
-      dilu_info: "当其他角色计算与你距离时，始终+1。",
+      jueying_info: "其他角色计算与你的距离+1。",
+      jueying_append:
+        '<span class="text" style="font-family: yuanli">公所乘马名绝影。——《三国志·魏书》</span>',
       zhuahuang: "爪黄飞电",
       zhuahuang_bg: "+马",
-      zhuahuang_info: "当其他角色计算与你距离时，始终+1。",
-      chitu: "赤兔",
-      chitu_bg: "-马",
-      chitu_info: "当你计算与其他角色距离时，始终-1。",
-      dayuan: "大宛",
-      dayuan_bg: "-马",
-      dayuan_info: "当你计算与其他角色距离时，始终-1。",
-      zixing: "紫骍",
-      zixing_bg: "-马",
-      zixing_info: "当你计算与其他角色距离时，始终-1。",
+      zhuahuang_info: "其他角色计算与你的距离+1。",
+      zhuahuang_append:
+        '<span class="text" style="font-family: yuanli">操骑爪黄飞电马，引十万之众，与天子猎于许田。——《三国演义》</span>',
+      dilu: "的卢",
+      dilu_bg: "+马",
+      dilu_info: "其他角色计算与你的距离+1。",
+      dilu_append:
+        '<span class="text" style="font-family: yuanli">备急曰：‘的卢，今日危矣，可努力。’的卢乃一踊三丈，遂得过。——《世语》</span>',
     },
     list: [
-      ["spade", 1, "juedou"],
+      ["heart", 1, "taoyuan"],
+      ["heart", 1, "wanjian"],
+      ["heart", 2, "shan"],
+      ["heart", 2, "shan"],
+      ["heart", 3, "tao"],
+      ["heart", 3, "wugu"],
+      ["heart", 4, "tao"],
+      ["heart", 4, "wugu"],
+      ["heart", 5, "chitu"],
+      ["heart", 5, "qilin"],
+      ["heart", 6, "tao"],
+      ["heart", 6, "lebu"],
+      ["heart", 7, "tao"],
+      ["heart", 7, "wuzhong"],
+      ["heart", 8, "tao"],
+      ["heart", 8, "wuzhong"],
+      ["heart", 9, "tao"],
+      ["heart", 9, "wuzhong"],
+      ["heart", 10, "sha"],
+      ["heart", 10, "sha"],
+      ["heart", 11, "sha"],
+      ["heart", 11, "wuzhong"],
+      ["heart", 12, "tao"],
+      ["heart", 12, "guohe"],
+      ["heart", 13, "shan"],
+      ["heart", 13, "zhuahuang"],
+
+      ["diamond", 1, "zhuge"],
+      ["diamond", 1, "juedou"],
+      ["diamond", 2, "shan"],
+      ["diamond", 2, "shan"],
+      ["diamond", 3, "shan"],
+      ["diamond", 3, "shunshou"],
+      ["diamond", 4, "shan"],
+      ["diamond", 4, "shunshou"],
+      ["diamond", 5, "shan"],
+      ["diamond", 5, "guanshi"],
+      ["diamond", 6, "sha"],
+      ["diamond", 6, "shan"],
+      ["diamond", 7, "sha"],
+      ["diamond", 7, "shan"],
+      ["diamond", 8, "sha"],
+      ["diamond", 8, "shan"],
+      ["diamond", 9, "sha"],
+      ["diamond", 9, "shan"],
+      ["diamond", 10, "sha"],
+      ["diamond", 10, "shan"],
+      ["diamond", 11, "shan"],
+      ["diamond", 11, "shan"],
+      ["diamond", 12, "tao"],
+      ["diamond", 12, "fangtian"],
+      ["diamond", 13, "sha"],
+      ["diamond", 13, "zixing"],
+
+      ["club", 1, "zhuge"],
+      ["club", 1, "juedou"],
+      ["club", 2, "sha"],
+      ["club", 2, "bagua"],
+      ["club", 3, "sha"],
+      ["club", 3, "guohe"],
+      ["club", 4, "sha"],
+      ["club", 4, "guohe"],
+      ["club", 5, "dilu"],
+      ["club", 5, "sha"],
+      ["club", 6, "sha"],
+      ["club", 6, "lebu"],
+      ["club", 7, "sha"],
+      ["club", 7, "nanman"],
+      ["club", 8, "sha"],
+      ["club", 8, "sha"],
+      ["club", 9, "sha"],
+      ["club", 9, "sha"],
+      ["club", 10, "sha"],
+      ["club", 10, "sha"],
+      ["club", 11, "sha"],
+      ["club", 11, "sha"],
+      ["club", 12, "jiedao"],
+      ["club", 12, "wuxie"],
+      ["club", 13, "jiedao"],
+      ["club", 13, "wuxie"],
+
       ["spade", 1, "shandian"],
+      ["spade", 1, "juedou"],
       ["spade", 2, "cixiong"],
       ["spade", 2, "bagua"],
       ["spade", 3, "shunshou"],
@@ -5283,96 +5441,15 @@ game.import("card", function () {
       ["spade", 10, "sha"],
       ["spade", 11, "shunshou"],
       ["spade", 11, "wuxie"],
-      ["spade", 12, "guohe"],
       ["spade", 12, "zhangba"],
+      ["spade", 12, "guohe"],
       ["spade", 13, "nanman"],
       ["spade", 13, "dayuan"],
 
-      ["heart", 1, "wanjian"],
-      ["heart", 1, "taoyuan"],
-      ["heart", 2, "shan"],
-      ["heart", 2, "shan"],
-      ["heart", 3, "wugu"],
-      ["heart", 3, "tao"],
-      ["heart", 4, "wugu"],
-      ["heart", 4, "tao"],
-      ["heart", 5, "chitu"],
-      ["heart", 5, "qilin"],
-      ["heart", 6, "lebu"],
-      ["heart", 6, "tao"],
-      ["heart", 7, "wuzhong"],
-      ["heart", 7, "tao"],
-      ["heart", 8, "wuzhong"],
-      ["heart", 8, "tao"],
-      ["heart", 9, "wuzhong"],
-      ["heart", 9, "tao"],
-      ["heart", 10, "sha"],
-      ["heart", 10, "sha"],
-      ["heart", 11, "wuzhong"],
-      ["heart", 11, "sha"],
-      ["heart", 12, "tao"],
-      ["heart", 12, "guohe"],
-      ["heart", 13, "shan"],
-      ["heart", 13, "zhuahuang"],
-
-      ["club", 1, "juedou"],
-      ["club", 1, "zhuge"],
-      ["club", 2, "sha"],
-      ["club", 2, "bagua"],
-      ["club", 3, "sha"],
-      ["club", 3, "guohe"],
-      ["club", 4, "sha"],
-      ["club", 4, "guohe"],
-      ["club", 5, "sha"],
-      ["club", 5, "dilu"],
-      ["club", 6, "sha"],
-      ["club", 6, "lebu"],
-      ["club", 7, "sha"],
-      ["club", 7, "nanman"],
-      ["club", 8, "sha"],
-      ["club", 8, "sha"],
-      ["club", 9, "sha"],
-      ["club", 9, "sha"],
-      ["club", 10, "sha"],
-      ["club", 10, "sha"],
-      ["club", 11, "sha"],
-      ["club", 11, "sha"],
-      ["club", 12, "wuxie"],
-      ["club", 12, "jiedao"],
-      ["club", 13, "wuxie"],
-      ["club", 13, "jiedao"],
-
-      ["diamond", 1, "juedou"],
-      ["diamond", 1, "zhuge"],
-      ["diamond", 2, "shan"],
-      ["diamond", 2, "shan"],
-      ["diamond", 3, "shunshou"],
-      ["diamond", 3, "shan"],
-      ["diamond", 4, "shunshou"],
-      ["diamond", 4, "shan"],
-      ["diamond", 5, "guanshi"],
-      ["diamond", 5, "shan"],
-      ["diamond", 6, "sha"],
-      ["diamond", 6, "shan"],
-      ["diamond", 7, "sha"],
-      ["diamond", 7, "shan"],
-      ["diamond", 8, "sha"],
-      ["diamond", 8, "shan"],
-      ["diamond", 9, "sha"],
-      ["diamond", 9, "shan"],
-      ["diamond", 10, "sha"],
-      ["diamond", 10, "shan"],
-      ["diamond", 11, "shan"],
-      ["diamond", 11, "shan"],
-      ["diamond", 12, "fangtian"],
-      ["diamond", 12, "tao"],
-      ["diamond", 13, "zixing"],
-      ["diamond", 13, "sha"],
-
-      ["spade", 2, "hanbing"],
       ["heart", 12, "shandian"],
-      ["club", 2, "renwang"],
       ["diamond", 12, "wuxie"],
+      ["club", 2, "renwang"],
+      ["spade", 2, "hanbing"],
     ],
   }
 })

@@ -25,7 +25,7 @@ export const normal = [
   ["spade", 12, "zhangba"],
   ["spade", 12, "tiesuo"],
   ["spade", 13, "nanman"],
-  ["spade", 13, "dawan"],
+  ["spade", 13, "dayuan"],
 
   ["club", 1, "juedou"],
   ["club", 1, "baiyin"],
@@ -81,7 +81,7 @@ export const normal = [
   ["diamond", 12, "sanjian"],
   ["diamond", 12, "wuxie", null, ["guo"]],
   ["diamond", 13, "shan"],
-  ["diamond", 13, "zixin"],
+  ["diamond", 13, "zixing"],
 
   ["heart", 1, "taoyuan"],
   ["heart", 1, "wanjian"],
@@ -205,7 +205,7 @@ export const old = [
   ["spade", 12, "zhangba"],
   ["spade", 12, "tiesuo"],
   ["spade", 13, "nanman"],
-  ["spade", 13, "dawan"],
+  ["spade", 13, "dayuan"],
 
   ["club", 1, "juedou"],
   ["club", 1, "baiyin"],
@@ -261,7 +261,7 @@ export const old = [
   ["diamond", 12, "sanjian"],
   ["diamond", 12, "wuxie", null, ["guo"]],
   ["diamond", 13, "shan"],
-  ["diamond", 13, "zixin"],
+  ["diamond", 13, "zixing"],
 
   ["heart", 1, "taoyuan"],
   ["heart", 1, "wanjian"],
@@ -453,7 +453,7 @@ export const yingbian = [
   ["diamond", 12, "sanjian"],
   ["diamond", 12, "wuxie", null, ["guo"]],
   ["diamond", 12, "fangtian"],
-  ["diamond", 13, "zixin"],
+  ["diamond", 13, "zixing"],
   ["diamond", 13, "shan"],
   ["diamond", 13, "shan"],
   //特殊

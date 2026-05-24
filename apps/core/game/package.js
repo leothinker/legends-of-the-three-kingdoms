@@ -17,11 +17,13 @@ window.wtk_package = {
     standard: "标准版",
     extra: "军争篇",
     refresh: "界限突破",
+    sixiang: "珍藏封印",
+    sp: "忠胆英杰",
     wangzhe: "王者之战",
-    simplified: "精简版",
+    yingbian: "应变篇",
+    simplify: "精简版",
     yongjian: "用间篇",
-    zhulu: "逐鹿天下",
-    seal: "珍藏封印",
+    guozhan: "国战",
   },
   play: {
     boss: "诸神降临",
@@ -36,9 +38,6 @@ window.wtk_package = {
     boss: "挑战",
     doudizhu: "斗地主",
     single: "单挑",
-    chess: "战棋",
-    tafang: "塔防",
-    stone: "炉石",
     brawl: "乱斗",
   },
   submode: {
@@ -58,11 +57,6 @@ window.wtk_package = {
       jiange: "守卫剑阁",
       siguo: "四国争霸",
       standard: "自由对决",
-    },
-    chess: {
-      combat: "战棋模式",
-      three: "战棋统率",
-      leader: "战棋君主",
     },
     single: {
       normal: "新1v1",

@@ -181,6 +181,7 @@ event._result = 当前步骤返回值 ?? 子事件 result ?? 原 event._result
 ```js
 "step 0"
 player.chooseTarget("选择一名角色")
+
 ;("step 1")
 if (result.bool) {
   event.target = result.targets[0]
@@ -213,8 +214,10 @@ Step：
 ```js
 "step 0"
 player.draw(2)
+
 ;("step 1")
 player.chooseToDiscard(1, true)
+
 ;("step 2")
 game.log(player, "完成了流程")
 ```
@@ -498,6 +501,7 @@ Step：
 ```js
 "step 0"
 player.chooseBool("是否摸一张牌？")
+
 ;("step 1")
 if (result.bool) {
   player.draw()
@@ -520,6 +524,7 @@ Step：
 ```js
 "step 0"
 event.count = 0
+
 ;("step 1")
 player.draw()
 event.count++
@@ -543,6 +548,7 @@ Step：
 ```js
 "step 0"
 player.judge((card) => (get.color(card) == "black" ? 1 : -1))
+
 ;("step 1")
 if (result.bool) {
   player.draw()
@@ -573,6 +579,7 @@ if (!player.countCards("h")) {
   return
 }
 player.chooseToDiscard(1, true)
+
 ;("step 1")
 player.draw()
 ```
@@ -602,6 +609,7 @@ Step 中跨步骤常把数据挂到 `event`：
 "step 0"
 event.target = trigger.player
 player.chooseCard("he", true)
+
 ;("step 1")
 event.target.gain(result.cards, player)
 ```

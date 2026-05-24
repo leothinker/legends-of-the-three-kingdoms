@@ -468,8 +468,8 @@ export class Get {
   }
   /**
    * 将一个传统格式的character转化为Character对象格式
-   * @param { Array|Object|import("../library/element/character.js").Character } data
-   * @returns {import("../library/element/character.js").Character}
+   * @param { Array|Object|import("../library/element/character").Character } data
+   * @returns {import("../library/element/character").Character}
    */
   convertedCharacter(data) {
     if (!(data instanceof lib.element.Character)) {
@@ -1280,7 +1280,7 @@ export class Get {
   /**
    * @overload
    * @param { string } name
-   * @returns { import("../library/element/character.js").Character }
+   * @returns { import("../library/element/character").Character }
    */
   /**
    * @template { 0 | 1 | 2 | 3 | 4 } T
@@ -5565,6 +5565,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         td.innerHTML = node.phaseNumber
         tr.appendChild(td)
         td = document.createElement("td")
+
         ;(function () {
           let num = 0
           for (var j = 0; j < node.stat.length; j++) {

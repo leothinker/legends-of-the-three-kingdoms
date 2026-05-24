@@ -1,7 +1,7 @@
 import { lib, game, ui, get, ai, _status } from "wtk"
 game.import("card", function () {
   return {
-    name: "seal",
+    name: "sixiang",
     connect: true,
     card: {
       yinyueqiang: {

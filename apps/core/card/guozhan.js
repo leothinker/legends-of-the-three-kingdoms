@@ -1255,35 +1255,7 @@ game.import("card", function () {
           target.addTempSkill("diaohulishan")
         },
         ai: {
-          order(item, player) {
-            if (!player) {
-              player = get.player()
-            }
-            if (
-              player.hasCard(function (card) {
-                return [
-                  "gz_haolingtianxia",
-                  "gz_guguoanbang",
-                  "gz_kefuzhongyuan",
-                  "wuzhong",
-                  "yuanjiao",
-                  "lianjunshengyan",
-                  "lulitongxin",
-                  "yiyi",
-                ].includes(get.name(card))
-              }, "hs")
-            ) {
-              return 3.5
-            }
-            if (
-              player.hasCard(function (card) {
-                return get.name(card) == "taoyuan"
-              }, "hs")
-            ) {
-              return get.order({ name: "taoyuan" }, player) - 1
-            }
-            return 9.5
-          },
+          order: 10,
           value: 4,
           useful: [2, 1],
           wuxie() {
@@ -1291,22 +1263,33 @@ game.import("card", function () {
           },
           result: {
             player(player, target) {
-              var att = get.attitude(player, target)
-              if (target.hp == 1 && att < 0) {
+              if (target.hasSkill("undist") || target.hasSkill("diaohulishan")) {
                 return 0
               }
-              if (
-                game.hasPlayer(function (current) {
-                  return get.attitude(player, current) < att
-                })
-              ) {
-                var num = 1
-                if (target == player.next || target == player.previous) {
-                  num += 0.5
+              return player.countCards("hs", (card) => {
+                if (ui.selected.cards.includes(card)) {
+                  return false
                 }
-                return num
-              }
-              return 0
+                const cardx = get.autoViewAs(
+                  { name: get.name(card), nature: get.nature(card), cards: [card] },
+                  [card],
+                )
+                if (!player.hasUseTarget(cardx, null, true)) {
+                  return false
+                }
+                const select = get.select(cardx)
+                if (select[1] === -1) {
+                  if (player.canUse(cardx, target, null, true)) {
+                    return get.effect(target, cardx, player, player) < 0
+                  }
+                  return false
+                }
+                let eff1 = player.getUseValue(cardx, null, true)
+                target.addSkill("undist")
+                let eff2 = player.getUseValue(cardx, null, true)
+                target.removeSkill("undist")
+                return eff2 > eff1
+              })
             },
           },
         },
@@ -2595,12 +2578,12 @@ game.import("card", function () {
     translate: {
       liulongcanjia: "六龙骖驾",
       liulongcanjia_info:
-        "锁定技，当此牌进入你的装备区时，弃置你装备区里其他坐骑牌。只要此牌在你的装备区里，你的装备区便不能放入其他坐骑牌。你计算与其他角色的距离-1，其他角色计算与你的距离+1。",
+        "锁定技。此牌占用1个进攻坐骑和1个防御坐骑槽位，且不可被替换。你计算与其他角色的距离-1，其他角色计算与你的距离+1。",
       minguangkai: "明光铠",
       minguangkai_cancel: "明光铠",
       minguangkai_link: "明光铠",
       minguangkai_info:
-        "锁定技，当你成为【火烧连营】、【火攻】或火【杀】的目标时，取消之；若你是小势力角色，你不会被横置。",
+        "锁定技。①当你成为【火烧连营】、【火攻】或火【杀】的目标时，取消之。②当你即将横置前，若你是小势力角色，取消之。",
       dinglanyemingzhu: "定澜夜明珠",
       dinglanyemingzhu_bg: "珠",
       dinglanyemingzhu_info:
@@ -2612,7 +2595,7 @@ game.import("card", function () {
       feilongduofeng2: "飞龙夺凤",
       feilongduofeng3: "飞龙夺凤",
       feilongduofeng_info:
-        "当你使用【杀】指定角色为目标后，你可以令该角色弃置一张牌。你的【杀】令目标角色进入濒死状态时，你可以获得其一张手牌。",
+        "①当你使用【杀】指定目标后，你可令目标角色弃置一张牌。②当你因使用【杀】而令其他角色进入濒死状态时，你可以获得其一张手牌。",
       taipingyaoshu: "太平要术",
       taipingyaoshu_info:
         "锁定技。①当你即将受到属性伤害时，取消之。②你的手牌上限+X（X为场上势力数-1）。③当你失去装备区里的【太平要术】时，你摸两张牌，然后若你的体力值大于1，你失去1点体力。",
@@ -2627,12 +2610,12 @@ game.import("card", function () {
       yuxi_skill2: "玉玺",
       yuxi: "玉玺",
       yuxi_info:
-        "锁定技，若你有已明置的武将牌，你获得以下效果：你的势力成为场上唯一的大势力，其他势力均为小势力；摸牌阶段，你多摸一张牌；出牌阶段开始时，你视为使用一张【知己知彼】。",
-      xietianzi: "挟天子以令诸侯",
+        "锁定技。若你有明置的武将牌，则：①你的势力视为唯一的大势力。②摸牌阶段开始时，你令额定摸牌数+1。③出牌阶段开始时，你视为使用【知己知彼】。",
+      xietianzi: "挟令",
       xietianzi_info:
         "出牌阶段，对自己使用。你结束出牌阶段。本回合的弃牌阶段结束时，你可以弃置一张手牌，获得一个额外的回合。",
       xietianzi_info_guozhan:
-        "出牌阶段，若你是大势力角色，对你使用。结束你的出牌阶段，然后若你于弃牌阶段结束时弃置一张手牌，则于此回合结束时，你进行一个额外的回合。",
+        "出牌阶段，对身为大势力角色的自己使用。你结束出牌阶段。本回合的弃牌阶段结束时，你可以弃置一张手牌，获得一个额外的回合。",
       shuiyanqijunx: "水淹七军",
       shuiyanqijunx_info:
         "出牌阶段，对一名其他角色使用。目标角色选择一项：⒈弃置装备区里的所有牌（至少一张）。⒉受到你造成的1点雷电伤害。",
@@ -2640,23 +2623,23 @@ game.import("card", function () {
         "出牌阶段，对一名装备区里有牌的其他角色使用。目标角色选择一项：⒈弃置装备区里的所有牌。⒉受到你造成的1点雷电伤害。",
       lulitongxin: "勠力同心",
       lulitongxin_info:
-        "出牌阶段，对所有的大势力角色或所有的小势力角色使用。若目标角色处于连环状态，则其摸一张牌；不处于连环状态，则其横置。",
+        "出牌阶段，对所有大势力角色或所有小势力角色使用。若目标角色：未横置，则其横置；已横置，则其摸一张牌。",
       lulitongxin_info_versus:
         "出牌阶段，对所有己方角色或所有敌方角色使用。若目标角色：未横置，则其横置；已横置，则其摸一张牌。",
       lianjunshengyan: "联军盛宴",
       lianjunshengyan_info:
-        "出牌阶段，对你和你选择的一个其他势力的所有角色使用，你选择一项：1.回复X点体力；2.摸X张牌。然后其他每名目标角色各摸一张牌并重置其武将牌。（X为该势力存活角色数）",
+        "出牌阶段，对你和你选择的除你的势力外的一个势力的所有角色使用。若目标角色：为你，你选择摸Y张牌并回复X-Y点体力（X为该势力的角色数，Y∈[0,X]）；不为你，其摸一张牌，然后重置。",
       lianjunshengyan_info_boss:
         "出牌阶段，对场上所有角色使用。你摸X张牌（X为存活角色数），其他角色依次选择回复1点体力或摸一张牌。",
       chiling: "敕令",
       chiling_info:
-        "出牌阶段，对所有没有势力的角色使用。每名角色依次选择一项：1.明置一张武将牌，摸一张牌；2.弃置一张装备牌；3.失去1点体力。（若【敕令】因使用以外的效果进入弃牌堆前，则改为将此牌移出游戏，然后在此回合结束前，没有势力的角色依次选择执行敕令的效果。）",
+        "①出牌阶段，对所有没有势力的角色使用。目标角色选择一项：1、明置一张武将牌，然后摸一张牌；2、弃置一张装备牌；3、失去1点体力。②当【敕令】因判定或弃置而置入弃牌堆时，系统将之移出游戏并将【诏书】置于牌堆底，然后系统于当前回合结束后视为对所有没有势力的角色使用【敕令】。",
       diaohulishan: "调虎离山",
       diaohulishan_info: "出牌阶段，对至多两名其他角色使用。目标角色于此回合视为移出游戏。",
       huoshaolianying: "火烧连营",
       huoshaolianying_bg: "烧",
       huoshaolianying_info_guozhan:
-        "出牌阶段，对你的下家和所有与其处于同一队列的角色使用。每人受到1点火焰伤害。",
+        "出牌阶段，对你的下家及其队列中的所有角色使用。你对目标角色造成1点火属性伤害。",
       huoshaolianying_info:
         "出牌阶段，对距离最小的一名横置角色使用（若无横置角色，则改为对距离最小的所有角色使用），你对目标造成1点火属性伤害。",
       yuanjiao: "远交近攻",
@@ -2687,7 +2670,7 @@ game.import("card", function () {
       huxinjing_info:
         "此牌可对其他角色使用。当你受到伤害时，若伤害值大于1或大于等于你的体力值，则你可以将所有【护心镜】置入弃牌堆，然后防止此伤害。",
       huxinjing_info_guozhan:
-        "当你受到大于等于你体力值的伤害时，你可以将装备区里的【护心镜】放入弃牌堆防止此伤害。",
+        "当你受到伤害时，若伤害值大于等于你的体力值，则你可以将所有【护心镜】置入弃牌堆，然后防止此伤害。",
       gz_haolingtianxia: "号令天下",
       gz_haolingtianxia_info:
         "出牌阶段，对一名体力值不为全场最少的角色使用。所有其他角色依次可以选择一项：①弃置一张牌（魏势力角色无需弃牌），视为对目标角色使用一张【杀】；②弃置目标角色的一张牌（魏势力角色改为获得其一张牌）。",

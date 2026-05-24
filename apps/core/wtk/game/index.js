@@ -2325,6 +2325,7 @@ export class Game {
     // }
 
     game.#skillSyncDebounceMap[skill] ??= {}
+
     ;(game.#skillSyncDebounceMap[skill][sync] ??= debounce((...args) => {
       game.send("dataSync", { type: "skill", name: skill, key: sync, args }, null)
     }))(...args)

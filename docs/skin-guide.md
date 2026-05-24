@@ -108,29 +108,29 @@ map用于定位要进行原画切换的武将牌，接受两种类型的参数�
 
 - ①[map.skill]：将`map.skill`的值作为skill处理，更换武将牌上持有技能`map.skill`的武将牌，如
   `javascript
-player.changeSkin("potzhongao", "pot_weiyan_achieve")
-`
+		player.changeSkin("potzhongao", "pot_weiyan_achieve")
+		`
   -- 仅会更换持有技能〖忠傲〗`potzhongao`的武将牌`pot_weiyan`的原画为`pot_weiyan_achieve`，不会影响到另一张武将牌`mb_caocao`
 
 - ②[map.characterName]：更换对应id为`map.characterName`的武将牌，如
   `javascript
-player.changeSkin({ characterName: "pot_weiyan" }, "pot_weiyan_achieve")
-`
+		player.changeSkin({ characterName: "pot_weiyan" }, "pot_weiyan_achieve")
+		`
   -- 仅会更换武将牌`pot_weiyan`的原画为`pot_weiyan_achieve`，不会影响到另一张武将牌`mb_caocao`
 
 - ③[map.characterSkinName]：更换对应`player.skin[name]`为`map.characterSkinName`的武将牌，如
   `javascript
-player.changeSkin({ characterSkinName: "pot_weiyan_achieve" }, "pot_weiyan_fail")
-`
+		player.changeSkin({ characterSkinName: "pot_weiyan_achieve" }, "pot_weiyan_fail")
+		`
   -- 仅会将当前原画为`pot_weiyan_achieve`的武将牌`pot_weiyan`更换为原画`pot_weiyan_fail`，不会影响到另一张武将牌`mb_caocao`
 
 - ④[map.source]：传入值为`name`/`name1`/`name2`，更换所在位置为`player[map.source]`的武将牌，如
   `javascript
-	player.changeSkin({ source: "name1" }, "pot_weiyan_achieve")
-	`
+		player.changeSkin({ source: "name1" }, "pot_weiyan_achieve")
+		`
   -- 仅会将玩家在`player.name1`处的主将`pot_weiyan`更换为原画`pot_weiyan_achieve`，不会影响到副将`mb_caocao`
 
-  2.字符串[string]：该参数下map会被当作skill处理，后续判断等同`map.skill`的情况
+2.字符串[string]：该参数下map会被当作skill处理，后续判断等同`map.skill`的情况
 
 ### 3.2 character
 

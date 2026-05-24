@@ -21,11 +21,13 @@ const characterSort = {
     "sxrm_pangde",
     "sxrm_yanwen",
   ],
+  shixinrumo_chen: ["sxrm_zhouyu"],
 }
 
 const characterSortTranslate = {
   shixinrumo_yi: "蚀心入魔·疑",
   shixinrumo_man: "蚀心入魔·慢",
+  shixinrumo_chen: "蚀心入魔·嗔",
 }
 
 export { characterSort, characterSortTranslate }

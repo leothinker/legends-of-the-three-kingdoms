@@ -5,9 +5,9 @@ const characterSort = {
 }
 
 const characterSortTranslate = {
-  zhencang_22: "珍藏版（2022）",
-  zhencang_24: "珍藏版（2024）",
-  zhencang_26: "珍藏版（2026）",
+  extra_zc22: "珍藏版（2022）",
+  extra_zc24: "珍藏版（2024）",
+  extra_zc26: "珍藏版（2026）",
 }
 
 export { characterSort, characterSortTranslate }

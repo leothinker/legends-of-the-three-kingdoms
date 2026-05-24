@@ -699,13 +699,6 @@ const translates = {
   jsrgxunji: "勋济",
   jsrgxunji_info:
     "结束阶段，若你本回合对本回合使用牌指定过的其他角色均造成过伤害，则你可以将本回合造成过伤害的牌对应的位于弃牌堆的实体牌分配给任意角色各一张。",
-
-  chixueqingfeng: "赤血青锋",
-  chixueqingfeng2: "赤血青锋",
-  chixueqingfeng_info:
-    "锁定技，当你使用【杀】指定目标后，你令目标角色不能使用或打出手牌且防具技能无效直到此【杀】结算结束。",
-  jiejia: "解甲归田",
-  jiejia_info: "出牌阶段，对一名装备区内有牌的角色使用。该角色获得其装备区内的所有牌。",
 }
 
 export default translates

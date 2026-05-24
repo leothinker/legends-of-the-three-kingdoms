@@ -6,7 +6,7 @@ window.wtk_package = {
     refresh: "界限突破",
     jieshenhua: "界神话再临",
     jiangxing: "将星",
-    zhencang: "珍藏版",
+    extra: "珍藏版",
     // shenwu: "神武再世",
     tianshui: "天水濯名",
     jsrg: "江山如故",

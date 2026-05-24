@@ -973,7 +973,7 @@ const skills = {
     },
     filter(event, player) {
       if (event.name == "useCard") {
-        if (!["duanjian", "serafuku", "yonglv"].includes(event.card.name)) {
+        if (!["zheji", "nvzhuang", "numa"].includes(event.card.name)) {
           return false
         }
         return player.countCards("h") < player.maxHp
@@ -990,9 +990,9 @@ const skills = {
         if (!_status.cangqiao) {
           game.broadcastAll(function () {
             _status.cangqiao = [
-              { name: "duanjian", number: 13, suit: "club" },
-              { name: "serafuku", number: 9, suit: "heart" },
-              { name: "yonglv", number: 13, suit: "club" },
+              { name: "zheji", number: 13, suit: "club" },
+              { name: "nvzhuang", number: 9, suit: "heart" },
+              { name: "numa", number: 13, suit: "club" },
             ]
             for (let info of _status.cangqiao) {
               if (!lib.inpile.includes(info.name)) {
@@ -1001,7 +1001,7 @@ const skills = {
             }
           })
         }
-        let list = ["duanjian", "serafuku", "yonglv"],
+        let list = ["zheji", "nvzhuang", "numa"],
           cards = []
         for (let name of list) {
           let card = get.discardPile(name)
@@ -1153,7 +1153,7 @@ const skills = {
       }
       event.set(
         "huaxiu",
-        ["duanjian", "serafuku", "yonglv"].filter((i) => i in lib.card),
+        ["zheji", "nvzhuang", "numa"].filter((i) => i in lib.card),
       )
     },
     filter(event, player) {
@@ -1185,9 +1185,9 @@ const skills = {
       if (result?.bool && result.links?.length) {
         const name = result.links[0][2],
           map = {
-            duanjian: "hun_zhuge",
-            serafuku: "hun_bagua",
-            yonglv: "lingling",
+            zheji: "hun_zhuge",
+            nvzhuang: "hun_bagua",
+            numa: "lingling",
           }
         game.log(
           player,
@@ -1201,7 +1201,7 @@ const skills = {
           function (name, player, map) {
             if (!_status.huaxiu_origin) {
               _status.huaxiu_origin = {}
-              for (let name of ["duanjian", "serafuku", "yonglv"]) {
+              for (let name of ["zheji", "nvzhuang", "numa"]) {
                 _status.huaxiu_origin[name] = {
                   info: lib.card[name],
                   translate: lib.translate[name],
@@ -1268,7 +1268,7 @@ const skills = {
         },
         trigger: { player: "phaseBegin" },
         filter(event, player) {
-          for (let name of ["duanjian", "serafuku", "yonglv"]) {
+          for (let name of ["zheji", "nvzhuang", "numa"]) {
             if (_status.huaxiu?.[name]?.includes(player)) {
               return true
             }
@@ -1282,7 +1282,7 @@ const skills = {
         },
         contentx(event, trigger, player) {
           game.broadcastAll(function (player) {
-            for (let name of ["duanjian", "serafuku", "yonglv"]) {
+            for (let name of ["zheji", "nvzhuang", "numa"]) {
               if (_status.huaxiu?.[name]?.includes(player)) {
                 _status.huaxiu[name].remove(player)
                 lib.init.sheet(`
@@ -1307,11 +1307,11 @@ const skills = {
             return false
           }
           const map = {
-            duanjian: "hun_zhuge",
-            serafuku: "hun_bagua",
-            yonglv: "lingling",
+            zheji: "hun_zhuge",
+            nvzhuang: "hun_bagua",
+            numa: "lingling",
           }
-          for (let name of ["duanjian", "serafuku", "yonglv"]) {
+          for (let name of ["zheji", "nvzhuang", "numa"]) {
             if (name in _status.huaxiu && !_status.huaxiu[name].length) {
               game.log(`#y${get.translation({ name })}`, "的效果还原了")
               game.broadcastAll(function (name) {

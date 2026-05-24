@@ -250,7 +250,7 @@ game.import("card", function () {
           },
         },
       },
-      duanjian: {
+      zheji: {
         type: "equip",
         subtype: "equip1",
         fullskin: true,
@@ -291,11 +291,11 @@ game.import("card", function () {
           },
         },
       },
-      serafuku: {
+      nvzhuang: {
         type: "equip",
         subtype: "equip2",
         fullskin: true,
-        skills: ["serafuku"],
+        skills: ["nvzhuang"],
         selectTarget: -1,
         manualConfirm: true,
         ai: {
@@ -379,7 +379,7 @@ game.import("card", function () {
           },
         },
       },
-      yonglv: {
+      numa: {
         type: "equip",
         subtype: "equip4",
         fullskin: true,
@@ -459,7 +459,7 @@ game.import("card", function () {
           }
         },
       },
-      serafuku: {
+      nvzhuang: {
         audio: true,
         trigger: { target: "useCardToTargeted" },
         forced: true,
@@ -1009,9 +1009,9 @@ game.import("card", function () {
       kaihua_append:
         '<span class="text" style="font-family: yuanli">借局布势，力小势大；鸿渐于陆，其羽可用为仪也。——《三十六计》</span>',
 
-      duanjian: "折戟",
-      duanjian_info: "这是一把坏掉的武器……",
-      duanjian_append:
+      zheji: "折戟",
+      zheji_info: "这是一把坏掉的武器……",
+      zheji_append:
         '<span class="text" style="font-family: yuanli">折戟沉沙铁未销，自将磨洗认前朝。东风不与周郎便，铜雀春深锁二乔。——《赤壁》</span>',
       qixingbaodao: "七星宝刀",
       qixingbaodao_info: "锁定技，当此牌置入你的装备区时，你弃置你判定区和装备区里所有的其他牌。",
@@ -1026,15 +1026,15 @@ game.import("card", function () {
       yinfengyi_info: "锁定技，你受到锦囊牌的伤害+1；当你因【毒】失去体力时，失去的体力值+1。",
       yinfengyi_append:
         '<span class="text" style="font-family: yuanli">淮北蜂毒，尾能杀人…——《江淮之蜂蟹》</span>',
-      serafuku: "女装",
-      serafuku_info:
+      nvzhuang: "女装",
+      nvzhuang_info:
         "锁定技，若你是男性角色，当你成为【杀】的目标后，你进行判定：若结果为黑色，此【杀】伤害+1。",
-      serafuku_append:
+      nvzhuang_append:
         '<span class="text" style="font-family: yuanli">司马懿受了巾帼女衣，看了书札，并不嗔怒，只问丞相寝食及事之烦简，绝不提起军旅之事。——《三国演义》</span>',
 
-      yonglv: "驽马",
-      yonglv_info: "锁定技，你计算与其他角色的距离-1；其他角色计算与你的距离视为1。",
-      yonglv_append:
+      numa: "驽马",
+      numa_info: "锁定技，你计算与其他角色的距离-1；其他角色计算与你的距离视为1。",
+      numa_append:
         '<span class="text" style="font-family: yuanli">以某比之，譬犹驽马并麒麟，寒鸦配鸾凤耳。——徐庶</span>',
       zhanxiang: "战象",
       zhanxiang_info: "锁定技，其他角色计算与你的距离+1；其他角色对你赠予的牌视为赠予失败。",
@@ -1069,13 +1069,13 @@ game.import("card", function () {
       ["heart", 6, "chenghuodajie"],
       ["heart", 7, "tao"],
       ["heart", 8, "tao"],
-      ["heart", 9, "serafuku", null, ["gifts"]],
+      ["heart", 9, "nvzhuang", null, ["gifts"]],
       ["heart", 10, "sha", null, ["gifts"]],
       ["heart", 11, "sha", null, ["gifts"]],
       ["heart", 12, "sha", null, ["gifts"]],
       ["heart", 13, "zhanxiang", null, ["gifts"]],
 
-      ["club", 1, "duanjian", null, ["gifts"]],
+      ["club", 1, "zheji", null, ["gifts"]],
       ["club", 2, "sha", "stab"],
       ["club", 3, "yinfengyi", null, ["gifts"]],
       ["club", 4, "du"],
@@ -1087,7 +1087,7 @@ game.import("card", function () {
       ["club", 10, "sha", "stab"],
       ["club", 11, "wuxie"],
       ["club", 12, "wuxie"],
-      ["club", 13, "yonglv", null, ["gifts"]],
+      ["club", 13, "numa", null, ["gifts"]],
 
       ["diamond", 1, "juedou", null, ["gifts"]],
       ["diamond", 2, "shan"],

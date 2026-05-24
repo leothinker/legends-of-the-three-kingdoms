@@ -4544,7 +4544,7 @@ game.import("card", function () {
           }
         },
         marktext: "※",
-        intro: { content: "当前防具技能已失效" },
+        intro: { content: "无视防具" },
       },
       zhangba_skill: {
         audio: true,

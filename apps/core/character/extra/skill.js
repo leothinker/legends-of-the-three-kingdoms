@@ -1739,6 +1739,63 @@ const skills = {
         .set("_global_waiting", true)
     },
   },
+  chixueqingfeng: {
+    equipSkill: true,
+    trigger: { player: "useCardToPlayered" },
+    filter(event) {
+      return event.card.name == "sha"
+    },
+    logTarget: "target",
+    forced: true,
+    content() {
+      var target = trigger.target
+      target.addTempSkill("chixueqingfeng2")
+      target.markAuto("chixueqingfeng2", [trigger.card])
+    },
+    ai: {
+      unequip_ai: true,
+      directHit_ai: true,
+      skillTagFilter(player, tag, arg) {
+        if (arg && arg.card && arg.card.name == "sha") {
+          return true
+        }
+        return false
+      },
+    },
+  },
+  chixueqingfeng2: {
+    equipSkill: true,
+    trigger: { global: "useCardAfter" },
+    forced: true,
+    charlotte: true,
+    popup: false,
+    firstDo: true,
+    onremove: true,
+    filter(event, player) {
+      return player.storage.chixueqingfeng2 && player.storage.chixueqingfeng2.includes(event.card)
+    },
+    content() {
+      player.storage.chixueqingfeng2.remove(trigger.card)
+      if (!player.storage.chixueqingfeng2.length) {
+        player.removeSkill("chixueqingfeng2")
+      }
+    },
+    mark: true,
+    marktext: "※",
+    intro: {
+      content: "无视防具且不能使用或打出手牌",
+    },
+    mod: {
+      cardEnabled2(card) {
+        if (get.position(card) == "h") {
+          return false
+        }
+      },
+    },
+    ai: {
+      unequip2: true,
+    },
+  },
   // 魔貂蝉
   // 幻惑
   huanhuo: {

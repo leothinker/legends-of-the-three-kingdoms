@@ -316,7 +316,7 @@ declare interface importModeConfig {
   /**
    * mode的start启动方法
    */
-  start: ContentFuncByAll
+  start: ContentFuncByAll | ContentFuncsByAll
   /**
    * mode的start启动之前的处理方法
    */
@@ -941,6 +941,7 @@ type _AllCardName =
   | "shandian"
   | "chilongya"
   | "cixiong"
+  | "duanjian"
   | "fangtian"
   | "fengxueren"
   | "guanshi"
@@ -979,6 +980,7 @@ type _AllCardName =
   | "nvzhuang"
   | "qinglianxindeng"
   | "renwang"
+  | "serafuku"
   | "suolianjia"
   | "tengjia"
   | "yexingyi"
@@ -992,10 +994,11 @@ type _AllCardName =
   | "zhuahuang"
   | "chitu"
   | "daihuofenglun"
-  | "dayuan"
+  | "dawan"
   | "jingfanma"
   | "numa"
-  | "zixing"
+  | "yonglv"
+  | "zixin"
   | "donghuangzhong"
   | "fuxiqin"
   | "gjyuheng"

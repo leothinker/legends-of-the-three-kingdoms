@@ -68,7 +68,8 @@ const translates = {
 
   chixueqingfeng: "赤血青锋",
   chixueqingfeng2: "赤血青锋",
-  chixueqingfeng_info: "锁定技，你使用【杀】无视目标角色防具，其不能使用或打出手牌直到结算完成。",
+  chixueqingfeng_info:
+    "锁定技，当你使用【杀】指定一名角色为目标后，此【杀】无视其防具且其不能使用或打出手牌，直到此【杀】结算结束。",
 
   olhuaquan_heavy: "重拳",
   olhuaquan_heavy_bg: "重拳",

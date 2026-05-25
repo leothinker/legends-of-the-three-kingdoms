@@ -1,4 +1,12 @@
 export default {
+  caocao: "魏武帝",
+  simayi: "狼顾之鬼",
+  xiahoudun: "独眼的罗刹",
+  zhangliao: "前将军",
+  xuzhu: "虎痴",
+  guojia: "早终的先知",
+  zhenji: "薄幸的美人",
+
   liubei: "乱世的枭雄",
   guanyu: "美髯公",
   zhangfei: "万夫不当",
@@ -16,23 +24,18 @@ export default {
   luxun: "儒生雄才",
   sunshangxiang: "弓腰姬",
 
-  caocao: "魏武帝",
-  simayi: "狼顾之鬼",
-  xiahoudun: "独眼的罗刹",
-  zhangliao: "前将军",
-  xuchu: "虎痴",
-  guojia: "早终的先知",
-  zhenji: "薄幸的美人",
-
   huatuo: "神医",
   lvbu: "武的化身",
   diaochan: "绝世的舞姬",
 
   huaxiong: "飞扬跋扈",
+  re_yuanshu: "野心渐增",
 
+  caozhang: "黄须儿",
+  xf_yiji: "礼仁同渡",
   gongsunzan: "白马义从",
 
-  panfeng: "联军上将",
+  std_yuejin: "奋强突固",
   ganfuren: "昭烈皇后",
-  yuejin: "奋强突固",
+  std_panfeng: "桀骜不驯",
 }

@@ -1,4 +1,49 @@
 const characters = {
+  caocao: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["jianxiong", "hujia"],
+    isZhugong: true,
+  },
+  simayi: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["fankui", "guicai"],
+    names: "司马|懿",
+  },
+  xiahoudun: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["ganglie"],
+    names: "夏侯|惇",
+  },
+  zhangliao: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["tuxi"],
+  },
+  xuzhu: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["luoyi"],
+  },
+  guojia: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["tiandu", "yiji"],
+  },
+  zhenji: {
+    sex: "female",
+    group: "wei",
+    hp: 3,
+    skills: ["luoshen", "qingguo"],
+  },
   liubei: {
     sex: "male",
     group: "shu",
@@ -94,49 +139,6 @@ const characters = {
     hp: 3,
     skills: ["jieyin", "xiaoji"],
   },
-  caocao: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["jianxiong", "hujia"],
-    isZhugong: true,
-  },
-  simayi: {
-    sex: "male",
-    group: "wei",
-    hp: 3,
-    skills: ["fankui", "guicai"],
-  },
-  xiahoudun: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["ganglie"],
-  },
-  zhangliao: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["tuxi"],
-  },
-  xuchu: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["luoyi"],
-  },
-  guojia: {
-    sex: "male",
-    group: "wei",
-    hp: 3,
-    skills: ["tiandu", "yiji"],
-  },
-  zhenji: {
-    sex: "female",
-    group: "wei",
-    hp: 3,
-    skills: ["qingguo", "luoshen"],
-  },
   huatuo: {
     sex: "male",
     group: "qun",
@@ -154,6 +156,7 @@ const characters = {
     group: "qun",
     hp: 3,
     skills: ["lijian", "biyue"],
+    names: "null|null",
   },
   huaxiong: {
     sex: "male",
@@ -161,30 +164,46 @@ const characters = {
     hp: 6,
     skills: ["yaowu"],
   },
+  re_yuanshu: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["rewangzun", "retongji"],
+  },
+  xf_yiji: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["xinfu_jijie", "xinfu_jiyuan"],
+  },
   gongsunzan: {
     sex: "male",
     group: "qun",
     hp: 4,
-    skills: ["yicong"],
+    skills: ["reyicong"],
+    names: "公孙|瓒",
   },
-  panfeng: {
+  std_yuejin: {
     sex: "male",
-    group: "qun",
+    group: "wei",
     hp: 4,
-    skills: ["kuangfu"],
+    skills: ["stdxiaoguo"],
+    dieAudios: ["yuejin"],
+    img: "image/character/gz_yuejin.jpg",
   },
   ganfuren: {
     sex: "female",
     group: "shu",
     hp: 3,
-    skills: ["shushen", "shenzhi"],
+    skills: ["stdshushen", "shenzhi"],
     names: "甘|null",
   },
-  yuejin: {
+  std_panfeng: {
     sex: "male",
-    group: "wei",
+    group: "qun",
     hp: 4,
-    skills: ["xiaoguo"],
+    skills: ["stdkuangfu"],
+    dieAudios: ["re_panfeng"],
   },
 }
 

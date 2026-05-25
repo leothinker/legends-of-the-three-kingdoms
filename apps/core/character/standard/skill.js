@@ -1813,7 +1813,7 @@ const skills = {
     },
     position: "hes",
     viewAs: { name: "tao" },
-    prompt: "将一张红色牌当桃使用",
+    prompt: "将一张红色牌当【桃】使用",
     check(card) {
       return 15 - get.value(card)
     },
@@ -1980,7 +1980,6 @@ const skills = {
     async content(event, trigger, player) {
       const useCardEvent = event.targets[1].useCard(
         { name: "juedou", isCard: true },
-        "nowuxie",
         event.targets[0],
         "noai",
       )
@@ -2012,48 +2011,8 @@ const skills = {
       player.draw()
     },
   },
-
-  zhanshen: {
-    audio: 2,
-    trigger: { player: "phaseZhunbeiBegin" },
-    forced: true,
-    juexingji: true,
-    skillAnimation: true,
-    animationColor: "gray",
-    filter(event, player) {
-      return (
-        player.isDamaged() && game.dead.filter((target) => target.isFriendOf(player)).length > 0
-      )
-    },
-    async content(event, trigger, player) {
-      player.awakenSkill(event.name)
-      const cards = player.getEquips(1)
-      if (cards.length) {
-        player.discard(cards)
-      }
-      player.loseMaxHp()
-      player.addSkills(["mashu", "shenji"])
-    },
-    derivation: ["mashu", "shenji"],
-  },
-  shenji: {
-    audio: 2,
-    mod: {
-      selectTarget(card, player, range) {
-        if (range[1] == -1) {
-          return
-        }
-        if (card.name == "sha") {
-          range[1] += 2
-        }
-      },
-      cardUsable(card, player, num) {
-        if (card.name == "sha") {
-          return num + 1
-        }
-      },
-    },
-  },
+  // 华雄
+  // 耀武
   yaowu: {
     trigger: { player: "damageBegin3" },
     audio: 2,
@@ -2078,13 +2037,86 @@ const skills = {
       },
     },
   },
-  new_jiangchi: {
+  // 袁术
+  // 妄尊
+  wangzun: {
+    trigger: { global: "phaseZhunbeiBegin" },
+    forced: true,
+    audio: 2,
+    filter(event, player) {
+      return event.player.isZhu
+    },
+    logTarget: "player",
+    async content(event, trigger, player) {
+      player.draw()
+      const target = trigger.player
+      target.addTempSkill("wangzun2")
+      target.addMark("wangzun2", 1, false)
+    },
+  },
+  wangzun2: {
+    onremove: true,
+    mod: {
+      maxHandcard(player, num) {
+        return num - player.countMark("wangzun2")
+      },
+    },
+    intro: { content: "手牌上限-#" },
+  },
+  // 同疾
+  tongji: {
+    global: "tongji_disable",
+    audio: 2,
+    trigger: { global: "useCard1" },
+    forced: true,
+    filter(event, player) {
+      return (
+        event.targets.includes(player) &&
+        player != event.player &&
+        event.card.name == "sha" &&
+        player.hp < player.countCards("h")
+      )
+    },
+    content() {},
+    ai: { neg: true },
+    gainable: true,
+    subSkill: {
+      disable: {
+        mod: {
+          targetEnabled(card, player, target) {
+            if (card.name == "sha") {
+              if (player.hasSkill("tongji")) {
+                return
+              }
+              if (target.hasSkill("tongji")) {
+                return
+              }
+              if (
+                game.hasPlayer(function (current) {
+                  return (
+                    current.hasSkill("tongji") &&
+                    current.hp < current.countCards("h") &&
+                    player.inRange(current)
+                  )
+                })
+              ) {
+                return false
+              }
+            }
+          },
+        },
+      },
+    },
+  },
+  // 曹彰
+  // 将驰
+  jiangchi: {
     audio: 2,
     trigger: {
       player: "phaseDrawEnd",
     },
     logAudio: (event, player, name, indexedData, costResult) =>
-      costResult.cost_data == "弃牌" ? "new_jiangchi1.mp3" : "new_jiangchi2.mp3",
+      costResult.cost_data == "弃牌" ? "jiangchi2.mp3" : "jiangchi1.mp3",
     async cost(event, trigger, player) {
       const list = ["弃牌", "摸牌", "cancel2"]
       if (!player.countCards("he")) {
@@ -2125,11 +2157,11 @@ const skills = {
         player.addTempSkill("jiangchi2", "phaseUseEnd")
       } else if (control == "摸牌") {
         player.draw()
-        player.addTempSkill("new_jiangchi3", "phaseEnd")
+        player.addTempSkill("jiangchi3", "phaseEnd")
       }
     },
   },
-  new_jiangchi3: {
+  jiangchi3: {
     mod: {
       cardEnabled(card) {
         if (card.name == "sha") {
@@ -2141,19 +2173,11 @@ const skills = {
           return false
         }
       },
-      ignoredHandcard(card, player) {
-        if (get.name(card) == "sha") {
-          return true
-        }
-      },
-      cardDiscardable(card, player, name) {
-        if (name == "phaseDiscard" && get.name(card) == "sha") {
-          return false
-        }
-      },
     },
   },
-  xinfu_jijie: {
+  // 伊籍
+  // 机捷
+  jijie: {
     enable: "phaseUse",
     usable: 1,
     audio: 2,
@@ -2196,7 +2220,8 @@ const skills = {
       },
     },
   },
-  xinfu_jiyuan: {
+  // 急援
+  jiyuan: {
     trigger: {
       global: ["dying", "gainAfter", "loseAsyncAfter"],
     },
@@ -2235,26 +2260,39 @@ const skills = {
       event.targets[0].draw()
     },
   },
-  //主公吕布
-  stdqingjiao: {
-    audio: 2,
+  // 公孙瓒
+  // 义从
+  yicong: {
     trigger: {
-      player: "phaseJieshuBegin",
+      player: ["changeHp"],
     },
-    zhuSkill: true,
-    filter(event, player) {
-      return player.hasHistory("sourceDamage", (evt) => {
-        return evt.player != player && evt.player?.group == "qun"
-      })
-    },
+    audio: 2,
+    audioname: ["re_gongsunzan"],
     forced: true,
-    async content(event, trigger, player) {
-      await player.draw()
+    filter(event, player) {
+      return get.sgn(player.hp - 2.5) != get.sgn(player.hp - 2.5 - event.num)
+    },
+    content() {},
+    mod: {
+      globalFrom(from, to, current) {
+        if (from.hp > 2) {
+          return current - 1
+        }
+      },
+      globalTo(from, to, current) {
+        if (to.hp <= 2) {
+          return current + 1
+        }
+      },
+    },
+    ai: {
+      threaten: 0.8,
     },
   },
-  //标准版乐进
-  stdxiaoguo: {
-    audio: "xiaoguo",
+  // 乐进
+  // 骁果
+  xiaoguo: {
+    audio: 2,
     trigger: { global: "phaseJieshuBegin" },
     filter(event, player) {
       return (
@@ -2310,9 +2348,47 @@ const skills = {
       }
     },
   },
-  //标准版甘夫人
-  stdshushen: {
-    audio: "shushen",
+  // 甘夫人
+  // 神智
+  shenzhi: {
+    audio: 2,
+    trigger: { player: "phaseZhunbeiBegin" },
+    check(event, player) {
+      if (player.hp > 2) {
+        return false
+      }
+      var cards = player.getCards("h")
+      if (cards.length <= player.hp) {
+        return false
+      }
+      if (cards.length > 3) {
+        return false
+      }
+      for (var i = 0; i < cards.length; i++) {
+        if (get.value(cards[i]) > 7 || get.tag(cards[i], "recover") >= 1) {
+          return false
+        }
+      }
+      return true
+    },
+    filter(event, player) {
+      return player.countCards("h") > 0
+    },
+    preHidden: true,
+    content() {
+      "step 0"
+      var cards = player.getCards("h")
+      event.bool = cards.length > player.hp
+      player.discard(cards)
+      ;("step 1")
+      if (event.bool) {
+        player.recover()
+      }
+    },
+  },
+  // 淑慎
+  shushen: {
+    audio: 2,
     trigger: { player: "recoverEnd" },
     getIndex(event) {
       return event.num || 1
@@ -2329,12 +2405,14 @@ const skills = {
     },
     ai: { threaten: 0.8, expose: 0.1 },
   },
-  stdkuangfu: {
-    audio: "xinkuangfu",
+  // 潘凤
+  // 狂斧
+  kuangfu: {
+    audio: 2,
     trigger: { source: "damageSource" },
     forced: true,
     filter(event, player) {
-      if (player.hasSkill("stdkuangfu_used")) {
+      if (player.hasSkill("kuangfu_used")) {
         return false
       }
       return (
@@ -2346,7 +2424,7 @@ const skills = {
       )
     },
     async content(event, trigger, player) {
-      player.addTempSkill("stdkuangfu_used", "phaseChange")
+      player.addTempSkill("kuangfu_used", "phaseChange")
       if (trigger.player.hp < player.hp) {
         player.draw(2)
       } else {
@@ -2359,164 +2437,6 @@ const skills = {
     subSkill: {
       used: {
         charlotte: true,
-      },
-    },
-  },
-  rewangzun: {
-    trigger: { global: "phaseZhunbeiBegin" },
-    forced: true,
-    audio: "wangzun",
-    filter(event, player) {
-      return event.player.hp > player.hp
-    },
-    logTarget: "player",
-    async content(event, trigger, player) {
-      player.draw()
-      let zhu = false
-      const target = trigger.player
-      switch (get.mode()) {
-        case "identity": {
-          zhu = target.isZhu
-          break
-        }
-        case "guozhan": {
-          zhu = get.is.jun(target)
-          break
-        }
-        case "versus": {
-          zhu = target.identity == "zhu"
-          break
-        }
-        case "doudizhu": {
-          zhu = target == game.zhu
-          break
-        }
-      }
-      if (zhu) {
-        player.draw()
-        target.addTempSkill("rewangzun2")
-        target.addMark("rewangzun2", 1, false)
-      }
-    },
-  },
-  rewangzun2: {
-    onremove: true,
-    mod: {
-      maxHandcard(player, num) {
-        return num - player.countMark("rewangzun2")
-      },
-    },
-    intro: { content: "手牌上限-#" },
-  },
-  retongji: {
-    trigger: { global: "useCardToTarget" },
-    logTarget: "target",
-    audio: "tongji",
-    filter(event, player) {
-      return (
-        event.card.name == "sha" &&
-        event.player != player &&
-        !event.targets.includes(player) &&
-        event.target.inRange(player) &&
-        event.target.countCards("he") > 0
-      )
-    },
-    async cost(event, trigger, player) {
-      const result = await trigger.target
-        .chooseCard(
-          "he",
-          "是否对" + get.translation(player) + "发动【同疾】？",
-          "弃置一张牌，将" + get.translation(trigger.card) + "转移给" + get.translation(player),
-          lib.filter.cardDiscardable,
-        )
-        .set("ai", (card) => {
-          if (!_status.event.check) {
-            return -1
-          }
-          return get.unuseful(card) + 9
-        })
-        .set(
-          "check",
-          (() => {
-            if (trigger.target.countCards("h", "shan")) {
-              return -get.attitude(trigger.target, player)
-            }
-            if (get.attitude(trigger.target, player) < 5) {
-              return 6 - get.attitude(trigger.target, player)
-            }
-            if (trigger.target.hp == 1 && player.countCards("h", "shan") == 0) {
-              return 10 - get.attitude(trigger.target, player)
-            }
-            if (trigger.target.hp == 2 && player.countCards("h", "shan") == 0) {
-              return 8 - get.attitude(trigger.target, player)
-            }
-            return -1
-          })() > 0,
-        )
-        .forResult()
-      if (result.bool) {
-        event.result = {
-          bool: true,
-          cost_data: {
-            cards: result.cards,
-          },
-        }
-      }
-    },
-    async content(event, trigger, player) {
-      trigger.target.discard(event.cost_data.cards)
-      const evt = trigger.getParent()
-      evt.triggeredTargets2.remove(trigger.target)
-      evt.targets.remove(trigger.target)
-      evt.targets.push(player)
-    },
-    ai: {
-      neg: true,
-    },
-  },
-  zhongyi: {
-    audio: 2,
-    enable: "phaseUse",
-    limited: true,
-    skillAnimation: true,
-    animationColor: "orange",
-    filterCard: true,
-    position: "he",
-    filter(event, player) {
-      return player.countCards("he") > 0
-    },
-    discard: false,
-    lose: false,
-    async content(event, trigger, player) {
-      player.awakenSkill(event.name)
-      player.addTempSkill("zhongyi2", "roundStart")
-      player.addToExpansion(player, "give", event.cards).gaintag.add("zhongyi2")
-    },
-  },
-  zhongyi2: {
-    trigger: { global: "damageBegin1" },
-    forced: true,
-    popup: false,
-    logTarget: "source",
-    sourceSkill: "zhongyi",
-    filter(event, player) {
-      return event.getParent().name == "sha" && event.source && event.source.isFriendOf(player)
-    },
-    async content(event, trigger, player) {
-      trigger.num++
-    },
-    intro: { content: "expansion", markcount: "expansion" },
-    onremove(player, skill) {
-      const cards = player.getExpansions(skill)
-      if (cards.length) {
-        player.loseToDiscardpile(cards)
-      }
-    },
-  },
-  feiying: {
-    mod: {
-      globalTo(from, to, distance) {
-        return distance + 1
       },
     },
   },

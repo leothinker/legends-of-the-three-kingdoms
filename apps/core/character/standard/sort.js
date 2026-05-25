@@ -26,9 +26,9 @@ const characterSort = {
     "lvbu",
     "diaochan",
   ],
-  standard_2013: ["huaxiong", "re_yuanshu"],
-  standard_2019: ["caozhang", "xf_yiji", "gongsunzan"],
-  standard_2023: ["std_yuejin", "ganfuren", "std_panfeng"],
+  standard_2013: ["huaxiong", "old_yuanshu"],
+  standard_2019: ["caozhang", "re_yiji", "gongsunzan"],
+  standard_2023: ["yuejin", "ganfuren", "panfeng"],
 }
 
 const characterSortTranslate = {

@@ -156,7 +156,7 @@
   "right_click": "pause",
   "sort": "type_sort",
   "cards": ["standard", "extra", "refresh"],
-  "characters": ["refresh", "jieshenhua", "extra", "jsrg", "sxrm"],
+  "characters": ["standard"],
   "moderned_characters": [
     "bingshi",
     "clan",

@@ -29,13 +29,13 @@ export default {
   diaochan: "绝世的舞姬",
 
   huaxiong: "飞扬跋扈",
-  re_yuanshu: "野心渐增",
+  old_yuanshu: "野心渐增",
 
   caozhang: "黄须儿",
-  xf_yiji: "礼仁同渡",
-  gongsunzan: "白马义从",
+  re_yiji: "礼仁同渡",
+  gongsunzan: "白马将军",
 
-  std_yuejin: "奋强突固",
+  yuejin: "奋强突固",
   ganfuren: "昭烈皇后",
-  std_panfeng: "桀骜不驯",
+  panfeng: "联军上将",
 }

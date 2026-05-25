@@ -25,7 +25,7 @@ export default () => {
       "re_xiahoudun",
       "re_xushu",
       "yuanshu",
-      "xf_yiji",
+      "re_yiji",
       "re_zhangfei",
       "re_zhangliao",
       "re_xuzhu",

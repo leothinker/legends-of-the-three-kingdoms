@@ -1208,7 +1208,7 @@ export class Library {
         },
         unauto_choose: {
           name: "拆顺手牌选择",
-          init: false,
+          init: true,
           unfrequent: true,
           intro: "拆牌或者顺牌时，就算只能选择对方的手牌依然手动选择",
         },
@@ -6444,7 +6444,7 @@ export class Library {
         },
         auto_mark_identity: {
           name: "自动标记身份",
-          init: false,
+          init: true,
           intro: "根据角色的出牌行为自动标记可能的身份",
         },
         enhance_zhu: {

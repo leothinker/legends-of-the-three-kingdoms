@@ -164,46 +164,49 @@ const characters = {
     hp: 6,
     skills: ["yaowu"],
   },
-  re_yuanshu: {
+  old_yuanshu: {
     sex: "male",
     group: "qun",
     hp: 4,
-    skills: ["rewangzun", "retongji"],
+    skills: ["wangzun", "tongji"],
   },
-  xf_yiji: {
+  caozhang: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["jiangchi"],
+  },
+  re_yiji: {
     sex: "male",
     group: "shu",
     hp: 3,
-    skills: ["xinfu_jijie", "xinfu_jiyuan"],
+    skills: ["jijie", "jiyuan"],
   },
   gongsunzan: {
     sex: "male",
     group: "qun",
     hp: 4,
-    skills: ["reyicong"],
+    skills: ["yicong"],
     names: "公孙|瓒",
   },
-  std_yuejin: {
+  yuejin: {
     sex: "male",
     group: "wei",
     hp: 4,
-    skills: ["stdxiaoguo"],
-    dieAudios: ["yuejin"],
-    img: "image/character/gz_yuejin.jpg",
+    skills: ["xiaoguo"],
   },
   ganfuren: {
     sex: "female",
     group: "shu",
     hp: 3,
-    skills: ["stdshushen", "shenzhi"],
+    skills: ["shenzhi", "shushen"],
     names: "甘|null",
   },
-  std_panfeng: {
+  panfeng: {
     sex: "male",
     group: "qun",
     hp: 4,
-    skills: ["stdkuangfu"],
-    dieAudios: ["re_panfeng"],
+    skills: ["kuangfu"],
   },
 }
 

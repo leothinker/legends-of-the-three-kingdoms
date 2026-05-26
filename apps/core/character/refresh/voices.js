@@ -11,10 +11,10 @@ export default {
   "#reguicai2": "才通天地，逆天改命！",
   "#re_simayi:die": "我的气数就到这里了么？",
 
-  "#reganglie1": "伤我者，十倍奉还！",
-  "#reganglie2": "哪个敢动我！",
-  "#qingjian1": "钱财乃身外之物。",
-  "#qingjian2": "福生于清俭，德生于卑退。",
+  "#reganglie1": "哪个敢动我！",
+  "#reganglie2": "伤我者，十倍奉还！",
+  "#qingjian1": "福生于清俭，德生于卑退。",
+  "#qingjian2": "钱财乃身外之物。",
   "#re_xiahoudun:die": "诸多败绩，有负丞相重托。",
 
   "#retuxi1": "快马突袭，占尽先机！",

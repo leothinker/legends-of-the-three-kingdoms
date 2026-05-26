@@ -11,8 +11,8 @@ export default {
   "#guicai2": "吾乃天命之子！",
   "#simayi:die": "难道真的是天命难违?",
 
-  "#ganglie1": "鼠辈，竟敢伤我！",
-  "#ganglie2": "以彼之道，还施彼身！",
+  "#ganglie1": "以彼之道，还施彼身！",
+  "#ganglie2": "鼠辈，竟敢伤我！",
   "#xiahoudun:die": "两，两边，都看不见了。",
 
   "#tuxi1": "哼，没想到吧！",

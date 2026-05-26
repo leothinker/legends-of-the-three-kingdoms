@@ -32,10 +32,10 @@ const characterSort = {
 }
 
 const characterSortTranslate = {
-  standard_2008: "2008版标准包",
-  standard_2013: "2013版标准包",
-  standard_2019: "2019版标准包",
-  standard_2023: "2023版标准包",
+  standard_2008: "标准版2008",
+  standard_2013: "标准版2013",
+  standard_2019: "标准版2019",
+  standard_2023: "标准版2023",
 }
 
 export { characterSort, characterSortTranslate }

@@ -235,13 +235,21 @@ const skills = {
   ganglie: {
     audio: 2,
     trigger: { player: "damageEnd" },
-    filter(event, player) {
-      return event.source?.isIn()
-    },
     check(event, player) {
+      if (!event.source?.isIn()) {
+        return Math.random() < 0.5
+      }
       return get.attitude(player, event.source) <= 0
     },
-    logTarget: "source",
+    prompt2(event, player) {
+      let str = "你可以进行判定"
+      if (event.source?.isIn()) {
+        str += `，若结果不为红桃，${get.translation(event.source)}选择一项：1.弃置两张手牌；2.受到你造成的1点伤害。`
+      } else {
+        str += "。"
+      }
+      return str
+    },
     async content(event, trigger, player) {
       const { source } = trigger
       const judgeEvent = player.judge((card) => {
@@ -253,7 +261,7 @@ const skills = {
       judgeEvent.judge2 = (result) => result.bool
       let result
       result = await judgeEvent.forResult()
-      if (!result?.bool) {
+      if (!result?.bool || !source?.isIn()) {
         return
       }
       result =
@@ -580,6 +588,9 @@ const skills = {
   // 洛神
   luoshen: {
     audio: 2,
+    audioname2: {
+      re_zhenji: "reluoshen",
+    },
     trigger: { player: "phaseZhunbeiBegin" },
     frequent: true,
     preHidden: true,

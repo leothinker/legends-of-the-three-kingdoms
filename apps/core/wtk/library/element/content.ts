@@ -7653,7 +7653,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           )
           .step(async (event, trigger, player) => {
             if (cards?.some((card) => get.position(card) == "s")) {
-              evt.isDestoryed = true
+              evt.isDestroyed = true
               await game.cardsGotoOrdering(cards)
               await game.cardsDiscard(cards)
             }
@@ -7784,7 +7784,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event[key] = evt[key]
       }
       event.result = {}
-      if (evt.isDestoryed) {
+      if (evt.isDestroyed) {
         event.finish()
         event.untrigger()
         return

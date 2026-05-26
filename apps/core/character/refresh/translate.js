@@ -4,10 +4,7 @@ const translates = {
   re_caocao: "界曹操",
   re_caocao_prefix: "界",
   rejianxiong: "奸雄",
-  rejianxiong_info: "当你受到伤害后，你可以摸一张牌，并获得造成此伤害的牌。",
-  hujia: "护驾",
-  hujia_info:
-    "主公技，当你需要使用或打出【闪】时，你可以令其他魏势力角色选择是否替你使用或打出（视为由你使用或打出）。",
+  rejianxiong_info: "当你受到伤害后，你可以获得对你造成伤害的牌，摸一张牌。",
 
   re_simayi: "界司马懿",
   re_simayi_prefix: "界",

@@ -1,8 +1,8 @@
 export default {
   "#rejianxiong1": "燕雀安知鸿鹄之志。",
   "#rejianxiong2": "夫英雄者，胸怀大志，腹有良谋。",
-  "#hujia_re_caocao1": "大胆逆贼！谁可擒之？",
-  "#hujia_re_caocao2": "护卫何在！",
+  "#hujia_re_caocao1": "护卫何在！",
+  "#hujia_re_caocao2": "大胆逆贼！谁可擒之？",
   "#re_caocao:die": "华佗何在……",
 
   "#refankui1": "哼！自作孽不可活！",

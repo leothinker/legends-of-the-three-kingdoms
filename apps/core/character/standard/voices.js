@@ -1,8 +1,8 @@
 export default {
   "#jianxiong1": "宁教我负天下人，休教天下人负我！",
   "#jianxiong2": "吾好梦中杀人！",
-  "#hujia1": "魏将何在？",
-  "#hujia2": "来人！护驾！",
+  "#hujia1": "来人！护驾！",
+  "#hujia2": "魏将何在？",
   "#caocao:die": "霸业未成！未成啊！",
 
   "#fankui1": "出来混，早晚要还的！",

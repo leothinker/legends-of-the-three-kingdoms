@@ -5,8 +5,8 @@ export default {
   "#hujia2": "魏将何在？",
   "#caocao:die": "霸业未成！未成啊！",
 
-  "#fankui1": "出来混，早晚要还的！",
-  "#fankui2": "下次注意点！",
+  "#fankui1": "下次注意点！",
+  "#fankui2": "出来混，早晚要还的！",
   "#guicai1": "天命？哈哈哈哈~",
   "#guicai2": "吾乃天命之子！",
   "#simayi:die": "难道真的是天命难违?",

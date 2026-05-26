@@ -5,8 +5,8 @@ export default {
   "#hujia_re_caocao2": "大胆逆贼！谁可擒之？",
   "#re_caocao:die": "华佗何在……",
 
-  "#refankui1": "哼！自作孽不可活！",
-  "#refankui2": "哼！正中下怀！",
+  "#refankui1": "哼！正中下怀！",
+  "#refankui2": "哼！自作孽不可活！",
   "#reguicai1": "天命难违？哈哈哈哈哈哈！",
   "#reguicai2": "才通天地，逆天改命！",
   "#re_simayi:die": "我的气数就到这里了么？",

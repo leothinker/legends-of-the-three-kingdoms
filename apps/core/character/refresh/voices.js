@@ -31,8 +31,8 @@ export default {
   "#reyiji2": "依此计行，辽东可定。",
   "#re_guojia:die": "咳咳咳咳咳……",
 
-  "#reluoshen1": "屏翳收风，川后静波。",
-  "#reluoshen2": "冯夷鸣鼓，女娲清歌。",
+  "#re_luoshen1": "屏翳收风，川后静波。",
+  "#re_luoshen2": "冯夷鸣鼓，女娲清歌。",
   "#reqingguo1": "肩若削成，腰如约素。",
   "#reqingguo2": "延颈秀项，皓质呈露。",
   "#re_zhenji:die": "出亦复何苦，入亦复何愁。",

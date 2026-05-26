@@ -65,8 +65,8 @@ const translates = {
   hongyan: "红颜",
   hongyan_info: "锁定技，你的♠牌视为♥牌。",
 
-  jx_wolongzhuge: "界卧龙诸葛",
-  jx_wolongzhuge_prefix: "界",
+  jx_sp_zhugeliang: "界卧龙诸葛",
+  jx_sp_zhugeliang_prefix: "界",
   bazhen: "八阵",
   bazhen_info: "锁定技，若你的装备区里没有防具牌，你视为装备着【八卦阵】。",
   jx_huoji: "火计",
@@ -106,8 +106,8 @@ const translates = {
   jx_niepan_info:
     "限定技，出牌阶段或当你处于濒死状态时，你可以弃置你所属区域里的所有牌，复原你的武将牌，摸三张牌，将体力回复至3点。",
 
-  jx_yanliangwenchou: "界颜良文丑",
-  jx_yanliangwenchou_prefix: "界",
+  jx_yanwen: "界颜良文丑",
+  jx_yanwen_prefix: "界",
   jx_shuangxiong: "双雄",
   jx_shuangxiong_info:
     "摸牌阶段开始时，你可以改为亮出牌堆顶两张牌，然后你获得其中一张且可以将与此牌颜色不同的手牌当【决斗】使用直到回合结束；当你因【决斗】受到伤害后，你获得此次【决斗】中其他角色打出的【杀】。",
@@ -259,8 +259,8 @@ const translates = {
   zhiba_info:
     "主公技，每名其他吴势力角色的出牌阶段限一次，该角色可以与你拼点（若你已发动过“魂姿”，则你可以拒绝此次拼点）：若其没赢，你可以获得你与其此次拼点的牌。",
 
-  jx_zhangzhaozhanghong: "界张昭张纮",
-  jx_zhangzhaozhanghong_prefix: "界",
+  jx_zhangzhang: "界张昭张纮",
+  jx_zhangzhang_prefix: "界",
   jx_zhijian: "直谏",
   jx_zhijian_info:
     "出牌阶段，你可以将手牌中的一张装备牌置于一名其他角色的装备区里，然后你摸一张牌；当你于出牌阶段内使用装备牌时，你摸一张牌。",
@@ -417,24 +417,24 @@ const translates = {
   weidi_tag: "伪帝",
   weidi_info: "主公技，你于弃牌阶段弃置的牌可以交给任意名其他群势力角色各一张。",
 
-  le_guanyu: "神关羽",
-  le_guanyu_prefix: "神",
+  shen_guanyu: "神关羽",
+  shen_guanyu_prefix: "神",
   wushen: "武神",
   wushen_info: "锁定技，你的♥手牌均视为【杀】；你使用♥【杀】无距离限制。",
   wuhun: "武魂",
   wuhun_info:
     "锁定技，当你受到1点伤害后，你令伤害来源获得1枚“梦魇”标记；当你死亡时，你选择一名拥有“梦魇”标记数最多的其他角色，令其进行判定，若结果不为【桃】或【桃园结义】，则该角色死亡。",
 
-  le_lvmeng: "神吕蒙",
-  le_lvmeng_prefix: "神",
+  shen_lvmeng: "神吕蒙",
+  shen_lvmeng_prefix: "神",
   shelie: "涉猎",
   shelie_info: "摸牌阶段，你可以改为亮出牌堆顶的五张牌，然后你选择其中每种花色的各一张牌获得之。",
   gongxin: "攻心",
   gongxin_info:
     "出牌阶段限一次，你可以观看一名其他角色的所有手牌并可以展示其中一张♥牌，然后你选择一项：1.弃置此牌；2.将此牌置于牌堆顶。",
 
-  le_zhouyu: "神周瑜",
-  le_zhouyu_prefix: "神",
+  shen_zhouyu: "神周瑜",
+  shen_zhouyu_prefix: "神",
   qinyin: "琴音",
   qinyin_info:
     "弃牌阶段结束时，若你于此阶段内弃置过你的至少两张手牌，则你可以选择一项：1.令所有角色各回复1点体力；2.令所有角色各失去1点体力。",
@@ -442,8 +442,8 @@ const translates = {
   yeyan_info:
     "限定技，出牌阶段，你可以选择一项：1.选择至多三名角色，然后你对这些角色各造成1点火焰伤害；2.选择至多两名角色并弃置四张花色均不同的手牌，然后你失去3点体力，对这些角色造成共计至多3点火焰伤害且其中有角色需分配2点或更多伤害点数。",
 
-  le_zhugeliang: "神诸葛亮",
-  le_zhugeliang_prefix: "神",
+  shen_zhugeliang: "神诸葛亮",
+  shen_zhugeliang_prefix: "神",
   qixing: "七星",
   qixing_bg: "星",
   qixing_info:
@@ -459,15 +459,15 @@ const translates = {
   dawu_info:
     "结束阶段，你可以移去任意张“星”并选择等量的角色，然后直到你的下回合开始前或你死亡前，当这些角色受到非雷电伤害时，防止此伤害。",
 
-  le_caocao: "神曹操",
-  le_caocao_prefix: "神",
+  shen_caocao: "神曹操",
+  shen_caocao_prefix: "神",
   guixin: "归心",
   guixin_info: "当你受到1点伤害后，你可以各获得每名其他角色所属区域里的一张牌，然后你翻面。",
   feiying: "飞影",
   feiying_info: "锁定技，其他角色与你的距离+1。",
 
-  le_lvbu: "神吕布",
-  le_lvbu_prefix: "神",
+  shen_lvbu: "神吕布",
+  shen_lvbu_prefix: "神",
   kuangbao: "狂暴",
   kuangbao_bg: "暴",
   kuangbao_info:
@@ -480,8 +480,8 @@ const translates = {
   shenfen_info:
     "出牌阶段限一次，你可以弃6枚“暴怒”标记，对所有其他角色各造成1点伤害，若如此做，这些角色先各弃置装备区里所有的牌，再各弃置四张手牌，然后你翻面。",
 
-  jle_zhaoyun: "神赵云",
-  jle_zhaoyun_prefix: "神",
+  jshen_zhaoyun: "神赵云",
+  jshen_zhaoyun_prefix: "神",
   jx_juejing: "绝境",
   jx_juejing_info: "锁定技，你的手牌上限+2；当你进入濒死状态时或当你脱离濒死状态后，你摸一张牌。",
   jx_longhun: "龙魂",
@@ -492,8 +492,8 @@ const translates = {
   jx_longhun_info:
     "你可以将至多两张花色相同的牌按以下规则使用或打出：♥牌当【桃】；♦牌当火【杀】；♣牌当【闪】；♠牌当【无懈可击】。若你以此法使用或打出：两张♥牌，则此牌回复的体力+1；两张♦牌，则此牌造成的伤害+1；两张♣或♠牌，则你弃置当前回合角色的一张牌。",
 
-  jle_simayi: "神司马懿",
-  jle_simayi_prefix: "神",
+  jshen_simayi: "神司马懿",
+  jshen_simayi_prefix: "神",
   renjie: "忍戒",
   renjie2: "忍戒",
   renjie_info:

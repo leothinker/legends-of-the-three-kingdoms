@@ -1,201 +1,201 @@
 const characters = {
-  jx_zhoutai: {
+  re_zhoutai: {
     sex: "male",
     group: "wu",
     hp: 4,
-    skills: ["jx_buqu", "fenji"],
+    skills: ["rebuqu", "fenji"],
   },
-  jx_yuji: {
+  re_yuji: {
     sex: "male",
     group: "qun",
     hp: 3,
-    skills: ["jx_guhuo"],
+    skills: ["reguhuo"],
   },
-  jx_zhangjiao: {
+  re_zhangjiao: {
     sex: "male",
     group: "qun",
     hp: 3,
-    skills: ["jx_leiji", "guidao", "huangtian"],
+    skills: ["releiji", "guidao", "huangtian"],
     isZhugong: true,
   },
-  jx_huangzhong: {
+  re_huangzhong: {
     sex: "male",
     group: "shu",
     hp: 4,
-    skills: ["jx_liegong"],
+    skills: ["reliegong"],
   },
-  jx_weiyan: {
+  re_weiyan: {
     sex: "male",
     group: "shu",
     hp: 4,
-    skills: ["jx_kuanggu", "qimou"],
+    skills: ["rekuanggu", "qimou"],
   },
-  jx_xiahouyuan: {
+  re_xiahouyuan: {
     sex: "male",
     group: "wei",
     hp: 4,
-    skills: ["jx_shensu"],
+    skills: ["reshensu"],
   },
-  jx_caoren: {
+  re_caoren: {
     sex: "male",
     group: "wei",
     hp: 4,
-    skills: ["jx_jushou", "jiewei"],
+    skills: ["rejushou", "jiewei"],
   },
-  jx_xiaoqiao: {
+  re_xiaoqiao: {
     sex: "female",
     group: "wu",
     hp: 3,
-    skills: ["jx_tianxiang", "hongyan"],
+    skills: ["retianxiang", "hongyan"],
   },
-  jx_wolongzhuge: {
+  re_sp_zhugeliang: {
     sex: "male",
     group: "shu",
     hp: 3,
-    skills: ["bazhen", "jx_huoji", "jx_kanpo"],
+    skills: ["bazhen", "rehuoji", "rekanpo"],
   },
-  jx_dianwei: {
+  re_dianwei: {
     sex: "male",
     group: "wei",
     hp: 4,
-    skills: ["jx_qiangxi"],
+    skills: ["reqiangxi"],
   },
-  jx_xunyu: {
+  re_xunyu: {
     sex: "male",
     group: "wei",
     hp: 3,
-    skills: ["quhu", "jx_jieming"],
+    skills: ["quhu", "rejieming"],
   },
-  jx_pangde: {
+  re_pangde: {
     sex: "male",
     group: "qun",
     hp: 4,
     skills: ["mashu", "jianchu"],
   },
-  jx_pangtong: {
+  re_pangtong: {
     sex: "male",
     group: "shu",
     hp: 3,
-    skills: ["jx_lianhuan", "jx_niepan"],
+    skills: ["relianhuan", "reniepan"],
   },
-  jx_yanliangwenchou: {
+  re_yanwen: {
     sex: "male",
     group: "qun",
     hp: 4,
-    skills: ["jx_shuangxiong"],
+    skills: ["reshuangxiong"],
   },
-  jx_yuanshao: {
+  re_yuanshao: {
     sex: "male",
     group: "qun",
     hp: 4,
-    skills: ["jx_luanji", "xueyi"],
+    skills: ["reluanji", "xueyi"],
     isZhugong: true,
   },
-  jx_taishici: {
+  re_taishici: {
     sex: "male",
     group: "wu",
     hp: 4,
-    skills: ["jx_tianyi", "dangmo"],
+    skills: ["retianyi", "dangmo"],
   },
-  jx_xuhuang: {
+  re_xuhuang: {
     sex: "male",
     group: "wei",
     hp: 4,
-    skills: ["jx_duanliang", "jiezi"],
+    skills: ["reduanliang", "jiezi"],
   },
-  jx_menghuo: {
+  re_menghuo: {
     sex: "male",
     group: "shu",
     hp: 4,
-    skills: ["huoshou", "jx_zaiqi"],
+    skills: ["huoshou", "rezaiqi"],
   },
-  jx_zhurong: {
+  re_zhurong: {
     sex: "female",
     group: "shu",
     hp: 4,
-    skills: ["juxiang", "jx_lieren"],
+    skills: ["juxiang", "relieren"],
   },
-  jx_caopi: {
+  re_caopi: {
     sex: "male",
     group: "wei",
     hp: 3,
-    skills: ["jx_xingshang", "jx_fangzhu", "songwei"],
+    skills: ["rexingshang", "refangzhu", "songwei"],
     isZhugong: true,
   },
-  jx_sunjian: {
+  re_sunjian: {
     sex: "male",
     group: "wu",
     hp: 4,
     skills: ["yinghun", "polu"],
   },
-  jx_dongzhuo: {
+  re_dongzhuo: {
     sex: "male",
     group: "qun",
     hp: 8,
-    skills: ["jx_jiuchi", "roulin", "benghuai", "baonue"],
+    skills: ["rejiuchi", "roulin", "benghuai", "baonue"],
     isZhugong: true,
   },
-  jx_lusu: {
+  re_lusu: {
     sex: "male",
     group: "wu",
     hp: 3,
-    skills: ["jx_haoshi", "jx_dimeng"],
+    skills: ["rehaoshi", "redimeng"],
   },
-  jx_jiaxu: {
+  re_jiaxu: {
     sex: "male",
     group: "qun",
     hp: 3,
-    skills: ["jx_wansha", "jx_weimu", "luanwu"],
+    skills: ["rewansha", "reweimu", "luanwu"],
   },
-  jx_dengai: {
+  re_dengai: {
     sex: "male",
     group: "wei",
     hp: 4,
-    skills: ["jx_tuntian", "zaoxian"],
+    skills: ["retuntian", "zaoxian"],
   },
-  jx_jiangwei: {
+  re_jiangwei: {
     sex: "male",
     group: "shu",
     hp: 4,
-    skills: ["jx_tiaoxin", "jx_zhiji"],
+    skills: ["retiaoxin", "rezhiji"],
   },
-  jx_caiwenji: {
+  re_caiwenji: {
     sex: "female",
     group: "qun",
     hp: 3,
-    skills: ["jx_beige", "duanchang"],
+    skills: ["rebeige", "duanchang"],
   },
-  jx_zuoci: {
+  re_zuoci: {
     sex: "male",
     group: "qun",
     hp: 3,
-    skills: ["jx_huashen", "jx_xinsheng"],
+    skills: ["rehuashen", "rexinsheng"],
   },
-  jx_sunce: {
+  re_sunce: {
     sex: "male",
     group: "wu",
     hp: 4,
-    skills: ["jiang", "jx_hunzi", "zhiba"],
+    skills: ["jiang", "rehunzi", "zhiba"],
     isZhugong: true,
   },
-  jx_zhangzhaozhanghong: {
+  re_zhangzhang: {
     sex: "male",
     group: "wu",
     hp: 3,
-    skills: ["jx_zhijian", "guzheng"],
+    skills: ["rezhijian", "guzheng"],
   },
-  jx_liushan: {
+  re_liushan: {
     sex: "male",
     group: "shu",
     hp: 3,
-    skills: ["xiangle", "jx_fangquan", "ruoyu"],
+    skills: ["xiangle", "refangquan", "ruoyu"],
     isZhugong: true,
   },
-  jx_zhanghe: {
+  re_zhanghe: {
     sex: "male",
     group: "wei",
     hp: 4,
-    skills: ["jx_qiaobian"],
+    skills: ["reqiaobian"],
   },
   wangji: {
     sex: "male",
@@ -299,65 +299,65 @@ const characters = {
     skills: ["yongsi", "weidi"],
     isZhugong: true,
   },
-  le_guanyu: {
+  shen_guanyu: {
     sex: "male",
     group: "shen",
     hp: 5,
     skills: ["wushen", "wuhun"],
     groupInGuozhan: "shu",
   },
-  le_lvmeng: {
+  shen_lvmeng: {
     sex: "male",
     group: "shen",
     hp: 3,
     skills: ["shelie", "gongxin"],
     groupInGuozhan: "wu",
   },
-  le_zhouyu: {
+  shen_zhouyu: {
     sex: "male",
     group: "shen",
     hp: 4,
     skills: ["qinyin", "yeyan"],
     groupInGuozhan: "wu",
   },
-  le_zhugeliang: {
+  shen_zhugeliang: {
     sex: "male",
     group: "shen",
     hp: 3,
     skills: ["qixing", "kuangfeng", "dawu"],
     groupInGuozhan: "shu",
   },
-  le_caocao: {
+  shen_caocao: {
     sex: "male",
     group: "shen",
     hp: 3,
     skills: ["guixin", "feiying"],
     groupInGuozhan: "wei",
   },
-  le_lvbu: {
+  shen_lvbu: {
     sex: "male",
     group: "shen",
     hp: 5,
     skills: ["kuangbao", "wumou", "wuqian", "shenfen"],
     groupInGuozhan: "qun",
   },
-  jle_zhaoyun: {
+  jshen_zhaoyun: {
     sex: "male",
     group: "shen",
     hp: 2,
-    skills: ["jx_juejing", "jx_longhun"],
+    skills: ["rejuejing", "relonghun"],
     groupInGuozhan: "shu",
-    img: "image/character/le_zhaoyun.jpg",
-    dieAudios: ["le_zhaoyun"],
+    img: "image/character/shen_zhaoyun.jpg",
+    dieAudios: ["shen_zhaoyun"],
   },
-  jle_simayi: {
+  jshen_simayi: {
     sex: "male",
     group: "shen",
     hp: 4,
     skills: ["renjie", "sbaiyin", "lianpo"],
     groupInGuozhan: "wei",
-    img: "image/character/le_simayi.jpg",
-    dieAudios: ["le_simayi"],
+    img: "image/character/shen_simayi.jpg",
+    dieAudios: ["shen_simayi"],
   },
   le_liubei: {
     sex: "male",

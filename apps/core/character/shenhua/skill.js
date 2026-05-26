@@ -2,6 +2,118 @@ import { lib, game, ui, get, ai, _status } from "wtk"
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+  // 曹仁
+  // 据守
+  jushou: {
+    audio: 2,
+    trigger: { player: "phaseJieshuBegin" },
+    check(event, player) {
+      return event.player.hp + player.countCards("h") < 4
+    },
+    async content(event, trigger, player) {
+      await player.draw(3)
+      await player.turnOver()
+    },
+  },
+  // 夏侯渊
+  // 神速
+  shensu: {
+    audio: "shensu1",
+    audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
+    group: ["shensu1", "shensu2"],
+    preHidden: ["shensu1", "shensu2"],
+  },
+  shensu1_xiahouba: { audio: 2 },
+  shensu1: {
+    audio: 2,
+    audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
+    trigger: { player: "phaseJudgeBefore" },
+    sourceSkill: "shensu",
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseTarget(
+          get.prompt(event.skill),
+          "跳过判定阶段和摸牌阶段，视为使用一张无距离限制的【杀】",
+          function (card, player, target) {
+            if (player == target) {
+              return false
+            }
+            return player.canUse({ name: "sha" }, target, false)
+          },
+        )
+        .set("check", player.countCards("h") > 2)
+        .set("ai", function (target) {
+          if (!_status.event.check) {
+            return 0
+          }
+          return get.effect(target, { name: "sha" }, _status.event.player)
+        })
+        .setHiddenSkill(event.skill)
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      trigger.cancel()
+      player.skip("phaseDraw")
+      await player.useCard({ name: "sha", isCard: true }, event.targets[0], false)
+    },
+  },
+  shensu2: {
+    audio: "shensu1",
+    audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
+    trigger: { player: "phaseUseBefore" },
+    sourceSkill: "shensu",
+    filter(event, player) {
+      return (
+        player.countCards("he", function (card) {
+          if (_status.connectMode) {
+            return true
+          }
+          return get.type(card) == "equip"
+        }) > 0
+      )
+    },
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseCardTarget({
+          prompt: get.prompt(event.skill),
+          prompt2: "跳过出牌阶段并弃置一张装备牌，视为使用一张无距离限制的【杀】",
+          filterCard(card, player) {
+            return get.type(card) == "equip" && lib.filter.cardDiscardable(card, player)
+          },
+          position: "he",
+          filterTarget(card, player, target) {
+            if (player == target) {
+              return false
+            }
+            return player.canUse({ name: "sha" }, target, false)
+          },
+          ai1(card) {
+            if (_status.event.check) {
+              return 0
+            }
+            return 6 - get.value(card)
+          },
+          ai2(target) {
+            if (_status.event.check) {
+              return 0
+            }
+            return get.effect(target, { name: "sha" }, _status.event.player)
+          },
+          check:
+            player.countCards("hs", (i) => {
+              return player.hasValueTarget(i, null, true)
+            }) >
+            player.hp - 1,
+        })
+        .setHiddenSkill(event.skill)
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      trigger.cancel()
+      await player.discard(event.cards[0])
+      await player.useCard({ name: "sha", isCard: true }, event.targets[0], false)
+    },
+  },
   // 黄忠
   // 烈弓
   liegong: {
@@ -54,117 +166,6 @@ const skills = {
     },
     async content(event, trigger, player) {
       await player.recover(trigger.num)
-    },
-  },
-  // 夏侯渊
-  // 神速
-  shensu: {
-    audio: 2,
-    audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
-    group: ["shensu1", "shensu2"],
-    preHidden: ["shensu1", "shensu2"],
-  },
-  shensu1: {
-    audio: "shensu",
-    audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
-    trigger: { player: "phaseJudgeBefore" },
-    sourceSkill: "shensu",
-    async cost(event, trigger, player) {
-      event.result = await player
-        .chooseTarget(
-          get.prompt(event.skill),
-          "跳过判定阶段和摸牌阶段，视为对一名其他角色使用一张【杀】",
-          function (card, player, target) {
-            if (player == target) {
-              return false
-            }
-            return player.canUse({ name: "sha" }, target, false)
-          },
-        )
-        .set("check", player.countCards("h") > 2)
-        .set("ai", function (target) {
-          if (!_status.event.check) {
-            return 0
-          }
-          return get.effect(target, { name: "sha" }, _status.event.player)
-        })
-        .setHiddenSkill(event.skill)
-        .forResult()
-    },
-    async content(event, trigger, player) {
-      trigger.cancel()
-      player.skip("phaseDraw")
-      await player.useCard({ name: "sha", isCard: true }, event.targets[0], false)
-    },
-  },
-  shensu2: {
-    audio: "shensu",
-    audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
-    trigger: { player: "phaseUseBefore" },
-    sourceSkill: "shensu",
-    filter(event, player) {
-      return (
-        player.countCards("he", function (card) {
-          if (_status.connectMode) {
-            return true
-          }
-          return get.type(card) == "equip"
-        }) > 0
-      )
-    },
-    async cost(event, trigger, player) {
-      event.result = await player
-        .chooseCardTarget({
-          prompt: get.prompt(event.skill),
-          prompt2: "弃置一张装备牌并跳过出牌阶段，视为对一名其他角色使用一张【杀】",
-          filterCard(card, player) {
-            return get.type(card) == "equip" && lib.filter.cardDiscardable(card, player)
-          },
-          position: "he",
-          filterTarget(card, player, target) {
-            if (player == target) {
-              return false
-            }
-            return player.canUse({ name: "sha" }, target, false)
-          },
-          ai1(card) {
-            if (_status.event.check) {
-              return 0
-            }
-            return 6 - get.value(card)
-          },
-          ai2(target) {
-            if (_status.event.check) {
-              return 0
-            }
-            return get.effect(target, { name: "sha" }, _status.event.player)
-          },
-          check:
-            player.countCards("hs", (i) => {
-              return player.hasValueTarget(i, null, true)
-            }) >
-            player.hp - 1,
-        })
-        .setHiddenSkill(event.skill)
-        .forResult()
-    },
-    async content(event, trigger, player) {
-      trigger.cancel()
-      await player.discard(event.cards[0])
-      await player.useCard({ name: "sha", isCard: true }, event.targets[0], false)
-    },
-  },
-  // 曹仁
-  // 据守
-  jushou: {
-    audio: 2,
-    trigger: { player: "phaseJieshuBegin" },
-    check(event, player) {
-      return event.player.hp + player.countCards("h") < 4
-    },
-    async content(event, trigger, player) {
-      await player.draw(3)
-      await player.turnOver()
     },
   },
   // 小乔
@@ -566,7 +567,7 @@ const skills = {
   },
   // 黄天
   huangtian: {
-    audio: 2,
+    audio: "huangtian2",
     audioname: ["zhangjiao", "re_zhangjiao"],
     audioname2: {
       pe_jun_zhangjiao: ["xinhuangtian2_re_zhangjiao1.mp3", "xinhuangtian2_re_zhangjiao2.mp3"],
@@ -575,7 +576,7 @@ const skills = {
     zhuSkill: true,
   },
   huangtian2: {
-    audio: "huangtian",
+    audio: 2,
     enable: "phaseUse",
     discard: false,
     lose: false,

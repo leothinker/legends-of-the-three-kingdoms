@@ -1,5 +1,5 @@
 const characterSort = {
-  jieshenhua_feng: [
+  reshenhua_feng: [
     "jx_zhoutai",
     "jx_yuji",
     "jx_zhangjiao",
@@ -8,22 +8,22 @@ const characterSort = {
     "jx_xiahouyuan",
     "jx_caoren",
     "jx_xiaoqiao",
-    "le_guanyu",
-    "le_lvmeng",
+    "shen_guanyu",
+    "shen_lvmeng",
   ],
-  jieshenhua_huo: [
-    "jx_wolongzhuge",
+  reshenhua_huo: [
+    "jx_sp_zhugeliang",
     "jx_dianwei",
     "jx_xunyu",
     "jx_pangde",
     "jx_pangtong",
-    "jx_yanliangwenchou",
+    "jx_yanwen",
     "jx_yuanshao",
     "jx_taishici",
-    "le_zhouyu",
-    "le_zhugeliang",
+    "shen_zhouyu",
+    "shen_zhugeliang",
   ],
-  jieshenhua_lin: [
+  reshenhua_lin: [
     "jx_xuhuang",
     "jx_menghuo",
     "jx_zhurong",
@@ -32,20 +32,20 @@ const characterSort = {
     "jx_dongzhuo",
     "jx_lusu",
     "jx_jiaxu",
-    "le_caocao",
-    "le_lvbu",
+    "shen_caocao",
+    "shen_lvbu",
   ],
-  jieshenhua_shan: [
+  reshenhua_shan: [
     "jx_dengai",
     "jx_jiangwei",
     "jx_caiwenji",
     "jx_zuoci",
     "jx_sunce",
-    "jx_zhangzhaozhanghong",
+    "jx_zhangzhang",
     "jx_liushan",
     "jx_zhanghe",
-    "jle_zhaoyun",
-    "jle_simayi",
+    "jshen_zhaoyun",
+    "jshen_simayi",
   ],
   shenhua_yin: [
     "wangji",
@@ -74,10 +74,10 @@ const characterSort = {
 }
 
 const characterSortTranslate = {
-  jieshenhua_feng: "界神话再临·风",
-  jieshenhua_huo: "界神话再临·火",
-  jieshenhua_lin: "界神话再临·林",
-  jieshenhua_shan: "界神话再临·山",
+  reshenhua_feng: "界神话再临·风",
+  reshenhua_huo: "界神话再临·火",
+  reshenhua_lin: "界神话再临·林",
+  reshenhua_shan: "界神话再临·山",
   shenhua_yin: "神话再临·阴",
   shenhua_lei: "神话再临·雷",
 }

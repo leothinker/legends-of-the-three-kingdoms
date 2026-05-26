@@ -4,7 +4,7 @@ window.wtk_package = {
     standard: "标准版",
     shenhua: "神话再临",
     refresh: "界限突破",
-    jieshenhua: "界神话再临",
+    reshenhua: "界神话再临",
     jiangxing: "将星",
     extra: "珍藏版",
     // shenwu: "神武再世",

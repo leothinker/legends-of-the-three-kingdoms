@@ -55,6 +55,13 @@ export default {
   "#jijiang_re_liubei2": "欺我军无人乎？",
   "#re_liubei:die": "汉室未兴，祖宗未耀，朕实不忍此时西去……",
 
+  "#rewusheng1": "逆贼，哪里走？！",
+  "#rewusheng2": "刀锋所向，战无不克。",
+  "#yijue1": "恩已断，义当绝！",
+  "#yijue2": "关某向来恩怨分明。",
+  "#re_guanyu:die": "桃园一拜，恩义长在。",
+
+
   "#regongao1": "百战余生者，唯我大魏虎贲！",
   "#regongao2": "大魏凭武立国，当以骨血为饲！",
   "#rejuyi1": "举义旗，兴王师，伐不臣！",
@@ -424,11 +431,6 @@ export default {
   "#reyajiao1": "策马驱前，斩敌当先！",
   "#reyajiao2": "遍寻天下，但求一败！",
   "#re_zhaoyun:die": "你们谁……还敢再上……",
-  "#wusheng_re_guanyu1": "刀锋所向，战无不克！",
-  "#wusheng_re_guanyu2": "逆贼，哪里走！",
-  "#yijue1": "恩已断，义当绝！",
-  "#yijue2": "关某，向来恩怨分明！",
-  "#re_guanyu:die": "桃园一拜，恩义常在……",
   "#retieji1": "目标敌阵，全军突击！",
   "#retieji2": "敌人阵型已乱，随我杀！",
   "#re_machao:die": "请将我，葬在西凉……",

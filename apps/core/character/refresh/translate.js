@@ -60,8 +60,8 @@ const translates = {
   rerende_info:
     "出牌阶段每名角色限一次，你可以将任意张手牌交给一名其他角色，每阶段你以此法给出第二张牌时，你可以视为使用一张基本牌（以此法使用的【杀】有距离限制且计入次数限制）。",
 
-  reguanyu: "界关羽",
-  reguanyu_prefix: "界",
+  re_guanyu: "界关羽",
+  re_guanyu_prefix: "界",
   rewusheng: "武圣",
   rewusheng_info: "你可以将一张红色牌当【杀】使用或打出；你使用方块【杀】无距离限制。",
   yijue: "义绝",

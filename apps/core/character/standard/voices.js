@@ -23,8 +23,8 @@ export default {
   "#luoyi2": "脱！",
   "#xuzhu:die": "冷，好冷啊……",
 
-  "#tiandu1": "罢了。",
-  "#tiandu2": "也好。",
+  "#tiandu1": "也好。",
+  "#tiandu2": "罢了。",
   "#yiji1": "就这样吧。",
   "#yiji2": "哦？",
   "#guojia:die": "咳、咳……",

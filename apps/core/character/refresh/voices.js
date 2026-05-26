@@ -25,8 +25,8 @@ export default {
   "#reluoyi2": "过来打一架，对，就是你！",
   "#re_xuzhu:die": "丞相，末将尽力了！",
 
-  "#tiandu_re_guojia1": "天意如此。",
-  "#tiandu_re_guojia2": "那，就这样吧。",
+  "#tiandu_re_guojia1": "那，就这样吧。",
+  "#tiandu_re_guojia2": "天意如此。",
   "#reyiji1": "锦囊妙策，终定社稷。",
   "#reyiji2": "依此计行，辽东可定。",
   "#re_guojia:die": "咳咳咳咳咳……",

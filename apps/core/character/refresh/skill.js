@@ -762,6 +762,8 @@ const skills = {
   // 仁德
   rerende: {
     audio: 2,
+    audioname: ["gz_jun_liubei"],
+    audioname2: { shen_caopi: "rerende_shen_caopi" },
     enable: "phaseUse",
     filter(event, player) {
       return (

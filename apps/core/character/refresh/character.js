@@ -54,7 +54,7 @@ const characters = {
     sex: "male",
     group: "shu",
     hp: 4,
-    skills: ["rende", "jijiang"],
+    skills: ["rerende", "jijiang"],
     isZhugong: true,
   },
   re_guanyu: {

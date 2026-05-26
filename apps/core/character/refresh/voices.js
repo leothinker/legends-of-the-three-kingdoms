@@ -49,6 +49,11 @@ export default {
   "#rebiyue2": "美人本该有此福利！",
   "#re_diaochan:die": "父亲之恩，貂蝉来生再报。",
 
+  "#rerende1": "同心同德，救困扶危！",
+  "#rerende2": "施仁布泽，乃我大汉立国之本！",
+  "#jijiang_re_liubei1": "哪位将军替我拿下此贼？",
+  "#jijiang_re_liubei2": "欺我军无人乎？",
+  "#re_liubei:die": "汉室未兴，祖宗未耀，朕实不忍此时西去……",
 
   "#regongao1": "百战余生者，唯我大魏虎贲！",
   "#regongao2": "大魏凭武立国，当以骨血为饲！",
@@ -469,11 +474,6 @@ export default {
   "#new_reqingnang1": "舒活筋络，方解病痛之苦。",
   "#new_reqingnang2": "悬丝诊脉，顽疾可医。",
   "#re_huatuo:die": "生老病死，命不可违……",
-  "#rerende1": "施仁布泽，乃我大汉立国之本！",
-  "#rerende2": "同心同德，救困扶危！",
-  "#jijiang1_re_liubei1": "哪位将军，替我拿下此贼！",
-  "#jijiang1_re_liubei2": "欺我军无人乎？！",
-  "#re_liubei:die": "汉室未兴，祖宗未耀，朕实不忍此时西去……",
   "#rejizhi1": "得上通，智集心。",
   "#rejizhi2": "集万千才智，致巧趣鲜用。",
   "#re_huangyueying:die": "我的面容，有吓到你吗？",

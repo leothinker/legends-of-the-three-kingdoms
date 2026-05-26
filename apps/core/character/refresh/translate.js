@@ -57,14 +57,11 @@ const translates = {
   wangxi_info:
     "当你对其他角色造成1点伤害后，或当你受到其他角色造成的1点伤害后，你可以与其各摸一张牌。",
 
-  reliubei: "界刘备",
-  reliubei_prefix: "界",
+  re_liubei: "界刘备",
+  re_liubei_prefix: "界",
   rerende: "仁德",
   rerende_info:
     "出牌阶段每名角色限一次，你可以将任意张手牌交给一名其他角色，每阶段你以此法给出第二张牌时，你可以视为使用一张基本牌（以此法使用的【杀】有距离限制且计入次数限制）。",
-  jijiang: "激将",
-  jijiang_info:
-    "主公技，当你需要使用或打出【杀】时，你可以令其他蜀势力角色选择是否替你使用或打出【杀】（视为由你使用或打出）。",
 
   reguanyu: "界关羽",
   reguanyu_prefix: "界",

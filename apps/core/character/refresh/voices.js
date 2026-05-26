@@ -43,6 +43,13 @@ export default {
   "#wangxi2": "前尘往事，莫再提起。",
   "#lidian:die": "报国杀敌，虽死犹荣……",
 
+  "#lijian_re_diaochan1": "呵呵，你们都该死！",
+  "#lijian_re_diaochan2": "你们，谁更爱我呢？",
+  "#rebiyue1": "嗯~~再给人家一张，好不好嘛！",
+  "#rebiyue2": "美人本该有此福利！",
+  "#re_diaochan:die": "父亲之恩，貂蝉来生再报。",
+
+
   "#regongao1": "百战余生者，唯我大魏虎贲！",
   "#regongao2": "大魏凭武立国，当以骨血为饲！",
   "#rejuyi1": "举义旗，兴王师，伐不臣！",
@@ -467,11 +474,6 @@ export default {
   "#jijiang1_re_liubei1": "哪位将军，替我拿下此贼！",
   "#jijiang1_re_liubei2": "欺我军无人乎？！",
   "#re_liubei:die": "汉室未兴，祖宗未耀，朕实不忍此时西去……",
-  "#lijian_re_diaochan1": "赢家，才能得到我~",
-  "#lijian_re_diaochan2": "这场比赛，将军可要赢哦~",
-  "#rebiyue1": "梦蝶幻月，如沫虚妄。",
-  "#rebiyue2": "水映月明，芙蓉照倩影。",
-  "#re_diaochan:die": "我的任务，终于完成了……",
   "#rejizhi1": "得上通，智集心。",
   "#rejizhi2": "集万千才智，致巧趣鲜用。",
   "#re_huangyueying:die": "我的面容，有吓到你吗？",

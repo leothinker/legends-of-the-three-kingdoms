@@ -15,8 +15,8 @@ export default {
   "#ganglie2": "鼠辈，竟敢伤我！",
   "#xiahoudun:die": "两，两边，都看不见了。",
 
-  "#tuxi1": "哼，没想到吧！",
-  "#tuxi2": "拿来吧！",
+  "#tuxi1": "拿来吧！",
+  "#tuxi2": "哼，没想到吧！",
   "#zhangliao:die": "真的没想到……",
 
   "#luoyi1": "脱！",

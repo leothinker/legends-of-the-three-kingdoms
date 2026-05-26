@@ -1,8 +1,8 @@
 export default {
   "#rejianxiong1": "燕雀安知鸿鹄之志。",
   "#rejianxiong2": "夫英雄者，胸怀大志，腹有良谋。",
-  "#hujia_re_caocao1": "护卫何在！",
-  "#hujia_re_caocao2": "大胆逆贼！谁可擒之？",
+  "#rehujia1": "护卫何在！",
+  "#rehujia2": "大胆逆贼！谁可擒之？",
   "#re_caocao:die": "华佗何在……",
 
   "#refankui1": "哼！正中下怀！",
@@ -31,8 +31,8 @@ export default {
   "#reyiji2": "依此计行，辽东可定。",
   "#re_guojia:die": "咳咳咳咳咳……",
 
-  "#re_luoshen1": "屏翳收风，川后静波。",
-  "#re_luoshen2": "冯夷鸣鼓，女娲清歌。",
+  "#reluoshen1": "屏翳收风，川后静波。",
+  "#reluoshen2": "冯夷鸣鼓，女娲清歌。",
   "#reqingguo1": "肩若削成，腰如约素。",
   "#reqingguo2": "延颈秀项，皓质呈露。",
   "#re_zhenji:die": "出亦复何苦，入亦复何愁。",
@@ -51,8 +51,8 @@ export default {
 
   "#rerende1": "同心同德，救困扶危！",
   "#rerende2": "施仁布泽，乃我大汉立国之本！",
-  "#jijiang_re_liubei1": "哪位将军替我拿下此贼？",
-  "#jijiang_re_liubei2": "欺我军无人乎？",
+  "#rejijiang1": "哪位将军替我拿下此贼？",
+  "#rejijiang2": "欺我军无人乎？",
   "#re_liubei:die": "汉室未兴，祖宗未耀，朕实不忍此时西去……",
 
   "#rewusheng1": "逆贼，哪里走？！",
@@ -60,7 +60,6 @@ export default {
   "#yijue1": "恩已断，义当绝！",
   "#yijue2": "关某向来恩怨分明。",
   "#re_guanyu:die": "桃园一拜，恩义长在。",
-
 
   "#regongao1": "百战余生者，唯我大魏虎贲！",
   "#regongao2": "大魏凭武立国，当以骨血为饲！",

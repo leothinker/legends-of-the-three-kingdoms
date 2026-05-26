@@ -49,6 +49,7 @@ const skills = {
       },
     },
   },
+  rehujia: { audio: 2 },
   // 界司马懿
   // 反馈
   refankui: {
@@ -618,6 +619,7 @@ const skills = {
     },
   },
   // 界甄姬
+  reluoshen: { audio: 2 },
   // 倾国
   reqingguo: {
     mod: {
@@ -934,6 +936,7 @@ const skills = {
       },
     },
   },
+  rejijiang: { audio: 2 },
   // 界关羽
   // 武圣
   rewusheng: {
@@ -946,6 +949,17 @@ const skills = {
     },
     locked: false,
     audio: 2,
+    audioname: ["jsp_guanyu", "re_guanzhang", "dc_jsp_guanyu"],
+    audioname2: {
+      dc_guansuo: "wusheng_guansuo",
+      guanzhang: "wusheng_guanzhang",
+      guansuo: "wusheng_guansuo",
+      gz_jun_liubei: "shouyue_wusheng",
+      std_guanxing: "wusheng_guanzhang",
+      ty_guanxing: "wusheng_guanzhang",
+      ol_guanzhang: "wusheng_ol_guanzhang",
+      re_baosanniang: "wusheng_re_baosanniang",
+    },
     enable: ["chooseToRespond", "chooseToUse"],
     filterCard(card, player) {
       if (get.zhu(player, "shouyue")) {

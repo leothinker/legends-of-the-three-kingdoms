@@ -33,8 +33,8 @@ const skills = {
   // 护驾
   hujia: {
     audio: 2,
-    audioname: ["re_caocao"],
     audioname2: {
+      re_caocao: "rehujia",
       pe_jun_caocao: "sbhujia",
     },
     zhuSkill: true,
@@ -835,8 +835,9 @@ const skills = {
   // 激将
   jijiang: {
     audio: 2,
-    audioname: ["liushan", "re_liubei", "re_liushan", "ol_liushan"],
+    audioname: ["liushan", "re_liushan", "ol_liushan"],
     audioname2: {
+      re_liubei: "rejijiang",
       pe_jun_liubei: "sbjijiang",
     },
     group: ["jijiang1"],
@@ -997,7 +998,6 @@ const skills = {
       respondSha: true,
     },
   },
-  wusheng_re_guanyu: { audio: 2 },
   // 张飞
   // 咆哮
   paoxiao: {
@@ -1041,7 +1041,6 @@ const skills = {
       },
     },
   },
-  paoxiao_xiahouba: { audio: 2 },
   // 诸葛亮
   // 观星
   guanxing_fail: {},
@@ -1213,7 +1212,6 @@ const skills = {
       },
     },
   },
-  longdan_sha_re_zhaoyun: { audio: 2 },
   // 马超
   // 马术
   mashu: {
@@ -1832,7 +1830,6 @@ const skills = {
       threaten: 1.5,
     },
   },
-  jijiu_re_huatuo: { audio: 2 },
   // 青囊
   qingnang: {
     audio: 2,

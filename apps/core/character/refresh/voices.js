@@ -21,8 +21,8 @@ export default {
   "#retuxi2": "马似飞影，枪如霹雳！",
   "#re_zhangliao:die": "被敌人占了先机，呃啊~",
 
-  "#reluoyi1": "过来打一架，对，就是你！",
-  "#reluoyi2": "废话少说，放马过来吧！",
+  "#reluoyi1": "废话少说，放马过来吧！",
+  "#reluoyi2": "过来打一架，对，就是你！",
   "#re_xuzhu:die": "丞相，末将尽力了！",
 
   "#tiandu_re_guojia1": "天意如此。",

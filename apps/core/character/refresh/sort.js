@@ -1,6 +1,5 @@
 const characterSort = {
   refresh_standard: [
-    "re_zhugeliang",
     "re_zhaoyun",
     "re_machao",
     "re_huangyueying",
@@ -21,7 +20,15 @@ const characterSort = {
   ],
   refresh_2014: ["re_simayi"],
   refresh_2015: ["lidian", "re_liubei"],
-  refresh_2018: ["re_caocao", "re_xiahoudun", "re_zhangliao", "re_xuzhu", "re_guojia", "re_guanyu"],
+  refresh_2018: [
+    "re_caocao",
+    "re_xiahoudun",
+    "re_zhangliao",
+    "re_xuzhu",
+    "re_guojia",
+    "re_guanyu",
+    "re_zhugeliang",
+  ],
   refresh_2019: ["re_zhenji", "re_zhangfei"],
 }
 

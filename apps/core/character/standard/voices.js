@@ -51,8 +51,8 @@ export default {
 
   "#guanxing1": "观今夜天象，知天下大事。",
   "#guanxing2": "知天易，逆天难。",
-  "#kongcheng11": "（低沉的琴音）",
-  "#kongcheng12": "（悠扬的琴音）",
+  "#kongcheng1": "（悠扬的琴音）",
+  "#kongcheng2": "（低沉的琴音）",
   "#zhugeliang:die": "将星陨落，天命难违。",
 
   "#longdan_sha1": "能进能退乃真正法器！",

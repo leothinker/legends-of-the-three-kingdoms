@@ -1274,7 +1274,8 @@ const skills = {
   // 观星
   reguanxing: {
     audio: 2,
-    audioname: ["rejiangwei"],
+    audioname: ["jiangwei", "re_jiangwei", "ol_jiangwei"],
+    audioname2: { gexuan: "guanxing_gexuan" },
     trigger: { player: ["phaseZhunbeiBegin", "phaseJieshuBegin"] },
     frequent: true,
     filter(event, player, name) {

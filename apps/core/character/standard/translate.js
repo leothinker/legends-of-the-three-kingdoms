@@ -64,10 +64,10 @@ const translates = {
 
   zhugeliang: "诸葛亮",
   guanxing: "观星",
-  kongcheng: "空城",
-  kongcheng1: "空城",
   guanxing_info:
     "准备阶段，你可以观看牌堆顶的X张牌（X为存活角色数且至多为5），然后将这些牌以任意顺序置于牌堆顶或牌堆底。",
+  kongcheng: "空城",
+  kongcheng1: "空城",
   kongcheng_info: "锁定技，若你没有手牌，你不能成为【杀】或【决斗】的目标。",
 
   zhaoyun: "赵云",

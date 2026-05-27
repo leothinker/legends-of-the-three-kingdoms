@@ -1080,7 +1080,7 @@ const skills = {
       },
     },
     group: "kongcheng1",
-    audio: "kongcheng1",
+    audio: 2,
     audioname: ["re_zhugeliang"],
     ai: {
       noh: true,
@@ -1094,7 +1094,7 @@ const skills = {
     },
   },
   kongcheng1: {
-    audio: 2,
+    audio: "kongcheng",
     trigger: { player: "loseEnd" },
     forced: true,
     firstDo: true,

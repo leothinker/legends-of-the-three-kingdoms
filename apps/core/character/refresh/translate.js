@@ -79,13 +79,11 @@ const translates = {
   tishen2: "替身",
   tishen2_info: "",
 
-  rezhugeliang: "界诸葛亮",
-  rezhugeliang_prefix: "界",
+  re_zhugeliang: "界诸葛亮",
+  re_zhugeliang_prefix: "界",
   reguanxing: "观星",
   reguanxing_info:
-    "准备阶段，你可以观看牌堆顶的五张牌（若存活人数小于4则改为三张），然后将其中任意张牌以任意顺序置于牌堆顶，其余以任意顺序置于牌堆底。若你将这些牌均放至牌堆底，则结束阶段你可以再进行一次“观星”。",
-  kongcheng: "空城",
-  kongcheng_info: "锁定技，若你没有手牌，你不能成为【杀】或【决斗】的目标。",
+    "准备阶段，你可以观看牌堆顶的五张牌（若存活角色数小于4则改为三张），然后将这些牌以任意顺序置于牌堆顶或牌堆底。若你将这些牌均置于牌堆底，结束阶段，你可以再发动一次〖观星〗。",
 
   rezhaoyun: "界赵云",
   rezhaoyun_prefix: "界",

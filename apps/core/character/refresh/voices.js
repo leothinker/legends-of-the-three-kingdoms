@@ -83,6 +83,12 @@ export default {
   "#retieji2": "目标敌阵，全军突击！",
   "#re_machao:die": "请将我，葬在西凉。",
 
+  "#rejizhi1": "得上通，智集心。",
+  "#rejizhi2": "集万千才智，致巧趣鲜用。",
+  "#reqicai1": "女子之才，蕙质兰心。",
+  "#reqicai2": "吾之才学，不逊先生分毫。",
+  "#re_huangyueying:die": "我的面容，有吓到你吗？",
+
   "#regongao1": "百战余生者，唯我大魏虎贲！",
   "#regongao2": "大魏凭武立国，当以骨血为饲！",
   "#rejuyi1": "举义旗，兴王师，伐不臣！",
@@ -484,9 +490,6 @@ export default {
   "#new_reqingnang1": "舒活筋络，方解病痛之苦。",
   "#new_reqingnang2": "悬丝诊脉，顽疾可医。",
   "#re_huatuo:die": "生老病死，命不可违……",
-  "#rejizhi1": "得上通，智集心。",
-  "#rejizhi2": "集万千才智，致巧趣鲜用。",
-  "#re_huangyueying:die": "我的面容，有吓到你吗？",
   "#rezhiheng1": "制衡互牵，大局可安。",
   "#rezhiheng2": "不急不躁，稳谋应对。",
   "#rejiuyuan1": "你们真是朕的得力干将。",

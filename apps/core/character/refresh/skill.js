@@ -1438,11 +1438,16 @@ const skills = {
   // 集智
   rejizhi: {
     audio: 2,
+    audioname2: {
+      lukang: "rejizhi_lukang",
+      zj_lukang: "rejizhi_lukang",
+      new_simayi: "rejizhi_new_simayi",
+    },
     locked: false,
     trigger: { player: "useCard" },
     frequent: true,
     filter(event) {
-      return get.type(event.card, "trick") == "trick" && event.card.isCard
+      return get.type(event.card) == "trick" && event.card.isCard
     },
     init(player) {
       player.storage.rejizhi = 0

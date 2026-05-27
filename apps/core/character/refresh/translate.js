@@ -97,14 +97,13 @@ const translates = {
   retieji_info:
     "当你使用【杀】指定一名角色为目标后，你可以令其本回合所有非锁定技失效，然后你进行判定，除非其弃置与结果花色相同的一张牌，否则不能使用【闪】响应此【杀】。",
 
-  rehuangyueying: "界黄月英",
-  rehuangyueying_prefix: "界",
+  re_huangyueying: "界黄月英",
+  re_huangyueying_prefix: "界",
   rejizhi: "集智",
   rejizhi_info:
-    "当你使用非转化的普通锦囊牌时，你可以摸一张牌。若此牌是基本牌，你可以弃置此牌令本回合手牌上限+1。",
+    "当你使用非转化的普通锦囊牌时，你可以摸一张牌。若此牌为基本牌，你可以弃置此牌，然后本回合手牌上限+1。",
   reqicai: "奇才",
-  reqicai_info:
-    "锁定技，你使用锦囊牌无距离限制；当其他角色弃置你装备区内的防具牌或宝物牌时，你取消之。",
+  reqicai_info: "锁定技，你使用锦囊牌无距离限制；其他角色不能弃置你装备区里的防具牌与宝物牌。",
 
   resunquan: "界孙权",
   resunquan_prefix: "界",

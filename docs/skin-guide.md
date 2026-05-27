@@ -126,8 +126,8 @@ player.changeSkin({ characterSkinName: "pot_weiyan_achieve" }, "pot_weiyan_fail"
 
 - ④[map.source]：传入值为`name`/`name1`/`name2`，更换所在位置为`player[map.source]`的武将牌，如
   `javascript
-	player.changeSkin({ source: "name1" }, "pot_weiyan_achieve")
-	`
+player.changeSkin({ source: "name1" }, "pot_weiyan_achieve")
+`
   -- 仅会将玩家在`player.name1`处的主将`pot_weiyan`更换为原画`pot_weiyan_achieve`，不会影响到副将`mb_caocao`
 
   2.字符串[string]：该参数下map会被当作skill处理，后续判断等同`map.skill`的情况

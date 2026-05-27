@@ -112,7 +112,7 @@ const translates = {
   qianxin_info: "觉醒技，当你造成伤害后，若你已受伤，你减1点体力上限，然后获得技能〖荐言〗。",
   jianyan: "荐言",
   jianyan_info:
-    "出牌阶段限一次，你可以声明一种牌的类别或颜色，然后连续亮出牌堆顶的牌，直到亮出符合你声明的牌为止。最后你令一名男性角色获得此牌。",
+    "出牌阶段限一次，你可以声明一种牌的类别或颜色，然后将牌堆中第一张符合你声明的牌交给一名男性角色。",
 
   re_sunquan: "界孙权",
   re_sunquan_prefix: "界",
@@ -123,12 +123,10 @@ const translates = {
   rejiuyuan_info:
     "主公技，当其他吴势力角色对其使用【桃】时，若其体力值大于你，其可以改为令你回复1点体力，然后其摸一张牌。",
 
-  reganning: "界甘宁",
-  reganning_prefix: "界",
-  qixi: "奇袭",
-  qixi_info: "你可以将一张黑色牌当【过河拆桥】使用。",
+  re_ganning: "界甘宁",
+  re_ganning_prefix: "界",
   fenwei: "奋威",
-  fenwei_info: "限定技，当一张锦囊牌指定不少于两个目标后，你可令此牌对其中任意名目标角色无效。",
+  fenwei_info: "限定技，当一张锦囊牌指定多个目标后，你可以令此牌对其中任意个目标无效。",
 
   relvmeng: "界吕蒙",
   relvmeng_prefix: "界",

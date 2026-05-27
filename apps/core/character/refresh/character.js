@@ -100,18 +100,18 @@ const characters = {
     hp: 4,
     skills: ["zhuhai", "qianxin"],
   },
-	re_sunquan: {
-		sex: "male",
-		group: "wu",
-		hp: 4,
-		skills: ["rezhiheng", "rejiuyuan"],
-		isZhugong: true,
-	},
+  re_sunquan: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["rezhiheng", "rejiuyuan"],
+    isZhugong: true,
+  },
   re_ganning: {
     sex: "male",
     group: "wu",
     hp: 4,
-    skills: ["qixi"],
+    skills: ["qixi", "fenwei"],
   },
   re_lvmeng: {
     sex: "male",

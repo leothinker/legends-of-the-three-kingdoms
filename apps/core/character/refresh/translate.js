@@ -130,10 +130,9 @@ const translates = {
 
   relvmeng: "界吕蒙",
   relvmeng_prefix: "界",
-  keji: "克己",
-  keji_info: "若你未于出牌阶段内使用或打出过【杀】，则你可以跳过弃牌阶段。",
   qinxue: "勤学",
-  qinxue_info: `觉醒技，准备阶段，若你的手牌数比你的体力值多3或更多（若游戏人数不小于7则改为2），你减1点体力上限，然后获得${get.poptip("gongxin")}。`,
+  qinxue_info:
+    "觉醒技，准备阶段，若你的手牌数减体力值至少为3（游戏人数不小于7则改为2），你减1点体力上限，然后获得技能〖攻心〗。",
 
   rehuanggai: "界黄盖",
   rehuanggai_prefix: "界",

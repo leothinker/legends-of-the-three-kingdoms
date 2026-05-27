@@ -1882,7 +1882,7 @@ const skills = {
     audio: 2,
     juexingji: true,
     derivation: "gongxin",
-    trigger: { player: ["phaseZhunbeiBegin", "phaseJieshuBegin"] },
+    trigger: { player: ["phaseZhunbeiBegin"] },
     forced: true,
     filter(event, player) {
       if (player.countCards("h") >= player.hp + 2) {

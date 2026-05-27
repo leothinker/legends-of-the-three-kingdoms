@@ -19,7 +19,7 @@ export default {
 
   re_sunquan: "年轻的贤君",
   re_ganning: "锦帆游侠",
-  re_lvmeng: "白衣渡江",
+  re_lvmeng: "士别三日",
   re_huanggai: "轻身为国",
   re_zhouyu: "大都督",
   re_daqiao: "矜持之花",

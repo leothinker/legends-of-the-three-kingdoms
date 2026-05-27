@@ -117,7 +117,7 @@ const characters = {
     sex: "male",
     group: "wu",
     hp: 4,
-    skills: ["keji"],
+    skills: ["keji", "qinxue"],
   },
   re_huanggai: {
     sex: "male",

@@ -142,7 +142,7 @@ const characters = {
     sex: "male",
     group: "wu",
     hp: 3,
-    skills: ["qianxun", "lianying"],
+    skills: ["reqianxun", "relianying"],
     clans: ["吴郡陆氏"],
   },
   re_sunshangxiang: {

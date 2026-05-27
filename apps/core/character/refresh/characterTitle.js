@@ -15,6 +15,7 @@ export default {
   re_zhaoyun: "虎威将军",
   re_machao: "一骑当千",
   re_huangyueying: "归隐的杰女",
+  xushu: "化剑为犁",
 
   re_sunquan: "年轻的贤君",
   re_ganning: "锦帆游侠",

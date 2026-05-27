@@ -105,6 +105,15 @@ const translates = {
   reqicai: "奇才",
   reqicai_info: "锁定技，你使用锦囊牌无距离限制；其他角色不能弃置你装备区里的防具牌与宝物牌。",
 
+  xushu: "徐庶",
+  zhuhai: "诛害",
+  zhuhai_info: "其他角色的结束阶段，若其本回合造成过伤害，你可以对其使用一张【杀】。",
+  qianxin: "潜心",
+  qianxin_info: "觉醒技，当你造成伤害后，若你已受伤，你减1点体力上限，然后获得技能〖荐言〗。",
+  jianyan: "荐言",
+  jianyan_info:
+    "出牌阶段限一次，你可以声明一种牌的类别或颜色，然后连续亮出牌堆顶的牌，直到亮出符合你声明的牌为止。最后你令一名男性角色获得此牌。",
+
   resunquan: "界孙权",
   resunquan_prefix: "界",
   rezhiheng: "制衡",

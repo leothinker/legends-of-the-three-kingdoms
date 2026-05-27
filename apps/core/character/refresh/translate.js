@@ -143,15 +143,15 @@ const translates = {
   zhaxiang_info:
     "锁定技，当你失去1点体力后，你摸三张牌，然后若此时为你的出牌阶段内，则此阶段你使用【杀】的次数上限+1、使用红色【杀】无距离限制且不能被【闪】响应。",
 
-  rezhouyu: "界周瑜",
-  rezhouyu_prefix: "界",
+  re_zhouyu: "界周瑜",
+  re_zhouyu_prefix: "界",
   reyingzi: "英姿",
   reyingzi_info: "锁定技，摸牌阶段，你多摸一张牌；你的手牌上限等于你的体力上限。",
   refanjian: "反间",
   refanjian_card: "弃牌",
   refanjian_hp: "失去体力",
   refanjian_info:
-    "出牌阶段限一次，你可以展示一张手牌并交给一名角色，令其选择一项：1.展示所有手牌，然后弃置与此牌花色相同的所有牌；2.失去1点体力。",
+    "出牌阶段限一次，你可以展示一张手牌并交给一名其他角色，令其选择一项：1.展示所有手牌，然后弃置与此牌花色相同的所有牌；2.失去1点体力。",
 
   redaqiao: "界大乔",
   redaqiao_prefix: "界",

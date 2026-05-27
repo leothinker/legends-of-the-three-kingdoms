@@ -2023,7 +2023,14 @@ const skills = {
   // 英姿
   reyingzi: {
     audio: 2,
-    audioname: ["resunce"],
+    audioname: ["sunce", "re_sunben", "re_sunce"],
+    audioname2: {
+      gexuan: "reyingzi_gexuan",
+      re_sunyi: "reyingzi_re_sunyi",
+      heqi: "reyingzi_heqi",
+      re_heqi: "reyingzi_heqi",
+      boss_sunce: "reyingzi_sunce",
+    },
     trigger: { player: "phaseDrawBegin2" },
     forced: true,
     preHidden: true,

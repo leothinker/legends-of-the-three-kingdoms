@@ -2730,6 +2730,7 @@ const skills = {
   // 趫猛
   qiaomeng: {
     audio: 2,
+    audioname: ["xin_gongsunzan"],
     trigger: { source: "damageSource" },
     direct: true,
     filter(event, player) {

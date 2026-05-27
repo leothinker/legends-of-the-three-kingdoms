@@ -163,6 +163,12 @@ export default {
   "#reyaowu2": "黄毛小儿，就这两下子吗？",
   "#re_huaxiong:die": "皮厚不挡刀哇……",
 
+  "#qiaomeng1": "夺敌辎重，以为己用。",
+  "#qiaomeng2": "秣马厉兵，枕戈待战。",
+  "#yicong_re_gongsunzan1": "列阵锋矢，直取要害。",
+  "#yicong_re_gongsunzan2": "变阵冲轭，以守代攻。",
+  "#re_gongsunzan:die": "皇图霸业梦，付之，一炬中……",
+
   "#regongao1": "百战余生者，唯我大魏虎贲！",
   "#regongao2": "大魏凭武立国，当以骨血为饲！",
   "#rejuyi1": "举义旗，兴王师，伐不臣！",
@@ -412,10 +418,6 @@ export default {
   "#olzaoxian2": "效仿五丁开川，赢粮直捣黄龙！",
   "#ol_dengai:die": "钟会！你为何害我！",
   "#qiaomeng1": "秣马厉兵，枕戈待战。",
-  "#qiaomeng2": "夺敌辎重，以为己用。",
-  "#reyicong1": "变阵冲轭，以守代攻。",
-  "#reyicong2": "列阵锋矢，直取要害。",
-  "#re_gongsunzan:die": "皇图霸业梦，付之，一炬中……",
   "#rejunxing1": "严法尚公，岂分贵贱而异施？",
   "#rejunxing2": "情理可容之事，法未必能容！",
   "#yuce_re_manchong1": "骄之以利，示之以慑！",

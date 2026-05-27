@@ -171,16 +171,16 @@ const characters = {
     names: "null|null",
   },
   re_huaxiong: {
-		sex: "male",
-		group: "qun",
-		hp: 6,
+    sex: "male",
+    group: "qun",
+    hp: 6,
     skills: ["reyaowu"],
   },
   re_gongsunzan: {
     sex: "male",
     group: "qun",
     hp: 4,
-    skills: ["", ""],
+    skills: ["qiaomeng", "yicong"],
   },
 }
 

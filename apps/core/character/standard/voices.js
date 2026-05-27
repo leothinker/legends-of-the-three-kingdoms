@@ -143,8 +143,8 @@ export default {
   "#jiyuan2": "形势危急，还请速行。",
   "#re_yiji:die": "未能，救得刘公脱险……",
 
-  "#yicong1": "冲啊！",
-  "#yicong2": "众将听令，排好阵势，御敌！",
+  "#yicong1": "众将听令，排好阵势，御敌！",
+  "#yicong2": "冲啊！",
   "#gongsunzan:die": "我军将败，我已无颜苟活于世。",
 
   "#xiaoguo1": "三军听我号令，不得撤退！",

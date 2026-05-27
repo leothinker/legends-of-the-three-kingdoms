@@ -123,7 +123,7 @@ const characters = {
     sex: "male",
     group: "wu",
     hp: 4,
-    skills: ["kurou"],
+    skills: ["rekurou", "zhaxiang"],
   },
   re_zhouyu: {
     sex: "male",

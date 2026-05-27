@@ -128,20 +128,20 @@ const translates = {
   fenwei: "奋威",
   fenwei_info: "限定技，当一张锦囊牌指定多个目标后，你可以令此牌对其中任意个目标无效。",
 
-  relvmeng: "界吕蒙",
-  relvmeng_prefix: "界",
+  re_lvmeng: "界吕蒙",
+  re_lvmeng_prefix: "界",
   qinxue: "勤学",
   qinxue_info:
     "觉醒技，准备阶段，若你的手牌数减体力值至少为3（游戏人数不小于7则改为2），你减1点体力上限，然后获得技能〖攻心〗。",
 
-  rehuanggai: "界黄盖",
-  rehuanggai_prefix: "界",
+  re_huanggai: "界黄盖",
+  re_huanggai_prefix: "界",
   rekurou: "苦肉",
   rekurou_info: "出牌阶段限一次，你可以弃置一张牌，然后失去1点体力。",
   zhaxiang: "诈降",
   zhaxiang2: "诈降",
   zhaxiang_info:
-    "锁定技，当你失去1点体力后，你摸三张牌，然后若此时在你的出牌阶段内，则你于此阶段内使用红色【杀】无距离限制且不能被【闪】响应，且此阶段你可以多使用一张【杀】。",
+    "锁定技，当你失去1点体力后，你摸三张牌，然后若此时为你的出牌阶段内，则此阶段你使用【杀】的次数上限+1、使用红色【杀】无距离限制且不能被【闪】响应。",
 
   rezhouyu: "界周瑜",
   rezhouyu_prefix: "界",

@@ -1885,7 +1885,8 @@ const skills = {
     trigger: { player: ["phaseZhunbeiBegin"] },
     forced: true,
     filter(event, player) {
-      if (player.countCards("h") >= player.hp + 2) {
+      const num = get.totalPopulation() >= 7 ? 2 : 3
+      if (player.countCards("h") >= player.hp + num) {
         return true
       }
       return false
@@ -1894,7 +1895,6 @@ const skills = {
       const { name } = event
       player.awakenSkill(name)
       await player.loseMaxHp()
-      await player.chooseDrawRecover(2, true)
       await player.addSkills("gongxin")
     },
   },
@@ -1928,6 +1928,7 @@ const skills = {
   // 诈降
   zhaxiang: {
     audio: 2,
+    audioname2: { ol_sb_jiangwei: "zhaxiang_ol_sb_jiangwei" },
     trigger: { player: "loseHpEnd" },
     filter(event, player) {
       return player.isIn() && event.num > 0
@@ -1937,7 +1938,7 @@ const skills = {
     async content(event, trigger, player) {
       await player.draw(3)
       if (player.isPhaseUsing()) {
-        player.addTempSkill(event.name + "_effect")
+        player.addTempSkill(event.name + "_effect", "phaseUseAfter")
         player.addMark(event.name + "_effect", 1, false)
       }
     },
@@ -1958,6 +1959,7 @@ const skills = {
         charlotte: true,
         onremove: true,
         audio: "zhaxiang",
+        audioname2: { ol_sb_jiangwei: "zhaxiang_ol_sb_jiangwei" },
         trigger: { player: "useCard" },
         sourceSkill: "zhaxiang",
         filter(event, player) {

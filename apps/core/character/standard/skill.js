@@ -1116,9 +1116,8 @@ const skills = {
   // 赵云
   // 龙胆
   longdan: {
-    audio: "longdan_sha",
-    audioname: ["re_zhaoyun"],
-    audioname2: { old_zhaoyun: "longdan_sha_re_zhaoyun" },
+    audio: 2,
+    audioname2: { re_zhaoyun: "relongdan" },
     group: ["longdan_sha", "longdan_shan", "longdan_draw"],
     subSkill: {
       draw: {
@@ -1137,9 +1136,8 @@ const skills = {
         },
       },
       sha: {
-        audio: 2,
-        audioname: ["re_zhaoyun"],
-        audioname2: { old_zhaoyun: "longdan_sha_re_zhaoyun" },
+        audio: "longdan",
+        audioname2: { re_zhaoyun: "relongdan" },
         enable: ["chooseToUse", "chooseToRespond"],
         filterCard: { name: "shan" },
         viewAs: { name: "sha" },
@@ -1175,9 +1173,8 @@ const skills = {
         },
       },
       shan: {
-        audio: "longdan_sha",
-        audioname: ["re_zhaoyun"],
-        audioname2: { old_zhaoyun: "longdan_sha_re_zhaoyun" },
+        audio: "longdan",
+        audioname2: { re_zhaoyun: "relongdan" },
         enable: ["chooseToRespond", "chooseToUse"],
         filterCard: { name: "sha" },
         viewAs: { name: "shan" },

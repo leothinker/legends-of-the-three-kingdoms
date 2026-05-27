@@ -12,7 +12,7 @@ export default {
   re_guanyu: "美髯公",
   re_zhangfei: "万夫不当",
   re_zhugeliang: "迟暮的丞相",
-  re_zhaoyun: "少年将军",
+  re_zhaoyun: "虎威将军",
   re_machao: "一骑当千",
   re_huangyueying: "归隐的杰女",
 

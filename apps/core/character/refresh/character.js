@@ -69,18 +69,18 @@ const characters = {
     hp: 4,
     skills: ["repaoxiao", "tishen"],
   },
-	re_zhugeliang: {
-		sex: "male",
-		group: "shu",
-		hp: 3,
-		skills: ["reguanxing", "kongcheng"],
-		names: "诸葛|亮",
-	},
+  re_zhugeliang: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["reguanxing", "kongcheng"],
+    names: "诸葛|亮",
+  },
   re_zhaoyun: {
     sex: "male",
     group: "shu",
     hp: 4,
-    skills: ["longdan"],
+    skills: ["longdan", "yajiao"],
   },
   re_machao: {
     sex: "male",

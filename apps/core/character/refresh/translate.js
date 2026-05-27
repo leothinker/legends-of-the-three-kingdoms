@@ -169,11 +169,11 @@ const translates = {
   relianying_info:
     "当你失去手牌后，若你没有手牌，你可以令至多X名角色各摸一张牌（X为你此次失去的手牌数）。",
 
-  resunshangxiang: "界孙尚香",
-  resunshangxiang_prefix: "界",
+  re_sunshangxiang: "界孙尚香",
+  re_sunshangxiang_prefix: "界",
   rejieyin: "结姻",
   rejieyin_info:
-    "出牌阶段限一次，你可以选择一名男性角色并弃置一张手牌或将一张装备牌放入其装备区。然后你与其体力值较高的角色摸一张牌，体力值较低的角色回复1点体力。",
+    "出牌阶段限一次，你可以选择一名其他男性角色并弃置一张手牌或将一张装备牌置入其装备区。然后你与其体力值较高的角色摸一张牌，体力值较低的角色回复1点体力。",
   rexiaoji: "枭姬",
   rexiaoji_info: "当你失去装备区里的牌后，你可以摸两张牌。",
 

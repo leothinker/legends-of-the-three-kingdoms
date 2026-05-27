@@ -1753,7 +1753,7 @@ const skills = {
   // 枭姬
   xiaoji: {
     audio: 2,
-    audioname: ["sp_sunshangxiang", "re_sunshangxiang"],
+    audioname: ["sp_sunshangxiang"],
     trigger: {
       player: "loseAfter",
       global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],

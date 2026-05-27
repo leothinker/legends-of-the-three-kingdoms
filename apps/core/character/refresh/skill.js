@@ -2476,6 +2476,34 @@ const skills = {
       },
     },
   },
+  // 枭姬
+  rexiaoji: {
+    audio: 2,
+    audioname: ["sp_sunshangxiang"],
+    trigger: {
+      player: "loseAfter",
+      global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
+    },
+    frequent: true,
+    filter(event, player) {
+      const evt = event.getl(player)
+      return evt && evt.player === player && evt.es && evt.es.length > 0
+    },
+    async content(event, trigger, player) {
+      player.draw(2)
+    },
+    ai: {
+      noe: true,
+      reverseEquip: true,
+      effect: {
+        target(card, player, target, current) {
+          if (get.type(card) == "equip" && !get.cardtag(card, "gifts")) {
+            return [1, 3]
+          }
+        },
+      },
+    },
+  },
   // 界华佗
   // 除疠
   chuli: {

@@ -1677,6 +1677,7 @@ const skills = {
   // 制衡
   rezhiheng: {
     audio: 2,
+    audioname2: { shen_caopi: "rezhiheng_shen_caopi", new_simayi: "rezhiheng_new_simayi" },
     mod: {
       aiOrder(player, card, num) {
         if (num <= 0 || get.itemtype(card) !== "card" || get.type(card) !== "equip") {

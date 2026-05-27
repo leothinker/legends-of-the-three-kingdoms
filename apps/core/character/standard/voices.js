@@ -67,10 +67,10 @@ export default {
   "#jizhi2": "嗯……",
   "#huangyueying:die": "亮~",
 
-  "#zhiheng1": "容我三思。",
-  "#zhiheng2": "且慢！",
-  "#jiuyuan1": "有汝辅佐，甚好。",
-  "#jiuyuan2": "好舒服啊！",
+  "#zhiheng1": "且慢！",
+  "#zhiheng2": "容我三思。",
+  "#jiuyuan1": "好舒服啊！",
+  "#jiuyuan2": "有汝辅佐，甚好。",
   "#sunquan:die": "父亲，大哥，仲谋愧矣！",
 
   "#qixi1": "接招吧。",

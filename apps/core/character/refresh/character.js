@@ -135,7 +135,7 @@ const characters = {
     sex: "female",
     group: "wu",
     hp: 3,
-    skills: ["guose", "liuli"],
+    skills: ["reguose", "liuli"],
     names: "桥|null",
   },
   re_luxun: {

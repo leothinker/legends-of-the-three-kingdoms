@@ -177,13 +177,11 @@ const translates = {
   rexiaoji: "枭姬",
   rexiaoji_info: "当你失去装备区里的牌后，你可以摸两张牌。",
 
-  rehuatuo: "界华佗",
-  rehuatuo_prefix: "界",
-  jijiu: "急救",
-  jijiu_info: "你的回合外，你可以将一张红色牌当【桃】使用。",
+  re_huatuo: "界华佗",
+  re_huatuo_prefix: "界",
   chuli: "除疠",
   chuli_info:
-    "出牌阶段限一次，你可以选择任意名势力各不相同的其他角色，然后你弃置你和这些角色的各一张牌。被弃置♠牌的角色各摸一张牌。",
+    "出牌阶段限一次，你可以选择任意名势力各不相同的其他角色，然后弃置你与这些角色的各一张牌。被弃置黑桃牌的角色各摸一张牌。",
 
   relvbu: "界吕布",
   relvbu_prefix: "界",

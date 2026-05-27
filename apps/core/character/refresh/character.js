@@ -155,13 +155,13 @@ const characters = {
     sex: "male",
     group: "qun",
     hp: 3,
-    skills: ["jijiu", "qingnang"],
+    skills: ["jijiu", "chuli"],
   },
   re_lvbu: {
     sex: "male",
     group: "qun",
-    hp: 4,
-    skills: ["wushuang"],
+    hp: 5,
+    skills: ["wushuang", "reliyu"],
   },
   re_diaochan: {
     sex: "female",

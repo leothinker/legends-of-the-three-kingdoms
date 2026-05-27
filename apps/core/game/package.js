@@ -24,6 +24,7 @@ window.wtk_package = {
     simplify: "精简版",
     yongjian: "用间篇",
     guozhan: "国战",
+    zhulu: "逐鹿中原",
   },
   play: {
     boss: "诸神降临",

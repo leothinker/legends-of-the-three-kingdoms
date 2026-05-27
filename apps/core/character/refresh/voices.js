@@ -79,6 +79,10 @@ export default {
   "#yajiao2": "策马趋前，斩敌当先！",
   "#re_zhaoyun:die": "你们谁…还敢…再上…",
 
+  "#retieji1": "敌人阵型已乱，随我杀！",
+  "#retieji2": "目标敌阵，全军突击！",
+  "#re_machao:die": "请将我，葬在西凉。",
+
   "#regongao1": "百战余生者，唯我大魏虎贲！",
   "#regongao2": "大魏凭武立国，当以骨血为饲！",
   "#rejuyi1": "举义旗，兴王师，伐不臣！",
@@ -438,9 +442,6 @@ export default {
   "#xinbuyi1": "有老身在，阁下勿忧。",
   "#xinbuyi2": "如此佳婿，谁敢伤之？",
   "#xin_wuguotai:die": "爱女已去，老身何存？",
-  "#retieji1": "目标敌阵，全军突击！",
-  "#retieji2": "敌人阵型已乱，随我杀！",
-  "#re_machao:die": "请将我，葬在西凉……",
   "#reyingzi1": "哈哈哈哈哈哈哈哈……！",
   "#reyingzi2": "伯符，且看我这一手！",
   "#refanjian1": "与我为敌，就当这般生不如死！",

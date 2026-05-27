@@ -1301,7 +1301,7 @@ const skills = {
     },
   },
   // 界赵云
-  re_zhaoyun: { audio: 2 },
+  relongdan: { audio: 2 },
   // 涯角
   yajiao: {
     audio: 2,
@@ -1358,6 +1358,7 @@ const skills = {
   // 铁骑
   retieji: {
     audio: 2,
+    audioname: ["boss_lvbu3", "tw_dm_quyi"],
     trigger: { player: "useCardToPlayered" },
     check(event, player) {
       return get.attitude(player, event.target) <= 0

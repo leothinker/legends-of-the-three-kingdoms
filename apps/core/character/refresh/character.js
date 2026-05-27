@@ -86,7 +86,7 @@ const characters = {
     sex: "male",
     group: "shu",
     hp: 4,
-    skills: ["mashu", "tieji"],
+    skills: ["mashu", "retieji"],
   },
   re_huangyueying: {
     sex: "female",

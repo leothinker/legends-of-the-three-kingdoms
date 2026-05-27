@@ -2049,7 +2049,6 @@ const skills = {
   // 妄尊
   wangzun: {
     trigger: { global: "phaseZhunbeiBegin" },
-    forced: true,
     audio: 2,
     filter(event, player) {
       return event.player.isZhu

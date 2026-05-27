@@ -45,8 +45,8 @@ export default {
   "#wusheng2": "看尔乃插标卖首。",
   "#guanyu:die": "什么？此地名叫麦城？！",
 
-  "#paoxiao1": "燕人张飞在此！",
-  "#paoxiao2": "喝啊~",
+  "#paoxiao1": "喝啊~",
+  "#paoxiao2": "燕人张飞在此！",
   "#zhangfei:die": "实在是，杀不动了……",
 
   "#guanxing1": "观今夜天象，知天下大事。",

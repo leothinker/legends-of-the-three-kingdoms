@@ -43,12 +43,6 @@ export default {
   "#wangxi2": "前尘往事，莫再提起。",
   "#lidian:die": "报国杀敌，虽死犹荣……",
 
-  "#lijian_re_diaochan1": "呵呵，你们都该死！",
-  "#lijian_re_diaochan2": "你们，谁更爱我呢？",
-  "#rebiyue1": "嗯~~再给人家一张，好不好嘛！",
-  "#rebiyue2": "美人本该有此福利！",
-  "#re_diaochan:die": "父亲之恩，貂蝉来生再报。",
-
   "#rerende1": "同心同德，救困扶危！",
   "#rerende2": "施仁布泽，乃我大汉立国之本！",
   "#rejijiang1": "哪位将军替我拿下此贼？",
@@ -158,6 +152,16 @@ export default {
   "#liyu1": "大丈夫，相时而动。",
   "#liyu2": "人不为己，天诛地灭。",
   "#re_lvbu:die": "我竟然输了…不可能！",
+
+  "#lijian_re_diaochan1": "呵呵，你们都该死！",
+  "#lijian_re_diaochan2": "你们，谁更爱我呢？",
+  "#rebiyue1": "嗯~~再给人家一张，好不好嘛！",
+  "#rebiyue2": "美人本该有此福利！",
+  "#re_diaochan:die": "父亲之恩，貂蝉来生再报。",
+
+  "#reyaowu1": "别得意的太早。",
+  "#reyaowu2": "黄毛小儿，就这两下子吗？",
+  "#re_huaxiong:die": "皮厚不挡刀哇……",
 
   "#regongao1": "百战余生者，唯我大魏虎贲！",
   "#regongao2": "大魏凭武立国，当以骨血为饲！",
@@ -511,11 +515,6 @@ export default {
   "#xinbuyi1": "有老身在，阁下勿忧。",
   "#xinbuyi2": "如此佳婿，谁敢伤之？",
   "#xin_wuguotai:die": "爱女已去，老身何存？",
-  "#new_reyaowu1": "有吾在此，解太师烦忧。",
-  "#new_reyaowu2": "这些杂兵，我有何惧！",
-  "#shizhan1": "看你能坚持几个回合！",
-  "#shizhan2": "兀那汉子，且报上名来！",
-  "#re_huaxiong:die": "我掉以轻心了……",
   "#xinleiji1": "疾雷迅电，不可趋避！",
   "#xinleiji2": "雷霆之诛，灭军毁城！",
   "#xinguidao1": "汝之命运，吾来改之！",

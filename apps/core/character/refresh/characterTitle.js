@@ -29,4 +29,6 @@ export default {
   re_huatuo: "神医",
   re_lvbu: "武的化身",
   re_diaochan: "绝世的舞姬",
+  re_huaxiong: "飞扬跋扈",
+  re_gongsunzan: "白马将军",
 }

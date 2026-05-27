@@ -189,19 +189,16 @@ const translates = {
   liyu_info:
     "当你使用【杀】对一名其他角色造成伤害后，你可以获得其区域里的一张牌，然后若获得的牌：不为装备牌，其摸一张牌；为装备牌，你视为对其选择的另一名角色使用一张【决斗】。",
 
-  rediaochan: "界貂蝉",
-  rediaochan_prefix: "界",
-  lijian: "离间",
-  lijian_info:
-    "出牌阶段限一次，你可以弃置一张牌并选择两名男性角色，然后令其中一名男性角色视为对另一名男性角色使用一张【决斗】。",
+  re_diaochan: "界貂蝉",
+  re_diaochan_prefix: "界",
   rebiyue: "闭月",
   rebiyue_info: "结束阶段，若你：有手牌，你可以摸一张牌；没有手牌，你可以摸两张牌。",
 
-  rehuaxiong: "界华雄",
-  rehuaxiong_prefix: "界",
+  re_huaxiong: "界华雄",
+  re_huaxiong_prefix: "界",
   reyaowu: "耀武",
   reyaowu_info:
-    "锁定技，当你受到【杀】造成的伤害时，若此【杀】为红色，伤害来源回复1点体力或摸一张牌；若此【杀】不为红色，则你摸一张牌。",
+    "锁定技，当你受到【杀】造成的伤害时，若此【杀】：为红色，伤害来源回复1点体力或摸一张牌；不为红色，你摸一张牌。",
 
   regongsunzan: "界公孙瓒",
   regongsunzan_prefix: "界",

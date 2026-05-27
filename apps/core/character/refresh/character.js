@@ -167,14 +167,20 @@ const characters = {
     sex: "female",
     group: "qun",
     hp: 3,
-    skills: ["lijian", "biyue"],
+    skills: ["lijian", "rebiyue"],
     names: "null|null",
   },
   re_huaxiong: {
+		sex: "male",
+		group: "qun",
+		hp: 6,
+    skills: ["reyaowu"],
+  },
+  re_gongsunzan: {
     sex: "male",
     group: "qun",
-    hp: 6,
-    skills: ["yaowu"],
+    hp: 4,
+    skills: ["", ""],
   },
 }
 

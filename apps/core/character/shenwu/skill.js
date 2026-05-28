@@ -835,6 +835,202 @@ const skills = {
       },
     },
   },
+  // 界貂蝉
+  // 离间
+  relijian: {
+    audio: "lijian",
+    enable: "phaseUse",
+    usable: 1,
+    filter(event, player) {
+      return game.countPlayer((current) => current != player && current.hasSex("male")) > 1
+    },
+    check(card) {
+      return 10 - get.value(card)
+    },
+    filterCard: true,
+    position: "he",
+    filterTarget(card, player, target) {
+      if (player == target) {
+        return false
+      }
+      if (!target.hasSex("male")) {
+        return false
+      }
+      if (ui.selected.targets.length == 1) {
+        return target.canUse({ name: "juedou" }, ui.selected.targets[0])
+      }
+      return true
+    },
+    targetprompt: ["先出杀", "后出杀"],
+    selectTarget: 2,
+    multitarget: true,
+    async content(event, trigger, player) {
+      const useCardEvent = event.targets[1].useCard(
+        { name: "juedou", isCard: true },
+        "nowuxie",
+        event.targets[0],
+        "noai",
+      )
+      useCardEvent.animate = false
+      await game.delay(0.5)
+    },
+    ai: {
+      order: 8,
+      result: {
+        target(player, target) {
+          if (ui.selected.targets.length == 0) {
+            return -3
+          } else {
+            return get.effect(target, { name: "juedou" }, ui.selected.targets[0], target)
+          }
+        },
+      },
+      expose: 0.4,
+      threaten: 3,
+    },
+  },
+  // 界华雄
+  // 耀武
+  olyaowu: {
+    trigger: { player: "damageBegin3" },
+    audio: "reyaowu",
+    forced: true,
+    filter(event) {
+      return event.card && (get.color(event.card) != "red" || (event.source && event.source.isIn()))
+    },
+    async content(event, trigger, player) {
+      if (get.color(trigger.card) == "red") {
+        await trigger.source.draw()
+      } else {
+        await trigger.player.draw()
+      }
+    },
+    ai: {
+      effect: {
+        target: (card, player, target) => {
+          if (typeof card !== "object" || !get.tag(card, "damage")) {
+            return
+          }
+          if (player.hasSkillTag("jueqing", false, target)) {
+            return
+          }
+          if (get.color(card) === "red") {
+            return [1, 0, 1, 0.6]
+          }
+          return [1, 0.6]
+        },
+      },
+    },
+  },
+  // 势斩
+  shizhan: {
+    audio: 2,
+    enable: "phaseUse",
+    usable: 2,
+    filterTarget(card, player, target) {
+      return target != player && target.canUse("juedou", player)
+    },
+    async content(event, trigger, player) {
+      await event.target.useCard({ name: "juedou", isCard: true }, player, "noai")
+    },
+    ai: {
+      order: 2,
+      result: {
+        player(player, target) {
+          return get.effect(player, { name: "juedou", isCard: true }, target, player)
+        },
+      },
+    },
+  },
+  // 界公孙瓒
+  // 义从
+  reyicong: {
+    trigger: {
+      player: ["changeHp"],
+    },
+    audio: 2,
+    forced: true,
+    filter(event, player) {
+      return (
+        get.sgn(player.getDamagedHp() - 1.5) != get.sgn(player.getDamagedHp() - 1.5 + event.num)
+      )
+    },
+    async content(_) {},
+    mod: {
+      globalFrom(from, to, current) {
+        return current - 1
+      },
+      globalTo(from, to, current) {
+        if (to.getDamagedHp() >= 2) {
+          return current + 1
+        }
+      },
+    },
+    ai: {
+      threaten: 0.8,
+    },
+  },
+  // 趫猛
+  reqiaomeng: {
+    audio: "qiaomeng",
+    trigger: { player: "useCardToPlayered" },
+    filter(event, player) {
+      if (!event.isFirstTarget || get.color(event.card) != "black") {
+        return false
+      }
+      for (var i of event.targets) {
+        if (
+          i != player &&
+          i.hasCard(function (card) {
+            return lib.filter.canBeDiscarded(card, player, i)
+          }, "he")
+        ) {
+          return true
+        }
+      }
+      return false
+    },
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseTarget(
+          get.prompt("reqiaomeng"),
+          "选择一名不为自己的目标角色，然后弃置其一张牌。若以此法弃置的牌为：装备牌，你获得此牌；锦囊牌，你令" +
+            get.translation(trigger.card) +
+            "不可被响应。",
+          function (card, player, target) {
+            return (
+              target != player &&
+              _status.event.getTrigger().targets.includes(target) &&
+              target.hasCard(function (card) {
+                return lib.filter.canBeDiscarded(card, player, target)
+              }, "he")
+            )
+          },
+        )
+        .set("ai", function (target) {
+          const player = _status.event.player
+          return get.effect(target, { name: "guohe_copy2" }, player, player)
+        })
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      const {
+        targets: [target],
+      } = event
+      const result = await player.discardPlayerCard(target, true, "he").forResult()
+      if (result?.bool && result.cards?.length) {
+        //为了体现白马义从野性纯真的美 直接获取卡牌原类型 不考虑维系区域
+        const card = result.cards[0],
+          type = get.type2(card, false)
+        if (type == "trick") {
+          trigger.directHit.addArray(game.filterPlayer((current) => current != player))
+        }
+        if (type == "equip" && get.position(card, true) == "d") {
+          await player.gain(card, "gain2")
+        }
+      }
+    },
+  },
 }
 
 export default skills

@@ -2673,7 +2673,7 @@ const skills = {
   // 闭月
   rebiyue: {
     audio: 2,
-    audioname2: { sp_diaochan: "biyue" },
+    audioname2: { ol_diaochan: "biyue" },
     trigger: { player: "phaseJieshuBegin" },
     frequent: true,
     async content(event, trigger, player) {

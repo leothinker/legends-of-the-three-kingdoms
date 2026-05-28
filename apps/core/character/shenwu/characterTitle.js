@@ -10,14 +10,9 @@ export default {
 
   ol_sunquan: "年轻的贤君",
   ol_lvmeng: "士别三日",
-  re_zhouyu: "大都督",
-  re_daqiao: "矜持之花",
-  re_luxun: "儒生雄才",
-  re_sunshangxiang: "弓腰姬",
+  ol_sunshangxiang: "弓腰姬",
 
-  re_huatuo: "神医",
-  re_lvbu: "武的化身",
-  re_diaochan: "绝世的舞姬",
-  re_huaxiong: "飞扬跋扈",
-  re_gongsunzan: "白马将军",
+  ol_diaochan: "绝世的舞姬",
+  ol_huaxiong: "飞扬跋扈",
+  ol_gongsunzan: "白马将军",
 }

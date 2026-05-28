@@ -151,11 +151,13 @@ const characters = {
     skills: ["reqianxun", "relianying"],
     clans: ["吴郡陆氏"],
   },
-  re_sunshangxiang: {
+  ol_sunshangxiang: {
     sex: "female",
     group: "wu",
     hp: 3,
-    skills: ["rejieyin", "rexiaoji"],
+    skills: ["rejieyin", "xiaoji"],
+    img: "image/character/re_sunshangxiang.jpg",
+    dieAudios: ["re_sunshangxiang"],
   },
   re_huatuo: {
     sex: "male",
@@ -169,24 +171,30 @@ const characters = {
     hp: 5,
     skills: ["wushuang", "liyu"],
   },
-  re_diaochan: {
+  ol_diaochan: {
     sex: "female",
     group: "qun",
     hp: 3,
-    skills: ["lijian", "rebiyue"],
+    skills: ["relijian", "rebiyue"],
     names: "null|null",
+    img: "image/character/diaochan.jpg",
+    dieAudios: ["diaochan"],
   },
-  re_huaxiong: {
+  ol_huaxiong: {
     sex: "male",
     group: "qun",
     hp: 6,
-    skills: ["reyaowu"],
+    skills: ["olyaowu", "shizhan"],
+    img: "image/character/re_huaxiong.jpg",
+    dieAudios: ["re_huaxiong"],
   },
-  re_gongsunzan: {
+  ol_gongsunzan: {
     sex: "male",
     group: "qun",
     hp: 4,
-    skills: ["qiaomeng", "yicong"],
+    skills: ["reyicong", "reqiaomeng"],
+    img: "image/character/re_gongsunzan.jpg",
+    dieAudios: ["re_gongsunzan"],
   },
 }
 

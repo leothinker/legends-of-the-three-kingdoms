@@ -1757,6 +1757,7 @@ const skills = {
   xiaoji: {
     audio: 2,
     audioname: ["sp_sunshangxiang"],
+    audioname2: { re_sunshangxiang: "rexiaoji" },
     trigger: {
       player: "loseAfter",
       global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
@@ -2274,7 +2275,7 @@ const skills = {
       player: ["changeHp"],
     },
     audio: 2,
-    audioname: ["re_gongsunzan"],
+    audioname2: { re_gongsunzan: "reyicong" },
     forced: true,
     filter(event, player) {
       return get.sgn(player.hp - 2.5) != get.sgn(player.hp - 2.5 - event.num)

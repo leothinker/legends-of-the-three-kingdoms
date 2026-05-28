@@ -66,6 +66,32 @@ const translates = {
   botu: "博图",
   botu_info:
     "每轮限X次（X为存活角色数且至多为3），回合结束后，若本回合置入弃牌堆的牌包含四种花色，你可以获得一个额外回合。",
+
+  ol_sunshangxiang: "界孙尚香",
+  ol_sunshangxiang_prefix: "界",
+
+  ol_diaochan: "界貂蝉",
+  ol_diaochan_prefix: "界",
+  relijian: "离间",
+  relijian_info:
+    "出牌阶段限一次，你可以弃置一张牌并选择两名其他男性角色，然后令其中一名角色视为对另一名角色使用一张【决斗】（不能被【无懈可击】响应）。",
+
+  ol_huaxiong: "界华雄",
+  ol_huaxiong_prefix: "界",
+  olyaowu: "耀武",
+  olyaowu_info:
+    "锁定技，当你受到伤害时，若对你造成伤害的牌：为红色，伤害来源摸一张牌；不为红色，你摸一张牌。",
+  shizhan: "势斩",
+  shizhan_info: "出牌阶段限两次，你可以令一名其他角色视为对你使用一张【决斗】。",
+
+  ol_gongsunzan: "界公孙瓒",
+  ol_gongsunzan_prefix: "界",
+  reyicong: "义从",
+  reyicong_info:
+    "锁定技，你计算与其他角色的距离-1；若你已损失的体力值不小于2，其他角色计算与你的距离+1。",
+  reqiaomeng: "趫猛",
+  reqiaomeng_info:
+    "当你使用的黑色牌指定其他角色为目标后，你可以弃置其中一个目标一张牌。若此牌为：装备牌，你获得之；锦囊牌，此黑色牌无法被响应。",
 }
 
 export default translates

@@ -23,13 +23,13 @@ const characterSort = {
     "re_zhouyu",
     "re_daqiao",
     "re_luxun",
-    "re_sunshangxiang",
+    "ol_sunshangxiang",
 
     "re_huatuo",
     "re_lvbu",
-    "re_diaochan",
-    "re_huaxiong",
-    "re_gongsunzan",
+    "ol_diaochan",
+    "ol_huaxiong",
+    "ol_gongsunzan",
   ],
   refresh_feng: [
     "caoren",

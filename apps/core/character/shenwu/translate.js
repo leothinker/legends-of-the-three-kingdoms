@@ -52,9 +52,20 @@ const translates = {
   oljizhi_info:
     "当你使用非转化的锦囊牌时，你可以摸一张牌。然后你可以弃置一张基本牌，若如此做，本回合你的手牌上限+1。",
 
+  ol_sunquan: "界孙权",
+  ol_sunquan_prefix: "界",
   oljiuyuan: "救援",
   oljiuyuan_info:
     "主公技，当其他吴势力角色于其回合内回复体力时，若其体力值不小于你，其可以改为令你回复1点体力，然后其摸一张牌。",
+
+  ol_lvmeng: "界吕蒙",
+  ol_lvmeng_prefix: "界",
+  reqinxue: "勤学",
+  reqinxue_info:
+    "觉醒技，准备阶段或结束阶段，若你的手牌数减体力值至少为2，你减1点体力上限，回复1点体力或摸两张牌，然后获得技能〖攻心〗。",
+  botu: "博图",
+  botu_info:
+    "每轮限X次（X为存活角色数且至多为3），回合结束后，若本回合置入弃牌堆的牌包含四种花色，你可以获得一个额外回合。",
 }
 
 export default translates

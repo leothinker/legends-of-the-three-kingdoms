@@ -1393,6 +1393,7 @@ const skills = {
   keji: {
     audio: 2,
     audioname: ["re_lvmeng", "sp_lvmeng"],
+    audioname2: { ol_lvmeng: "keji_re_lvmeng" },
     trigger: { player: "phaseDiscardBefore" },
     frequent(event, player) {
       return player.needsToDiscard()
@@ -1413,6 +1414,7 @@ const skills = {
       trigger.cancel()
     },
   },
+  keji_re_lvmeng: { audio: 2 },
   // 黄盖
   // 苦肉
   kurou: {

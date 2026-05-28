@@ -8,10 +8,8 @@ export default {
   ol_zhaoyun: "虎威将军",
   ol_huangyueying: "归隐的杰女",
 
-  re_sunquan: "年轻的贤君",
-  re_ganning: "锦帆游侠",
-  re_lvmeng: "士别三日",
-  re_huanggai: "轻身为国",
+  ol_sunquan: "年轻的贤君",
+  ol_lvmeng: "士别三日",
   re_zhouyu: "大都督",
   re_daqiao: "矜持之花",
   re_luxun: "儒生雄才",

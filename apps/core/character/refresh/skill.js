@@ -1786,17 +1786,16 @@ const skills = {
   rejiuyuan: {
     audio: 2,
     zhuSkill: true,
-    trigger: { global: "useCardToPlayered" },
+    trigger: { global: "taoBegin" },
     direct: true,
     filter(event, player) {
       return (
-        get.name(event.card) === "tao" &&
-        event.target === event.player &&
         player != event.player &&
         event.player.group == "wu" &&
         player.hp < event.player.hp &&
         event.getParent().name != "rejiuyuan" &&
-        player.hasZhuSkill("rejiuyuan", event.player)
+        player.hasZhuSkill("rejiuyuan", event.player) &&
+        event.player === event.target
       )
     },
     async content(event, trigger, player) {

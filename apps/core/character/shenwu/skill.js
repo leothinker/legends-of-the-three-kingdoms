@@ -632,18 +632,15 @@ const skills = {
     },
     async content(event, trigger, player) {
       await player.draw("nodelay")
-      if (
-        _status.currentPhase !== player ||
-        !player.hasCard((card) => get.type(card) === "basic", "h")
-      ) {
+      if (!player.hasCard({ type: "basic" }, "h")) {
         return
       }
 
       const result = await player
         .chooseToDiscard("是否弃置一张基本牌并令本回合你的手牌上限+1？", { type: "basic" })
         .set("ai", (card) => {
-          if (player.needsToDiscard(-3)) {
-            return 7 - get.value(card, player)
+          if (_status.currentPhase === player && player.needsToDiscard(-3)) {
+            return 6 - get.value(card, player)
           }
           return 0
         })
@@ -651,7 +648,9 @@ const skills = {
 
       if (result.bool) {
         player.storage.oljizhi++
-        player.markSkill("oljizhi")
+        if (_status.currentPhase === player) {
+          player.markSkill("oljizhi")
+        }
       }
     },
     ai: {
@@ -690,8 +689,8 @@ const skills = {
         player != event.player &&
         event.player.group == "wu" &&
         player.hp <= event.player.hp &&
-        event.getParent().name != "rejiuyuan" &&
-        player.hasZhuSkill("rejiuyuan", event.player) &&
+        event.getParent().name != "oljiuyuan" &&
+        player.hasZhuSkill("oljiuyuan", event.player) &&
         event.player === _status.currentPhase
       )
     },
@@ -710,12 +709,130 @@ const skills = {
 
       // step 1
       if (result.bool) {
-        player.logSkill("rejiuyuan")
+        player.logSkill("oljiuyuan")
         trigger.player.line(player, "green")
         trigger.cancel()
         await player.recover(trigger.player)
         await trigger.player.draw()
       }
+    },
+  },
+  // 界吕蒙
+  // 勤学
+  reqinxue: {
+    skillAnimation: true,
+    animationColor: "wood",
+    audio: "qinxue",
+    juexingji: true,
+    derivation: "gongxin",
+    trigger: { player: ["phaseZhunbeiBegin", "phaseJieshuBegin"] },
+    forced: true,
+    filter(event, player) {
+      if (player.countCards("h") >= player.hp + 2) {
+        return true
+      }
+      return false
+    },
+    async content(event, trigger, player) {
+      const { name } = event
+      player.awakenSkill(name)
+      await player.loseMaxHp()
+      await player.chooseDrawRecover(2, true)
+      await player.addSkills("gongxin")
+    },
+  },
+  // 博图
+  botu: {
+    audio: 2,
+    trigger: { player: "phaseEnd" },
+    frequent: true,
+    filter(event, player) {
+      if (player.countMark("botu_used") >= Math.min(3, game.countPlayer())) {
+        return false
+      }
+      var suits = []
+      game.getGlobalHistory("cardMove", function (evt) {
+        if (suits.length >= 4) {
+          return
+        }
+        if (evt.name == "lose") {
+          if (evt.position == ui.discardPile) {
+            for (var i of evt.cards) {
+              suits.add(get.suit(i, false))
+            }
+          }
+        } else {
+          if (evt.name == "cardsDiscard") {
+            for (var i of evt.cards) {
+              suits.add(get.suit(i, false))
+            }
+          }
+        }
+      })
+      return suits.length >= 4
+    },
+    async content(event, trigger, player) {
+      player.addTempSkill("botu_used", "roundStart")
+      player.addMark("botu_used", 1, false)
+      player.insertPhase()
+    },
+    group: "botu_mark",
+    subSkill: {
+      used: {
+        onremove: true,
+        charlotte: true,
+      },
+      mark: {
+        trigger: {
+          global: ["loseAfter", "cardsDiscardAfter"],
+          player: "phaseAfter",
+        },
+        forced: true,
+        firstDo: true,
+        silent: true,
+        filter(event, player) {
+          if (event.name == "phase") {
+            return true
+          }
+          if (player != _status.currentPhase) {
+            return false
+          }
+          if (event.name == "lose") {
+            return event.position == ui.discardPile
+          }
+          return true
+        },
+        async content(event, trigger, player) {
+          if (trigger.name == "phase") {
+            player.unmarkSkill("botu_mark")
+            return
+          }
+          const suits = []
+          game.getGlobalHistory("cardMove", (evt) => {
+            if (suits.length >= 4) {
+              return false
+            }
+            if (evt.name == "lose") {
+              if (evt.position == ui.discardPile) {
+                for (const c of evt.cards) {
+                  suits.add(get.suit(c, false))
+                }
+              }
+            } else if (evt.name == "cardsDiscard") {
+              for (const c of evt.cards) {
+                suits.add(get.suit(c, false))
+              }
+            }
+            return false
+          })
+          player.storage.botu_mark = suits
+          player.markSkill("botu_mark")
+        },
+        intro: {
+          onunmark: true,
+          content: "本回合已有$花色的牌进入过弃牌堆",
+        },
+      },
     },
   },
 }

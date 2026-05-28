@@ -102,18 +102,14 @@ const characters = {
     img: "image/character/re_huangyueying.jpg",
     dieAudios: ["re_huangyueying"],
   },
-  xushu: {
-    sex: "male",
-    group: "shu",
-    hp: 4,
-    skills: ["zhuhai", "qianxin"],
-  },
-  re_sunquan: {
+  ol_sunquan: {
     sex: "male",
     group: "wu",
     hp: 4,
-    skills: ["rezhiheng", "rejiuyuan"],
+    skills: ["rezhiheng", "oljiuyuan"],
     isZhugong: true,
+    img: "image/character/re_sunquan.jpg",
+    dieAudios: ["re_sunquan"],
   },
   re_ganning: {
     sex: "male",
@@ -121,11 +117,13 @@ const characters = {
     hp: 4,
     skills: ["qixi", "fenwei"],
   },
-  re_lvmeng: {
+  ol_lvmeng: {
     sex: "male",
     group: "wu",
     hp: 4,
-    skills: ["keji", "qinxue"],
+    skills: ["keji", "reqinxue", "botu"],
+    img: "image/character/re_lvmeng.jpg",
+    dieAudios: ["re_lvmeng"],
   },
   re_huanggai: {
     sex: "male",

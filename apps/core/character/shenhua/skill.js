@@ -4802,7 +4802,7 @@ const skills = {
   gongxin: {
     audio: 2,
     audioname: ["re_lvmeng"],
-    audioname2: { gexuan: "gongxin_gexuan" },
+    audioname2: { ol_lvmeng: "gongxin_re_lvmeng", gexuan: "gongxin_gexuan" },
     enable: "phaseUse",
     usable: 1,
     filterTarget(card, player, target) {
@@ -4873,6 +4873,7 @@ const skills = {
       expose: 0.4,
     },
   },
+  gongxin_re_lvmeng: { audio: 2 },
   // 神周瑜
   // 琴音
   qinyin: {

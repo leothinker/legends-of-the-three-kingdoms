@@ -1,6 +1,5 @@
 window.wtk_package = {
   character: {
-    //经典标包＋神话再临
     standard: "标准版",
     shenhua: "神话再临",
     refresh: "界限突破",
@@ -8,8 +7,8 @@ window.wtk_package = {
     jiangxing: "将星",
     extra: "珍藏版",
     shenwu: "神武再世",
-    tianshui: "天水濯名",
     jsrg: "江山如故",
+    tianshui: "天水濯名",
     sxrm: "蚀心入魔",
     yanling: "雁翎耀光",
   },
@@ -24,7 +23,7 @@ window.wtk_package = {
     simplify: "精简版",
     yongjian: "用间篇",
     guozhan: "国战",
-    zhulu: "逐鹿中原",
+    zhulu: "逐鹿天下",
   },
   play: {
     boss: "诸神降临",

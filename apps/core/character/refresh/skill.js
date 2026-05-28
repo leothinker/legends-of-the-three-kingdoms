@@ -619,7 +619,6 @@ const skills = {
     },
   },
   // 界甄姬
-  reluoshen: { audio: 2 },
   // 倾国
   reqingguo: {
     mod: {
@@ -1163,8 +1162,6 @@ const skills = {
     firstDo: true,
     audioname2: {
       old_guanzhang: "old_fuhun",
-      xin_zhangfei: "paoxiao_re_zhangfei",
-      old_zhangfei: "paoxiao_re_zhangfei",
     },
     audioname: ["guanzhang", "xiahouba", "re_guanzhang"],
     trigger: { player: "useCard1" },
@@ -1300,7 +1297,6 @@ const skills = {
     },
   },
   // 界赵云
-  relongdan: { audio: 2 },
   // 涯角
   yajiao: {
     audio: 2,

@@ -2,6 +2,168 @@ import { lib, game, ui, get, ai, _status } from "wtk"
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+  // 界刘备
+  // 激将
+  rejijiang: {
+    audio: 2,
+    audioname: ["ol_liushan"],
+    group: ["rejijiang1", "rejijiang3"],
+    zhuSkill: true,
+    filter(event, player) {
+      if (
+        !player.hasZhuSkill("rejijiang") ||
+        !game.hasPlayer(function (current) {
+          return current != player && current.group == "shu"
+        })
+      ) {
+        return false
+      }
+      return !event.jijiang && (event.type != "phase" || !player.hasSkill("jijiang3"))
+    },
+    enable: ["chooseToUse", "chooseToRespond"],
+    viewAs: { name: "sha" },
+    filterCard: () => false,
+    selectCard: -1,
+    ai: {
+      order() {
+        return get.order({ name: "sha" }) + 0.3
+      },
+      respondSha: true,
+      skillTagFilter(player) {
+        if (
+          !player.hasZhuSkill("rejijiang") ||
+          !game.hasPlayer(function (current) {
+            return current != player && current.group == "shu"
+          })
+        ) {
+          return false
+        }
+      },
+    },
+  },
+  rejijiang1: {
+    audio: "rejijiang",
+    audioname: ["ol_liushan"],
+    trigger: { player: ["useCardBegin", "respondBegin"] },
+    logTarget: "targets",
+    sourceSkill: "rejijiang",
+    filter(event, player) {
+      return event.skill == "rejijiang"
+    },
+    forced: true,
+    async content(event, trigger, player) {
+      delete trigger.skill
+      trigger.getParent().set("jijiang", true)
+
+      var current = player.next
+
+      while (current != player) {
+        if (current.group == "shu") {
+          var next = current.chooseToRespond("是否替" + get.translation(player) + "打出一张杀？", {
+            name: "sha",
+          })
+          next.set("ai", function () {
+            var event = _status.event
+            return get.attitude(event.player, event.source) - 2
+          })
+          next.set("source", player)
+          next.set("jijiang", true)
+          next.set("skillwarn", "替" + get.translation(player) + "打出一张杀")
+          next.noOrdering = true
+          next.autochoose = lib.filter.autoRespondSha
+
+          var result = await next.forResult()
+
+          if (result.bool) {
+            trigger.card = result.card
+            trigger.cards = result.cards
+            trigger.throw = false
+            if (typeof current.ai.shown == "number" && current.ai.shown < 0.95) {
+              current.ai.shown += 0.3
+              if (current.ai.shown > 0.95) {
+                current.ai.shown = 0.95
+              }
+            }
+            return
+          }
+        }
+        current = current.next
+      }
+
+      player.addTempSkill("jijiang3")
+      trigger.cancel()
+      trigger.getParent().goto(0)
+    },
+  },
+  rejijiang3: {
+    trigger: { global: ["useCard", "respond"] },
+    usable: 1,
+    sourceSkill: "rejijiang",
+    filter(event, player) {
+      return (
+        event.card.name == "sha" &&
+        event.player != player &&
+        event.player.group == "shu" &&
+        event.player.isIn() &&
+        event.player != _status.currentPhase &&
+        player.hasZhuSkill("rejijiang")
+      )
+    },
+    async cost(event, trigger, player) {
+      event.result = await trigger.player
+        .chooseBool(`激将：是否令${get.translation(player)}摸一张牌？`)
+        .set("ai", () => {
+          const evt = _status.event
+          return get.attitude(evt.player, evt.getParent().player) > 0
+        })
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      trigger.player.line(player, "fire")
+      await player.draw()
+    },
+  },
+  // 界孙权
+  // 救援
+  oljiuyuan: {
+    audio: "rejiuyuan",
+    zhuSkill: true,
+    trigger: { global: "recoverBefore" },
+    direct: true,
+    filter(event, player) {
+      return (
+        player != event.player &&
+        event.player.group == "wu" &&
+        player.hp <= event.player.hp &&
+        event.getParent().name != "rejiuyuan" &&
+        player.hasZhuSkill("rejiuyuan", event.player) &&
+        event.player === _status.currentPhase
+      )
+    },
+    async content(event, trigger, player) {
+      // step 0
+      const result = await trigger.player
+        .chooseBool(
+          "是否对" + get.translation(player) + "发动【救援】？",
+          "改为令其回复1点体力，然后你摸一张牌",
+        )
+        .set("ai", function () {
+          const evt = _status.event
+          return get.attitude(evt.player, evt.getParent().player) > 0
+        })
+        .forResult()
+
+      // step 1
+      if (result.bool) {
+        player.logSkill("rejiuyuan")
+        trigger.player.line(player, "green")
+        trigger.cancel()
+        await player.recover(trigger.player)
+        await trigger.player.draw()
+      }
+    },
+  },
+
   ollianhuan: {
     audio: "xinlianhuan",
     audioname: ["ol_pangtong"],
@@ -6365,125 +6527,6 @@ const skills = {
     },
   },
   xinhuangtian3: {},
-  rejijiang: {
-    audio: "jijiang1",
-    audioname: ["liushan", "re_liubei", "re_liushan", "ol_liushan"],
-    group: ["rejijiang1", "rejijiang3"],
-    zhuSkill: true,
-    filter(event, player) {
-      if (
-        !player.hasZhuSkill("rejijiang") ||
-        !game.hasPlayer(function (current) {
-          return current != player && current.group == "shu"
-        })
-      ) {
-        return false
-      }
-      return !event.jijiang && (event.type != "phase" || !player.hasSkill("jijiang3"))
-    },
-    enable: ["chooseToUse", "chooseToRespond"],
-    viewAs: { name: "sha" },
-    filterCard: () => false,
-    selectCard: -1,
-    ai: {
-      order() {
-        return get.order({ name: "sha" }) + 0.3
-      },
-      respondSha: true,
-      skillTagFilter(player) {
-        if (
-          !player.hasZhuSkill("rejijiang") ||
-          !game.hasPlayer(function (current) {
-            return current != player && current.group == "shu"
-          })
-        ) {
-          return false
-        }
-      },
-    },
-  },
-  rejijiang1: {
-    audio: "jijiang1",
-    audioname: ["liushan", "re_liubei", "re_liushan", "ol_liushan"],
-    trigger: { player: ["useCardBegin", "respondBegin"] },
-    logTarget: "targets",
-    sourceSkill: "rejijiang",
-    filter(event, player) {
-      return event.skill == "rejijiang"
-    },
-    forced: true,
-    async content(event, trigger, player) {
-      delete trigger.skill
-      trigger.getParent().set("jijiang", true)
-
-      var current = player.next
-
-      while (current != player) {
-        if (current.group == "shu") {
-          var next = current.chooseToRespond("是否替" + get.translation(player) + "打出一张杀？", {
-            name: "sha",
-          })
-          next.set("ai", function () {
-            var event = _status.event
-            return get.attitude(event.player, event.source) - 2
-          })
-          next.set("source", player)
-          next.set("jijiang", true)
-          next.set("skillwarn", "替" + get.translation(player) + "打出一张杀")
-          next.noOrdering = true
-          next.autochoose = lib.filter.autoRespondSha
-
-          var result = await next.forResult()
-
-          if (result.bool) {
-            trigger.card = result.card
-            trigger.cards = result.cards
-            trigger.throw = false
-            if (typeof current.ai.shown == "number" && current.ai.shown < 0.95) {
-              current.ai.shown += 0.3
-              if (current.ai.shown > 0.95) {
-                current.ai.shown = 0.95
-              }
-            }
-            return
-          }
-        }
-        current = current.next
-      }
-
-      player.addTempSkill("jijiang3")
-      trigger.cancel()
-      trigger.getParent().goto(0)
-    },
-  },
-  rejijiang3: {
-    trigger: { global: ["useCard", "respond"] },
-    usable: 1,
-    sourceSkill: "rejijiang",
-    filter(event, player) {
-      return (
-        event.card.name == "sha" &&
-        event.player != player &&
-        event.player.group == "shu" &&
-        event.player.isIn() &&
-        event.player != _status.currentPhase &&
-        player.hasZhuSkill("rejijiang")
-      )
-    },
-    async cost(event, trigger, player) {
-      event.result = await trigger.player
-        .chooseBool(`激将：是否令${get.translation(player)}摸一张牌？`)
-        .set("ai", () => {
-          const evt = _status.event
-          return get.attitude(evt.player, evt.getParent().player) > 0
-        })
-        .forResult()
-    },
-    async content(event, trigger, player) {
-      trigger.player.line(player, "fire")
-      await player.draw()
-    },
-  },
   //鲁肃
   olhaoshi: {
     audio: 2,

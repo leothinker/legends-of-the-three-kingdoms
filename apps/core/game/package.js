@@ -7,7 +7,7 @@ window.wtk_package = {
     reshenhua: "界神话再临",
     jiangxing: "将星",
     extra: "珍藏版",
-    // shenwu: "神武再世",
+    shenwu: "神武再世",
     tianshui: "天水濯名",
     jsrg: "江山如故",
     sxrm: "蚀心入魔",

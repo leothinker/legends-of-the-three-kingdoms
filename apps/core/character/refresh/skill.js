@@ -936,7 +936,6 @@ const skills = {
       },
     },
   },
-  rejijiang: { audio: 2 },
   // 界关羽
   // 武圣
   rewusheng: {
@@ -1791,16 +1790,17 @@ const skills = {
   rejiuyuan: {
     audio: 2,
     zhuSkill: true,
-    trigger: { global: "recoverBefore" },
+    trigger: { global: "useCardToPlayered" },
     direct: true,
     filter(event, player) {
       return (
+        get.name(event.card) === "tao" &&
+        event.target === event.player &&
         player != event.player &&
         event.player.group == "wu" &&
         player.hp < event.player.hp &&
         event.getParent().name != "rejiuyuan" &&
-        player.hasZhuSkill("rejiuyuan", event.player) &&
-        event.player === _status.currentPhase
+        player.hasZhuSkill("rejiuyuan", event.player)
       )
     },
     async content(event, trigger, player) {

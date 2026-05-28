@@ -1,6 +1,33 @@
 import { lib, game, ui, get, ai, _status } from "wtk"
+import { old } from "../../mode/guozhan/src/info/pile"
 
 const translates = {
+  ol_caocao: "界曹操",
+  ol_caocao_prefix: "界",
+  rehujia: "护驾",
+  rehujia_info:
+    "主公技，当你需要使用或打出【闪】时，你可以令其他魏势力角色选择是否替你使用或打出【闪】（视为由你使用或打出）。当其他魏势力角色于其回合外使用、打出或替你使用或打出【闪】时，其可以令你摸一张牌（每回合限一次）。",
+
+  ol_xuzhu: "",
+  olluoyi:
+    "摸牌阶段开始前，你可以亮出牌堆顶的三张牌，然后你可以跳过摸牌阶段并获得其中的基本牌、武器牌和【决斗】。若如此做，直到你的下个回合开始，你为伤害来源的【杀】或【决斗】造成的伤害+1。",
+
+  ol_zhenji: "",
+  olluoshen:
+    "准备阶段，你可以进行判定，当黑色判定牌生效后，你获得之并可以重复此流程。你的手牌上限+X（X为你本回合因〖洛神〗获得的牌数）。",
+
+  oljiuyuan: "救援",
+  oljiuyuan_info:
+    "主公技，当其他吴势力角色于其回合内回复体力时，若其体力值不小于你，其可以改为令你回复1点体力，然后其摸一张牌。",
+
+  ol_liubei: "界刘备",
+  ol_liubei_prefix: "界",
+  rejijiang: "激将",
+  rejijiang1: "激将",
+  rejijiang2: "激将",
+  rejijiang_info:
+    "主公技，当你需要使用或打出【杀】时，你可以令其他蜀势力角色选择是否替你使用或打出【杀】（视为由你使用或打出）。当其他蜀势力角色于其回合外使用、打出或替你使用或打出【杀】时，其可以令你摸一张牌（每回合限一次）。",
+
   re_zhangliao: "界张辽",
   re_zhangliao_prefix: "界",
   re_simayi: "界司马懿",
@@ -23,8 +50,6 @@ const translates = {
   re_zhangfei_prefix: "界",
   re_machao: "界马超",
   re_machao_prefix: "界",
-  re_caocao: "界曹操",
-  re_caocao_prefix: "界",
   re_guojia: "界郭嘉",
   re_guojia_prefix: "界",
   re_lvbu: "界吕布",
@@ -37,8 +62,6 @@ const translates = {
   re_ganning_prefix: "界",
   re_huatuo: "界华佗",
   re_huatuo_prefix: "界",
-  re_liubei: "界刘备",
-  re_liubei_prefix: "界",
 
   re_diaochan: "界貂蝉",
   re_diaochan_prefix: "界",
@@ -139,10 +162,6 @@ const translates = {
   rezhiheng: "制衡",
   rezhiheng_info:
     "出牌阶段限一次，你可以弃置任意张牌并摸等量的牌，若你在发动〖制衡〗时弃置了所有手牌，则你多摸一张牌。",
-  rejiuyuan: "救援",
-  rejiuyuan_info:
-    "主公技，其他吴势力角色于其回合内回复体力时，若其体力值大于等于你，则该角色可以改为令你回复1点体力，然后其摸一张牌。",
-
   new_yajiao: "涯角",
   new_yajiao_info:
     "每当你于回合外使用或打出牌时，你可以亮出牌堆顶的一张牌，并将其交给一名角色。若此牌与你此次使用或打出的牌类别不同，则你弃置一张牌。",
@@ -709,11 +728,6 @@ const translates = {
   oldimeng_info:
     "出牌阶段限一次，你可令两名手牌数之差不大于你牌数的其他角色交换手牌。若如此做，此阶段结束时，你弃置X张牌（X为这两名角色手牌数之差）。",
 
-  rejijiang: "激将",
-  rejijiang1: "激将",
-  rejijiang2: "激将",
-  rejijiang_info:
-    "主公技。①当你需要使用或打出【杀】时，你可以令其他蜀势力角色依次选择是否打出一张【杀】。若有角色响应，则你视为使用或打出了此【杀】。②每回合限一次。当有蜀势力角色于回合外使用或打出【杀】时，其可以令你摸一张牌。",
   xin_yufan: "界虞翻",
   xin_yufan_prefix: "界",
   xinzongxuan: "纵玄",
@@ -731,9 +745,6 @@ const translates = {
   reyanyu2: "燕语",
   reyanyu_info:
     "①出牌阶段，你可以重铸【杀】。②出牌阶段结束时，你可以令一名其他男性角色摸X张牌（X为你本阶段内发动过〖燕语①〗的次数且至多为3）。",
-  rehujia: "护驾",
-  rehujia_info:
-    "主公技。①当你需要使用或打出一张【闪】时，你可以令其他魏势力角色选择是否打出一张【闪】。若有角色响应，则你视为使用或打出了一张【闪】。②每回合限一次。当有魏势力角色于回合外使用或打出【闪】时，其可以令你摸一张牌。",
   ol_xuhuang: "界徐晃",
   ol_xuhuang_prefix: "界",
   olduanliang: "断粮",

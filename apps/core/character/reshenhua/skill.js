@@ -368,6 +368,121 @@ const skills = {
       },
     },
   },
+  // 小乔
+  // 天香
+  retianxiang: {
+    audio: 2,
+    audioname: ["daxiaoqiao"],
+    trigger: { player: "damageBegin4" },
+    preHidden: true,
+    filter(event, player) {
+      return (
+        player.countCards("h", function (card) {
+          return _status.connectMode || get.suit(card, player) == "heart"
+        }) > 0 && event.num > 0
+      )
+    },
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseCardTarget({
+          filterCard(card, player) {
+            return get.suit(card) == "heart" && lib.filter.cardDiscardable(card, player)
+          },
+          filterTarget(card, player, target) {
+            return player != target
+          },
+          ai1(card) {
+            return 10 - get.value(card)
+          },
+          ai2(target) {
+            const att = get.attitude(_status.event.player, target)
+            const trigger = _status.event.getTrigger()
+            let da = 0
+            if (_status.event.player.hp == 1) {
+              da = 10
+            }
+            const eff = get.damageEffect(target, trigger.source, target)
+            if (att == 0) {
+              return 0.1 + da
+            }
+            if (eff >= 0 && att > 0) {
+              return att + da
+            }
+            if (att > 0 && target.hp > 1) {
+              if (target.maxHp - target.hp >= 3) {
+                return att * 1.1 + da
+              }
+              if (target.maxHp - target.hp >= 2) {
+                return att * 0.9 + da
+              }
+            }
+            return -att + da
+          },
+          prompt: get.prompt(event.skill),
+          prompt2: lib.translate[`${event.skill}_info`],
+        })
+        .setHiddenSkill(event.name.slice(0, -5))
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      const [target] = event.targets
+      const [card] = event.cards
+      trigger.cancel()
+      await player.discard(event.cards)
+      const result = await player
+        .chooseControlList(
+          true,
+          function (event, player) {
+            const target = _status.event.target
+            let att = get.attitude(player, target)
+            if (target.hasSkillTag("maihp")) {
+              att = -att
+            }
+            if (att > 0) {
+              return 0
+            } else {
+              return 1
+            }
+          },
+          [
+            "令" +
+              get.translation(target) +
+              "受到伤害来源对其造成的1点伤害，然后摸X张牌（X为其已损失体力值且至多为5）",
+            "令" + get.translation(target) + "失去1点体力，然后获得" + get.translation(event.cards),
+          ],
+        )
+        .set("target", target)
+        .forResult()
+      if (typeof result.index != "number") {
+        return
+      }
+      if (result.index) {
+        event.related = target.loseHp()
+      } else {
+        event.related = target.damage(trigger.source || "nosource", "nocard")
+      }
+      await event.related
+      //if(event.related.cancelled||target.isDead()) return;
+      if (result.index && card.isInPile()) {
+        await target.gain(card, "gain2")
+      } else if (target.getDamagedHp()) {
+        await target.draw(Math.min(5, target.getDamagedHp()))
+      }
+    },
+    ai: {
+      maixie_defend: true,
+      effect: {
+        target(card, player, target) {
+          if (player.hasSkillTag("jueqing", false, target)) {
+            return
+          }
+          if (get.tag(card, "damage") && target.countCards("he") > 1) {
+            return 0.7
+          }
+        },
+      },
+    },
+  },
 
   jx_buqu: {
     audio: 2,

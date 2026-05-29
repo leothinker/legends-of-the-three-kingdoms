@@ -26,7 +26,7 @@ const translates = {
   tianxiang_info:
     "当你受到伤害时，你可以弃置一张红桃手牌并选择一名其他角色。若如此做，你将此伤害转移给其，然后其摸X张牌（X为其已损失的体力值）。",
   hongyan: "红颜",
-  hongyan_info: "锁定技，你的黑桃牌和你的黑桃判定牌视为红桃牌。 ",
+  hongyan_info: "锁定技，你的黑桃牌和你的黑桃判定牌视为红桃牌。",
 
   zhoutai: "周泰",
   buqu: "不屈",

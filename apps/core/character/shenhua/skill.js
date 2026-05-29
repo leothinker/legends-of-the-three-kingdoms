@@ -169,7 +169,7 @@ const skills = {
   // 天香
   tianxiang: {
     audio: 2,
-    audioname: ["daxiaoqiao", "re_xiaoqiao", "ol_xiaoqiao"],
+    audioname: ["daxiaoqiao"],
     trigger: { player: "damageBegin3" },
     filter(event, player) {
       return player.countCards("h", { suit: "heart" }) > 0 && event.num > 0

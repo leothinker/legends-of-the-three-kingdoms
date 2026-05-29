@@ -20,4 +20,12 @@ export default {
   "#reqimou1": "勇战不如奇谋。",
   "#reqimou2": "为了胜利，可以出其不意。",
   "#ol_weiyan:die": "奸贼害我……",
+
+  "#oltianxiang1": "你岂会懂我的美丽？",
+  "#oltianxiang2": "碧玉闺秀，只可远观。",
+  "#rehongyan1": "我的容貌，让你心动了吗？",
+  "#rehongyan2": "红颜娇花好，折花门前盼。",
+  "#piaoling1": "清风拂君，落花飘零。",
+  "#piaoling2": "花自飘零水自流。",
+  "#ol_xiaoqiao:die": "同心而离居，忧伤以终老。",
 }

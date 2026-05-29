@@ -34,12 +34,14 @@ const characterSort = {
   refresh_feng: [
     "ol_caoren",
     "ol_xiahouyuan",
+    "ol_huangzhong",
     "ol_weiyan",
     "ol_xiaoqiao",
-    "zhoutai",
-    "re_zhangjiao",
-    "xin_yuji",
-    "ol_huangzhong",
+    "ol_zhoutai",
+    "ol_zhangjiao",
+    "ol_yuji",
+    "shen_guanyu",
+    "shen_lvmeng",
   ],
   refresh_huo: [
     "ol_sp_zhugeliang",

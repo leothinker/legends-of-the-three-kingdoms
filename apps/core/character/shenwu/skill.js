@@ -1353,6 +1353,207 @@ const skills = {
       },
     },
   },
+  // 界小乔
+  // 天香
+  oltianxiang: {
+    audio: 2,
+    audioname: ["daxiaoqiao"],
+    trigger: { player: "damageBegin4" },
+    direct: true,
+    filter(event, player) {
+      return (
+        player.countCards("he", function (card) {
+          if (_status.connectMode && get.position(card) == "h") {
+            return true
+          }
+          return get.suit(card, player) == "heart"
+        }) > 0 && event.num > 0
+      )
+    },
+    async content(event, trigger, player) {
+      // step 0
+      const result = await player
+        .chooseCardTarget({
+          filterCard(card, player) {
+            return get.suit(card) == "heart" && lib.filter.cardDiscardable(card, player)
+          },
+          filterTarget(card, player, target) {
+            return player != target
+          },
+          position: "he",
+          ai1(card) {
+            return 10 - get.value(card)
+          },
+          ai2(target) {
+            var att = get.attitude(_status.event.player, target)
+            var trigger = _status.event.getTrigger()
+            var da = 0
+            if (_status.event.player.hp == 1) {
+              da = 10
+            }
+            var eff = get.damageEffect(target, trigger.source, target)
+            if (att == 0) {
+              return 0.1 + da
+            }
+            if (eff >= 0 && att > 0) {
+              return att + da
+            }
+            if (att > 0 && target.hp > 1) {
+              if (target.maxHp - target.hp >= 3) {
+                return att * 1.1 + da
+              }
+              if (target.maxHp - target.hp >= 2) {
+                return att * 0.9 + da
+              }
+            }
+            return -att + da
+          },
+          prompt: get.prompt("oltianxiang"),
+          prompt2: lib.translate.oltianxiang_info,
+        })
+        .forResult()
+      // step 1
+      if (result.bool) {
+        await player.discard(result.cards)
+        var target = result.targets[0]
+        const result2 = await player
+          .chooseControlList(
+            true,
+            function (event, player) {
+              var target = _status.event.target
+              var att = get.attitude(player, target)
+              if (target.hasSkillTag("maihp")) {
+                att = -att
+              }
+              if (att > 0) {
+                return 0
+              } else {
+                return 1
+              }
+            },
+            [
+              "令" +
+                get.translation(target) +
+                "受到伤害来源对其造成的1点伤害，然后摸X张牌（X为其已损失体力值且至多为5）",
+              "令" +
+                get.translation(target) +
+                "失去1点体力，然后获得" +
+                get.translation(result.cards),
+            ],
+          )
+          .set("target", target)
+          .forResult()
+        player.logSkill(event.name, target)
+        trigger.cancel()
+        event.target = target
+        event.card = result.cards[0]
+        // step 2
+        if (typeof result2.index == "number") {
+          event.index = result2.index
+          if (result2.index) {
+            event.related = event.target.loseHp()
+          } else {
+            const param = trigger.source
+              ? { source: trigger.source, nocard: true }
+              : { nosource: true, nocard: true }
+            event.related = event.target.damage(param)
+          }
+          await event.related
+        } else {
+          return
+        }
+        // step 3
+        if (event.related.cancelled || target.isDead()) {
+          return
+        }
+        if (event.index && event.card.isInPile()) {
+          await target.gain(event.card, "gain2")
+        } else if (target.getDamagedHp()) {
+          await target.draw({ num: Math.min(5, target.getDamagedHp()) })
+        }
+      }
+    },
+    ai: {
+      maixie_defend: true,
+      effect: {
+        target(card, player, target) {
+          if (player.hasSkillTag("jueqing", false, target)) {
+            return
+          }
+          if (get.tag(card, "damage") && target.countCards("he") > 1) {
+            return 0.7
+          }
+        },
+      },
+    },
+  },
+  // 红颜
+  rehongyan: {
+    audio: 2,
+    mod: {
+      suit(card, suit) {
+        if (suit == "spade") {
+          return "heart"
+        }
+      },
+      maxHandcardBase(player, num) {
+        if (
+          player.countCards("e", function (card) {
+            return get.suit(card, player) == "heart"
+          })
+        ) {
+          return player.maxHp
+        }
+      },
+    },
+  },
+  // 飘零
+  piaoling: {
+    audio: 2,
+    trigger: { player: "phaseJieshuBegin" },
+    frequent: true,
+    async content(event, trigger, player) {
+      const result = await player
+        .judge(function (card) {
+          return get.suit(card) == "heart" ? 2 : 0
+        })
+        .set("judge2", function (result) {
+          return result.bool ? true : false
+        })
+        .forResult()
+      if (result?.card && result.suit == "heart") {
+        const { card } = result
+        if (get.position(card, true) == "d") {
+          const result2 = await player
+            .chooseTarget(
+              "飘零：令一名角色获得" + get.translation(card) + "，或点【取消】将其置于牌堆顶",
+            )
+            .set("ai", function (target) {
+              var player = _status.event.player
+              var att = get.attitude(player, target)
+              if (player == target) {
+                att /= 2
+              }
+              return att
+            })
+            .forResult()
+          if (result2.bool && result2.targets?.length) {
+            const {
+              targets: [target],
+            } = result2
+            player.line(target, "green")
+            await target.gain(card, "gain2")
+            if (player == target) {
+              await player.chooseToDiscard("he", true)
+            }
+          } else {
+            game.log(player, "将", card, "置于牌堆顶")
+            await game.cardsGotoPile(card, "insert")
+          }
+        }
+      }
+    },
+  },
 }
 
 export default skills

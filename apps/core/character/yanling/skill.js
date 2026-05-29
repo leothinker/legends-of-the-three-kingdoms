@@ -4,7 +4,7 @@ import { lib, game, ui, get, ai, _status } from "wtk"
 const skills = {
   // 界小乔
   // 天香
-  yl_tianxiang: {
+  ylygtianxiang: {
     audio: "jx_tianxiang",
     trigger: {
       player: "damageBegin4",
@@ -35,7 +35,7 @@ const skills = {
       await player.modedDiscard(cards)
       trigger.cancel()
     },
-    group: "yl_tianxiang_lose",
+    group: "ylygtianxiang_lose",
     subSkill: {
       lose: {
         trigger: {
@@ -53,7 +53,7 @@ const skills = {
           if (!["chooseToCompare", "equip"].includes(event.name) && !event.visible) {
             return false
           }
-          return get.info("yl_tianxiang_lose").getCards(event, player).length > 0
+          return get.info("ylygtianxiang_lose").getCards(event, player).length > 0
         },
         getCards(event, player) {
           let cards
@@ -86,7 +86,7 @@ const skills = {
               const att = get.attitude(player, target)
               const eff = get.effect(target, { name: "losehp" }, player, player)
               if (cards.length == 1 && att < 0) {
-                if (target.hasSkill("yl_tianxiang_loseHp")) {
+                if (target.hasSkill("ylygtianxiang_loseHp")) {
                   return 0
                 }
                 return -att * eff
@@ -122,7 +122,7 @@ const skills = {
       },
     },
   },
-  yl_hongyan: {
+  ylyghongyan: {
     audio: "hongyan",
     mod: {
       suit(card, suit) {
@@ -202,12 +202,12 @@ const skills = {
   },
   // 界于吉
   // 蛊惑
-  yl_guhuo: {
+  ylygguhuo: {
     audio: "jx_guhuo",
     derivation: ["huinu"],
     getList(event, player) {
       return get.inpileVCardList((info) => {
-        if (!["basic", "trick"].removeArray(player.getStorage("yl_guhuo_used")).includes(info[0])) {
+        if (!["basic", "trick"].removeArray(player.getStorage("ylygguhuo_used")).includes(info[0])) {
           return false
         }
         return event.filterCard(
@@ -221,18 +221,18 @@ const skills = {
       return (
         lib.inpile.includes(name) &&
         player.countCards("hs") &&
-        !player.getStorage("yl_guhuo_used").includes(get.type(name))
+        !player.getStorage("ylygguhuo_used").includes(get.type(name))
       )
     },
     enable: "chooseToUse",
     filter(event, player) {
-      return player.countCards("hs") && get.info("yl_guhuo").getList(event, player).length
+      return player.countCards("hs") && get.info("ylygguhuo").getList(event, player).length
     },
     chooseButton: {
       dialog(event, player) {
         return ui.create.dialog(
           "蛊惑",
-          [get.info("yl_guhuo").getList(event, player), "vcard"],
+          [get.info("ylygguhuo").getList(event, player), "vcard"],
           "hidden",
         )
       },
@@ -269,24 +269,24 @@ const skills = {
                 (get.realAttitude || get.attitude)(current, player) < 0
               )
             })
-            const cardx = lib.skill.yl_guhuo_backup.viewAs
+            const cardx = lib.skill.ylygguhuo_backup.viewAs
             if (enemyNum) {
               if (
                 card.name == cardx.name &&
                 (card.name != "sha" || get.is.sameNature(card, cardx))
               ) {
                 return 2 + Math.random() * 3
-              } else if (lib.skill.yl_guhuo_backup.aiUse < 0.5 && !player.isDying()) {
+              } else if (lib.skill.ylygguhuo_backup.aiUse < 0.5 && !player.isDying()) {
                 return 0
               }
             }
             return 6 - get.value(card)
           },
           async precontent(event, trigger, player) {
-            player.logSkill("yl_guhuo")
-            player.addTempSkill("yl_guhuo_guess")
-            player.addTempSkill("yl_guhuo_used")
-            player.markAuto("yl_guhuo_used", get.type(event.result.card.name))
+            player.logSkill("ylygguhuo")
+            player.addTempSkill("ylygguhuo_guess")
+            player.addTempSkill("ylygguhuo_used")
+            player.markAuto("ylygguhuo_used", get.type(event.result.card.name))
             const [card] = event.result.cards
             event.result.card.suit = get.suit(card)
             event.result.card.number = get.number(card)
@@ -303,7 +303,7 @@ const skills = {
       respondShan: true,
       fireAttack: true,
       skillTagFilter(player) {
-        if (!player.countCards("hs") || player.getStorage("yl_guhuo_used").includes("basic")) {
+        if (!player.countCards("hs") || player.getStorage("ylygguhuo_used").includes("basic")) {
           return false
         }
       },
@@ -328,7 +328,7 @@ const skills = {
         firstDo: true,
         charlotte: true,
         filter(event, player) {
-          return event.skill == "yl_guhuo_backup"
+          return event.skill == "ylygguhuo_backup"
         },
         async content(event, trigger, player) {
           let isFake = false
@@ -343,7 +343,7 @@ const skills = {
           const next = player.lose(card, ui.ordering).set("relatedEvent", trigger)
           await next
           trigger.throw = false
-          trigger.skill = "yl_guhuo_backup"
+          trigger.skill = "ylygguhuo_backup"
           game.log(
             player,
             "声明",
@@ -405,7 +405,7 @@ const skills = {
               .chooseButton([prompt, [["jx_guhuo_ally", "jx_guhuo_betray"], "vcard"]], true)
               .set("ai", function (button) {
                 const player = _status.event.player
-                const evt = _status.event.getParent("yl_guhuo_guess"),
+                const evt = _status.event.getParent("ylygguhuo_guess"),
                   evtx = evt.getTrigger()
                 if (!evt) {
                   return Math.random()
@@ -502,26 +502,26 @@ const skills = {
     },
   },
   // 界典韦
-  yl_qiangxi: {
+  ylygqiangxi: {
     audio: "jx_qiangxi",
     enable: "phaseUse",
     onChooseToUse(event) {
-      if (!game.online && !event.yl_qiangxi_targets && event.type == "phase") {
+      if (!game.online && !event.ylygqiangxi_targets && event.type == "phase") {
         event.set(
-          "yl_qiangxi_targets",
+          "ylygqiangxi_targets",
           event.player
-            .getHistory("useSkill", (evt) => evt.skill == "yl_qiangxi")
+            .getHistory("useSkill", (evt) => evt.skill == "ylygqiangxi")
             .flatMap((evt) => evt.targets),
         )
       }
     },
     filter(event, player) {
       return game.hasPlayer(
-        (target) => !event.yl_qiangxi_targets.includes(target) && player.canCompare(target),
+        (target) => !event.ylygqiangxi_targets.includes(target) && player.canCompare(target),
       )
     },
     filterTarget(card, player, target) {
-      return !get.event().yl_qiangxi_targets.includes(target) && player.canCompare(target)
+      return !get.event().ylygqiangxi_targets.includes(target) && player.canCompare(target)
     },
     async content(event, trigger, player) {
       const { target } = event
@@ -652,7 +652,7 @@ const skills = {
       return game.hasPlayer((target) => target != player && target.hasSkill("xiangxing"))
     },
   },
-  yl_lianhuan: {
+  ylyglianhuan: {
     audio: "jx_lianhuan",
     enable: "phaseUse",
     filterCard: true,
@@ -677,7 +677,7 @@ const skills = {
         },
         filter(event, player) {
           return (
-            event.skill == "yl_lianhuan" &&
+            event.skill == "ylyglianhuan" &&
             event.targets?.length == 2 &&
             event.targets.some((target) => target.countCards("h") > 0)
           )
@@ -730,7 +730,7 @@ const skills = {
       },
     },
   },
-  yl_niepan: {
+  ylygniepan: {
     audio: "jx_niepan",
     enable: "chooseToUse",
     limited: true,
@@ -770,7 +770,7 @@ const skills = {
     ai: {
       order: 0.5,
       skillTagFilter(player, tag, target) {
-        if (player != target || player.storage.yl_niepan) {
+        if (player != target || player.storage.ylygniepan) {
           return false
         }
       },
@@ -788,7 +788,7 @@ const skills = {
         },
         async content(event, trigger, player) {
           player.removeSkill(event.name)
-          player.refreshSkill("yl_niepan")
+          player.refreshSkill("ylygniepan")
         },
       },
     },

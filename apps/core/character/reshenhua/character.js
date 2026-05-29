@@ -37,17 +37,12 @@ const characters = {
     hp: 4,
     skills: ["reliegong"],
   },
-  re_weiyan: {
-    sex: "male",
-    group: "shu",
-    hp: 4,
-    skills: ["rekuanggu", "qimou"],
-  },
   re_xiaoqiao: {
     sex: "female",
     group: "wu",
     hp: 3,
     skills: ["retianxiang", "hongyan"],
+    names: "桥|null",
   },
   re_sp_zhugeliang: {
     sex: "male",

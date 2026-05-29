@@ -21,4 +21,5 @@ export default {
   ol_xiahouyuan: "疾行的猎豹",
   ol_huangzhong: "老当益壮",
   ol_weiyan: "嗜血的独狼",
+  ol_xiaoqiao: "矫情之花",
 }

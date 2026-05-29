@@ -31,6 +31,12 @@ const translates = {
   qimou_info:
     "限定技，出牌阶段，你可以失去任意点体力，然后你于此阶段内计算与其他角色的距离-X，且你可以多使用X张【杀】（X为你以此法失去的体力值）。",
 
+  re_xiaoqiao: "界小乔",
+  re_xiaoqiao_prefix: "界",
+  retianxiang: "天香",
+  retianxiang_info:
+    "当你受到伤害时，你可以弃置一张红桃手牌并选择一名其他角色，然后防止此伤害并选择一项：1.令来源对其造成1点伤害，然后其摸X张牌（X为其已损失的体力值且至多为5）；2.令其失去1点体力，然后其获得你弃置的牌。",
+
   jx_zhoutai: "界周泰",
   jx_zhoutai_prefix: "界",
   jx_buqu: "不屈",
@@ -57,14 +63,6 @@ const translates = {
   huangtian2: "黄天",
   huangtian_info:
     "主公技，其他群势力角色的出牌阶段限一次，该角色可以将一张【闪】或【闪电】交给你。",
-
-  jx_xiaoqiao: "界小乔",
-  jx_xiaoqiao_prefix: "界",
-  jx_tianxiang: "天香",
-  jx_tianxiang_info:
-    "当你受到伤害时，你可以弃置一张♥手牌，防止此伤害并选择一名其他角色，你选择一项：1.令来源对其造成1点伤害，然后其摸X张牌（X为其已损失体力值且至多为5）；2.令其失去1点体力，然后其获得你弃置的牌。",
-  hongyan: "红颜",
-  hongyan_info: "锁定技，你的♠牌视为♥牌。",
 
   jx_sp_zhugeliang: "界卧龙诸葛",
   jx_sp_zhugeliang_prefix: "界",

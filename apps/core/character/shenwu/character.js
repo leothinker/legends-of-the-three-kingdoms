@@ -225,6 +225,13 @@ const characters = {
     hp: 4,
     skills: ["rekuanggu", "reqimou"],
   },
+  ol_xiaoqiao: {
+    sex: "female",
+    group: "wu",
+    hp: 3,
+    skills: ["oltianxiang", "rehongyan", "piaoling"],
+    names: "桥|null",
+  },
 }
 
 export default characters

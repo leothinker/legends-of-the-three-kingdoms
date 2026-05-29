@@ -121,6 +121,18 @@ const translates = {
   reqimou: "奇谋",
   reqimou_info:
     "限定技，出牌阶段，你可以失去任意点体力，摸X张牌，然后直到回合结束，你计算与其他角色的距离-X，且你可以多使用X张【杀】（X为你以此法失去的体力值）。",
+
+  ol_xiaoqiao: "界小乔",
+  ol_xiaoqiao_prefix: "界",
+  oltianxiang: "天香",
+  oltianxiang_info:
+    "当你受到伤害时，你可以弃置一张红桃牌并选择一名其他角色，然后防止此伤害并选择一项：1.令来源对其造成1点伤害，然后其摸X张牌（X为其已损失的体力值且至多为5）；2.令其失去1点体力，然后其获得你弃置的牌。",
+  rehongyan: "红颜",
+  rehongyan_info:
+    "锁定技，你的黑桃牌和你的黑桃判定牌视为红桃牌。若你的装备区里有红桃牌，你的手牌上限等于体力上限。",
+  piaoling: "飘零",
+  piaoling_info:
+    "结束阶段，你可以进行一次判定，若结果为红桃，你将判定牌置于牌堆顶或交给一名角色，若其为你，你弃置一张牌。",
 }
 
 export default translates

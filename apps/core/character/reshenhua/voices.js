@@ -18,4 +18,8 @@ export default {
   "#qimou1": "成王败寇，怎可有勇无谋？",
   "#qimou2": "且不要因为暂时的得失而胆怯。",
   "#re_weiyan:die": "奸贼害我……",
+
+  "#retianxiang1": "盈盈一笑，娇花照水。",
+  "#retianxiang2": "月容花貌难自弃。",
+  "#re_xiaoqiao:die": "周郎，等我！",
 }

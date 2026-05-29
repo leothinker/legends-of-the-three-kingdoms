@@ -10,6 +10,7 @@ export default {
 
   ol_sunquan: "年轻的贤君",
   ol_lvmeng: "士别三日",
+  ol_huanggai: "轻身为国",
   ol_sunshangxiang: "弓腰姬",
 
   ol_diaochan: "绝世的舞姬",

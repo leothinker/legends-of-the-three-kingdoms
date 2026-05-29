@@ -229,6 +229,146 @@ const skills = {
       },
     },
   },
+  // 界魏延
+  // 狂骨
+  rekuanggu: {
+    audio: 2,
+    audioname: ["ol_weiyan"],
+    trigger: { source: "damageSource" },
+    filter(event, player) {
+      return event.checkKuanggu && event.num > 0
+    },
+    getIndex(event, player, triggername) {
+      return event.num
+    },
+    preHidden: true,
+    async cost(event, trigger, player) {
+      let choice
+      if (
+        player.isDamaged() &&
+        get.recoverEffect(player) > 0 &&
+        player.countCards("hs", function (card) {
+          return card.name == "sha" && player.hasValueTarget(card)
+        }) >= player.getCardUsable("sha")
+      ) {
+        choice = "recover_hp"
+      } else {
+        choice = "draw_card"
+      }
+      const next = player.chooseDrawRecover(
+        "###" + get.prompt(event.skill) + "###摸一张牌或回复1点体力",
+      )
+      next.set("choice", choice)
+      next.set("ai", function () {
+        return _status.event.getParent().choice
+      })
+      next.set("logSkill", event.skill)
+      next.setHiddenSkill(event.skill)
+      const { control } = await next.forResult()
+      if (control == "cancel2") {
+        return
+      }
+      event.result = { bool: true, skill_popup: false } // 好像在content里面不能中断getIndex喵
+    },
+    async content(event, trigger, player) {},
+  },
+  // 奇谋
+  qimou: {
+    limited: true,
+    audio: 2,
+    enable: "phaseUse",
+    skillAnimation: true,
+    animationColor: "orange",
+    async content(event, trigger, player) {
+      const shas = player.getCards("h", "sha")
+      let num
+      if (player.hp >= 4 && shas.length >= 3) {
+        num = 3
+      } else if (player.hp >= 3 && shas.length >= 2) {
+        num = 2
+      } else {
+        num = 1
+      }
+      const map = {}
+      const list = []
+      for (let i = 1; i <= player.hp; i++) {
+        const cn = get.cnNumber(i, true)
+        map[cn] = i
+        list.push(cn)
+      }
+      player.awakenSkill(event.name)
+      player.storage.qimou = true
+      const result = await player
+        .chooseControl(list, function () {
+          return get.cnNumber(_status.event.goon, true)
+        })
+        .set("prompt", "失去任意点体力")
+        .set("goon", num)
+        .forResult()
+      num = map[result.control] || 1
+      player.storage.qimou2 = num
+      player.addTempSkill("qimou2", "phaseUseAfter")
+      await player.loseHp(num)
+    },
+    ai: {
+      order: 2,
+      result: {
+        player(player) {
+          if (player.hp == 1) {
+            return 0
+          }
+          const shas = player.getCards("h", "sha")
+          if (!shas.length) {
+            return 0
+          }
+          const card = shas[0]
+          if (!lib.filter.cardEnabled(card, player)) {
+            return 0
+          }
+          if (lib.filter.cardUsable(card, player)) {
+            return 0
+          }
+          let mindist
+          if (player.hp >= 4 && shas.length >= 3) {
+            mindist = 4
+          } else if (player.hp >= 3 && shas.length >= 2) {
+            mindist = 3
+          } else {
+            mindist = 2
+          }
+          if (
+            game.hasPlayer(function (current) {
+              return (
+                current.hp <= mindist - 1 &&
+                get.distance(player, current, "attack") <= mindist &&
+                player.canUse(card, current, false) &&
+                get.effect(current, card, player, player) > 0
+              )
+            })
+          ) {
+            return 1
+          }
+          return 0
+        },
+      },
+    },
+  },
+  qimou2: {
+    onremove: true,
+    mod: {
+      cardUsable(card, player, num) {
+        if (typeof player.storage.qimou2 == "number" && card.name == "sha") {
+          return num + player.storage.qimou2
+        }
+      },
+      globalFrom(from, to, distance) {
+        if (typeof from.storage.qimou2 == "number") {
+          return distance - from.storage.qimou2
+        }
+      },
+    },
+  },
+
   jx_buqu: {
     audio: 2,
     audioname: ["key_yuri"],
@@ -834,141 +974,6 @@ const skills = {
             return [1, (club + spade) / 4]
           }
         },
-      },
-    },
-  },
-  jx_kuanggu: {
-    audio: 2,
-    trigger: { source: "damageSource" },
-    filter(event, player) {
-      return event.checkKuanggu && event.num > 0
-    },
-    getIndex(event, player, triggername) {
-      return event.num
-    },
-    preHidden: true,
-    async cost(event, trigger, player) {
-      let choice
-      if (
-        player.isDamaged() &&
-        get.recoverEffect(player) > 0 &&
-        player.countCards("hs", function (card) {
-          return card.name == "sha" && player.hasValueTarget(card)
-        }) >= player.getCardUsable("sha")
-      ) {
-        choice = "recover_hp"
-      } else {
-        choice = "draw_card"
-      }
-      const next = player.chooseDrawRecover(
-        "###" + get.prompt(event.skill) + "###摸一张牌或回复1点体力",
-      )
-      next.set("choice", choice)
-      next.set("ai", function () {
-        return _status.event.getParent().choice
-      })
-      next.set("logSkill", event.skill)
-      next.setHiddenSkill(event.skill)
-      const { control } = await next.forResult()
-      if (control == "cancel2") {
-        return
-      }
-      event.result = { bool: true, skill_popup: false } // 好像在content里面不能中断getIndex喵
-    },
-    async content(event, trigger, player) {},
-  },
-  qimou: {
-    limited: true,
-    audio: 2,
-    enable: "phaseUse",
-    skillAnimation: true,
-    animationColor: "orange",
-    async content(event, trigger, player) {
-      const shas = player.getCards("h", "sha")
-      let num
-      if (player.hp >= 4 && shas.length >= 3) {
-        num = 3
-      } else if (player.hp >= 3 && shas.length >= 2) {
-        num = 2
-      } else {
-        num = 1
-      }
-      const map = {}
-      const list = []
-      for (let i = 1; i <= player.hp; i++) {
-        const cn = get.cnNumber(i, true)
-        map[cn] = i
-        list.push(cn)
-      }
-      player.awakenSkill(event.name)
-      player.storage.qimou = true
-      const result = await player
-        .chooseControl(list, function () {
-          return get.cnNumber(_status.event.goon, true)
-        })
-        .set("prompt", "失去任意点体力")
-        .set("goon", num)
-        .forResult()
-      num = map[result.control] || 1
-      player.storage.qimou2 = num
-      player.addTempSkill("qimou2")
-      await player.loseHp(num)
-    },
-    ai: {
-      order: 2,
-      result: {
-        player(player) {
-          if (player.hp == 1) {
-            return 0
-          }
-          const shas = player.getCards("h", "sha")
-          if (!shas.length) {
-            return 0
-          }
-          const card = shas[0]
-          if (!lib.filter.cardEnabled(card, player)) {
-            return 0
-          }
-          if (lib.filter.cardUsable(card, player)) {
-            return 0
-          }
-          let mindist
-          if (player.hp >= 4 && shas.length >= 3) {
-            mindist = 4
-          } else if (player.hp >= 3 && shas.length >= 2) {
-            mindist = 3
-          } else {
-            mindist = 2
-          }
-          if (
-            game.hasPlayer(function (current) {
-              return (
-                current.hp <= mindist - 1 &&
-                get.distance(player, current, "attack") <= mindist &&
-                player.canUse(card, current, false) &&
-                get.effect(current, card, player, player) > 0
-              )
-            })
-          ) {
-            return 1
-          }
-          return 0
-        },
-      },
-    },
-  },
-  qimou2: {
-    onremove: true,
-    mod: {
-      cardUsable(card, player, num) {
-        if (typeof player.storage.qimou2 == "number" && card.name == "sha") {
-          return num + player.storage.qimou2
-        }
-      },
-      globalFrom(from, to, distance) {
-        if (typeof from.storage.qimou2 == "number") {
-          return distance - from.storage.qimou2
-        }
       },
     },
   },

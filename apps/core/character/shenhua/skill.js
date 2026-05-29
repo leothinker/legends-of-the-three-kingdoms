@@ -156,7 +156,6 @@ const skills = {
   // 狂骨
   kuanggu: {
     audio: 2,
-    audioname: ["re_weiyan", "ol_weiyan"],
     trigger: { source: "damageSource" },
     forced: true,
     filter(event, player) {

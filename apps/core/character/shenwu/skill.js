@@ -741,6 +741,99 @@ const skills = {
       await player.addSkills("gongxin")
     },
   },
+  // 诈降
+  rezhaxiang: {
+    audio: "zhaxiang",
+    trigger: { player: "loseHpEnd" },
+    filter(event, player) {
+      return player.isIn() && event.num > 0
+    },
+    getIndex: (event) => event.num,
+    forced: true,
+    async content(event, trigger, player) {
+      await player.draw(3)
+      if (player.isPhaseUsing()) {
+        player.addTempSkill(event.name + "_effect")
+        player.addMark(event.name + "_effect", 1, false)
+      }
+    },
+    subSkill: {
+      effect: {
+        mod: {
+          targetInRange(card, player, target, now) {
+            if (card.name == "sha" && get.color(card) == "red") {
+              return true
+            }
+          },
+          cardUsable(card, player, num) {
+            if (card.name == "sha") {
+              return num + player.countMark("rezhaxiang_effect")
+            }
+          },
+        },
+        charlotte: true,
+        onremove: true,
+        audio: "rezhaxiang",
+        audioname2: { ol_sb_jiangwei: "rezhaxiang_ol_sb_jiangwei" },
+        trigger: { player: "useCard" },
+        sourceSkill: "rezhaxiang",
+        filter(event, player) {
+          return event.card?.name == "sha" && get.color(event.card) == "red"
+        },
+        forced: true,
+        async content(event, trigger, player) {
+          trigger.directHit.addArray(game.players)
+        },
+        intro: {
+          content: "<li>使用【杀】的次数上限+#<br><li>使用红色【杀】无距离限制且不能被【闪】响应",
+        },
+        ai: {
+          directHit_ai: true,
+          skillTagFilter(player, tag, arg) {
+            return arg?.card?.name == "sha" && get.color(arg.card) == "red"
+          },
+        },
+      },
+    },
+    ai: {
+      maihp: true,
+      effect: {
+        target(card, player, target) {
+          if (get.tag(card, "damage")) {
+            if (player.hasSkillTag("jueqing", false, target)) {
+              return [1, 1]
+            }
+            return 1.2
+          }
+          if (get.tag(card, "loseHp")) {
+            if (target.hp <= 1) {
+              return
+            }
+            var using = target.isPhaseUsing()
+            if (target.hp <= 2) {
+              return [1, player.countCards("h") <= 1 && using ? 3 : 0]
+            }
+            if (using && target.countCards("h", { name: "sha", color: "red" })) {
+              return [1, 3]
+            }
+            return [
+              1,
+              target.countCards("h") <= target.hp ||
+              (using &&
+                game.hasPlayer(
+                  (current) =>
+                    current != player &&
+                    get.attitude(player, current) < 0 &&
+                    player.inRange(current),
+                ))
+                ? 3
+                : 2,
+            ]
+          }
+        },
+      },
+    },
+  },
   // 博图
   botu: {
     audio: 2,
@@ -1184,6 +1277,79 @@ const skills = {
           return true
         }
         return false
+      },
+    },
+  },
+  // 界魏延
+  // 奇谋
+  reqimou: {
+    limited: true,
+    audio: 2,
+    enable: "phaseUse",
+    skillAnimation: true,
+    animationColor: "orange",
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      const result = await player
+        .chooseNumbers(
+          get.prompt(event.name),
+          [{ prompt: "请选择你要失去的体力值", min: 1, max: player.getHp() }],
+          true,
+        )
+        .set("processAI", () => {
+          const player = get.player()
+          let num = player.getHp() - 1
+          if (player.countCards("hs", { name: ["tao", "jiu"] })) {
+            num = player.getHp()
+          }
+          return [num]
+        })
+        .forResult()
+      const number = result.numbers[0]
+      player.storage.reqimou2 = number
+      await player.loseHp(number)
+      await player.draw(number)
+      player.addTempSkill("reqimou2")
+    },
+    ai: {
+      order: 14,
+      result: {
+        player(player) {
+          if (player.hp < 3) {
+            return false
+          }
+          var mindist = player.hp
+          if (player.countCards("hs", (card) => player.canSaveCard(card, player))) {
+            mindist++
+          }
+          if (
+            game.hasPlayer(function (current) {
+              return (
+                get.distance(player, current) <= mindist &&
+                player.canUse("sha", current, false) &&
+                get.effect(current, { name: "sha" }, player, player) > 0
+              )
+            })
+          ) {
+            return 1
+          }
+          return 0
+        },
+      },
+    },
+  },
+  reqimou2: {
+    onremove: true,
+    mod: {
+      cardUsable(card, player, num) {
+        if (typeof player.storage.reqimou2 == "number" && card.name == "sha") {
+          return num + player.storage.reqimou2
+        }
+      },
+      globalFrom(from, to, distance) {
+        if (typeof from.storage.reqimou2 == "number") {
+          return distance - from.storage.reqimou2
+        }
       },
     },
   },

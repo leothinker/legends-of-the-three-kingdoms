@@ -19,7 +19,7 @@ const characterSort = {
     "ol_sunquan",
     "re_ganning",
     "ol_lvmeng",
-    "re_huanggai",
+    "ol_huanggai",
     "re_zhouyu",
     "re_daqiao",
     "re_luxun",

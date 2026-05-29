@@ -12,4 +12,10 @@ export default {
   "#reliegong1": "弓不离手，自有转机。",
   "#reliegong2": "箭阵开道，所向无敌。",
   "#re_huangzhong:die": "把我的弓，拿来，呃。",
+
+  "#rekuanggu1": "哈哈哈……赢你还不容易？",
+  "#rekuanggu2": "哼！也不看看我是何人！",
+  "#qimou1": "成王败寇，怎可有勇无谋？",
+  "#qimou2": "且不要因为暂时的得失而胆怯。",
+  "#re_weiyan:die": "奸贼害我……",
 }

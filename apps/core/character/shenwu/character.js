@@ -125,11 +125,13 @@ const characters = {
     img: "image/character/re_lvmeng.jpg",
     dieAudios: ["re_lvmeng"],
   },
-  re_huanggai: {
+  ol_huanggai: {
     sex: "male",
     group: "wu",
     hp: 4,
-    skills: ["rekurou", "zhaxiang"],
+    skills: ["rekurou", "rezhaxiang"],
+    img: "image/character/re_huanggai.jpg",
+    dieAudios: ["re_huanggai"],
   },
   re_zhouyu: {
     sex: "male",
@@ -216,6 +218,12 @@ const characters = {
     group: "shu",
     hp: 4,
     skills: ["olliegong"],
+  },
+  ol_weiyan: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["rekuanggu", "reqimou"],
   },
 }
 

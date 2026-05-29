@@ -67,6 +67,12 @@ const translates = {
   botu_info:
     "每轮限X次（X为存活角色数且至多为3），回合结束后，若本回合置入弃牌堆的牌包含四种花色，你可以获得一个额外回合。",
 
+  ol_huanggai: "界黄盖",
+  ol_huanggai_prefix: "界",
+  rezhaxiang: "诈降",
+  rezhaxiang_info:
+    "锁定技，当你失去1点体力后，你摸三张牌，然后若此时为你的出牌阶段内，则此回合你使用【杀】的次数上限+1、使用红色【杀】无距离限制且不能被【闪】响应。",
+
   ol_sunshangxiang: "界孙尚香",
   ol_sunshangxiang_prefix: "界",
 
@@ -109,6 +115,12 @@ const translates = {
   olliegong: "烈弓",
   olliegong_info:
     "你使用【杀】无距离限制。当你使用【杀】指定一名角色为目标后，你可以根据下列条件执行相应的效果：1.其手牌数不大于你的手牌数，其不能使用【闪】响应此【杀】；2.其体力值不小于你的体力值，此【杀】伤害+1。",
+
+  ol_weiyan: "界魏延",
+  ol_weiyan_prefix: "界",
+  reqimou: "奇谋",
+  reqimou_info:
+    "限定技，出牌阶段，你可以失去任意点体力，摸X张牌，然后直到回合结束，你计算与其他角色的距离-X，且你可以多使用X张【杀】（X为你以此法失去的体力值）。",
 }
 
 export default translates

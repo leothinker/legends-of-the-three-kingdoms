@@ -23,6 +23,14 @@ const translates = {
   reliegong_info:
     "你使用【杀】可以选择距离不大于此【杀】点数的角色为目标。当你使用【杀】指定一名角色为目标后，你可以根据下列条件执行相应的效果：1.其手牌数不大于你的手牌数，其不能使用【闪】响应此【杀】；2.其体力值不小于你的体力值，此【杀】伤害+1。",
 
+  re_weiyan: "界魏延",
+  re_weiyan_prefix: "界",
+  rekuanggu: "狂骨",
+  rekuanggu_info: "当你对距离小于2的一名角色造成1点伤害后，你可以回复1点体力或摸一张牌。",
+  qimou: "奇谋",
+  qimou_info:
+    "限定技，出牌阶段，你可以失去任意点体力，然后你于此阶段内计算与其他角色的距离-X，且你可以多使用X张【杀】（X为你以此法失去的体力值）。",
+
   jx_zhoutai: "界周泰",
   jx_zhoutai_prefix: "界",
   jx_buqu: "不屈",
@@ -49,14 +57,6 @@ const translates = {
   huangtian2: "黄天",
   huangtian_info:
     "主公技，其他群势力角色的出牌阶段限一次，该角色可以将一张【闪】或【闪电】交给你。",
-
-  jx_weiyan: "界魏延",
-  jx_weiyan_prefix: "界",
-  jx_kuanggu: "狂骨",
-  jx_kuanggu_info: "当你对距离1以内的一名角色造成1点伤害后，你可以回复1点体力或摸一张牌。",
-  qimou: "奇谋",
-  qimou_info:
-    "限定技，出牌阶段，你可以失去任意点体力，然后直到回合结束，你计算与其他角色的距离-X，且你可以多使用X张【杀】。（X为你失去的体力值）",
 
   jx_xiaoqiao: "界小乔",
   jx_xiaoqiao_prefix: "界",

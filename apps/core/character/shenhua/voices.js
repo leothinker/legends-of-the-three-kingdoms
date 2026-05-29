@@ -1,7 +1,7 @@
 export default {
-  "#jushou1": "我先休息一会！",
-  "#jushou2": "尽管来吧！",
-  "#new_caoren:die": "实在是守不住了。",
+  "#jushou1": "尽管来吧！",
+  "#jushou2": "我先休息一会！",
+  "#caoren:die": "实在是守不住了。",
 
   "#shensu11": "吾善于千里袭人。",
   "#shensu12": "取汝首级，犹如探囊取物。",

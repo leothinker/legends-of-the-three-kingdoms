@@ -15,4 +15,6 @@ export default {
   ol_diaochan: "绝世的舞姬",
   ol_huaxiong: "飞扬跋扈",
   ol_gongsunzan: "白马将军",
+
+  ol_caoren: "大将军",
 }

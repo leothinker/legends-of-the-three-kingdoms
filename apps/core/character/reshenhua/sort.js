@@ -1,12 +1,12 @@
 const characterSort = {
   reshenhua_feng: [
+    "re_caoren",
     "jx_zhoutai",
     "jx_yuji",
     "jx_zhangjiao",
     "jx_huangzhong",
     "jx_weiyan",
     "jx_xiahouyuan",
-    "jx_caoren",
     "jx_xiaoqiao",
     "shen_guanyu",
     "shen_lvmeng",

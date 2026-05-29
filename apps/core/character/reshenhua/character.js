@@ -1,4 +1,10 @@
 const characters = {
+  re_caoren: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["rejushou", "jiewei"],
+  },
   re_zhoutai: {
     sex: "male",
     group: "wu",
@@ -35,12 +41,6 @@ const characters = {
     group: "wei",
     hp: 4,
     skills: ["reshensu"],
-  },
-  re_caoren: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["rejushou", "jiewei"],
   },
   re_xiaoqiao: {
     sex: "female",

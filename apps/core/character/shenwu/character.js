@@ -196,6 +196,14 @@ const characters = {
     img: "image/character/re_gongsunzan.jpg",
     dieAudios: ["re_gongsunzan"],
   },
+  ol_caoren: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["rejushou", "rejiewei"],
+    img: "image/character/re_caoren.jpg",
+    dieAudios: ["re_caoren"],
+  },
 }
 
 export default characters

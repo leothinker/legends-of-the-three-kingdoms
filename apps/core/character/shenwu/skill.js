@@ -1031,6 +1031,56 @@ const skills = {
       }
     },
   },
+  // 曹仁
+  // 解围
+  rejiewei: {
+    audio: "jiewei",
+    enable: "chooseToUse",
+    filterCard: true,
+    position: "e",
+    viewAs: { name: "wuxie" },
+    filter(event, player) {
+      return player.countCards("e") > 0
+    },
+    viewAsFilter(player) {
+      return player.countCards("e") > 0
+    },
+    prompt: "将装备区里的一张牌当【无懈可击】使用",
+    check(card) {
+      return 8 - get.equipValue(card)
+    },
+    threaten: 1.2,
+    group: "rejiewei_move",
+    subSkill: {
+      move: {
+        trigger: { player: "turnOverEnd" },
+        audio: "jiewei",
+        filter(event, player) {
+          return !player.isTurnedOver() && player.canMoveCard()
+        },
+        async cost(event, trigger, player) {
+          event.result = await player
+            .chooseToDiscard(
+              "he",
+              get.prompt("rejiewei"),
+              "弃置一张牌，然后可以移动场上的一张牌",
+              lib.filter.cardDiscardable,
+            )
+            .set("ai", function (card) {
+              if (!_status.event.check) {
+                return 0
+              }
+              return 7 - get.value(card)
+            })
+            .set("check", player.canMoveCard(true))
+            .forResult()
+        },
+        async content(event, trigger, player) {
+          await player.moveCard()
+        },
+      },
+    },
+  },
 }
 
 export default skills

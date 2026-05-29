@@ -32,7 +32,7 @@ const characterSort = {
     "ol_gongsunzan",
   ],
   refresh_feng: [
-    "caoren",
+    "ol_caoren",
     "ol_xiahouyuan",
     "ol_weiyan",
     "ol_xiaoqiao",

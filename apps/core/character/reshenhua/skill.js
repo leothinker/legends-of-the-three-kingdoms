@@ -2,6 +2,83 @@ import { lib, game, ui, get, ai, _status } from "wtk"
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+  // 曹仁
+  // 据守
+  rejushou: {
+    audio: 2,
+    trigger: { player: "phaseJieshuBegin" },
+    async content(event, trigger, player) {
+      await player.draw(4)
+      await player.turnOver()
+      const result = await player
+        .chooseCard("h", true, "弃置一张手牌，若此牌为装备牌，则你改为使用之")
+        .set("ai", function (card) {
+          if (get.type(card) == "equip") {
+            return 5 - get.value(card)
+          }
+          return -get.value(card)
+        })
+        .set("filterCard", lib.filter.cardDiscardable)
+        .forResult()
+      if (result.bool && result.cards.length) {
+        const card = result.cards[0]
+        if (get.type(card) == "equip" && player.hasUseTarget(card)) {
+          player.chooseUseTarget(card, true, "nopopup")
+        } else {
+          player.discard(card)
+        }
+      }
+    },
+  },
+  // 解围
+  jiewei: {
+    audio: 2,
+    enable: "chooseToUse",
+    filterCard: true,
+    position: "e",
+    viewAs: { name: "wuxie" },
+    filter(event, player) {
+      return player.countCards("e") > 0
+    },
+    viewAsFilter(player) {
+      return player.countCards("e") > 0
+    },
+    prompt: "将装备区里的一张牌当【无懈可击】使用",
+    check(card) {
+      return 8 - get.equipValue(card)
+    },
+    threaten: 1.2,
+    group: "jiewei_move",
+    subSkill: {
+      move: {
+        trigger: { player: "turnOverEnd" },
+        audio: "jiewei",
+        filter(event, player) {
+          return !player.isTurnedOver() && player.canMoveCard()
+        },
+        async cost(event, trigger, player) {
+          event.result = await player
+            .chooseToDiscard(
+              "h",
+              get.prompt("jiewei"),
+              "弃置一张手牌，然后可以移动场上的一张牌",
+              lib.filter.cardDiscardable,
+            )
+            .set("ai", function (card) {
+              if (!_status.event.check) {
+                return 0
+              }
+              return 7 - get.value(card)
+            })
+            .set("check", player.canMoveCard(true))
+            .forResult()
+        },
+        async content(event, trigger, player) {
+          await player.moveCard()
+        },
+      },
+    },
+  },
   jx_buqu: {
     audio: 2,
     audioname: ["key_yuri"],
@@ -887,80 +964,6 @@ const skills = {
       trigger.cancel()
       await player.turnOver()
       await player.useCard({ name: "sha", isCard: true }, event.targets[0], false)
-    },
-  },
-  jx_jushou: {
-    audio: 2,
-    trigger: { player: "phaseJieshuBegin" },
-    async content(event, trigger, player) {
-      await player.draw(4)
-      await player.turnOver()
-      const result = await player
-        .chooseCard("h", true, "弃置一张手牌，若以此法弃置的是装备牌，则你改为使用之")
-        .set("ai", function (card) {
-          if (get.type(card) == "equip") {
-            return 5 - get.value(card)
-          }
-          return -get.value(card)
-        })
-        .set("filterCard", lib.filter.cardDiscardable)
-        .forResult()
-      if (result.bool && result.cards.length) {
-        const card = result.cards[0]
-        if (get.type(card) == "equip" && player.hasUseTarget(card)) {
-          player.chooseUseTarget(card, true, "nopopup")
-        } else {
-          player.discard(card)
-        }
-      }
-    },
-  },
-  jiewei: {
-    audio: 2,
-    enable: "chooseToUse",
-    filterCard: true,
-    position: "e",
-    viewAs: { name: "wuxie" },
-    filter(event, player) {
-      return player.countCards("e") > 0
-    },
-    viewAsFilter(player) {
-      return player.countCards("e") > 0
-    },
-    prompt: "将一张装备区内的牌当无懈可击使用",
-    check(card) {
-      return 8 - get.equipValue(card)
-    },
-    threaten: 1.2,
-    group: "jiewei_move",
-    subSkill: {
-      move: {
-        trigger: { player: "turnOverEnd" },
-        audio: "jiewei",
-        filter(event, player) {
-          return !player.isTurnedOver() && player.canMoveCard()
-        },
-        async cost(event, trigger, player) {
-          event.result = await player
-            .chooseToDiscard(
-              "he",
-              get.prompt("jiewei"),
-              "弃置一张牌并移动场上的一张牌",
-              lib.filter.cardDiscardable,
-            )
-            .set("ai", function (card) {
-              if (!_status.event.check) {
-                return 0
-              }
-              return 7 - get.value(card)
-            })
-            .set("check", player.canMoveCard(true))
-            .forResult()
-        },
-        async content(event, trigger, player) {
-          await player.moveCard(true)
-        },
-      },
     },
   },
   jx_tianxiang: {

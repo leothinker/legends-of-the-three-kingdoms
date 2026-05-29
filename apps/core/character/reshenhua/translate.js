@@ -1,6 +1,15 @@
 import { lib, game, ui, get, ai, _status } from "wtk"
 
 const translates = {
+  re_caoren: "界曹仁",
+  re_caoren_prefix: "界",
+  rejushou: "据守",
+  rejushou_info:
+    "结束阶段，你可以翻面，然后摸四张牌并弃置一张手牌，若此牌为装备牌，则你改为使用之。",
+  jiewei: "解围",
+  jiewei_info:
+    "你可以将装备区里的一张牌当【无懈可击】使用；当你翻面至正面朝上时，你可以弃置一张手牌，然后可以移动场上的一张牌。",
+
   jx_zhoutai: "界周泰",
   jx_zhoutai_prefix: "界",
   jx_buqu: "不屈",
@@ -47,15 +56,6 @@ const translates = {
   jx_shensu: "神速",
   jx_shensu_info:
     "你可以做出如下选择：1.跳过判定阶段和摸牌阶段；2.跳过出牌阶段并弃置一张装备牌；3.跳过弃牌阶段并翻面。你每选择一项，视为你使用一张无距离限制的【杀】。",
-
-  jx_caoren: "界曹仁",
-  jx_caoren_prefix: "界",
-  jx_jushou: "据守",
-  jx_jushou_info:
-    "结束阶段，你可以翻面，若如此做，你摸四张牌，然后你弃置一张手牌，若以此法弃置的是装备牌，则改为你使用之。",
-  jiewei: "解围",
-  jiewei_info:
-    "你可以将装备区里的牌当【无懈可击】使用；当你从背面翻至正面时，你可以弃置一张手牌，然后移动场上的一张牌。",
 
   jx_xiaoqiao: "界小乔",
   jx_xiaoqiao_prefix: "界",

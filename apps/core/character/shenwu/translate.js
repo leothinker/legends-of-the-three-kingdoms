@@ -92,6 +92,12 @@ const translates = {
   reqiaomeng: "趫猛",
   reqiaomeng_info:
     "当你使用的黑色牌指定其他角色为目标后，你可以弃置其中一个目标一张牌。若此牌为：装备牌，你获得之；锦囊牌，此黑色牌无法被响应。",
+
+  ol_caoren: "界曹仁",
+  ol_caoren_prefix: "界",
+  rejiewei: "解围",
+  rejiewei_info:
+    "你可以将装备区里的一张牌当【无懈可击】使用；当你翻面至正面朝上时，你可以弃置一张牌，然后可以移动场上的一张牌。",
 }
 
 export default translates

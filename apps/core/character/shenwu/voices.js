@@ -10,4 +10,8 @@ export default {
   "#shebian1": "设变力战，虏敌千万。",
   "#shebian2": "随机应变，临机设变。",
   "#ol_xiahouyuan:die": "我的速度，还是不够……",
+
+  "#olliegong1": "龙骨成镞，矢破苍穹。",
+  "#olliegong2": "凤翎为羽，箭没坚城。",
+  "#ol_huangzhong:die": "末将有负主公重托……",
 }

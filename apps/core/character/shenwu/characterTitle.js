@@ -17,4 +17,7 @@ export default {
   ol_gongsunzan: "白马将军",
 
   ol_caoren: "大将军",
+  ol_xiahouyuan: "疾行的猎豹",
+  ol_huangzhong: "老当益壮",
+  ol_weiyan: "嗜血的独狼",
 }

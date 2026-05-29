@@ -8,4 +8,8 @@ export default {
   "#reshensu1": "吾等无需恋战。",
   "#reshensu2": "吾自当以一当十，速战速决。",
   "#re_xiahouyuan:die": "吾命休矣，遂成竖子之名。",
+
+  "#reliegong1": "弓不离手，自有转机。",
+  "#reliegong2": "箭阵开道，所向无敌。",
+  "#re_huangzhong:die": "把我的弓，拿来，呃。",
 }

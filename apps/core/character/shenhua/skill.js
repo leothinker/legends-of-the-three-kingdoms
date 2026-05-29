@@ -117,7 +117,6 @@ const skills = {
   // 烈弓
   liegong: {
     audio: 2,
-    audioname: ["re_huangzhong"],
     trigger: { player: "useCardToPlayered" },
     check(event, player) {
       return get.attitude(player, event.target) <= 0

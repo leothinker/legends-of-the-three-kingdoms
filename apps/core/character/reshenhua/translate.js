@@ -17,6 +17,12 @@ const translates = {
   reshensu_info:
     "你可以做出如下选择：1.跳过判定阶段和摸牌阶段；2.跳过出牌阶段并弃置一张装备牌；3.跳过弃牌阶段并翻面。你每选择一项，便视为使用一张无距离限制的【杀】。",
 
+  re_huangzhong: "界黄忠",
+  re_huangzhong_prefix: "界",
+  reliegong: "烈弓",
+  reliegong_info:
+    "你使用【杀】可以选择距离不大于此【杀】点数的角色为目标。当你使用【杀】指定一名角色为目标后，你可以根据下列条件执行相应的效果：1.其手牌数不大于你的手牌数，其不能使用【闪】响应此【杀】；2.其体力值不小于你的体力值，此【杀】伤害+1。",
+
   jx_zhoutai: "界周泰",
   jx_zhoutai_prefix: "界",
   jx_buqu: "不屈",
@@ -43,12 +49,6 @@ const translates = {
   huangtian2: "黄天",
   huangtian_info:
     "主公技，其他群势力角色的出牌阶段限一次，该角色可以将一张【闪】或【闪电】交给你。",
-
-  jx_huangzhong: "界黄忠",
-  jx_huangzhong_prefix: "界",
-  jx_liegong: "烈弓",
-  jx_liegong_info:
-    "你的【杀】攻击范围等于此【杀】的点数。你的【杀】指定目标后，你可以根据下列条件执行相应的效果：1.若你的手牌数不小于其手牌数，该角色不能使用【闪】；2.若你的体力值不大于其体力值，此【杀】伤害+1。",
 
   jx_weiyan: "界魏延",
   jx_weiyan_prefix: "界",

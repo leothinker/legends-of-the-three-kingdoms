@@ -1031,7 +1031,7 @@ const skills = {
       }
     },
   },
-  // 曹仁
+  // 界曹仁
   // 解围
   rejiewei: {
     audio: "jiewei",
@@ -1081,7 +1081,7 @@ const skills = {
       },
     },
   },
-  // 夏侯渊
+  // 界夏侯渊
   // 设变
   shebian: {
     audio: 2,
@@ -1094,6 +1094,97 @@ const skills = {
     },
     async content(event, trigger, player) {
       await player.moveCard().set("nojudge", true)
+    },
+  },
+  // 界黄忠
+  // 烈弓
+  olliegong: {
+    mod: {
+      aiOrder(player, card, num) {
+        if (num > 0 && (card.name === "sha" || get.tag(card, "draw"))) {
+          return num + 6
+        }
+      },
+      targetInRange(card, player) {
+        if (card.name == "sha") {
+          return true
+        }
+      },
+    },
+    targetprompt2: (target) => {
+      const player = get.player(),
+        card = get.card(),
+        list = []
+      if (card?.name != "sha" || !target.classList.contains("selectable")) {
+        return list
+      }
+      const num = card.cards?.length ?? 0
+      if (target.countCards("h") <= player.countCards("h") - num) {
+        list.add("不可响应")
+      }
+      if (target.hp >= player.hp) {
+        list.add("加伤")
+      }
+      return list
+    },
+    onChooseToUse(event) {
+      event.targetprompt2.add(lib.skill.olliegong.targetprompt2)
+    },
+    onChooseTarget(event) {
+      event.targetprompt2.add(lib.skill.olliegong.targetprompt2)
+    },
+    audio: 2,
+    trigger: { player: "useCardToTargeted" },
+    logTarget: "target",
+    locked: false,
+    check(event, player) {
+      return get.attitude(player, event.target) <= 0
+    },
+    filter(event, player) {
+      if (event.card.name != "sha") {
+        return false
+      }
+      if (event.target.countCards("h") <= player.countCards("h")) {
+        return true
+      }
+      if (event.target.hp >= player.hp) {
+        return true
+      }
+      return false
+    },
+    async content(event, trigger, player) {
+      if (trigger.target.countCards("h") <= player.countCards("h")) {
+        trigger.getParent().directHit.push(trigger.target)
+      }
+      if (trigger.target.hp >= player.hp) {
+        const id = trigger.target.playerid
+        const map = trigger.getParent().customArgs
+        if (!map[id]) {
+          map[id] = {}
+        }
+        if (typeof map[id].extraDamage != "number") {
+          map[id].extraDamage = 0
+        }
+        map[id].extraDamage++
+      }
+    },
+    ai: {
+      threaten: 0.5,
+      directHit_ai: true,
+      skillTagFilter(player, tag, arg) {
+        if (
+          arg?.target &&
+          arg?.card &&
+          get.attitude(player, arg.target) <= 0 &&
+          arg.card.name == "sha" &&
+          player.countCards("h", function (card) {
+            return card != arg.card && (!arg.card.cards || !arg.card.cards.includes(card))
+          }) >= arg.target.countCards("h")
+        ) {
+          return true
+        }
+        return false
+      },
     },
   },
 }

@@ -103,6 +103,12 @@ const translates = {
   ol_xiahouyuan_prefix: "界",
   shebian: "设变",
   shebian_info: "当你翻面时，你可以移动场上的一张装备牌。",
+
+  ol_huangzhong: "界黄忠",
+  ol_huangzhong_prefix: "界",
+  olliegong: "烈弓",
+  olliegong_info:
+    "你使用【杀】无距离限制。当你使用【杀】指定一名角色为目标后，你可以根据下列条件执行相应的效果：1.其手牌数不大于你的手牌数，其不能使用【闪】响应此【杀】；2.其体力值不小于你的体力值，此【杀】伤害+1。",
 }
 
 export default translates

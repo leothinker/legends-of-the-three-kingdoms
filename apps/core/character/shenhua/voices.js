@@ -3,8 +3,8 @@ export default {
   "#jushou2": "我先休息一会！",
   "#caoren:die": "实在是守不住了。",
 
-  "#shensu11": "吾善于千里袭人。",
-  "#shensu12": "取汝首级，犹如探囊取物。",
+  "#shensu1": "取汝首级，犹如探囊取物。",
+  "#shensu2": "吾善于千里袭人。",
   "#xiahouyuan:die": "竟然，比我还，快。",
 
   "#liegong1": "百步穿杨！",

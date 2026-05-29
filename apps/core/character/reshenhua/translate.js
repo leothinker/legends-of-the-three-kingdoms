@@ -10,6 +10,13 @@ const translates = {
   jiewei_info:
     "你可以将装备区里的一张牌当【无懈可击】使用；当你翻面至正面朝上时，你可以弃置一张手牌，然后可以移动场上的一张牌。",
 
+  re_xiahouyuan: "界夏侯渊",
+  re_xiahouyuan_prefix: "界",
+  reshensu: "神速",
+  shensu4: "神速",
+  reshensu_info:
+    "你可以做出如下选择：1.跳过判定阶段和摸牌阶段；2.跳过出牌阶段并弃置一张装备牌；3.跳过弃牌阶段并翻面。你每选择一项，便视为使用一张无距离限制的【杀】。",
+
   jx_zhoutai: "界周泰",
   jx_zhoutai_prefix: "界",
   jx_buqu: "不屈",
@@ -50,12 +57,6 @@ const translates = {
   qimou: "奇谋",
   qimou_info:
     "限定技，出牌阶段，你可以失去任意点体力，然后直到回合结束，你计算与其他角色的距离-X，且你可以多使用X张【杀】。（X为你失去的体力值）",
-
-  jx_xiahouyuan: "界夏侯渊",
-  jx_xiahouyuan_prefix: "界",
-  jx_shensu: "神速",
-  jx_shensu_info:
-    "你可以做出如下选择：1.跳过判定阶段和摸牌阶段；2.跳过出牌阶段并弃置一张装备牌；3.跳过弃牌阶段并翻面。你每选择一项，视为你使用一张无距离限制的【杀】。",
 
   jx_xiaoqiao: "界小乔",
   jx_xiaoqiao_prefix: "界",

@@ -79,6 +79,63 @@ const skills = {
       },
     },
   },
+  // 夏侯渊
+  // 神速
+  reshensu: {
+    audio: 2,
+    audioname: ["xiahouba", "ol_xiahouyuan"],
+    group: ["reshensu_1", "reshensu_2", "shensu4"],
+    preHidden: ["reshensu_1", "reshensu_2", "shensu4"],
+    subSkill: {
+      1: {
+        audio: "reshensu",
+        inherit: "shensu1",
+        sourceSkill: "reshensu",
+      },
+      2: {
+        audio: "reshensu",
+        inherit: "shensu2",
+        sourceSkill: "reshensu",
+      },
+    },
+  },
+  shensu4: {
+    audio: "reshensu",
+    audioname: ["xiahouba"],
+    trigger: { player: "phaseDiscardBefore" },
+    sourceSkill: "reshensu",
+    async cost(event, trigger, player) {
+      const check =
+        player.needsToDiscard() ||
+        player.isTurnedOver() ||
+        (player.hasSkill("shebian") && player.canMoveCard(true, true))
+      event.result = await player
+        .chooseTarget(
+          get.prompt(event.skill),
+          "跳过弃牌阶段并翻面，视为使用一张无距离限制的【杀】",
+          function (card, player, target) {
+            if (player == target) {
+              return false
+            }
+            return player.canUse({ name: "sha" }, target, false)
+          },
+        )
+        .set("check", check)
+        .set("ai", function (target) {
+          if (!_status.event.check) {
+            return 0
+          }
+          return get.effect(target, { name: "sha" }, _status.event.player, _status.event.player)
+        })
+        .setHiddenSkill(event.skill)
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      trigger.cancel()
+      await player.turnOver()
+      await player.useCard({ name: "sha", isCard: true }, event.targets[0], false)
+    },
+  },
   jx_buqu: {
     audio: 2,
     audioname: ["key_yuri"],
@@ -911,59 +968,6 @@ const skills = {
           return distance - from.storage.qimou2
         }
       },
-    },
-  },
-  jx_shensu: {
-    audio: 2,
-    group: ["jx_shensu_1", "jx_shensu_2", "shensu4"],
-    preHidden: ["jx_shensu_1", "jx_shensu_2", "shensu4"],
-    subSkill: {
-      1: {
-        audio: "shensu1",
-        inherit: "shensu1",
-        sourceSkill: "jx_shensu",
-      },
-      2: {
-        inherit: "shensu2",
-        sourceSkill: "jx_shensu",
-      },
-    },
-  },
-  shensu4: {
-    audio: "shensu1",
-    audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
-    trigger: { player: "phaseDiscardBefore" },
-    sourceSkill: "xinshensu",
-    async cost(event, trigger, player) {
-      const check =
-        player.needsToDiscard() ||
-        player.isTurnedOver() ||
-        (player.hasSkill("shebian") && player.canMoveCard(true, true))
-      event.result = await player
-        .chooseTarget(
-          get.prompt(event.skill),
-          "跳过弃牌阶段并将武将牌翻面，视为对一名其他角色使用一张【杀】",
-          function (card, player, target) {
-            if (player == target) {
-              return false
-            }
-            return player.canUse({ name: "sha" }, target, false)
-          },
-        )
-        .set("check", check)
-        .set("ai", function (target) {
-          if (!_status.event.check) {
-            return 0
-          }
-          return get.effect(target, { name: "sha" }, _status.event.player, _status.event.player)
-        })
-        .setHiddenSkill(event.skill)
-        .forResult()
-    },
-    async content(event, trigger, player) {
-      trigger.cancel()
-      await player.turnOver()
-      await player.useCard({ name: "sha", isCard: true }, event.targets[0], false)
     },
   },
   jx_tianxiang: {

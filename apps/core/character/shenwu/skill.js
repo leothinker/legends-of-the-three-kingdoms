@@ -1081,6 +1081,21 @@ const skills = {
       },
     },
   },
+  // 夏侯渊
+  // 设变
+  shebian: {
+    audio: 2,
+    trigger: { player: "turnOverEnd" },
+    check(event, player) {
+      return player.canMoveCard(true, true)
+    },
+    filter(event, player) {
+      return player.canMoveCard(null, true)
+    },
+    async content(event, trigger, player) {
+      await player.moveCard().set("nojudge", true)
+    },
+  },
 }
 
 export default skills

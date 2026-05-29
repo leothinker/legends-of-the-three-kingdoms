@@ -18,15 +18,14 @@ const skills = {
   // 夏侯渊
   // 神速
   shensu: {
-    audio: "shensu1",
-    audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
+    audio: 2,
+    audioname: ["xiahouba"],
     group: ["shensu1", "shensu2"],
     preHidden: ["shensu1", "shensu2"],
   },
-  shensu1_xiahouba: { audio: 2 },
   shensu1: {
-    audio: 2,
-    audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
+    audio: "shensu",
+    audioname: ["xiahouba"],
     trigger: { player: "phaseJudgeBefore" },
     sourceSkill: "shensu",
     async cost(event, trigger, player) {
@@ -58,8 +57,8 @@ const skills = {
     },
   },
   shensu2: {
-    audio: "shensu1",
-    audioname: ["xiahouba", "re_xiahouyuan", "ol_xiahouyuan"],
+    audio: "shensu",
+    audioname: ["xiahouba"],
     trigger: { player: "phaseUseBefore" },
     sourceSkill: "shensu",
     filter(event, player) {

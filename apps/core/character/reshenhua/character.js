@@ -5,6 +5,13 @@ const characters = {
     hp: 4,
     skills: ["rejushou", "jiewei"],
   },
+  re_xiahouyuan: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["reshensu"],
+    names: "夏侯|渊",
+  },
   re_zhoutai: {
     sex: "male",
     group: "wu",
@@ -35,12 +42,6 @@ const characters = {
     group: "shu",
     hp: 4,
     skills: ["rekuanggu", "qimou"],
-  },
-  re_xiahouyuan: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["reshensu"],
   },
   re_xiaoqiao: {
     sex: "female",

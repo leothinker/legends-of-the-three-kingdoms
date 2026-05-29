@@ -204,6 +204,13 @@ const characters = {
     img: "image/character/re_caoren.jpg",
     dieAudios: ["re_caoren"],
   },
+  ol_xiahouyuan: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["reshensu", "shebian"],
+    names: "夏侯|渊",
+  },
 }
 
 export default characters

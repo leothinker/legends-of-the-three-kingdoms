@@ -98,6 +98,11 @@ const translates = {
   rejiewei: "解围",
   rejiewei_info:
     "你可以将装备区里的一张牌当【无懈可击】使用；当你翻面至正面朝上时，你可以弃置一张牌，然后可以移动场上的一张牌。",
+
+  ol_xiahouyuan: "界夏侯渊",
+  ol_xiahouyuan_prefix: "界",
+  shebian: "设变",
+  shebian_info: "当你翻面时，你可以移动场上的一张装备牌。",
 }
 
 export default translates

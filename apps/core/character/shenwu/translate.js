@@ -133,6 +133,12 @@ const translates = {
   piaoling: "飘零",
   piaoling_info:
     "结束阶段，你可以进行一次判定，若结果为红桃，你将判定牌置于牌堆顶或交给一名角色，若其为你，你弃置一张牌。",
+
+  ol_zhoutai: "界周泰",
+  ol_zhoutai_prefix: "界",
+  refenji: "奋激",
+  refenji_info:
+    "每回合每名角色限一次，当一名角色非因使用或打出而失去手牌后，你可以失去1点体力，然后失去手牌的角色摸两张牌。",
 }
 
 export default translates

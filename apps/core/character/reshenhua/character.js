@@ -12,30 +12,17 @@ const characters = {
     skills: ["reshensu"],
     names: "夏侯|渊",
   },
-  re_zhoutai: {
-    sex: "male",
-    group: "wu",
-    hp: 4,
-    skills: ["rebuqu", "fenji"],
-  },
-  re_yuji: {
-    sex: "male",
-    group: "qun",
-    hp: 3,
-    skills: ["reguhuo"],
-  },
-  re_zhangjiao: {
-    sex: "male",
-    group: "qun",
-    hp: 3,
-    skills: ["releiji", "guidao", "huangtian"],
-    isZhugong: true,
-  },
   re_huangzhong: {
     sex: "male",
     group: "shu",
     hp: 4,
     skills: ["reliegong"],
+  },
+  re_weiyan: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["rekuanggu", "qimou"],
   },
   re_xiaoqiao: {
     sex: "female",
@@ -43,6 +30,26 @@ const characters = {
     hp: 3,
     skills: ["retianxiang", "hongyan"],
     names: "桥|null",
+  },
+  re_zhoutai: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["rebuqu", "fenji"],
+  },
+
+  re_zhangjiao: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["releiji", "guidao", "huangtian"],
+    isZhugong: true,
+  },
+  re_yuji: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["reguhuo"],
   },
   re_sp_zhugeliang: {
     sex: "male",

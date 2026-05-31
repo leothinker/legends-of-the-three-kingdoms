@@ -4,4 +4,5 @@ export default {
   re_huangzhong: "老当益壮",
   re_weiyan: "嗜血的独狼",
   re_xiaoqiao: "矫情之花",
+  re_zhoutai: "历战之躯",
 }

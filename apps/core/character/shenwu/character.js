@@ -232,6 +232,14 @@ const characters = {
     skills: ["oltianxiang", "rehongyan", "piaoling"],
     names: "桥|null",
   },
+  ol_zhoutai: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["rebuqu", "refenji"],
+    img: "image/character/re_zhoutai.jpg",
+    dieAudios: ["re_zhoutai"],
+  },
 }
 
 export default characters

@@ -207,7 +207,9 @@ const skills = {
     derivation: ["huinu"],
     getList(event, player) {
       return get.inpileVCardList((info) => {
-        if (!["basic", "trick"].removeArray(player.getStorage("ylygguhuo_used")).includes(info[0])) {
+        if (
+          !["basic", "trick"].removeArray(player.getStorage("ylygguhuo_used")).includes(info[0])
+        ) {
           return false
         }
         return event.filterCard(

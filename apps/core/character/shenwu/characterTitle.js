@@ -22,4 +22,5 @@ export default {
   ol_huangzhong: "老当益壮",
   ol_weiyan: "嗜血的独狼",
   ol_xiaoqiao: "矫情之花",
+  ol_zhoutai: "历战之躯",
 }

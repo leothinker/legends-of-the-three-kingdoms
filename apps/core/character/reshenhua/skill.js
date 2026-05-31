@@ -483,8 +483,9 @@ const skills = {
       },
     },
   },
-
-  jx_buqu: {
+  // 周泰
+  // 不屈
+  rebuqu: {
     audio: 2,
     audioname: ["key_yuri"],
     trigger: { player: "chooseToUseBefore" },
@@ -495,16 +496,16 @@ const skills = {
         event.type == "dying" &&
         player.isDying() &&
         event.dying == player &&
-        !event.getParent()._jx_buqu
+        !event.getParent()._rebuqu
       )
     },
     async content(event, trigger, player) {
-      trigger.getParent()._jx_buqu = true
+      trigger.getParent()._rebuqu = true
       const [card] = get.cards()
       const next = player.addToExpansion(card, "gain2")
-      next.gaintag.add("jx_buqu")
+      next.gaintag.add("rebuqu")
       await next
-      const cards = player.getExpansions("jx_buqu"),
+      const cards = player.getExpansions("rebuqu"),
         num = get.number(card)
       player.showCards(cards, "不屈")
       for (let i = 0; i < cards.length; i++) {
@@ -521,8 +522,8 @@ const skills = {
     },
     mod: {
       maxHandcardBase(player, num) {
-        if (get.mode() != "guozhan" && player.getExpansions("jx_buqu").length) {
-          return player.getExpansions("jx_buqu").length
+        if (get.mode() != "guozhan" && player.getExpansions("rebuqu").length) {
+          return player.getExpansions("rebuqu").length
         }
       },
     },
@@ -537,7 +538,7 @@ const skills = {
       effect: {
         target(card, player, target) {
           if (get.tag(card, "damage") || get.tag(card, "loseHp")) {
-            let num = target.getExpansions("jx_buqu").length || target.getHp()
+            let num = target.getExpansions("rebuqu").length || target.getHp()
             return (num + 1) / 5
           }
         },
@@ -554,11 +555,10 @@ const skills = {
       markcount: "expansion",
     },
   },
+  // 奋激
   fenji: {
-    audio: "fenji",
-    trigger: {
-      global: "phaseJieshuBegin",
-    },
+    audio: 2,
+    trigger: { global: "phaseAfter" },
     filter(event, player) {
       if (event.player.countCards("h") == 0 && event.player.isIn()) {
         return true
@@ -6806,8 +6806,8 @@ const skills = {
     },
     bannedList: [
       "bifa",
-      "buqu",
-      "gzbuqu",
+      "rerebuqu",
+      "gzrerebuqu",
       "songci",
       "funan",
       "xinfu_guhuo",

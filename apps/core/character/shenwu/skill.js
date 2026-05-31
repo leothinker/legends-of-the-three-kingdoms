@@ -1554,6 +1554,50 @@ const skills = {
       }
     },
   },
+  // 周泰
+  // 奋激
+  refenji: {
+    audio: "fenji",
+    trigger: { global: ["gainAfter", "loseAfter", "loseAsyncAfter"] },
+    filter(event, player) {
+      return event.player.isIn()
+    },
+    getIndex(event, player) {
+      if (event.type == "use" || event.type == "respond") {
+        return []
+      }
+      const storage = player.getStorage("refenji_used")
+      return game
+        .filterPlayer((current) => {
+          return event.getl(current).hs.length > 0 && !storage.includes(current)
+        })
+        .sortBySeat()
+    },
+    logTarget: (event, player, triggername, target) => target,
+    check(event, player, triggername, target) {
+      if (get.attitude(player, target) <= 0) {
+        return false
+      }
+      return (
+        2 * get.effect(target, { name: "draw" }, player, player) +
+          get.effect(player, { name: "losehp" }, player, player) >
+        0
+      )
+    },
+    async content(event, trigger, player) {
+      const [target] = event.targets
+      player.markAuto(`${event.name}_used`, target)
+      player.addTempSkill(`${event.name}_used`)
+      await player.loseHp()
+      await target.draw(2)
+    },
+    subSkill: {
+      used: {
+        onremove: true,
+        charlotte: true,
+      },
+    },
+  },
 }
 
 export default skills

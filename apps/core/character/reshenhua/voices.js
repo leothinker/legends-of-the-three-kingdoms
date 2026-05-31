@@ -22,4 +22,10 @@ export default {
   "#retianxiang1": "盈盈一笑，娇花照水。",
   "#retianxiang2": "月容花貌难自弃。",
   "#re_xiaoqiao:die": "周郎，等我！",
+
+  "#rebuqu1": "战如熊虎，不惜躯命。",
+  "#rebuqu2": "哼，这点小伤算什么。",
+  "#fenji1": "百战之身，奋勇驱前。",
+  "#fenji2": "两肋插刀，愿赴此躯。",
+  "#re_zhoutai:die": "敌众我寡，无力回天。",
 }

@@ -240,6 +240,13 @@ const characters = {
     img: "image/character/re_zhoutai.jpg",
     dieAudios: ["re_zhoutai"],
   },
+  ol_zhangjiao: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["olleiji", "reguidao", "rehuangtian"],
+    isZhugong: true,
+  },
 }
 
 export default characters

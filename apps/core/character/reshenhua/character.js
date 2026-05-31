@@ -37,7 +37,6 @@ const characters = {
     hp: 4,
     skills: ["rebuqu", "fenji"],
   },
-
   re_zhangjiao: {
     sex: "male",
     group: "qun",
@@ -45,6 +44,7 @@ const characters = {
     skills: ["releiji", "guidao", "huangtian"],
     isZhugong: true,
   },
+
   re_yuji: {
     sex: "male",
     group: "qun",

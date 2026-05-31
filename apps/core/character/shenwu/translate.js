@@ -139,6 +139,19 @@ const translates = {
   refenji: "奋激",
   refenji_info:
     "每回合每名角色限一次，当一名角色非因使用或打出而失去手牌后，你可以失去1点体力，然后失去手牌的角色摸两张牌。",
+
+  ol_zhangjiao: "界张角",
+  ol_zhangjiao_prefix: "界",
+  olleiji: "雷击",
+  olleiji_misa: "雷击",
+  olleiji_info:
+    "当你使用或打出【闪】或使用【闪电】时，你可以进行判定。当你进行判定后，若结果为：黑桃，你对一名角色造成2点雷电伤害；梅花，你回复1点体力，可以对一名角色造成1点雷电伤害。",
+  reguidao: "鬼道",
+  reguidao_info:
+    "当一名角色的判定牌生效前，你可以用一张黑色牌替换之。若此牌为黑桃2-9，你摸一张牌。",
+  rehuangtian: "黄天",
+  rehuangtian2: "黄天",
+  rehuangtian_info: "主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或黑桃手牌。",
 }
 
 export default translates

@@ -1554,7 +1554,7 @@ const skills = {
       }
     },
   },
-  // 周泰
+  // 界周泰
   // 奋激
   refenji: {
     audio: "fenji",
@@ -1598,6 +1598,386 @@ const skills = {
       },
     },
   },
+  // 界张角
+  // 雷击
+  olleiji: {
+    group: "olleiji_misa",
+    audio: 2,
+    audioname: ["boss_qinglong"],
+    trigger: { player: ["useCard", "respond"] },
+    filter(event, player) {
+      return event.card.name == "shan" || (event.name == "useCard" && event.card.name == "shandian")
+    },
+    judgeCheck(card, bool) {
+      var suit = get.suit(card)
+      if (suit == "spade") {
+        if (bool && get.number(card) > 1 && get.number(card) < 10) {
+          return 5
+        }
+        return 4
+      }
+      if (suit == "club") {
+        return 2
+      }
+      return 0
+    },
+    async content(event, trigger, player) {
+      const judgeEvent = player.judge(lib.skill.olleiji.judgeCheck)
+      judgeEvent.judge2 = (result) => !!result.bool
+      await judgeEvent
+    },
+    ai: {
+      useShan: true,
+      effect: {
+        target_use(card, player, target, current) {
+          let name
+          if (typeof card == "object") {
+            if (card.viewAs) {
+              name = card.viewAs
+            } else {
+              name = get.name(card)
+            }
+          }
+          if (
+            name == "shandian" ||
+            (get.tag(card, "respondShan") &&
+              !player.hasSkillTag(
+                "directHit_ai",
+                true,
+                {
+                  target: target,
+                  card: card,
+                },
+                true,
+              ))
+          ) {
+            let club = 0,
+              spade = 0
+            if (
+              game.hasPlayer(function (current) {
+                return (
+                  get.attitude(target, current) < 0 &&
+                  get.damageEffect(current, target, target, "thunder") > 0
+                )
+              })
+            ) {
+              club = 2
+              spade = 4
+            }
+            if (!target.isHealthy()) {
+              club += 2
+            }
+            if (!club && !spade) {
+              return 1
+            }
+            if (name === "sha") {
+              if (!target.mayHaveShan(player, "use")) {
+                return
+              }
+            } else if (!target.mayHaveShan(player)) {
+              return 1 - 0.1 * Math.min(5, target.countCards("hs"))
+            }
+            if (!target.hasSkillTag("rejudge")) {
+              return [1, (club + spade) / 4]
+            }
+            let pos =
+                player == target || player.hasSkillTag("viewHandcard", null, target, true)
+                  ? "hes"
+                  : "e",
+              better = club > spade ? "club" : "spade",
+              max = 0
+            target.hasCard(function (cardx) {
+              if (get.suit(cardx) == better) {
+                max = 2
+                return true
+              }
+              if (spade && get.color(cardx) == "black") {
+                max = 1
+              }
+            }, pos)
+            if (max == 2) {
+              return [1, Math.max(club, spade)]
+            }
+            if (max == 1) {
+              return [1, Math.min(club, spade)]
+            }
+            if (pos == "e") {
+              return [
+                1,
+                Math.min(
+                  (Math.max(1, target.countCards("hs")) * (club + spade)) / 4,
+                  Math.max(club, spade),
+                ),
+              ]
+            }
+            return [1, (club + spade) / 4]
+          }
+        },
+        target(card, player, target) {
+          let name
+          if (typeof card == "object") {
+            if (card.viewAs) {
+              name = card.viewAs
+            } else {
+              name = get.name(card)
+            }
+          }
+          if (name == "lebu" || name == "bingliang") {
+            return [
+              target.hasSkillTag("rejudge") ? 0.4 : 1,
+              2,
+              target.hasSkillTag("rejudge") ? 0.4 : 1,
+              0,
+            ]
+          }
+        },
+      },
+    },
+  },
+  olleiji_misa: {
+    audio: "olleiji",
+    trigger: { player: "judgeEnd" },
+    direct: true,
+    disableReason: ["暴虐", "助祭", "弘仪", "孤影"],
+    sourceSkill: "olleiji",
+    filter(event, player) {
+      return (
+        !lib.skill.olleiji_misa.disableReason.includes(event.judgestr) &&
+        ["spade", "club"].includes(event.result.suit)
+      )
+    },
+    async content(event, trigger, player) {
+      // step 0
+      event.num = 1 + ["club", "spade"].indexOf(trigger.result.suit)
+      event.logged = false
+      if (event.num == 1 && player.isDamaged()) {
+        event.logged = true
+        player.logSkill("olleiji")
+        await player.recover()
+      }
+      const result = await player
+        .chooseTarget("雷击：是否对一名角色造成" + event.num + "点雷电伤害？")
+        .set("ai", (target) => {
+          const player = _status.event.player
+          let eff = get.damageEffect(target, player, target, "thunder")
+          if (
+            get.event().num > 1 &&
+            !target.hasSkillTag("filterDamage", null, {
+              player: player,
+              card: null,
+              nature: "thunder",
+            })
+          ) {
+            if (eff > 0) {
+              eff -= 25
+            } else if (eff < 0) {
+              eff *= 2
+            }
+          }
+          return eff * get.attitude(player, target)
+        })
+        .set("num", event.num)
+        .forResult()
+
+      // step 1
+      if (result.bool && result.targets && result.targets.length) {
+        if (!event.logged) {
+          player.logSkill("olleiji", result.targets)
+        } else {
+          player.line(result.targets, "thunder")
+        }
+        await result.targets[0].damage(event.num, "thunder")
+      }
+    },
+  },
+  // 鬼道
+  reguidao: {
+    audio: 2,
+    mod: {
+      aiOrder(player, card, num) {
+        if (
+          num > 0 &&
+          get.itemtype(card) == "card" &&
+          get.color(card) == "black" &&
+          get.type(card) == "equip"
+        ) {
+          num * 1.35
+        }
+      },
+      aiValue(player, card, num) {
+        if (num > 0 && get.itemtype(card) == "card" && get.color(card) == "black") {
+          return num * 1.15
+        }
+      },
+      aiUseful(player, card, num) {
+        if (num > 0 && get.itemtype(card) == "card" && get.color(card) == "black") {
+          return num * 1.35
+        }
+      },
+    },
+    locked: false,
+    trigger: { global: "judge" },
+    filter(event, player) {
+      return player.countCards("hes", { color: "black" }) > 0
+    },
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseCard(
+          `${get.translation(trigger.player)}的${trigger.judgestr || ""}判定为${get.translation(trigger.player.judging[0])}，${get.prompt(event.skill)}`,
+          "hes",
+          (card) => {
+            const player = get.player()
+            if (get.color(card) !== "black") {
+              return false
+            }
+            const mod2 = game.checkMod(card, player, "unchanged", "cardEnabled2", player)
+            if (mod2 != "unchanged") {
+              return mod2
+            }
+            const mod = game.checkMod(card, player, "unchanged", "cardRespondable", player)
+            if (mod != "unchanged") {
+              return mod
+            }
+            return true
+          },
+        )
+        .set("ai", (card) => {
+          const trigger = get.event().getTrigger()
+          const { player, judging } = get.event()
+          const result = trigger.judge(card) - trigger.judge(judging)
+          const attitude = get.attitude(player, trigger.player)
+          if (attitude == 0 || result == 0) {
+            if (trigger.player != player) {
+              return 0
+            }
+            if (
+              game.hasPlayer(function (current) {
+                return get.attitude(player, current) < 0
+              })
+            ) {
+              var checkx =
+                lib.skill.olleiji.judgeCheck(card, true) - lib.skill.olleiji.judgeCheck(judging)
+              if (checkx > 0) {
+                return checkx
+              }
+            }
+            return 0
+          }
+          let val = get.value(card)
+          if (get.subtype(card) == "equip2") {
+            val /= 2
+          } else {
+            val /= 7
+          }
+          if (attitude == 0 || result == 0) {
+            return 0
+          }
+          if (attitude > 0) {
+            return result - val
+          }
+          return -result - val
+        })
+        .set("judging", trigger.player.judging[0])
+        .forResult()
+    },
+    popup: false,
+    async content(event, trigger, player) {
+      const next = player.respond(event.cards, event.name, "highlight", "noOrdering")
+      await next
+      const { cards } = next
+      if (cards?.length) {
+        player.$gain2(trigger.player.judging[0])
+        await player.gain(trigger.player.judging[0])
+        const card = cards[0]
+        if (get.suit(card) == "spade" && get.number(card) > 1 && get.number(card) < 10) {
+          await player.draw("nodelay")
+        }
+        trigger.player.judging[0] = card
+        trigger.orderingCards.addArray(cards)
+        game.log(trigger.player, "的判定牌改为", cards)
+        await game.delay(2)
+      }
+    },
+    ai: {
+      rejudge: true,
+      tag: { rejudge: 1 },
+    },
+  },
+  // 黄天
+  rehuangtian: {
+    audio: 2,
+    audioname: ["zhangjiao", "re_zhangjiao"],
+    global: "rehuangtian2",
+    zhuSkill: true,
+  },
+  rehuangtian2: {
+    audio: "rehuangtian",
+    enable: "phaseUse",
+    discard: false,
+    lose: false,
+    delay: false,
+    line: true,
+    prepare(cards, player, targets) {
+      targets[0].logSkill("rehuangtian")
+    },
+    prompt() {
+      var player = _status.event.player
+      var list = game.filterPlayer(function (target) {
+        return target != player && target.hasZhuSkill("rehuangtian", player)
+      })
+      var str = "将一张【闪】或黑桃手牌交给" + get.translation(list)
+      if (list.length > 1) {
+        str += "中的一人"
+      }
+      return str
+    },
+    filter(event, player) {
+      if (player.group != "qun") {
+        return false
+      }
+      if (
+        !game.hasPlayer(function (target) {
+          return (
+            target != player &&
+            target.hasZhuSkill("rehuangtian", player) &&
+            !target.hasSkill("rehuangtian3")
+          )
+        })
+      ) {
+        return false
+      }
+      return player.hasCard(function (card) {
+        return lib.skill.rehuangtian2.filterCard(card, player)
+      }, "h")
+    },
+    filterCard(card, player) {
+      return get.name(card, player) == "shan" || get.suit(card, player) == "spade"
+    },
+    log: false,
+    visible: true,
+    filterTarget(card, player, target) {
+      return (
+        target != player &&
+        target.hasZhuSkill("rehuangtian", player) &&
+        !target.hasSkill("rehuangtian3")
+      )
+    },
+    //usable:1,
+    //forceaudio:true,
+    async content(event, trigger, player) {
+      const { cards, target } = event
+      await player.give(cards, target)
+      target.addTempSkill("rehuangtian3", "phaseUseEnd")
+    },
+    ai: {
+      expose: 0.3,
+      order: 10,
+      result: {
+        target: 5,
+      },
+    },
+  },
+  rehuangtian3: {},
 }
 
 export default skills

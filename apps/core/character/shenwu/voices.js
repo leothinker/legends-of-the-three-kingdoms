@@ -28,4 +28,12 @@ export default {
   "#piaoling1": "清风拂君，落花飘零。",
   "#piaoling2": "花自飘零水自流。",
   "#ol_xiaoqiao:die": "同心而离居，忧伤以终老。",
+
+  "#olleiji1": "疾雷迅电，不可趋避！",
+  "#olleiji2": "雷霆之诛，灭军毁城！",
+  "#reguidao1": "鬼道运行，由我把控！",
+  "#reguidao2": "汝之命运，吾来改之！",
+  "#rehuangtian1": "黄天法力，万军可灭！",
+  "#rehuangtian2": "天书庇佑，黄巾可兴！",
+  "#ol_zhangjiao:die": "天书无效，人心难聚……",
 }

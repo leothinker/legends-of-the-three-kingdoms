@@ -46,24 +46,18 @@ const translates = {
   fenji: "奋激",
   fenji_info: "一名角色的结束阶段，若其没有手牌，你可以令其摸两张牌，然后你失去1点体力。",
 
+  re_zhangjiao: "界张角",
+  re_zhangjiao_prefix: "界",
+  releiji: "雷击",
+  releiji_info:
+    "当你使用或打出【闪】时，你可以令一名其他角色进行判定，若结果为：黑桃，你对其造成2点雷电伤害；梅花，你回复1点体力，对其造成1点雷电伤害。",
+
   jx_yuji: "界于吉",
   jx_yuji_prefix: "界",
   jx_guhuo: "蛊惑",
   jx_guhuo_info: `每名角色的回合限一次，你可以扣置一张手牌当任意一张基本牌或普通锦囊牌使用或打出。其他所有角色依次选择是否质疑，然后有人质疑则翻开此牌：若为假则此牌作废，若为真则质疑者获得${get.poptip("chanyuan")}。`,
   chanyuan: "缠怨",
   chanyuan_info: "锁定技，你不能质疑“蛊惑”；若你的体力值为1，则你的其他技能失效。",
-
-  jx_zhangjiao: "界张角",
-  jx_zhangjiao_prefix: "界",
-  jx_leiji: "雷击",
-  jx_leiji_info:
-    "当你使用或打出【闪】时，你可以令一名其他角色进行判定，若结果为：♠，你对其造成2点雷电伤害；♣，你回复1点体力，然后对其造成1点雷电伤害。",
-  guidao: "鬼道",
-  guidao_info: "当一名角色的判定牌生效前，你可以打出一张黑色牌替换之。",
-  huangtian: "黄天",
-  huangtian2: "黄天",
-  huangtian_info:
-    "主公技，其他群势力角色的出牌阶段限一次，该角色可以将一张【闪】或【闪电】交给你。",
 
   jx_sp_zhugeliang: "界卧龙诸葛",
   jx_sp_zhugeliang_prefix: "界",

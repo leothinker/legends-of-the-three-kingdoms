@@ -495,7 +495,7 @@ const skills = {
   // 鬼道
   guidao: {
     audio: 2,
-    audioname: ["sp_zhangjiao"],
+    audioname: ["re_zhangjiao"],
     trigger: { global: "judge" },
     filter(event, player) {
       return player.countCards("hes", { color: "black" }) > 0
@@ -564,8 +564,8 @@ const skills = {
   },
   // 黄天
   huangtian: {
-    audio: "huangtian2",
-    audioname: ["zhangjiao", "re_zhangjiao"],
+    audio: 2,
+    audioname: ["re_zhangjiao"],
     audioname2: {
       pe_jun_zhangjiao: ["xinhuangtian2_re_zhangjiao1.mp3", "xinhuangtian2_re_zhangjiao2.mp3"],
     },
@@ -573,7 +573,7 @@ const skills = {
     zhuSkill: true,
   },
   huangtian2: {
-    audio: 2,
+    audio: "huangtian",
     enable: "phaseUse",
     discard: false,
     lose: false,

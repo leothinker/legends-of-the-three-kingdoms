@@ -368,7 +368,7 @@ const skills = {
       },
     },
   },
-  // 小乔
+  // 界小乔
   // 天香
   retianxiang: {
     audio: 2,
@@ -483,7 +483,7 @@ const skills = {
       },
     },
   },
-  // 周泰
+  // 界周泰
   // 不屈
   rebuqu: {
     audio: 2,
@@ -583,6 +583,130 @@ const skills = {
       await player.loseHp()
     },
   },
+  // 界张角
+  // 雷击
+  releiji: {
+    audio: 2,
+    audioname: ["boss_qinglong"],
+    trigger: { player: ["useCard", "respond"] },
+    filter(event, player) {
+      return event.card.name == "shan"
+    },
+    line: "thunder",
+    async cost(event, trigger, player) {
+      const next = player.chooseTarget(get.prompt2(event.skill), function (card, player, target) {
+        return target != player
+      })
+      next.ai = function (target) {
+        if (target.hasSkill("hongyan")) {
+          return 0
+        }
+        return get.damageEffect(target, _status.event.player, _status.event.player, "thunder")
+      }
+      event.result = await next.forResult()
+    },
+    async content(event, trigger, player) {
+      const [target] = event.targets
+      const next = target.judge(function (card) {
+        const suit = get.suit(card)
+        if (suit == "spade") {
+          return -4
+        }
+        if (suit == "club") {
+          return -2
+        }
+        return 0
+      })
+      next.judge2 = function (result) {
+        return result.bool == false // ? true : false; 喵？
+      }
+      const { suit } = await next.forResult()
+      if (suit == "club") {
+        await player.recover()
+        await target.damage("thunder")
+      } else if (suit == "spade") {
+        await target.damage(2, "thunder")
+      }
+    },
+    ai: {
+      useShan: true,
+      effect: {
+        target_use(card, player, target, current) {
+          if (
+            get.tag(card, "respondShan") &&
+            !player.hasSkillTag(
+              "directHit_ai",
+              true,
+              {
+                target: target,
+                card: card,
+              },
+              true,
+            )
+          ) {
+            let club = 0,
+              spade = 0
+            if (
+              game.hasPlayer(function (current) {
+                return (
+                  get.attitude(target, current) < 0 &&
+                  get.damageEffect(current, target, target, "thunder") > 0
+                )
+              })
+            ) {
+              club = 2
+              spade = 4
+            }
+            if (!target.isHealthy()) {
+              club += 2
+            }
+            if (!club && !spade) {
+              return 1
+            }
+            if (card.name === "sha") {
+              if (!target.mayHaveShan(player, "use")) {
+                return
+              }
+            } else if (!target.mayHaveShan(player)) {
+              return 1 - 0.1 * Math.min(5, target.countCards("hs"))
+            }
+            if (!target.hasSkillTag("rejudge")) {
+              return [1, (club + spade) / 4]
+            }
+            let pos = player.hasSkillTag("viewHandcard", null, target, true) ? "hes" : "e",
+              better = club > spade ? "club" : "spade",
+              max = 0
+            target.hasCard(function (cardx) {
+              if (get.suit(cardx) === better) {
+                max = 2
+                return true
+              }
+              if (spade && get.color(cardx) === "black") {
+                max = 1
+              }
+            }, pos)
+            if (max === 2) {
+              return [1, Math.max(club, spade)]
+            }
+            if (max === 1) {
+              return [1, Math.min(club, spade)]
+            }
+            if (pos === "e") {
+              return [
+                1,
+                Math.min(
+                  (Math.max(1, target.countCards("hs")) * (club + spade)) / 4,
+                  Math.max(club, spade),
+                ),
+              ]
+            }
+            return [1, (club + spade) / 4]
+          }
+        },
+      },
+    },
+  },
+
   jx_guhuo: {
     audio: "guhuo_guess",
     derivation: ["chanyuan"],
@@ -972,126 +1096,6 @@ const skills = {
     async content(event, trigger, player) {},
   },
   guhuo_phase: {},
-  jx_leiji: {
-    audio: 2,
-    trigger: { player: ["useCard", "respond"] },
-    filter(event, player) {
-      return event.card.name == "shan"
-    },
-    line: "thunder",
-    async cost(event, trigger, player) {
-      const next = player.chooseTarget(get.prompt2(event.skill), function (card, player, target) {
-        return target != player
-      })
-      next.ai = function (target) {
-        if (target.hasSkill("hongyan")) {
-          return 0
-        }
-        return get.damageEffect(target, _status.event.player, _status.event.player, "thunder")
-      }
-      event.result = await next.forResult()
-    },
-    async content(event, trigger, player) {
-      const [target] = event.targets
-      const next = target.judge(function (card) {
-        const suit = get.suit(card)
-        if (suit == "spade") {
-          return -4
-        }
-        if (suit == "club") {
-          return -2
-        }
-        return 0
-      })
-      next.judge2 = function (result) {
-        return result.bool == false // ? true : false; 喵？
-      }
-      const { suit } = await next.forResult()
-      if (suit == "club") {
-        await player.recover()
-        await target.damage("thunder")
-      } else if (suit == "spade") {
-        await target.damage(2, "thunder")
-      }
-    },
-    ai: {
-      useShan: true,
-      effect: {
-        target_use(card, player, target, current) {
-          if (
-            get.tag(card, "respondShan") &&
-            !player.hasSkillTag(
-              "directHit_ai",
-              true,
-              {
-                target: target,
-                card: card,
-              },
-              true,
-            )
-          ) {
-            let club = 0,
-              spade = 0
-            if (
-              game.hasPlayer(function (current) {
-                return (
-                  get.attitude(target, current) < 0 &&
-                  get.damageEffect(current, target, target, "thunder") > 0
-                )
-              })
-            ) {
-              club = 2
-              spade = 4
-            }
-            if (!target.isHealthy()) {
-              club += 2
-            }
-            if (!club && !spade) {
-              return 1
-            }
-            if (card.name === "sha") {
-              if (!target.mayHaveShan(player, "use")) {
-                return
-              }
-            } else if (!target.mayHaveShan(player)) {
-              return 1 - 0.1 * Math.min(5, target.countCards("hs"))
-            }
-            if (!target.hasSkillTag("rejudge")) {
-              return [1, (club + spade) / 4]
-            }
-            let pos = player.hasSkillTag("viewHandcard", null, target, true) ? "hes" : "e",
-              better = club > spade ? "club" : "spade",
-              max = 0
-            target.hasCard(function (cardx) {
-              if (get.suit(cardx) === better) {
-                max = 2
-                return true
-              }
-              if (spade && get.color(cardx) === "black") {
-                max = 1
-              }
-            }, pos)
-            if (max === 2) {
-              return [1, Math.max(club, spade)]
-            }
-            if (max === 1) {
-              return [1, Math.min(club, spade)]
-            }
-            if (pos === "e") {
-              return [
-                1,
-                Math.min(
-                  (Math.max(1, target.countCards("hs")) * (club + spade)) / 4,
-                  Math.max(club, spade),
-                ),
-              ]
-            }
-            return [1, (club + spade) / 4]
-          }
-        },
-      },
-    },
-  },
   jx_tianxiang: {
     audio: 2,
     trigger: { player: "damageBegin4" },

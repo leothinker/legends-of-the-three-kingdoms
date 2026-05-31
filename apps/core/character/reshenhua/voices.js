@@ -28,4 +28,12 @@ export default {
   "#fenji1": "百战之身，奋勇驱前。",
   "#fenji2": "两肋插刀，愿赴此躯。",
   "#re_zhoutai:die": "敌众我寡，无力回天。",
+
+  "#releiji1": "成为黄天之世的祭品吧。",
+  "#releiji2": "呼风唤雨，驱雷策电。",
+  "#guidao_re_zhangjiao1": "道施所向，皆由我控。",
+  "#guidao_re_zhangjiao2": "哼哼，天意如此。",
+  "#huangtian_re_zhangjiao1": "苍天不覆，黄天交替。",
+  "#huangtian_re_zhangjiao2": "黄天立，民心顺，天下平。",
+  "#zhangjiao:die": "黄天既覆，苍生何存……",
 }

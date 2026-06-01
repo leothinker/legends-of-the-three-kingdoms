@@ -50,6 +50,12 @@ const characters = {
     hp: 3,
     skills: ["reguhuo"],
   },
+  re_dianwei: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["reqiangxi"],
+  },
 
   re_sp_zhugeliang: {
     sex: "male",
@@ -57,12 +63,7 @@ const characters = {
     hp: 3,
     skills: ["bazhen", "rehuoji", "rekanpo"],
   },
-  re_dianwei: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["reqiangxi"],
-  },
+
   re_xunyu: {
     sex: "male",
     group: "wei",

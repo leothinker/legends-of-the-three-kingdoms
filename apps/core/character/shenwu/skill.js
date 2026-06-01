@@ -2341,6 +2341,100 @@ const skills = {
     forced: true,
     async content(event, trigger, player) {},
   },
+  // 界典韦
+  // 强袭
+  olqiangxi: {
+    audio: 2,
+    audioname: ["boss_lvbu3"],
+    enable: "phaseUse",
+    usable: 2,
+    filter(event, player) {
+      if (player.hp < 1 && !player.hasCard((card) => lib.skill.olqiangxi.filterCard(card), "he")) {
+        return false
+      }
+      return game.hasPlayer((current) => lib.skill.olqiangxi.filterTarget(null, player, current))
+    },
+    filterCard(card) {
+      return get.subtype(card) == "equip1"
+    },
+    position: "he",
+    filterTarget(card, player, target) {
+      if (target == player) {
+        return false
+      }
+      var stat = player.getStat()._olqiangxi
+      return !stat || !stat.includes(target)
+    },
+    selectCard() {
+      if (_status.event.player.hp < 1) {
+        return 1
+      }
+      return [0, 1]
+    },
+    async content(event, trigger, player) {
+      const { cards, target } = event
+
+      var stat = player.getStat()
+      if (!stat._olqiangxi) {
+        stat._olqiangxi = []
+      }
+      stat._olqiangxi.push(target)
+      if (!cards.length) {
+        await player.damage("nosource", "nocard")
+      }
+      await target.damage("nocard")
+    },
+    ai: {
+      damage: true,
+      order: 8,
+      result: {
+        player(player, target) {
+          if (ui.selected.cards.length) {
+            return 0
+          }
+          if (player.hp >= target.hp) {
+            return -0.9
+          }
+          if (player.hp <= 2) {
+            return -10
+          }
+          return get.damageEffect(player, player, player)
+        },
+        target(player, target) {
+          if (!ui.selected.cards.length) {
+            if (player.hp < 2) {
+              return 0
+            }
+            if (player.hp == 2 && target.hp >= 2) {
+              return 0
+            }
+            if (target.hp > player.hp) {
+              return 0
+            }
+          }
+          return get.damageEffect(target, player, target)
+        },
+      },
+      threaten: 1.5,
+    },
+  },
+  // 狞恶
+  ninge: {
+    audio: 2,
+    trigger: { global: "damageEnd" },
+    filter(event, player) {
+      if (player != event.player && player != event.source) {
+        return false
+      }
+      return event.player.getHistory("damage").indexOf(event) == 1
+    },
+    logTarget: "player",
+    forced: true,
+    async content(event, trigger, player) {
+      await player.draw()
+      await player.discardPlayerCard(trigger.player, true, "ej")
+    },
+  },
 }
 
 export default skills

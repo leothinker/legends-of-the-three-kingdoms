@@ -42,4 +42,8 @@ export default {
   "#chanyuan1": "不识天数，在劫难逃。",
   "#chanyuan2": "凡人仇怨，皆由心生。",
   "#re_yuji:die": "道法玄机，竟被参破……",
+
+  "#reqiangxi1": "铁戟双提八十斤，威风凛凛震乾坤！",
+  "#reqiangxi2": "勇字当头，义字当先！",
+  "#re_dianwei:die": "汝等小儿，竟敢害我！拿命来！",
 }

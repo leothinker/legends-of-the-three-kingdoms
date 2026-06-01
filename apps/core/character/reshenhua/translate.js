@@ -59,6 +59,12 @@ const translates = {
   chanyuan: "缠怨",
   chanyuan_info: "锁定技，你不能质疑〖蛊惑〗；若你的体力值为1，你的其他技能失效。",
 
+  re_dianwei: "界典韦",
+  re_dianwei_prefix: "界",
+  reqiangxi: "强袭",
+  reqiangxi_info:
+    "出牌阶段对每名角色限一次，你可以失去1点体力或弃置一张武器牌，对你攻击范围内的一名其他角色造成1点伤害。",
+
   jx_sp_zhugeliang: "界卧龙诸葛",
   jx_sp_zhugeliang_prefix: "界",
   bazhen: "八阵",
@@ -67,12 +73,6 @@ const translates = {
   jx_huoji_info: "你可以将一张红色牌当【火攻】使用。",
   jx_kanpo: "看破",
   jx_kanpo_info: "你可以将一张黑色牌当【无懈可击】使用。",
-
-  jx_dianwei: "界典韦",
-  jx_dianwei_prefix: "界",
-  jx_qiangxi: "强袭",
-  jx_qiangxi_info:
-    "出牌阶段对每名角色各限一次，你可以失去1点体力或弃置一张武器牌，然后对攻击范围内的一名其他角色造成1点伤害。",
 
   jx_xunyu: "界荀彧",
   jx_xunyu_prefix: "界",

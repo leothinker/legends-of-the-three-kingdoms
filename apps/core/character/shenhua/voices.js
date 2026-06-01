@@ -36,8 +36,8 @@ export default {
   "#guhuo2": "猜猜看哪~",
   "#yuji:die": "竟然……被猜到了……",
 
-  "#qiangxi1": "吃我一戟！",
-  "#qiangxi2": "看我三步之内取你小命！",
+  "#qiangxi1": "看我三步之内取你小命！",
+  "#qiangxi2": "吃我一戟！",
   "#dianwei:die": "主公，快走！",
 
   "#yingyang1": "此战，我必取胜！",

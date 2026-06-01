@@ -42,4 +42,10 @@ export default {
   "#rechanyuan1": "此咒甚重，怨念缠身。",
   "#rechanyuan2": "不信吾法，无福之缘。",
   "#ol_yuji:die": "符水失效，此病难医……",
+
+  "#olqiangxi1": "典韦来也，谁敢一战！",
+  "#olqiangxi2": "双戟青罡，百死无生。",
+  "#ninge1": "古之恶来，今之典韦。",
+  "#ninge2": "宁为刀俎，不为鱼肉。",
+  "#ol_dianwei:die": "为将者，怎可徒手而亡？",
 }

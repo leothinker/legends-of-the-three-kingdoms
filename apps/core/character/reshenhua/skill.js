@@ -1103,6 +1103,63 @@ const skills = {
     forced: true,
     async content(event, trigger, player) {},
   },
+  // 界典韦
+  // 强袭
+  reqiangxi: {
+    subSkill: {
+      off: {
+        sub: true,
+      },
+    },
+    audio: 2,
+    enable: "phaseUse",
+    filterCard(card) {
+      return get.subtype(card) == "equip1"
+    },
+    selectCard() {
+      return [0, 1]
+    },
+    filterTarget(card, player, target) {
+      if (player == target) {
+        return false
+      }
+      if (target.hasSkill("reqiangxi_off")) {
+        return false
+      }
+      return player.inRange(target)
+    },
+    async content(event, trigger, player) {
+      const { cards, target } = event
+      // step 0
+      if (cards.length === 0) {
+        await player.loseHp()
+      }
+      // step 1
+      target.addTempSkill("reqiangxi_off", "phaseUseAfter")
+      await target.damage("nocard")
+    },
+    check(card) {
+      return 10 - get.value(card)
+    },
+    position: "he",
+    ai: {
+      order: 8.5,
+      result: {
+        target(player, target) {
+          if (!ui.selected.cards.length) {
+            if (player.hp < 2) {
+              return 0
+            }
+            if (target.hp >= player.hp) {
+              return 0
+            }
+          }
+          return get.damageEffect(target, player)
+        },
+      },
+    },
+    threaten: 1.5,
+  },
 }
 
 export default skills

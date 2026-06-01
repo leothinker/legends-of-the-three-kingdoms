@@ -7,6 +7,7 @@ export default {
   zhoutai: "历战之躯",
   zhangjiao: "天公将军",
   yuji: "太平道人",
+
   dianwei: "古之恶来",
 
   sp_zhugeliang: "卧龙",

@@ -152,6 +152,14 @@ const translates = {
   rehuangtian: "黄天",
   rehuangtian2: "黄天",
   rehuangtian_info: "主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或黑桃手牌。",
+
+  ol_yuji: "界于吉",
+  ol_yuji_prefix: "界",
+  olguhuo: "蛊惑",
+  olguhuo_info:
+    "每回合限一次，你可以扣置一张手牌，将此牌当任意一张基本牌或普通锦囊牌使用或打出且其他角色可以进行质疑。若有其他角色质疑则翻开此牌，若为假，则此牌作废且质疑者各摸一张牌，否则质疑者各弃置一张牌或失去1点体力，然后获得〖缠怨〗。",
+  rechanyuan: "缠怨",
+  rechanyuan_info: "锁定技，你不能质疑〖蛊惑〗；若你的体力值小于等于1，你的其他技能失效。",
 }
 
 export default translates

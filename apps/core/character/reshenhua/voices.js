@@ -36,4 +36,10 @@ export default {
   "#huangtian_re_zhangjiao1": "苍天不覆，黄天交替。",
   "#huangtian_re_zhangjiao2": "黄天立，民心顺，天下平。",
   "#zhangjiao:die": "黄天既覆，苍生何存……",
+
+  "#reguhuo1": "道法玄机，变幻莫测。",
+  "#reguhuo2": "如真似幻，扑朔迷离。",
+  "#chanyuan1": "不识天数，在劫难逃。",
+  "#chanyuan2": "凡人仇怨，皆由心生。",
+  "#re_yuji:die": "道法玄机，竟被参破……",
 }

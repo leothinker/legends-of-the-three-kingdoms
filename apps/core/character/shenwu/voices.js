@@ -36,4 +36,10 @@ export default {
   "#rehuangtian1": "黄天法力，万军可灭！",
   "#rehuangtian2": "天书庇佑，黄巾可兴！",
   "#ol_zhangjiao:die": "天书无效，人心难聚……",
+
+  "#olguhuo1": "这牌，猜对了吗？",
+  "#olguhuo2": "真真假假，虚实难测。",
+  "#rechanyuan1": "此咒甚重，怨念缠身。",
+  "#rechanyuan2": "不信吾法，无福之缘。",
+  "#ol_yuji:die": "符水失效，此病难医……",
 }

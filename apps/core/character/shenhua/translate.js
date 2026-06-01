@@ -47,6 +47,10 @@ const translates = {
   guhuo: "蛊惑",
   guhuo_info:
     "你可以扣置一张手牌，将此牌当任意一张基本牌或普通锦囊牌使用或打出且其他角色可以进行质疑。若有其他角色质疑则翻开此牌且此牌作废，若为：假，质疑者各摸一张牌；真，质疑者各失去1点体力，然后若被质疑的牌的花色为红桃，此牌依旧进行结算。",
+  guhuo_ally: "信任",
+  guhuo_betray: "质疑",
+  guhuo_ally_bg: "真",
+  guhuo_betray_bg: "假",
 
   dianwei: "典韦",
   qiangxi: "强袭",

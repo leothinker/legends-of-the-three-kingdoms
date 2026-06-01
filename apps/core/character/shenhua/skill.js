@@ -908,7 +908,7 @@ const skills = {
           }
           for (const target of event.targets) {
             const { links } = await target
-              .chooseButton([event.prompt, [["reguhuo_ally", "reguhuo_betray"], "vcard"]], true)
+              .chooseButton([event.prompt, [["guhuo_ally", "guhuo_betray"], "vcard"]], true)
               .set("ai", function (button) {
                 const player = _status.event.player
                 const evt = _status.event.getParent("guhuo_guess"),
@@ -917,7 +917,7 @@ const skills = {
                   return Math.random()
                 }
                 const card = { name: evtx.card.name, nature: evtx.card.nature, isCard: true }
-                const ally = button.link[2] == "reguhuo_ally"
+                const ally = button.link[2] == "guhuo_ally"
                 if (ally && (player.hp <= 1 || get.attitude(player, evt.player) >= 0)) {
                   return 1.1
                 }
@@ -940,7 +940,7 @@ const skills = {
                 return Math.random()
               })
               .forResult()
-            if (links[0][2] == "reguhuo_betray") {
+            if (links[0][2] == "guhuo_betray") {
               target.addExpose(0.2)
               game.log(target, "#y质疑")
               target.popup("质疑！", "fire")

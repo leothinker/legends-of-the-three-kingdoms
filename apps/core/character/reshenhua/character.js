@@ -44,13 +44,13 @@ const characters = {
     skills: ["releiji", "guidao", "huangtian"],
     isZhugong: true,
   },
-
   re_yuji: {
     sex: "male",
     group: "qun",
     hp: 3,
     skills: ["reguhuo"],
   },
+
   re_sp_zhugeliang: {
     sex: "male",
     group: "shu",

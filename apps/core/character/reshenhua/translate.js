@@ -52,12 +52,12 @@ const translates = {
   releiji_info:
     "当你使用或打出【闪】时，你可以令一名其他角色进行判定，若结果为：黑桃，你对其造成2点雷电伤害；梅花，你回复1点体力，对其造成1点雷电伤害。",
 
-  jx_yuji: "界于吉",
-  jx_yuji_prefix: "界",
-  jx_guhuo: "蛊惑",
-  jx_guhuo_info: `每名角色的回合限一次，你可以扣置一张手牌当任意一张基本牌或普通锦囊牌使用或打出。其他所有角色依次选择是否质疑，然后有人质疑则翻开此牌：若为假则此牌作废，若为真则质疑者获得${get.poptip("chanyuan")}。`,
+  re_yuji: "界于吉",
+  re_yuji_prefix: "界",
+  reguhuo: "蛊惑",
+  reguhuo_info: `每回合限一次，你可以扣置一张手牌，将此牌当任意一张基本牌或普通锦囊牌使用或打出且其他角色可以进行质疑。若有其他角色质疑则翻开此牌，若为假，则此牌作废，否则质疑者获得${get.poptip("chanyuan")}。`,
   chanyuan: "缠怨",
-  chanyuan_info: "锁定技，你不能质疑“蛊惑”；若你的体力值为1，则你的其他技能失效。",
+  chanyuan_info: "锁定技，你不能质疑〖蛊惑〗；若你的体力值为1，你的其他技能失效。",
 
   jx_sp_zhugeliang: "界卧龙诸葛",
   jx_sp_zhugeliang_prefix: "界",

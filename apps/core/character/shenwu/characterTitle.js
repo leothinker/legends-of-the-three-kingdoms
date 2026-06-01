@@ -24,4 +24,5 @@ export default {
   ol_xiaoqiao: "矫情之花",
   ol_zhoutai: "历战之躯",
   ol_zhangjiao: "天公将军",
+  ol_yuji: "太平道人",
 }

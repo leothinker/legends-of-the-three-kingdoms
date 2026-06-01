@@ -6,4 +6,5 @@ export default {
   re_xiaoqiao: "矫情之花",
   re_zhoutai: "历战之躯",
   re_zhangjiao: "天公将军",
+  re_yuji: "太平青领道",
 }

@@ -46,4 +46,10 @@ export default {
   "#reqiangxi1": "铁戟双提八十斤，威风凛凛震乾坤！",
   "#reqiangxi2": "勇字当头，义字当先！",
   "#re_dianwei:die": "汝等小儿，竟敢害我！拿命来！",
+
+  "#quhu_re_xunyu1": "驱虎伤敌，保我无虞。",
+  "#quhu_re_xunyu2": "无需费我一兵一卒。",
+  "#rejieming1": "因势利导，是为良计。",
+  "#rejieming2": "杀身成仁，不负皇恩。",
+  "#re_xunyu:die": "命不由人，徒叹奈何……",
 }

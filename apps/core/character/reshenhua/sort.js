@@ -12,9 +12,9 @@ const characterSort = {
     "shen_lvmeng",
   ],
   reshenhua_huo: [
-    "re_sp_zhugeliang",
     "re_dianwei",
     "re_xunyu",
+    "re_sp_zhugeliang",
     "re_pangde",
     "re_pangtong",
     "re_yanwen",

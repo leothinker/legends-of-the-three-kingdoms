@@ -7,4 +7,7 @@ export default {
   re_zhoutai: "历战之躯",
   re_zhangjiao: "天公将军",
   re_yuji: "太平青领道",
+
+  re_dianwei: "古之恶来",
+  re_xunyu: "王佐之才",
 }

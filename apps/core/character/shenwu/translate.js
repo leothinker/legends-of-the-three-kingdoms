@@ -169,6 +169,12 @@ const translates = {
   ninge: "狞恶",
   ninge_info:
     "锁定技，当一名角色每回合第二次受到伤害后，若其为你或伤害来源为你，你摸一张牌并弃置其场上一张牌。",
+
+  ol_xunyu: "界荀彧",
+  ol_xunyu_prefix: "界",
+  oljieming: "节命",
+  oljieming_info:
+    "当你受到1点伤害后或死亡时，你可以令一名角色摸X张牌，然后将手牌弃置至X张（X为其体力上限且至多为5）。",
 }
 
 export default translates

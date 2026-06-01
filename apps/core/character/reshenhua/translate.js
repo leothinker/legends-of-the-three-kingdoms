@@ -65,6 +65,12 @@ const translates = {
   reqiangxi_info:
     "出牌阶段对每名角色限一次，你可以失去1点体力或弃置一张武器牌，对你攻击范围内的一名其他角色造成1点伤害。",
 
+  re_xunyu: "界荀彧",
+  re_xunyu_prefix: "界",
+  rejieming: "节命",
+  rejieming_info:
+    "当你受到1点伤害后，你可以令一名角色摸两张牌，然后若其手牌数小于其体力上限，你摸一张牌。",
+
   jx_sp_zhugeliang: "界卧龙诸葛",
   jx_sp_zhugeliang_prefix: "界",
   bazhen: "八阵",
@@ -73,15 +79,6 @@ const translates = {
   jx_huoji_info: "你可以将一张红色牌当【火攻】使用。",
   jx_kanpo: "看破",
   jx_kanpo_info: "你可以将一张黑色牌当【无懈可击】使用。",
-
-  jx_xunyu: "界荀彧",
-  jx_xunyu_prefix: "界",
-  quhu: "驱虎",
-  quhu_info:
-    "出牌阶段限一次，你可以与一名体力值大于你的角色拼点：若你赢，你令该角色对其攻击范围内你选择的另一名角色造成1点伤害；若你没赢，其对你造成1点伤害。",
-  jx_jieming: "节命",
-  jx_jieming_info:
-    "当你受到1点伤害后，你可以令一名角色摸两张牌，然后若其手牌数小于其体力上限，你摸一张牌。",
 
   jx_pangde: "界庞德",
   jx_pangde_prefix: "界",

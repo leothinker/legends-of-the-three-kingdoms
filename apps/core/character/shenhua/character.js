@@ -63,6 +63,7 @@ const characters = {
     skills: ["quhu", "jieming"],
     clans: ["颍川荀氏"],
   },
+
   sp_zhugeliang: {
     sex: "male",
     group: "shu",

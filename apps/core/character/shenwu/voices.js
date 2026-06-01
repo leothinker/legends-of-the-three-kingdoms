@@ -48,4 +48,10 @@ export default {
   "#ninge1": "古之恶来，今之典韦。",
   "#ninge2": "宁为刀俎，不为鱼肉。",
   "#ol_dianwei:die": "为将者，怎可徒手而亡？",
+
+  "#quhu_ol_xunyu1": "两虎相斗，旁观成败。",
+  "#quhu_ol_xunyu2": "驱兽相争，坐收渔利。",
+  "#oljieming1": "含气在胸，有进无退。",
+  "#oljieming2": "蕴节于形，生死无惧。",
+  "#ol_xunyu:die": "一招不慎，为虎所噬……",
 }

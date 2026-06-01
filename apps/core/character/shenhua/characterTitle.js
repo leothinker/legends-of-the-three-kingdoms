@@ -9,10 +9,10 @@ export default {
   yuji: "太平道人",
 
   dianwei: "古之恶来",
+  xunyu: "王佐之才",
 
   sp_zhugeliang: "卧龙",
   pangtong: "凤雏",
-  xunyu: "王佐之才",
   taishici: "笃烈之士",
   yanwen: "虎狼兄弟",
   yuanshao: "乱箭肃敌",

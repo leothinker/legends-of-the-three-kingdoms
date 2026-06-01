@@ -44,9 +44,9 @@ const characterSort = {
     "shen_lvmeng",
   ],
   refresh_huo: [
-    "ol_sp_zhugeliang",
-    "ol_xunyu",
     "ol_dianwei",
+    "ol_xunyu",
+    "ol_sp_zhugeliang",
     "ol_yanwen",
     "ol_pangtong",
     "ol_yuanshao",

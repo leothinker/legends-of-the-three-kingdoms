@@ -1160,6 +1160,77 @@ const skills = {
     },
     threaten: 1.5,
   },
+  // 界荀彧
+  rejieming: {
+    audio: 2,
+    trigger: { player: "damageEnd" },
+    filter(event, player) {
+      return event.num > 0
+    },
+    getIndex: (event) => event.num,
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseTarget(get.prompt2(event.skill))
+        .set("ai", (target) => {
+          const att = get.attitude(get.player(), target)
+          if (att > 2) {
+            if (target.maxHp - target.countCards("h") > 2) {
+              return 2 * att
+            }
+            return att
+          }
+          return att / 3
+        })
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      const {
+        targets: [target],
+      } = event
+      player.line(target, "thunder")
+      await target.draw(2)
+      if (target.countCards("h") < target.maxHp) {
+        await player.draw()
+      }
+    },
+    ai: {
+      maixie: true,
+      maixie_hp: true,
+      effect: {
+        target(card, player, target, current) {
+          if (get.tag(card, "damage") && target.hp > 1) {
+            if (player.hasSkillTag("jueqing", false, target)) {
+              return [1, -2]
+            }
+            var max = 0
+            var players = game.filterPlayer()
+            for (var i = 0; i < players.length; i++) {
+              if (get.attitude(target, players[i]) > 0) {
+                max = Math.max(Math.min(5, players[i].hp) - players[i].countCards("h"), max)
+              }
+            }
+            switch (max) {
+              case 0:
+                return 2
+              case 1:
+                return 1.5
+              case 2:
+                return [1, 2]
+              default:
+                return [0, max]
+            }
+          }
+          if (
+            (card.name == "tao" || card.name == "caoyao") &&
+            target.hp > 1 &&
+            target.countCards("h") <= target.hp
+          ) {
+            return [0, 0]
+          }
+        },
+      },
+    },
+  },
 }
 
 export default skills

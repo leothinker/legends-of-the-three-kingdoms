@@ -56,6 +56,13 @@ const characters = {
     hp: 4,
     skills: ["reqiangxi"],
   },
+  re_xunyu: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["quhu", "rejieming"],
+    clans: ["颍川荀氏"],
+  },
 
   re_sp_zhugeliang: {
     sex: "male",
@@ -64,12 +71,6 @@ const characters = {
     skills: ["bazhen", "rehuoji", "rekanpo"],
   },
 
-  re_xunyu: {
-    sex: "male",
-    group: "wei",
-    hp: 3,
-    skills: ["quhu", "rejieming"],
-  },
   re_pangde: {
     sex: "male",
     group: "qun",

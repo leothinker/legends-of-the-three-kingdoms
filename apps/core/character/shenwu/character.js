@@ -259,6 +259,13 @@ const characters = {
     hp: 4,
     skills: ["olqiangxi", "ninge"],
   },
+  ol_xunyu: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["quhu", "oljieming"],
+    clans: ["颍川荀氏"],
+  },
 }
 
 export default characters

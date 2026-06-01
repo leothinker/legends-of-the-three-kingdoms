@@ -2435,6 +2435,101 @@ const skills = {
       await player.discardPlayerCard(trigger.player, true, "ej")
     },
   },
+  // 界荀彧
+  // 节命
+  oljieming: {
+    audio: 2,
+    audioname2: { sxrm_caocao: "oljieming_sxrm_caocao" },
+    trigger: { player: ["damageEnd", "die"] },
+    forceDie: true,
+    filter(event, player) {
+      if (event.name == "die") {
+        return true
+      }
+      return player.isIn() && event.num > 0
+    },
+    getIndex(event) {
+      return event.num || 1
+    },
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseTarget(get.prompt2(event.skill), (card, player, target) => {
+          return target.maxHp > 0
+        })
+        .set("ai", (target) => {
+          const player = get.player()
+          let att = get.attitude(player, target)
+          let draw = Math.min(5, target.maxHp) - target.countCards("h")
+          if (draw >= 0) {
+            if (target.hasSkillTag("nogain")) {
+              att /= 6
+            }
+            if (att > 2) {
+              return Math.sqrt(draw + 1) * att
+            }
+            return att / 3
+          }
+          if (draw < -1) {
+            if (target.hasSkillTag("nogain")) {
+              att *= 6
+            }
+            if (att < -2) {
+              return -Math.sqrt(1 - draw) * att
+            }
+          }
+          return 0
+        })
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      const {
+        targets: [target],
+      } = event
+      await target.draw(Math.min(5, target.maxHp))
+      let num = target.countCards("h") - Math.min(5, target.maxHp)
+      if (num > 0) {
+        await target.chooseToDiscard("h", true, num, "allowChooseAll")
+      }
+    },
+    ai: {
+      expose: 0.2,
+      maixie: true,
+      maixie_hp: true,
+      effect: {
+        target(card, player, target, current) {
+          if (get.tag(card, "damage") && target.hp > 1) {
+            if (player.hasSkillTag("jueqing", false, target)) {
+              return [1, -2]
+            }
+            var max = 0
+            var players = game.filterPlayer()
+            for (var i = 0; i < players.length; i++) {
+              if (get.attitude(target, players[i]) > 0) {
+                max = Math.max(Math.min(5, players[i].hp) - players[i].countCards("h"), max)
+              }
+            }
+            switch (max) {
+              case 0:
+                return 2
+              case 1:
+                return 1.5
+              case 2:
+                return [1, 2]
+              default:
+                return [0, max]
+            }
+          }
+          if (
+            (card.name == "tao" || card.name == "caoyao") &&
+            target.hp > 1 &&
+            target.countCards("h") <= target.hp
+          ) {
+            return [0, 0]
+          }
+        },
+      },
+    },
+  },
 }
 
 export default skills

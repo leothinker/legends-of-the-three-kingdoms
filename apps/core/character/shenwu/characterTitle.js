@@ -28,4 +28,5 @@ export default {
 
   ol_dianwei: "古之恶来",
   ol_xunyu: "王佐之才",
+  ol_sp_zhugeliang: "卧龙",
 }

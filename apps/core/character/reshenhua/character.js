@@ -63,12 +63,12 @@ const characters = {
     skills: ["quhu", "rejieming"],
     clans: ["颍川荀氏"],
   },
-
   re_sp_zhugeliang: {
     sex: "male",
     group: "shu",
     hp: 3,
     skills: ["bazhen", "rehuoji", "rekanpo"],
+    names: "诸葛|亮",
   },
 
   re_pangde: {

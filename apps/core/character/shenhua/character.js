@@ -63,7 +63,6 @@ const characters = {
     skills: ["quhu", "jieming"],
     clans: ["颍川荀氏"],
   },
-
   sp_zhugeliang: {
     sex: "male",
     group: "shu",
@@ -71,6 +70,7 @@ const characters = {
     skills: ["bazhen", "huoji", "kanpo"],
     names: "诸葛|亮",
   },
+
   pangtong: {
     sex: "male",
     group: "shu",

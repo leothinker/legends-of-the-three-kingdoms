@@ -20,8 +20,8 @@ const translates = {
   old_jx_tuxi_info:
     "摸牌阶段，你可以少摸任意张牌，然后选择等量的手牌数大于或等于你的其他角色，获得这些角色的各一张手牌。",
 
-  jx_xuchu: "界许褚",
-  jx_xuchu_prefix: "界",
+  jx_xuzhu: "界许褚",
+  jx_xuzhu_prefix: "界",
   jx_luoyi: "裸衣",
   jx_luoyi_info:
     "你可以跳过摸牌阶段，然后展示牌堆顶的三张牌，获得其中的基本牌、武器牌和【决斗】。若如此做，直到你的下回合开始，你为伤害来源的【杀】或【决斗】造成的伤害+1。",

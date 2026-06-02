@@ -266,6 +266,13 @@ const characters = {
     skills: ["quhu", "oljieming"],
     clans: ["颍川荀氏"],
   },
+  ol_sp_zhugeliang: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["bazhen", "olhuoji", "olkanpo", "cangzhuo"],
+    names: "诸葛|亮",
+  },
 }
 
 export default characters

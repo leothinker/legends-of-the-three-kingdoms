@@ -468,8 +468,8 @@ export class Get {
   }
   /**
    * 将一个传统格式的character转化为Character对象格式
-   * @param { Array|Object|import("../library/element/character").Character } data
-   * @returns {import("../library/element/character").Character}
+   * @param { Array|Object|import("../library/element/character.js").Character } data
+   * @returns {import("../library/element/character.js").Character}
    */
   convertedCharacter(data) {
     if (!(data instanceof lib.element.Character)) {
@@ -1280,7 +1280,7 @@ export class Get {
   /**
    * @overload
    * @param { string } name
-   * @returns { import("../library/element/character").Character }
+   * @returns { import("../library/element/character.js").Character }
    */
   /**
    * @template { 0 | 1 | 2 | 3 | 4 } T

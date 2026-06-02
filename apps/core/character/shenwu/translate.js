@@ -175,6 +175,17 @@ const translates = {
   oljieming: "节命",
   oljieming_info:
     "当你受到1点伤害后或死亡时，你可以令一名角色摸X张牌，然后将手牌弃置至X张（X为其体力上限且至多为5）。",
+
+  ol_sp_zhugeliang: "界卧龙诸葛",
+  ol_sp_zhugeliang_prefix: "界",
+  olhuoji: "火计",
+  olhuoji_info:
+    "你可以将一张红色牌当【火攻】使用；你的【火攻】改为展示目标角色一张手牌，你弃置与其展示牌颜色相同的手牌以造成伤害。",
+  olkanpo: "看破",
+  olkanpo_info: "你可以将一张黑色牌当【无懈可击】使用；你的【无懈可击】不能被响应。",
+  cangzhuo: "藏拙",
+  cangzhuo_info:
+    "弃牌阶段开始时，若你本回合未使用过锦囊牌，你可以展示任意张锦囊牌，令这些牌此阶段不计入手牌上限。",
 }
 
 export default translates

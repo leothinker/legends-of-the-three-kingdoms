@@ -1447,32 +1447,6 @@ const skills = {
     },
   },
   // 卧龙诸葛
-  // 火计
-  huoji: {
-    audio: 2,
-    enable: "chooseToUse",
-    filterCard(card) {
-      return get.color(card) == "red"
-    },
-    viewAs: { name: "huogong" },
-    viewAsFilter(player) {
-      if (!player.countCards("hs", { color: "red" })) {
-        return false
-      }
-    },
-    position: "hs",
-    prompt: "将一张红色牌当火攻使用",
-    check(card) {
-      const player = get.player()
-      if (player.countCards("h") > player.hp) {
-        return 6 - get.value(card)
-      }
-      return 3 - get.value(card)
-    },
-    ai: {
-      fireAttack: true,
-    },
-  },
   // 八阵
   bazhen: {
     audio: 2,
@@ -1544,6 +1518,32 @@ const skills = {
       },
     },
   },
+  // 火计
+  huoji: {
+    audio: 2,
+    enable: "chooseToUse",
+    filterCard(card) {
+      return get.color(card) == "red"
+    },
+    viewAs: { name: "huogong" },
+    viewAsFilter(player) {
+      if (!player.countCards("hs", { color: "red" })) {
+        return false
+      }
+    },
+    position: "hs",
+    prompt: "将一张红色手牌当【火攻】使用",
+    check(card) {
+      const player = get.player()
+      if (player.countCards("h") > player.hp) {
+        return 6 - get.value(card)
+      }
+      return 3 - get.value(card)
+    },
+    ai: {
+      fireAttack: true,
+    },
+  },
   // 看破
   kanpo: {
     mod: {
@@ -1583,7 +1583,7 @@ const skills = {
     },
     viewAs: { name: "wuxie" },
     position: "hs",
-    prompt: "将一张黑色手牌当无懈可击使用",
+    prompt: "将一张黑色手牌当【无懈可击】使用",
     check(card) {
       const tri = _status.event.getTrigger()
       if (tri && tri.card && tri.card.name == "chiling") {

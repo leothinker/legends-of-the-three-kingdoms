@@ -1593,8 +1593,8 @@ const skills = {
     },
     subSkill: {
       used: {
-        onremove: true,
         charlotte: true,
+        onremove: true,
       },
     },
   },
@@ -2527,6 +2527,141 @@ const skills = {
             return [0, 0]
           }
         },
+      },
+    },
+  },
+  // 界卧龙诸葛
+  // 火计
+  olhuoji: {
+    audio: 2,
+    audioname: ["ol_pangtong"],
+    trigger: { player: "huogongBegin" },
+    forced: true,
+    locked: false,
+    popup: false,
+    group: "olhuoji_viewAs",
+    async content(event, trigger, player) {
+      trigger.set("chooseToShow", async (event, player, target) => {
+        const { showPosition = "h" } = event
+        const cards = (await player.choosePlayerCard(target, showPosition, true).forResult()).cards
+        return { bool: true, cards: cards }
+      })
+      trigger.set("filterDiscard", (card) => {
+        const { cards2 } = get.event().getParent("huogong", true)
+        return get.color(card) == get.color(cards2[0])
+      })
+    },
+    async huogongContent(event, trigger, player) {
+      const { target } = event
+      if (target.countCards("h") == 0) {
+        return
+      }
+      const cards = (await player.choosePlayerCard(target, "h", true).forResult()).cards,
+        card = cards[0]
+      await target.showCards(cards).setContent(function () {})
+      event.dialog = ui.create.dialog(get.translation(target) + "展示的手牌", cards)
+      event.videoId = lib.status.videoId++
+
+      game.broadcast("createDialog", event.videoId, get.translation(target) + "展示的手牌", cards)
+      game.addVideo("cardDialog", null, [
+        get.translation(target) + "展示的手牌",
+        get.cardsInfo(cards),
+        event.videoId,
+      ])
+      game.log(target, "展示了", card)
+      const result = await player
+        .chooseToDiscard({ color: get.color(card) }, "h", function (card) {
+          var evt = _status.event.getParent()
+          if (get.damageEffect(evt.target, evt.player, evt.player, "fire") > 0) {
+            return 7 - get.value(card, evt.player)
+          }
+          return -1
+        })
+        .set("prompt", false)
+        .forResult()
+      //game.delay(2);
+      if (result?.bool) {
+        await target.damage("fire")
+      } else {
+        target.addTempSkill("huogong2")
+      }
+      event.dialog.close()
+      game.addVideo("cardDialog", null, event.videoId)
+      game.broadcast("closeDialog", event.videoId)
+    },
+    subSkill: { viewAs: { inherit: "rehuoji", audio: "olhuoji" } },
+  },
+  // 看破
+  olkanpo: {
+    audio: 2,
+    audioname: ["ol_pangtong"],
+    trigger: { player: "useCard" },
+    forced: true,
+    locked: false,
+    popup: false,
+    group: "olkanpo_viewAs",
+    filter(event, player) {
+      return event.card.name == "wuxie"
+    },
+    async content(event, trigger, player) {
+      trigger.directHit.addArray(game.players)
+    },
+    subSkill: { viewAs: { inherit: "rekanpo", audio: "olkanpo" } },
+  },
+  // 藏拙
+  cangzhuo: {
+    trigger: { player: "phaseDiscardBegin" },
+    frequent: true,
+    audio: 2,
+    filter(event, player) {
+      return (
+        player.getHistory("useCard", function (card) {
+          return get.type(card.card, "trick") == "trick"
+        }).length == 0
+      )
+    },
+    async content(event, trigger, player) {
+      const result = await player
+        .chooseCard(
+          "h",
+          [1, Infinity],
+          "展示任意张锦囊牌，令这些牌此阶段不计入手牌上限",
+          (card) => get.type(card, "trick") == "trick",
+          "allowChooseAll",
+        )
+        .set(
+          "tricks",
+          player
+            .getCards("h", (card) => get.type(card, "trick") == "trick")
+            .sort((a, b) => get.value(a, player) - get.value(b, player))
+            .slice(0, Math.max(0, player.countCards("h") - player.getHandcardLimit())),
+        )
+        .set("ai", (card) => {
+          const { player, tricks } = get.event()
+          return tricks.includes(card) ? 10 - get.value(card, player) : 0
+        })
+        .forResult()
+      if (result.bool) {
+        player.addGaintag(result.cards, "cangzhuo")
+        player.addTempSkill("cangzhuo2")
+        player.showCards(result.cards, "藏拙")
+      }
+    },
+  },
+  cangzhuo2: {
+    onremove(player) {
+      player.removeGaintag("cangzhuo")
+    },
+    mod: {
+      ignoredHandcard(card, player) {
+        if (card.hasGaintag("cangzhuo")) {
+          return true
+        }
+      },
+      cardDiscardable(card, player, name) {
+        if (name == "phaseDiscard" && card.hasGaintag("cangzhuo")) {
+          return false
+        }
       },
     },
   },

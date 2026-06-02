@@ -10,4 +10,5 @@ export default {
 
   re_dianwei: "古之恶来",
   re_xunyu: "王佐之才",
+  re_sp_zhugeliang: "卧龙",
 }

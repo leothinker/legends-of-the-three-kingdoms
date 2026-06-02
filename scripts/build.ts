@@ -12,8 +12,4 @@ await Promise.all([
   fs.cp("apps/core/dist", "dist", { recursive: true }),
   fs.cp("apps/core/audio", "dist/audio", { recursive: true }),
   fs.cp("apps/core/image", "dist/image", { recursive: true }),
-  fs.cp("docs", "dist/docs", { recursive: true }),
-  fs.cp(".nomedia", "dist/.nomedia"),
-  fs.cp("LICENSE", "dist/LICENSE"),
-  fs.cp("README.md", "dist/README.md"),
 ])

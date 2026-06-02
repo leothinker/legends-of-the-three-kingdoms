@@ -1231,6 +1231,83 @@ const skills = {
       },
     },
   },
+  // 界卧龙诸葛
+  // 火计
+  rehuoji: {
+    position: "hes",
+    audio: 2,
+    audioname: ["ol_pangtong"],
+    enable: "chooseToUse",
+    filterCard(card) {
+      return get.color(card) == "red"
+    },
+    viewAs: {
+      name: "huogong",
+    },
+    viewAsFilter(player) {
+      if (!player.countCards("hes", { color: "red" })) {
+        return false
+      }
+    },
+    prompt: "将一张红色牌当【火攻】使用",
+    check(card) {
+      var player = get.player()
+      if (player.countCards("h") > player.hp) {
+        return 6 - get.value(card)
+      }
+      return 4 - get.value(card)
+    },
+    ai: {
+      fireAttack: true,
+    },
+  },
+  // 看破
+  rekanpo: {
+    mod: {
+      aiValue(player, card, num) {
+        if (get.name(card) != "wuxie" && get.color(card) != "black") {
+          return
+        }
+        var cards = player.getCards("hs", function (card) {
+          return get.name(card) == "wuxie" || get.color(card) == "black"
+        })
+        cards.sort(function (a, b) {
+          return (get.name(b) == "wuxie" ? 1 : 2) - (get.name(a) == "wuxie" ? 1 : 2)
+        })
+        var geti = function () {
+          if (cards.includes(card)) {
+            return cards.indexOf(card)
+          }
+          return cards.length
+        }
+        if (get.name(card) == "wuxie") {
+          return Math.min(num, [6, 4, 3][Math.min(geti(), 2)]) * 0.6
+        }
+        return Math.max(num, [6, 4, 3][Math.min(geti(), 2)])
+      },
+      aiUseful() {
+        return lib.skill.rekanpo.mod.aiValue.apply(this, arguments)
+      },
+    },
+    locked: false,
+    audio: 2,
+    audioname: ["ol_pangtong"],
+    position: "hes",
+    enable: "chooseToUse",
+    filterCard(card) {
+      return get.color(card) == "black"
+    },
+    viewAsFilter(player) {
+      return player.countCards("hes", { color: "black" }) > 0
+    },
+    viewAs: {
+      name: "wuxie",
+    },
+    prompt: "将一张黑色牌当【无懈可击】使用",
+    check(card) {
+      return 8 - get.value(card)
+    },
+  },
 }
 
 export default skills

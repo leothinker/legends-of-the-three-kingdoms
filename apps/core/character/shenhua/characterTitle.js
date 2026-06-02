@@ -10,8 +10,8 @@ export default {
 
   dianwei: "古之恶来",
   xunyu: "王佐之才",
-
   sp_zhugeliang: "卧龙",
+
   pangtong: "凤雏",
   taishici: "笃烈之士",
   yanwen: "虎狼兄弟",

@@ -52,4 +52,12 @@ export default {
   "#rejieming1": "因势利导，是为良计。",
   "#rejieming2": "杀身成仁，不负皇恩。",
   "#re_xunyu:die": "命不由人，徒叹奈何……",
+
+  "#bazhen_re_sp_zhugeliang1": "你可识得此阵？",
+  "#bazhen_re_sp_zhugeliang2": "太极生两仪，两仪生四象，四象生八卦。",
+  "#rehuoji1": "燃烧吧！",
+  "#rehuoji2": "此火可助我军大获全胜。",
+  "#rekanpo1": "雕虫小技！",
+  "#rekanpo2": "你的计谋被识破了！",
+  "#re_sp_zhugeliang:die": "我的计谋竟被……",
 }

@@ -54,4 +54,14 @@ export default {
   "#oljieming1": "含气在胸，有进无退。",
   "#oljieming2": "蕴节于形，生死无惧。",
   "#ol_xunyu:die": "一招不慎，为虎所噬……",
+
+  "#bazhen_ol_sp_zhugeliang1": "八阵连心，日月同辉。",
+  "#bazhen_ol_sp_zhugeliang2": "此阵变化，岂是汝等可解？",
+  "#olhuoji1": "东风，让这火烧得再猛烈些吧！",
+  "#olhuoji2": "赤壁借东风，燃火灭魏军。",
+  "#olkanpo1": "此计奥妙，我已看破。",
+  "#olkanpo2": "还有什么是我看不破的？",
+  "#cangzhuo1": "藏巧于拙，用晦而明。",
+  "#cangzhuo2": "寓清于浊，以屈为伸。",
+  "#ol_sp_zhugeliang:die": "星途半废，夙愿未完。",
 }

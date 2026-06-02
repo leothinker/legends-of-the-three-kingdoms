@@ -64,20 +64,20 @@ const translates = {
   jieming: "节命",
   jieming_info: "当你受到1点伤害后，你可以令一名角色将手牌摸至X张（X为其体力上限且至多为5）。",
 
+  sp_zhugeliang: "卧龙诸葛",
+  bazhen: "八阵",
+  bazhen_info: "锁定技，若你的装备区里没有防具牌且你的防具栏未被废除，你视为装备着【八卦阵】。",
+  huoji: "火计",
+  huoji_info: "你可以将一张红色手牌当【火攻】使用。",
+  kanpo: "看破",
+  kanpo_info: "你可以将一张黑色手牌当【无懈可击】使用。",
+
   pangtong: "庞统",
   lianhuan: "连环",
   lianhuan_info: "你可以将一张♣手牌当【铁索连环】使用或重铸。",
   niepan: "涅槃",
   niepan_info:
     "限定技，当你处于濒死状态时，你可以弃置你区域里的所有牌，然后复原你的武将牌，摸三张牌，将体力回复至3点。",
-
-  sp_zhugeliang: "卧龙诸葛",
-  huoji: "火计",
-  huoji_info: "你可以将一张红色手牌当【火攻】使用。",
-  bazhen: "八阵",
-  bazhen_info: "锁定技，若你的装备区里没有防具牌，你视为装备【八卦阵】。",
-  kanpo: "看破",
-  kanpo_info: "你可以将一张黑色手牌当【无懈可击】使用。",
 
   taishici: "太史慈",
   tianyi: "天义",

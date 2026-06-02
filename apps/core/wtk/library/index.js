@@ -5977,7 +5977,7 @@ export class Library {
         },
         connect_limit_zhu: {
           name: "常备主候选武将数",
-          init: "3",
+          init: 3,
           restart: true,
           item: {
             off: "不限制",
@@ -6667,7 +6667,7 @@ export class Library {
         },
         limit_zhu: {
           name: "常备主候选武将数",
-          init: "3",
+          init: 3,
           restart: true,
           item: {
             off: "不限制",

@@ -1227,6 +1227,9 @@ const skills = {
     async content(event, trigger, player) {
       const list = []
       const he = player.getCards("he")
+      if (he.length) {
+        await player.showCards(he)
+      }
       for (const card of he) {
         if (get.type(card, "trick") == "trick") {
           list.push(card)
@@ -1610,19 +1613,16 @@ const skills = {
         .forResult()
 
       // step 1
-      event.card = get.cardPile(
-        function (card) {
-          if (get.color(card) == result.control) {
-            return true
-          }
-          if (get.type(card, "trick") == result.control) {
-            return true
-          }
-          return false
-        },
-        "cardPile",
-        "top",
-      )
+      const discards = []
+      while (ui.cardPile.hasChildNodes()) {
+        const next = get.cards()[0]
+        if (get.color(next) == result.control || get.type(next, "trick") == result.control) {
+          event.card = next
+          break
+        }
+        discards.push(next)
+        await player.showCards([next])
+      }
       if (!event.card) {
         return
       }
@@ -1632,7 +1632,7 @@ const skills = {
       result = await player
         .chooseTarget(
           true,
-          "选择一名男性角色送出" + get.translation(event.card),
+          "选择一名男性角色获得" + get.translation(event.card),
           function (card, player, target) {
             return target.hasSex("male")
           },
@@ -1650,6 +1650,7 @@ const skills = {
       // step 3
       player.line(result.targets, "green")
       await result.targets[0].gain(event.card, "gain2")
+      await game.cardsDiscard(discards)
     },
     ai: {
       order: 9,

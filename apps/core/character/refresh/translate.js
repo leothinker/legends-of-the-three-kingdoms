@@ -29,8 +29,8 @@ const translates = {
   retuxi: "突袭",
   retuxi_info: "摸牌阶段，你可以少摸任意张牌并获得等量其他角色的各一张手牌。",
 
-  re_xuchu: "界许褚",
-  re_xuchu_prefix: "界",
+  re_xuzhu: "界许褚",
+  re_xuzhu_prefix: "界",
   reluoyi: "裸衣",
   reluoyi2: "裸衣",
   reluoyi_info:
@@ -112,7 +112,7 @@ const translates = {
   qianxin_info: "觉醒技，当你造成伤害后，若你已受伤，你减1点体力上限，然后获得技能〖荐言〗。",
   jianyan: "荐言",
   jianyan_info:
-    "出牌阶段限一次，你可以声明一种牌的类别或颜色，然后将牌堆中第一张符合你声明的牌交给一名男性角色。",
+    "出牌阶段限一次，你可以声明一种牌的类别或颜色，然后连续亮出牌堆顶的牌，直到亮出符合你声明的牌为止。最后你令一名男性角色获得此牌。",
 
   re_sunquan: "界孙权",
   re_sunquan_prefix: "界",

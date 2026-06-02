@@ -71,14 +71,12 @@ const translates = {
   rejieming_info:
     "当你受到1点伤害后，你可以令一名角色摸两张牌，然后若其手牌数小于其体力上限，你摸一张牌。",
 
-  jx_sp_zhugeliang: "界卧龙诸葛",
-  jx_sp_zhugeliang_prefix: "界",
-  bazhen: "八阵",
-  bazhen_info: "锁定技，若你的装备区里没有防具牌，你视为装备着【八卦阵】。",
-  jx_huoji: "火计",
-  jx_huoji_info: "你可以将一张红色牌当【火攻】使用。",
-  jx_kanpo: "看破",
-  jx_kanpo_info: "你可以将一张黑色牌当【无懈可击】使用。",
+  re_sp_zhugeliang: "界卧龙诸葛",
+  re_sp_zhugeliang_prefix: "界",
+  rehuoji: "火计",
+  rehuoji_info: "你可以将一张红色牌当【火攻】使用。",
+  rekanpo: "看破",
+  rekanpo_info: "你可以将一张黑色牌当【无懈可击】使用。",
 
   jx_pangde: "界庞德",
   jx_pangde_prefix: "界",

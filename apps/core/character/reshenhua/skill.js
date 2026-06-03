@@ -1587,6 +1587,74 @@ const skills = {
     },
   },
   dangmo: { audio: 2 },
+  // 界庞德
+  // 鞬出
+  jianchu: {
+    audio: 2,
+    trigger: { player: "useCardToPlayered" },
+    filter(event, player) {
+      return event.card.name == "sha" && event.target.countDiscardableCards(player, "he") > 0
+    },
+    preHidden: true,
+    check(event, player) {
+      return get.attitude(player, event.target) <= 0
+    },
+    logTarget: "target",
+    async content(event, trigger, player) {
+      const result = await player
+        .discardPlayerCard(trigger.target, get.prompt("jianchu", trigger.target), true)
+        .set("ai", function (button) {
+          if (!_status.event.att) {
+            return 0
+          }
+          if (get.position(button.link) == "e") {
+            if (get.subtype(button.link) == "equip2") {
+              return 5 * get.value(button.link)
+            }
+            return get.value(button.link)
+          }
+          return 1
+        })
+        .set("att", get.attitude(player, trigger.target) <= 0)
+        .forResult()
+      if (result.bool && result.links && result.links.length) {
+        if (
+          get.type(result.links[0], null, result.links[0].original == "h" ? player : false) ==
+          "equip"
+        ) {
+          trigger.getParent().directHit.add(trigger.target)
+        } else if (trigger.cards) {
+          const list = []
+          for (let i = 0; i < trigger.cards.length; i++) {
+            if (get.position(trigger.cards[i], true) == "o") {
+              list.push(trigger.cards[i])
+            }
+          }
+          if (list.length) {
+            trigger.target.gain(list, "gain2", "log")
+          }
+        }
+      }
+    },
+    ai: {
+      unequip_ai: true,
+      directHit_ai: true,
+      skillTagFilter(player, tag, arg) {
+        if (tag == "directHit_ai") {
+          return (
+            arg.card.name == "sha" &&
+            arg.target.countCards("e", function (card) {
+              return get.value(card) > 1
+            }) > 0
+          )
+        }
+        if (arg && arg.name == "sha" && arg.target.getEquip(2)) {
+          return true
+        }
+        return false
+      },
+    },
+  },
 }
 
 export default skills

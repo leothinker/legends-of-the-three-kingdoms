@@ -2992,6 +2992,85 @@ const skills = {
       }
     },
   },
+  // 界庞德
+  // 鞬出
+  rejianchu: {
+    audio: 2,
+    trigger: { player: "useCardToPlayered" },
+    filter(event, player) {
+      return event.card.name == "sha" && event.target.countDiscardableCards(player, "he") > 0
+    },
+    direct: true,
+    async content(event, trigger, player) {
+      // step 0
+      const result = await player
+        .discardPlayerCard(trigger.target, get.prompt("rejianchu", trigger.target))
+        .set("ai", function (button) {
+          if (!_status.event.att) {
+            return 0
+          }
+          if (get.position(button.link) == "e") {
+            if (get.subtype(button.link) == "equip2") {
+              return 5 * get.value(button.link)
+            }
+            return get.value(button.link)
+          }
+          return 1
+        })
+        .set("logSkill", ["rejianchu", trigger.target])
+        .set("att", get.attitude(player, trigger.target) <= 0)
+        .forResult()
+      // step 1
+      if (result.bool && result.links && result.links.length) {
+        if (
+          get.type(result.links[0], null, result.links[0].original == "h" ? player : false) !=
+          "basic"
+        ) {
+          trigger.getParent().directHit.add(trigger.target)
+          player.addTempSkill("rejianchu2")
+          player.addMark("rejianchu2", 1, false)
+        } else if (trigger.cards) {
+          var list = []
+          for (var i = 0; i < trigger.cards.length; i++) {
+            if (get.position(trigger.cards[i], true) == "o") {
+              list.push(trigger.cards[i])
+            }
+          }
+          if (list.length) {
+            await trigger.target.gain(list, "gain2", "log")
+          }
+        }
+      }
+    },
+    ai: {
+      unequip_ai: true,
+      directHit_ai: true,
+      skillTagFilter(player, tag, arg) {
+        if (tag == "directHit_ai") {
+          return (
+            arg.card.name == "sha" &&
+            arg.target.countCards("e", function (card) {
+              return get.value(card) > 1
+            }) > 0
+          )
+        }
+        if (arg && arg.name == "sha" && arg.target.getEquip(2)) {
+          return true
+        }
+        return false
+      },
+    },
+  },
+  rejianchu2: {
+    mod: {
+      cardUsable(card, player, num) {
+        if (card.name == "sha") {
+          return num + player.countMark("rejianchu2")
+        }
+      },
+    },
+    onremove: true,
+  },
 }
 
 export default skills

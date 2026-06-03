@@ -1699,6 +1699,7 @@ const skills = {
     charlotte: true,
   },
   // 庞德
+  // 猛进
   mengjin: {
     audio: 2,
     trigger: { player: "shaMiss" },

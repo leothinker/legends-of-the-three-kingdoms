@@ -64,6 +64,10 @@ export default {
   "#tianyi2": "请助我一臂之力！",
   "#taishici:die": "大丈夫，当带三尺之剑，立不世之功……",
 
+  "#mengjin1": "我要杀你们个片甲不留！",
+  "#mengjin2": "你可敢挡我？",
+  "#pangde:die": "四面都是水，我命休矣……",
+
   // "#yingyang1": "此战，我必取胜！",
   // "#yingyang2": "相斗之趣，吾常胜之！",
   // "#duanliang1_re_xuhuang1": "粮不三载，敌军已犯行军大忌。",

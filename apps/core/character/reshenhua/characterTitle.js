@@ -13,4 +13,5 @@ export default {
   re_sp_zhugeliang: "卧龙",
   re_pangtong: "凤雏",
   re_taishici: "剑鸣不平",
+  re_pangde: "人马一体",
 }

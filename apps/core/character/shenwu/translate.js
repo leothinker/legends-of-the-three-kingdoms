@@ -202,6 +202,12 @@ const translates = {
   hanzhan_gain: "酣战",
   hanzhan_info:
     "当你与其他角色拼点或其他角色与你拼点时，你可以选择其一张手牌，其用此牌与你拼点。当你拼点后，你可以获得其中点数最大的【杀】。",
+
+  re_pangde: "界庞德",
+  re_pangde_prefix: "界",
+  rejianchu: "鞬出",
+  rejianchu_info:
+    "当你使用【杀】指定一名角色为目标后，你可以弃置其一张牌，若弃置的牌：为基本牌，其获得此【杀】；不为基本牌，其不能使用【闪】且你本回合可以多使用一张【杀】。",
 }
 
 export default translates

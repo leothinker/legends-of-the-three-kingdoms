@@ -86,9 +86,7 @@ const translates = {
 
   pangde: "庞德",
   mengjin: "猛进",
-  mengjin_info: "当你使用的【杀】被目标角色抵消时，你可以弃置其一张牌。",
-  mashu: "马术",
-  mashu_info: "锁定技，你与其他角色的距离-1。",
+  mengjin_info: "当你使用的【杀】被一名角色使用的【闪】抵消后，你可以弃置其一张牌。",
 
   yanwen: "颜良文丑",
   shuangxiong: "双雄",

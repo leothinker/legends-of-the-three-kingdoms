@@ -84,13 +84,13 @@ const characters = {
     names: "太史|慈",
     dieAudios: ["ol_taishici"],
   },
+  re_pangde: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["mashu", "jianchu"],
+  },
 
-  // re_pangde: {
-  //   sex: "male",
-  //   group: "qun",
-  //   hp: 4,
-  //   skills: ["mashu", "jianchu"],
-  // },
   // re_yanwen: {
   //   sex: "male",
   //   group: "qun",

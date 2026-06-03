@@ -83,13 +83,13 @@ const characters = {
     skills: ["tianyi"],
     names: "太史|慈",
   },
-
   pangde: {
     sex: "male",
     group: "qun",
     hp: 4,
     skills: ["mashu", "mengjin"],
   },
+
   yuanshao: {
     sex: "male",
     group: "qun",

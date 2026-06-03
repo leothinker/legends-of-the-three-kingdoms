@@ -31,4 +31,5 @@ export default {
   ol_sp_zhugeliang: "卧龙",
   ol_pangtong: "凤雏",
   ol_taishici: "笃烈之士",
+  ol_pangde: "人马一体",
 }

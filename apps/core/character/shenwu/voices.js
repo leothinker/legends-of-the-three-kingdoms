@@ -85,4 +85,8 @@ export default {
   "#hanzhan1": "伯符，且与我一战！",
   "#hanzhan2": "与君酣战，快哉快哉！",
   "#ol_taishici:die": "无妄之灾，难以避免……",
+
+  "#rejianchu1": "你这身躯，怎么能快过我？",
+  "#rejianchu2": "这些怎么能挡住我的威力！",
+  "#ol_pangde:die": "人亡马倒，命之所归。",
 }

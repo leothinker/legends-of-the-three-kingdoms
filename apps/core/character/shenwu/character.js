@@ -285,6 +285,12 @@ const characters = {
     skills: ["tianyi", "hanzhan"],
     names: "太史|慈",
   },
+  ol_pangde: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["mashu", "rejianchu"],
+  },
 }
 
 export default characters

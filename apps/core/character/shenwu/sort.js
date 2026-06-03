@@ -2,7 +2,7 @@ const characterSort = {
   refresh_standard: [
     "ol_caocao",
     "re_simayi",
-    "re_xiahoudun",
+    "ol_xiahoudun",
     "re_zhangliao",
     "ol_xuzhu",
     "re_guojia",

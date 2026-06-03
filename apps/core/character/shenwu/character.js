@@ -15,12 +15,14 @@ const characters = {
     skills: ["refankui", "reguicai"],
     names: "司马|懿",
   },
-  re_xiahoudun: {
+  ol_xiahoudun: {
     sex: "male",
     group: "wei",
     hp: 4,
-    skills: ["reganglie", "qingjian"],
+    skills: ["olganglie", "qingjian"],
     names: "夏侯|惇",
+    img: "image/character/re_xiahoudun.jpg",
+    dieAudios: ["re_xiahoudun"],
   },
   re_zhangliao: {
     sex: "male",

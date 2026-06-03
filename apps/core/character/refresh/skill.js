@@ -6,8 +6,6 @@ const skills = {
   // 奸雄
   rejianxiong: {
     audio: 2,
-    audioname: ["shen_caopi", "mb_caocao"],
-    audioname2: { caoying: "lingren_jianxiong" },
     trigger: { player: "damageEnd" },
     async content(event, trigger, player) {
       if (get.itemtype(trigger.cards) == "cards" && get.position(trigger.cards[0], true) == "o") {
@@ -49,7 +47,6 @@ const skills = {
       },
     },
   },
-  rehujia: { audio: 2 },
   // 界司马懿
   // 反馈
   refankui: {

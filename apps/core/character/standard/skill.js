@@ -6,7 +6,6 @@ const skills = {
   // 奸雄
   jianxiong: {
     audio: 2,
-    audioname2: { caoying: "lingren_jianxiong" },
     preHidden: true,
     trigger: { player: "damageEnd" },
     filter(event, player) {
@@ -33,10 +32,8 @@ const skills = {
   // 护驾
   hujia: {
     audio: 2,
-    audioname2: {
-      re_caocao: "rehujia",
-      pe_jun_caocao: "sbhujia",
-    },
+    audioname: ["re_caocao"],
+    audioname2: { old_caocao: "hujia_re_caocao" },
     zhuSkill: true,
     trigger: { player: ["chooseToRespondBefore", "chooseToUseBefore"] },
     filter(event, player) {

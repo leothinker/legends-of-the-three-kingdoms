@@ -1115,7 +1115,7 @@ export class Library {
         },
         ignore_error: {
           name: "无视报错",
-          init: false,
+          init: true,
           intro:
             "不以弹窗形式报错。<br/>注：此选项仅保证部分不影响运行的错误不会令游戏卡死，不保证报错后结算正常。影响游戏运行的错误请通知扩展作者适配。",
         },

@@ -7,6 +7,7 @@ const characterSort = {
     "xuzhu",
     "guojia",
     "zhenji",
+
     "liubei",
     "guanyu",
     "zhangfei",
@@ -14,6 +15,7 @@ const characterSort = {
     "zhaoyun",
     "machao",
     "huangyueying",
+
     "sunquan",
     "ganning",
     "lvmeng",
@@ -22,6 +24,7 @@ const characterSort = {
     "daqiao",
     "luxun",
     "sunshangxiang",
+
     "huatuo",
     "lvbu",
     "diaochan",

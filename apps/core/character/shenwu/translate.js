@@ -8,6 +8,12 @@ const translates = {
   rehujia_info:
     "主公技，当你需要使用或打出【闪】时，你可以令其他魏势力角色选择是否替你使用或打出【闪】（视为由你使用或打出）。当其他魏势力角色于其回合外使用、打出或替你使用或打出【闪】时，其可以令你摸一张牌（每回合限一次）。",
 
+  ol_xiahoudun: "界夏侯惇",
+  ol_xiahoudun_prefix: "界",
+  olganglie: "刚烈",
+  olganglie_info:
+    "当你受到其他角色造成的1点伤害后，你可以进行判定，若结果为：红色，你对伤害来源造成1点伤害；黑色，你弃置其一张牌。",
+
   ol_xuzhu: "界许褚",
   ol_xuzhu_prefix: "界",
   olluoyi: "裸衣",

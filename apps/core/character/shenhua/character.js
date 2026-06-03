@@ -70,13 +70,13 @@ const characters = {
     skills: ["bazhen", "huoji", "kanpo"],
     names: "诸葛|亮",
   },
-
   pangtong: {
     sex: "male",
     group: "shu",
     hp: 3,
     skills: ["lianhuan", "niepan"],
   },
+
   taishici: {
     sex: "male",
     group: "wu",

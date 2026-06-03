@@ -1254,198 +1254,6 @@ const skills = {
       },
     },
   },
-  // 庞统
-  // 连环
-  lianhuan: {
-    audio: 2,
-    hiddenCard(player, name) {
-      return name == "tiesuo" && player.hasCard((card) => get.suit(card) == "club", "sh")
-    },
-    enable: "chooseToUse",
-    filter(event, player) {
-      if (!player.hasCard((card) => get.suit(card) == "club", "sh")) {
-        return false
-      }
-      return (
-        event.type == "phase" ||
-        event.filterCard(get.autoViewAs({ name: "tiesuo" }, "unsure"), player, event)
-      )
-    },
-    position: "hs",
-    filterCard(card, player, event) {
-      if (!event) {
-        event = _status.event
-      }
-      if (get.suit(card) != "club") {
-        return false
-      }
-      if (event.type == "phase" && get.position(card) != "s" && player.canRecast(card)) {
-        return true
-      } else {
-        if (game.checkMod(card, player, "unchanged", "cardEnabled2", player) === false) {
-          return false
-        }
-        const cardx = get.autoViewAs({ name: "tiesuo" }, [card])
-        return event._backup.filterCard(cardx, player, event)
-      }
-    },
-    filterTarget(fuck, player, target) {
-      const card = ui.selected.cards[0],
-        event = _status.event,
-        backup = event._backup
-      if (!card || game.checkMod(card, player, "unchanged", "cardEnabled2", player) === false) {
-        return false
-      }
-      const cardx = get.autoViewAs({ name: "tiesuo" }, [card])
-      return backup.filterCard(cardx, player, event) && backup.filterTarget(cardx, player, target)
-    },
-    selectTarget() {
-      const card = ui.selected.cards[0],
-        event = _status.event,
-        player = event.player,
-        backup = event._backup
-      let recast = false,
-        use = false
-      const cardx = get.autoViewAs({ name: "tiesuo" }, [card])
-      if (event.type == "phase" && player.canRecast(card)) {
-        recast = true
-      }
-      if (card && game.checkMod(card, player, "unchanged", "cardEnabled2", player) !== false) {
-        if (backup.filterCard(cardx, player, event)) {
-          use = true
-        }
-      }
-      if (!use) {
-        return [0, 0]
-      } else {
-        const select = backup.selectTarget(cardx, player)
-        if (recast && select[0] > 0) {
-          select[0] = 0
-        }
-        return select
-      }
-    },
-    filterOk() {
-      const card = ui.selected.cards[0],
-        event = _status.event,
-        player = event.player,
-        backup = event._backup
-      const selected = ui.selected.targets.length
-      let recast = false,
-        use = false
-      const cardx = get.autoViewAs({ name: "tiesuo" }, [card])
-      if (event.type == "phase" && player.canRecast(card)) {
-        recast = true
-      }
-      if (card && game.checkMod(card, player, "unchanged", "cardEnabled2", player) !== false) {
-        if (backup.filterCard(cardx, player, event)) {
-          use = true
-        }
-      }
-      if (recast && selected == 0) {
-        return true
-      } else if (use) {
-        const select = backup.selectTarget(cardx, player)
-        if (select[0] <= -1) {
-          return true
-        }
-        return selected >= select[0] && selected <= select[1]
-      }
-    },
-    ai1(card) {
-      return 6 - get.value(card)
-    },
-    ai2(target) {
-      const player = get.player()
-      return get.effect(target, { name: "tiesuo" }, player, player)
-    },
-    discard: false,
-    lose: false,
-    delay: false,
-    viewAs(cards, player) {
-      return {
-        name: "tiesuo",
-      }
-    },
-    prepare: () => true,
-    async precontent(event, trigger, player) {
-      const result = event.result
-      if (!result?.targets?.length) {
-        delete result.card
-      }
-    },
-    async content(event, trigger, player) {
-      await player.recast(event.cards)
-    },
-    ai: {
-      order(item, player) {
-        if (
-          game.hasPlayer(
-            (current) => get.effect(current, { name: "tiesuo" }, player, player) > 0,
-          ) ||
-          player.hasCard((card) => get.suit(card) == "club" && player.canRecast(card), "h")
-        ) {
-          return 8
-        }
-        return 1
-      },
-      result: { player: 1 },
-    },
-  },
-  // 涅槃
-  niepan: {
-    audio: "niepan",
-    audioname2: { sb_pangtong: "sbniepan" },
-    enable: "chooseToUse",
-    skillAnimation: true,
-    limited: true,
-    animationColor: "orange",
-    filter(event, player) {
-      if (event.type == "dying") {
-        if (player != event.dying) {
-          return false
-        }
-        return true
-      }
-      return false
-    },
-    async content(event, trigger, player) {
-      player.awakenSkill(event.name)
-      player.storage.niepan = true
-      await player.discard(player.getCards("hej"))
-      await player.link(false)
-      await player.turnOver(false)
-      await player.draw(3)
-      if (player.hp < 3) {
-        await player.recover(3 - player.hp)
-      }
-    },
-    ai: {
-      order: 1,
-      skillTagFilter(player, arg, target) {
-        if (player != target || player.storage.niepan) {
-          return false
-        }
-      },
-      save: true,
-      result: {
-        player(player) {
-          if (player.hp <= 0) {
-            return 10
-          }
-          if (player.hp <= 2 && player.countCards("he") <= 1) {
-            return 10
-          }
-          return 0
-        },
-      },
-      threaten(player, target) {
-        if (!target.storage.niepan) {
-          return 0.6
-        }
-      },
-    },
-  },
   // 卧龙诸葛
   // 八阵
   bazhen: {
@@ -1592,6 +1400,208 @@ const skills = {
       return 8 - get.value(card)
     },
     threaten: 1.2,
+  },
+  // 庞统
+  // 连环
+  lianhuan: {
+    audio: 2,
+    hiddenCard(player, name) {
+      return name == "tiesuo" && player.hasCard((card) => get.suit(card) == "club", "sh")
+    },
+    enable: "chooseToUse",
+    filter(event, player) {
+      if (!player.hasCard((card) => get.suit(card) == "club", "sh")) {
+        return false
+      }
+      return (
+        event.type == "phase" ||
+        event.filterCard(get.autoViewAs({ name: "tiesuo" }, "unsure"), player, event)
+      )
+    },
+    position: "hs",
+    filterCard(card, player, event) {
+      if (!event) {
+        event = _status.event
+      }
+      if (get.suit(card) != "club") {
+        return false
+      }
+      if (event.type == "phase" && get.position(card) != "s" && player.canRecast(card)) {
+        return true
+      } else {
+        if (game.checkMod(card, player, "unchanged", "cardEnabled2", player) === false) {
+          return false
+        }
+        const cardx = get.autoViewAs({ name: "tiesuo" }, [card])
+        return event._backup.filterCard(cardx, player, event)
+      }
+    },
+    filterTarget(fuck, player, target) {
+      const card = ui.selected.cards[0],
+        event = _status.event,
+        backup = event._backup
+      if (!card || game.checkMod(card, player, "unchanged", "cardEnabled2", player) === false) {
+        return false
+      }
+      const cardx = get.autoViewAs({ name: "tiesuo" }, [card])
+      return backup.filterCard(cardx, player, event) && backup.filterTarget(cardx, player, target)
+    },
+    selectTarget() {
+      const card = ui.selected.cards[0],
+        event = _status.event,
+        player = event.player,
+        backup = event._backup
+      let recast = false,
+        use = false
+      const cardx = get.autoViewAs({ name: "tiesuo" }, [card])
+      if (event.type == "phase" && player.canRecast(card)) {
+        recast = true
+      }
+      if (card && game.checkMod(card, player, "unchanged", "cardEnabled2", player) !== false) {
+        if (backup.filterCard(cardx, player, event)) {
+          use = true
+        }
+      }
+      if (!use) {
+        return [0, 0]
+      } else {
+        const select = backup.selectTarget(cardx, player)
+        if (recast && select[0] > 0) {
+          select[0] = 0
+        }
+        return select
+      }
+    },
+    filterOk() {
+      const card = ui.selected.cards[0],
+        event = _status.event,
+        player = event.player,
+        backup = event._backup
+      const selected = ui.selected.targets.length
+      let recast = false,
+        use = false
+      const cardx = get.autoViewAs({ name: "tiesuo" }, [card])
+      if (event.type == "phase" && player.canRecast(card)) {
+        recast = true
+      }
+      if (card && game.checkMod(card, player, "unchanged", "cardEnabled2", player) !== false) {
+        if (backup.filterCard(cardx, player, event)) {
+          use = true
+        }
+      }
+      if (recast && selected == 0) {
+        return true
+      } else if (use) {
+        const select = backup.selectTarget(cardx, player)
+        if (select[0] <= -1) {
+          return true
+        }
+        return selected >= select[0] && selected <= select[1]
+      }
+    },
+    ai1(card) {
+      return 6 - get.value(card)
+    },
+    ai2(target) {
+      const player = get.player()
+      const card = ui.selected.cards[0],
+        event = _status.event,
+        backup = event._backup
+      if (!card || game.checkMod(card, player, "unchanged", "cardEnabled2", player) === false) {
+        return 0
+      }
+      const cardx = get.autoViewAs({ name: "tiesuo" }, [card])
+      if (backup.filterCard(cardx, player, event) && backup.filterTarget(cardx, player, target)) {
+        return get.effect(target, { name: "tiesuo" }, player, player)
+      }
+      return 0
+    },
+    discard: false,
+    lose: false,
+    delay: false,
+    viewAs(cards, player) {
+      return {
+        name: "tiesuo",
+      }
+    },
+    prepare: () => true,
+    async precontent(event, trigger, player) {
+      const result = event.result
+      if (!result?.targets?.length) {
+        delete result.card
+      }
+    },
+    async content(event, trigger, player) {
+      await player.recast(event.cards)
+    },
+    ai: {
+      order(item, player) {
+        if (
+          game.hasPlayer(
+            (current) => get.effect(current, { name: "tiesuo" }, player, player) > 0,
+          ) ||
+          player.hasCard((card) => get.suit(card) == "club" && player.canRecast(card), "h")
+        ) {
+          return 8
+        }
+        return 1
+      },
+      result: { player: 1 },
+    },
+  },
+  // 涅槃
+  niepan: {
+    audio: 2,
+    audioname2: { sb_pangtong: "sbniepan" },
+    enable: "chooseToUse",
+    skillAnimation: true,
+    limited: true,
+    animationColor: "orange",
+    filter(event, player) {
+      if (event.type == "dying") {
+        if (player != event.dying) {
+          return false
+        }
+        return true
+      }
+      return false
+    },
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      player.storage.niepan = true
+      await player.discard(player.getCards("hej"))
+      await player.link(false)
+      await player.turnOver(false)
+      await player.draw(3)
+      if (player.hp < 3) {
+        await player.recover(3 - player.hp)
+      }
+    },
+    ai: {
+      order: 1,
+      skillTagFilter(player, arg, target) {
+        if (player != target || player.storage.niepan) {
+          return false
+        }
+      },
+      save: true,
+      result: {
+        player(player) {
+          if (player.hp <= 0) {
+            return 10
+          }
+          if (player.hp <= 2 && player.countCards("he") <= 1) {
+            return 10
+          }
+          return 0
+        },
+      },
+      threaten(player, target) {
+        if (!target.storage.niepan) {
+          return 0.6
+        }
+      },
+    },
   },
   // 太史慈
   // 天义

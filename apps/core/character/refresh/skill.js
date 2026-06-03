@@ -2689,7 +2689,7 @@ const skills = {
     },
     //priority:1,
     audio: 2,
-    audioname: ["sb_huaxiong", "ol_huaxiong"],
+    audioname: ["sb_huaxiong"],
     filter(event) {
       return (
         event.card &&

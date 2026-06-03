@@ -1236,7 +1236,6 @@ const skills = {
   rehuoji: {
     position: "hes",
     audio: 2,
-    audioname: ["ol_pangtong"],
     enable: "chooseToUse",
     filterCard(card) {
       return get.color(card) == "red"
@@ -1291,7 +1290,6 @@ const skills = {
     },
     locked: false,
     audio: 2,
-    audioname: ["ol_pangtong"],
     position: "hes",
     enable: "chooseToUse",
     filterCard(card) {
@@ -1306,6 +1304,135 @@ const skills = {
     prompt: "将一张黑色牌当【无懈可击】使用",
     check(card) {
       return 8 - get.value(card)
+    },
+  },
+  // 界庞统
+  // 连环
+  relianhuan: {
+    audio: 2,
+    inherit: "lianhuan",
+    group: "relianhuan_add",
+    subSkill: {
+      add: {
+        audio: "relianhuan",
+        trigger: { player: "useCard2" },
+        filter(event, player) {
+          if (event.card.name != "tiesuo") {
+            return false
+          }
+          var info = get.info(event.card)
+          if (info.allowMultiple == false) {
+            return false
+          }
+          if (event.targets && !info.multitarget) {
+            if (
+              game.hasPlayer((current) => {
+                return (
+                  !event.targets.includes(current) &&
+                  lib.filter.targetEnabled2(event.card, player, current)
+                )
+              })
+            ) {
+              return true
+            }
+          }
+          return false
+        },
+        charlotte: true,
+        forced: true,
+        popup: false,
+        content() {
+          "step 0"
+          player
+            .chooseTarget(
+              get.prompt("relianhuan"),
+              "为" + get.translation(trigger.card) + "额外指定一个目标",
+              (card, player, target) => {
+                return (
+                  !_status.event.sourcex.includes(target) &&
+                  lib.filter.targetEnabled2(_status.event.card, player, target)
+                )
+              },
+            )
+            .set("sourcex", trigger.targets)
+            .set("ai", function (target) {
+              var player = _status.event.player
+              return get.effect(target, _status.event.card, player, player)
+            })
+            .set("card", trigger.card)
+          ;("step 1")
+          if (result.bool) {
+            if (!event.isMine() && !event.isOnline()) {
+              game.delayex()
+            }
+          } else {
+            event.finish()
+          }
+          ;("step 2")
+          if (result.bool) {
+            var targets = result.targets
+            player.logSkill("relianhuan_add", targets)
+            trigger.targets.addArray(targets)
+            game.log(targets, "也成为了", trigger.card, "的目标")
+          }
+        },
+      },
+    },
+  },
+  // 涅槃
+  reniepan: {
+    audio: 2,
+    audioname2: { sb_pangtong: "sbniepan" },
+    enable: "chooseToUse",
+    limited: true,
+    skillAnimation: true,
+    animationColor: "fire",
+    filter(event, player) {
+      if (event.type == "dying") {
+        if (player != event.dying) {
+          return false
+        }
+        return true
+      } else if (event.getParent().name == "phaseUse") {
+        return true
+      }
+      return false
+    },
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      player.storage.reniepan = true
+      await player.discard(player.getCards("hej"))
+      await player.link(false)
+      await player.turnOver(false)
+      await player.draw(3)
+      if (player.hp < 3) {
+        await player.recover(3 - player.hp)
+      }
+    },
+    ai: {
+      order: 0.5,
+      skillTagFilter(player, tag, target) {
+        if (player != target || player.storage.reniepan) {
+          return false
+        }
+      },
+      save: true,
+      result: {
+        player(player) {
+          if (player.hp <= 0) {
+            return 10
+          }
+          if (player.hp <= 1 && player.countCards("he") <= 1) {
+            return 10
+          }
+          return 0
+        },
+      },
+      threaten(player, target) {
+        if (!target.storage.reniepan) {
+          return 0.6
+        }
+      },
     },
   },
 }

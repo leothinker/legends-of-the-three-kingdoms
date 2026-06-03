@@ -186,6 +186,15 @@ const translates = {
   cangzhuo: "藏拙",
   cangzhuo_info:
     "弃牌阶段开始时，若你本回合未使用过锦囊牌，你可以展示任意张锦囊牌，令这些牌此阶段不计入手牌上限。",
+
+  ol_pangtong: "界庞统",
+  ol_pangtong_prefix: "界",
+  ollianhuan: "连环",
+  ollianhuan_info:
+    "你可以将一张梅花牌当【铁索连环】使用或重铸；你使用【铁索连环】可以多指定一名角色为目标。",
+  olniepan: "涅槃",
+  olniepan_info:
+    "限定技，当你处于濒死状态时，你可以弃置区域里的所有牌，复原武将牌，然后摸三张牌并将体力回复至3点，选择下列一个技能并获得之：〖八阵〗、〖火计〗或〖看破〗。",
 }
 
 export default translates

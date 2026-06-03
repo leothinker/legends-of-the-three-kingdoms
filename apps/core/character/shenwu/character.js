@@ -188,7 +188,6 @@ const characters = {
     hp: 6,
     skills: ["olyaowu", "shizhan"],
     img: "image/character/re_huaxiong.jpg",
-    dieAudios: ["re_huaxiong"],
   },
   ol_gongsunzan: {
     sex: "male",
@@ -272,6 +271,12 @@ const characters = {
     hp: 3,
     skills: ["bazhen", "olhuoji", "olkanpo", "cangzhuo"],
     names: "诸葛|亮",
+  },
+  ol_pangtong: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["ollianhuan", "olniepan"],
   },
 }
 

@@ -70,18 +70,18 @@ const characters = {
     skills: ["bazhen", "rehuoji", "rekanpo"],
     names: "诸葛|亮",
   },
+  re_pangtong: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["relianhuan", "reniepan"],
+  },
 
   re_pangde: {
     sex: "male",
     group: "qun",
     hp: 4,
     skills: ["mashu", "jianchu"],
-  },
-  re_pangtong: {
-    sex: "male",
-    group: "shu",
-    hp: 3,
-    skills: ["relianhuan", "reniepan"],
   },
   re_yanwen: {
     sex: "male",

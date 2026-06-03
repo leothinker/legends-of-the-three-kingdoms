@@ -2,8 +2,11 @@ export default {
   "#botu1": "今日起兵，渡江攻敌！",
   "#botu2": "时机已到，全军出击！",
 
+  "#olyaowu1": "这些杂兵，我有何惧！",
+  "#olyaowu2": "有吾在此，解太师烦忧。",
   "#shizhan1": "兀那汉子，且报上名来！",
   "#shizhan2": "看你能坚持几个回合！",
+  "#ol_huaxiong:die": "我掉以轻心了……",
 
   "#reshensu_ol_xiahouyuan1": "奔轶绝尘，不留踪影。",
   "#reshensu_ol_xiahouyuan2": "健步如飞，破敌不备。",
@@ -64,4 +67,16 @@ export default {
   "#cangzhuo1": "藏巧于拙，用晦而明。",
   "#cangzhuo2": "寓清于浊，以屈为伸。",
   "#ol_sp_zhugeliang:die": "星途半废，夙愿未完。",
+
+  "#ollianhuan1": "连环之策，攻敌之计。",
+  "#ollianhuan2": "锁链连舟，困步难行。",
+  "#olniepan1": "烈火脱胎，涅槃重生。",
+  "#olniepan2": "破而后立，方有大成。",
+  "#bazhen_ol_pangtong1": "八卦四象，阴阳运转。",
+  "#bazhen_ol_pangtong2": "离火艮山，皆随我用。",
+  "#olhuoji_ol_pangtong1": "火计诱敌，江水助势。",
+  "#olhuoji_ol_pangtong2": "火烧赤壁，曹贼必败。",
+  "#olkanpo_ol_pangtong1": "卧龙之才，吾也略懂。",
+  "#olkanpo_ol_pangtong2": "这些小伎俩，逃不出我的眼睛！",
+  "#ol_pangtong:die": "骥飞羽落，坡道归尘。",
 }

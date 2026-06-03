@@ -60,4 +60,10 @@ export default {
   "#rekanpo1": "雕虫小技！",
   "#rekanpo2": "你的计谋被识破了！",
   "#re_sp_zhugeliang:die": "我的计谋竟被……",
+
+  "#relianhuan1": "将多兵众，不可以敌，使其自累，以杀其势。",
+  "#relianhuan2": "善用兵者，运巧必防损，立谋虑中变。",
+  "#reniepan1": "凤凰折翅，涅槃再生。",
+  "#reniepan2": "九天之志，展翅翱翔。",
+  "#re_pangtong:die": "落……凤……坡……",
 }

@@ -78,6 +78,15 @@ const translates = {
   rekanpo: "看破",
   rekanpo_info: "你可以将一张黑色牌当【无懈可击】使用。",
 
+  re_pangtong: "界庞统",
+  re_pangtong_prefix: "界",
+  relianhuan: "连环",
+  relianhuan_info:
+    "你可以将一张梅花手牌当【铁索连环】使用或重铸；你使用【铁索连环】可以多指定一名角色为目标。",
+  reniepan: "涅槃",
+  reniepan_info:
+    "限定技，出牌阶段或当你处于濒死状态时，你可以弃置区域里的所有牌，复原武将牌，然后摸三张牌并将体力回复至3点。",
+
   jx_pangde: "界庞德",
   jx_pangde_prefix: "界",
   mashu: "马术",
@@ -85,15 +94,6 @@ const translates = {
   jianchu: "鞬出",
   jianchu_info:
     "当你使用的【杀】指定目标后，你可以弃置该角色一张牌，若以此法弃置的牌：是装备牌，其不能使用【闪】响应此【杀】；不是装备牌，其获得此【杀】。",
-
-  jx_pangtong: "界庞统",
-  jx_pangtong_prefix: "界",
-  jx_lianhuan: "连环",
-  jx_lianhuan_info:
-    "你可以将一张♣手牌当【铁索连环】使用或重铸；你使用【铁索连环】可以多选择一名角色为目标。",
-  jx_niepan: "涅槃",
-  jx_niepan_info:
-    "限定技，出牌阶段或当你处于濒死状态时，你可以弃置你所属区域里的所有牌，复原你的武将牌，摸三张牌，将体力回复至3点。",
 
   jx_yanwen: "界颜良文丑",
   jx_yanwen_prefix: "界",

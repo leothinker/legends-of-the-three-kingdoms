@@ -986,7 +986,7 @@ const skills = {
   // 耀武
   olyaowu: {
     trigger: { player: "damageBegin3" },
-    audio: "reyaowu",
+    audio: 2,
     forced: true,
     filter(event) {
       return event.card && (get.color(event.card) != "red" || (event.source && event.source.isIn()))
@@ -2661,6 +2661,164 @@ const skills = {
       cardDiscardable(card, player, name) {
         if (name == "phaseDiscard" && card.hasGaintag("cangzhuo")) {
           return false
+        }
+      },
+    },
+  },
+  // 界庞统
+  // 连环
+  ollianhuan: {
+    audio: 2,
+    hiddenCard: (player, name) => {
+      return name == "tiesuo" && player.hasCard((card) => get.suit(card) == "club", "she")
+    },
+    filter(event, player) {
+      if (!player.hasCard((card) => get.suit(card) == "club", "she")) {
+        return false
+      }
+      return event.type == "phase" || event.filterCard({ name: "tiesuo" }, player, event)
+    },
+    position: "hes",
+    inherit: "relianhuan",
+    group: "ollianhuan_add",
+    subSkill: {
+      add: {
+        audio: "ollianhuan",
+        trigger: { player: "useCard2" },
+        filter(event, player) {
+          if (event.card.name != "tiesuo") {
+            return false
+          }
+          var info = get.info(event.card)
+          if (info.allowMultiple == false) {
+            return false
+          }
+          if (event.targets && !info.multitarget) {
+            if (
+              game.hasPlayer((current) => {
+                return (
+                  !event.targets.includes(current) &&
+                  lib.filter.targetEnabled2(event.card, player, current)
+                )
+              })
+            ) {
+              return true
+            }
+          }
+          return false
+        },
+        charlotte: true,
+        forced: true,
+        popup: false,
+        async content(event, trigger, player) {
+          const result = await player
+            .chooseTarget({
+              prompt: get.prompt("ollianhuan"),
+              filterTarget(card, player, target) {
+                const event = get.event()
+                return (
+                  !event.sourcex.includes(target) &&
+                  lib.filter.targetEnabled2(event.card, player, target)
+                )
+              },
+            })
+            .set("prompt2", `为${get.translation(trigger.card)}额外指定一个目标`)
+            .set("sourcex", trigger.targets)
+            .set("ai", function (target) {
+              var player = _status.event.player
+              return get.effect(target, _status.event.card, player, player)
+            })
+            .set("card", trigger.card)
+            .forResult()
+          if (result?.bool && result.targets) {
+            if (!event.isMine() && !event.isOnline()) {
+              await game.delayex()
+            }
+            const targets = result.targets
+            player.logSkill("ollianhuan_add", targets)
+            trigger.targets.addArray(targets)
+            game.log(targets, "也成为了", trigger.card, "的目标")
+          }
+        },
+      },
+    },
+  },
+  // 涅槃
+  olniepan: {
+    audio: 2,
+    enable: "chooseToUse",
+    skillAnimation: true,
+    limited: true,
+    animationColor: "orange",
+    filter(event, player) {
+      if (event.type == "dying") {
+        if (player != event.dying) {
+          return false
+        }
+        return true
+      }
+      return false
+    },
+    async content(event, trigger, player) {
+      // step 0
+      player.awakenSkill(event.name)
+      player.storage.olniepan = true
+      await player.discard(player.getCards("hej"))
+      // step 1
+      await player.link(false)
+      // step 2
+      await player.turnOver(false)
+      // step 3
+      await player.draw(3)
+      // step 4
+      if (player.hp < 3) {
+        await player.recover(3 - player.hp)
+      }
+      // step 5
+      const result = await player
+        .chooseControl("bazhen", "olhuoji", "olkanpo")
+        .set("prompt", "选择获得一个技能")
+        .set("ai", () => {
+          let player = get.event().player,
+            threaten = get.threaten(player)
+          if (!player.hasEmptySlot(2)) {
+            return "olhuoji"
+          }
+          if (threaten < 0.8) {
+            return "olkanpo"
+          }
+          if (threaten < 1.6) {
+            return "bazhen"
+          }
+          return ["olhuoji", "bazhen"].randomGet()
+        })
+        .forResult()
+      // step 6
+      player.addSkills(result.control)
+    },
+    derivation: ["bazhen", "olhuoji", "olkanpo"],
+    ai: {
+      order: 1,
+      skillTagFilter(player, tag, target) {
+        if (player != target || player.storage.olniepan) {
+          return false
+        }
+      },
+      save: true,
+      result: {
+        player(player) {
+          if (player.hp <= 0) {
+            return 10
+          }
+          if (player.hp <= 2 && player.countCards("he") <= 1) {
+            return 10
+          }
+          return 0
+        },
+      },
+      threaten(player, target) {
+        if (!target.storage.olniepan) {
+          return 0.6
         }
       },
     },

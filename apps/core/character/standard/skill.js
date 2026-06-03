@@ -32,8 +32,7 @@ const skills = {
   // 护驾
   hujia: {
     audio: 2,
-    audioname: ["re_caocao"],
-    audioname2: { old_caocao: "hujia_re_caocao" },
+    audioname2: { re_caocao: "rehujia", old_caocao: "rehujia" },
     zhuSkill: true,
     trigger: { player: ["chooseToRespondBefore", "chooseToUseBefore"] },
     filter(event, player) {
@@ -152,7 +151,6 @@ const skills = {
   // 鬼才
   guicai: {
     audio: 2,
-    audioname2: { xin_simayi: "jilue_guicai" },
     trigger: { global: "judge" },
     preHidden: true,
     filter(event, player) {

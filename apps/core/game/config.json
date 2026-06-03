@@ -8,7 +8,7 @@
   "zhinang_tricks": ["guohe", "wuxie", "wuzhong", "dongzhuxianji"],
   "connect_zhinang_tricks": ["guohe", "wuxie", "wuzhong", "dongzhuxianji"],
   "all": {
-    "sgscharacters": ["standard", "shenhua", "refresh", "reshenhua", "shenwu"],
+    "sgscharacters": ["standard", "shenhua", "refresh", "reshenhua", "shenwu", "old"],
     "sgscards": ["standard", "extra", "sp", "guozhan", "zhulu", "yingbian", "yongjian"],
     "sgsmodes": ["identity", "guozhan", "versus", "doudizhu", "single", "brawl", "connect"],
     "stockmode": [
@@ -130,9 +130,9 @@
   "intro": "i",
   "right_click": "pause",
   "sort": "type_sort",
-  "cards": ["standard"],
-  "characters": ["standard"],
-  "moderned_characters": ["standard", "shenhua", "refresh", "reshenhua", "shenwu"],
+  "cards": ["standard", "extra", "refresh"],
+  "characters": ["refresh", "reshenhua"],
+  "moderned_characters": ["standard", "shenhua", "refresh", "reshenhua", "shenwu", "old"],
   "moderned_modes": ["guozhan"],
   "connect_characters": ["diy"],
   "connect_cards": ["huodong", "guozhan", "sp", "zhulu", "yingbian", "yongjian", "xianxia"],

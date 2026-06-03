@@ -1,14 +1,17 @@
 const characterSort = {
   refresh_2014: [
     "re_simayi",
+
     "re_machao",
     "xushu",
+
     "re_ganning",
     "re_lvmeng",
     "re_huanggai",
     "re_zhouyu",
     "re_daqiao",
     "re_luxun",
+
     "re_huatuo",
     "re_gongsunzan",
   ],
@@ -19,10 +22,13 @@ const characterSort = {
     "re_zhangliao",
     "re_xuzhu",
     "re_guojia",
+
     "re_guanyu",
     "re_zhugeliang",
     "re_zhaoyun",
+
     "re_sunquan",
+
     "re_lvbu",
     "re_diaochan",
     "re_huaxiong",
@@ -32,14 +38,11 @@ const characterSort = {
 }
 
 const characterSortTranslate = {
-  refresh_standard: "界限突破·标",
   refresh_2014: "界限突破2014",
   refresh_2015: "界限突破2015",
-  refresh_2017: "界限突破2017",
   refresh_2018: "界限突破2018",
   refresh_2019: "界限突破2019",
   refresh_2021: "界限突破2021",
-  refresh_2023: "界限突破2023",
 }
 
 export { characterSort, characterSortTranslate }

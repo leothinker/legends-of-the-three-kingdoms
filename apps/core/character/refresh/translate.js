@@ -18,11 +18,12 @@ const translates = {
   reganglie: "刚烈",
   reganglie_info:
     "当你受到1点伤害后，你可以进行判定，若结果为：红色，你对伤害来源造成1点伤害；黑色，你弃置其一张牌。",
+  reganglie_info_guozhan:
+    "当你受到伤害后，你可以进行判定，若结果为：红色，你对伤害来源造成1点伤害；黑色，你弃置其一张牌。",
   qingjian: "清俭",
   qingjian_info:
     "每回合限一次，当你于摸牌阶段外获得牌后，你可以展示任意张牌并将这些牌交给一名其他角色，然后当前回合角色本回合手牌上限+X（X为你以此法展示的牌包含的类别数）。",
   qingjian_add: "清俭",
-  qingjian_add_info: "",
 
   re_zhangliao: "界张辽",
   re_zhangliao_prefix: "界",

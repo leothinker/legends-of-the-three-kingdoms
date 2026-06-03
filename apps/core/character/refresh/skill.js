@@ -51,10 +51,6 @@ const skills = {
   // 反馈
   refankui: {
     audio: 2,
-    audioname2: {
-      boss_chujiangwang: "boss_chujiangwang_fankui",
-      sxrm_caocao: "refankui_sxrm_caocao",
-    },
     trigger: { player: "damageEnd" },
     filter(event, player) {
       return (
@@ -106,7 +102,6 @@ const skills = {
   // 鬼才
   reguicai: {
     audio: 2,
-    audioname: ["new_simayi"],
     trigger: { global: "judge" },
     filter(event, player) {
       return player.countCards("hes") > 0
@@ -184,7 +179,6 @@ const skills = {
   // 刚烈
   reganglie: {
     audio: 2,
-    audioname2: { sxrm_caocao: "reganglie_sxrm_caocao" },
     trigger: { player: "damageEnd" },
     getIndex(event, player, triggername) {
       if (get.mode() == "guozhan") {

@@ -7,6 +7,7 @@ const skills = {
   // 护驾
   rehujia: {
     audio: 2,
+    audioname2: {},
     inherit: "hujia",
     filter(event, player) {
       if (event.responded) {
@@ -70,62 +71,9 @@ const skills = {
   // 刚烈
   olganglie: {
     audio: "reganglie",
-    trigger: { player: "damageEnd" },
-    getIndex(event, player, triggername) {
-      if (get.mode() == "guozhan") {
-        return 1
-      }
-      return event.num
-    },
+    inherit: "reganglie",
     filter(event, player) {
       return event.num > 0 && event.source && event.source != player
-    },
-    check(event, player) {
-      if (!event.source?.isIn()) {
-        return Math.random() < 0.5
-      }
-      return get.attitude(player, event.source) <= 0
-    },
-    prompt2(event, player) {
-      let str = "你可以进行判定"
-      if (event.source?.isIn()) {
-        str += `，若结果为：红色，你对${get.translation(event.source)}造成1点伤害；黑色，你弃置${get.translation(event.source)}一张牌。`
-      } else {
-        str += "。"
-      }
-      return str
-    },
-    preHidden: true,
-    async content(event, trigger, player) {
-      const { source } = trigger
-      const result = await player
-        .judge((card) => {
-          if (get.color(card) == "red") {
-            return 1
-          }
-          return 0
-        })
-        .forResult()
-      if (!source?.isIn()) {
-        return
-      }
-      switch (result?.color) {
-        case "black":
-          if (source.countDiscardableCards(player, "he")) {
-            await player.discardPlayerCard(source, "he", true)
-          }
-          break
-
-        case "red":
-          await source.damage()
-          break
-        default:
-          break
-      }
-    },
-    ai: {
-      maixie_defend: true,
-      expose: 0.4,
     },
   },
   // 界许褚

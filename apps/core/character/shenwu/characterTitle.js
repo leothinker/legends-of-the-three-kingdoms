@@ -1,5 +1,6 @@
 export default {
   ol_caocao: "魏武帝",
+  ol_xiahoudun: "独眼的罗刹",
   ol_xuzhu: "虎痴",
   ol_zhenji: "薄幸的美人",
 

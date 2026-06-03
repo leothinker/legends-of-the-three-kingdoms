@@ -12,8 +12,8 @@ export default {
   xunyu: "王佐之才",
   sp_zhugeliang: "卧龙",
   pangtong: "凤雏",
-
   taishici: "笃烈之士",
+
   yanwen: "虎狼兄弟",
   yuanshao: "乱箭肃敌",
   jiangwei: "龙的衣钵",

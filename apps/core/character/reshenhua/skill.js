@@ -1435,6 +1435,158 @@ const skills = {
       },
     },
   },
+  // 界太史慈
+  // 天义
+  retianyi: {
+    audio: 2,
+    enable: "phaseUse",
+    usable: 1,
+    filterTarget: (card, player, target) => player.canCompare(target),
+    filter(event, player) {
+      return game.hasPlayer((curr) => player.canCompare(curr))
+    },
+    async content(event, trigger, player) {
+      const result = await player.chooseToCompare(event.targets[0]).forResult()
+      if (result.bool) {
+        player.addTempSkill("retianyi_effect")
+      } else {
+        player.addTempSkill("retianyi_diseffect")
+      }
+    },
+    subSkill: {
+      effect: {
+        charlotte: true,
+        mark: true,
+        marktext: "天义",
+        intro: {
+          name: "天义",
+          content: "本回合使用【杀】次数上限+1、目标上限+1、无距离限制",
+        },
+        mod: {
+          cardUsable(card, player, num) {
+            if (get.name(card) == "sha") {
+              return num + 1
+            }
+          },
+          targetInRange(card, player, bool) {
+            if (get.name(card) == "sha") {
+              return true
+            }
+          },
+          selectTarget(card, player, range) {
+            if (get.name(card) == "sha") {
+              range[1]++
+            }
+          },
+        },
+      },
+      diseffect: {
+        trigger: { player: "useCard" },
+        charlotte: true,
+        forced: true,
+        mark: true,
+        marktext: "天义",
+        intro: {
+          name: "天义",
+          content: "本回合使用下一张牌时取消之并令唯一目标摸两张牌",
+        },
+        async content(event, trigger, player) {
+          trigger.cancel()
+          player.removeSkill(event.name)
+          if (trigger.targets.length == 1) {
+            await trigger.targets[0].draw(2)
+          }
+        },
+        ai: {
+          effect: {
+            player_use(card, player, target) {
+              return [0, 0, 0, 2]
+            },
+          },
+        },
+      },
+    },
+    ai: {
+      order: 10,
+      result: {
+        player(player, target) {
+          if (player.countCards("h") > 1) {
+            return -get.attitude(player, target)
+          }
+          return 0
+        },
+      },
+    },
+  },
+  // 荡魔
+  redangmo: {
+    audio: "dangmo",
+    trigger: { player: "useCardAfter" },
+    filter(event, player) {
+      const evts = player.getHistory("useCard")
+      if (evts.length < 2) {
+        return false
+      }
+      const targets = get.info("redangmo").logTarget(event, player)
+      return targets?.length
+    },
+    logTarget(event, player) {
+      const evts = player.getHistory("useCard")
+      if (evts.length < 2) {
+        return []
+      }
+      const index = evts.indexOf(event),
+        nows = event?.targets,
+        olds = evts[index - 1]?.targets
+      if (
+        !olds?.length ||
+        !nows?.length ||
+        (olds.containsAll(...nows) && nows.containsAll(...olds))
+      ) {
+        return []
+      }
+      return olds.filter((current) => current?.isIn() && nows.includes(current))
+    },
+    check(event, player) {
+      const targets = get.info("redangmo").logTarget(event, player)
+      return (
+        targets.reduce((total, target) => {
+          return total + get.damageEffect(target, player, player)
+        }, 0) > 0
+      )
+    },
+    async content(event, trigger, player) {
+      await game.doAsyncInOrder(event.targets, async (target) => await target.damage())
+    },
+    mod: {
+      aiOrder(player, card, num) {
+        const num1 = get.info(card).selectTarget ?? 0,
+          num2 = game.countPlayer()
+        if (typeof num1 == "number") {
+          return Math.abs(num1 - num2)
+        } else if (typeof num1 == "function") {
+          return Math.abs(num1(card, player) - nmu2)
+        } else {
+          return Math.abs(num1[1] - num2)
+        }
+      },
+    },
+    ai: {
+      effct: {
+        target(card, player, target) {
+          if (
+            !player.getHistory("useCard", (evt) => evt.targets.length > 0).length &&
+            player.hasSkill("zc26_tianyi_effct") &&
+            ui.selected.targets.length > 0
+          ) {
+            return 0
+          }
+          return [1, 0]
+        },
+      },
+    },
+  },
+  dangmo: { audio: 2 },
 }
 
 export default skills

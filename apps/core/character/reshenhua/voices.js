@@ -66,4 +66,7 @@ export default {
   "#reniepan1": "凤凰折翅，涅槃再生。",
   "#reniepan2": "九天之志，展翅翱翔。",
   "#re_pangtong:die": "落……凤……坡……",
+
+  "#dangmo1": "魔高一尺，道高一丈！",
+  "#dangmo2": "天魔祸世，吾自荡而除之！",
 }

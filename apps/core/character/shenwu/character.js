@@ -278,6 +278,13 @@ const characters = {
     hp: 3,
     skills: ["ollianhuan", "olniepan"],
   },
+  ol_taishici: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["tianyi", "hanzhan"],
+    names: "太史|慈",
+  },
 }
 
 export default characters

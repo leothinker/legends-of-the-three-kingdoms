@@ -2823,6 +2823,175 @@ const skills = {
       },
     },
   },
+  // 界太史慈
+  // 酣战
+  hanzhan: {
+    audio: 2,
+    trigger: {
+      global: "chooseToCompareBegin",
+    },
+    filter(event, player) {
+      if (player == event.player) {
+        return true
+      }
+      if (event.targets) {
+        return event.targets.includes(player)
+      }
+      return player == event.target
+    },
+    logTarget(event, player) {
+      if (player != event.player) {
+        return event.player
+      }
+      return event.targets || event.target
+    },
+    prompt2(event, player) {
+      return "选择其一张手牌，其用此牌与你拼点"
+    },
+    check(trigger, player) {
+      var num = 0
+      var targets =
+        player == trigger.player
+          ? trigger.targets
+            ? trigger.targets.slice(0)
+            : [trigger.target]
+          : [trigger.player]
+      while (targets.length) {
+        var target = targets.shift()
+        if (target.getCards("h").length > 1) {
+          num -= get.attitude(player, target)
+        }
+      }
+      return num > 0
+    },
+    async content(event, trigger, player) {
+      const targets =
+        player == trigger.player
+          ? trigger.targets
+            ? trigger.targets.slice(0)
+            : [trigger.target]
+          : [trigger.player]
+      if (!trigger.fixedResult) {
+        trigger.fixedResult = {}
+      }
+      for (const target of targets) {
+        const hs = target.getCards("h")
+        if (hs.length) {
+          const result = await player.choosePlayerCard(target, "h", true).forResult()
+          if (result.bool) {
+            trigger.fixedResult[target.playerid] = result.cards[0]
+          }
+        }
+      }
+    },
+    group: "hanzhan_gain",
+    subfrequent: ["gain"],
+  },
+  hanzhan_gain: {
+    trigger: {
+      global: "chooseToCompareAfter",
+    },
+    audio: "hanzhan",
+    sourceSkill: "hanzhan",
+    filter(event, player) {
+      if (event.preserve) {
+        return false
+      }
+      if (
+        player != event.player &&
+        player != event.target &&
+        (!event.targets || !event.targets.includes(player))
+      ) {
+        return false
+      }
+      for (var i of event.lose_list) {
+        if (Array.isArray(i[1])) {
+          for (var j of i[1]) {
+            if (get.name(j, i[0]) == "sha" && get.position(j, true) == "o") {
+              return true
+            }
+          }
+        } else {
+          var j = i[1]
+          if (get.name(j, i[0]) == "sha" && get.position(j, true) == "o") {
+            return true
+          }
+        }
+      }
+      return false
+    },
+    frequent: true,
+    prompt2(event, player) {
+      var cards = [],
+        max = 0
+      for (var i of event.lose_list) {
+        if (Array.isArray(i[1])) {
+          for (var j of i[1]) {
+            if (get.name(j, i[0]) == "sha" && get.position(j, true) == "o") {
+              var num = get.number(j, i[0])
+              if (num > max) {
+                cards = []
+                max = num
+              }
+              if (num == max) {
+                cards.push(j)
+              }
+            }
+          }
+        } else {
+          var j = i[1]
+          if (get.name(j, i[0]) == "sha" && get.position(j, true) == "o") {
+            var num = get.number(j, i[0])
+            if (num > max) {
+              cards = []
+              max = num
+            }
+            if (num == max) {
+              cards.push(j)
+            }
+          }
+        }
+      }
+      return "获得" + get.translation(cards)
+    },
+    async content(event, trigger, player) {
+      const cards = []
+      let max = 0
+      for (const entry of trigger.lose_list) {
+        const owner = entry[0]
+        const item = entry[1]
+        if (Array.isArray(item)) {
+          for (const j of item) {
+            if (get.name(j, owner) === "sha" && get.position(j, true) === "o") {
+              const num = get.number(j, owner)
+              if (num > max) {
+                cards.length = 0
+                max = num
+              }
+              if (num === max) {
+                cards.push(j)
+              }
+            }
+          }
+        } else {
+          const j = item
+          if (get.name(j, owner) === "sha" && get.position(j, true) === "o") {
+            const num = get.number(j, owner)
+            if (num > max) {
+              cards.length = 0
+              max = num
+            }
+            if (num === max) {
+              cards.push(j)
+            }
+          }
+        }
+      }
+      if (cards.length) {
+        await player.gain(cards, "gain2")
+      }
+    },
+  },
 }
 
 export default skills

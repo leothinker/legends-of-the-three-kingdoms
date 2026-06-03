@@ -79,4 +79,10 @@ export default {
   "#olkanpo_ol_pangtong1": "卧龙之才，吾也略懂。",
   "#olkanpo_ol_pangtong2": "这些小伎俩，逃不出我的眼睛！",
   "#ol_pangtong:die": "骥飞羽落，坡道归尘。",
+
+  "#retianyi1": "天降大任，速战解围！",
+  "#retianyi2": "义不从之，天必不佑！",
+  "#hanzhan1": "伯符，且与我一战！",
+  "#hanzhan2": "与君酣战，快哉快哉！",
+  "#ol_taishici:die": "无妄之灾，难以避免……",
 }

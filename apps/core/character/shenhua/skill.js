@@ -1607,7 +1607,7 @@ const skills = {
   // 天义
   tianyi: {
     audio: 2,
-    audioname: ["re_taishici"],
+    audioname2: { ol_taishici: "retianyi" },
     enable: "phaseUse",
     usable: 1,
     filterTarget(card, player, target) {

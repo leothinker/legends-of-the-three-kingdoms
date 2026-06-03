@@ -30,4 +30,5 @@ export default {
   ol_xunyu: "王佐之才",
   ol_sp_zhugeliang: "卧龙",
   ol_pangtong: "凤雏",
+  ol_taishici: "笃烈之士",
 }

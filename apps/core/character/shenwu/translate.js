@@ -195,6 +195,13 @@ const translates = {
   olniepan: "涅槃",
   olniepan_info:
     "限定技，当你处于濒死状态时，你可以弃置区域里的所有牌，复原武将牌，然后摸三张牌并将体力回复至3点，选择下列一个技能并获得之：〖八阵〗、〖火计〗或〖看破〗。",
+
+  ol_taishici: "界太史慈",
+  ol_taishici_prefix: "界",
+  hanzhan: "酣战",
+  hanzhan_gain: "酣战",
+  hanzhan_info:
+    "当你与其他角色拼点或其他角色与你拼点时，你可以选择其一张手牌，其用此牌与你拼点。当你拼点后，你可以获得其中点数最大的【杀】。",
 }
 
 export default translates

@@ -12,4 +12,5 @@ export default {
   re_xunyu: "王佐之才",
   re_sp_zhugeliang: "卧龙",
   re_pangtong: "凤雏",
+  re_taishici: "剑鸣不平",
 }

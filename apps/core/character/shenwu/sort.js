@@ -48,7 +48,7 @@ const characterSort = {
     "ol_xunyu",
     "ol_sp_zhugeliang",
     "ol_pangtong",
-    "re_taishici",
+    "ol_taishici",
     "ol_pangde",
     "ol_yuanshao",
     "ol_yanwen",

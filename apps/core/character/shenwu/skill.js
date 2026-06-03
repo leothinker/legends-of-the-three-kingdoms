@@ -3160,6 +3160,145 @@ const skills = {
       },
     },
   },
+  // 界颜良文丑
+  // 双雄
+  olshuangxiong: {
+    audio: 2,
+    trigger: { player: "phaseDrawEnd" },
+    filter: (event, player) => player.countCards("he") > 0,
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseToDiscard(
+          "he",
+          get.prompt("olshuangxiong"),
+          "弃置一张牌，然后你本回合内可以将一张与此牌颜色不同的牌当做【决斗】使用",
+          "chooseonly",
+        )
+        .set("ai", function (card) {
+          let player = _status.event.player
+          if (!_status.event.goon || player.skipList.includes("phaseUse")) {
+            return -get.value(card)
+          }
+          let color = get.color(card),
+            effect = 0,
+            cards = player.getCards("hes"),
+            sha = false
+          for (const cardx of cards) {
+            if (cardx == card || get.color(cardx) == color) {
+              continue
+            }
+            const cardy = get.autoViewAs({ name: "juedou" }, [cardx]),
+              eff1 = player.getUseValue(cardy)
+            if (get.position(cardx) == "e") {
+              let eff2 = get.value(cardx)
+              if (eff1 > eff2) {
+                effect += eff1 - eff2
+              }
+              continue
+            } else if (get.name(cardx) == "sha") {
+              if (sha) {
+                effect += eff1
+                continue
+              } else {
+                sha = true
+              }
+            }
+            let eff2 = player.getUseValue(cardx, null, true)
+            if (eff1 > eff2) {
+              effect += eff1 - eff2
+            }
+          }
+          return effect - get.value(card)
+        })
+        .set(
+          "goon",
+          player.hasValueTarget({ name: "juedou" }) && !player.hasSkill("olshuangxiong_effect"),
+        )
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      const { cards } = event,
+        color = get.color(cards[0], player)
+      await player.modedDiscard(cards)
+      player.markAuto("olshuangxiong_effect", [color])
+      player.addTempSkill("olshuangxiong_effect")
+    },
+    group: "olshuangxiong_jianxiong",
+    subSkill: {
+      effect: {
+        audio: "olshuangxiong",
+        enable: "chooseToUse",
+        viewAs: { name: "juedou" },
+        position: "hes",
+        viewAsFilter(player) {
+          return player.hasCard(
+            (card) => lib.skill.olshuangxiong_effect.filterCard(card, player),
+            "hes",
+          )
+        },
+        filterCard(card, player) {
+          const color = get.color(card),
+            colors = player.getStorage("olshuangxiong_effect")
+          for (const i of colors) {
+            if (color != i) {
+              return true
+            }
+          }
+          return false
+        },
+        prompt() {
+          const colors = _status.event.player.getStorage("olshuangxiong_effect")
+          let str = "将一张颜色"
+          for (let i = 0; i < colors.length; i++) {
+            if (i > 0) {
+              str += "或"
+            }
+            str += "不为"
+            str += get.translation(colors[i])
+          }
+          str += "的牌当做【决斗】使用"
+          return str
+        },
+        check(card) {
+          const player = _status.event.player
+          if (get.position(card) == "e") {
+            const raw = get.value(card)
+            const eff = player.getUseValue(get.autoViewAs({ name: "juedou" }, [card]))
+            return eff - raw
+          }
+          const raw = player.getUseValue(card, null, true)
+          const eff = player.getUseValue(get.autoViewAs({ name: "juedou" }, [card]))
+          return eff - raw
+        },
+        onremove: true,
+        charlotte: true,
+        ai: { order: 7 },
+      },
+      jianxiong: {
+        audio: "olshuangxiong",
+        trigger: { player: "phaseJieshuBegin" },
+        forced: true,
+        locked: false,
+        filter(event, player) {
+          return player.hasHistory("damage", function (evt) {
+            //Disable Umi Kato's chaofan
+            return evt.card && evt.cards && evt.cards.some((card) => get.position(card, true))
+          })
+        },
+        async content(event, trigger, player) {
+          const cards = []
+          player.getHistory("damage", function (evt) {
+            if (evt.card && evt.cards) {
+              cards.addArray(evt.cards.filterInD("d"))
+            }
+          })
+          if (cards.length) {
+            await player.gain(cards, "gain2")
+          }
+        },
+      },
+    },
+  },
 }
 
 export default skills

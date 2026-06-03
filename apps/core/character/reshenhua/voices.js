@@ -79,4 +79,8 @@ export default {
   "#xueyi_re_yuanshao1": "名门士胄，朝野敬仰。",
   "#xueyi_re_yuanshao2": "吾乃名门望族，岂能与汝等为伍？",
   "#re_yuanshao:die": "袁门不幸啊……",
+
+  "#reshuangxiong1": "此战，如有你我一人在此，何惧华雄？定叫他有去无回！",
+  "#reshuangxiong2": "哥哥，且看我与赵云一战。且与他战个五十回合！",
+  "#re_yanwen:die": "不是叫你看好我身后吗？",
 }

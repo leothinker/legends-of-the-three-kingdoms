@@ -298,6 +298,13 @@ const characters = {
     skills: ["olluanji", "olxueyi"],
     isZhugong: true,
   },
+  ol_yanwen: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["olshuangxiong"],
+    names: "颜|良-文|丑",
+  },
 }
 
 export default characters

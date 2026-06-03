@@ -95,4 +95,8 @@ export default {
   "#olxueyi1": "高贵名门，族裔盛名。",
   "#olxueyi2": "贵裔之脉，后起之秀！",
   "#ol_yuanshao:die": "孟德此计，防不胜防……",
+
+  "#olshuangxiong1": "兄弟协力，定可于乱世纵横。",
+  "#olshuangxiong2": "吾执矛，汝执槊，此天下可有挡我者。",
+  "#ol_yanwen:die": "双雄皆陨，徒隆武圣之名……",
 }

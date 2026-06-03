@@ -217,6 +217,12 @@ const translates = {
   olxueyi: "血裔",
   olxueyi_info:
     "主公技，游戏开始时，你获得2X枚“裔”（X为群势力角色数）。出牌阶段开始时，你可以弃1枚“裔”，然后摸一张牌。每有1枚“裔”，你的手牌上限便+1。",
+
+  ol_yanwen: "界颜良文丑",
+  ol_yanwen_prefix: "界",
+  olshuangxiong: "双雄",
+  olshuangxiong_info:
+    "摸牌阶段结束时，你可以弃置一张牌，然后本回合你可以将一张与之颜色不同的牌当【决斗】使用。结束阶段，你获得本回合对你造成伤害的牌。",
 }
 
 export default translates

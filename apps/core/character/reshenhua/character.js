@@ -97,13 +97,14 @@ const characters = {
     skills: ["reluanji", "xueyi"],
     isZhugong: true,
   },
+  re_yanwen: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["reshuangxiong"],
+    names: "颜|良-文|丑",
+  },
 
-  // re_yanwen: {
-  //   sex: "male",
-  //   group: "qun",
-  //   hp: 4,
-  //   skills: ["reshuangxiong"],
-  // },
   // re_xuhuang: {
   //   sex: "male",
   //   group: "wei",

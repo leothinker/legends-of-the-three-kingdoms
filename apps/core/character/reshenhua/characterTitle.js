@@ -15,4 +15,5 @@ export default {
   re_taishici: "剑鸣不平",
   re_pangde: "人马一体",
   re_yuanshao: "高贵的名门",
+  re_yanwen: "虎狼兄弟",
 }

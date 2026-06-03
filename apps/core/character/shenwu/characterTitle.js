@@ -32,4 +32,5 @@ export default {
   ol_pangtong: "凤雏",
   ol_taishici: "笃烈之士",
   ol_pangde: "人马一体",
+  ol_yuanshao: "高贵的名门",
 }

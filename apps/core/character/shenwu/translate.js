@@ -208,6 +208,15 @@ const translates = {
   rejianchu: "鞬出",
   rejianchu_info:
     "当你使用【杀】指定一名角色为目标后，你可以弃置其一张牌，若弃置的牌：为基本牌，其获得此【杀】；不为基本牌，其不能使用【闪】且你本回合可以多使用一张【杀】。",
+
+  ol_yuanshao: "界袁绍",
+  ol_yuanshao_prefix: "界",
+  olluanji: "乱击",
+  olluanji_info:
+    "你可以将两张花色相同的手牌当【万箭齐发】使用。你使用【万箭齐发】可以少选择一个目标。",
+  olxueyi: "血裔",
+  olxueyi_info:
+    "主公技，游戏开始时，你获得2X枚“裔”（X为群势力角色数）。出牌阶段开始时，你可以弃1枚“裔”，然后摸一张牌。每有1枚“裔”，你的手牌上限便+1。",
 }
 
 export default translates

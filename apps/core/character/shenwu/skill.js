@@ -3071,6 +3071,95 @@ const skills = {
     },
     onremove: true,
   },
+  // 界袁绍
+  // 乱击
+  olluanji: {
+    inherit: "luanji",
+    audioname2: { shen_caopi: "olluanji_shen_caopi" },
+    audio: 2,
+    line: false,
+    group: "olluanji_remove",
+    check(card) {
+      return 7 - get.value(card)
+    },
+  },
+  olluanji_remove: {
+    trigger: { player: "useCard2" },
+    direct: true,
+    sourceSkill: "olluanji",
+    filter(event, player) {
+      return event.card.name == "wanjian" && event.targets.length > 0
+    },
+    line: false,
+    async content(event, trigger, player) {
+      // step 0
+      const result = await player
+        .chooseTarget(
+          get.prompt("olluanji"),
+          "为" + get.translation(trigger.card) + "减少一个目标",
+          function (card, player, target) {
+            return _status.event.targets.includes(target)
+          },
+        )
+        .set("targets", trigger.targets)
+        .set("ai", function (target) {
+          var player = _status.event.player
+          return -get.effect(target, _status.event.getTrigger().card, player, player)
+        })
+        .forResult()
+      // step 1
+      if (result.bool) {
+        player.logSkill("olluanji", result.targets)
+        trigger.targets.remove(result.targets[0])
+      }
+    },
+  },
+  // 血裔
+  olxueyi: {
+    audio: 2,
+    trigger: { global: "phaseBefore", player: "enterGame" },
+    forced: true,
+    zhuSkill: true,
+    filter(event, player) {
+      return (event.name != "phase" || game.phaseNumber == 0) && player.hasZhuSkill("olxueyi")
+    },
+    async content(event, trigger, player) {
+      const num = game.countPlayer((current) => current.group == "qun")
+      if (num) {
+        player.addMark("olxueyi", num * 2)
+      }
+    },
+    marktext: "裔",
+    intro: {
+      name2: "裔",
+      content: "mark",
+    },
+    mod: {
+      maxHandcard(player, num) {
+        if (player.hasZhuSkill("olxueyi")) {
+          return num + player.countMark("olxueyi")
+        }
+      },
+    },
+    group: "olxueyi_draw",
+    subSkill: {
+      draw: {
+        audio: "olxueyi",
+        trigger: { player: "phaseUseBegin" },
+        prompt2: "弃置一枚「裔」标记，然后摸一张牌",
+        check(event, player) {
+          return player.getUseValue("wanjian") > 0 || !player.needsToDiscard()
+        },
+        filter(event, player) {
+          return player.hasZhuSkill("olxueyi") && player.hasMark("olxueyi")
+        },
+        async content(event, trigger, player) {
+          player.removeMark("olxueyi", 1)
+          await player.draw()
+        },
+      },
+    },
+  },
 }
 
 export default skills

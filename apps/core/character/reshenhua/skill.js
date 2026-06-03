@@ -1655,6 +1655,118 @@ const skills = {
       },
     },
   },
+  // 界袁绍
+  // 乱击
+  reluanji: {
+    audio: 2,
+    enable: "phaseUse",
+    viewAs: { name: "wanjian" },
+    filterCard(card, player) {
+      if (!player.storage.reluanji) {
+        return true
+      }
+      return !player.storage.reluanji.includes(get.suit(card))
+    },
+    position: "hs",
+    selectCard: 2,
+    check(card) {
+      const player = _status.event.player
+      const targets = game.filterPlayer(function (current) {
+        return player.canUse("wanjian", current)
+      })
+      let num = 0
+      for (let i = 0; i < targets.length; i++) {
+        let eff = get.sgn(get.effect(targets[i], { name: "wanjian" }, player, player))
+        if (targets[i].hp == 1) {
+          eff *= 1.5
+        }
+        num += eff
+      }
+      if (!player.needsToDiscard(-1)) {
+        if (targets.length >= 7) {
+          if (num < 2) {
+            return 0
+          }
+        } else if (targets.length >= 5) {
+          if (num < 1.5) {
+            return 0
+          }
+        }
+      }
+      return 6 - get.value(card)
+    },
+    ai: {
+      basic: {
+        order: 8.9,
+      },
+    },
+    group: [
+      "reluanji_count",
+      "reluanji_reset",
+      "reluanji_respond",
+      "reluanji_damage",
+      "reluanji_draw",
+    ],
+    subSkill: {
+      reset: {
+        trigger: { player: "phaseAfter" },
+        silent: true,
+        async content(event, trigger, player) {
+          delete player.storage.reluanji
+          delete player.storage.reluanji2
+        },
+      },
+      count: {
+        trigger: { player: "useCard" },
+        silent: true,
+        filter(event) {
+          return event.skill == "reluanji"
+        },
+        async content(event, trigger, player) {
+          player.storage.reluanji2 = trigger.card
+          if (!player.storage.reluanji) {
+            player.storage.reluanji = []
+          }
+          player.storage.reluanji.addArray(trigger.cards.map((c) => get.suit(c)))
+        },
+      },
+      respond: {
+        trigger: { global: "respond" },
+        silent: true,
+        filter(event) {
+          return event.getParent(2).skill == "reluanji"
+        },
+        async content(event, trigger, player) {
+          await trigger.player.draw()
+        },
+      },
+      damage: {
+        trigger: { source: "damage" },
+        forced: true,
+        silent: true,
+        popup: false,
+        filter(event, player) {
+          return player.storage.reluanji2 && event.card == player.storage.reluanji2
+        },
+        async content(event, trigger, player) {
+          delete player.storage.reluanji2
+        },
+      },
+      draw: {
+        trigger: { player: "useCardAfter" },
+        forced: true,
+        silent: true,
+        popup: false,
+        filter(event, player) {
+          return player.storage.reluanji2 && event.card == player.storage.reluanji2
+        },
+        async content(event, trigger, player) {
+          await player.draw()
+          delete player.storage.reluanji2
+        },
+      },
+    },
+  },
 }
 
 export default skills

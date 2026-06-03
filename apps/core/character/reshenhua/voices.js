@@ -73,4 +73,10 @@ export default {
   "#jianchu1": "来呀，冲杀出去，杀他个片甲不留。",
   "#jianchu2": "一人一骑，横扫千军。",
   "#re_pangde:die": "我宁为国家鬼，不为贼将也。",
+
+  "#reluanji1": "万箭穿心，灭其士气。",
+  "#reluanji2": "卿当与本公同心戮力，共安社稷。",
+  "#xueyi_re_yuanshao1": "名门士胄，朝野敬仰。",
+  "#xueyi_re_yuanshao2": "吾乃名门望族，岂能与汝等为伍？",
+  "#re_yuanshao:die": "袁门不幸啊……",
 }

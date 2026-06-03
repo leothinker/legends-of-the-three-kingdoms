@@ -90,19 +90,19 @@ const characters = {
     hp: 4,
     skills: ["mashu", "jianchu"],
   },
+  re_yuanshao: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["reluanji", "xueyi"],
+    isZhugong: true,
+  },
 
   // re_yanwen: {
   //   sex: "male",
   //   group: "qun",
   //   hp: 4,
   //   skills: ["reshuangxiong"],
-  // },
-  // re_yuanshao: {
-  //   sex: "male",
-  //   group: "qun",
-  //   hp: 4,
-  //   skills: ["reluanji", "xueyi"],
-  //   isZhugong: true,
   // },
   // re_xuhuang: {
   //   sex: "male",

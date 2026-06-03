@@ -14,6 +14,7 @@ export default {
   pangtong: "凤雏",
   taishici: "笃烈之士",
   pangde: "人马一体",
+  yuanshao: "高贵的名门",
 
   yanwen: "虎狼兄弟",
   yuanshao: "乱箭肃敌",
@@ -35,7 +36,6 @@ export default {
   dongzhuo: "魔王",
   jiaxu: "冷酷的毒士",
   xuhuang: "周亚夫之风",
-  re_yuanshao: "高贵的名门",
   re_lusu: "独断外交家",
   wangji: "经行合一",
   kuailiangkuaiyue: "雍论臼谋",

@@ -4733,7 +4733,7 @@ export default () => {
                       hp: 4,
                       skills: ["fankui", "zhuiji", "duanbing"],
                     },
-                    xin_yuanshao: {
+                    re_yuanshao: {
                       sex: "male",
                       group: "qun",
                       hp: 3,

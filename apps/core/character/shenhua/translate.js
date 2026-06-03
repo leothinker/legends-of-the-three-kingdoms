@@ -95,9 +95,9 @@ const translates = {
 
   yuanshao: "袁绍",
   luanji: "乱击",
-  luanji_info: "你可以将两张花色相同的手牌当一张【万箭齐发】使用。",
+  luanji_info: "你可以将两张花色相同的手牌当【万箭齐发】使用。",
   xueyi: "血裔",
-  xueyi_info: "主公技，你的手牌上限+X（X为其他群势力角色数的两倍）。",
+  xueyi_info: "主公技，锁定技，你的手牌上限+2X（X为其他群势力角色数）。",
 
   xuhuang: "徐晃",
   duanliang: "断粮",

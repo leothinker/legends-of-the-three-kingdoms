@@ -68,6 +68,12 @@ export default {
   "#mengjin2": "你可敢挡我？",
   "#pangde:die": "四面都是水，我命休矣……",
 
+  "#luanji1": "弓箭手，准备放箭！",
+  "#luanji2": "全都去死吧！",
+  "#xueyi1": "崇王攘夷，生长尊贵。",
+  "#xueyi2": "衣冠华胄，宜蒙优免。",
+  "#yuanshao:die": "老天不助我袁家啊……",
+
   // "#yingyang1": "此战，我必取胜！",
   // "#yingyang2": "相斗之趣，吾常胜之！",
   // "#duanliang1_re_xuhuang1": "粮不三载，敌军已犯行军大忌。",
@@ -83,9 +89,6 @@ export default {
   // "#shuangxiong1": "吾乃河北上将颜良文丑是也！",
   // "#shuangxiong2": "快来与我等决一死战！",
   // "#yanwen:die": "这红脸长须大将是……",
-  // "#luanji1": "弓箭手，准备放箭！",
-  // "#luanji2": "全都去死吧！",
-  // "#yuanshao:die": "老天不助我袁家啊！……",
   // "#huoshou11": "背黑锅我来，送死？你去！",
   // "#huoshou12": "通通算我的！",
   // "#zaiqi1": "起！",

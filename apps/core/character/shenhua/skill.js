@@ -1715,6 +1715,95 @@ const skills = {
       await player.discardPlayerCard("he", trigger.target, true)
     },
   },
+  // 袁绍
+  // 乱击
+  luanji: {
+    audio: 2,
+    enable: "phaseUse",
+    position: "hs",
+    viewAs: { name: "wanjian" },
+    filterCard(card, player) {
+      if (ui.selected.cards.length) {
+        return get.suit(card) == get.suit(ui.selected.cards[0])
+      }
+      const cards = player.getCards("hs")
+      for (let i = 0; i < cards.length; i++) {
+        if (card != cards[i]) {
+          if (get.suit(card) == get.suit(cards[i])) {
+            return true
+          }
+        }
+      }
+      return false
+    },
+    selectCard: 2,
+    complexCard: true,
+    check(card) {
+      const player = _status.event.player
+      const targets = game.filterPlayer(function (current) {
+        return player.canUse("wanjian", current)
+      })
+      let num = 0
+      for (let i = 0; i < targets.length; i++) {
+        let eff = get.sgn(get.effect(targets[i], { name: "wanjian" }, player, player))
+        if (targets[i].hp == 1) {
+          eff *= 1.5
+        }
+        num += eff
+      }
+      if (!player.needsToDiscard(-1)) {
+        if (targets.length >= 7) {
+          if (num < 2) {
+            return 0
+          }
+        } else if (targets.length >= 5) {
+          if (num < 1.5) {
+            return 0
+          }
+        }
+      }
+      return 6 - get.value(card)
+    },
+    ai: {
+      basic: {
+        order: 8.5,
+      },
+    },
+  },
+  // 血裔
+  xueyi: {
+    trigger: { player: "phaseDiscardBefore" },
+    audio: 2,
+    audioname: ["re_yuanshao"],
+    forced: true,
+    firstDo: true,
+    filter(event, player) {
+      return (
+        player.hasZhuSkill("xueyi") &&
+        game.hasPlayer(function (current) {
+          return current != player && current.group == "qun"
+        }) &&
+        player.countCards("h") > player.hp
+      )
+    },
+    async content() {},
+    mod: {
+      maxHandcard(player, num) {
+        if (player.hasZhuSkill("xueyi")) {
+          return (
+            num +
+            game.countPlayer(function (current) {
+              if (player != current && current.group == "qun") {
+                return 2
+              }
+            })
+          )
+        }
+        return num
+      },
+    },
+    zhuSkill: true,
+  },
   // 颜良文丑
   shuangxiong: {
     audio: 2,
@@ -1797,98 +1886,6 @@ const skills = {
       re_yanwen1: { audio: true },
       re_yanwen2: { audio: true },
     },
-  },
-  // 袁绍
-  // 乱击
-  luanji: {
-    audio: 2,
-    enable: "phaseUse",
-    position: "hs",
-    viewAs: { name: "wanjian" },
-    filterCard(card, player) {
-      if (ui.selected.cards.length) {
-        return get.suit(card) == get.suit(ui.selected.cards[0])
-      }
-      const cards = player.getCards("hs")
-      for (let i = 0; i < cards.length; i++) {
-        if (card != cards[i]) {
-          if (get.suit(card) == get.suit(cards[i])) {
-            return true
-          }
-        }
-      }
-      return false
-    },
-    selectCard: 2,
-    complexCard: true,
-    check(card) {
-      const player = _status.event.player
-      const targets = game.filterPlayer(function (current) {
-        return player.canUse("wanjian", current)
-      })
-      let num = 0
-      for (let i = 0; i < targets.length; i++) {
-        let eff = get.sgn(get.effect(targets[i], { name: "wanjian" }, player, player))
-        if (targets[i].hp == 1) {
-          eff *= 1.5
-        }
-        num += eff
-      }
-      if (!player.needsToDiscard(-1)) {
-        if (targets.length >= 7) {
-          if (num < 2) {
-            return 0
-          }
-        } else if (targets.length >= 5) {
-          if (num < 1.5) {
-            return 0
-          }
-        }
-      }
-      return 6 - get.value(card)
-    },
-    ai: {
-      basic: {
-        order: 8.5,
-      },
-    },
-  },
-  // 血裔
-  xueyi: {
-    trigger: { player: "phaseDiscardBefore" },
-    audio: 2,
-    audioname: ["re_yuanshao"],
-    audioname2: {
-      pe_jun_yuanshao: ["xueyi_re_yuanshao1.mp3", "xueyi_re_yuanshao2.mp3"],
-    },
-    forced: true,
-    firstDo: true,
-    filter(event, player) {
-      return (
-        player.hasZhuSkill("xueyi") &&
-        game.hasPlayer(function (current) {
-          return current != player && current.group == "qun"
-        }) &&
-        player.countCards("h") > player.hp
-      )
-    },
-    async content() {},
-    mod: {
-      maxHandcard(player, num) {
-        if (player.hasZhuSkill("xueyi")) {
-          return (
-            num +
-            game.countPlayer(function (current) {
-              if (player != current && current.group == "qun") {
-                return 2
-              }
-            })
-          )
-        }
-        return num
-      },
-    },
-    zhuSkill: true,
   },
   // 徐晃
   // 断粮

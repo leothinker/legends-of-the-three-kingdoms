@@ -44,12 +44,6 @@ const characters = {
     hp: 3,
     skills: ["luoshen", "reqingguo"],
   },
-  lidian: {
-    sex: "male",
-    group: "wei",
-    hp: 3,
-    skills: ["xunxun", "wangxi"],
-  },
   re_liubei: {
     sex: "male",
     group: "shu",

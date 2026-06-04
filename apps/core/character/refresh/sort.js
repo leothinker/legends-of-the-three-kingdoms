@@ -15,7 +15,7 @@ const characterSort = {
     "re_huatuo",
     "re_gongsunzan",
   ],
-  refresh_2015: ["lidian", "re_liubei"],
+  refresh_2015: ["re_liubei"],
   refresh_2018: [
     "re_caocao",
     "re_xiahoudun",

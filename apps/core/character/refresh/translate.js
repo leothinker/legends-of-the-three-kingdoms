@@ -48,14 +48,6 @@ const translates = {
   reqingguo: "倾国",
   reqingguo_info: "你可以将一张黑色牌当【闪】使用或打出。",
 
-  lidian: "李典",
-  xunxun: "恂恂",
-  xunxun_info:
-    "摸牌阶段开始时，你可以观看牌堆顶的四张牌，将其中两张牌以任意顺序置于牌堆顶，其余以任意顺序置于牌堆底。",
-  wangxi: "忘隙",
-  wangxi_info:
-    "当你对其他角色造成1点伤害后，或当你受到其他角色造成的1点伤害后，你可以与其各摸一张牌。",
-
   re_liubei: "界刘备",
   re_liubei_prefix: "界",
   rerende: "仁德",

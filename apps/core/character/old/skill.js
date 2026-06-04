@@ -367,6 +367,80 @@ const skills = {
       content: "cardCount",
     },
   },
+  // 李典
+  // 恂恂
+  xunxun: {
+    audio: 2,
+    trigger: { player: "phaseDrawBegin1" },
+    preHidden: true,
+    frequent: true,
+    async content(event, trigger, player) {
+      trigger.changeToZero()
+      const cards = get.cards(4, true)
+      await game.cardsGotoOrdering(cards)
+      const result = await player
+        .chooseToMove("恂恂：获得其中的两张牌，其余以任意顺序置于牌堆底", true)
+        .set("list", [["获得", cards], ["牌堆底"]])
+        .set("filterMove", function (from, to, moved) {
+          if (to == 1 && moved[1].length >= 2) {
+            return false
+          }
+          return true
+        })
+        .set("filterOk", function (moved) {
+          return moved[1].length == 2
+        })
+        .set("processAI", function (list) {
+          var cards = list[0][1].slice(0).sort(function (a, b) {
+            return get.value(b) - get.value(a)
+          })
+          return [cards, cards.splice(2)]
+        })
+        .forResult()
+      const top = result.moved[0]
+      const bottom = result.moved[1]
+      player.popup(`${get.cnNumber(0)}上${get.cnNumber(bottom.length)}下`)
+      await player.gain(top, "gain2")
+      await game.cardsGotoPile(bottom)
+    },
+  },
+  // 忘隙
+  wangxi: {
+    audio: 2,
+    trigger: { player: "damageEnd", source: "damageSource" },
+    getIndex: (event) => event.num,
+    filter(event) {
+      if (event._notrigger.includes(event.player)) {
+        return false
+      }
+      return (
+        event.num && event.source?.isIn() && event.player?.isIn() && event.source != event.player
+      )
+    },
+    check(event, player) {
+      if (player.isPhaseUsing()) {
+        return true
+      }
+      if (event.player == player) {
+        return get.attitude(player, event.source) > -3
+      }
+      return get.attitude(player, event.player) > -3
+    },
+    logTarget(event, player) {
+      if (event.player == player) {
+        return event.source
+      }
+      return event.player
+    },
+    preHidden: true,
+    async content(event, trigger, player) {
+      await game.asyncDraw([trigger.player, trigger.source].sortBySeat())
+    },
+    ai: {
+      maixie: true,
+      maixie_hp: true,
+    },
+  },
 }
 
 export default skills

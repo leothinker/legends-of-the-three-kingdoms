@@ -1,7 +1,14 @@
 const characterSort = {
   old_standard: [],
   old_shenhua: [],
-  old_refresh: ["old_caocao", "old_xiahoudun", "old_zhangliao", "old_xuzhu", "old_guojia"],
+  old_refresh: [
+    "old_caocao",
+    "old_xiahoudun",
+    "old_zhangliao",
+    "old_xuzhu",
+    "old_guojia",
+    "lidian",
+  ],
 }
 
 const characterSortTranslate = {

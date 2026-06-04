@@ -488,7 +488,7 @@ const skills = {
           cards.length == 1
             ? { links: cards.slice(0), bool: true }
             : await player
-                .chooseCardButton("将这些牌交给任意角色", true, cards, [1, cards.length])
+                .chooseCardButton("遗计：将这些牌交给任意角色", true, cards, [1, cards.length])
                 .set("ai", () => {
                   if (ui.selected.buttons.length == 0) {
                     return 1

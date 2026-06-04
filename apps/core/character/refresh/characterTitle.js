@@ -6,7 +6,6 @@ export default {
   re_xuzhu: "虎痴",
   re_guojia: "早终的先知",
   re_zhenji: "薄幸的美人",
-  lidian: "深明大义",
 
   re_liubei: "乱世的枭雄",
   re_guanyu: "美髯公",

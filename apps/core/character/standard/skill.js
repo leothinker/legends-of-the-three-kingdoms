@@ -440,7 +440,8 @@ const skills = {
   // 天妒
   tiandu: {
     audio: 2,
-    audioname: ["re_guojia", "xizhicai", "gz_nagisa"],
+    audioname: ["re_guojia"],
+    audioname2: { old_guojia: "tiandu_re_guojia" },
     trigger: { player: "judgeEnd" },
     preHidden: true,
     frequent(event) {
@@ -457,6 +458,7 @@ const skills = {
       player.gain(trigger.result.card, "gain2")
     },
   },
+  tiandu_re_guojia: { audio: 2 },
   // 遗计
   yiji: {
     audio: 2,
@@ -486,7 +488,7 @@ const skills = {
           cards.length == 1
             ? { links: cards.slice(0), bool: true }
             : await player
-                .chooseCardButton("遗计：请选择要分配的牌", true, cards, [1, cards.length])
+                .chooseCardButton("将这些牌交给任意角色", true, cards, [1, cards.length])
                 .set("ai", () => {
                   if (ui.selected.buttons.length == 0) {
                     return 1
@@ -500,7 +502,7 @@ const skills = {
         cards.removeArray(links)
         event.togive = links.slice(0)
         const { targets } = await player
-          .chooseTarget("选择一名角色获得" + get.translation(links), true)
+          .chooseTarget("将" + get.translation(links) + "交给一名角色", true)
           .set("ai", (target) => {
             const att = get.attitude(_status.event.player, target)
             if (_status.event.enemy) {

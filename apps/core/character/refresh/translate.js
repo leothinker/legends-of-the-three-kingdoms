@@ -40,6 +40,7 @@ const translates = {
   re_guojia: "界郭嘉",
   re_guojia_prefix: "界",
   reyiji: "遗计",
+  reyiji_tag: "已分配",
   reyiji_info: "当你受到1点伤害后，你可以摸两张牌，然后可以将至多两张手牌交给其他角色。",
 
   re_zhenji: "界甄姬",

@@ -337,7 +337,6 @@ const skills = {
   // 突袭
   retuxi: {
     audio: 2,
-    audioname2: { gz_jun_caocao: "jianan_tuxi" },
     trigger: {
       player: "phaseDrawBegin2",
     },
@@ -357,13 +356,10 @@ const skills = {
 
       // step 0
       let num = get.copy(trigger.num)
-      if (get.mode() == "guozhan" && num > 2) {
-        num = 2
-      }
       result = await player
         .chooseTarget(
           get.prompt("retuxi"),
-          "获得至多" + get.translation(num) + "名角色的各一张手牌，然后少摸等量的牌",
+          "少摸至多" + get.translation(num) + "张牌并获得等量其他角色的各一张手牌",
           [1, num],
           (card, player, target) => target.countCards("h") > 0 && player != target,
         )
@@ -427,7 +423,7 @@ const skills = {
 
       event.cards = cardsx
       const prompt =
-        "是否放弃摸牌" + (cardsx.length ? "，改为获得" + get.translation(cardsx) : "") + "？"
+        "是否放弃摸牌" + (cardsx.length ? "并获得" + get.translation(cardsx) : "") + "？"
       const result = await player
         .chooseBool(prompt)
         .set("choice", cardsx.length >= trigger.num)
@@ -445,7 +441,7 @@ const skills = {
   },
   reluoyi2: {
     trigger: { source: "damageBegin1" },
-    sourceSkill: "reluoyi",
+    sourceSkill: "oldluoyi",
     filter(event) {
       return (
         event.card && (event.card.name == "sha" || event.card.name == "juedou") && event.notLink()
@@ -469,8 +465,6 @@ const skills = {
   // 遗计
   reyiji: {
     audio: 2,
-    audioname: ["yj_sb_guojia", "yj_sb_guojia_shadow"],
-    audioname2: { sxrm_caocao: "reyiji_sxrm_caocao" },
     trigger: {
       player: "damageEnd",
     },
@@ -503,7 +497,7 @@ const skills = {
             },
             filterTarget: lib.filter.notMe,
             selectCard: [1, event.num],
-            prompt: "请选择要分配的卡牌和目标",
+            prompt: "可以将至多两张手牌交给其他角色",
             ai1(card) {
               return ui.selected.cards.length ? 0 : 1
             },

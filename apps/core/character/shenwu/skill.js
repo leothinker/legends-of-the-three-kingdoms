@@ -81,7 +81,7 @@ const skills = {
   olluoyi: {
     audio: "reluoyi",
     trigger: {
-      player: "phaseDrawBegin1",
+      player: "phaseDrawBefore",
     },
     filter(event, player) {
       return !event.numFixed
@@ -104,7 +104,7 @@ const skills = {
 
       event.cards = cardsx
       const prompt =
-        "是否放弃摸牌" + (cardsx.length ? "，改为获得" + get.translation(cardsx) : "") + "？"
+        "是否跳过摸牌阶段" + (cardsx.length ? "并获得" + get.translation(cardsx) : "") + "？"
       const result = await player
         .chooseBool(prompt)
         .set("choice", cardsx.length >= trigger.num)
@@ -115,7 +115,7 @@ const skills = {
           await player.gain(cardsx, "gain2")
         }
         player.addTempSkill("olluoyi_buff", { player: "phaseBeforeStart" })
-        trigger.changeToZero()
+        trigger.cancel()
       }
     },
     subSkill: { buff: { inherit: "reluoyi2", sourceSkill: "olluoyi" } },

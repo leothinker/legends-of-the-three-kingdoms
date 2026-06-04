@@ -134,6 +134,239 @@ const skills = {
       expose: 0.3,
     },
   },
+  // 界张辽
+  // 突袭
+  oldtuxi: {
+    audio: "retuxi",
+    trigger: { player: "phaseDrawBegin2" },
+    direct: true,
+    filter(event) {
+      return event.num > 0
+    },
+    async content(event, trigger, player) {
+      // step 0
+      const result = await player
+        .chooseTarget(
+          get.prompt("oldtuxi"),
+          [1, trigger.num],
+          function (card, player, target) {
+            return (
+              target.countCards("h") > 0 &&
+              player != target &&
+              target.countCards("h") >= player.countCards("h")
+            )
+          },
+          function (target) {
+            var att = get.attitude(_status.event.player, target)
+            if (target.hasSkill("tuntian")) {
+              return att / 10
+            }
+            return 1 - att
+          },
+        )
+        .forResult()
+      // step 1
+      if (result.bool) {
+        player.logSkill("oldtuxi", result.targets)
+        await player.gainMultiple(result.targets)
+        trigger.num -= result.targets.length
+      } else {
+        event.finish()
+        return
+      }
+      // step 2
+      if (trigger.num <= 0) {
+        await game.delay()
+      }
+    },
+    ai: {
+      threaten: 1.6,
+      expose: 0.2,
+    },
+  },
+  // 界许褚
+  // 裸衣
+  oldluoyi: {
+    audio: "reluoyi",
+    trigger: { player: "phaseDrawBegin1" },
+    filter(event, player) {
+      return !event.numFixed
+    },
+    check(event, player) {
+      if (player.countCards("h", "sha")) {
+        return true
+      }
+      return Math.random() < 0.5
+    },
+    async content(event, trigger, player) {
+      // step 0
+      player.addTempSkill("reluoyi2", { player: "phaseBefore" })
+      trigger.changeToZero()
+
+      // step 1
+      event.cards = get.cards(3)
+      await player.showCards(event.cards, "裸衣")
+
+      // step 2
+      const cards = event.cards
+      for (let i = 0; i < cards.length; i++) {
+        if (
+          get.type(cards[i]) != "basic" &&
+          cards[i].name != "juedou" &&
+          (get.type(cards[i]) != "equip" || get.subtype(cards[i]) != "equip1")
+        ) {
+          cards[i].discard()
+          cards.splice(i--, 1)
+        }
+      }
+      await player.gain(cards, "gain2")
+    },
+  },
+  // 界郭嘉
+  // 遗计
+  oldyiji: {
+    audio: "reyiji",
+    trigger: { player: "damageEnd" },
+    frequent: true,
+    filter(event) {
+      return event.num > 0
+    },
+    async content(event, trigger, player) {
+      // initialize counters (mimic step 0)
+      event.num = 1
+      event.count = 1
+
+      let result
+      // repeat for trigger.num times (event.count starts at 1)
+      while (event.count <= trigger.num) {
+        // step 1: draw/gain two cards
+        await player.gain(get.cards(2))
+        player.$draw(2)
+
+        // step 2/3: allow up to two give-aways per iteration
+        while (true) {
+          result = await player
+            .chooseCardTarget({
+              filterCard: true,
+              selectCard: [1, 2],
+              filterTarget(card, player, target) {
+                return player != target && target != event.temp
+              },
+              ai1(card) {
+                if (ui.selected.cards.length > 0) return -1
+                if (card.name == "du") return 20
+                return _status.event.player.countCards("h") - _status.event.player.hp
+              },
+              ai2(target) {
+                var att = get.attitude(_status.event.player, target)
+                if (ui.selected.cards.length && ui.selected.cards[0].name == "du") {
+                  if (target.hasSkillTag("nodu")) return 0
+                  return 1 - att
+                }
+                return att - 4
+              },
+              prompt: "请选择要扣置的手牌",
+            })
+            .forResult()
+
+          if (result?.bool) {
+            // move chosen cards to storage
+            await player.lose(result.cards, ui.special, "toStorage")
+            const tar = result.targets[0]
+            if (tar.hasSkill("oldyiji2")) {
+              tar.storage.oldyiji2 = tar.storage.oldyiji2.concat(result.cards)
+            } else {
+              tar.addSkill("oldyiji2")
+              tar.storage.oldyiji2 = result.cards
+            }
+            player.$give(result.cards.length, tar, false)
+            player.line(result.targets, "green")
+            game.addVideo("storage", tar, [
+              "oldyiji2",
+              get.cardsInfo(tar.storage.oldyiji2),
+              "cards",
+            ])
+
+            // if this is the first give in this iteration, allow a second give (to a different target)
+            if (event.num === 1) {
+              event.temp = tar
+              event.num++
+              continue // go back to chooseCardTarget (step 2)
+            }
+
+            // finished gives for this iteration -> prepare next iteration (if any)
+            delete event.temp
+            event.num = 1
+            event.count++
+            break
+          } else {
+            // player declined to give; if more iterations remain, continue loop; otherwise finish
+            if (event.count < trigger.num) {
+              delete event.temp
+              event.num = 1
+              event.count++
+              break
+            }
+            return
+          }
+        }
+
+        // loop continues while(event.count <= trigger.num)
+      }
+    },
+    ai: {
+      maixie: true,
+      maixie_hp: true,
+      effect: {
+        target(card, player, target) {
+          if (get.tag(card, "damage")) {
+            if (player.hasSkillTag("jueqing", false, target)) {
+              return [1, -2]
+            }
+            if (!target.hasFriend()) {
+              return
+            }
+            var num = 1
+            if (get.attitude(player, target) > 0) {
+              if (player.needsToDiscard()) {
+                num = 0.7
+              } else {
+                num = 0.5
+              }
+            }
+            if (player.hp >= 4) {
+              return [1, num * 2]
+            }
+            if (target.hp == 3) {
+              return [1, num * 1.5]
+            }
+            if (target.hp == 2) {
+              return [1, num * 0.5]
+            }
+          }
+        },
+      },
+      threaten: 0.6,
+    },
+  },
+  oldyiji2: {
+    trigger: { player: "phaseDrawBegin" },
+    forced: true,
+    mark: true,
+    popup: "遗计获得牌",
+    audio: false,
+    sourceSkill: "oldyiji",
+    async content(event, trigger, player) {
+      await player.$draw(player.storage.oldyiji2.length)
+      await player.gain(player.storage.oldyiji2, "fromStorage")
+      delete player.storage.oldyiji2
+      player.removeSkill("oldyiji2")
+      await game.delay()
+    },
+    intro: {
+      content: "cardCount",
+    },
+  },
 }
 
 export default skills

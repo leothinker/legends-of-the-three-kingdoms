@@ -1977,7 +1977,9 @@ export class Game {
       return
     }
     for (const client of lib.node.clients) {
-      client.send(func, ...args)
+      if (client.inited) {
+        client.send(func, ...args)
+      }
     }
   }
   /**
@@ -2333,6 +2335,7 @@ export class Game {
     // }
 
     game.#skillSyncDebounceMap[skill] ??= {}
+
     ;(game.#skillSyncDebounceMap[skill][sync] ??= debounce((...args) => {
       game.send("dataSync", { type: "skill", name: skill, key: sync, args }, null)
     }))(...args)

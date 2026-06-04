@@ -399,8 +399,8 @@ const skills = {
         .forResult()
       const top = result.moved[0]
       const bottom = result.moved[1]
-      player.popup(`${get.cnNumber(0)}上${get.cnNumber(bottom.length)}下`)
       await player.gain(top, "gain2")
+      player.popup(`${get.cnNumber(0)}上${get.cnNumber(bottom.length)}下`)
       await game.cardsGotoPile(bottom)
     },
   },
@@ -440,6 +440,13 @@ const skills = {
       maixie: true,
       maixie_hp: true,
     },
+  },
+  // 界刘备
+  // 仁德
+  oldrende: {
+    audio: "rerende",
+    usable: 1,
+    inherit: "rende",
   },
 }
 

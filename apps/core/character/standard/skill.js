@@ -821,22 +821,11 @@ const skills = {
       threaten: 0.8,
     },
   },
-  rende1: {
-    trigger: { player: "phaseUseBegin" },
-    silent: true,
-    sourceSkill: "rende",
-    async content(event, trigger, player) {
-      player.storage.rende = 0
-    },
-  },
   // 激将
   jijiang: {
     audio: 2,
-    audioname: ["liushan", "re_liushan"],
-    audioname2: {
-      re_liubei: "rejijiang",
-      pe_jun_liubei: "sbjijiang",
-    },
+    audioname: ["liushan"],
+    audioname2: { re_liubei: "rejijiang", old_liubei: "rejijiang" },
     group: ["jijiang1"],
     zhuSkill: true,
     filter(event, player) {
@@ -871,11 +860,8 @@ const skills = {
   },
   jijiang1: {
     audio: "jijiang",
-    audioname: ["liushan", "re_liushan"],
-    audioname2: {
-      re_liubei: "rejijiang",
-      pe_jun_liubei: "sbjijiang",
-    },
+    audioname: ["liushan"],
+    audioname2: { re_liubei: "rejijiang", old_liubei: "rejijiang" },
     trigger: { player: ["useCardBegin", "respondBegin"] },
     logTarget: "targets",
     sourceSkill: "jijiang",

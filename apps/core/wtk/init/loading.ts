@@ -496,6 +496,7 @@ export function loadMode(mode: importModeConfig) {
   mixinGeneral(mode, "ui", ui)
   mixinGeneral(mode, "get", get)
   mixinGeneral(mode, "ai", ai)
+
   ;["onwash", "onover"].forEach((name) => {
     if (game[name]) {
       lib[name]?.push(game[name])

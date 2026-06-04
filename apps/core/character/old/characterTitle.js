@@ -5,4 +5,6 @@ export default {
   old_xuzhu: "虎痴",
   old_guojia: "早终的先知",
   lidian: "深明大义",
+
+  old_liubei: "乱世的枭雄",
 }

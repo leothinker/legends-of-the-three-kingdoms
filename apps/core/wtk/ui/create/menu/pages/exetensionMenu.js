@@ -17,6 +17,7 @@ import {
   createConfig,
 } from "../index.js"
 import { ui, game, get, ai, lib, _status } from "wtk"
+import { delay } from "@/util/index.js"
 import { security } from "@/util/sandbox.js"
 import { Character } from "@/library/element/index.js"
 
@@ -353,7 +354,14 @@ export const extensionMenu = function (connectMenu) {
           }
         }
         inputExtName.disabled = true
-        setTimeout(function () {
+
+        const waitingImage = Promise.allSettled([
+          ...(dash1.imagePromises || []),
+          ...(dash2.imagePromises || []),
+        ])
+        const waitDelay = delay(500)
+
+        Promise.allSettled([waitingImage, waitDelay]).then(() => {
           var ext = {}
           for (var i in dash4.content) {
             try {
@@ -447,14 +455,14 @@ export const extensionMenu = function (connectMenu) {
             }),
             "README.md": "",
           }
-          for (var i in dash1.content.image) {
-            extension[i] = dash1.content.image[i]
+          for (const id in dash1.content.image) {
+            extension[id] = dash1.content.image[id]
           }
-          for (var i in dash1.content.audio) {
-            extension["audio/die/" + i] = dash1.content.audio[i]
+          for (const id in dash1.content.audio) {
+            extension["audio/die/" + id] = dash1.content.audio[id]
           }
-          for (var i in dash2.content.image) {
-            extension[i] = dash2.content.image[i]
+          for (const id in dash2.content.image) {
+            extension[id] = dash2.content.image[id]
           }
           // var callback = () => {
           if (exportext) {
@@ -501,7 +509,7 @@ export const extensionMenu = function (connectMenu) {
           // } else {
           // 	callback();
           // }
-        }, 500)
+        })
       }
       var buttonConfirm = document.createElement("button")
       buttonConfirm.innerHTML = "确定"
@@ -854,6 +862,11 @@ export const extensionMenu = function (connectMenu) {
         }
         page.reset = function (name) {
           resetEditor()
+          if (page.imagePromises == null) {
+            page.imagePromises = []
+          } else {
+            page.imagePromises.length = 0
+          }
           var buttons = page.querySelectorAll(".button.character")
           var list = []
           for (var i = 0; i < buttons.length; i++) {
@@ -868,16 +881,18 @@ export const extensionMenu = function (connectMenu) {
               translate: {},
             }
             page.content.image = {}
-            for (var i in page.content.pack.character) {
-              var file = i + ".jpg"
-              var url = lib.assetURL + "extension/" + name + "/" + file
-              createButton(i, url)
-              game.promises
-                .readFile(url)
-                .then((result) => {
-                  page.content.image[file] = result
-                })
-                .catch((e) => console.error(e))
+            for (const id in page.content.pack.character) {
+              const file = id + ".jpg"
+              const url = lib.assetURL + "extension/" + name + "/" + file
+              createButton(id, url)
+              page.imagePromises.push(
+                game.promises
+                  .readFile(url)
+                  .then((result) => {
+                    page.content.image[file] = result
+                  })
+                  .catch((e) => console.error(e)),
+              )
             }
           } else {
             page.content = {
@@ -1472,6 +1487,11 @@ export const extensionMenu = function (connectMenu) {
         }
         page.reset = function (name) {
           resetEditor()
+          if (page.imagePromises == null) {
+            page.imagePromises = []
+          } else {
+            page.imagePromises.length = 0
+          }
           var buttons = page.querySelectorAll(".button.card")
           var list = []
           for (var i = 0; i < buttons.length; i++) {
@@ -1500,22 +1520,19 @@ export const extensionMenu = function (connectMenu) {
                 }
               }
             }
-            for (var i in page.content.pack.card) {
-              var file
-              var fullskin = page.content.pack.card[i].fullskin ? true : false
-              if (fullskin) {
-                file = i + ".png"
-              } else {
-                file = i + ".jpg"
-              }
-              var url = lib.assetURL + "extension/" + name + "/" + file
-              createButton(i, url, fullskin)
-              game.promises
-                .readFile(url)
-                .then((result) => {
-                  page.content.image[file] = result
-                })
-                .catch((e) => console.error(e))
+            for (const id in page.content.pack.card) {
+              const fullskin = page.content.pack.card[id].fullskin ? true : false
+              const file = id + (fullskin ? ".png" : ".jpg")
+              const url = lib.assetURL + "extension/" + name + "/" + file
+              createButton(id, url, fullskin)
+              page.imagePromises.push(
+                game.promises
+                  .readFile(url)
+                  .then((result) => {
+                    page.content.image[file] = result
+                  })
+                  .catch((e) => console.error(e)),
+              )
             }
           } else {
             page.content = {

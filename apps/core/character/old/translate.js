@@ -35,6 +35,12 @@ const translates = {
   wangxi: "忘隙",
   wangxi_info:
     "当你对其他角色造成1点伤害后，或当你受到其他角色造成的1点伤害后，你可以与其各摸一张牌。",
+
+  old_liubei: "界刘备",
+  old_liubei_prefix: "界",
+  oldrende: "仁德",
+  oldrende_info:
+    "出牌阶段限一次，你可以将任意张手牌交给其他角色，若你给出的牌数大于1，你回复1点体力。",
 }
 
 export default translates

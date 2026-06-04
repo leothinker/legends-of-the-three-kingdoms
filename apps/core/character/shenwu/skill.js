@@ -177,7 +177,6 @@ const skills = {
   // 激将
   rejijiang: {
     audio: 2,
-    audioname: ["ol_liushan"],
     group: ["rejijiang1", "rejijiang3"],
     zhuSkill: true,
     filter(event, player) {
@@ -214,7 +213,6 @@ const skills = {
   },
   rejijiang1: {
     audio: "rejijiang",
-    audioname: ["ol_liushan"],
     trigger: { player: ["useCardBegin", "respondBegin"] },
     logTarget: "targets",
     sourceSkill: "rejijiang",
@@ -230,7 +228,7 @@ const skills = {
 
       while (current != player) {
         if (current.group == "shu") {
-          var next = current.chooseToRespond("是否替" + get.translation(player) + "打出一张杀？", {
+          var next = current.chooseToRespond("是否替" + get.translation(player) + "使用或打出【杀】？", {
             name: "sha",
           })
           next.set("ai", function () {
@@ -239,7 +237,7 @@ const skills = {
           })
           next.set("source", player)
           next.set("jijiang", true)
-          next.set("skillwarn", "替" + get.translation(player) + "打出一张杀")
+          next.set("skillwarn", "替" + get.translation(player) + "使用或打出【杀】")
           next.noOrdering = true
           next.autochoose = lib.filter.autoRespondSha
 

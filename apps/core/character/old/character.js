@@ -47,6 +47,15 @@ const characters = {
     hp: 3,
     skills: ["xunxun", "wangxi"],
   },
+  old_liubei: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["oldrende", "jijiang"],
+    isZhugong: true,
+    img: "image/character/re_liubei.jpg",
+    dieAudios: ["re_liubei"],
+  },
 }
 
 export default characters

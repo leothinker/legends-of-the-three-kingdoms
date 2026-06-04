@@ -1177,7 +1177,7 @@ export class Player extends HTMLDivElement {
   /**
    * 让一名角色连接一名角色一些手牌
    *
-   * @param {import("./Player/type.js").EventConnectCardsParams} [params]
+   * @param {import("./Player/type.d").EventConnectCardsParams} [params]
    */
   connectCards(params) {
     const next = game.createEvent("connectCards")
@@ -1230,7 +1230,7 @@ export class Player extends HTMLDivElement {
   /**
    * 让一名角色重置一名角色一些连接手牌
    *
-   * @param {import("./Player/type.js").EventResetConnectCardsParams} [params]
+   * @param {import("./Player/type.d").EventResetConnectCardsParams} [params]
    */
   resetConnectedCards(params) {
     const next = game.createEvent("resetConnectedCards")
@@ -1327,7 +1327,7 @@ export class Player extends HTMLDivElement {
   /**
    * 让一名角色明置一些手牌
    *
-   * @param {import("./Player/type.js").EventAddShownCardsParams} [params]
+   * @param {import("./Player/type.d").EventAddShownCardsParams} [params]
    */
   addShownCards(params) {
     const args = [...arguments]
@@ -1366,7 +1366,7 @@ export class Player extends HTMLDivElement {
   /**
    * 让一名角色暗置一些手牌
    *
-   * @param {import("./Player/type.js").EventHideShownCardsParams} [params]
+   * @param {import("./Player/type.d").EventHideShownCardsParams} [params]
    */
   hideShownCards(params) {
     const next = game.createEvent("hideShownCards", false)
@@ -1974,7 +1974,7 @@ export class Player extends HTMLDivElement {
    *
    * 参数：废除来源角色（不写默认当前事件角色），废除区域（数字/区域字符串/数组，可以写多个，重复废除）
    *
-   * @param {import("./Player/type.js").EventDisableEquipParams} [params]
+   * @param {import("./Player/type.d").EventDisableEquipParams} [params]
    */
   disableEquip(params) {
     const next = game.createEvent("disableEquip")
@@ -2029,7 +2029,7 @@ export class Player extends HTMLDivElement {
    *
    * 参数：恢复来源角色（不写默认当前事件角色），恢复区域（数字/区域字符串/数组，可以写多个，重复恢复）
    *
-   * @param {import("./Player/type.js").EventEnableEquipParams} [params]
+   * @param {import("./Player/type.d").EventEnableEquipParams} [params]
    */
   enableEquip(params) {
     const next = game.createEvent("enableEquip")
@@ -2083,7 +2083,7 @@ export class Player extends HTMLDivElement {
    *
    * 参数：扩展来源角色（不写默认当前事件角色），扩展区域（数字/区域字符串/数组，可以写多个，重复扩展）
    *
-   * @param {import("./Player/type.js").EventExpandEquipParams} [params]
+   * @param {import("./Player/type.d").EventExpandEquipParams} [params]
    */
   expandEquip(params) {
     const next = game.createEvent("expandEquip")
@@ -2297,7 +2297,7 @@ export class Player extends HTMLDivElement {
   //装备区End
 
   /**
-   * @param { import("./Player/type.js").EventChooseToDebateParams } [params]
+   * @param { import("./Player/type.d").EventChooseToDebateParams } [params]
    */
   chooseToDebate(params) {
     const next = game.createEvent("chooseToDebate")
@@ -2348,7 +2348,7 @@ export class Player extends HTMLDivElement {
   }
 
   /**
-   * @param { import("./Player/type.js").EventChooseCooperationForParams } [params]
+   * @param { import("./Player/type.d").EventChooseCooperationForParams } [params]
    */
   chooseCooperationFor(params) {
     const next = game.createEvent("chooseCooperationFor")
@@ -2922,7 +2922,7 @@ export class Player extends HTMLDivElement {
   }
 
   /**
-   * @param { import("./Player/type.js").EventChooseToMoveParams } [params]
+   * @param { import("./Player/type.d").EventChooseToMoveParams } [params]
    */
   chooseToMove(params) {
     var next = game.createEvent("chooseToMove")
@@ -2955,7 +2955,7 @@ export class Player extends HTMLDivElement {
   }
 
   /**
-   * @param { import("./Player/type.js").EventChooseToMoveNewParams } [params]
+   * @param { import("./Player/type.d").EventChooseToMoveNewParams } [params]
    */
   chooseToMove_new(params) {
     var next = game.createEvent("chooseToMove_new")
@@ -3484,7 +3484,7 @@ export class Player extends HTMLDivElement {
   }
   /**
    * 令玩家选择恢复一个已废除的装备栏
-   * @param { import("./Player/type.js").EventChooseToEnableParams } [params]
+   * @param { import("./Player/type.d").EventChooseToEnableParams } [params]
    * @returns { GameEvent }
    */
   chooseToEnable(params) {
@@ -3521,7 +3521,7 @@ export class Player extends HTMLDivElement {
   }
   /**
    * 令玩家选择废除一个未废除的装备栏
-   * @param { import("./Player/type.js").EventChooseToDisableParams } [params]
+   * @param { import("./Player/type.d").EventChooseToDisableParams } [params]
    * @returns { GameEvent }
    */
   chooseToDisable(params) {
@@ -6050,7 +6050,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param { import("./Player/type.js").EventChooseToUseParams } [params]
+   * @param { import("./Player/type.d").EventChooseToUseParams } [params]
    */
   chooseToUse(params) {
     var next = game.createEvent("chooseToUse")
@@ -6117,7 +6117,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param { import("./Player/type.js").EventChooseToRespondParams } [params]
+   * @param { import("./Player/type.d").EventChooseToRespondParams } [params]
    */
   chooseToRespond(params) {
     const next = game.createEvent("chooseToRespond")
@@ -6210,7 +6210,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param { import("./Player/type.js").EventChooseToGiveParams } [params]
+   * @param { import("./Player/type.d").EventChooseToGiveParams } [params]
    */
   chooseToGive(params) {
     const next = game.createEvent("chooseToGive")
@@ -6284,7 +6284,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param { import("./Player/type.js").EventChooseToDiscardParams } [params]
+   * @param { import("./Player/type.d").EventChooseToDiscardParams } [params]
    */
   chooseToDiscard(params) {
     var next = game.createEvent("chooseToDiscard")
@@ -6484,7 +6484,7 @@ export class Player extends HTMLDivElement {
   }
   /**
    * @param {Player} target
-   * @param {import("./Player/type.js").EventChooseSkillParams} [params]
+   * @param {import("./Player/type.d").EventChooseSkillParams} [params]
    * @returns {GameEvent}
    */
   chooseSkill(target, params) {
@@ -6516,7 +6516,7 @@ export class Player extends HTMLDivElement {
   /**
    *
    * @param {string[]} list
-   * @param {import("./Player/type.js").EventDiscoverCardParams} [params]
+   * @param {import("./Player/type.d").EventDiscoverCardParams} [params]
    * @returns
    */
   discoverCard(list, params) {
@@ -6559,7 +6559,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param {import("./Player/type.js").EventChooseCardButtonParams} [params]
+   * @param {import("./Player/type.d").EventChooseCardButtonParams} [params]
    */
   chooseCardButton(params) {
     let cards
@@ -6614,7 +6614,7 @@ export class Player extends HTMLDivElement {
   }
   /**
    *
-   * @param {import("./Player/type.js").EventChooseVCardButtonParams} [params]
+   * @param {import("./Player/type.d").EventChooseVCardButtonParams} [params]
    * @returns {GameEvent}
    */
   chooseVCardButton(params) {
@@ -6681,7 +6681,7 @@ export class Player extends HTMLDivElement {
   }
   /**
    *
-   * @param {import("./Player/type.js").EventChooseButtonParams} [params]
+   * @param {import("./Player/type.d").EventChooseButtonParams} [params]
    * @returns
    */
   chooseButton(params) {
@@ -6776,7 +6776,7 @@ export class Player extends HTMLDivElement {
   }
   /**
    *
-   * @param {import("./Player/type.js").EventChooseCardOLParams} [params]
+   * @param {import("./Player/type.d").EventChooseCardOLParams} [params]
    * @returns {GameEvent}
    */
   chooseCardOL(params) {
@@ -6802,7 +6802,7 @@ export class Player extends HTMLDivElement {
   }
   /**
    *
-   * @param {import("./Player/type.js").EventChooseCardParams} [params]
+   * @param {import("./Player/type.d").EventChooseCardParams} [params]
    * @returns
    */
   chooseCard(params) {
@@ -6884,7 +6884,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param {import("./Player/type.js").EventChooseUseTargetParams} [params]
+   * @param {import("./Player/type.d").EventChooseUseTargetParams} [params]
    * @returns
    */
   chooseUseTarget(params) {
@@ -6970,7 +6970,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param {import("./Player/type.js").EventChooseTargetParams} [params]
+   * @param {import("./Player/type.d").EventChooseTargetParams} [params]
    * @returns
    */
   chooseTarget(params) {
@@ -7032,7 +7032,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param {import("./Player/type.js").EventChooseCardTargetParams} [params]
+   * @param {import("./Player/type.d").EventChooseCardTargetParams} [params]
    * @returns
    */
   chooseCardTarget(params) {
@@ -7069,7 +7069,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param {import("./Player/type.js").EventChooseButtonTargetParams} [params]
+   * @param {import("./Player/type.d").EventChooseButtonTargetParams} [params]
    * @returns
    */
   chooseButtonTarget(params) {
@@ -7110,7 +7110,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param {import("./Player/type.js").EventChooseControlListParams} [params]
+   * @param {import("./Player/type.d").EventChooseControlListParams} [params]
    */
   chooseControlList(params) {
     if (
@@ -7158,7 +7158,7 @@ export class Player extends HTMLDivElement {
   }
   /**
    *
-   * @param {import("./Player/type.js").EventChooseControlParams} [params]
+   * @param {import("./Player/type.d").EventChooseControlParams} [params]
    * @returns
    */
   chooseControl(params) {
@@ -7204,7 +7204,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param {import("./Player/type.js").EventChooseBoolParams} [params]
+   * @param {import("./Player/type.d").EventChooseBoolParams} [params]
    * @returns
    */
   chooseBool(params) {
@@ -7245,7 +7245,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param {import("./Player/type.js").EventChooseDrawRecoverParams} [params]
+   * @param {import("./Player/type.d").EventChooseDrawRecoverParams} [params]
    */
   chooseDrawRecover(params) {
     const next = game.createEvent("chooseDrawRecover", false)
@@ -7294,7 +7294,7 @@ export class Player extends HTMLDivElement {
   /**
    * 选择一或多个数值
    *
-   * @param {import("./Player/type.js").EventChooseNumbersParams} [params]
+   * @param {import("./Player/type.d").EventChooseNumbersParams} [params]
    */
   chooseNumbers(params) {
     const next = game.createEvent("chooseNumbers")
@@ -7362,7 +7362,7 @@ export class Player extends HTMLDivElement {
   }
 
   /**
-   * @param {import("./Player/type.js").EventChoosePlayerCardParams} [params]
+   * @param {import("./Player/type.d").EventChoosePlayerCardParams} [params]
    */
   choosePlayerCard(params) {
     const next = game.createEvent("choosePlayerCard")
@@ -7453,7 +7453,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param {import("./Player/type.js").EventDiscardPlayerCardParams} [params]
+   * @param {import("./Player/type.d").EventDiscardPlayerCardParams} [params]
    */
   discardPlayerCard(params) {
     const next = game.createEvent("discardPlayerCard")
@@ -7544,7 +7544,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param {import("./Player/type.js").EventGainPlayerCardParams} [params]
+   * @param {import("./Player/type.d").EventGainPlayerCardParams} [params]
    */
   gainPlayerCard(params) {
     const next = game.createEvent("gainPlayerCard")
@@ -7825,7 +7825,7 @@ export class Player extends HTMLDivElement {
   /**
    * 移动一些牌
    *
-   * @param {import("./Player/type.js").EventMoveCardParams} [params]
+   * @param {import("./Player/type.d").EventMoveCardParams} [params]
    * @returns { GameEvent }
    */
   moveCard(params) {
@@ -7945,7 +7945,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家使用牌
    *
-   * @param {import("./Player/type.js").EventUseCardParams} [params]
+   * @param {import("./Player/type.d").EventUseCardParams} [params]
    * @returns { GameEvent }
    */
   useCard(params) {
@@ -8100,7 +8100,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家使用某个技能
    *
-   * @param {import("./Player/type.js").EventUseSkillParams} [params]
+   * @param {import("./Player/type.d").EventUseSkillParams} [params]
    * @returns { GameEvent }
    */
   useSkill(params) {
@@ -8158,7 +8158,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家摸牌摸至指定值
    * @param { number } num
-   * @param { import("./Player/type.js").EventDrawToParams | any[] } [args]
+   * @param { import("./Player/type.d").EventDrawToParams | any[] } [args]
    * @returns { GameEvent }
    */
   drawTo(num, args) {
@@ -8192,7 +8192,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家摸牌
    *
-   * @param { number | import("./Player/type.js").EventDrawParams } [params]
+   * @param { number | import("./Player/type.d").EventDrawParams } [params]
    * @returns { GameEvent }
    */
   draw(params) {
@@ -8267,7 +8267,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家随机弃置其区域内的一些牌
    *
-   * @param {import("./Player/type.js").EventRandomDiscardParams} [params]
+   * @param {import("./Player/type.d").EventRandomDiscardParams} [params]
    * @returns { GameEvent }
    */
   randomDiscard(params) {
@@ -8329,7 +8329,7 @@ export class Player extends HTMLDivElement {
   /**
    * 随机获得一名角色的牌
    *
-   * @param { import("./Player/type.js").EventRandomGainParams } [params]
+   * @param { import("./Player/type.d").EventRandomGainParams } [params]
    */
   randomGain(params) {
     let position = "he"
@@ -8399,7 +8399,7 @@ export class Player extends HTMLDivElement {
   /**
    * 强制令玩家弃置其区域内的一些牌
    *
-   * @param {import("./Player/type.js").EventDiscardParams} [params]
+   * @param {import("./Player/type.d").EventDiscardParams} [params]
    * @returns { GameEvent }
    */
   discard(params) {
@@ -8446,7 +8446,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家弃置其区域内一些能被弃置的牌
    *
-   * @param {import("./Player/type.js").EventModedDiscardParams} [params]
+   * @param {import("./Player/type.d").EventModedDiscardParams} [params]
    * @returns { GameEvent }
    */
   modedDiscard(params) {
@@ -8568,7 +8568,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家将一些牌置入弃牌堆
    *
-   * @param {import("./Player/type.js").EventLoseToDiscardpileParams} [params]
+   * @param {import("./Player/type.d").EventLoseToDiscardpileParams} [params]
    * @returns { GameEvent }
    */
   loseToDiscardpile(params) {
@@ -8615,7 +8615,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家打出牌
    *
-   * @param {import("./Player/type.js").EventRespondParams} [params]
+   * @param {import("./Player/type.d").EventRespondParams} [params]
    * @returns { GameEvent }
    */
   respond(params) {
@@ -8912,7 +8912,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家获得一些牌
    *
-   * @param { import("./Player/type.js").EventGainParams } [params]
+   * @param { import("./Player/type.d").EventGainParams } [params]
    * @returns { GameEvent }
    */
   gain(params) {
@@ -9041,7 +9041,7 @@ export class Player extends HTMLDivElement {
   /**
    * 将一些牌置入玩家的武将牌上
    *
-   * @param { import("./Player/type.js").EventAddToExpansionParams } [params]
+   * @param { import("./Player/type.d").EventAddToExpansionParams } [params]
    * @returns { GameEvent }
    */
   addToExpansion(params) {
@@ -9182,7 +9182,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param { import("./Player/type.js").EventLoseParams } [params]
+   * @param { import("./Player/type.d").EventLoseParams } [params]
    */
   lose(params) {
     const next = game.createEvent("lose")
@@ -9293,7 +9293,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家受到伤害
    *
-   * @param {import("./Player/type.js").EventDamageParams} [params]
+   * @param {import("./Player/type.d").EventDamageParams} [params]
    * @returns { GameEvent }
    */
   damage(params) {
@@ -9415,7 +9415,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家回复体力
    *
-   * @param { import("./Player/type.js").EventRecoverParams } [params]
+   * @param { import("./Player/type.d").EventRecoverParams } [params]
    * @returns { GameEvent }
    */
   recover(params) {
@@ -9487,7 +9487,7 @@ export class Player extends HTMLDivElement {
    * 令玩家回复体力至指定值
    *
    * @param { number } num
-   * @param { import("./Player/type.js").EventRecoverToParams } [args]
+   * @param { import("./Player/type.d").EventRecoverToParams } [args]
    * @returns { GameEvent }
    */
   recoverTo(num, args) {
@@ -9536,7 +9536,7 @@ export class Player extends HTMLDivElement {
   /**
    * 扣减玩家的体力上限
    *
-   * @param { import("./Player/type.js").EventGainMaxHpParams } [params]
+   * @param { import("./Player/type.d").EventGainMaxHpParams } [params]
    * @returns { GameEvent }}
    */
   loseMaxHp(params) {
@@ -9567,7 +9567,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家获得体力上限
    *
-   * @param { import("./Player/type.js").EventGainMaxHpParams } [params]
+   * @param { import("./Player/type.d").EventGainMaxHpParams } [params]
    * @returns { GameEvent }
    */
   gainMaxHp(params) {
@@ -10208,7 +10208,7 @@ export class Player extends HTMLDivElement {
     }
   }
   /**
-   * @param { import("./Player/type.js").EventJudgeParams } [params]
+   * @param { import("./Player/type.d").EventJudgeParams } [params]
    */
   judge(params) {
     const next = game.createEvent("judge")

@@ -10,6 +10,7 @@ const characterSort = {
     "lidian",
 
     "old_liubei",
+    "old_guanyu",
   ],
 }
 

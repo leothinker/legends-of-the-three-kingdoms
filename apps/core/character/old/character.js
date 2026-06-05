@@ -56,6 +56,14 @@ const characters = {
     img: "image/character/re_liubei.jpg",
     dieAudios: ["re_liubei"],
   },
+  old_guanyu: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["wusheng", "oldyijue"],
+    img: "image/character/re_guanyu.jpg",
+    dieAudios: ["re_guanyu"],
+  },
 }
 
 export default characters

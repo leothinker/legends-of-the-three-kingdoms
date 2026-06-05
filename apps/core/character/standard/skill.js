@@ -932,13 +932,7 @@ const skills = {
   // 武圣
   wusheng: {
     audio: 2,
-    audioname2: {
-      old_guanzhang: "wusheng_old_guanzhang",
-      old_guanyu: "wusheng_re_guanyu",
-      guanzhang: "wusheng_guanzhang",
-      guansuo: "wusheng_guansuo",
-    },
-    audioname: ["jsp_guanyu", "re_guanzhang", "dc_jsp_guanyu"],
+    audioname2: { old_guanyu: "rewusheng" },
     enable: ["chooseToRespond", "chooseToUse"],
     filterCard(card, player) {
       if (get.zhu(player, "shouyue")) {
@@ -959,7 +953,7 @@ const skills = {
         }
       }
     },
-    prompt: "将一张红色牌当【杀】使用或打出",
+    prompt: "将一张红色牌当杀使用或打出",
     check(card) {
       const val = get.value(card)
       if (_status.event.name == "chooseToRespond") {

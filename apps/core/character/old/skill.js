@@ -448,6 +448,92 @@ const skills = {
     usable: 1,
     inherit: "rende",
   },
+  // 界关羽
+  // 义绝
+  oldyijue: {
+    audio: "yijue",
+    enable: "phaseUse",
+    usable: 1,
+    filterTarget(card, player, target) {
+      return player != target && target.countCards("h")
+    },
+    filter(event, player) {
+      return player.countCards("h") > 0
+    },
+    async content(event, trigger, player) {
+      const { target } = event
+      let result
+
+      // step 0
+      result = await player.chooseToCompare(target).set("small", true).forResult()
+
+      // step 1
+      if (result.bool) {
+        if (!target.hasSkill("fengyin")) {
+          target.addTempSkill("fengyin")
+        }
+        target.addTempSkill("oldyijue2")
+        return
+      } else if (target.hp < target.maxHp) {
+        result = await player
+          .chooseBool("是否让目标回复1点体力？")
+          .set("ai", function () {
+            return get.recoverEffect(target, player, player) > 0
+          })
+          .forResult()
+      } else {
+        return
+      }
+
+      // step 2
+      if (result.bool) {
+        await target.recover()
+      }
+    },
+    ai: {
+      result: {
+        target(player, target) {
+          var hs = player.getCards("h")
+          if (hs.length < 3) {
+            return 0
+          }
+          var bool = false
+          for (var i = 0; i < hs.length; i++) {
+            if (get.number(hs[i]) >= 9 && get.value(hs[i]) < 7) {
+              bool = true
+              break
+            }
+          }
+          if (!bool) {
+            return 0
+          }
+          if (target.countCards("h") > target.hp + 1 && get.recoverEffect(target) > 0) {
+            return 1
+          }
+          if (
+            player.canUse("sha", target) &&
+            (player.countCards("h", "sha") || player.countCards("he", { color: "red" }))
+          ) {
+            return -2
+          }
+          return -0.5
+        },
+      },
+      order: 9,
+    },
+  },
+  oldyijue2: {
+    charlotte: true,
+    mark: true,
+    mod: {
+      cardEnabled2(card) {
+        if (get.position(card) == "h") {
+          return false
+        }
+      },
+    },
+    intro: { content: "不能使用或打出手牌" },
+  },
 }
 
 export default skills

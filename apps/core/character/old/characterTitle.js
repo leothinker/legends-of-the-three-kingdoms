@@ -7,4 +7,5 @@ export default {
   lidian: "深明大义",
 
   old_liubei: "乱世的枭雄",
+  old_guanyu: "美髯公",
 }

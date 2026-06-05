@@ -41,6 +41,13 @@ const translates = {
   oldrende: "仁德",
   oldrende_info:
     "出牌阶段限一次，你可以将任意张手牌交给其他角色，若你给出的牌数大于1，你回复1点体力。",
+
+  old_guanyu: "界关羽",
+  old_guanyu_prefix: "界",
+  oldyijue: "义绝",
+  oldyijue2: "义绝",
+  oldyijue_info:
+    "出牌阶段限一次，你可以与一名角色拼点，若你：赢，直到回合结束，其不能使用或打出手牌且所有非锁定技失效；没赢，你可以令其回复1点体力。",
 }
 
 export default translates

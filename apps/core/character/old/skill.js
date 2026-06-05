@@ -399,7 +399,7 @@ const skills = {
         .forResult()
       const top = result.moved[0]
       const bottom = result.moved[1]
-      await player.gain(top, "gain2")
+      await player.gain(top, "draw")
       player.popup(`${get.cnNumber(0)}上${get.cnNumber(bottom.length)}下`)
       await game.cardsGotoPile(bottom)
     },
@@ -533,6 +533,66 @@ const skills = {
       },
     },
     intro: { content: "不能使用或打出手牌" },
+  },
+  // 界张飞
+  // 替身
+  oldtishen: {
+    audio: "tishen",
+    skillAnimation: true,
+    animationColor: "soil",
+    limited: true,
+    trigger: { player: "phaseZhunbeiBegin" },
+    filter(event, player) {
+      if (typeof player.storage.oldtishen2 == "number") {
+        return player.hp < player.storage.oldtishen2
+      }
+      return false
+    },
+    check(event, player) {
+      if (player.hp <= 1) {
+        return true
+      }
+      return player.hp < player.storage.oldtishen2 - 1
+    },
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      const next = await player.recover(player.storage.oldtishen2 - player.hp)
+      await player.draw(next.num)
+    },
+    intro: {
+      mark(dialog, content, player) {
+        if (player.storage.oldtishen) {
+          return
+        }
+        if (typeof player.storage.oldtishen2 != "number") {
+          return "上回合体力：无"
+        }
+        return "上回合体力：" + player.storage.oldtishen2
+      },
+      content: "limited",
+    },
+    group: ["oldtishen2"],
+  },
+  oldtishen2: {
+    trigger: { player: "phaseJieshuBegin" },
+    priority: -10,
+    silent: true,
+    sourceSkill: "oldtishen",
+    async content(event, trigger, player) {
+      player.storage.oldtishen2 = player.hp
+      game.broadcast((pl) => {
+        pl.storage.oldtishen2 = pl.hp
+      }, player)
+      game.addVideo("storage", player, ["oldtishen2", player.storage.oldtishen2])
+    },
+    intro: {
+      content(storage, player) {
+        if (player.storage.oldtishen) {
+          return
+        }
+        return "上回合体力：" + storage
+      },
+    },
   },
 }
 

@@ -228,9 +228,12 @@ const skills = {
 
       while (current != player) {
         if (current.group == "shu") {
-          var next = current.chooseToRespond("是否替" + get.translation(player) + "使用或打出【杀】？", {
-            name: "sha",
-          })
+          var next = current.chooseToRespond(
+            "是否替" + get.translation(player) + "使用或打出【杀】？",
+            {
+              name: "sha",
+            },
+          )
           next.set("ai", function () {
             var event = _status.event
             return get.attitude(event.player, event.source) - 2
@@ -296,8 +299,6 @@ const skills = {
   // 咆哮
   olpaoxiao: {
     audio: "repaoxiao",
-    audioname: ["xiahouba", "re_guanzhang"],
-    audioname2: { guanzhang: "paoxiao_guanzhang", ol_guanzhang: "paoxiao_ol_guanzhang" },
     trigger: { player: "shaMiss" },
     forced: true,
     async content(event, trigger, player) {
@@ -316,8 +317,6 @@ const skills = {
     trigger: { source: "damageBegin1" },
     forced: true,
     audio: "repaoxiao",
-    audioname: ["xiahouba", "re_guanzhang"],
-    audioname2: { guanzhang: "paoxiao_guanzhang", ol_guanzhang: "paoxiao_ol_guanzhang" },
     sourceSkill: "olpaoxiao",
     filter(event, player) {
       return event.card && event.card.name == "sha" && player.countMark("olpaoxiao2") > 0
@@ -327,7 +326,7 @@ const skills = {
       trigger.num += player.countMark("olpaoxiao2")
       player.removeSkill("olpaoxiao2")
     },
-    intro: { content: "本回合内下一次使用【杀】造成伤害时令伤害值+#" },
+    intro: { content: "本回合下一次造成【杀】的伤害时，此伤害+#" },
   },
   // 替身
   retishen: {

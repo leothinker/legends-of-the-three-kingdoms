@@ -11,6 +11,7 @@ const characterSort = {
 
     "old_liubei",
     "old_guanyu",
+    "old_zhangfei",
   ],
 }
 

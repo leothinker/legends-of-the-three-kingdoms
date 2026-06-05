@@ -1054,10 +1054,6 @@ const skills = {
   repaoxiao: {
     audio: 2,
     firstDo: true,
-    audioname2: {
-      old_guanzhang: "old_fuhun",
-    },
-    audioname: ["guanzhang", "xiahouba", "re_guanzhang"],
     trigger: { player: "useCard1" },
     forced: true,
     filter(event, player) {
@@ -1121,9 +1117,7 @@ const skills = {
     async content(event, trigger, player) {
       const list = []
       const he = player.getCards("he")
-      if (he.length) {
-        await player.showCards(he)
-      }
+      await player.showCards(he)
       for (const card of he) {
         if (get.type(card, "trick") == "trick") {
           list.push(card)

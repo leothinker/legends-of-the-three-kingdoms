@@ -159,10 +159,8 @@ step N 返回值 → event._result → 作为第四参数传给 step N+1
 event.setContent(function () {
   "step 0"
   game.delay()
-
   ;("step 1")
   player.draw(2)
-
   ;("step 2")
   player.chooseToUse()
 })

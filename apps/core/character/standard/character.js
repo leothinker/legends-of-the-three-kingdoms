@@ -164,24 +164,6 @@ const characters = {
     hp: 6,
     skills: ["yaowu"],
   },
-  old_yuanshu: {
-    sex: "male",
-    group: "qun",
-    hp: 4,
-    skills: ["wangzun", "tongji"],
-  },
-  caozhang: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["jiangchi"],
-  },
-  re_yiji: {
-    sex: "male",
-    group: "shu",
-    hp: 3,
-    skills: ["jijie", "jiyuan"],
-  },
   gongsunzan: {
     sex: "male",
     group: "qun",

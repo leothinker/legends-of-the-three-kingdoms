@@ -88,12 +88,6 @@ const characters = {
     hp: 3,
     skills: ["rejizhi", "reqicai"],
   },
-  xushu: {
-    sex: "male",
-    group: "shu",
-    hp: 4,
-    skills: ["zhuhai", "qianxin"],
-  },
   re_sunquan: {
     sex: "male",
     group: "wu",
@@ -175,6 +169,18 @@ const characters = {
     group: "qun",
     hp: 4,
     skills: ["qiaomeng", "yicong"],
+  },
+  caozhang: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["jiangchi"],
+  },
+  re_yiji: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["jijie", "jiyuan"],
   },
 }
 

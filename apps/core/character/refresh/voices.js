@@ -77,14 +77,6 @@ export default {
   "#reqicai2": "吾之才学，不逊先生分毫。",
   "#re_huangyueying:die": "我的面容，有吓到你吗？",
 
-  "#zhuhai1": "早知今日，何必当初！",
-  "#zhuhai2": "善恶有报，天道轮回！",
-  "#qianxin1": "弃武从文，安邦卫国！",
-  "#qianxin2": "既遇明主，天下可图！",
-  "#jianyan1": "如此如此，敌军自破！",
-  "#jianyan2": "开言纳谏，社稷之福！",
-  "#xushu:die": "母亲……孩儿……尽孝来了。",
-
   "#rezhiheng1": "不急不躁，稳谋应对。",
   "#rezhiheng2": "制衡互牵，大局可安。",
   "#rejiuyuan1": "你们真是朕的得力干将。",
@@ -162,4 +154,14 @@ export default {
   "#yicong_re_gongsunzan1": "列阵锋矢，直取要害。",
   "#yicong_re_gongsunzan2": "变阵冲轭，以守代攻。",
   "#re_gongsunzan:die": "皇图霸业梦，付之，一炬中……",
+
+  "#jiangchi1": "谨遵父训，不可逞匹夫之勇。",
+  "#jiangchi2": "吾定当身先士卒，振魏武雄风！",
+  "#caozhang:die": "子桓，你害我。",
+
+  "#jijie1": "一拜一起，未足为劳。",
+  "#jijie2": "识言观行，方能雍容风议。",
+  "#jiyuan1": "公若辞，必遭蔡瑁之害矣。",
+  "#jiyuan2": "形势危急，还请速行。",
+  "#re_yiji:die": "未能，救得刘公脱险……",
 }

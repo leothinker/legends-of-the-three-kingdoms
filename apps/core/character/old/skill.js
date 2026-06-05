@@ -827,6 +827,224 @@ const skills = {
       },
     },
   },
+  // 徐庶
+  // 诛害
+  zhuhai: {
+    audio: 2,
+    trigger: { global: "phaseJieshuBegin" },
+    direct: true,
+    filter(event, player) {
+      return (
+        event.player.isIn() &&
+        event.player.getStat("damage") &&
+        lib.filter.targetEnabled({ name: "sha" }, player, event.player) &&
+        (player.hasSha() || (_status.connectMode && player.countCards("h") > 0))
+      )
+    },
+    clearTime: true,
+    async content(event, trigger, player) {
+      await player
+        .chooseToUse(
+          function (card, player, event) {
+            if (get.name(card) != "sha") {
+              return false
+            }
+            return lib.filter.filterCard.apply(this, arguments)
+          },
+          "诛害：是否对" + get.translation(trigger.player) + "使用一张【杀】？",
+        )
+        .set("logSkill", "zhuhai")
+        .set("complexSelect", true)
+        .set("complexTarget", true)
+        .set("filterTarget", function (card, player, target) {
+          if (
+            target != _status.event.sourcex &&
+            !ui.selected.targets.includes(_status.event.sourcex)
+          ) {
+            return false
+          }
+          return lib.filter.targetEnabled.apply(this, arguments)
+        })
+        .set("sourcex", trigger.player)
+    },
+  },
+  // 潜心
+  qianxin: {
+    skillAnimation: true,
+    animationColor: "orange",
+    audio: 2,
+    juexingji: true,
+    trigger: { source: "damageSource" },
+    forced: true,
+    derivation: "jianyan",
+    filter(event, player) {
+      return player.hp < player.maxHp
+    },
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      await player.addSkills("jianyan")
+      await player.loseMaxHp()
+    },
+  },
+  // 荐言
+  jianyan: {
+    audio: 2,
+    enable: "phaseUse",
+    usable: 1,
+    delay: false,
+    filter(event, player) {
+      return game.hasPlayer(function (current) {
+        return current.hasSex("male")
+      })
+    },
+    async content(event, trigger, player) {
+      let result
+
+      // step 0
+      result = await player
+        .chooseControl(["red", "black", "basic", "trick", "equip"])
+        .set("ai", function () {
+          var player = _status.event.player
+          if (!player.hasShan()) {
+            return "basic"
+          }
+          if (player.countCards("e") <= 1) {
+            return "equip"
+          }
+          if (player.countCards("h") > 2) {
+            return "trick"
+          }
+          return "red"
+        })
+        .forResult()
+
+      // step 1
+      const discards = []
+      while (ui.cardPile.hasChildNodes()) {
+        const next = get.cards()[0]
+        if (get.color(next) == result.control || get.type(next, "trick") == result.control) {
+          event.card = next
+          break
+        }
+        discards.push(next)
+        await player.showCards([next])
+      }
+      if (!event.card) {
+        return
+      }
+      await player.showCards([event.card])
+
+      // step 2
+      result = await player
+        .chooseTarget(
+          true,
+          "选择一名男性角色获得" + get.translation(event.card),
+          function (card, player, target) {
+            return target.hasSex("male")
+          },
+        )
+        .set("ai", function (target) {
+          var att = get.attitude(_status.event.player, target)
+          if (_status.event.neg) {
+            return -att
+          }
+          return att
+        })
+        .set("neg", get.value(event.card, player, "raw") < 0)
+        .forResult()
+
+      // step 3
+      player.line(result.targets, "green")
+      await result.targets[0].gain(event.card, "gain2")
+      await game.cardsDiscard(discards)
+    },
+    ai: {
+      order: 9,
+      result: {
+        player(player) {
+          if (
+            game.hasPlayer(function (current) {
+              return current.hasSex("male") && get.attitude(player, current) > 0
+            })
+          ) {
+            return 2
+          }
+          return 0
+        },
+      },
+      threaten: 1.2,
+    },
+  },
+  // 袁术
+  // 妄尊
+  wangzun: {
+    trigger: { global: "phaseZhunbeiBegin" },
+    audio: 2,
+    filter(event, player) {
+      return event.player.isZhu
+    },
+    logTarget: "player",
+    async content(event, trigger, player) {
+      player.draw()
+      const target = trigger.player
+      target.addTempSkill("wangzun2")
+      target.addMark("wangzun2", 1, false)
+    },
+  },
+  wangzun2: {
+    onremove: true,
+    mod: {
+      maxHandcard(player, num) {
+        return num - player.countMark("wangzun2")
+      },
+    },
+    intro: { content: "手牌上限-#" },
+  },
+  // 同疾
+  tongji: {
+    global: "tongji_disable",
+    audio: 2,
+    trigger: { global: "useCard1" },
+    forced: true,
+    filter(event, player) {
+      return (
+        event.targets.includes(player) &&
+        player != event.player &&
+        event.card.name == "sha" &&
+        player.hp < player.countCards("h")
+      )
+    },
+    content() {},
+    ai: { neg: true },
+    gainable: true,
+    subSkill: {
+      disable: {
+        mod: {
+          targetEnabled(card, player, target) {
+            if (card.name == "sha") {
+              if (player.hasSkill("tongji")) {
+                return
+              }
+              if (target.hasSkill("tongji")) {
+                return
+              }
+              if (
+                game.hasPlayer(function (current) {
+                  return (
+                    current.hasSkill("tongji") &&
+                    current.hp < current.countCards("h") &&
+                    player.inRange(current)
+                  )
+                })
+              ) {
+                return false
+              }
+            }
+          },
+        },
+      },
+    },
+  },
 }
 
 export default skills

@@ -158,24 +158,6 @@ const translates = {
   yaowu: "耀武",
   yaowu_info: "锁定技，当你受到红色【杀】造成的伤害时，伤害来源回复1点体力或摸一张牌。",
 
-  old_yuanshu: "袁术",
-  wangzun: "妄尊",
-  wangzun2: "妄尊",
-  wangzun_info: "主公的准备阶段，你可以摸一张牌，然后主公本回合手牌上限-1。",
-  tongji: "同疾",
-  tongji_info: "锁定技，若你的手牌数大于体力值，攻击范围含有你的角色使用【杀】只能以你为目标。",
-
-  caozhang: "曹彰",
-  jiangchi: "将驰",
-  jiangchi_info:
-    "摸牌阶段结束时，你可以选择一项：1.摸一张牌，本回合不能使用或打出【杀】；2.弃置一张牌，本回合使用【杀】无距离限制且可以多使用一张【杀】。",
-
-  re_yiji: "伊籍",
-  jijie: "机捷",
-  jijie_info: "出牌阶段限一次，你可以观看牌堆底的一张牌，然后将之交给一名角色。",
-  jiyuan: "急援",
-  jiyuan_info: "当一名角色进入濒死状态或你交给一名其他角色牌时，你可以令该角色摸一张牌。",
-
   gongsunzan: "公孙瓒",
   yicong: "义从",
   yicong_info:

@@ -29,10 +29,7 @@ export default {
   diaochan: "绝世的舞姬",
 
   huaxiong: "飞扬跋扈",
-  old_yuanshu: "野心渐增",
 
-  caozhang: "黄须儿",
-  re_yiji: "礼仁同渡",
   gongsunzan: "白马将军",
 
   yuejin: "奋强突固",

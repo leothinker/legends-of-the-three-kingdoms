@@ -1161,8 +1161,7 @@ const skills = {
   // 观星
   reguanxing: {
     audio: 2,
-    audioname: ["jiangwei", "re_jiangwei", "ol_jiangwei"],
-    audioname2: { gexuan: "guanxing_gexuan" },
+    audioname: ["re_jiangwei"],
     trigger: { player: ["phaseZhunbeiBegin", "phaseJieshuBegin"] },
     frequent: true,
     filter(event, player, name) {
@@ -1201,7 +1200,7 @@ const skills = {
       await player.showCards(event.card)
       event.same = get.type2(event.card) == get.type2(trigger.card)
       const result = await player
-        .chooseTarget(`涯角：令一名角色获得${get.translation(event.card)}`, true)
+        .chooseTarget(`涯角：将${get.translation(event.card)}交给一名角色`, true)
         .set("ai", (target) => {
           const { player, du, same } = get.event()
           let att = get.attitude(player, target)
@@ -1244,7 +1243,6 @@ const skills = {
   // 铁骑
   retieji: {
     audio: 2,
-    audioname: ["boss_lvbu3", "tw_dm_quyi"],
     trigger: { player: "useCardToPlayered" },
     check(event, player) {
       return get.attitude(player, event.target) <= 0
@@ -1270,7 +1268,7 @@ const skills = {
       const num = target.countCards("h", "shan")
       result = await target
         .chooseToDiscard(
-          "请弃置一张" + get.translation(suit) + "牌，否则不能使用闪抵消此杀",
+          "弃置一张" + get.translation(suit) + "牌，否则不能使用【闪】响应此【杀】",
           "he",
           function (card) {
             return get.suit(card) == _status.event.suit

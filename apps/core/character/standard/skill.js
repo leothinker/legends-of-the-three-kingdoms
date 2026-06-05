@@ -1020,7 +1020,7 @@ const skills = {
   guanxing_fail: {},
   guanxing: {
     audio: 2,
-    audioname: ["jiangwei", "re_jiangwei", "re_zhugeliang", "ol_jiangwei"],
+    audioname: ["jiangwei"],
     trigger: { player: "phaseZhunbeiBegin" },
     frequent: true,
     preHidden: true,
@@ -1091,7 +1091,7 @@ const skills = {
   // 龙胆
   longdan: {
     audio: 2,
-    audioname2: { re_zhaoyun: "relongdan" },
+    audioname2: { re_zhaoyun: "relongdan", old_zhaoyun: "relongdan" },
     group: ["longdan_sha", "longdan_shan", "longdan_draw"],
     subSkill: {
       draw: {
@@ -1111,7 +1111,7 @@ const skills = {
       },
       sha: {
         audio: "longdan",
-        audioname2: { re_zhaoyun: "relongdan" },
+        audioname2: { re_zhaoyun: "relongdan", old_zhaoyun: "relongdan" },
         enable: ["chooseToUse", "chooseToRespond"],
         filterCard: { name: "shan" },
         viewAs: { name: "sha" },
@@ -1148,7 +1148,7 @@ const skills = {
       },
       shan: {
         audio: "longdan",
-        audioname2: { re_zhaoyun: "relongdan" },
+        audioname2: { re_zhaoyun: "relongdan", old_zhaoyun: "relongdan" },
         enable: ["chooseToRespond", "chooseToUse"],
         filterCard: { name: "sha" },
         viewAs: { name: "shan" },

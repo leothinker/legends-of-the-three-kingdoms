@@ -594,6 +594,115 @@ const skills = {
       },
     },
   },
+  // 界赵云
+  // 涯角
+  oldyajiao: {
+    audio: "yajiao",
+    trigger: { player: ["respond", "useCard"] },
+    frequent: true,
+    filter(event, player) {
+      return player != _status.currentPhase && get.itemtype(event.cards) == "cards"
+    },
+    async content(event, trigger, player) {
+      let result
+
+      // step 0
+      event.card = get.cards()[0]
+      game.broadcast(function (card) {
+        ui.arena.classList.add("thrownhighlight")
+        card.copy("thrown", "center", "thrownhighlight", ui.arena).addTempClass("start")
+      }, event.card)
+      event.node = event.card
+        .copy("thrown", "center", "thrownhighlight", ui.arena)
+        .addTempClass("start")
+      ui.arena.classList.add("thrownhighlight")
+      game.addVideo("thrownhighlight1")
+      game.addVideo("centernode", null, get.cardInfo(event.card))
+
+      if (get.type(event.card, "trick") == get.type(trigger.card, "trick")) {
+        result = await player
+          .chooseTarget("选择获得此牌的角色")
+          .set("ai", function (target) {
+            var att = get.attitude(_status.event.player, target)
+            if (_status.event.du) {
+              if (target.hasSkillTag("nodu")) {
+                return 0
+              }
+              return -att
+            }
+            if (att > 0) {
+              return att + Math.max(0, 5 - target.countCards("h"))
+            }
+            return att
+          })
+          .set("du", event.card.name == "du")
+          .forResult()
+      } else {
+        result = await player
+          .chooseBool("是否弃置" + get.translation(event.card) + "？")
+          .forResult()
+        event.disbool = true
+      }
+
+      await game.delay(2)
+
+      // step 1
+      if (event.disbool) {
+        if (!result.bool) {
+          game.log(player, "展示了", event.card)
+          ui.cardPile.insertBefore(event.card, ui.cardPile.firstChild)
+        } else {
+          game.log(player, "展示并弃掉了", event.card)
+          await event.card.discard()
+        }
+        game.addVideo("deletenode", player, [get.cardInfo(event.node)])
+        event.node.delete()
+        game.broadcast(function (card) {
+          ui.arena.classList.remove("thrownhighlight")
+          if (card.clone) {
+            card.clone.delete()
+          }
+        }, event.card)
+      } else if (result.targets) {
+        player.line(result.targets, "green")
+        await result.targets[0].gain(event.card, "log")
+        event.node.moveDelete(result.targets[0])
+        game.addVideo("gain2", result.targets[0], [get.cardInfo(event.node)])
+        game.broadcast(
+          function (card, target) {
+            ui.arena.classList.remove("thrownhighlight")
+            if (card.clone) {
+              card.clone.moveDelete(target)
+            }
+          },
+          event.card,
+          result.targets[0],
+        )
+      } else {
+        game.log(player, "展示了", event.card)
+        ui.cardPile.insertBefore(event.card, ui.cardPile.firstChild)
+        game.addVideo("deletenode", player, [get.cardInfo(event.node)])
+        event.node.delete()
+        game.broadcast(function (card) {
+          ui.arena.classList.remove("thrownhighlight")
+          if (card.clone) {
+            card.clone.delete()
+          }
+        }, event.card)
+      }
+      game.addVideo("thrownhighlight2")
+      ui.arena.classList.remove("thrownhighlight")
+    },
+    ai: {
+      effect: {
+        target(card, player, target) {
+          if (get.tag(card, "respond") && target.countCards("h") > 1) {
+            return [1, 0.2]
+          }
+        },
+      },
+    },
+  },
 }
 
 export default skills

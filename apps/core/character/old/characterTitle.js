@@ -9,4 +9,5 @@ export default {
   old_liubei: "乱世的枭雄",
   old_guanyu: "美髯公",
   old_zhangfei: "万夫不当",
+  old_zhaoyun: "虎威将军",
 }

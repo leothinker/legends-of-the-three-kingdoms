@@ -55,6 +55,12 @@ const translates = {
   oldtishen2: "替身",
   oldtishen_info:
     "限定技，准备阶段，你可以将体力回复至等同于你上回合结束后的体力，然后摸X张牌（X为你本次回复的体力值）。",
+
+  old_zhaoyun: "界赵云",
+  old_zhaoyun_prefix: "界",
+  oldyajiao: "涯角",
+  oldyajiao_info:
+    "当你于回合外使用或打出手牌时，你可以展示牌堆顶的一张牌。若这两张牌的类别：相同，你可以将此牌交给一名角色；不同，你可以将此牌置入弃牌堆。",
 }
 
 export default translates

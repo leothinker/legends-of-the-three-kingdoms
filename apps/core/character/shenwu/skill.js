@@ -562,7 +562,7 @@ const skills = {
           const { type, videoId, highlightRemove } = evt
           if (get.type2(card) == type) {
             const result = await player
-              .chooseTarget("涯角：选择获得此牌的角色")
+              .chooseTarget("涯角：将此牌交给一名角色")
               .set("ai", function (target) {
                 var att = get.attitude(_status.event.player, target)
                 if (_status.event.du) {

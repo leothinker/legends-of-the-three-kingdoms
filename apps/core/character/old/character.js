@@ -72,6 +72,14 @@ const characters = {
     img: "image/character/re_zhangfei.jpg",
     dieAudios: ["re_zhangfei"],
   },
+  old_zhaoyun: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["longdan", "oldyajiao"],
+    img: "image/character/re_zhaoyun.jpg",
+    dieAudios: ["re_zhaoyun"],
+  },
 }
 
 export default characters

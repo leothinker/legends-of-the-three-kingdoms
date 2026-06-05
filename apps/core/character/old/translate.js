@@ -61,6 +61,14 @@ const translates = {
   oldyajiao: "涯角",
   oldyajiao_info:
     "当你于回合外使用或打出手牌时，你可以展示牌堆顶的一张牌。若这两张牌的类别：相同，你可以将此牌交给一名角色；不同，你可以将此牌置入弃牌堆。",
+
+  old_huangyueying: "界黄月英",
+  old_huangyueying_prefix: "界",
+  oldjizhi: "集智",
+  oldjizhi_info:
+    "当你使用非转化的锦囊牌时，你可以展示牌堆顶的一张牌，若此牌：为基本牌，你将之置入弃牌堆或将一张手牌与之交换；不为基本牌，你获得之。",
+  oldqicai: "奇才",
+  oldqicai_info: "锁定技，你使用锦囊牌无距离限制；其他角色不能弃置你装备区里除坐骑牌外的牌。",
 }
 
 export default translates

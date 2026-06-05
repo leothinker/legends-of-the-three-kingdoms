@@ -1322,11 +1322,6 @@ const skills = {
   // 集智
   rejizhi: {
     audio: 2,
-    audioname2: {
-      lukang: "rejizhi_lukang",
-      zj_lukang: "rejizhi_lukang",
-      new_simayi: "rejizhi_new_simayi",
-    },
     locked: false,
     trigger: { player: "useCard" },
     frequent: true,
@@ -1344,7 +1339,7 @@ const skills = {
       }
 
       const result2 = await player
-        .chooseBool(`是否弃置${get.translation(event.card)}并令本回合手牌上限+1？`)
+        .chooseBool(`是否弃置${get.translation(event.card)}，然后本回合手牌上限+1？`)
         .set(
           "ai",
           (evt, player) =>

@@ -639,12 +639,12 @@ const skills = {
     },
     async content(event, trigger, player) {
       await player.draw("nodelay")
-      if (!player.hasCard({ type: "basic" }, "h")) {
+      if (!player.hasCard({ type: "basic" }, "he")) {
         return
       }
 
       const result = await player
-        .chooseToDiscard("是否弃置一张基本牌并令本回合你的手牌上限+1？", { type: "basic" })
+        .chooseToDiscard(`是否弃置一张基本牌，若如此做，本回合你的手牌上限+1？`, { type: "basic" })
         .set("ai", (card) => {
           if (_status.currentPhase === player && player.needsToDiscard(-3)) {
             return 6 - get.value(card, player)

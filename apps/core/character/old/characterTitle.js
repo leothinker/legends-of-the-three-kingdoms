@@ -10,4 +10,5 @@ export default {
   old_guanyu: "美髯公",
   old_zhangfei: "万夫不当",
   old_zhaoyun: "虎威将军",
+  old_huangyueying: "归隐的杰女",
 }

@@ -80,6 +80,14 @@ const characters = {
     img: "image/character/re_zhaoyun.jpg",
     dieAudios: ["re_zhaoyun"],
   },
+  old_huangyueying: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["oldjizhi", "oldqicai"],
+    img: "image/character/re_huangyueying.jpg",
+    dieAudios: ["re_huangyueying"],
+  },
 }
 
 export default characters

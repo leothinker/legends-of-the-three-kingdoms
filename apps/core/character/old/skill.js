@@ -445,8 +445,67 @@ const skills = {
   // 仁德
   oldrende: {
     audio: "rerende",
+    enable: "phaseUse",
     usable: 1,
-    inherit: "rende",
+    filter(event, player) {
+      return player.countCards("h") > 0
+    },
+    filterTarget: lib.filter.notMe,
+    filterCard: true,
+    selectCard: [1, Infinity],
+    allowChooseAll: true,
+    position: "h",
+    discard: false,
+    lose: false,
+    delay: false,
+    async content(event, trigger, player) {
+      const { cards, target, targets } = event
+      const assignedTargets = targets.slice(0)
+      let result
+
+      event.num = cards.length
+      event.targets = assignedTargets
+
+      await player.give(cards, target)
+      if (event.num > 1) {
+        await player.recover()
+      }
+
+      while (
+        player.countCards("h") > 0 &&
+        game.hasPlayer((current) => current != player && !assignedTargets.includes(current))
+      ) {
+        result = await player
+          .chooseCardTarget({
+            prompt: "是否继续将任意张手牌交给其他角色",
+            prompt2: "操作提示：请先选择任意张手牌，然后再选择一名其他角色。",
+            filterCard: true,
+            selectCard: [1, Infinity],
+            filterTarget(card, player, target) {
+              return target != player && !assignedTargets.includes(target)
+            },
+          })
+          .forResult()
+
+        if (!result.bool) {
+          break
+        }
+
+        const currentTarget = result.targets[0]
+        const selectedCards = result.cards
+
+        player.line(currentTarget, "green")
+        await player.give(selectedCards, currentTarget)
+        assignedTargets.push(currentTarget)
+
+        const prevNum = event.num
+        event.num += selectedCards.length
+
+        if (prevNum < 2 && event.num > 1) {
+          await player.recover()
+        }
+      }
+    },
   },
   // 界关羽
   // 义绝
@@ -700,6 +759,71 @@ const skills = {
             return [1, 0.2]
           }
         },
+      },
+    },
+  },
+  // 界黄月英
+  // 集智
+  oldjizhi: {
+    audio: "rejizhi",
+    trigger: { player: "useCard" },
+    frequent: true,
+    filter(event, player) {
+      return get.type(event.card, "trick") == "trick" && event.card.isCard
+    },
+    async content(event, trigger, player) {
+      let result
+
+      // step 0
+      const card = get.cards()[0]
+      await game.cardsGotoOrdering(card)
+      await player.showCards(card, get.translation(player) + "发动了【集智】")
+
+      if (get.type(card) !== "basic") {
+        await player.gain(card, "gain2")
+        return
+      }
+      if (!player.countCards("h")) {
+        return
+      }
+
+      // step 1
+      result = await player
+        .chooseCard(
+          "h",
+          "是否将一张手牌与" + get.translation(card) + "交换？",
+          "若选择「取消」，则将" + get.translation(card) + "置入弃牌堆。",
+        )
+        .forResult()
+
+      // step 2
+      if (result.bool && result.cards?.length) {
+        const handcard = result.cards[0]
+        player.$throw(handcard, 1000)
+        game.log(player, "将", handcard, "置于牌堆顶")
+        await player.lose(handcard, ui.cardPile, "visible", "insert")
+        await player.gain(card, "gain2")
+      }
+    },
+  },
+  // 奇才
+  oldqicai: {
+    audio: "reqicai",
+    mod: {
+      targetInRange(card, player, target, now) {
+        var type = get.type(card)
+        if (type == "trick" || type == "delay") {
+          return true
+        }
+      },
+      canBeDiscarded(card, player, target) {
+        if (
+          get.position(card) == "e" &&
+          !get.subtypes(card).some((subtype) => ["equip3", "equip4", "equip6"].includes(subtype)) &&
+          player != target
+        ) {
+          return false
+        }
       },
     },
   },

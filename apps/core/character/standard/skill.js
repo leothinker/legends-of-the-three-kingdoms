@@ -1241,10 +1241,6 @@ const skills = {
   // 集智
   jizhi: {
     audio: 2,
-    audioname: ["jianyong"],
-    audioname2: {
-      xin_simayi: "jilue_jizhi",
-    },
     trigger: { player: "useCard" },
     frequent: true,
     preHidden: true,

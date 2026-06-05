@@ -1,5 +1,5 @@
 const characterSort = {
-  old_standard: [],
+  old_standard: ["old_liubei", "old_huangyueying"],
   old_shenhua: [],
   old_refresh: [
     "old_caocao",
@@ -9,7 +9,6 @@ const characterSort = {
     "old_guojia",
     "lidian",
 
-    "old_liubei",
     "old_guanyu",
     "old_zhangfei",
     "old_zhaoyun",

@@ -1519,16 +1519,16 @@ const skills = {
   rejiuyuan: {
     audio: 2,
     zhuSkill: true,
-    trigger: { global: "taoBegin" },
+    trigger: { global: "useCard" },
     direct: true,
     filter(event, player) {
       return (
         player != event.player &&
         event.player.group == "wu" &&
-        player.hp < event.player.hp &&
-        event.getParent().name != "rejiuyuan" &&
-        player.hasZhuSkill("rejiuyuan", event.player) &&
-        event.player === event.target
+        event.player.hp > player.hp &&
+        get.name(event.card) == "tao" &&
+        event.targets.includes(event.player) &&
+        player.hasZhuSkill("rejiuyuan", event.player)
       )
     },
     async content(event, trigger, player) {
@@ -1558,7 +1558,6 @@ const skills = {
   // 奋威
   fenwei: {
     audio: 2,
-    audioname2: { heqi: "fenwei_heqi" },
     limited: true,
     trigger: { global: "useCardToPlayered" },
     filter(event, player) {
@@ -1580,7 +1579,7 @@ const skills = {
       event.result = await player
         .chooseTarget(
           get.prompt(event.skill),
-          `令${get.translation(trigger.card)}对任意名角色无效`,
+          `令${get.translation(trigger.card)}对其中任意个目标无效`,
           [1, trigger.targets.length],
           (card, player, target) => {
             return get.event().targets.includes(target)
@@ -2545,6 +2544,20 @@ const skills = {
         player.draw()
         player.addTempSkill("jiangchi3", "phaseEnd")
       }
+    },
+  },
+  jiangchi2: {
+    mod: {
+      targetInRange(card, player, target, now) {
+        if (card.name == "sha") {
+          return true
+        }
+      },
+      cardUsable(card, player, num) {
+        if (card.name == "sha") {
+          return num + 1
+        }
+      },
     },
   },
   jiangchi3: {

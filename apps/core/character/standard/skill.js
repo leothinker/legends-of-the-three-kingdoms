@@ -1269,10 +1269,6 @@ const skills = {
   // 制衡
   zhiheng: {
     audio: 2,
-    audioname: ["gz_jun_sunquan"],
-    audioname2: {
-      xin_simayi: "jilue_zhiheng",
-    },
     mod: {
       aiOrder(player, card, num) {
         if (num <= 0 || get.itemtype(card) !== "card" || get.type(card) !== "equip") {
@@ -1340,7 +1336,6 @@ const skills = {
   qixi: {
     audio: 2,
     audioname: ["re_ganning"],
-    audioname2: { re_heqi: "duanbing_heqi" },
     enable: "chooseToUse",
     filterCard(card) {
       return get.color(card) == "black"
@@ -1361,7 +1356,7 @@ const skills = {
   // 克己
   keji: {
     audio: 2,
-    audioname: ["re_lvmeng", "sp_lvmeng"],
+    audioname: ["re_lvmeng"],
     audioname2: { ol_lvmeng: "keji_re_lvmeng" },
     trigger: { player: "phaseDiscardBefore" },
     frequent(event, player) {

@@ -17,15 +17,6 @@ export default () => {
       if (!lib.storage.stage) {
         lib.storage.stage = {}
       }
-      if (!_status.extensionmade) {
-        _status.extensionmade = []
-      }
-      if (_status.extensionscene) {
-        game.save("scene", lib.storage.scene)
-      }
-      if (_status.extensionstage) {
-        game.save("stage", lib.storage.stage)
-      }
       var dialog = ui.create.dialog("hidden")
       dialog.classList.add("fixed")
       dialog.classList.add("scroll1")
@@ -4571,7 +4562,7 @@ export default () => {
           var list = [
             ["re_sp_zhugeliang", "yujin_yujin", "re_zhangliao", "re_lusu"],
             ["re_huangzhong", "re_xiahouyuan", "zhanghe", "xin_fazheng"],
-            ["re_caocao", "xin_yuanshao", "guotufengji", "re_guojia"],
+            ["re_caocao", "re_yuanshao", "guotufengji", "re_guojia"],
             ["chunyuqiong", "sp_xuyou", "re_xuhuang", "gaolan"],
             ["re_sp_zhugeliang", "re_zhangzhang", "guyong", "re_lusu"],
             ["yj_jushou", "re_caocao", "jsp_guanyu", "re_yanwen"],
@@ -4724,7 +4715,7 @@ export default () => {
               {
                 name: "官渡追击战",
                 place: [false, true, true, false],
-                character: ["re_caocao", "xin_yuanshao", "guotufengji", "re_guojia"],
+                character: ["re_caocao", "re_yuanshao", "guotufengji", "re_guojia"],
                 lib: {
                   character: {
                     re_caocao: {
@@ -4756,7 +4747,7 @@ export default () => {
                   },
                   translate: {
                     re_caocao: "官渡曹操",
-                    xin_yuanshao: "官渡袁绍",
+                    re_yuanshao: "官渡袁绍",
                     guotufengji: "袁军智囊",
                     re_guojia: "官渡郭嘉",
                   },
@@ -5183,58 +5174,14 @@ export default () => {
                 _status.sceneToLoad = scene
                 game.switchScene()
               })
-              if (_status.extensionmade.includes(name)) {
-                ui.create.node(
-                  "button",
-                  "管理扩展",
-                  this,
-                  function () {
-                    ui.click.configMenu()
-                    ui.click.extensionTab(name)
-                  },
-                  { marginLeft: "6px" },
-                )
-              } else {
-                ui.create.node(
-                  "button",
-                  "删除场景",
-                  this,
-                  function () {
-                    if (confirm("确定删除" + name + "？")) {
-                      game.removeScene(name)
-                    }
-                  },
-                  { marginLeft: "6px" },
-                )
-              }
               ui.create.node(
                 "button",
-                "导出扩展",
+                "删除场景",
                 this,
                 function () {
-                  var str =
-                    '{name:"' +
-                    name +
-                    '",content:function(){\nif(lib.config.mode=="brawl"){\n' +
-                    "if(!lib.storage.scene) lib.storage.scene={};\n" +
-                    'if(!lib.storage.scene["' +
-                    name +
-                    '"]){\nlib.storage.scene["' +
-                    name +
-                    '"]=' +
-                    get.stringify(scene) +
-                    ";\n_status.extensionscene=true;}\n" +
-                    "if(!_status.extensionmade) _status.extensionmade=[];\n" +
-                    '_status.extensionmade.push("' +
-                    name +
-                    '");\n}}\n}'
-                  var extension = {
-                    "extension.js":
-                      'game.import("extension",function(lib,game,ui,get,ai,_status){return ' +
-                      str +
-                      "})",
+                  if (confirm("确定删除" + name + "？")) {
+                    game.removeScene(name)
                   }
-                  game.importExtension(extension, null, name)
                 },
                 { marginLeft: "6px" },
               )
@@ -6315,61 +6262,14 @@ export default () => {
                 var rect2 = line2.getBoundingClientRect()
                 line2.style.height = rect1.height - (rect2.top - rect1.top) + "px"
               }, 1000)
-              if (_status.extensionmade.includes(name)) {
-                ui.create.node(
-                  "button",
-                  "管理扩展",
-                  line1,
-                  function () {
-                    ui.click.configMenu()
-                    ui.click.extensionTab(name)
-                  },
-                  { marginLeft: "6px" },
-                )
-              } else {
-                ui.create.node(
-                  "button",
-                  "删除关卡",
-                  line1,
-                  function () {
-                    if (confirm("确定删除" + name + "？")) {
-                      game.removeStage(name)
-                    }
-                  },
-                  { marginLeft: "6px" },
-                )
-              }
               ui.create.node(
                 "button",
-                "导出扩展",
+                "删除关卡",
                 line1,
                 function () {
-                  var level = stage.level
-                  stage.level = 0
-                  var str =
-                    '{name:"' +
-                    name +
-                    '",content:function(){\nif(lib.config.mode=="brawl"){\n' +
-                    "if(!lib.storage.stage) lib.storage.stage={};\n" +
-                    'if(!lib.storage.stage["' +
-                    name +
-                    '"]){\nlib.storage.stage["' +
-                    name +
-                    '"]=' +
-                    get.stringify(stage) +
-                    ";\n_status.extensionstage=true;}\n" +
-                    "if(!_status.extensionmade) _status.extensionmade=[];\n" +
-                    '_status.extensionmade.push("' +
-                    name +
-                    '");\n}}\n}'
-                  stage.level = level
-                  var extension = {
-                    "extension.js":
-                      'game.import("extension",function(lib,game,ui,get,ai,_status){return ' +
-                      str +
-                      "})",
+                  if (confirm("确定删除" + name + "？")) {
+                    game.removeStage(name)
                   }
-                  game.importExtension(extension, null, name)
                 },
                 { marginLeft: "6px" },
               )

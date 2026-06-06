@@ -1057,8 +1057,6 @@ export class Game {
       uiBackground.setBackgroundImage(background)
     } else if (background.startsWith("db:")) {
       uiBackground.setBackgroundDB(background.slice(3))
-    } else if (background.startsWith("ext:")) {
-      uiBackground.setBackgroundImage(`extension/${background.slice(4)}`)
     } else if (background == "default") {
       uiBackground.addTempClass("start")
       style.backgroundImage = "none"
@@ -2579,8 +2577,6 @@ export class Game {
     let parsedPath = ""
     if (["blob:", "data:"].some((prefix) => path.startsWith(prefix))) {
       parsedPath = path
-    } else if (path.startsWith("ext:")) {
-      parsedPath = path.replace(/^ext:/, "extension/")
     } else if (path.startsWith("db:")) {
       parsedPath = path.replace(/^(db:[^:]*)\//, (_, p) => p + ":")
     } else {
@@ -2929,8 +2925,6 @@ export class Game {
         ui.backgroundMusic.src = aozhan
       } else if (aozhan.startsWith("db:")) {
         game.getDB("image", aozhan.slice(3)).then((result) => (ui.backgroundMusic.src = result))
-      } else if (aozhan.startsWith("ext:")) {
-        ui.backgroundMusic.src = `${lib.assetURL}extension/${aozhan.slice(4)}`
       } else {
         ui.backgroundMusic.src = `${lib.assetURL}audio/background/aozhan_${aozhan}.mp3`
       }
@@ -2959,8 +2953,6 @@ export class Game {
       ui.backgroundMusic.src = music
     } else if (music.startsWith("db:")) {
       game.getDB("image", music.slice(3)).then((result) => (ui.backgroundMusic.src = result))
-    } else if (music.startsWith("ext:")) {
-      ui.backgroundMusic.src = `${lib.assetURL}extension/${music.slice(4)}`
     } else {
       ui.backgroundMusic.src = `${lib.assetURL}audio/background/${music}.mp3`
     }
@@ -3021,19 +3013,6 @@ export class Game {
    */
   /**
    * @overload
-   * @param { 'extension' } type
-   * @param {(
-   * 	lib: InstanceType<typeof import('../library/index.js').Library>,
-   * 	game: InstanceType<typeof Game>,
-   * 	ui: InstanceType<typeof import('../ui/index.js').UI>,
-   * 	get: InstanceType<typeof import('../get/index.js').Get>,
-   * 	ai: InstanceType<typeof import('../ai/index.js').AI>,
-   * _status: InstanceType<typeof import('../status/index.js').status>
-   * ) => importExtensionConfig } content
-   * @param {*} [url]
-   */
-  /**
-   * @overload
    * @param { 'play' } type
    * @param {(
    * 	lib: InstanceType<typeof import('../library/index.js').Library>,
@@ -3046,247 +3025,35 @@ export class Game {
    * @param {*} [url]
    */
   import(type, content, url) {
-    if (type == "extension") {
-      const promise = game.loadExtension(content).then((name) => {
-        if (typeof _status.extensionLoaded == "undefined") {
-          _status.extensionLoaded = []
-        }
-        _status.extensionLoaded.add(name)
-        return name
-      })
-      if (typeof _status.extensionLoading == "undefined") {
-        _status.extensionLoading = []
-      }
-      _status.extensionLoading.add(promise)
-      return promise
+    if (!lib.imported[type]) {
+      lib.imported[type] = {}
+    }
+
+    /** @type {Promise<any>} */
+    let promise
+    if (typeof content === "function") {
+      promise = Promise.try(content, lib, game, ui, get, ai, _status)
     } else {
-      if (!lib.imported[type]) {
-        lib.imported[type] = {}
-      }
-
-      /** @type {Promise<any>} */
-      let promise
-      if (typeof content === "function") {
-        promise = Promise.try(content, lib, game, ui, get, ai, _status)
-      } else {
-        // 目前假定content是一个合法的对象
-        promise = Promise.resolve(content)
-      }
-
-      promise = promise.then((result) => {
-        if (result.name) {
-          lib.imported[type][result.name] = result
-        }
-      })
-
-      if (typeof _status.importing == "undefined") {
-        _status.importing = {}
-      }
-      if (!_status.importing[type]) {
-        _status.importing[type] = []
-      }
-
-      _status.importing[type].add(promise)
-
-      return promise
-    }
-  }
-  async loadExtension(object) {
-    let stopImporting = false
-    if (typeof object === "function") {
-      const extensionFilter =
-        object.filter ||
-        function () {
-          return true
-        }
-      if (isClass(object)) {
-        object = (await object.init?.()) ?? new object()
-      } else {
-        object = await object(lib, game, ui, get, ai, _status)
-      }
-      if ((await extensionFilter()) !== true) {
-        stopImporting = true
-      }
-    }
-    const name = object.name,
-      extensionName = `extension_${name}`,
-      extensionMenu = {
-        enable: {
-          name: "开启",
-          init: true,
-        },
-      }
-    object.config ??= {}
-    if (object.package) {
-      const author = Object.getOwnPropertyDescriptor(object.package, "author")
-      if (author) {
-        extensionMenu.author = {
-          get name() {
-            return `作者：${this.author}`
-          },
-          clear: true,
-          nopointer: true,
-        }
-        Object.defineProperty(extensionMenu.author, "author", author)
-      }
-      const intro = Object.getOwnPropertyDescriptor(object.package, "intro")
-      if (intro) {
-        extensionMenu.intro = {
-          clear: true,
-          nopointer: true,
-        }
-        Object.defineProperty(extensionMenu.intro, "name", intro)
-      }
-      if (object.package.translation) {
-        lib.translate[extensionName] = object.package.translation
-      }
-    }
-    const addOptions = (target, source) => {
-      if (source) {
-        const descriptors = Object.fromEntries(
-          Object.keys(source).map((key) => [key, Object.getOwnPropertyDescriptor(source, key)]),
-        )
-        Object.defineProperties(target, descriptors)
-      }
-    }
-    addOptions(extensionMenu, object.config)
-    addOptions(lib.help, object.help)
-
-    if (object.editable !== false && lib.config.show_extensionmaker) {
-      extensionMenu.edit = {
-        name: "编辑此扩展",
-        clear: true,
-        onclick() {
-          if (game.editExtension && lib.extensionPack && lib.extensionPack[name]) {
-            game.editExtension(name)
-          } else {
-            alert("无法编辑未启用的扩展，请启用此扩展并重启后重试")
-          }
-        },
-      }
-    }
-    extensionMenu.delete = {
-      name: "删除此扩展",
-      clear: true,
-      onclick() {
-        if (this.innerHTML != "<span>确认删除</span>") {
-          this.innerHTML = "<span>确认删除</span>"
-          new Promise((resolve) => setTimeout(resolve, 1000)).then(
-            () => (this.innerHTML = "<span>删除此扩展</span>"),
-          )
-          return
-        }
-        const page = this.parentNode,
-          start = page.parentNode.previousSibling
-        page.remove()
-        if (start) {
-          const pageInStart = Array.from(start.childNodes).find(
-            (childNode) => childNode.link == page,
-          )
-          if (pageInStart) {
-            let active = false
-            if (pageInStart.classList.contains("active")) {
-              active = true
-            }
-            pageInStart.remove()
-            if (active) {
-              start.firstChild.classList.add("active")
-              start.nextSibling.appendChild(start.firstChild.link)
-            }
-          }
-        }
-        game.removeExtension(name)
-        if (typeof object.onremove == "function") {
-          object.onremove()
-        }
-      },
+      // 目前假定content是一个合法的对象
+      promise = Promise.resolve(content)
     }
 
-    lib.extensionMenu[extensionName] = extensionMenu
+    promise = promise.then((result) => {
+      if (result.name) {
+        lib.imported[type][result.name] = result
+      }
+    })
 
-    if (_status.importingExtension) {
-      game.importedPack = object
-      return
+    if (typeof _status.importing == "undefined") {
+      _status.importing = {}
     }
-    if (stopImporting || !object || !lib.config[`${extensionName}_enable`]) {
-      return
-    }
-    Object.keys(object.config)
-      .filter((key) => !(`${extensionName}_${key}` in lib.config))
-      .forEach((key) => {
-        const value = object.config[key]
-        if (value && "init" in value) {
-          game.saveConfig(`${extensionName}_${key}`, value.init)
-        }
-      })
-    const config = {}
-    Object.keys(lib.config)
-      .filter((key) => key !== extensionName && key.startsWith(extensionName))
-      .forEach((key) => {
-        const keyName = key.slice(extensionName.length + 1)
-        config[keyName] = lib.config[key]
-      })
-    try {
-      let extensionPack
-      if (object.package) {
-        extensionPack = object.package
-        object.package.files = object.files ?? {}
-        const extensionPackFiles = {
-          character: [],
-          card: [],
-          skill: [],
-          audio: [],
-          ...object.package.files,
-        }
-      } else {
-        extensionPack = {}
-      }
-      lib.extensionPack[name] = extensionPack
-      const { arenaReady, content, prepare, precontent } = object
-      extensionPack.code = {
-        arenaReady,
-        content,
-        prepare,
-        precontent,
-        help: object.help,
-        config: object.config,
-      }
-      try {
-        if (precontent) {
-          _status.extension = name
-
-          await precontent.call(object, config)
-          delete _status.extension
-        }
-        if (prepare) {
-          lib.onprepare?.push(prepare)
-        }
-      } catch (e) {
-        console.error(`加载《${name}》扩展的precontent时出现错误。`, e)
-        if (!lib.config.ignore_error) {
-          alert(`加载《${name}》扩展的precontent时出现错误。
-该错误本身可能并不影响扩展运行。您可以在“设置→通用→无视扩展报错”中关闭此弹窗。
-错误信息: 
-${e instanceof Error ? e.stack : String(e)}`)
-        }
-      }
-
-      if (content) {
-        lib.extensions.push([
-          name,
-          content,
-          config,
-          _status.evaluatingExtension,
-          object.package ?? {},
-          object.connect,
-          arenaReady,
-        ])
-      }
-    } catch (e) {
-      console.error(e)
+    if (!_status.importing[type]) {
+      _status.importing[type] = []
     }
 
-    return name
+    _status.importing[type].add(promise)
+
+    return promise
   }
   /**
    * 下载文件
@@ -3383,121 +3150,6 @@ ${e instanceof Error ? e.stack : String(e)}`)
    * @type { (data: any, name?: string) => void }
    */
   export
-
-  async importExtension(data, finishLoad, exportExtension) {
-    //by 来瓶可乐加冰、Rintim、Tipx-L、诗笺
-    const zip = await get.promises.zip()
-    if (get.objtype(data) == "object") {
-      const filelist = Object.keys(data)
-      filelist.forEach((value) => zip.file(value, data[value]))
-      if (exportExtension) {
-        //导出
-        game.export(zip.generate({ type: "blob" }), exportExtension)
-        if (typeof finishLoad == "function") {
-          finishLoad()
-        }
-      } else {
-        //保存
-        game.importExtension.apply(this, [zip.generate({ type: "arraybuffer" }), finishLoad])
-      }
-      return
-    }
-    //导入
-    try {
-      if (typeof game.readFile !== "function") {
-        throw new Error("没有文件系统操作权限，无法导入扩展。")
-      }
-      zip.load(data)
-
-      const importExtensionInfo = async () => {
-        // 标准工程扩展
-        const infoFile = zip.file("info.json")
-        if (infoFile) {
-          _status.importingExtension = true
-          try {
-            const info = JSON.parse(infoFile.asText())
-            await game.import("extension", () => {
-              return Object.assign(info, {
-                config: {},
-              })
-            })
-            if (Array.isArray(_status.extensionLoading)) {
-              await Promise.allSettled(_status.extensionLoading)
-              delete _status.extensionLoading
-            }
-          } catch (error) {
-            console.log(error)
-          }
-          _status.importingExtension = false
-          return
-        }
-
-        // 旧扩展（非esm扩展）
-        const extensionFile = zip.file("extension.js")
-        if (extensionFile) {
-          _status.importingExtension = true
-          try {
-            security.eval(extensionFile.asText())
-            if (Array.isArray(_status.extensionLoading)) {
-              await Promise.allSettled(_status.extensionLoading)
-              delete _status.extensionLoading
-            }
-          } catch (error) {
-            console.log(error)
-          }
-          _status.importingExtension = false
-          return
-        }
-      }
-      await importExtensionInfo()
-
-      if (!game.importedPack) {
-        throw new Error("此压缩包不是一个扩展")
-      }
-      const name = game.importedPack.name
-      if (lib.config.all.plays.includes(name)) {
-        throw new Error("禁止安装游戏原生扩展")
-      }
-      const extensions = lib.config.extensions
-      if (extensions.includes(name)) {
-        game.removeExtension(name, true)
-      }
-      extensions.add(name)
-      game.saveConfigValue("extensions")
-      game.saveConfig(`extension_${name}_enable`, true)
-      delete game.importedPack
-
-      const targetDir = `extension/${name}`
-      const tasks = []
-      for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
-        const outputPath = lib.path.join(targetDir, relativePath)
-
-        if (zipEntry.dir) {
-          // 目录：确保存在
-          tasks.push(game.promises.createDir(outputPath))
-        } else {
-          // 文件：先创建父目录，再写文件
-          const task = (async () => {
-            await game.promises.createDir(lib.path.dirname(outputPath))
-
-            const content = zipEntry.asArrayBuffer()
-            await game.promises.writeFile(content, "./", outputPath)
-          })()
-
-          tasks.push(task)
-        }
-      }
-      await Promise.all(tasks)
-
-      if (typeof finishLoad == "function") {
-        finishLoad()
-      }
-    } catch (error) {
-      alert(`导入失败：\n${error}`)
-      console.error(error)
-      return false
-    }
-  }
 
   /**
    * @param { string[] } list
@@ -6251,311 +5903,6 @@ ${e instanceof Error ? e.stack : String(e)}`)
     return next
   }
   /**
-   * @param { string } name
-   * @param { { extension: string, sex: Sex, group: string, hp: string | number, skills?: string[], tags?: any[], translate: string } } information
-   */
-  addCharacter(name, information) {
-    //TODO: 这一坨也要改
-    const extensionName = _status.extension || information.extension,
-      character = [
-        information.sex,
-        information.group,
-        information.hp,
-        information.skills || [],
-        [
-          _status.evaluatingExtension
-            ? `db:extension-${extensionName}:${name}.jpg`
-            : `ext:${extensionName}/${name}.jpg`,
-          `die:ext:${extensionName}/${name}.mp3`,
-        ],
-      ]
-    if (information.tags) {
-      character[4] = character[4].concat(information.tags)
-    }
-    lib.character[name] = character
-    const packName = extensionName
-    if (!lib.characterPack[packName]) {
-      lib.characterPack[packName] = {}
-    }
-    lib.translate[name] = information.translate
-    lib.characterPack[packName][name] = character
-    lib.translate[`${packName}_character_config`] = extensionName
-  }
-  /**
-   * @param { { mode?: string, forbid?: any, character: { [key: string]: Character }, skill: { [key: string]: object }, [key: string]: any } } pack
-   * @param { string } [packagename]
-   */
-  addCharacterPack(pack, packagename) {
-    let extname = _status.extension || "扩展"
-    let gzFlag = false
-    packagename = packagename || extname
-
-    for (const name in pack) {
-      const content = pack[name]
-
-      switch (name) {
-        case "mode":
-          if (content == "guozhan") {
-            gzFlag = true
-          }
-        // [falls through]
-        case "forbid":
-          break
-        case "character":
-          processCharacter(content)
-          break
-        case "skill":
-          processSkill(content)
-          break
-        default:
-          for (const key in content) {
-            lib[name][key] ??= content[key]
-          }
-      }
-    }
-
-    let packname = packagename
-    lib.characterPack[packname] = pack.character
-    lib.translate[packname + "_character_config"] = packagename
-    if (gzFlag) {
-      lib.characterGuozhanFilter.add(packname)
-    }
-    return
-
-    /**
-     * @param {Record<string, Character>} content
-     */
-    function processCharacter(content) {
-      for (const name in content) {
-        const character = (content[name] = get.convertedCharacter(content[name]))
-
-        // 处理武将图像和阵亡音效
-        if (character.dieAudios.length === 0) {
-          character.dieAudios.push(`ext:${extname}/audio/die:true`)
-        }
-        character.img ??= `extension/${extname}/${name}.jpg`
-
-        // 处理AI禁用
-        if (
-          character.isBoss ||
-          character.isHiddenBoss ||
-          lib.config.forbidai_user?.includes(name)
-        ) {
-          lib.config.forbidai.add(name)
-        }
-
-        // 将武将技能加入技能列表
-        for (const skill of character.skills) {
-          lib.skilllist.add(skill)
-        }
-
-        if (lib.character[name] != null) {
-          continue
-        }
-
-        if (lib.config[`extension_${extname}_characters_enable`] === undefined) {
-          game.saveExtensionConfig(extname, "characters_enable", true)
-        }
-        if (lib.config[`extension_${extname}_characters_enable`] === true) {
-          lib.character[name] = character
-        }
-      }
-    }
-
-    /**
-     * @param {Record<string, Skill>} content
-     */
-    function processSkill(content) {
-      for (const name in content) {
-        const skill = content[name]
-
-        if (typeof skill.audio == "number" || typeof skill.audio == "boolean") {
-          skill.audio = `ext:${extname}:${skill.audio}`
-        }
-
-        lib.skill[name] ??= skill
-      }
-    }
-  }
-  /**
-   * @param { string } name
-   * @param { Card } info
-   * @param { { extension: string, translate: string, description: string, number?: number, color?: string } } info2
-   */
-  addCard(name, info, info2) {
-    var extname = _status.extension || info2.extension
-    if (info.audio == true) {
-      info.audio = "ext:" + extname
-    }
-    if (!info.image || typeof info.image !== "string") {
-      if (info.fullskin) {
-        if (_status.evaluatingExtension) {
-          info.image = "db:extension-" + extname + ":" + name + ".png"
-        } else {
-          info.image = "ext:" + extname + "/" + name + ".png"
-        }
-      } else if (info.fullimage) {
-        if (_status.evaluatingExtension) {
-          info.image = "db:extension-" + extname + ":" + name + ".jpg"
-        } else {
-          info.image = "ext:" + extname + "/" + name + ".jpg"
-        }
-      }
-    }
-    lib.card[name] = info
-    lib.translate[name] = info2.translate
-    lib.translate[name + "_info"] = info2.description
-    if (typeof info2.number == "number") {
-      let suits = ["heart", "spade", "diamond", "club"]
-      if (info2.color == "red") {
-        suits = ["heart", "diamond"]
-      } else if (info2.color == "black") {
-        suits = ["club", "spade"]
-      }
-      for (let i = 0; i < info2.number; i++) {
-        lib.card.list.push([
-          suits[Math.floor(Math.random() * suits.length)],
-          Math.ceil(Math.random() * 13),
-          name,
-        ])
-      }
-    }
-    let packname = extname
-    if (!lib.cardPack[packname]) {
-      lib.cardPack[packname] = []
-      lib.translate[packname + "_card_config"] = extname
-    }
-    lib.cardPack[packname].push(name)
-  }
-  /**
-   * @param { { extension: string, mode?: string[], forbid?: string[], list: any[], card: {[key: string]: Card}, skill: { [key: string]: object }  } } pack
-   * @param { string } [packagename]
-   */
-  addCardPack(pack, packagename) {
-    let extname = _status.extension || "扩展"
-    packagename = packagename || extname
-    let packname = packagename
-    lib.cardPack[packname] = []
-    lib.cardPackInfo[packname] = pack
-    lib.translate[packname + "_card_config"] = packagename
-    for (let i in pack) {
-      if (i == "mode" || i == "forbid") {
-        continue
-      }
-      if (i == "list") {
-        for (let j = 0; j < pack[i].length; j++) {
-          lib.card.list.push(pack[i][j])
-        }
-        continue
-      }
-      for (let j in pack[i]) {
-        if (i == "card") {
-          if (pack[i][j].audio == true) {
-            pack[i][j].audio = "ext:" + extname
-          }
-          if (!pack[i][j].image) {
-            if (pack[i][j].fullskin) {
-              if (_status.evaluatingExtension) {
-                pack[i][j].image = "db:extension-" + extname + ":" + j + ".png"
-              } else {
-                pack[i][j].image = "ext:" + extname + "/" + j + ".png"
-              }
-            } else if (pack[i][j].fullimage) {
-              if (_status.evaluatingExtension) {
-                pack[i][j].image = "db:extension-" + extname + ":" + j + ".jpg"
-              } else {
-                pack[i][j].image = "ext:" + extname + "/" + j + ".jpg"
-              }
-            }
-          }
-          lib.cardPack[packname].push(j)
-        } else if (i == "skill") {
-          if (typeof pack[i][j].audio == "number" || typeof pack[i][j].audio == "boolean") {
-            pack[i][j].audio = "ext:" + extname + ":" + pack[i][j].audio
-          }
-        }
-        if (lib[i][j] == undefined) {
-          // 判断扩展卡牌包是否开启
-          if (i == "card") {
-            // if (!game.hasExtension(extname) || !game.hasExtensionLoaded(extname)) continue;
-            if (lib.config[`extension_${extname}_cards_enable`] === undefined) {
-              game.saveExtensionConfig(extname, "cards_enable", true)
-            }
-            if (lib.config[`extension_${extname}_cards_enable`] === true) {
-              lib[i][j] = pack[i][j]
-            }
-          } else {
-            lib[i][j] = pack[i][j]
-          }
-        }
-      }
-    }
-  }
-  /**
-   * @param { string } name
-   * @param { { [key: string]: object } } info
-   * @param { string } [translate]
-   * @param { string } [description]
-   * @param { string } [appendInfo]
-   * @param { string } [abInfo]
-   */
-  addSkill(name, info, translate, description, appendInfo, abInfo) {
-    if (lib.skill[name]) {
-      return false
-    }
-    if (typeof info.audio == "number" || typeof info.audio == "boolean") {
-      info.audio = "ext:" + _status.extension + ":" + info.audio
-    }
-    lib.skill[name] = info
-    lib.translate[name] = translate
-    lib.translate[name + "_info"] = description
-    lib.translate[name + "_append"] = appendInfo
-    lib.translate[`${name}_ab`] = abInfo
-    return true
-  }
-  /**
-   * @param { string } name
-   * @param {*} info
-   * @param { { translate: string, config: { [key: string]: object } } } info2
-   */
-  addMode(name, info, info2) {
-    lib.config.all.mode.push(name)
-    lib.translate[name] = info2.translate
-    let imgsrc
-    let extname = _status.extension || info2.extension
-    if (info.splash) {
-      imgsrc = info.splash
-    } else {
-      if (_status.evaluatingExtension) {
-        imgsrc = "extension-" + extname + ":" + name + ".jpg"
-      } else {
-        imgsrc = "ext:" + extname + "/" + name + ".jpg"
-      }
-    }
-    lib.mode[name] = {
-      name: info2.translate,
-      config: info2.config,
-      splash: imgsrc,
-      fromextension: true,
-    }
-    lib.init["setMode_" + name] = async () => {
-      await game.import("mode", (lib, game, ui, get, ai, _status) => {
-        info.name = name
-        return info
-      })
-    }
-    if (!lib.config.extensionInfo[extname]) {
-      lib.config.extensionInfo[extname] = {}
-    }
-    if (!lib.config.extensionInfo[extname].mode) {
-      lib.config.extensionInfo[extname].mode = []
-    }
-    if (lib.config.extensionInfo[extname].mode.indexOf(name) == -1) {
-      lib.config.extensionInfo[extname].mode.push(name)
-    }
-    game.saveConfig("extensionMode", lib.config.extensionInfo)
-  }
-  /**
    * @param { string } skill
    * @param { Player } [player]
    */
@@ -6636,63 +5983,6 @@ ${e instanceof Error ? e.stack : String(e)}`)
       game.players[i].in(true)
     }
     ui.clear()
-  }
-  /**
-   * @param { string } extensionName
-   */
-  hasExtension(extensionName) {
-    if (this.hasExtensionInstalled(extensionName)) {
-      if (typeof lib.config[`extension_${extensionName}_enable`] != "boolean") {
-        game.saveExtensionConfig(extensionName, "enable", true)
-      }
-      return lib.config[`extension_${extensionName}_enable`] === true
-    }
-    return false
-  }
-  /**
-   * @param { string } extensionName
-   */
-  hasExtensionInstalled(extensionName) {
-    return lib.config.extensions.includes(extensionName)
-  }
-  /**
-   * @param { string } extensionName
-   */
-  hasExtensionLoaded(extensionName) {
-    return extensionName !== void 0 && _status.extensionLoaded.includes(extensionName)
-  }
-  /**
-   * @param { string } extensionName
-   * @param { boolean } [keepFile]
-   */
-  removeExtension(extensionName, keepFile) {
-    const prefix = `extension_${extensionName}`
-    Object.keys(lib.config).forEach((key) => {
-      if (key.startsWith(prefix)) {
-        game.saveConfig(key)
-      }
-    })
-    localStorage.removeItem(`${lib.configprefix}${prefix}`)
-    game.deleteDB("data", prefix)
-    lib.config.extensions.remove(extensionName)
-    game.saveConfig("extensions", lib.config.extensions)
-    const modeList = lib.config.extensionInfo[extensionName]
-    if (modeList) {
-      if (modeList.file) {
-        Object.values(modeList.file).forEach((filePath) =>
-          game.deleteDB("image", `extension-${extensionName}:${filePath}`),
-        )
-      }
-      if (modeList.mode) {
-        Object.values(modeList.mode).forEach(game.clearModeConfig)
-      }
-      delete lib.config.extensionInfo[extensionName]
-      game.saveConfigValue("extensionInfo")
-    }
-    if (!game.readFile || keepFile) {
-      return
-    }
-    game.promises.removeDir(`extension/${extensionName}`).catch(console.error)
   }
   addRecentCharacter() {
     let list = get.config("recentCharacter") || []
@@ -8066,16 +7356,14 @@ ${e instanceof Error ? e.stack : String(e)}`)
    * @param {*} configx
    */
   switchMode(name, configx) {
-    if (!lib.layoutfixed.includes(name)) {
-      if (lib.config.layout != game.layout) {
-        lib.init.layout(lib.config.layout)
-      } else if (lib.config.mode == "brawl") {
-        if (
-          lib.config.player_border == "normal" &&
-          (game.layout == "long" || game.layout == "long2")
-        ) {
-          ui.arena.classList.add("lslim_player")
-        }
+    if (lib.config.layout != game.layout) {
+      lib.init.layout(lib.config.layout)
+    } else if (lib.config.mode == "brawl") {
+      if (
+        lib.config.player_border == "normal" &&
+        (game.layout == "long" || game.layout == "long2")
+      ) {
+        ui.arena.classList.add("lslim_player")
       }
     }
     game.loadModeAsync(name, async (exports) => {
@@ -8226,12 +7514,6 @@ ${e instanceof Error ? e.stack : String(e)}`)
         exports.startBefore()
       }
       game.createEvent("game", false).setContent(exports.start)
-      if (lib.mode[lib.config.mode] && lib.mode[lib.config.mode].fromextension) {
-        let startstr = exports.start.toString()
-        if (startstr.indexOf("onfree") == -1) {
-          setTimeout(lib.init.onfree, 500)
-        }
-      }
 
       if (!lib.db) {
         try {
@@ -9997,144 +9279,6 @@ ${e instanceof Error ? e.stack : String(e)}`)
     config.version = lib.version
     localStorage.setItem(`${lib.configprefix}${mode}`, JSON.stringify(config))
   }
-  showChangeLog() {
-    if (lib.version == lib.config.version && !_status.extensionChangeLog) {
-      return
-    }
-    const ul = document.createElement("ul")
-    ul.style.textAlign = "left"
-    const caption = lib.version == lib.config.version ? "扩展更新" : `${lib.version}更新内容`
-    let players = null,
-      cards = null
-    if (lib.version != lib.config.version) {
-      lib.changeLog.forEach((value) => {
-        if (value.startsWith("players://")) {
-          try {
-            players = JSON.parse(value.slice(10)).filter((value) => lib.character[value])
-          } catch (e) {
-            players = null
-          }
-        } else if (value.startsWith("cards://")) {
-          try {
-            cards = JSON.parse(value.slice(8)).filter((value) => lib.card[value])
-          } catch (e) {
-            cards = null
-          }
-        } else {
-          const li = document.createElement("li")
-          li.innerHTML = value
-          ul.appendChild(li)
-        }
-      })
-    }
-    const dialog = ui.create.dialog(caption, "hidden")
-    if (lib.version != lib.config.version) {
-      const lic = ui.create.div(dialog.content)
-      lic.style.display = "block"
-      lic.appendChild(ul)
-    }
-    game.saveConfig("version", lib.version)
-    if (players?.length) {
-      dialog.addSmall([players, "character"])
-      dialog.classList.add("forcebutton")
-      dialog.classList.add("withbg")
-    }
-    if (cards?.length) {
-      dialog.addSmall([
-        cards.map((value) => [get.translation(get.type(value)), "", value]),
-        "vcard",
-      ])
-      dialog.classList.add("forcebutton")
-      dialog.classList.add("withbg")
-    }
-    if (_status.extensionChangeLog) {
-      Object.keys(_status.extensionChangeLog).forEach((extname) => {
-        dialog.add(ui.create.div(".placeholder"))
-        dialog.add(`${extname} ${lib.extensionPack[extname].version} 更新内容`)
-        dialog.add(ui.create.div(".placeholder"))
-        const changeLogList = _status.extensionChangeLog[extname]
-        changeLogList.forEach((item) => {
-          switch (item.type) {
-            case "text": {
-              const list = Array.isArray(item.data) ? item.data : [item.data]
-              if (item.addText) {
-                list.forEach((value) => {
-                  dialog.addText(value)
-                })
-              } else {
-                list.forEach((value) => {
-                  const li = document.createElement("li")
-                  li.innerHTML = value
-                  li.style.textAlign = item.textAlign || "center"
-                  dialog.content.appendChild(li)
-                })
-              }
-              break
-            }
-            case "players": {
-              dialog.addSmall([item.data, "character"])
-              dialog.classList.add("forcebutton")
-              dialog.classList.add("withbg")
-              break
-            }
-            case "cards": {
-              dialog.addSmall([
-                item.data.map((value) => [get.translation(get.type(value)), "", value]),
-                "vcard",
-              ])
-              dialog.classList.add("forcebutton")
-              dialog.classList.add("withbg")
-              break
-            }
-            default:
-              return
-          }
-        })
-      })
-    }
-    dialog.open()
-    let hidden = false
-    if (!ui.auto.classList.contains("hidden")) {
-      ui.auto.hide()
-      hidden = true
-    }
-    game.pause()
-    const control = ui.create.control("确定", () => {
-      dialog.close()
-      control.close()
-      if (hidden) {
-        ui.auto.show()
-      }
-      game.resume()
-    })
-    lib.init.onfree()
-  }
-  /**
-   * 显示显示扩展的更新日志，在game.showChangeLog时显示扩展更新内容
-   * @param { string } str 更新日志内容，支持以下格式：`string`: 文本，自动包装为 `{ type: 'text', data: str }`；`Array`: 对象数组，每个对象格式为 `{ type, data, 其他属性 }`； `Object`: 单个日志对象，自动包装成数组
-   * @param { string } [extname] 扩展名，未输入则使用_status.extension
-   */
-  showExtensionChangeLog(str, extname) {
-    extname = extname || _status.extension
-    const cfg = `extension_${extname}_changelog`
-    if (!lib.extensionPack[extname] || lib.extensionPack[extname].version == lib.config[cfg]) {
-      return
-    }
-    game.saveConfig(cfg, lib.extensionPack[extname].version)
-    _status.extensionChangeLog ??= {}
-    if (typeof str === "string") {
-      _status.extensionChangeLog[extname] = [
-        {
-          type: "text",
-          data: str,
-        },
-      ]
-    } else if (Array.isArray(str)) {
-      _status.extensionChangeLog[extname] = str
-    } else if (get.objtype(str) === "object") {
-      _status.extensionChangeLog[extname] = [str]
-    }
-  }
   /**
    * @param { string } key
    * @param { * } [value]
@@ -10173,28 +9317,6 @@ ${e instanceof Error ? e.stack : String(e)}`)
    */
   saveConfigValue(key) {
     return game.saveConfig(key, lib.config[key])
-  }
-  /**
-   * @param { string } extension
-   * @param { string } key
-   * @param { * } [value]
-   */
-  saveExtensionConfig(extension, key, value) {
-    return game.saveConfig(`extension_${extension}_${key}`, value)
-  }
-  /**
-   * @param { string } extension
-   * @param { string } key
-   */
-  saveExtensionConfigValue(extension, key) {
-    return game.saveExtensionConfig(extension, key, game.getExtensionConfig(extension, key))
-  }
-  /**
-   * @param { string } extension
-   * @param { string } key
-   */
-  getExtensionConfig(extension, key) {
-    return lib.config[`extension_${extension}_${key}`]
   }
   /**
    * @param { string } mode

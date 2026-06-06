@@ -383,9 +383,7 @@ export class Card extends HTMLDivElement {
       if (typeof img != "string") {
         img = null
       } else {
-        if (img.startsWith("ext:")) {
-          img = img.replace(/^ext:/, "extension/")
-        } else if (
+        if (
           ["character:"].some((prefix) => img.startsWith(prefix)) ||
           ["background", "card"].includes(img)
         ) {
@@ -410,11 +408,6 @@ export class Card extends HTMLDivElement {
         } else if (typeof img == "string") {
           this.node.image.setBackgroundImage(img)
         }
-        /*if (img.startsWith("ext:")) {
-					this.node.image.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-				} else {
-					this.node.image.setBackgroundDB(img);
-				}*/
       } else {
         if (lib.card[bg].modeimage) {
           this.node.image.setBackgroundImage(
@@ -455,12 +448,6 @@ export class Card extends HTMLDivElement {
           this.setBackgroundImage(img)
           this.style.backgroundSize = "cover"
         }
-        /*if (img.startsWith("ext:")) {
-					this.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-					this.style.backgroundSize = "cover";
-				} else {
-					this.setBackgroundDB(img);
-				}*/
       } else if (get.dynamicVariable(lib.card[bg].image, this)) {
         if (get.dynamicVariable(lib.card[bg].image, this).startsWith("character:")) {
           this.setBackground(get.dynamicVariable(lib.card[bg].image, this).slice(10), "character")
@@ -498,12 +485,6 @@ export class Card extends HTMLDivElement {
           this.node.avatar.setBackgroundImage(img)
           this.node.avatar.style.backgroundSize = "cover"
         }
-        /*if (img.startsWith("ext:")) {
-					this.node.avatar.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-					this.node.avatar.style.backgroundSize = "cover";
-				} else {
-					this.node.avatar.setBackgroundDB(img);
-				}*/
       } else if (get.dynamicVariable(lib.card[bg].image, this)) {
         if (get.dynamicVariable(lib.card[bg].image, this).startsWith("character:")) {
           this.node.avatar.setBackground(
@@ -538,12 +519,6 @@ export class Card extends HTMLDivElement {
           this.setBackgroundImage(img)
           this.style.backgroundSize = "cover"
         }
-        /*if (img.startsWith("ext:")) {
-					this.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-					this.style.backgroundSize = "cover";
-				} else {
-					this.setBackgroundDB(img);
-				}*/
       } else {
         this.setBackground(get.dynamicVariable(lib.card[bg].image, this))
       }

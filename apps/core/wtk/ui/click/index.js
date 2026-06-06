@@ -4196,8 +4196,6 @@ export class Click {
               resolve(`${lib.assetURL}image/card/${imageName}.png`)
             } else if (image.startsWith("db:")) {
               game.getDB("image", image.slice(3)).then(resolve, reject)
-            } else if (image.startsWith("ext:")) {
-              resolve(`${lib.assetURL}${image.replace(/^ext:/, "extension/")}`)
             } else {
               resolve(`${lib.assetURL}${image}`)
             }
@@ -4231,9 +4229,6 @@ export class Click {
                     }
                     if (image.startsWith("db:")) {
                       return await game.getDB("image", image.slice(3))
-                    }
-                    if (image.startsWith("ext:")) {
-                      return `${lib.assetURL}${image.replace(/^ext:/, "extension/")}`
                     }
                     return `${lib.assetURL}${image}`
                   })
@@ -4274,9 +4269,6 @@ export class Click {
                 }
                 if (image.startsWith("db:")) {
                   return await game.getDB("image", image.slice(3))
-                }
-                if (image.startsWith("ext:")) {
-                  return `${lib.assetURL}${image.replace(/^ext:/, "extension/")}`
                 }
                 return `${lib.assetURL}${image}`
               })

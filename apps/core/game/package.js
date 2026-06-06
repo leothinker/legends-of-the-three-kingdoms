@@ -31,7 +31,6 @@ window.wtk_package = {
     guozhan: "国战",
     versus: "对决",
     connect: "联机",
-    boss: "挑战",
     doudizhu: "斗地主",
     single: "单挑",
     brawl: "乱斗",

@@ -57,9 +57,6 @@ export class Library {
     {},
     {
       get(target, prop, receiver) {
-        if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
-          prop = prop.slice("mode_extension_".length)
-        }
         return Reflect.get(target, prop, receiver)
       },
       set(target, prop, newValue) {
@@ -69,10 +66,6 @@ export class Library {
             Promise.resolve().then(() => {
               ui.updateCharacterPackMenu.forEach((fun) => fun(prop))
             })
-          }
-
-          if (prop.startsWith("mode_extension_")) {
-            prop = prop.slice("mode_extension_".length)
           }
         }
         const newPack = new Proxy(
@@ -87,9 +80,6 @@ export class Library {
         return Reflect.set(target, prop, newPack)
       },
       defineProperty(target, prop, descriptor) {
-        if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
-          prop = prop.slice("mode_extension_".length)
-        }
         return Reflect.defineProperty(target, prop, descriptor)
       },
     },
@@ -99,21 +89,12 @@ export class Library {
     {},
     {
       get(target, prop, receiver) {
-        if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
-          prop = prop.slice("mode_extension_".length)
-        }
         return Reflect.get(target, prop, receiver)
       },
       set(target, prop, value, receiver) {
-        if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
-          prop = prop.slice("mode_extension_".length)
-        }
         return Reflect.set(target, prop, value, receiver)
       },
       defineProperty(target, prop, descriptor) {
-        if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
-          prop = prop.slice("mode_extension_".length)
-        }
         return Reflect.defineProperty(target, prop, descriptor)
       },
     },
@@ -128,9 +109,6 @@ export class Library {
     {},
     {
       get(target, prop, receiver) {
-        if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
-          prop = prop.slice("mode_extension_".length)
-        }
         return Reflect.get(target, prop, receiver)
       },
       set(target, prop, newValue) {
@@ -141,15 +119,9 @@ export class Library {
             })
           }
         }
-        if (prop.startsWith("mode_extension_")) {
-          prop = prop.slice("mode_extension_".length)
-        }
         return Reflect.set(target, prop, newValue)
       },
       defineProperty(target, prop, descriptor) {
-        if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
-          prop = prop.slice("mode_extension_".length)
-        }
         return Reflect.defineProperty(target, prop, descriptor)
       },
     },
@@ -389,8 +361,6 @@ export class Library {
   onfree = []
   inpile = []
   inpile_nature = []
-  extensions = []
-  extensionPack = {}
 
   /**
    * @type { IOnloadSplash[] }
@@ -488,10 +458,9 @@ export class Library {
     return this.#relatedTrigger
   }
   /**
-   * @type { { character?: Record<string, importCharacterConfig>, card?: Record<string, importCardConfig>, mode?: Record<string, importModeConfig>, player?: Record<string, importPlayerConfig>, extension?: Record<string, importExtensionConfig>, play?: Record<string, importPlayConfig> } }
+   * @type { { character?: Record<string, importCharacterConfig>, card?: Record<string, importCardConfig>, mode?: Record<string, importModeConfig>, player?: Record<string, importPlayerConfig>, play?: Record<string, importPlayConfig> } }
    */
   imported = {}
-  layoutfixed = ["chess", "tafang", "stone"]
   pinyins = {
     _metadata: {
       shengmu: [
@@ -1625,26 +1594,6 @@ export class Library {
           },
           unfrequent: true,
         },
-        extension_auto_import: {
-          name: "自动导入扩展",
-          intro: dedent`
-						开启后三国杀会自动导入扩展目录下的扩展（以此法导入的扩展默认关闭）
-						<br />
-						※ 如果你的运行环境不支持文件操作，则该选项无效
-						<br />
-						※ 鉴于不同平台下文件操作的性能区别，开启后可能会降低加载速度
-					`,
-          init: false,
-          async onclick(bool) {
-            await game.promises.saveConfig("extension_auto_import", bool)
-          },
-          unfrequent: true,
-        },
-        fuck_sojson: {
-          name: "检测加密扩展",
-          init: false,
-          unfrequent: true,
-        },
         update_link: {
           name: "更新地址",
           init: "coding",
@@ -1656,97 +1605,6 @@ export class Library {
           onclick(item) {
             game.saveConfig("update_link", item)
             lib.updateURL = lib.updateURLS[item] || lib.updateURLS.coding
-          },
-        },
-        extension_source: {
-          name: "获取扩展地址",
-          init: "GitHub Proxy",
-          unfrequent: true,
-          item: {},
-          intro: () =>
-            `获取在线扩展时的地址。当前地址：${document.createElement("br").outerHTML}${lib.config.extension_sources[lib.config.extension_source]}`,
-        },
-        extension_create: {
-          name: "添加获取扩展地址",
-          clear: true,
-          unfrequent: true,
-          onclick() {
-            game.prompt("请输入地址名称", function (str) {
-              if (str) {
-                var map = lib.config.extension_sources
-                game.prompt("请输入" + str + "的地址", function (str2) {
-                  if (str2) {
-                    delete map[str]
-                    map[str] = str2
-                    game.saveConfig("extension_sources", map)
-                    game.saveConfig("extension_source", str)
-                    var nodexx = ui.extension_source
-                    nodexx.updateInner()
-                    var nodeyy = nodexx._link.menu
-                    var nodezz = nodexx._link.config
-                    for (var i = 0; i < nodeyy.childElementCount; i++) {
-                      if (nodeyy.childNodes[i]._link == str) {
-                        nodeyy.childNodes[i].remove()
-                        break
-                      }
-                    }
-                    var textMenu = ui.create.div("", str, nodeyy, function () {
-                      var node = this.parentNode._link
-                      var config = node._link.config
-                      node._link.current = this.link
-                      var tmpName = node.lastChild.innerHTML
-                      node.lastChild.innerHTML = config.item[this._link]
-                      if (config.onclick) {
-                        if (config.onclick.call(node, this._link, this) === false) {
-                          node.lastChild.innerHTML = tmpName
-                        }
-                      }
-                      if (config.update) {
-                        config.update()
-                      }
-                    })
-                    textMenu._link = str
-                    nodezz.item[name] = str
-                    alert("已添加扩展地址：" + str)
-                  }
-                })
-              }
-            })
-          },
-        },
-        extension_delete: {
-          name: "删除当前扩展地址",
-          clear: true,
-          unfrequent: true,
-          onclick() {
-            var bool = false,
-              map = lib.config.extension_sources
-            for (var i in map) {
-              if (i != lib.config.extension_source) {
-                bool = true
-                break
-              }
-            }
-            if (!bool) {
-              alert("不能删除最后一个扩展地址！")
-              return
-            }
-            var name = lib.config.extension_source
-            game.saveConfig("extension_source", i)
-            delete map[name]
-            game.saveConfig("extension_sources", map)
-            var nodexx = ui.extension_source
-            nodexx.updateInner()
-            var nodeyy = nodexx._link.menu
-            var nodezz = nodexx._link.config
-            for (var i = 0; i < nodeyy.childElementCount; i++) {
-              if (nodeyy.childNodes[i]._link == name) {
-                nodeyy.childNodes[i].remove()
-                break
-              }
-            }
-            delete nodezz.item[name]
-            alert("已删除扩展地址：" + name)
           },
         },
         update: function (config, map) {
@@ -2026,11 +1884,7 @@ export class Library {
             }
           },
           onclick(layout) {
-            if (lib.layoutfixed.includes(lib.config.mode)) {
-              game.saveConfig("layout", layout)
-            } else {
-              lib.init.layout(layout)
-            }
+            lib.init.layout(layout)
           },
         },
         splash_style: {
@@ -4406,16 +4260,6 @@ export class Library {
             map.show_time.show()
             map.watchface.hide()
           }
-          /*if (lib.config.show_deckMonitor) {
-						map.show_deckMonitor_online.show();
-					} else {
-						map.show_deckMonitor_online.hide();
-					}*/
-          if (lib.config.show_extensionmaker) {
-            map.show_extensionshare.show()
-          } else {
-            map.show_extensionshare.hide()
-          }
         },
         show_history: {
           name: "出牌记录栏",
@@ -5070,16 +4914,6 @@ export class Library {
           init: false,
           unfrequent: true,
         },
-        show_extensionmaker: {
-          name: "显示制作扩展",
-          init: true,
-          unfrequent: true,
-        },
-        show_extensionshare: {
-          name: "显示分享扩展",
-          init: true,
-          unfrequent: true,
-        },
         show_characternamepinyin: {
           name: "显示武将名注解",
           intro: "在武将资料卡显示武将名及其注解、性别、势力、体力等信息",
@@ -5451,49 +5285,6 @@ export class Library {
           },
           clear: true,
         },
-        remove_extension_onfig: {
-          name: "重置无效扩展",
-          clear: true,
-          async onclick() {
-            if (this.firstChild.innerHTML != "已重置") {
-              let config = lib.config
-              if (get.is.object(config)) {
-                let extensionList = config.extensions
-                for (let name of extensionList) {
-                  let num = await game.promises.checkDir(`extension/${name}`)
-                  if (num !== 1) {
-                    game.removeExtension(name)
-                  } else {
-                    let all = await game.promises.getFileList(`extension/${name}`)
-                    if (all?.[1].length) {
-                      const hasExtensionJs = all[1].includes("extension.js")
-                      const hasInfoJson = all[1].includes("info.json")
-
-                      if (!hasExtensionJs) {
-                        const message = hasInfoJson
-                          ? `扩展${name}有 info.json 但缺少 extension.js 文件`
-                          : `扩展${name}缺少必须的 extension.js 文件`
-                        console.error(message)
-                        game.removeExtension(name)
-                      }
-                    }
-                  }
-                }
-              }
-              this.firstChild.innerHTML = "已重置"
-              const that = this
-              setTimeout(function () {
-                that.firstChild.innerHTML = "重置无效扩展"
-                setTimeout(function () {
-                  let ret = confirm(`检测完成，已为你清除无效配置，是否重启？`)
-                  if (ret) {
-                    game.reload()
-                  }
-                })
-              }, 500)
-            }
-          },
-        },
         redownload_game: {
           name: "重新下载游戏",
           onclick() {
@@ -5524,327 +5315,6 @@ export class Library {
           } else {
             map.redownload_game.hide()
           }
-        },
-        // trim_game:{
-        // 	name:'隐藏非官方扩展包',
-        // 	onclick(){
-        // 		if(this.innerHTML!='已隐藏'){
-        // 			this.innerHTML='已隐藏';
-        //      						 var pack=lib.config.all.cards.slice(0);
-        //      						 if(Array.isArray(lib.config.hiddenCardPack)){
-        //      									  for(var i=0;i<lib.config.hiddenCardPack.length;i++){
-        //      															pack.add(lib.config.hiddenCardPack[i]);
-        //      									  }
-        //      						 }
-        //      						 for(var i=0;i<pack.length;i++){
-        //      									  if(lib.config.all.sgscards.includes(pack[i])){
-        //      															pack.splice(i--,1);
-        //      									  }
-        //      						 }
-        // 			game.saveConfig('hiddenCardPack',pack);
-        //
-        //      						 var pack=lib.config.all.characters.slice(0);
-        //      						 if(Array.isArray(lib.config.hiddenCharacterPack)){
-        //      									  for(var i=0;i<lib.config.hiddenCharacterPack.length;i++){
-        //      															pack.add(lib.config.hiddenCharacterPack[i]);
-        //      									  }
-        //      						 }
-        //      						 for(var i=0;i<pack.length;i++){
-        //      									  if(lib.config.all.sgscharacters.includes(pack[i])){
-        //      															pack.splice(i--,1);
-        //      									  }
-        //      						 }
-        // 			game.saveConfig('hiddenCharacterPack',pack);
-        //
-        //      						 var pack=lib.config.all.mode.slice(0);
-        //      						 if(Array.isArray(lib.config.hiddenModePack)){
-        //      									  for(var i=0;i<lib.config.hiddenModePack.length;i++){
-        //      															pack.add(lib.config.hiddenModePack[i]);
-        //      									  }
-        //      						 }
-        //      						 for(var i=0;i<pack.length;i++){
-        //      									  if(lib.config.all.sgsmodes.includes(pack[i])){
-        //      															pack.splice(i--,1);
-        //      									  }
-        //      						 }
-        // 			game.saveConfig('hiddenModePack',pack);
-        //
-        // 			var that=this;
-        // 			setTimeout(function(){
-        // 				that.innerHTML='隐藏非官方扩展包';
-        // 			},500);
-        // 		}
-        // 	},
-        // 	clear:true
-        // }
-      },
-    },
-  }
-  extensionMenu = {
-    cardpile: {
-      enable: {
-        name: "开启",
-        init: false,
-        restart: true,
-      },
-      intro: {
-        name: "将杀闪等牌在牌堆中的比例维持在与军争牌堆相同，防止开启扩展包后被过多地稀释",
-        clear: true,
-        nopointer: true,
-      },
-      sha: {
-        name: "杀",
-        init: "1",
-        item: {
-          1: "补充全部",
-          0.5: "补充一半",
-          0: "不补充",
-        },
-      },
-      huosha: {
-        name: "火杀",
-        init: "1",
-        item: {
-          1: "补充全部",
-          0.5: "补充一半",
-          0: "不补充",
-        },
-      },
-      leisha: {
-        name: "雷杀",
-        init: "1",
-        item: {
-          1: "补充全部",
-          0.5: "补充一半",
-          0: "不补充",
-        },
-      },
-      shan: {
-        name: "闪",
-        init: "1",
-        item: {
-          1: "补充全部",
-          0.5: "补充一半",
-          0: "不补充",
-        },
-      },
-      tao: {
-        name: "桃",
-        init: "0",
-        item: {
-          1: "补充全部",
-          0.5: "补充一半",
-          0: "不补充",
-        },
-      },
-      jiu: {
-        name: "酒",
-        init: "0",
-        item: {
-          1: "补充全部",
-          0.5: "补充一半",
-          0: "不补充",
-        },
-      },
-      wuxie: {
-        name: "无懈可击",
-        init: "0.5",
-        item: {
-          1: "补充全部",
-          0.5: "补充一半",
-          0: "不补充",
-        },
-      },
-      nanman: {
-        name: "南蛮入侵",
-        init: "0",
-        item: {
-          1: "补充全部",
-          0.5: "补充一半",
-          0: "不补充",
-        },
-      },
-      wanjian: {
-        name: "万箭齐发",
-        init: "0",
-        item: {
-          1: "补充全部",
-          0.5: "补充一半",
-          0: "不补充",
-        },
-      },
-      guohe: {
-        name: "过河拆桥",
-        init: "0",
-        item: {
-          1: "补充全部",
-          0.5: "补充一半",
-          0: "不补充",
-        },
-      },
-      shunshou: {
-        name: "顺手牵羊",
-        init: "0",
-        item: {
-          1: "补充全部",
-          0.5: "补充一半",
-          0: "不补充",
-        },
-      },
-      tiesuo: {
-        name: "铁索连环",
-        init: "0",
-        item: {
-          1: "补充全部",
-          0.5: "补充一半",
-          0: "不补充",
-        },
-      },
-      hide: {
-        name: "隐藏此扩展",
-        clear: true,
-        onclick() {
-          if (this.firstChild.innerHTML == "隐藏此扩展") {
-            this.firstChild.innerHTML = "此扩展将在重启后隐藏"
-            lib.config.hiddenPlayPack.add("cardpile")
-            if (!lib.config.prompt_hidepack) {
-              alert("隐藏的扩展包可通过选项-其它-重置隐藏内容恢复")
-              game.saveConfig("prompt_hidepack", true)
-            }
-          } else {
-            this.firstChild.innerHTML = "隐藏此扩展"
-            lib.config.hiddenPlayPack.remove("cardpile")
-          }
-          game.saveConfig("hiddenPlayPack", lib.config.hiddenPlayPack)
-        },
-      },
-    },
-    boss: {
-      enable: {
-        name: "开启",
-        init: false,
-        restart: true,
-        onswitch: function (bool) {
-          if (bool) {
-            var storage = { boss: {}, versus: {}, translate: {} }
-            var loadversus = function () {
-              game.loadModeAsync("versus", function (mode) {
-                for (var i in mode.translate) {
-                  storage.translate[i] = mode.translate[i]
-                }
-                for (var i in mode.jiangeboss) {
-                  if (mode.jiangeboss[i].isBossAllowed) {
-                    storage.versus[i] = mode.jiangeboss[i]
-                  }
-                }
-                localStorage.setItem("boss_storage_playpackconfig", JSON.stringify(storage))
-              })
-            }
-            game.loadModeAsync("boss", function (mode) {
-              for (var i in mode.translate) {
-                storage.translate[i] = mode.translate[i]
-              }
-              for (var i in mode.characterPack.mode_boss) {
-                if (mode.characterPack.mode_boss[i].isBossAllowed) {
-                  storage.boss[i] = mode.characterPack.mode_boss[i]
-                }
-              }
-              loadversus()
-            })
-          } else {
-            localStorage.removeItem("boss_storage_playpackconfig")
-          }
-        },
-      },
-      intro: {
-        name: "将剑阁和挑战模式的武将添加到其它模式",
-        clear: true,
-        nopointer: true,
-      },
-      enableai: {
-        name: "随机选将可用",
-        init: false,
-      },
-      hide: {
-        name: "隐藏此扩展",
-        clear: true,
-        onclick() {
-          if (this.firstChild.innerHTML == "隐藏此扩展") {
-            this.firstChild.innerHTML = "此扩展将在重启后隐藏"
-            lib.config.hiddenPlayPack.add("boss")
-            if (!lib.config.prompt_hidepack) {
-              alert("隐藏的扩展包可通过选项-其它-重置隐藏内容恢复")
-              game.saveConfig("prompt_hidepack", true)
-            }
-          } else {
-            this.firstChild.innerHTML = "隐藏此扩展"
-            lib.config.hiddenPlayPack.remove("boss")
-          }
-          game.saveConfig("hiddenPlayPack", lib.config.hiddenPlayPack)
-        },
-      },
-    },
-    coin: {
-      enable: {
-        name: "开启",
-        init: false,
-        restart: true,
-        onclick(bool) {
-          if (bool) {
-            lib.config.plays.add("coin")
-          } else {
-            lib.config.plays.remove("coin")
-          }
-          game.saveConfig("plays", lib.config.plays)
-        },
-      },
-      intro: {
-        name: "每完成一次对局，可获得一定数量的金币；金币可用于购买游戏特效",
-        clear: true,
-        nopointer: true,
-      },
-      display: {
-        name: "金币显示",
-        init: "text",
-        item: {
-          symbol: "符号",
-          text: "文字",
-        },
-        onclick(item) {
-          game.saveConfig("coin_display_playpackconfig", item)
-          if (game.changeCoin) {
-            game.changeCoin(0)
-          }
-        },
-      },
-      canvas: {
-        name: "特效置顶",
-        init: false,
-        onclick(bool) {
-          game.saveConfig("coin_canvas_playpackconfig", bool)
-          if (bool) {
-            ui.window.classList.add("canvas_top")
-          } else {
-            ui.window.classList.remove("canvas_top")
-          }
-        },
-      },
-      hide: {
-        name: "隐藏此扩展",
-        clear: true,
-        onclick() {
-          if (this.firstChild.innerHTML == "隐藏此扩展") {
-            this.firstChild.innerHTML = "此扩展将在重启后隐藏"
-            lib.config.hiddenPlayPack.add("coin")
-            if (!lib.config.prompt_hidepack) {
-              alert("隐藏的扩展包可通过选项-其它-重置隐藏内容恢复")
-              game.saveConfig("prompt_hidepack", true)
-            }
-          } else {
-            this.firstChild.innerHTML = "隐藏此扩展"
-            lib.config.hiddenPlayPack.remove("coin")
-          }
-          game.saveConfig("hiddenPlayPack", lib.config.hiddenPlayPack)
         },
       },
     },
@@ -7798,11 +7268,6 @@ export class Library {
           init: true,
           intro: "禁止与自己版本不同的玩家进入房间",
         },
-        check_extension: {
-          name: "禁止扩展玩家进房",
-          init: false,
-          intro: "禁止开启了扩展的玩家进入房间",
-        },
         reset_banBlacklist: {
           name: "重置黑名单",
           onclick() {
@@ -8513,246 +7978,6 @@ export class Library {
         },
       },
     },
-    chess: {
-      name: "战棋",
-      config: {
-        chess_mode: {
-          name: "游戏模式",
-          init: "combat",
-          item: {
-            combat: "自由",
-            three: "统率",
-            leader: "君主",
-          },
-          restart: true,
-          frequent: true,
-        },
-        update: function (config, map) {
-          if (config.chess_mode == "leader") {
-            map.chess_leader_save.show()
-            map.chess_leader_clear.show()
-            map.chess_leader_allcharacter.show()
-            map.chess_character.hide()
-          } else {
-            map.chess_leader_save.hide()
-            map.chess_leader_clear.hide()
-            map.chess_leader_allcharacter.hide()
-            map.chess_character.show()
-          }
-          if (config.chess_mode == "combat") {
-            // map.battle_number.show();
-            // map.chess_ordered.show();
-            map.free_choose.show()
-            map.change_choice.show()
-          } else {
-            // map.battle_number.hide();
-            // map.chess_ordered.hide();
-            map.free_choose.hide()
-            map.change_choice.hide()
-          }
-        },
-        chess_leader_save: {
-          name: "选择历程",
-          init: "save1",
-          item: {
-            save1: "一",
-            save2: "二",
-            save3: "三",
-            save4: "四",
-            save5: "五",
-          },
-          restart: true,
-          frequent: true,
-        },
-        chess_leader_allcharacter: {
-          name: "启用全部角色",
-          init: true,
-          onclick(bool) {
-            if (confirm("调整该设置将清除所有进度，是否继续？")) {
-              for (var i = 1; i < 6; i++) {
-                game.save("save" + i, null, "chess")
-              }
-              game.saveConfig("chess_leader_allcharacter", bool, "chess")
-              if (get.mode() == "chess") {
-                game.reload()
-              }
-              return
-            } else {
-              this.classList.toggle("on")
-            }
-          },
-        },
-        chess_leader_clear: {
-          name: "清除进度",
-          onclick() {
-            var node = this
-            if (node._clearing) {
-              for (var i = 1; i < 6; i++) {
-                game.save("save" + i, null, "chess")
-              }
-              game.reload()
-              return
-            }
-            node._clearing = true
-            node.firstChild.innerHTML = "单击以确认 (3)"
-            setTimeout(function () {
-              node.firstChild.innerHTML = "单击以确认 (2)"
-              setTimeout(function () {
-                node.firstChild.innerHTML = "单击以确认 (1)"
-                setTimeout(function () {
-                  node.firstChild.innerHTML = "清除进度"
-                  delete node._clearing
-                }, 1000)
-              }, 1000)
-            }, 1000)
-          },
-          clear: true,
-          frequent: true,
-        },
-        // chess_treasure:{
-        // 	name:'战场机关',
-        // 	init:'0',
-        // 	frequent:true,
-        // 	item:{
-        // 		'0':'关闭',
-        // 		'0.1':'较少出现',
-        // 		'0.2':'偶尔出现',
-        // 		'0.333':'时常出现',
-        // 		'0.5':'频繁出现',
-        // 	}
-        // },
-        chess_obstacle: {
-          name: "随机路障",
-          init: "0.2",
-          item: {
-            0: "关闭",
-            0.2: "少量",
-            0.333: "中量",
-            0.5: "大量",
-          },
-          frequent: true,
-        },
-        show_range: {
-          name: "显示卡牌范围",
-          init: true,
-        },
-        show_distance: {
-          name: "显示距离",
-          init: true,
-        },
-        chess_character: {
-          name: "战棋武将",
-          init: true,
-          frequent: true,
-        },
-        chess_card: {
-          name: "战棋卡牌",
-          init: true,
-          frequent: true,
-        },
-        free_choose: {
-          name: "自由选将",
-          init: true,
-          onclick(bool) {
-            game.saveConfig("free_choose", bool, this._link.config.mode)
-            if (
-              get.mode() != this._link.config.mode ||
-              (!_status.event.getParent().showConfig && !_status.event.showConfig)
-            ) {
-              return
-            }
-            if (!ui.cheat2 && get.config("free_choose")) {
-              ui.create.cheat2()
-            } else if (ui.cheat2 && !get.config("free_choose")) {
-              ui.cheat2.close()
-              delete ui.cheat2
-            }
-          },
-        },
-        change_choice: {
-          name: "开启换将卡",
-          init: true,
-          onclick(bool) {
-            game.saveConfig("change_choice", bool, this._link.config.mode)
-            if (!_status.event.getParent().showConfig && !_status.event.showConfig) {
-              return
-            }
-            if (!ui.cheat && get.config("change_choice")) {
-              ui.create.cheat()
-            } else if (ui.cheat && !get.config("change_choice")) {
-              ui.cheat.close()
-              delete ui.cheat
-            }
-          },
-        },
-        chessscroll_speed: {
-          name: "边缘滚动速度",
-          init: "20",
-          intro: "鼠标移至屏幕边缘时自动滚屏",
-          item: {
-            0: "不滚动",
-            10: "10格/秒",
-            20: "20格/秒",
-            30: "30格/秒",
-          },
-        },
-      },
-    },
-    tafang: {
-      name: "塔防",
-      config: {
-        tafang_turn: {
-          name: "游戏胜利",
-          init: "10",
-          frequent: true,
-          item: {
-            10: "十回合",
-            20: "二十回合",
-            30: "三十回合",
-            1000: "无限",
-          },
-        },
-        // tafang_size:{
-        // 	name:'战场大小',
-        // 	init:'9',
-        // 	frequent:true,
-        // 	item:{
-        // 		'6':'小',
-        // 		'9':'中',
-        // 		'12':'大',
-        // 	}
-        // },
-        tafang_difficulty: {
-          name: "战斗难度",
-          init: "2",
-          frequent: true,
-          item: {
-            1: "简单",
-            2: "普通",
-            3: "困难",
-          },
-        },
-        show_range: {
-          name: "显示卡牌范围",
-          init: true,
-        },
-        show_distance: {
-          name: "显示距离",
-          init: true,
-        },
-        chessscroll_speed: {
-          name: "边缘滚动速度",
-          intro: "鼠标移至屏幕边缘时自动滚屏",
-          init: "20",
-          item: {
-            0: "不滚动",
-            10: "10格/秒",
-            20: "20格/秒",
-            30: "30格/秒",
-          },
-        },
-      },
-    },
     brawl: {
       name: "乱斗",
       config: {
@@ -8823,159 +8048,6 @@ export class Library {
         },
       },
     },
-    stone: {
-      name: "炉石",
-      config: {
-        // update:function(config,map){
-        // 	if(config.stone_mode=='deck'){
-        // 		// map.deck_length.show();
-        // 		// map.deck_repeat.show();
-        // 		map.random_length.hide();
-        // 		map.skill_bar.show();
-        // 	}
-        // 	else{
-        // 		// map.deck_length.hide();
-        // 		// map.deck_repeat.hide();
-        // 		map.random_length.show();
-        // 		map.skill_bar.hide();
-        // 	}
-        // },
-        // stone_mode:{
-        // 	name:'游戏模式',
-        // 	init:'deck',
-        // 	item:{
-        // 		deck:'构筑',
-        // 		random:'随机'
-        // 	},
-        // 	restart:true,
-        // 	frequent:true,
-        // },
-        // deck_length:{
-        // 	name:'卡组长度',
-        // 	init:'30',
-        // 	item:{
-        // 		'30':'30张',
-        // 		'50':'50张',
-        // 		'80':'80张',
-        // 	},
-        // 	frequent:true,
-        // },
-        // deck_repeat:{
-        // 	name:'重复卡牌',
-        // 	init:'2',
-        // 	item:{
-        // 		'2':'2张',
-        // 		'3':'3张',
-        // 		'5':'5张',
-        // 		'80':'无限',
-        // 	},
-        // 	frequent:true,
-        // },
-        // random_length:{
-        // 	name:'随从牌数量',
-        // 	init:'1/80',
-        // 	item:{
-        // 		'1/120':'少',
-        // 		'1/80':'中',
-        // 		'1/50':'多',
-        // 	},
-        // 	frequent:true,
-        // },
-        battle_number: {
-          name: "出场人数",
-          init: "1",
-          frequent: true,
-          item: {
-            1: "一人",
-            2: "两人",
-            3: "三人",
-            4: "四人",
-            6: "六人",
-            8: "八人",
-            10: "十人",
-          },
-          onclick(num) {
-            game.saveConfig("battle_number", num, this._link.config.mode)
-            if (_status.connectMode) {
-              return
-            }
-            if (!_status.event.getParent().showConfig && !_status.event.showConfig) {
-              return
-            }
-            if (_status.event.getParent().changeDialog) {
-              _status.event.getParent().changeDialog()
-            }
-          },
-        },
-        mana_mode: {
-          name: "行动值变化",
-          init: "inc",
-          item: {
-            inf: "涨落",
-            inc: "递增",
-          },
-          frequent: true,
-        },
-        skill_bar: {
-          name: "怒气值",
-          init: true,
-          frequent: true,
-          restart: true,
-        },
-        double_character: {
-          name: "双将模式",
-          init: false,
-          frequent: true,
-          restart: function () {
-            return (
-              _status.event.getParent().name != "chooseCharacter" ||
-              _status.event.name != "chooseButton"
-            )
-          },
-        },
-        free_choose: {
-          name: "自由选将",
-          init: true,
-          onclick(bool) {
-            game.saveConfig("free_choose", bool, this._link.config.mode)
-            if (_status.connectMode) {
-              return
-            }
-            if (
-              get.mode() != this._link.config.mode ||
-              (!_status.event.getParent().showConfig && !_status.event.showConfig)
-            ) {
-              return
-            }
-            if (!ui.cheat2 && get.config("free_choose")) {
-              ui.create.cheat2()
-            } else if (ui.cheat2 && !get.config("free_choose")) {
-              ui.cheat2.close()
-              delete ui.cheat2
-            }
-          },
-        },
-        change_choice: {
-          name: "开启换将卡",
-          init: true,
-          onclick(bool) {
-            game.saveConfig("change_choice", bool, this._link.config.mode)
-            if (_status.connectMode) {
-              return
-            }
-            if (!_status.event.getParent().showConfig && !_status.event.showConfig) {
-              return
-            }
-            if (!ui.cheat && get.config("change_choice")) {
-              ui.create.cheat()
-            } else if (ui.cheat && !get.config("change_choice")) {
-              ui.cheat.close()
-              delete ui.cheat
-            }
-          },
-        },
-      },
-    },
   }
   status = {
     running: false,
@@ -8989,7 +8061,7 @@ export class Library {
   }
   help = {
     关于游戏:
-      '<div style="margin:10px">关于三国杀</div><ul style="margin-top:0"><li>三国杀官方发布地址仅有GitHub仓库！<br><a href="https://github.com/libwtk/wtk">点击前往Github仓库</a><br><li>三国杀基于GPLv3开源协议。<br><a href="https://www.gnu.org/licenses/gpl-3.0.html">点击查看GPLv3协议</a><br><li>其他所有的所谓“三国杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与三国杀官方无关！',
+      '<div style="margin:10px">关于三国杀</div><ul style="margin-top:0"><li>三国杀基于GPLv3开源协议。<br><a href="https://www.gnu.org/licenses/gpl-3.0.html">点击查看GPLv3协议</a><br><li>其他所有的所谓“三国杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与三国杀官方无关！',
     游戏操作:
       "<ul><li>长按/鼠标悬停/右键单击显示信息。<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管。<li>键盘快捷键<br>" +
       "<table><tr><td>A<td>切换托管<tr><td>W<td>切换不询问无懈<tr><td>空格<td>暂停</table><li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。</ul>",
@@ -9389,75 +8461,6 @@ export class Library {
         next = next.next
       }
       next.die()
-    },
-    /**
-     * 在控制台输出每个扩展文件夹内的所有文件
-     *
-     * 需要node环境
-     *
-     * @param  { ...string } args 只需要显示的文件夹首字符
-     */
-    x(...args) {
-      /**
-       * @param { string } dir
-       * @param { (folders: string[], files: string[]) => any } callback
-       */
-      const gl = function (dir, callback) {
-        const files = [],
-          folders = []
-        // dir = '/Users/widget/Documents/extension/' + dir;
-        dir = lib.node.path.join(__dirname, "extension", dir)
-        lib.node.fs.promises
-          .readdir(dir)
-          .then((filelist) => {
-            for (let i = 0; i < filelist.length; i++) {
-              if (filelist[i][0] != "." && filelist[i][0] != "_") {
-                if (lib.node.fs.statSync(dir + "/" + filelist[i]).isDirectory()) {
-                  folders.push(filelist[i])
-                } else {
-                  files.push(filelist[i])
-                }
-              }
-            }
-            callback(folders, files)
-          })
-          .catch((e) => {
-            throw e
-          })
-      }
-      for (let i = 0; i < args.length; i++) {
-        args[i] = args[i][0]
-      }
-      gl("", function (list) {
-        if (args.length) {
-          for (let i = 0; i < list.length; i++) {
-            if (!args.includes(list[i][0])) {
-              list.splice(i--, 1)
-            }
-          }
-        }
-        if (list.length) {
-          for (let i = 0; i < list.length; i++) {
-            let str = list[i]
-            gl(str, function (folders, files) {
-              if (files.length > 1) {
-                for (let j = 0; j < files.length; j++) {
-                  if (typeof files[i] == "string" && files[i].includes("extension.js")) {
-                    files.splice(j--, 1)
-                  } else {
-                    if (j % 5 == 0) {
-                      str += "\n\t\t\t"
-                    }
-                    str += '"' + files[j] + '",'
-                  }
-                }
-                console.log(str.slice(0, str.length - 1))
-                game.print(str.slice(0, str.length - 1))
-              }
-            })
-          }
-        }
-      })
     },
     /**
      * 游戏设置变更为固定数据(不更改扩展设置)
@@ -12459,8 +11462,6 @@ export class Library {
           this.send("denied", "version")
           lib.node.clients.remove(this)
           this.closed = true
-        } else if (get.config("check_extension", "connect") && config.extension) {
-          this.send("denied", "extension")
         } else if (!_status.waitingForPlayer) {
           if (!config.nickname) {
             this.send("denied", "banned")
@@ -12878,7 +11879,6 @@ export class Library {
             avatar: lib.config.connect_avatar,
             nickname: get.connectNickname(),
             versionLocal: lib.version,
-            extension: lib.config.extensions.some((ext) => lib.config[`extension_${ext}_enable`]),
           },
           lib.config.banned_info,
         )
@@ -13791,14 +12791,6 @@ export class Library {
           case "offline":
             if (_status.paused && _status.event.name == "game") {
               setTimeout(game.resume, 500)
-            }
-            break
-          case "extension":
-            if (confirm("加入失败：房间禁止使用扩展！是否关闭所有扩展？")) {
-              let libexts = lib.config.extensions
-              for (let i = 0; i < libexts.length; i++) {
-                game.saveConfig("extension_" + libexts[i] + "_enable", false)
-              }
             }
             break
           default:

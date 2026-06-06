@@ -1659,53 +1659,7 @@ input.fileinput::-webkit-file-upload-button {
   overflow: hidden;
 }
 
-.videonode.menubutton.extension {
-  text-align: left;
-  height: auto;
-  max-height: 90px;
-}
-
-.videonode.menubutton.extension.current {
-  max-height: 400px;
-}
-
 .videonode.menubutton > div {
-  position: absolute;
-}
-
-.videonode.menubutton.extension > div {
-  position: relative;
-  display: block;
-}
-
-#window:not(.nopointer)
-  .videonode.menubutton.extension
-  > .caption
-  > .menubutton:not(.transparent2):not(.nopointer) {
-  cursor: pointer;
-}
-
-.videonode.menubutton.extension > .caption > .menubutton {
-  position: relative;
-  float: right;
-  font-size: 16px;
-  padding: 0;
-  text-align: center;
-  width: 80px;
-  font-family:
-    "STHeiti", "SimHei", "Microsoft JhengHei", "Microsoft YaHei", "WenQuanYi Micro Hei", Helvetica,
-    Arial, sans-serif;
-}
-
-.videonode.menubutton.extension > .caption > .menubutton > a {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 0;
-  opacity: 0;
-  cursor: pointer;
   position: absolute;
 }
 
@@ -1734,12 +1688,6 @@ input.fileinput::-webkit-file-upload-button {
   white-space: nowrap;
 }
 
-.videonode.menubutton.extension > .caption {
-  left: 0;
-  top: 0;
-  margin-left: 2px;
-}
-
 .videonode.menubutton > .text {
   font-size: 14px;
   left: 85px;
@@ -1749,27 +1697,6 @@ input.fileinput::-webkit-file-upload-button {
   font-family:
     "STHeiti", "SimHei", "Microsoft JhengHei", "Microsoft YaHei", "WenQuanYi Micro Hei", Helvetica,
     Arial, sans-serif;
-}
-
-.videonode.menubutton.extension > .text {
-  left: 0;
-  top: 0;
-  margin-left: 5px;
-}
-
-.videonode.menubutton.extension > .text.author > span {
-  /*float: right;*/
-  position: absolute;
-  right: 0;
-  top: 0;
-  transform: translateY(2px) scale(0.7);
-  width: 80px;
-  text-align: center;
-  opacity: 0;
-}
-
-.videonode.menubutton.extension.current > .text.author > span {
-  opacity: 1;
 }
 
 .videonode.menubutton > .victory {
@@ -1986,64 +1913,6 @@ input.fileinput::-webkit-file-upload-button {
 
 .favmode {
   float: right;
-}
-
-#create-extension {
-  height: calc(100% - 5px);
-  width: calc(100% - 10px);
-  overflow: hidden;
-}
-
-#create-extension > div {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  overflow: scroll;
-  left: 0;
-  top: 0;
-}
-
-#create-extension > .menu-buttons {
-  left: 10px;
-  height: calc(100% - 5px);
-  width: calc(100% - 15px) !important;
-}
-
-#create-extension > .menu-buttons > .config.more {
-  margin-left: 0px !important;
-  margin-top: 10px !important;
-}
-
-#create-extension > .menu-buttons > .config.more.margin-bottom {
-  margin-left: 0px !important;
-  margin-top: 10px !important;
-  margin-bottom: 5px !important;
-}
-
-#create-extension > .hidden {
-  pointer-events: none;
-}
-
-#create-extension > div:not(*:first-child).hidden {
-  transform: translateX(200px);
-}
-
-#create-extension > .menu-buttons > .new_character > .skill_list {
-  top: 290px;
-}
-
-#create-extension > .menu-buttons > .new_character > .skill_list > div:first-child {
-  transition: all 0s;
-}
-
-#create-extension > .menu-buttons > .new_character > .skill_list > div:first-child:not(*:empty) {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-#create-extension > .menu-buttons > .new_character > .skill_list > div:first-child > button {
-  margin-right: 3px;
-  margin-bottom: 3px;
 }
 
 div.popup-container.editor,

@@ -2,7 +2,6 @@ import { lib, game, get, _status, ai, ui } from "wtk"
 import { menu } from "./menu/index.js"
 import { cardPackMenu } from "./menu/pages/cardPackMenu.js"
 import { characterPackMenu } from "./menu/pages/characterPackMenu.js"
-import { extensionMenu } from "./menu/pages/exetensionMenu.js"
 import { optionsMenu } from "./menu/pages/optionsMenu.js"
 import { otherMenu } from "./menu/pages/otherMenu.js"
 import { startMenu } from "./menu/pages/startMenu.js"
@@ -159,178 +158,9 @@ export class Create {
 
     const editor = ui.create.div(editorpage)
 
-    const extensions = [
-      basicSetup,
-      lintGutter(), // 显示lint信息的gutter
-      search({ top: true }), // 启用搜索面板
-      highlightSelectionMatches(), // 高亮匹配的选择项
-    ]
-
-    if (language === "javascript" || language === "typescript") {
-      const { javascript, scopeCompletionSource, javascriptLanguage, esLint } =
-        await import("@codemirror/lang-javascript")
-      const { security } = await import("@/util/sandbox.js")
-      let proxyWindow = Object.assign({}, window, {
-        _status: _status,
-        lib: lib,
-        game: game,
-        ui: ui,
-        get: get,
-        ai: ai,
-        player: lib.element.player,
-        card: lib.element.card,
-        event: lib.element.event,
-        dialog: lib.element.dialog,
-      })
-      if (security.isSandboxRequired()) {
-        const { Monitor, AccessAction } = security.importSandbox()
-        new Monitor()
-          .action(AccessAction.DEFINE)
-          .action(AccessAction.WRITE)
-          .action(AccessAction.DELETE)
-          .require("target", proxyWindow)
-          .require(
-            "property",
-            "_status",
-            "lib",
-            "game",
-            "ui",
-            "get",
-            "ai",
-            "player",
-            "card",
-            "event",
-            "dialog",
-          )
-          .then((access, nameds, control) => {
-            if (access.action == AccessAction.DEFINE) {
-              control.preventDefault()
-              control.stopPropagation()
-              control.setReturnValue(false)
-              return
-            }
-
-            //
-            control.overrideParameter("target", window)
-          })
-          .start()
-      } else {
-        const keys = [
-          "_status",
-          "lib",
-          "game",
-          "ui",
-          "get",
-          "ai",
-          "player",
-          "card",
-          "event",
-          "dialog",
-        ]
-
-        for (const key of keys) {
-          const descriptor = Reflect.getOwnPropertyDescriptor(proxyWindow, key)
-          if (!descriptor) {
-            continue
-          }
-          descriptor.writable = false
-          descriptor.enumerable = true
-          descriptor.configurable = false
-          Reflect.defineProperty(proxyWindow, key, descriptor)
-        }
-
-        proxyWindow = new Proxy(proxyWindow, {
-          set(target, propertyKey, value, receiver) {
-            if (typeof propertyKey == "string" && keys.includes(propertyKey)) {
-              return Reflect.set(target, propertyKey, value, receiver)
-            }
-
-            return Reflect.set(window, propertyKey, value)
-          },
-        })
-      }
-
-      extensions.push(
-        javascript({ typescript: true }),
-        javascriptLanguage.data.of({
-          autocomplete: scopeCompletionSource(proxyWindow),
-        }),
-      )
-      if (language === "javascript") {
-        const { Linter } = await import("eslint-linter-browserify")
-        extensions.push(
-          linter(
-            esLint(new Linter(), {
-              rules: {
-                "no-class-assign": 0,
-                "no-console": 0,
-                "no-constant-condition": [
-                  "error",
-                  {
-                    checkLoops: false,
-                  },
-                ],
-                "no-irregular-whitespace": [
-                  "error",
-                  {
-                    skipStrings: true,
-                    skipTemplates: true,
-                  },
-                ],
-                "prefer-const": 0,
-                "no-redeclare": 0,
-                "no-undef": 0,
-                "no-empty": [
-                  "error",
-                  {
-                    allowEmptyCatch: true,
-                  },
-                ],
-                "no-unused-vars": 1,
-                "require-yield": 0,
-                "no-fallthrough": ["error", { commentPattern: "\\[falls[\\s\\w]*through\\]" }],
-              },
-              languageOptions: {
-                ecmaVersion: 13,
-                sourceType: "module",
-              },
-            }),
-          ),
-        )
-      }
-    } else if (language === "css") {
-      const { css } = await import("@codemirror/lang-css")
-      extensions.push(css())
-    } else if (language === "json") {
-      const { json, jsonParseLinter } = await import("@codemirror/lang-json")
-      extensions.push(json(), linter(jsonParseLinter()))
-    } else if (language === "html") {
-      const { html } = await import("@codemirror/lang-html")
-      const { parser: htmlParser } = await import("@lezer/html")
-      const { parser: jsParser } = await import("@lezer/javascript")
-      const { parseMixed } = await import("@lezer/common")
-      const { LRLanguage } = await import("@codemirror/language")
-
-      const mixedHTMLParser = htmlParser.configure({
-        wrap: parseMixed((node) => {
-          return node.name == "ScriptText" ? { parser: jsParser } : null
-        }),
-      })
-
-      const mixedHTML = LRLanguage.define({ parser: mixedHTMLParser })
-      extensions.push(html())
-    } else if (language === "markdown") {
-      const { markdown } = await import("@codemirror/lang-markdown")
-      extensions.push(markdown())
-    } else if (language === "vue") {
-      const { vue } = await import("@codemirror/lang-vue")
-      extensions.push(vue())
-    }
-
     const view = new EditorView({
       doc: value,
       parent: editor,
-      extensions,
     })
     lib.setScroll(view.scrollDOM)
     // return view;
@@ -463,9 +293,7 @@ export class Create {
         if (typeof img != "string") {
           img = null
         } else {
-          if (img.startsWith("ext:")) {
-            img = img.replace(/^ext:/, "extension/")
-          } else if (
+          if (
             ["character:"].some((prefix) => img.startsWith(prefix)) ||
             ["background", "card"].includes(img)
           ) {
@@ -480,11 +308,6 @@ export class Create {
           } else if (typeof img == "string") {
             bg.setBackgroundImage(img)
           }
-          /*if (img.startsWith("ext:")) {
-						bg.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-					} else {
-						bg.setBackgroundDB(img);
-					}*/
         } else {
           if (lib.card[cardName].modeimage) {
             bg.setBackgroundImage(
@@ -512,12 +335,6 @@ export class Create {
             bg.setBackgroundImage(img)
             bg.style.backgroundSize = "cover"
           }
-          /*if (img.startsWith("ext:")) {
-						bg.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-						bg.style.backgroundSize = "cover";
-					} else {
-						bg.setBackgroundDB(img);
-					}*/
         } else if (get.dynamicVariable(lib.card[cardName].image, card)) {
           if (get.dynamicVariable(lib.card[cardName].image, card).startsWith("character:")) {
             bg.setBackground(
@@ -552,12 +369,6 @@ export class Create {
             bg.setBackgroundImage(img)
             bg.style.backgroundSize = "cover"
           }
-          /*if (img.startsWith("ext:")) {
-						bg.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-						bg.style.backgroundSize = "cover";
-					} else {
-						bg.setBackgroundDB(img);
-					}*/
         } else {
           bg.setBackground(get.dynamicVariable(lib.card[cardName].image, card))
         }
@@ -938,8 +749,6 @@ export class Create {
   characterPackMenu = characterPackMenu
   /** 创建“卡牌”菜单 */
   cardPackMenu = cardPackMenu
-  /** 创建“扩展”菜单 */
-  extensionMenu = extensionMenu
   /** 创建“其他”菜单 */
   otherMenu = otherMenu
   statictable() {
@@ -1754,16 +1563,6 @@ export class Create {
         }
         packlist.add(lib.config.characters[i])
       }
-      Object.keys(lib.characterPack)
-        .filter((key) => {
-          if (key.indexOf("mode_extension") != 0) {
-            return false
-          }
-          const extName = key.slice(15)
-          //if (!game.hasExtension(extName) || !game.hasExtensionLoaded(extName)) return false;
-          return lib.config[`extension_${extName}_characters_enable`] === true
-        })
-        .forEach((key) => packlist.add(key))
       for (var i = 0; i < packlist.length; i++) {
         var span = document.createElement("div")
         span.style.display = "inline-block"

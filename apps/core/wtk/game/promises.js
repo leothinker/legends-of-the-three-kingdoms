@@ -163,25 +163,6 @@ export class GamePromises {
   saveConfigValue(key) {
     return game.promises.saveConfig(key, lib.config[key])
   }
-  /**
-   * @param { string } extension
-   * @param { string } key
-   * @param { * } [value]
-   */
-  saveExtensionConfig(extension, key, value) {
-    return game.promises.saveConfig(`extension_${extension}_${key}`, value)
-  }
-  /**
-   * @param { string } extension
-   * @param { string } key
-   */
-  saveExtensionConfigValue(extension, key) {
-    return game.promises.saveExtensionConfig(
-      extension,
-      key,
-      game.getExtensionConfig(extension, key),
-    )
-  }
 
   /**
    * 检查指定的路径是否是一个文件

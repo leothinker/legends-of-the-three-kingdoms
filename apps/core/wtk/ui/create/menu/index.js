@@ -481,9 +481,9 @@ export function menu(connectMenu) {
         clickContainer.call(cacheMenuContainer, connectMenu)
       }
     }
-    menux = createMenu(connectMenu, ["开始", "选项", "武将", "卡牌", "扩展", "其它"], {
+    menux = createMenu(connectMenu, ["开始", "选项", "武将", "卡牌", "其它"], {
       position: cacheMenuContainer,
-      bar: 40,
+      bar: 67.5,
     })
   } else {
     ui.connectMenuContainer = cacheMenuContainer
@@ -521,7 +521,7 @@ export function menu(connectMenu) {
 
     menux = createMenu(connectMenu, ["模式", "武将", "卡牌"], {
       position: cacheMenuContainer,
-      bar: 123,
+      bar: 122.5,
     })
     // menu = menux.menu;
     let cacheMenux = menux
@@ -542,15 +542,10 @@ export function menu(connectMenu) {
   let updatecardPackMenu = ui.create.cardPackMenu(connectMenu)
   ui.updateCardPackMenu.push(updatecardPackMenu)
 
-  // 扩展
-  ui.create.extensionMenu(connectMenu)
-
   // 其他
   ui.create.otherMenu(connectMenu)
 
   if (menuTimeout) {
     clearTimeout(menuTimeout)
-    delete window.resetExtension
-    localStorage.removeItem(lib.configprefix + "disable_extension", true)
   }
 }

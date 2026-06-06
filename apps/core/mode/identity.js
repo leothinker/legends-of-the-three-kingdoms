@@ -84,9 +84,6 @@ export default () => {
       },
       async (event, trigger, player) => {
         if (lib.config.new_tutorial) {
-          if (!_status.connectMode) {
-            game.showChangeLog()
-          }
           return
         }
 

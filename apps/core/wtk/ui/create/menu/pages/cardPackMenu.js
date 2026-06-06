@@ -79,22 +79,6 @@ export const cardPackMenu = function (connectMenu) {
       var node = start.firstChild.childNodes[i]
       if (node.mode) {
         if (node.mode.startsWith("mode_")) {
-          // 扩展卡牌包开启逻辑
-          if (node.mode.startsWith("mode_extension")) {
-            const extName = node.mode.slice(15)
-            if (!game.hasExtension(extName) || !game.hasExtensionLoaded(extName)) {
-              continue
-            }
-            if (lib.config[`extension_${extName}_cards_enable`] == true) {
-              node.classList.remove("off")
-              node.link?.firstChild?.classList.add("on")
-            } else {
-              node.classList.add("off")
-              if (node.link) {
-                node.link.firstChild.classList.remove("on")
-              }
-            }
-          }
           continue
         }
         if (node.mode == "custom") {
@@ -133,31 +117,21 @@ export const cardPackMenu = function (connectMenu) {
   }
   var togglePack = function (bool) {
     var name = this._link.config._name
-    // 扩展卡牌包开启逻辑
-    if (name.startsWith("mode_extension")) {
-      const extName = name.slice(15)
-      if (!game.hasExtension(extName) || !game.hasExtensionLoaded(extName)) {
-        return false
-      }
-      game.saveExtensionConfig(extName, "cards_enable", bool)
-    }
     // 原逻辑
-    else {
-      if (connectMenu) {
-        if (!bool) {
-          lib.config.connect_cards.add(name)
-        } else {
-          lib.config.connect_cards.remove(name)
-        }
-        game.saveConfig("connect_cards", lib.config.connect_cards)
+    if (connectMenu) {
+      if (!bool) {
+        lib.config.connect_cards.add(name)
       } else {
-        if (bool) {
-          lib.config.cards.add(name)
-        } else {
-          lib.config.cards.remove(name)
-        }
-        game.saveConfig("cards", lib.config.cards)
+        lib.config.connect_cards.remove(name)
       }
+      game.saveConfig("connect_cards", lib.config.connect_cards)
+    } else {
+      if (bool) {
+        lib.config.cards.add(name)
+      } else {
+        lib.config.cards.remove(name)
+      }
+      game.saveConfig("cards", lib.config.cards)
     }
     updateNodes()
   }
@@ -256,22 +230,8 @@ export const cardPackMenu = function (connectMenu) {
         name: "开启",
         _name: mode,
         init: (() => {
-          // 扩展卡牌包开启逻辑
-          if (mode.startsWith("mode_extension")) {
-            const extName = mode.slice(15)
-            if (!game.hasExtension(extName) || !game.hasExtensionLoaded(extName)) {
-              return false
-            }
-            // 这块或许应该在加载扩展时候写
-            if (lib.config[`extension_${extName}_cards_enable`] === undefined) {
-              game.saveExtensionConfig(extName, "cards_enable", true)
-            }
-            return lib.config[`extension_${extName}_cards_enable`] === true
-          }
           // 原逻辑
-          else {
-            return lib.config.cards.includes(mode)
-          }
+          return lib.config.cards.includes(mode)
         })(),
         onclick: togglePack,
       })
@@ -290,11 +250,7 @@ export const cardPackMenu = function (connectMenu) {
           _status.clicked = false
           return
         }
-        if (
-          mode.startsWith("mode_") &&
-          !mode.startsWith("mode_extension_") &&
-          mode != "mode_banned"
-        ) {
+        if (mode.startsWith("mode_") && mode != "mode_banned") {
           return
         }
         ui.click.touchpop()

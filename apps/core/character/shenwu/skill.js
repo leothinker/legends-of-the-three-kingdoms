@@ -1,5 +1,4 @@
 import { lib, game, ui, get, ai, _status } from "wtk"
-import { type } from "../../mode/boss"
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {

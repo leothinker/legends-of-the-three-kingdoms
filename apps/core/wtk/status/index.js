@@ -49,22 +49,6 @@ export class status {
   prehidden_skills = []
   postReconnect = {}
   /**
-   * @type { string | undefined }
-   */
-  extension = undefined
-  /**
-   * @type { boolean }
-   */
-  importingExtension = false
-  /**
-   * @type { Promise<any>[] | undefined }
-   */
-  extensionLoading = undefined
-  /**
-   * @type { string[] | undefined }
-   */
-  extensionLoaded = undefined
-  /**
    * @type { { [key: string]: Promise<any>[] } | undefined }
    */
   importing = undefined

@@ -65,15 +65,7 @@ export class DefaultSplash implements IOnloadSplash {
   click(mode: string, node: HTMLDivElement): void {
     node.classList.add("clicked")
 
-    if (game.layout !== "mobile" && lib.layoutfixed.indexOf(mode) !== -1) {
-      game.layout = "mobile"
-      // @ts-expect-error ignore
-      ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`
-    } else if (
-      game.layout === "mobile" &&
-      lib.config.layout !== "mobile" &&
-      lib.layoutfixed.indexOf(mode) === -1
-    ) {
+    if (game.layout === "mobile" && lib.config.layout !== "mobile") {
       game.layout = lib.config.layout
       if (game.layout === "default") {
         // @ts-expect-error ignore

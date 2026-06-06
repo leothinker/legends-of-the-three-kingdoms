@@ -7794,9 +7794,6 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       nameinfo = get.character(name),
       gzbool = false
     if (nameinfo.skinPath) {
-      if (nameinfo.skinPath.startsWith("ext:")) {
-        return nameinfo.skinPath.replace(/^ext:/, "extension/")
-      }
       return nameinfo.skinPath
     }
     const mode = get.mode()
@@ -7846,8 +7843,6 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     }
     if (imgPrefixUrl) {
       src = imgPrefixUrl
-    } else if (extimage) {
-      src = extimage.replace(/^ext:/, "extension/")
     } else if (dbimage) {
       src = dbimage.slice(3)
     } else if (modeimage) {

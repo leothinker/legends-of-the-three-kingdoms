@@ -1,6 +1,6 @@
 import { ui, game, lib } from "wtk"
 
-// https://github.com/libwtk/wtk/archive/refs/tags/v1.10.10.zip
+// https://github.com/libnoname/noname/archive/refs/tags/v1.10.10.zip
 
 /**
  * HTTP响应头中的Rate Limit相关信息：

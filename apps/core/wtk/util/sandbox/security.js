@@ -518,7 +518,6 @@ async function initSecurity({ lib, game, ui, get, ai, _status }) {
     "removeDir",
     "checkForUpdate",
     "checkForAssetUpdate",
-    "importExtension",
     "export",
     "multiDownload2",
     "multiDownload",

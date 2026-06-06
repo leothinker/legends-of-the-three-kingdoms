@@ -6,7 +6,7 @@
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/libwtk/wtk.git"
+    "url": "git+https://github.com/libnoname/noname.git"
   },
   "type": "module",
   "main": "dist",

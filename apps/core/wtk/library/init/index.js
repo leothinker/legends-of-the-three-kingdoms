@@ -17,65 +17,54 @@ export class LibInit {
     if (window.inSplash) {
       return
     }
-    if (window.resetExtension) {
-      if (
-        confirm(
-          "游戏似乎未正常载入，有可能因为部分扩展未正常载入，或者因为部分扩展未载入完毕。\n是否禁用扩展并重新打开？",
-        )
-      ) {
-        window.resetExtension()
-        window.location.reload()
-      }
-    } else {
-      if (lib.device) {
-        if (navigator.notification) {
-          navigator.notification.confirm(
-            "游戏似乎未正常载入，是否重置游戏？",
-            function (index) {
-              if (index == 2) {
-                localStorage.removeItem("wtk_inited")
-                window.location.reload()
-              } else if (index == 3) {
-                var wtk_inited = localStorage.getItem("wtk_inited")
-                var onlineKey = localStorage.getItem(lib.configprefix + "key")
-                localStorage.clear()
-                if (wtk_inited) {
-                  localStorage.setItem("wtk_inited", wtk_inited)
-                }
-                if (onlineKey) {
-                  localStorage.setItem(lib.configprefix + "key", onlineKey)
-                }
-                if (indexedDB) {
-                  indexedDB.deleteDatabase(lib.configprefix + "data")
-                }
-                setTimeout(function () {
-                  window.location.reload()
-                }, 200)
+    if (lib.device) {
+      if (navigator.notification) {
+        navigator.notification.confirm(
+          "游戏似乎未正常载入，是否重置游戏？",
+          function (index) {
+            if (index == 2) {
+              localStorage.removeItem("wtk_inited")
+              window.location.reload()
+            } else if (index == 3) {
+              var wtk_inited = localStorage.getItem("wtk_inited")
+              var onlineKey = localStorage.getItem(lib.configprefix + "key")
+              localStorage.clear()
+              if (wtk_inited) {
+                localStorage.setItem("wtk_inited", wtk_inited)
               }
-            },
-            "确认退出",
-            ["取消", "重新下载", "重置设置"],
-          )
-        } else {
-          if (confirm("游戏似乎未正常载入，是否重置游戏？")) {
-            localStorage.removeItem("wtk_inited")
-            window.location.reload()
-          }
-        }
+              if (onlineKey) {
+                localStorage.setItem(lib.configprefix + "key", onlineKey)
+              }
+              if (indexedDB) {
+                indexedDB.deleteDatabase(lib.configprefix + "data")
+              }
+              setTimeout(function () {
+                window.location.reload()
+              }, 200)
+            }
+          },
+          "确认退出",
+          ["取消", "重新下载", "重置设置"],
+        )
       } else {
         if (confirm("游戏似乎未正常载入，是否重置游戏？")) {
-          var onlineKey = localStorage.getItem(lib.configprefix + "key")
-          localStorage.clear()
-          if (onlineKey) {
-            localStorage.setItem(lib.configprefix + "key", onlineKey)
-          }
-          if (indexedDB) {
-            indexedDB.deleteDatabase(lib.configprefix + "data")
-          }
-          setTimeout(function () {
-            window.location.reload()
-          }, 200)
+          localStorage.removeItem("wtk_inited")
+          window.location.reload()
         }
+      }
+    } else {
+      if (confirm("游戏似乎未正常载入，是否重置游戏？")) {
+        var onlineKey = localStorage.getItem(lib.configprefix + "key")
+        localStorage.clear()
+        if (onlineKey) {
+          localStorage.setItem(lib.configprefix + "key", onlineKey)
+        }
+        if (indexedDB) {
+          indexedDB.deleteDatabase(lib.configprefix + "data")
+        }
+        setTimeout(function () {
+          window.location.reload()
+        }, 200)
       }
     }
   }
@@ -101,10 +90,6 @@ export class LibInit {
     if (lib.onfree) {
       clearTimeout(window.resetGameTimeout)
       delete window.resetGameTimeout
-      if (!game.syncMenu) {
-        delete window.resetExtension
-        localStorage.removeItem(lib.configprefix + "disable_extension")
-      }
 
       if (game.removeFile && lib.config.brokenFile.length) {
         while (lib.config.brokenFile.length) {
@@ -219,43 +204,6 @@ export class LibInit {
       : path
     if (path.startsWith("http")) {
       scriptSource += `?rand=${get.id()}`
-    } else if (
-      lib.config.fuck_sojson &&
-      !_status.connectMode &&
-      scriptSource.includes("extension") != -1 &&
-      scriptSource.startsWith(lib.assetURL)
-    ) {
-      const pathToRead = scriptSource.slice(lib.assetURL.length)
-      const alertMessage = `检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${pathToRead}`
-      if (typeof game.readFileAsText == "function") {
-        game.readFileAsText(
-          pathToRead,
-          (result) => {
-            if (
-              result.includes("sojson") ||
-              result.includes("jsjiami") ||
-              result.includes("var _0x")
-            ) {
-              alert(alertMessage)
-            }
-          },
-          () => void 0,
-        )
-      } else if (location.origin != "file://") {
-        lib.init.req(
-          pathToRead,
-          (result) => {
-            if (
-              result.includes("sojson") ||
-              result.includes("jsjiami") ||
-              result.includes("var _0x")
-            ) {
-              alert(alertMessage)
-            }
-          },
-          () => void 0,
-        )
-      }
     }
     const script = document.createElement("script")
     //script.type = "module";
@@ -692,10 +640,7 @@ export class LibInit {
      * @type {URL}
      */
     let resultUrl
-    if (linkString.startsWith("ext:")) {
-      let resultLink = `extension/${linkString.slice(4)}`
-      resultUrl = new URL(resultLink, rootURL)
-    } else if (URL.canParse(linkString)) {
+    if (URL.canParse(linkString)) {
       resultUrl = new URL(linkString)
     } else if (dbNow) {
       let content = new Blob([linkString], { type: "text/plain" })

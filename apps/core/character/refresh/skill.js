@@ -1519,39 +1519,47 @@ const skills = {
   rejiuyuan: {
     audio: 2,
     zhuSkill: true,
-    trigger: { global: "useCard" },
+    trigger: { global: "useCardToBegin" },
     direct: true,
     filter(event, player) {
       return (
-        player != event.player &&
+        event.player != player &&
         event.player.group == "wu" &&
+        event.target == event.player &&
         event.player.hp > player.hp &&
+        player.isDamaged() &&
         get.name(event.card) == "tao" &&
-        event.targets.includes(event.player) &&
         player.hasZhuSkill("rejiuyuan", event.player)
       )
     },
     async content(event, trigger, player) {
-      // step 0
       const result = await trigger.player
         .chooseBool(
-          "是否对" + get.translation(player) + "发动【救援】？",
-          "改为令其回复1点体力，然后你摸一张牌",
+          get.prompt("rejiuyuan", player),
+          "将【桃】转移给" + get.translation(player) + "，且结算结束后你摸一张牌",
         )
-        .set("ai", function () {
-          const evt = _status.event
-          return get.attitude(evt.player, evt.getParent().player) > 0
+        .set("ai", () => {
+          return get.attitude(get.event().player, player) > 0
         })
         .forResult()
 
-      // step 1
       if (result.bool) {
         player.logSkill("rejiuyuan")
         trigger.player.line(player, "green")
-        trigger.cancel()
-        await player.recover(trigger.player)
-        await trigger.player.draw()
+        trigger.target = player
+        trigger.player.addTempSkill("rejiuyuan_draw", "useCardAfter")
       }
+    },
+    subSkill: {
+      draw: {
+        trigger: { player: "useCardAfter" },
+        forced: true,
+        charlotte: true,
+        popup: false,
+        async content(event, trigger, player) {
+          await player.draw()
+        },
+      },
     },
   },
   // 界甘宁

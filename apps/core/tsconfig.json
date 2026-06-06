@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "exclude": ["dist", "output", "node_modules", "extension"],
+  "exclude": ["dist", "output", "node_modules"],
   "compilerOptions": {
     "lib": ["dom", "WebWorker", "ESNext"],
     "paths": {

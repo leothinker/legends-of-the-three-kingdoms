@@ -1634,11 +1634,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const custom_mapping = Array.isArray(beatmap.mapping)
       const mapping = custom_mapping ? beatmap.mapping.slice() : beatmap.mapping
       let hitsound = beatmap.hitsound || "hitsound.wav"
-      if (hitsound.startsWith("ext:")) {
-        hitsound = `${lib.assetURL}extension/${hitsound.slice(4)}`
-      } else {
-        hitsound = `${lib.assetURL}audio/effect/${hitsound}`
-      }
+      hitsound = `${lib.assetURL}audio/effect/${hitsound}`
       const hitsound_audio = new Audio(hitsound)
       hitsound_audio.volume = 0.25
       let abs = 1

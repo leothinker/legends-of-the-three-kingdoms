@@ -1,5 +1,5 @@
-import path from "node:path/posix"
 import fs from "node:fs"
+import path from "node:path/posix"
 
 function walkFiles(dir: string): string[] {
   const out: string[] = []
@@ -29,20 +29,25 @@ function toPosixRelative(fullPath: string, basePath: string): string {
 
 function getAllResources(basePath: string): string[] {
   const folders = ["audio", "font", "image", "theme"] as const
-  const excludeDirs = ["audio/effect", "image/flappybird", "image/pointer"] as const
+  const excludeDirs = [
+    "audio/effect",
+    "image/flappybird",
+    "image/pointer",
+  ] as const
 
   const allFiles: string[] = []
 
   for (const folder of folders) {
     const folderPath = path.join(basePath, folder)
-    if (!fs.existsSync(folderPath) || !fs.statSync(folderPath).isDirectory()) continue
+    if (!fs.existsSync(folderPath) || !fs.statSync(folderPath).isDirectory())
+      continue
 
     const files = walkFiles(folderPath)
     for (const file of files) {
       if (path.extname(file).toLowerCase() === ".css") continue
 
       const rel = toPosixRelative(file, basePath)
-      if (excludeDirs.some((ex) => rel.startsWith(ex + "/"))) continue
+      if (excludeDirs.some((ex) => rel.startsWith(`${ex}/`))) continue
 
       allFiles.push(rel)
     }
@@ -57,10 +62,16 @@ fs.mkdirSync("output/testpack", { recursive: true })
 
 for (const i of fs.readdirSync("dist")) {
   if (["audio", "font", "image"].includes(i)) continue //, "theme"
-  await fs.promises.cp(path.join("dist", i), path.join("output/testpack", i), { recursive: true })
+  await fs.promises.cp(path.join("dist", i), path.join("output/testpack", i), {
+    recursive: true,
+  })
 }
-const oldAsset = new Set(JSON.parse(fs.readFileSync("apps/core/game/asset.json", "utf-8")))
+const oldAsset = new Set(
+  JSON.parse(fs.readFileSync("apps/core/game/asset.json", "utf-8")),
+)
 asset = asset.filter((i) => !oldAsset.has(i))
 for (const i of asset) {
-  await fs.promises.cp(path.join("dist", i), path.join("output/testpack", i), { recursive: true })
+  await fs.promises.cp(path.join("dist", i), path.join("output/testpack", i), {
+    recursive: true,
+  })
 }

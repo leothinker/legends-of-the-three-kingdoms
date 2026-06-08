@@ -14,18 +14,18 @@
 `setContent(content)` 支持多种 content 形式：
 
 ```js
-event.setContent("phaseDraw")
+event.setContent("phaseDraw");
 event.setContent(function () {
-  "step 0"
-  player.draw()
-  ;("step 1")
-  player.chooseToDiscard(1, true)
-})
+  "step 0";
+  player.draw();
+  "step 1";
+  player.chooseToDiscard(1, true);
+});
 event.setContent(async function (event, trigger, player) {
-  await player.draw()
-  await player.chooseToDiscard(1, true)
-})
-event.setContent([fn1, fn2])
+  await player.draw();
+  await player.chooseToDiscard(1, true);
+});
+event.setContent([fn1, fn2]);
 ```
 
 其中：
@@ -75,13 +75,13 @@ content: function () {
 编译器会把它拆成类似：
 
 ```js
-;[
+[
   function step0(event, trigger, player) {
-    player.chooseCard("选择一张牌")
+    player.chooseCard("选择一张牌");
   },
   function step1(event, trigger, player) {
     if (result.bool) {
-      player.discard(result.cards)
+      player.discard(result.cards);
     }
   },
 ]
@@ -123,23 +123,23 @@ content: async function (event, trigger, player) {
 
 ## 核心区别
 
-| 对比项         | Step Content                          | Async Content                           |
-| -------------- | ------------------------------------- | --------------------------------------- |
-| 执行分段       | 通过 `"step 0"`、`"step 1"` 分段      | 一个普通 async 函数                     |
-| 等待子事件     | 每步结束后自动 `waitNext()`           | 需要显式 `await`                        |
-| 获取子事件结果 | 下一步直接用 `result`                 | `const result = await next.forResult()` |
-| 跳转           | `event.goto(n)`、`event.redo()`       | 用 `if/while/for/return/break/continue` |
-| 局部变量       | step 间不自然共享，通常要挂到 `event` | 普通局部变量自然可用                    |
-| 可读性         | 像状态机                              | 像正常异步流程                          |
-| 调试           | 依赖编译拆分后的代码片段              | 更接近原始代码                          |
+| 对比项 | Step Content | Async Content |
+| --- | --- | --- |
+| 执行分段 | 通过 `"step 0"`、`"step 1"` 分段 | 一个普通 async 函数 |
+| 等待子事件 | 每步结束后自动 `waitNext()` | 需要显式 `await` |
+| 获取子事件结果 | 下一步直接用 `result` | `const result = await next.forResult()` |
+| 跳转 | `event.goto(n)`、`event.redo()` | 用 `if/while/for/return/break/continue` |
+| 局部变量 | step 间不自然共享，通常要挂到 `event` | 普通局部变量自然可用 |
+| 可读性 | 像状态机 | 像正常异步流程 |
+| 调试 | 依赖编译拆分后的代码片段 | 更接近原始代码 |
 
 ## 隐式变量差异
 
 StepCompiler 会给每个 step 注入一些变量：
 
 ```js
-var { step, source, target, targets, card, cards, skill, forced, num, _result: result } = event
-var { _status, lib, game, ui, get, ai } = topVars
+var { step, source, target, targets, card, cards, skill, forced, num, _result: result } = event;
+var { _status, lib, game, ui, get, ai } = topVars;
 ```
 
 因此 step 中常见：
@@ -152,14 +152,14 @@ target.damage();
 Async 中推荐显式写：
 
 ```js
-const { target, targets, card, cards, num } = event
-const result = await player.chooseCard().forResult()
+const { target, targets, card, cards, num } = event;
+const result = await player.chooseCard().forResult();
 ```
 
 在角色包或模块文件里，`lib/game/ui/get/ai/_status` 通常已经通过 import 获得：
 
 ```js
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { lib, game, ui, get, ai, _status } from "wtk";
 ```
 
 ## result 的区别
@@ -167,7 +167,7 @@ import { lib, game, ui, get, ai, _status } from "wtk"
 Step 中的 `result` 不是 `event.result`，而是 `event._result` 的解构别名。
 
 ```js
-var { _result: result } = event
+var { _result: result } = event;
 ```
 
 `ArrayCompiler` 每一步后会更新：
@@ -179,21 +179,21 @@ event._result = 当前步骤返回值 ?? 子事件 result ?? 原 event._result
 所以旧写法：
 
 ```js
-"step 0"
-player.chooseTarget("选择一名角色")
+"step 0";
+player.chooseTarget("选择一名角色");
 
-;("step 1")
+"step 1";
 if (result.bool) {
-  event.target = result.targets[0]
+  event.target = result.targets[0];
 }
 ```
 
 转换成 async：
 
 ```js
-const result = await player.chooseTarget("选择一名角色").forResult()
+const result = await player.chooseTarget("选择一名角色").forResult();
 if (result.bool) {
-  event.target = result.targets[0]
+  event.target = result.targets[0];
 }
 ```
 
@@ -204,7 +204,7 @@ event.result = {
   bool: true,
   cards,
   targets,
-}
+};
 ```
 
 ## 等待子事件的区别
@@ -212,30 +212,30 @@ event.result = {
 Step：
 
 ```js
-"step 0"
-player.draw(2)
+"step 0";
+player.draw(2);
 
-;("step 1")
-player.chooseToDiscard(1, true)
+"step 1";
+player.chooseToDiscard(1, true);
 
-;("step 2")
-game.log(player, "完成了流程")
+"step 2";
+game.log(player, "完成了流程");
 ```
 
 Async：
 
 ```js
-await player.draw(2)
-await player.chooseToDiscard(1, true)
-game.log(player, "完成了流程")
+await player.draw(2);
+await player.chooseToDiscard(1, true);
+game.log(player, "完成了流程");
 ```
 
 注意：在 async 中如果你不写 `await`：
 
 ```js
-player.draw(2)
-player.chooseToDiscard(1, true)
-game.log(player, "完成了流程")
+player.draw(2);
+player.chooseToDiscard(1, true);
+game.log(player, "完成了流程");
 ```
 
 这些子事件仍可能被加入当前事件的 `next` 队列，并在 async 函数返回后的 `waitNext()` 中执行。但 `game.log` 会先运行，不会等待前面的事件结果。
@@ -257,15 +257,15 @@ game.log(player, "完成了流程")
 但项目中存在一类特殊事件：函数调用时会把刚创建的事件从当前事件的 `next` 中移除，然后挂到别的地方，例如：
 
 ```js
-event.next.remove(next)
-evt.after.push(next)
+event.next.remove(next);
+evt.after.push(next);
 ```
 
 或：
 
 ```js
-event.next.remove(next)
-trigger.next.push(next)
+event.next.remove(next);
+trigger.next.push(next);
 ```
 
 这类事件的语义是“安排到稍后/别的事件流程中执行”，不是“现在作为当前 content 的子事件执行”。在 async 转换时，不能对这类返回事件直接 `await`，否则会等待一个并不处于当前执行流程的事件，可能卡死，或至少得不到你以为的执行顺序。
@@ -301,7 +301,7 @@ const next = event.insertAfter(...);
 ```js
 const next = event.insertAfter(content, {
   player,
-})
+});
 ```
 
 它和 `event.insert(...)` 不同：
@@ -313,13 +313,13 @@ const next = event.insertAfter(content, {
 
 ```js
 // 不推荐：这个事件被安排在 after，不属于当前可立即等待的 next 流程
-await event.insertAfter(content, { player })
+await event.insertAfter(content, { player });
 ```
 
 应写成：
 
 ```js
-event.insertAfter(content, { player })
+event.insertAfter(content, { player });
 ```
 
 如果后续逻辑必须依赖它执行完，通常说明不该用 `insertAfter`；应改用 `event.insert(...)` 或直接 `await` 一个正常创建在当前 `next` 中的事件。
@@ -346,13 +346,13 @@ return next;
 所以转换时不要写：
 
 ```js
-await player.showCharacter(0)
+await player.showCharacter(0);
 ```
 
 应写成：
 
 ```js
-player.showCharacter(0)
+player.showCharacter(0);
 ```
 
 它的用途是“安排亮将相关事件在合适的时点结算”，不是让当前 async content 停下来等它。
@@ -377,13 +377,13 @@ if (evt && insert && evt.next.includes(next)) {
 不要写：
 
 ```js
-await player.insertPhase()
+await player.insertPhase();
 ```
 
 应写成：
 
 ```js
-player.insertPhase()
+player.insertPhase();
 ```
 
 如果你在当前技能中等待它，就相当于试图在当前流程里等待一个被插入到父级/回合循环队列中的事件，容易破坏调度顺序或卡住。
@@ -405,8 +405,8 @@ player.insertPhase()
 它们本身不返回需要等待的 `GameEvent`。转换 step 时不要试图把这些内部事件拿出来 `await`；按普通同步调用保留即可：
 
 ```js
-player.changeZhuanhuanji("skillName")
-player.logSkill("skillName", targets)
+player.changeZhuanhuanji("skillName");
+player.logSkill("skillName", targets);
 ```
 
 ### orderingDiscard 内部事件
@@ -416,18 +416,18 @@ player.logSkill("skillName", targets)
 典型模式：
 
 ```js
-const next = game.createEvent("orderingDiscard", false)
-event.next.remove(next)
-evt.after.push(next)
-next.relatedEvent = evt
-next.setContent("orderingDiscard")
+const next = game.createEvent("orderingDiscard", false);
+event.next.remove(next);
+evt.after.push(next);
+next.relatedEvent = evt;
+next.setContent("orderingDiscard");
 ```
 
 这类 `orderingDiscard` 是内部清理事件。外层调用仍然可以正常等待：
 
 ```js
-await game.cardsDiscard(cards)
-await player.lose(cards, ui.ordering)
+await game.cardsDiscard(cards);
+await player.lose(cards, ui.ordering);
 ```
 
 但不要把内部创建出来、已经改挂到 `after` 的 `orderingDiscard` 当成当前 content 的子事件来等待。
@@ -437,13 +437,13 @@ await player.lose(cards, ui.ordering)
 项目的具体技能里也能看到类似模式：
 
 ```js
-event.next.remove(next)
-trigger.after.push(next)
+event.next.remove(next);
+trigger.after.push(next);
 ```
 
 ```js
-event.next.remove(next)
-trigger.getParent().next.push(next)
+event.next.remove(next);
+trigger.getParent().next.push(next);
 ```
 
 转换这类 step 代码时，判断原则是：
@@ -466,7 +466,7 @@ next.setContent(...);
 不要追加：
 
 ```js
-await next
+await next;
 ```
 
 ## 基础转换规则
@@ -499,21 +499,21 @@ content: async function (event, trigger, player) {
 Step：
 
 ```js
-"step 0"
-player.chooseBool("是否摸一张牌？")
+"step 0";
+player.chooseBool("是否摸一张牌？");
 
-;("step 1")
+"step 1";
 if (result.bool) {
-  player.draw()
+  player.draw();
 }
 ```
 
 Async：
 
 ```js
-const result = await player.chooseBool("是否摸一张牌？").forResult()
+const result = await player.chooseBool("是否摸一张牌？").forResult();
 if (result.bool) {
-  await player.draw()
+  await player.draw();
 }
 ```
 
@@ -522,14 +522,14 @@ if (result.bool) {
 Step：
 
 ```js
-"step 0"
-event.count = 0
+"step 0";
+event.count = 0;
 
-;("step 1")
-player.draw()
-event.count++
+"step 1";
+player.draw();
+event.count++;
 if (event.count < 3) {
-  event.goto(1)
+  event.goto(1);
 }
 ```
 
@@ -537,7 +537,7 @@ Async：
 
 ```js
 for (let count = 0; count < 3; count++) {
-  await player.draw()
+  await player.draw();
 }
 ```
 
@@ -546,13 +546,13 @@ for (let count = 0; count < 3; count++) {
 Step：
 
 ```js
-"step 0"
-player.judge((card) => (get.color(card) == "black" ? 1 : -1))
+"step 0";
+player.judge(card => get.color(card) == "black" ? 1 : -1);
 
-;("step 1")
+"step 1";
 if (result.bool) {
-  player.draw()
-  event.redo()
+  player.draw();
+  event.redo();
 }
 ```
 
@@ -560,11 +560,11 @@ Async：
 
 ```js
 while (true) {
-  const result = await player.judge((card) => (get.color(card) == "black" ? 1 : -1)).forResult()
+  const result = await player.judge(card => (get.color(card) == "black" ? 1 : -1)).forResult();
   if (!result.bool) {
-    break
+    break;
   }
-  await player.draw()
+  await player.draw();
 }
 ```
 
@@ -573,32 +573,32 @@ while (true) {
 Step：
 
 ```js
-"step 0"
+"step 0";
 if (!player.countCards("h")) {
-  event.finish()
-  return
+  event.finish();
+  return;
 }
-player.chooseToDiscard(1, true)
+player.chooseToDiscard(1, true);
 
-;("step 1")
-player.draw()
+"step 1";
+player.draw();
 ```
 
 Async：
 
 ```js
 if (!player.countCards("h")) {
-  return
+  return;
 }
-await player.chooseToDiscard(1, true)
-await player.draw()
+await player.chooseToDiscard(1, true);
+await player.draw();
 ```
 
 如果需要保留事件 finished 状态给外部判断，可以写：
 
 ```js
-event.finish()
-return
+event.finish();
+return;
 ```
 
 ### 规则 6：跨 step 变量优先改成本地变量
@@ -606,20 +606,20 @@ return
 Step 中跨步骤常把数据挂到 `event`：
 
 ```js
-"step 0"
-event.target = trigger.player
-player.chooseCard("he", true)
+"step 0";
+event.target = trigger.player;
+player.chooseCard("he", true);
 
-;("step 1")
-event.target.gain(result.cards, player)
+"step 1";
+event.target.gain(result.cards, player);
 ```
 
 Async 中可以用局部变量：
 
 ```js
-const target = trigger.player
-const result = await player.chooseCard("he", true).forResult()
-await target.gain(result.cards, player)
+const target = trigger.player;
+const result = await player.chooseCard("he", true).forResult();
+await target.gain(result.cards, player);
 ```
 
 如果该数据需要给别的事件或后续系统读取，再保留 `event.target`。
@@ -917,15 +917,15 @@ content: async function (event, trigger, player) {
 错误：
 
 ```js
-player.chooseToDiscard(1, true)
-player.draw()
+player.chooseToDiscard(1, true);
+player.draw();
 ```
 
 这会先创建两个子事件，然后当前 async 函数直接继续/返回。若期望先弃牌再摸牌并让代码等待，应写：
 
 ```js
-await player.chooseToDiscard(1, true)
-await player.draw()
+await player.chooseToDiscard(1, true);
+await player.draw();
 ```
 
 ### 忘记 forResult
@@ -955,13 +955,13 @@ if (result.bool) ...
 这里的 `result` 是上一个子事件的结果。Async 中应改成本地变量：
 
 ```js
-const result = await next.forResult()
+const result = await next.forResult();
 ```
 
 只有需要设置当前事件结果时才写：
 
 ```js
-event.result = result
+event.result = result;
 ```
 
 ### 保留 event.goto 但没有必要

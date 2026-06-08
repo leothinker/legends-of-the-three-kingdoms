@@ -12,10 +12,10 @@ EventHandlers 是事件系统早期使用的回调注册机制，现已被淘汰
 
 ```js
 // beforeExecute — 事件 step 开始前
-event.callHandler("onXxx", event, { state: "begin" })
+event.callHandler("onXxx", event, { state: "begin" });
 
 // afterExecute — 事件 step 结束后
-event.callHandler("onXxx", event, { state: "end" })
+event.callHandler("onXxx", event, { state: "end" });
 ```
 
 其中 `"onXxx"` 由事件名派生：首字母大写，前缀 `on`。例如 `"damage"` → `"onDamage"`。

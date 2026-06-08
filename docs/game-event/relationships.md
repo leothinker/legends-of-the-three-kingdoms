@@ -80,16 +80,16 @@ popStatusEvent()            // 事件出栈
 
 `next` 和 `after` 的区别：
 
-|          | next                        | after                         |
-| -------- | --------------------------- | ----------------------------- |
-| 执行时机 | 下一轮 loop 迭代            | 所有 trigger 完成后           |
+|  | next | after |
+|--|------|-------|
+| 执行时机 | 下一轮 loop 迭代 | 所有 trigger 完成后 |
 | 使用场景 | `game.createEvent` 默认挂载 | `event.insertAfter`、延迟回调 |
 
 ### insert / insertAfter
 
 ```js
-event.insert(content, { player: target })
-event.insertAfter(cleanupContent, { player: target })
+event.insert(content, { player: target });
+event.insertAfter(cleanupContent, { player: target });
 ```
 
 - `insert(content, map)`：创建非 trigger 事件 push 到 `next`
@@ -110,7 +110,7 @@ event.insertAfter(cleanupContent, { player: target })
 
 事件树的层级关系定义"谁属于谁"，而事件栈决定"当前在执行谁"。
 
-### \_status.event — 当前事件指针
+### _status.event — 当前事件指针
 
 由 `GameEventManager.getStatusEvent()` 决定，按优先级依次返回：
 

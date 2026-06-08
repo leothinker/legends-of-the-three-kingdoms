@@ -10,11 +10,11 @@ GameEvent 是三国杀游戏内核的核心驱动机制。游戏中的所有行�
 
 **三种 content 写法**（按推荐度排序）：
 
-| 写法          | 状态     | 示例                                                          |
-| ------------- | -------- | ------------------------------------------------------------- |
+| 写法 | 状态 | 示例 |
+|------|------|------|
 | 单 async 函数 | **推荐** | `event.setContent(async (event, trigger, player) => { ... })` |
-| 函数数组      | 待废弃   | `event.setContent([fn1, fn2, fn3])`                           |
-| step 语法     | 待废弃   | `event.setContent(function() { "step 0"; ... })`              |
+| 函数数组 | 待废弃 | `event.setContent([fn1, fn2, fn3])` |
+| step 语法 | 待废弃 | `event.setContent(function() { "step 0"; ... })` |
 
 ## 模块架构
 
@@ -35,22 +35,22 @@ GameEvent 系统由五个正交模块组成：
 
 ### 模块职责
 
-| 模块             | 文档                                 | 职责                                               |
-| ---------------- | ------------------------------------ | -------------------------------------------------- |
-| 外部交互         | [interaction.md](interaction.md)     | 传参、Promise 接口、联机同步。系统唯一的对外合约面 |
-| 内部生命周期     | [lifecycle.md](lifecycle.md)         | 事件从创建到结束的完整状态流转，中断控制           |
-| Trigger          | [trigger.md](trigger.md)             | 技能触发时机的注册、收集、排序与执行               |
-| 事件关系         | [relationships.md](relationships.md) | 事件间的树结构、时序调度、调用栈管理               |
-| Content 编译     | [content.md](content.md)             | content 格式的编译链，从各种写法到统一可执行形式   |
-| chooseToUse 适配 | [chooseToUse.md](chooseToUse.md)     | 技能出牌/选择目标的备份恢复机制                    |
+| 模块 | 文档 | 职责 |
+|------|------|------|
+| 外部交互 | [interaction.md](interaction.md) | 传参、Promise 接口、联机同步。系统唯一的对外合约面 |
+| 内部生命周期 | [lifecycle.md](lifecycle.md) | 事件从创建到结束的完整状态流转，中断控制 |
+| Trigger | [trigger.md](trigger.md) | 技能触发时机的注册、收集、排序与执行 |
+| 事件关系 | [relationships.md](relationships.md) | 事件间的树结构、时序调度、调用栈管理 |
+| Content 编译 | [content.md](content.md) | content 格式的编译链，从各种写法到统一可执行形式 |
+| chooseToUse 适配 | [chooseToUse.md](chooseToUse.md) | 技能出牌/选择目标的备份恢复机制 |
 
 ### 废弃模块
 
 以下机制已标记废弃，文档独立存放，不在上述架构图中：
 
-| 文档                                 | 说明             |
-| ------------------------------------ | ---------------- |
-| [cache.md](cache.md)                 | 步骤级记忆化缓存 |
+| 文档 | 说明 |
+|------|------|
+| [cache.md](cache.md) | 步骤级记忆化缓存 |
 | [eventHandlers.md](eventHandlers.md) | 旧式回调注册机制 |
 
 ## 阅读指引

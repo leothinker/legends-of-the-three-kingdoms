@@ -30,9 +30,9 @@
 
 ## 待废弃
 
-| 方法/属性                                                                                                                  | 对应文档                             |
-| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `step` (getter/setter), `goto()`, `redo()`, `updateStep()`, `_result`                                                      | [content.md](content.md) 附录        |
-| `custom`, `backup()`, `restore()`                                                                                          | [chooseToUse.md](chooseToUse.md)     |
+| 方法/属性 | 对应文档 |
+| --------- | -------- |
+| `step` (getter/setter), `goto()`, `redo()`, `updateStep()`, `_result` | [content.md](content.md) 附录 |
+| `custom`, `backup()`, `restore()` | [chooseToUse.md](chooseToUse.md) |
 | `callHandler()`, `getHandler()`, `pushHandler()`, `hasHandler()`, `getDefaultHandlerType()`, `getDefaultNextHandlerType()` | [eventHandlers.md](eventHandlers.md) |
-| `putStepCache()`, `getStepCache()`, `clearStepCache()`, `callFuncUseStepCache()`, `putTempCache()`, `getTempCache()`       | [cache.md](cache.md)                 |
+| `putStepCache()`, `getStepCache()`, `clearStepCache()`, `callFuncUseStepCache()`, `putTempCache()`, `getTempCache()` | [cache.md](cache.md) |

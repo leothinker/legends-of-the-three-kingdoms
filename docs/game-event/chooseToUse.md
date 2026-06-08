@@ -18,7 +18,6 @@ chooseToUse 是事件为技能出牌/选择目标提供的筛选配置机制。�
 **通用属性**：`filterButton`、`selectButton`、`filterTarget`、`selectTarget`、`filterCard`、`selectCard`、`position`、`ai1`、`ai2` 等
 
 **viewAs 技能额外处理**：
-
 - `filterOk` 包装：检查 viewAs 函数是否允许当前卡牌
 - `filterCard` 先过 mod 检查再套用自定义 filter
 - 清除 `_buttonChoice`、`_cardChoice`、`_targetChoice` 等暂存的选择结果

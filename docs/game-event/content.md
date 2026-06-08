@@ -35,9 +35,9 @@ AsyncCompiler 和 StepCompiler 都是**预处理层**，统一将各自格式转
 
 ```ts
 interface IContentCompiler {
-  type: string // 编译器标识
-  filter(content: EventContent): boolean // 是否支持此 content
-  compile(content: EventCompileable): (e: GameEvent) => Promise<void>
+  type: string;                              // 编译器标识
+  filter(content: EventContent): boolean;     // 是否支持此 content
+  compile(content: EventCompileable): (e: GameEvent) => Promise<void>;
 }
 ```
 
@@ -58,10 +58,10 @@ interface IContentCompiler {
 
 ```js
 event.setContent(async (event, trigger, player) => {
-  await game.delay()
-  await player.draw(2)
-  await player.chooseToUse()
-})
+  await game.delay();
+  await player.draw(2);
+  await player.chooseToUse();
+});
 ```
 
 AsyncCompiler 将单个 async 函数包装为单元素数组 `[asyncFn]`，重新调用 `ContentCompiler.compile([asyncFn])` 使责任链匹配到 ArrayCompiler 执行。它是一个纯粹的适配层（约 19 行）。
@@ -98,7 +98,7 @@ ArrayCompiler 是所有 content 的最终执行器。编译后的函数实现一
 - `goto(n)`：设置 `step = n`（写入 `#nextStep`），下次 `updateStep()` 提交
 - `redo()`：等价于 `goto(this.step)`
 
-### \_result 传递
+### _result 传递
 
 `_result: Partial<Result>` 存储最后一个子事件的 result，在 step 间传递：
 
@@ -115,7 +115,6 @@ step N 返回值 → event._result → 作为第四参数传给 step N+1
 **`beforeExecute(event)`**：调用 `event.updateStep()` 提交排队的 step 变更
 
 **`isPrevented(event)`**：检查是否应终止当前步骤
-
 - 角色死亡 `player.isDead() && !event.forceDie` → 关闭 dieClose 弹窗，调用 `_oncancel`，finish
 - 角色离场 `player.isOut() && !event.includeOut` → finish（phase 事件额外标记 `_status.roundSkipped`）
 - 角色移除 `player.removed` → 无操作
@@ -125,13 +124,13 @@ step N 返回值 → event._result → 作为第四参数传给 step N+1
 
 ## 编译器对照
 
-|        | AsyncCompiler              | ArrayCompiler | StepCompiler       |
-| ------ | -------------------------- | ------------- | ------------------ |
-| type   | `"async"`                  | `"array"`     | `"step"`           |
-| filter | `instanceof AsyncFunction` | 函数数组      | 普通同步函数       |
-| 角色   | 适配层                     | 执行引擎      | 预处理器           |
-| 状态   | 推荐                       | 待废弃        | 待废弃             |
-| 独立性 | 依赖 ArrayCompiler         | 独立          | 依赖 ArrayCompiler |
+| | AsyncCompiler | ArrayCompiler | StepCompiler |
+|--|---------------|---------------|--------------|
+| type | `"async"` | `"array"` | `"step"` |
+| filter | `instanceof AsyncFunction` | 函数数组 | 普通同步函数 |
+| 角色 | 适配层 | 执行引擎 | 预处理器 |
+| 状态 | 推荐 | 待废弃 | 待废弃 |
+| 独立性 | 依赖 ArrayCompiler | 独立 | 依赖 ArrayCompiler |
 
 ---
 
@@ -139,11 +138,11 @@ step N 返回值 → event._result → 作为第四参数传给 step N+1
 
 ## 现状概述
 
-| 写法          | 状态             | 示例                                                      |
-| ------------- | ---------------- | --------------------------------------------------------- |
-| 单 async 函数 | **推荐**         | `setContent(async (event, trigger, player) => { ... })`   |
-| 函数数组      | 待废弃（次优先） | `setContent([fn1, fn2, fn3])`                             |
-| step 语法     | 待废弃（优先）   | `setContent(function() { "step 0"; ...; "step 1"; ... })` |
+| 写法 | 状态 | 示例 |
+|------|------|------|
+| 单 async 函数 | **推荐** | `setContent(async (event, trigger, player) => { ... })` |
+| 函数数组 | 待废弃（次优先） | `setContent([fn1, fn2, fn3])` |
+| step 语法 | 待废弃（优先） | `setContent(function() { "step 0"; ...; "step 1"; ... })` |
 
 - **step 语法**数量最大（约 3886 处），迁移最优先
 - **数组写法**直接传入数组的调用极少，但 `setContent("stringName")` 引用的预定义 content 大多内部也是数组
@@ -158,14 +157,14 @@ step N 返回值 → event._result → 作为第四参数传给 step N+1
 ```js
 event.setContent(function () {
   "step 0"
-  game.delay()
+  game.delay();
 
-  ;("step 1")
-  player.draw(2)
+  "step 1"
+  player.draw(2);
 
-  ;("step 2")
-  player.chooseToUse()
-})
+  "step 2"
+  player.chooseToUse();
+});
 ```
 
 ### StepCompiler 编译流程
@@ -181,17 +180,14 @@ event.setContent(function () {
 
 ```js
 new FunctionConstructor(
-  "topVars",
-  "event",
-  "trigger",
-  "player",
+  "topVars", "event", "trigger", "player",
   `
     var { step, source, target, targets, card, cards, skill, forced, num, _result: result } = event;
     var { _status, lib, game, ui, get, ai } = topVars;
     ${stepHead}
     { ${code} }
-  `,
-)
+  `
+);
 ```
 
 **安全机制**：使用 `security.getIsolatedsFrom(func)` 获取函数对应的隔离域 Function 构造函数，确保编译代码在正确沙盒中运行。
@@ -202,13 +198,9 @@ new FunctionConstructor(
 
 ```js
 event.setContent([
-  async (event) => {
-    await game.delay()
-  },
-  async (event) => {
-    await player.draw(2)
-  },
-])
+  async (event) => { await game.delay(); },
+  async (event) => { await player.draw(2); },
+]);
 ```
 
 每个函数作为独立一步执行，`goto`/`redo` 在数组中同样可用。
@@ -222,8 +214,8 @@ event.setContent([
 
 ```js
 event.setContent(async (event, trigger, player) => {
-  await game.delay()
-  await player.draw(2)
-  await player.chooseToUse()
-})
+  await game.delay();
+  await player.draw(2);
+  await player.chooseToUse();
+});
 ```

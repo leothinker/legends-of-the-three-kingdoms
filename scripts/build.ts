@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process"
 import fs from "node:fs/promises"
+
 spawnSync("pnpm -F wtk... build", {
   shell: true,
   stdio: "inherit",

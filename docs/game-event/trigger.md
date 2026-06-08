@@ -63,11 +63,11 @@ untrigger(all, player?)       // 取消触发（_triggered = 5 或 加入 _notri
 
 每项字段：
 
-| 字段       | 说明                                           |
-| ---------- | ---------------------------------------------- |
-| `player`   | 角色实例，或 `"firstDo"` / `"lastDo"` 特殊标识 |
-| `todoList` | 待触发的技能条目，按 priority 降序             |
-| `doneList` | 已触发过的技能条目（防止重复）                 |
+| 字段 | 说明 |
+|------|------|
+| `player` | 角色实例，或 `"firstDo"` / `"lastDo"` 特殊标识 |
+| `todoList` | 待触发的技能条目，按 priority 降序 |
+| `doneList` | 已触发过的技能条目（防止重复） |
 
 每个技能条目：`{ skill, player, priority, indexedData? }`
 
@@ -107,7 +107,7 @@ untrigger(all, player?)       // 取消触发（_triggered = 5 或 加入 _notri
 - `addTrigger(skills, player)`：沿 parent 链找 `arrangeTrigger`，检查技能是否定义了对应 trigger，加入适当队列。对普通条目检查重复，`indexedData` 条目不检查
 - `removeTrigger(skills, player)`：从 `arrangeTrigger` 所有队列中移除指定技能的条目
 
-## \_trigger / triggername — 因果链
+## _trigger / triggername — 因果链
 
 - `_trigger: GameEvent` — 指向触发此事件链的原始事件
 - `triggername: string` — 触发的时机名（如 `"useCardBegin"`）

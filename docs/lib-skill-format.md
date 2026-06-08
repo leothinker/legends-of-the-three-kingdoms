@@ -7,7 +7,7 @@
 ```js
 lib.skill = {
   技能名: 技能配置对象,
-}
+};
 ```
 
 角色包里的 `skill.js` 通常导出一个 `skills` 对象，加载后会被合并到 `lib.skill`。
@@ -19,12 +19,12 @@ const skills = {
     trigger: { player: "phaseJieshuBegin" },
     forced: true,
     async content(event, trigger, player) {
-      await player.draw()
+      await player.draw();
     },
   },
-}
+};
 
-export default skills
+export default skills;
 ```
 
 ## 核心分类
@@ -62,18 +62,10 @@ skillName: {
 `trigger` 表示监听的事件时机。常见 role：
 
 ```js
-trigger: {
-  player: "damageEnd"
-} // 当前事件的 event.player 是自己
-trigger: {
-  source: "damageSource"
-} // 当前事件的 event.source 是自己
-trigger: {
-  target: "useCardToTarget"
-} // 当前事件的 event.target 是自己
-trigger: {
-  global: "phaseJieshuBegin"
-} // 全局时机
+trigger: { player: "damageEnd" }       // 当前事件的 event.player 是自己
+trigger: { source: "damageSource" }    // 当前事件的 event.source 是自己
+trigger: { target: "useCardToTarget" } // 当前事件的 event.target 是自己
+trigger: { global: "phaseJieshuBegin" } // 全局时机
 ```
 
 时机可以是字符串，也可以是数组：
@@ -116,7 +108,7 @@ event.result = {
   cost_data: {
     cards: result.cards,
   },
-}
+};
 ```
 
 `content` 是技能效果本体。常用参数：
@@ -163,9 +155,9 @@ skillName: {
 常见 `enable`：
 
 ```js
-enable: "phaseUse" // 出牌阶段
-enable: "chooseToUse" // 响应使用牌
-enable: "chooseToRespond" // 响应打出牌
+enable: "phaseUse"                         // 出牌阶段
+enable: "chooseToUse"                      // 响应使用牌
+enable: "chooseToRespond"                  // 响应打出牌
 enable: ["chooseToUse", "chooseToRespond"] // 多场景
 ```
 

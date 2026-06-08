@@ -26,19 +26,19 @@ loop()                         // 核心执行循环
 checkSkipped(): Promise<bool>  // 检查是否被跳过
 ```
 
-## \_triggered 状态机
+## _triggered 状态机
 
 `_triggered` 是事件流程的核心状态字段，驱动 `loop()` 的分支走向：
 
-| 值     | 含义                                        | 触发阶段                                             |
-| ------ | ------------------------------------------- | ---------------------------------------------------- |
-| `null` | 非 trigger 事件（构造时 `trigger = false`） | 无                                                   |
-| `0`    | 初始状态                                    | → `XXXBefore`                                        |
-| `1`    | Before 已触发                               | → `XXXBegin`（未 finish）/ `XXXOmitted`（已 finish） |
-| `2`    | Begin 已触发                                | → 执行 content                                       |
-| `3`    | Content 已执行                              | → `XXXAfter`                                         |
-| `4`    | 全部触发完成                                | → 处理 after 链，退出 loop                           |
-| `5`    | 被 `untrigger` 取消                         | 跳过当前 arrangeTrigger                              |
+| 值 | 含义 | 触发阶段 |
+|----|------|----------|
+| `null` | 非 trigger 事件（构造时 `trigger = false`） | 无 |
+| `0` | 初始状态 | → `XXXBefore` |
+| `1` | Before 已触发 | → `XXXBegin`（未 finish）/ `XXXOmitted`（已 finish） |
+| `2` | Begin 已触发 | → 执行 content |
+| `3` | Content 已执行 | → `XXXAfter` |
+| `4` | 全部触发完成 | → 处理 after 链，退出 loop |
+| `5` | 被 `untrigger` 取消 | 跳过当前 arrangeTrigger |
 
 ## 构造
 
@@ -99,11 +99,11 @@ new GameEvent(name, trigger, manager)
 2. 若非 `notrigger` 模式，记录 skipped 历史、设置 `_cancelled = true`、触发 `XXXCancelled`
 3. 调用 `finish()`
 
-### \_notrigger / notrigger
+### _notrigger / notrigger
 
 - `notrigger: boolean` — 如果为 true，此事件不触发任何技能时机
 - `_notrigger: Player[]` — 特定角色的不触发列表，`trigger()` 中检查
 
-### \_oncancel
+### _oncancel
 
 取消回调函数，由 `ContentCompilerBase.isPrevented()` 在角色死亡时触发。

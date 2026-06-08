@@ -6,12 +6,12 @@
 
 ```javascript
 let skill = {
-  content: function () {
-    "step 0"
-    player.draw(2)
-    ;("step 1")
-    player.chooseToDiscard(2, true)
-  },
+    content: function () {
+        "step 0"
+        player.draw(2);
+        "step 1"
+        player.chooseToDiscard(2, true);
+    }
 }
 ```
 
@@ -19,10 +19,10 @@ let skill = {
 
 ```javascript
 let skill = {
-  content: async function (event, trigger, player) {
-    await player.draw(2)
-    await player.chooseToDiscard(2, true)
-  },
+    content: async function (event, trigger, player) {
+        await player.draw(2);
+        await player.chooseToDiscard(2, true);
+    }
 }
 ```
 
@@ -85,14 +85,14 @@ Promise是JavaScript中的一种异步编程解决方案，它允许你以一种
 
 ```javascript
 let skill = {
-  trigger: {
-    player: "phaseBegin",
-  },
-  content: function () {
-    "step 0"
-    player.draw(2)
-  },
-}
+ trigger: {
+  player: "phaseBegin",
+ },
+ content: function () {
+  "step 0"
+  player.draw(2);
+ },
+};
 ```
 
 这个技能对应的描述是: `当你回合开始时，你摸两张牌`
@@ -101,13 +101,13 @@ let skill = {
 
 ```javascript
 let skill = {
-  trigger: {
-    player: "phaseBegin",
-  },
-  content: async function (event, trigger, player) {
-    await player.draw(2)
-  },
-}
+ trigger: {
+  player: "phaseBegin",
+ },
+ content: async function (event, trigger, player) {
+  await player.draw(2);
+ },
+};
 ```
 
 这两处代码有下面几处变化：
@@ -147,20 +147,20 @@ let skill = {
 
 ```javascript
 let skill = {
-  trigger: {
-    player: "phaseBegin",
-  },
-  content() {
-    "step 0"
-    player.addTempSkill("jiang")
-    player.draw(2)
-    ;("step 1")
-    if (player.countCards("h") > 5) {
-      player.chooseToDiscard(2, true)
-    }
-    player.addMark("jiang")
-  },
-}
+ trigger: {
+  player: "phaseBegin",
+ },
+ content() {
+  "step 0"
+  player.addTempSkill("jiang");
+  player.draw(2);
+  "step 1"
+  if (player.countCards("h") > 5) {
+   player.chooseToDiscard(2, true);
+  }
+  player.addMark("jiang");
+ },
+};
 ```
 
 > 技能描述: 出牌阶段限一次，你可以于本回合获得【激昂】并摸两张牌，然后若手牌数量超过五张，你弃置两张牌；若如此做，你获得一枚【激昂】
@@ -234,18 +234,18 @@ function (...) {
 
 ```javascript
 let skill = {
-  trigger: {
-    player: "phaseBegin",
-  },
-  content: async function (event, trigger, player) {
-    player.addTempSkill("jiang")
-    await player.draw(2)
-    if (player.countCards("h") > 5) {
-      await player.chooseToDiscard(2, true)
-    }
-    player.addMark("jiang")
-  },
-}
+ trigger: {
+  player: "phaseBegin",
+ },
+ content: async function (event, trigger, player) {
+  player.addTempSkill("jiang");
+  await player.draw(2);
+  if (player.countCards("h") > 5) {
+   await player.chooseToDiscard(2, true);
+  }
+  player.addMark("jiang");
+ },
+};
 ```
 
 我们可以看到分步没有了，取而代之的是每次操作前面附加了一个 `await`；这个 `await`表示的是，会等待后面的代码运行完毕，再执行后续的代码
@@ -255,8 +255,8 @@ let skill = {
 原先分步情况下你可以在下一步中用 `result`变量来获取上一步事件的结果，而现在，当我们 `await`之后，我们可以这样做：
 
 ```javascript
-let result = await player.draw(2).forResult()
-let cards = result.cards
+let result = await player.draw(2).forResult();
+let cards = result.cards;
 ```
 
 你或许也发现了，无论是三国杀的分步，还是Javascript原来的回调异步，都会存在“结果”。就好比你做一件事，就算最后没有因为这件事得到任何东西，此时的情况也是一种“结果”
@@ -270,7 +270,7 @@ let cards = result.cards
 当然，大部分事件的结果其实是一个通用的模板，其中包括了`bool`、`cards`等一系列属性，我们可以通过[解构赋值](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment)语法来方便地获取结果的多个属性。
 
 ```javascript
-let { bool, cards } = await player.chooseToDiscard(2).forResult()
+let { bool, cards } = await player.chooseToDiscard(2).forResult();
 ```
 
 实际上 `await`没有那么死板，你完全可以把 `await`放在任何你想要的地方，只有能 `await`的情况才会等待，反之会原封不动的将值返回过来
@@ -278,7 +278,7 @@ let { bool, cards } = await player.chooseToDiscard(2).forResult()
 就比如，你可以：
 
 ```javascript
-await player.addTempSkill("jiang")
+await player.addTempSkill("jiang");
 ```
 
 `player.addTempSkill`并不需要等待，但你等待也不会出啥问题，此时 `await`后的返回值仍然是 `player.addTempSkill`原有的返回值；`await`只会处理需要等待的东西
@@ -304,13 +304,13 @@ await player.addTempSkill("jiang")
 也就是说你可以把
 
 ```javascript
-if (!result.bool) event.finish()
+if (!result.bool) event.finish();
 ```
 
 直接写成
 
 ```javascript
-if (!result.bool) return
+if (!result.bool) return;
 ```
 
 同时，如果你在分步中使用 `event.finish()`结束事件，代码并不会立刻停止执行，当前步后面的代码依旧会继续执行，直到当前步结束为止。如果你要阻止后续代码的执行，你还需要额外进行处理才能不继续执行后续代码
@@ -322,7 +322,7 @@ if (!result.bool) return
 如果你因为一些操作必须得有，请使用 `void`语句，这个语句会无视后面的值，一律返回 `undefined`，比如：
 
 ```javascript
-return void (await player.draw(2))
+return void await player.draw(2);
 ```
 
 我们不但等待了 `player.draw`，而且返回的内容也是 `undefined`
@@ -334,17 +334,17 @@ return void (await player.draw(2))
 比如下面这段代码使用了 `event.redo`:
 
 ```javascript
-let target = event.targets.shift()
-target.draw(1)
-if (event.targets.length) event.redo()
+let target = event.targets.shift();
+target.draw(1);
+if (event.targets.length) event.redo();
 ```
 
 你可以改成
 
 ```javascript
 while (event.targets.length) {
-  let target = event.targets.shift()
-  await target.draw(1)
+ let target = event.targets.shift();
+ await target.draw(1);
 }
 ```
 
@@ -354,7 +354,7 @@ while (event.targets.length) {
 
 ```javascript
 for (let target of event.targets) {
-  await target.draw(1)
+    await target.draw(1);
 }
 ```
 
@@ -383,8 +383,8 @@ for (let target of event.targets) {
 在 `Async Content`里面，当使用 `game.delay`/`game.delayx`时，我们也可以进行 `await`:
 
 ```javascript
-await game.delay()
-await game.delayx()
+await game.delay();
+await game.delayx();
 ```
 
 #### 3. Promise的使用
@@ -451,7 +451,7 @@ let promise = new Promise((resolve, reject) => { ... });
 在最新的Javascript中，提供了一个函数 `Promise.withResolvers`，这个函数会将 `Promise`本身和其 `resolve`和 `reject`包含在一个对象中返回；当你代码中的 `resolve`和 `reject`需要和 `Promise`对象同一作用域时，就能使用这个函数，如下面所示：
 
 ```javascript
-let { promise, resolve, reject } = Promise.withResolvers()
+let { promise, resolve, reject } = Promise.withResolvers();
 ```
 
 在后文中，为了防止演示代码的层级过多，我们将统一使用 `Promise.withResolvers`来创建 `Promise`，尽管大部分例子下直接用构造函数创建 `Promise`会更简洁
@@ -495,9 +495,9 @@ await waimaiPromise // 等待外卖送达
 然后我们要在5秒后执行 `resolve`函数，让 `await`结束等待
 
 ```javascript
-var { promise, resolve } = Promise.withResolvers() // 创建promise
-setTimeout(resolve, 5000) // 将resolve传递给setTimeout，setTimeout是一个系统函数，会在指定时间后执行你传入的函数，这里填写的时间是5000毫秒即5秒
-await promise // 等待直到resolve在5秒后被调用
+var { promise, resolve } = Promise.withResolvers(); // 创建promise
+setTimeout(resolve, 5000); // 将resolve传递给setTimeout，setTimeout是一个系统函数，会在指定时间后执行你传入的函数，这里填写的时间是5000毫秒即5秒
+await promise; // 等待直到resolve在5秒后被调用
 ```
 
 你有没有发现，我们已经实现了类似 `game.delay`的功能了；而事实上三国杀本体的 `game.delay`也就是使用这种方式实现的功能
@@ -516,16 +516,16 @@ await promise // 等待直到resolve在5秒后被调用
 
 ```javascript
 // 创建一个Promise来等待
-let { promise, resolve } = Promise.withResolvers()
+let { promise, resolve } = Promise.withResolvers();
 
 // 监听按钮点击，当按钮点击时执行大括号里面的代码
 button.listen(() => {
-  resolve() // 结束await的等待
-  game.log("玩家点击了按钮")
-})
+ resolve(); // 结束await的等待
+ game.log("玩家点击了按钮");
+});
 
 // 暂停代码的执行并等待点击
-await promise
+await promise;
 ```
 
 当然，你也可以继续使用 `game.pause`，这并不会造成错误或者其他影响
@@ -539,13 +539,13 @@ await promise
 闭包是指一种变量的访问，当一个函数访问外层代码声明的变量就叫做闭包访问，而那个变量成为闭包变量
 
 ```javascript
-let v1 = 1
+let v1 = 1;
 
 function funA() {
-  let v2 = 2
-  function funB() {
-    return v1 + v2 // 访问了两个闭包变量
-  }
+ let v2 = 2;
+ function funB() {
+  return v1 + v2; // 访问了两个闭包变量
+ }
 }
 ```
 
@@ -603,21 +603,21 @@ function funA() {
 
 ```javascript
 {
-  content: [
-    async (event, trigger, player) => {
-      player.addTempSkill("jiang")
-      await player.draw(2)
-    },
-    async (event, trigger, player) => {
-      if (player.countCards("h") > 5) {
-        //return的事件会自动await，并将结果存入event._result
-        return player.chooseToDiscard(2, true)
-      }
-    },
-    async (event, trigger, player) => {
-      player.addMark("jiang")
-    },
-  ]
+    content: [
+        async (event, trigger, player) => {
+            player.addTempSkill("jiang");
+            await player.draw(2);
+        },
+        async (event, trigger, player) => {
+            if (player.countCards("h") > 5){
+                //return的事件会自动await，并将结果存入event._result
+                return player.chooseToDiscard(2, true);
+            }
+        },
+        async (event, trigger, player) => {
+            player.addMark("jiang");
+        }
+    ]
 }
 ```
 

@@ -450,7 +450,7 @@ export const optionsMenu = function (connectMenu) {
               if (name.includes(".")) {
                 name = name.slice(0, name.indexOf("."))
               }
-              var link = (game.writeFile ? "cdv_" : "custom_") + name
+              var link = ( "custom_") + name
               if (lib.config.customBackgroundMusic[link]) {
                 if (!confirm("已经存在文件名称相同的背景音乐，是否仍然要继续导入？")) {
                   _status.music_importing = false
@@ -493,11 +493,7 @@ export const optionsMenu = function (connectMenu) {
                   }
                 })
               }
-              if (game.writeFile) {
-                game.writeFile(fileToLoad, "audio/background", link + ".mp3", callback)
-              } else {
                 game.putDB("audio", link, fileToLoad, callback)
-              }
             }
           }
         }

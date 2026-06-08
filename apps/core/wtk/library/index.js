@@ -2059,7 +2059,7 @@ export class Library {
                     if (name.includes(".")) {
                       name = name.slice(0, name.indexOf("."))
                     }
-                    var link = (game.writeFile ? "cdv_" : "custom_") + name
+                    var link = ( "custom_") + name
                     if (item[link]) {
                       for (var i = 1; i < 1000; i++) {
                         if (!item[link + "_" + i]) {
@@ -2082,11 +2082,7 @@ export class Library {
                         editbg.call(node.lastChild)
                       }
                     }
-                    if (game.writeFile) {
-                      game.writeFile(file, "image/background", link + ".jpg", callback)
-                    } else {
                       game.putDB("image", link, file, callback)
-                    }
                   }
                 })
               }
@@ -2180,11 +2176,6 @@ export class Library {
                   menu.updateBr()
                   lib.config.customBackgroundPack.remove(background)
                   game.saveConfig("customBackgroundPack", lib.config.customBackgroundPack)
-                  if (background.startsWith("cdv_")) {
-                    game.removeFile("image/background/" + background + ".jpg")
-                  } else {
-                    game.deleteDB("image", background)
-                  }
                   delete lib.configMenu.appearence.config.image_background.item[background]
                   if (lib.config.image_background == background) {
                     background = "default"
@@ -5101,11 +5092,6 @@ export class Library {
             if (confirm("是否清除已导入的所有自定义背景音乐？（该操作不可撤销！）")) {
               for (var i in lib.config.customBackgroundMusic) {
                 lib.config.all.background_music.remove(i)
-                if (i.startsWith("cdv_")) {
-                  game.removeFile("audio/background/" + i + ".mp3")
-                } else {
-                  game.deleteDB("audio", i)
-                }
               }
               lib.config.customBackgroundMusic = null
               game.saveConfig("customBackgroundMusic", null)

@@ -91,12 +91,6 @@ export class LibInit {
       clearTimeout(window.resetGameTimeout)
       delete window.resetGameTimeout
 
-      if (game.removeFile && lib.config.brokenFile.length) {
-        while (lib.config.brokenFile.length) {
-          game.removeFile(lib.config.brokenFile.shift())
-        }
-        game.saveConfigValue("brokenFile")
-      }
 
       var onfree = lib.onfree
       delete lib.onfree

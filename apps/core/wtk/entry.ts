@@ -1,9 +1,10 @@
-import { lib, game } from "wtk"
+import { game, lib } from "wtk"
 import { boot } from "@/init/index.js"
-import { userAgentLowerCase, device } from "@/util/index.js"
+import { device, userAgentLowerCase } from "@/util/index.js"
 import "core-js-bundle"
 // 保证打包时存在(importmap)
 import "vue/dist/vue.esm-browser.js"
+
 ;(async () => {
   try {
     lib.device = device

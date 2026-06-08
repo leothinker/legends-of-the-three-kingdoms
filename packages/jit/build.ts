@@ -1,5 +1,6 @@
-import { build } from "tsup"
 import fs from "node:fs/promises"
+import { build } from "tsup"
+
 await build({
   config: false,
   clean: true,

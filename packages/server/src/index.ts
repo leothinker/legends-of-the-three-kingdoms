@@ -1,4 +1,4 @@
-import { WebSocket, WebSocketServer } from "ws"
+import { type WebSocket, WebSocketServer } from "ws"
 
 interface Client extends WebSocket {
   wsid: string
@@ -72,7 +72,7 @@ const util = {
     const clientCount = new Map<string, number>()
 
     // init counter
-    rooms.forEach((room, key) => clientCount.set(key, 0))
+    rooms.forEach((_room, key) => clientCount.set(key, 0))
 
     // count clients per room
     clients.forEach((c) => {
@@ -91,7 +91,13 @@ const util = {
         if (count === 0) {
           util.sendl(room.owner, "reloadroom")
         }
-        roomList.push([room.owner.nickname, room.owner.avatar, room.config, count, room.key])
+        roomList.push([
+          room.owner.nickname,
+          room.owner.avatar,
+          room.config,
+          count,
+          room.key,
+        ])
       }
     })
 
@@ -140,7 +146,14 @@ const util = {
 }
 
 const handlers = {
-  create(client: Client, key: string, nickname: string, avatar: string, config: any, mode: string) {
+  create(
+    client: Client,
+    key: string,
+    nickname: string,
+    avatar: string,
+    _config: any,
+    _mode: string,
+  ) {
     if (client.onlineKey !== key) return
 
     client.nickname = util.nickname(nickname)
@@ -169,7 +182,8 @@ const handlers = {
 
     if (
       !room.config ||
-      (room.config.gameStarted && (!room.config.observe || !room.config.observeReady))
+      (room.config.gameStarted &&
+        (!room.config.observe || !room.config.observeReady))
     ) {
       return util.sendl(client, "enterroomfailed")
     }
@@ -199,7 +213,11 @@ const handlers = {
   },
 
   events(client: Client, cfg: any, id: string, type: string) {
-    if (bannedKeys.has(id) || typeof id !== "string" || client.onlineKey !== id) {
+    if (
+      bannedKeys.has(id) ||
+      typeof id !== "string" ||
+      client.onlineKey !== id
+    ) {
       bannedIps.add(client.clientIp)
       client.close()
       return
@@ -210,7 +228,7 @@ const handlers = {
 
     if (typeof cfg === "string") {
       // join / leave existing event
-      for (let ev of events) {
+      for (const ev of events) {
         if (ev.id === cfg) {
           if (type === "join" && !ev.members.includes(id)) {
             ev.members.push(id)
@@ -239,7 +257,8 @@ const handlers = {
     ) {
       if (events.length >= 20) util.sendl(client, "eventsdenied", "total")
       else if (cfg.utc <= now) util.sendl(client, "eventsdenied", "time")
-      else if (util.isBanned(cfg.content)) util.sendl(client, "eventsdenied", "ban")
+      else if (util.isBanned(cfg.content))
+        util.sendl(client, "eventsdenied", "ban")
       else {
         const item: EventItem = {
           ...cfg,

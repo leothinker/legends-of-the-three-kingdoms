@@ -3100,35 +3100,10 @@ export class Game {
    */
   readFileAsText
   /**
-   * 将数据写入文件
-   * @type { undefined | ((data: File | ArrayBuffer, path: string, name: string, callback?: (e: Error) => void) => void) }
-   */
-  writeFile
-  /**
-   * 移除文件
-   * @type { undefined | ((filename: string, callback?: (e: Error) => void) => void) }
-   */
-  removeFile
-  /**
    * 获取文件列表
    * @type { undefined | ((dir: string, success: (folders: string[], files: string[]) => any, failure?: (e: Error) => void) => void) }
    */
   getFileList
-  /**
-   * 按路径依次创建文件夹
-   * @type { undefined | ((list: string | string[], callback: Function, file?: boolean) => void) }
-   */
-  ensureDirectory
-  /**
-   * 创建文件夹
-   * @type { undefined | ((directory: string, successCallback?: Function, errorCallback?: Function) => void) }
-   */
-  createDir
-  /**
-   * 删除文件夹
-   * @type { undefined | ((directory: string, successCallback?: Function, errorCallback?: Function) => void) }
-   */
-  removeDir
   /**
    * @type { (forcecheck?: boolean | null, dev?: boolean) => Promise<any> }
    */
@@ -3256,7 +3231,6 @@ export class Game {
           tmpName,
           function (data) {
             onload(data)
-            game.removeFile(tmpName)
           },
           onerror,
         )

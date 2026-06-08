@@ -81,54 +81,6 @@ export class GamePromises {
       game.readFileAsText(filename, resolve, reject)
     })
   }
-  writeFile(data, path, name) {
-    return new Promise((resolve, reject) => {
-      // @ts-expect-error ignore
-      game.writeFile(data, path, name, resolve)
-    }).then((result) => {
-      return new Promise((resolve, reject) => {
-        if (result instanceof Error) {
-          reject(result)
-        } else {
-          resolve(result)
-        }
-      })
-    })
-  }
-  ensureDirectory(list, callback, file) {
-    return new Promise((resolve, reject) => {
-      // @ts-expect-error ignore
-      game.ensureDirectory(list, resolve, file)
-    })
-  }
-  createDir(directory) {
-    return new Promise((resolve, reject) => {
-      // @ts-expect-error ignore
-      game.createDir(directory, resolve, reject)
-    })
-  }
-  removeFile(filename) {
-    return /** @type {Promise<void>} */ (
-      new Promise((resolve, reject) => {
-        // @ts-expect-error ignore
-        game.removeFile(filename, (err) => {
-          if (err) {
-            reject(err)
-          } else {
-            resolve()
-          }
-        })
-      })
-    )
-  }
-  removeDir(directory) {
-    return /** @type {Promise<void>} */ (
-      new Promise((resolve, reject) => {
-        // @ts-expect-error ignore
-        game.removeDir(directory, resolve, reject)
-      })
-    )
-  }
 
   /**
    * 获取文件列表

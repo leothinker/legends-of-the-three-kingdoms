@@ -1,9 +1,9 @@
-import { Plugin } from "vite"
-import fs from "fs"
-import path from "path"
+import fs from "node:fs"
+import path from "node:path"
+import type { Plugin } from "vite"
 
 export default function vitePluginJIT(): Plugin {
-  let root = process.cwd()
+  let _root = process.cwd()
   let isBuild = false
 
   return {
@@ -11,12 +11,14 @@ export default function vitePluginJIT(): Plugin {
 
     configResolved(config) {
       isBuild = config.command === "build"
-      root = config.root
+      _root = config.root
     },
 
     transformIndexHtml(html) {
       if (!isBuild) return
-      const script = fs.readFileSync(path.resolve(import.meta.dirname, "entry.js")).toString()
+      const script = fs
+        .readFileSync(path.resolve(import.meta.dirname, "entry.js"))
+        .toString()
       return {
         html,
         tags: [

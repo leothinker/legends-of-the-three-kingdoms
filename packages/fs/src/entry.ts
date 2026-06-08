@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import minimist from "minimist"
-import { defaultConfig, default as createApp } from "./index"
+import { default as createApp, defaultConfig } from "./index"
 
 // 解析命令行参数
 // 示例: -s --maxAge 100

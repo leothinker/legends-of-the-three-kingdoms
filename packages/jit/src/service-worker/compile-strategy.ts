@@ -1,6 +1,6 @@
-import ts from "typescript"
 import * as sfc from "@vue/compiler-sfc"
 import dedent from "dedent"
+import ts from "typescript"
 import { compile } from "./ts-compiler"
 
 console.log(`ts loaded`, ts.version)
@@ -95,7 +95,7 @@ export class RawResourceStrategy extends CompileStrategy {
   match(ctx: RequestContext): boolean {
     return ctx.url.searchParams.has("raw")
   }
-  async transform(ctx: RequestContext, text: string): Promise<Response> {
+  async transform(_ctx: RequestContext, text: string): Promise<Response> {
     return getResponse(`export default ${text}`)
   }
 }
@@ -118,9 +118,12 @@ export class RawResourceStrategy extends CompileStrategy {
  */
 export class WorkerResourceStrategy extends CompileStrategy {
   match(ctx: RequestContext): boolean {
-    return ctx.url.searchParams.has("worker") || ctx.url.searchParams.has("sharedworker")
+    return (
+      ctx.url.searchParams.has("worker") ||
+      ctx.url.searchParams.has("sharedworker")
+    )
   }
-  async transform(ctx: RequestContext, text: string): Promise<Response> {
+  async transform(ctx: RequestContext, _text: string): Promise<Response> {
     return getResponse(dedent`
 			const url = new URL(import.meta.url);
 			url.searchParams.delete("worker");
@@ -144,7 +147,7 @@ export class UrlResourceStrategy extends CompileStrategy {
   match(ctx: RequestContext): boolean {
     return ctx.url.searchParams.has("url")
   }
-  async transform(ctx: RequestContext, text: string): Promise<Response> {
+  async transform(_ctx: RequestContext, _text: string): Promise<Response> {
     // TODO: 返回资源 URL 字符串
     return getResponse(`
 			const url = new URL(import.meta.url);
@@ -157,7 +160,9 @@ export class UrlResourceStrategy extends CompileStrategy {
 export class JSONStrategy extends CompileStrategy {
   match(ctx: RequestContext): boolean {
     // 只处理import关键字发起的请求
-    return ctx.url.pathname.endsWith(".json") && !!ctx.request.headers.get("origin")
+    return (
+      ctx.url.pathname.endsWith(".json") && !!ctx.request.headers.get("origin")
+    )
   }
   async transform(ctx: RequestContext, text: string): Promise<Response> {
     // 兼容import with
@@ -189,23 +194,24 @@ export class TSStrategy extends CompileStrategy {
 export class CSSStrategy extends CompileStrategy {
   match(ctx: RequestContext): boolean {
     // 只处理import关键字发起的请求
-    return ctx.url.pathname.endsWith(".css") && !!ctx.request.headers.get("origin")
+    return (
+      ctx.url.pathname.endsWith(".css") && !!ctx.request.headers.get("origin")
+    )
   }
   async transform(ctx: RequestContext, text: string): Promise<Response> {
     // 兼容import with
     if (ctx.request.headers.get("accept")?.includes("text/css")) {
       return getResponse(text, "text/css")
-    } else {
-      const id = Date.now().toString()
-      const scopeId = `data-v-${id}`
-      return getResponse(dedent`
+    }
+    const id = Date.now().toString()
+    const scopeId = `data-v-${id}`
+    return getResponse(dedent`
 				const style = document.createElement('style');
 				style.setAttribute('type', 'text/css');
 				style.setAttribute('data-vue-dev-id', \`${scopeId}\`);
 				style.textContent = ${JSON.stringify(text)};
 				document.head.appendChild(style);
 			`)
-    }
   }
 }
 
@@ -223,7 +229,10 @@ export class VueSFCStrategy extends CompileStrategy {
   async transform(ctx: RequestContext, text: string): Promise<Response> {
     const id = Date.now().toString()
     // 后续处理sourceMap合并
-    const { descriptor } = sfc.parse(text, { filename: ctx.request.url, sourceMap: true })
+    const { descriptor } = sfc.parse(text, {
+      filename: ctx.request.url,
+      sourceMap: true,
+    })
     // console.log({ descriptor });
     const url = new URL(ctx.request.url)
 
@@ -235,7 +244,11 @@ export class VueSFCStrategy extends CompileStrategy {
       ].join("\n"),
     )
   }
-  async compileScript(url: URL, descriptor: sfc.SFCDescriptor, id: string): Promise<string[]> {
+  async compileScript(
+    url: URL,
+    descriptor: sfc.SFCDescriptor,
+    id: string,
+  ): Promise<string[]> {
     const scopeId = `data-v-${id}`
     const hasScoped = descriptor.styles.some((s) => s.scoped)
 
@@ -269,11 +282,15 @@ export class VueSFCStrategy extends CompileStrategy {
         .replace(`const __sfc_main__`, `export const __sfc_main__`),
     )
     return [
-      `import { __sfc_main__ } from '${url.origin + url.pathname + "?" + scriptSearchParams.toString()}'`,
+      `import { __sfc_main__ } from '${`${url.origin + url.pathname}?${scriptSearchParams.toString()}`}'`,
       `__sfc_main__.__scopeId = '${scopeId}'`,
     ]
   }
-  compileTemplate(url: URL, descriptor: sfc.SFCDescriptor, id: string): string[] {
+  compileTemplate(
+    url: URL,
+    descriptor: sfc.SFCDescriptor,
+    id: string,
+  ): string[] {
     const scopeId = `data-v-${id}`
     const hasScoped = descriptor.styles.some((s) => s.scoped)
 
@@ -296,14 +313,14 @@ export class VueSFCStrategy extends CompileStrategy {
     )
 
     return [
-      `import { render } from '${url.origin + url.pathname + "?" + templateSearchParams.toString()}'`,
+      `import { render } from '${`${url.origin + url.pathname}?${templateSearchParams.toString()}`}'`,
       `__sfc_main__.render = render;`,
       `export default __sfc_main__;`,
     ]
   }
   compileStyle(url: URL, descriptor: sfc.SFCDescriptor, id: string): string[] {
     // 一个 Vue 文件可能有多个 style 标签
-    let styleIndex = 0
+    const styleIndex = 0
     const result: string[] = []
     for (const styleBlock of descriptor.styles) {
       const styleCode = sfc.compileStyle({

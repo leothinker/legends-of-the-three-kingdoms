@@ -1,5 +1,5 @@
-import { spawnSync } from "child_process"
-import { copyFileSync, existsSync } from "fs"
+import { spawnSync } from "node:child_process"
+import { copyFileSync, existsSync } from "node:fs"
 import { build } from "tsup"
 
 type Platform = "darwin" | "linux" | "win32"
@@ -11,7 +11,9 @@ function run(cmd: string, args: string[] = []) {
   const res = spawnSync(cmd, args, { stdio: "inherit", shell: true })
   if (res.error) throw res.error
   if (res.status && res.status !== 0) {
-    throw new Error(`Command failed: ${cmd} ${args.join(" ")} (exit ${res.status})`)
+    throw new Error(
+      `Command failed: ${cmd} ${args.join(" ")} (exit ${res.status})`,
+    )
   }
 }
 
@@ -54,13 +56,19 @@ async function main(platform) {
     if (platform === "win32") {
       targetExe += ".exe"
       copyFileSync(process.execPath, targetExe)
-      run("npx", ["postject", targetExe, sentinelKey, blobPath, "--sentinel-fuse", sentinelFuse])
+      run("npx", [
+        "postject",
+        targetExe,
+        sentinelKey,
+        blobPath,
+        "--sentinel-fuse",
+        sentinelFuse,
+      ])
       console.log("Windows build done")
       return
     }
-
     // macOS (darwin) and Linux share most steps; mac has extra codesign steps & macho segment arg
-    else if (platform === "macos") {
+    if (platform === "macos") {
       copyFileSync(process.execPath, targetExe)
 
       // remove signature (may fail on older/newer macOS; we try and warn if it fails)
@@ -98,7 +106,8 @@ async function main(platform) {
 
       console.log("macOS build done")
       return
-    } else if (platform === "linux") {
+    }
+    if (platform === "linux") {
       copyFileSync(process.execPath, targetExe)
       run("npx", [
         "postject",

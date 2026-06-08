@@ -13,7 +13,7 @@ export default async function browserReady({ lib, game }) {
     return
   }
 
-  game.export = function (data, name) {
+  game.export = (data, name) => {
     if (typeof data === "string") {
       data = new Blob([data], { type: "text/plain" })
     }
@@ -27,12 +27,12 @@ export default async function browserReady({ lib, game }) {
     downloadLink.click()
   }
 
-  game.exit = function () {
+  game.exit = () => {
     window.onbeforeunload = null
     window.close()
   }
 
-  game.open = function (url) {
+  game.open = (url) => {
     window.open(url)
   }
 
@@ -108,7 +108,11 @@ export default async function browserReady({ lib, game }) {
       .catch(onerror)
   }
 
-  game.readFile = function readFile(fileName, callback = () => {}, error = () => {}) {
+  game.readFile = function readFile(
+    fileName,
+    callback = () => {},
+    error = () => {},
+  ) {
     fetch(`/readFile?fileName=${fileName}`)
       .then((response) => response.json())
       .then((result) => {
@@ -117,7 +121,7 @@ export default async function browserReady({ lib, game }) {
 
           /** @type {Uint8Array} */
           let buffer
-          if (typeof data == "string") {
+          if (typeof data === "string") {
             buffer = Uint8Array.fromBase64(data)
           } else if (Array.isArray(data)) {
             buffer = new Uint8Array(data)
@@ -131,7 +135,11 @@ export default async function browserReady({ lib, game }) {
       .catch(error)
   }
 
-  game.readFileAsText = function readFileAsText(fileName, callback = () => {}, error = () => {}) {
+  game.readFileAsText = function readFileAsText(
+    fileName,
+    callback = () => {},
+    error = () => {},
+  ) {
     fetch(`/readFileAsText?fileName=${fileName}`)
       .then((response) => response.json())
       .then((result) => {
@@ -140,53 +148,6 @@ export default async function browserReady({ lib, game }) {
         } else {
           error(result?.errorMsg)
         }
-      })
-      .catch(error)
-  }
-
-  game.writeFile = function writeFile(data, path, name, callback = () => {}) {
-    game.ensureDirectory(path, () => {
-      if (Object.prototype.toString.call(data) == "[object File]") {
-        const fileReader = new FileReader()
-        fileReader.onload = (event) => {
-          game.writeFile(event.target.result, path, name, callback)
-        }
-        fileReader.readAsArrayBuffer(data, "UTF-8")
-      } else {
-        let filePath = path
-        if (path.endsWith("/")) {
-          filePath += name
-        } else if (path == "") {
-          filePath += name
-        } else {
-          filePath += "/" + name
-        }
-
-        fetch(`/writeFile`, {
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            data: typeof data == "string" ? data : Array.prototype.slice.call(new Uint8Array(data)),
-            path: filePath,
-          }),
-        })
-          .then((response) => response.json())
-          .then((result) => {
-            if (result?.success) {
-              callback()
-            } else {
-              callback(result?.errorMsg)
-            }
-          })
-      }
-    })
-  }
-
-  game.removeFile = function removeFile(fileName, callback = () => {}, error = () => {}) {
-    fetch(`/removeFile?fileName=${fileName}`)
-      .then((response) => response.json())
-      .then((result) => {
-        callback(result.errorMsg)
       })
       .catch(error)
   }
@@ -205,46 +166,5 @@ export default async function browserReady({ lib, game }) {
           onerror(new Error(result.errorMsg))
         }
       })
-  }
-
-  game.ensureDirectory = function ensureDirectory(list, callback = () => {}, file = false) {
-    let pathArray = typeof list == "string" ? list.split("/") : list
-    if (file) {
-      pathArray = pathArray.slice(0, -1)
-    }
-    game.createDir(pathArray.join("/"), callback, console.error)
-  }
-
-  game.createDir = function createDir(
-    directory,
-    successCallback = () => {},
-    errorCallback = () => {},
-  ) {
-    fetch(`/createDir?dir=${directory}`)
-      .then((response) => response.json())
-      .then((result) => {
-        if (result?.success) {
-          successCallback()
-        } else {
-          errorCallback(new Error("创建文件夹失败"))
-        }
-      })
-      .catch(errorCallback)
-  }
-  game.removeDir = function removeDir(
-    directory,
-    successCallback = () => {},
-    errorCallback = () => {},
-  ) {
-    fetch(`/removeDir?dir=${directory}`)
-      .then((response) => response.json())
-      .then((result) => {
-        if (result?.success) {
-          successCallback()
-        } else {
-          errorCallback(new Error("创建文件夹失败"))
-        }
-      })
-      .catch(errorCallback)
   }
 }

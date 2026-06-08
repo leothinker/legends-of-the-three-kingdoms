@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-;(async function () {
+;(async () => {
   const scope = new URL("./", location.href).toString()
   // if (import.meta.env.DEV) {
   // 	if ("serviceWorker" in navigator) {
@@ -14,7 +14,10 @@
       "无法启用即时编译功能",
       "您使用的客户端或浏览器不支持启用serviceWorker",
     ].join("\n"),
-    SERVICE_WORKER_LOAD_FAILED: ["无法启用即时编译功能", "serviceWorker加载失败"].join("\n"),
+    SERVICE_WORKER_LOAD_FAILED: [
+      "无法启用即时编译功能",
+      "serviceWorker加载失败",
+    ].join("\n"),
   }
 
   if (!("serviceWorker" in navigator)) {
@@ -24,9 +27,12 @@
 
   // 初次加载worker，需要重新启动一次
   if (sessionStorage.getItem("isJITReloaded") !== "true") {
-    let registrations = await navigator.serviceWorker.getRegistrations()
+    const registrations = await navigator.serviceWorker.getRegistrations()
     await registrations
-      .find((registration) => registration?.active?.scriptURL == `${scope}service-worker.js`)
+      .find(
+        (registration) =>
+          registration?.active?.scriptURL === `${scope}service-worker.js`,
+      )
       ?.unregister()
     sessionStorage.setItem("isJITReloaded", "true")
     window.location.reload()

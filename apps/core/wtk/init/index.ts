@@ -805,7 +805,6 @@ async function loadConfig() {
       result = {}
     }
     lib.init.background()
-    await game.promises.removeFile("wtk.config.txt").catch((e) => console.error(e))
   } else {
     result = await game.getDB("config")
   }

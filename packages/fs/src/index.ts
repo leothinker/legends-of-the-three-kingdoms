@@ -1,10 +1,10 @@
-import Fastify from "fastify"
-import fastifyStatic from "@fastify/static"
+import { exec } from "node:child_process"
+import fs from "node:fs/promises"
+import path from "node:path"
+import { cwd } from "node:process"
 import cors from "@fastify/cors"
-import fs from "fs/promises"
-import path from "path"
-import { cwd } from "process"
-import { exec } from "child_process"
+import fastifyStatic from "@fastify/static"
+import Fastify from "fastify"
 
 interface JsonResult<T = any> {
   success: boolean
@@ -18,7 +18,10 @@ const successfulJson = <T = any>(data?: T): JsonResult<T> => ({
   code: 200,
   data,
 })
-const failedJson = <T = any>(code: number, message?: string): JsonResult<T> => ({
+const failedJson = <T = any>(
+  code: number,
+  message?: string,
+): JsonResult<T> => ({
   success: false,
   code,
   errorMsg: message,
@@ -33,7 +36,8 @@ export const defaultConfig = {
 
 function createFsHandler(dirname: string) {
   const join = (url: string) => path.join(dirname, url)
-  const isInProject = (url: string) => path.normalize(join(url)).startsWith(dirname)
+  const isInProject = (url: string) =>
+    path.normalize(join(url)).startsWith(dirname)
 
   const ensureSafe = (url: string) => {
     if (!isInProject(url)) throw new Error(`只能访问 ${dirname} 下的资源`)
@@ -43,7 +47,9 @@ function createFsHandler(dirname: string) {
   const wrap = <Q, R>(fn: (query: Q) => Promise<R>) => {
     return async (req: any) => {
       try {
-        return successfulJson(await fn(req.method == "POST" ? req.body : req.query))
+        return successfulJson(
+          await fn(req.method === "POST" ? req.body : req.query),
+        )
       } catch (e: any) {
         return failedJson(400, String(e))
       }
@@ -76,27 +82,7 @@ export default function createApp(config: Partial<typeof defaultConfig> = {}) {
   })
 
   // index.html
-  app.get("/", async (req, reply) => reply.redirect("/index.html"))
-
-  app.get(
-    "/createDir",
-    wrap(async ({ dir }: { dir: string }) => {
-      const full = ensureSafe(dir)
-      await fs.mkdir(full, { recursive: true })
-      return true
-    }),
-  )
-
-  app.get(
-    "/removeDir",
-    wrap(async ({ dir }: { dir: string }) => {
-      const full = ensureSafe(dir)
-      const stat = await fs.stat(full)
-      if (!stat.isDirectory()) throw new Error(`${full} 不是文件夹`)
-      await fs.rm(full, { recursive: true, force: true })
-      return true
-    }),
-  )
+  app.get("/", async (_req, reply) => reply.redirect("/index.html"))
 
   app.get(
     "/readFile",
@@ -112,30 +98,6 @@ export default function createApp(config: Partial<typeof defaultConfig> = {}) {
     wrap(async ({ fileName }: { fileName: string }) => {
       const full = ensureSafe(fileName)
       return await fs.readFile(full, "utf-8")
-    }),
-  )
-
-  app.post(
-    "/writeFile",
-    {
-      bodyLimit: 10 * 1024 * 1024 * 1024,
-    },
-    wrap(async ({ path: p, data }: { path: string; data: number[] }) => {
-      const full = ensureSafe(p)
-      await fs.mkdir(path.dirname(full), { recursive: true })
-      await fs.writeFile(full, Buffer.from(data))
-      return true
-    }),
-  )
-
-  app.get(
-    "/removeFile",
-    wrap(async ({ fileName }: { fileName: string }) => {
-      const full = ensureSafe(fileName)
-      const stat = await fs.stat(full)
-      if (stat.isDirectory()) throw new Error("不能删除文件夹")
-      await fs.unlink(full)
-      return true
     }),
   )
 
@@ -169,7 +131,7 @@ export default function createApp(config: Partial<typeof defaultConfig> = {}) {
       try {
         const stat = await fs.stat(full)
         if (stat.isFile()) return "file"
-        else return "directory"
+        return "directory"
       } catch {
         return {}
       }
@@ -183,18 +145,18 @@ export default function createApp(config: Partial<typeof defaultConfig> = {}) {
       try {
         const stat = await fs.stat(full)
         if (stat.isFile()) return "file"
-        else return "directory"
+        return "directory"
       } catch {
         return {}
       }
     }),
   )
 
-  app.setNotFoundHandler((req, reply) => {
+  app.setNotFoundHandler((_req, reply) => {
     reply.code(404).send("Sorry can't find that!")
   })
 
-  app.setErrorHandler((err, req, reply) => {
+  app.setErrorHandler((err, _req, reply) => {
     reply.send(failedJson(400, String(err)))
   })
 

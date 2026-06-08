@@ -1,8 +1,9 @@
 /// <reference lib="WebWorker" />
 const worker = globalThis as unknown as ServiceWorkerGlobalScope
+
 import * as CompileStrategy from "./compile-strategy"
 
-worker.addEventListener("install", (event) => {
+worker.addEventListener("install", (_event) => {
   // The promise that skipWaiting() returns can be safely ignored.
   worker.skipWaiting()
 })

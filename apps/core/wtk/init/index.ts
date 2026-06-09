@@ -221,18 +221,6 @@ export async function boot() {
     appearenceConfig.global_font.item.default = "默认"
   }
 
-  if (config.get("image_background_random")) {
-    if (_status.htmlbg) {
-      game.saveConfig("image_background", _status.htmlbg)
-    } else {
-      const list = Object.keys(lib.configMenu.appearence.config.image_background.item).filter(
-        (i) => i !== "default",
-      )
-      game.saveConfig("image_background", list.randomGet(lib.config.image_background))
-    }
-    lib.init.background()
-    delete _status.htmlbg
-  }
 
   // 三国杀更新日志
   await lib.init.promises.js("game", "update")
@@ -1067,11 +1055,6 @@ async function createBackground() {
   }
 
   ui.background.style.backgroundImage = url
-  if (lib.config.image_background_blur) {
-    ui.background.style.filter = "blur(8px)"
-    ui.background.style.webkitFilter = "blur(8px)"
-    ui.background.style.transform = "scale(1.05)"
-  }
 }
 
 function createTouchDraggedFilter() {

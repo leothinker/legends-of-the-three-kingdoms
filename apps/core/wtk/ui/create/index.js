@@ -2401,7 +2401,6 @@ export class Create {
     }
     lib.init.js(lib.assetURL + "game", "keyWords", function () {})
 
-    lib.updateURL = lib.updateURLS[lib.config.update_link] || lib.updateURLS.coding
 
     lib.init.cssstyles()
 
@@ -2439,9 +2438,6 @@ export class Create {
     }
     if (lib.config.show_name == false) {
       ui.arena.classList.add("hide_name")
-    }
-    if (lib.config.change_skin_auto != "off") {
-      _status.skintimeout = setTimeout(ui.click.autoskin, parseInt(lib.config.change_skin_auto))
     }
     if (lib.config.border_style && lib.config.border_style.startsWith("dragon_")) {
       ui.arena.dataset.framedecoration = lib.config.border_style.slice(7)

@@ -239,12 +239,6 @@ export class LibInit {
         return
       }
       sScriptURL = lib.assetURL + str.slice(6)
-    } else {
-      let url = get.url(master)
-      if (url[url.length - 1] != "/") {
-        url += "/"
-      }
-      sScriptURL = url + str
     }
     const oReq = new XMLHttpRequest()
     if (typeof onload == "function") {
@@ -501,17 +495,7 @@ export class LibInit {
   }
 
   background() {
-    if (lib.config.image_background_random) {
-      var list = []
-      for (var i in lib.configMenu.appearence.config.image_background.item) {
-        if (i == "default") {
-          continue
-        }
-        list.push(i)
-      }
-      list.remove(lib.config.image_background)
-      localStorage.setItem(lib.configprefix + "background", JSON.stringify(list))
-    } else if (
+    if (
       lib.config.image_background &&
       lib.config.image_background != "default" &&
       !lib.config.image_background.startsWith("custom_")

@@ -1473,17 +1473,6 @@ export class Get {
     }
     return "###" + str + "###" + lib.translate[skill + "_info"]
   }
-  url(master) {
-    var url = lib.config.updateURL || lib.updateURL
-    if (url[url.length - 1] != "/") {
-      url += "/"
-    }
-    if (master != "nodev") {
-      return url + "master/"
-    } else {
-      return url + "v" + lib.version + "/"
-    }
-  }
   round(num, f) {
     var round = Math.pow(10, f)
     return Math.round(num * round) / round
@@ -5766,7 +5755,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           uiintro.add(viewInfo)
         }
       }
-      if ((lib.config.change_skin || lib.skin) && (!simple || get.is.phoneLayout())) {
+      if (( lib.skin) && (!simple || get.is.phoneLayout())) {
         ;[node.name1, node.name2].forEach((nameskin, index) => {
           if (nameskin) {
             createButtons(nameskin, (src) => {
@@ -6387,7 +6376,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           })
           uiintro.add(viewInfo)
         }
-        if ((lib.config.change_skin || lib.skin) && (!simple || get.is.phoneLayout())) {
+        if (( lib.skin) && (!simple || get.is.phoneLayout())) {
           const nameskin = node.link
           if (nameskin) {
             createButtons(nameskin, (src) => {

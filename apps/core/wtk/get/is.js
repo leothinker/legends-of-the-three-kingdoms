@@ -89,18 +89,6 @@ export class Is {
     return false
   }
   /**
-   * 判断坐骑栏是否被合并
-   * @returns { boolean }
-   */
-  mountCombined() {
-    if (lib.configOL.mount_combine) {
-      return lib.configOL.mount_combine
-    } else if (typeof _status.mountCombined != "boolean") {
-      _status.mountCombined = lib.config.mount_combine
-    }
-    return _status.mountCombined
-  }
-  /**
    * 判断传入的参数的属性是否相同（参数可以为卡牌、卡牌信息、属性等）
    * @param {...} infos 要判断的属性列表
    * @param {boolean} every 是否判断每一个传入的属性是否完全相同而不是存在部分相同

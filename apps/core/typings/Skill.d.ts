@@ -63,7 +63,12 @@ declare interface Mod {
   /**
    * 卡牌能否主动弃置
    */
-  cardDiscardable?(card: Card, player: Player, eventName: string, result: boolean): boolean | void
+  cardDiscardable?(
+    card: Card,
+    player: Player,
+    eventName: string,
+    result: boolean | "unchanged",
+  ): boolean | "unchanged" | undefined
   /**
    * 卡牌是否可用(卡牌能否被选择)
    * 比cardEnabled2更弱一些
@@ -71,7 +76,11 @@ declare interface Mod {
    * 适用范围：player.canUse，lib.filter.cardEnabled，默认lib.filter.filterCard
    *
    */
-  cardEnabled?(card: Card, player: Player, result: boolean): boolean | void
+  cardEnabled?(
+    card: Card,
+    player: Player,
+    result: boolean | "unchanged",
+  ): boolean | "unchanged" | undefined
   /**
    * 卡牌是否可用（适用范围基本可以视为所有情况下）
    *
@@ -79,11 +88,25 @@ declare interface Mod {
    *
    * 适用范围：event.backup中技能信息触发（viewAS），cardEnabled（优先于该mod的触发），cardRespondable（优先于该mod的触发），_save（优先于cardSavable的mod触发）中均触发
    */
-  cardEnabled2?(card: Card, player: Player, result: boolean): boolean | void
+  cardEnabled2?(
+    card: Card,
+    player: Player,
+    result: boolean | "unchanged",
+  ): boolean | "unchanged" | undefined
   /**卡牌能否被赠与 */
-  cardGiftable?(card: Card, player: Player, target: Player, current: boolean): boolean | void
+  cardGiftable?(
+    card: Card,
+    player: Player,
+    target: Player,
+    current: boolean,
+  ): boolean | undefined
   /**卡牌能否被重铸 */
-  cardRecastable?(card: Card, player: Player, source: Player, result: boolean): boolean | void
+  cardRecastable?(
+    card: Card,
+    player: Player,
+    source: Player,
+    result: boolean,
+  ): boolean | undefined
   /**
    * 卡牌是否可用（改变卡牌的使用次数）
    *
@@ -93,14 +116,22 @@ declare interface Mod {
    * @param player  玩家
    * @param num 使用次数
    */
-  cardUsable?(card: Card, player: Player, num: number): boolean | number | void
+  cardUsable?(
+    card: Card,
+    player: Player,
+    num: number,
+  ): boolean | number | undefined
   /**
    * 卡牌是否可以响应
    *
    * 要与cardEnabled一起使用（目前看来两个效果一致）
    *
    */
-  cardRespondable?(card: Card, player: Player, result: boolean): boolean | void
+  cardRespondable?(
+    card: Card,
+    player: Player,
+    result: boolean | "unchanged",
+  ): boolean | "unchanged" | undefined
   /**
    * 卡牌是否可以救人
    *
@@ -116,7 +147,12 @@ declare interface Mod {
    * @param player 玩家
    * @param taregt 当前处于濒死求救得玩家
    */
-  cardSavable?(card: Card, player: Player, taregt: Player, reslut: boolean): boolean | void
+  cardSavable?(
+    card: Card,
+    player: Player,
+    taregt: Player,
+    result: boolean,
+  ): boolean | "unchanged" | undefined
   /**
    * 在全局的防御范围 （globalToYou其他玩家到你的距离）
    * 注：防御距离就是要和别人的距离越远，所以，拉开距离需要增加；
@@ -124,7 +160,7 @@ declare interface Mod {
    * @param to 表示技能的拥有者
    * @param current 当前的数值
    */
-  globalTo?(from: Player, to: Player, current: number): number | void
+  globalTo?(from: Player, to: Player, current: number): number | undefined
   /**
    * 在全局的进攻距离 （globalFormYou其他玩家远离你的距离）
    * 注：进攻距离就是要和别人的距离越近，所以，要打到别人需要减少；
@@ -132,7 +168,7 @@ declare interface Mod {
    * @param to 表示其他玩家
    * @param current 当前的距离
    */
-  globalFrom?(from: Player, to: Player, current: number): number | void
+  globalFrom?(from: Player, to: Player, current: number): number | undefined
   /**
    * 你对其他角色的攻击范围
    * @param from 技能的拥有者
@@ -141,7 +177,7 @@ declare interface Mod {
    *
    * 注：和globalForm同理，减少距离，减少；
    */
-  attackFrom?(from: Player, to: Player, range: number): number | void
+  attackFrom?(from: Player, to: Player, range: number): number | undefined
   /**
    * 其他角色对你的攻击距离
    * @param from 表示其他玩家
@@ -149,15 +185,15 @@ declare interface Mod {
    * @param current 当前的数值
    *  注：和globalTo同理，拉开距离，增加；
    */
-  attackTo?(from: Player, to: Player, range: number): number | void
+  attackTo?(from: Player, to: Player, range: number): number | undefined
   /**
    * 蓄力值上限
    * @param player 玩家
    * @param max 当前上限
    */
-  maxCharge?(player: Player, max: number): number | void
+  maxCharge?(player: Player, max: number): number | undefined
   /** 手牌上限 */
-  maxHandcard?(player: Player, num: number): number | void
+  maxHandcard?(player: Player, num: number): number | undefined
   /**
    * 选择的目标范围,直接对range进行修改即可，无需返回值。
    */
@@ -173,7 +209,7 @@ declare interface Mod {
     player: Player,
     target: Player,
     result: boolean | "unchanged",
-  ): boolean | "unchanged" | void
+  ): boolean | "unchanged" | undefined
   /**
    * 【表示你能否成为其他角色的目标】
    * @param card
@@ -185,7 +221,7 @@ declare interface Mod {
     player: Player,
     target: Player,
     result: boolean | "unchanged",
-  ): boolean | "unchanged" | void
+  ): boolean | "unchanged" | undefined
 
   /**
    * 可以指定任意（范围内）目标
@@ -199,13 +235,17 @@ declare interface Mod {
     player: Player,
     target: Player,
     result: boolean | number,
-  ): boolean | number | void
+  ): boolean | number | undefined
   /**
    * 弃牌阶段时，忽略弃置的手牌
    * @param card
    * @param player
    */
-  ignoredHandcard?(card: Card, player: Player, current: boolean): boolean | void
+  ignoredHandcard?(
+    card: Card,
+    player: Player,
+    current: boolean,
+  ): boolean | undefined
   /** 表示自己牌能否被别人弃置 */
   canBeDiscarded?(
     card: Card,
@@ -213,7 +253,7 @@ declare interface Mod {
     target: Player,
     eventName: string,
     result: boolean,
-  ): boolean | void
+  ): boolean | undefined
   /**
    * 自己的牌能否被别人获得
    * 装备区的牌能否被移动到其他角色装备区内
@@ -224,29 +264,38 @@ declare interface Mod {
     target: Player,
     eventName: string,
     reslut: boolean,
-  ): boolean | void
+  ): boolean | undefined
   /**往往用于装备牌，能否被顶替 */
-  canBeReplaced?(card: Card, player: Player, current: boolean): boolean | void
+  canBeReplaced?(
+    card: Card,
+    player: Player,
+    current: boolean,
+  ): boolean | undefined
   /**
    * 改变花色	用于get.suit
    */
-  suit?(card: Card, suit: string): string | void
+  suit?(card: Card, suit: string): string | undefined
   /**
    * 改变最终的判定结果
    * @param player
    * @param result
    */
-  judge?(player: Player, result: Result): Result | void
+  judge?(player: Player, result: Result): Result | undefined
 
   /** 是否能在判定阶段使用无懈 */
-  wuxieJudgeEnabled?(card: Card, player: Player, current: Player, reslut: boolean): boolean | void
+  wuxieJudgeEnabled?(
+    card: Card,
+    player: Player,
+    current: Player,
+    reslut: boolean,
+  ): boolean | undefined
   /** 是否能在判定阶段响应无懈 */
   wuxieJudgeRespondable?(
     card: Card,
     player: Player,
     current: Player,
     result: boolean,
-  ): boolean | void
+  ): boolean | undefined
   /** 是否能使用无懈 */
   wuxieEnabled?(
     card: Card,
@@ -254,7 +303,7 @@ declare interface Mod {
     target: Player,
     current: Player,
     result: boolean,
-  ): boolean | void
+  ): boolean | undefined
   /** 是否能响应无懈 */
   wuxieRespondable?(
     card: Card,
@@ -262,62 +311,71 @@ declare interface Mod {
     target: Player,
     current: Player,
     result: boolean,
-  ): boolean | void
+  ): boolean | undefined
 
   /** 改变卡牌名字  用于get.name*/
-  cardname?(card: Card, player: Player, currentname: string): string | void
+  cardname?(card: Card, player: Player, currentname: string): string | undefined
   /** 改变卡牌伤害属性   用于get.nature*/
-  cardnature?(card: Card, player: Player, currentnature: string): string | void | boolean
+  cardnature?(
+    card: Card,
+    player: Player,
+    currentnature: string,
+  ): string | undefined | boolean
   /** 改变卡牌的点数	用于get.number*/
-  cardnumber?(card: Card, player: Player, num: number): number | void
+  cardnumber?(card: Card, player: Player, num: number): number | undefined
   /** 改变最终花色	用于get.suit*/
-  cardsuit?(card: Card, player: Player, suit: string): string | void
+  cardsuit?(card: Card, player: Player, suit: string): string | undefined
   /** 对特定角色使用牌的次数限制（用于优化【对特定角色使用牌无次数限制】的机制）【v1.9.105】 */
-  cardUsableTarget?(card: Card, player: Player, target: Player, result: boolean): boolean | void
+  cardUsableTarget?(
+    card: Card,
+    player: Player,
+    target: Player,
+    result: boolean,
+  ): boolean | undefined
 
   /** 用于get.value，对最后得返回value结果做处理 */
-  aiValue?(player: Player, card: Card, num: number): number | void
+  aiValue?(player: Player, card: Card, num: number): number | undefined
   /** 用于get.order，对最后得返回order结果做处理 */
-  aiOrder?(player: Player, card: Card, num: number): number | void
+  aiOrder?(player: Player, card: Card, num: number): number | undefined
 
   /**
    * 其他角色（to）是否在玩家（from）攻击范围内
    * @param from 指代技能的拥有者
    * @param to 表示其他迭代玩家
    * */
-  inRange?(from: Player, to: Player, current: boolean): boolean | void
+  inRange?(from: Player, to: Player, current: boolean): boolean | undefined
   /**
    * 玩家（to）是否在其他角色（from）的攻击范围内
    * @param from 表示其他人，迭代玩家
    * @param to 表示技能拥有者，即自己
    * */
-  inRangeOf?(from: Player, to: Player, current: boolean): boolean | void
+  inRangeOf?(from: Player, to: Player, current: boolean): boolean | undefined
   /** 用于手牌上限的判断，最先生效，主要用于改变手牌上限基数 */
-  maxHandcardBase?(player: Player, num: number): number | void
+  maxHandcardBase?(player: Player, num: number): number | undefined
   /** 用于手牌上限的判断，最后生效，主要用于实现固定手牌上限 */
-  maxHandcardFinal?(player: Player, num: number): number | void
+  maxHandcardFinal?(player: Player, num: number): number | undefined
 
   /** 用于get.useful，对最后得返回useful结果做处理 */
-  aiUseful?(player: Player, card: Card, num: number): number | void
+  aiUseful?(player: Player, card: Card, num: number): number | undefined
   /**
    * 玩家的攻击范围
    * @param player 玩家
    * @param num 当前的数值
    */
-  attackRange?(player: Player, num: number): number | void
+  attackRange?(player: Player, num: number): number | undefined
   /**
    * 玩家的攻击范围的基数
    * @param player 玩家
    * @param num 当前的数值
    */
-  attackRangeBase?(player: Player, num: number): number | void
+  attackRangeBase?(player: Player, num: number): number | undefined
   /**
    * 玩家的攻击范围的最终数值
    * @param player 玩家
    * @param num 当前的数值
    */
-  attackRangeFinal?(player: Player, num: number): number | void
-  chessMove?(player: Player, move: number): number | void
+  attackRangeFinal?(player: Player, num: number): number | undefined
+  chessMove?(player: Player, move: number): number | undefined
 }
 
 /** 技能 */
@@ -468,7 +526,10 @@ declare interface Skill {
    *
    * 若该属性值是“check”，则调用当前技能得check方法检测
    */
-  frequent?: boolean | string | ((event: GameEvent, player: Player) => number | boolean)
+  frequent?:
+    | boolean
+    | string
+    | ((event: GameEvent, player: Player) => number | boolean)
   /**
    * 此技能是否可以被设置为自动发动2
    *
@@ -597,7 +658,11 @@ declare interface Skill {
    *
    * 注：当前disableSkill中，若当前info.ondisable，调用onremove必须是方法，且不注入skill参数；
    */
-  onremove?: ((player: Player, type: string) => void) | string | string[] | boolean
+  onremove?:
+    | ((player: Player, type: string) => void)
+    | string
+    | string[]
+    | boolean
   /** 是否持续的附加技能，在removeSkill中使用 */
   keepSkill?: boolean
 
@@ -763,7 +828,7 @@ declare interface Skill {
   /** 标记显示内容 */
   intro?: {
     /** 自定义mark弹窗的显示内容 */
-    mark?: (dialog: Dialog, storage: any, player: Player) => string | void
+    mark?: (dialog: Dialog, storage: any, player: Player) => string | undefined
     /** 用于info.mark为“character”，添加，移除标记时，log显示的标记名（好像意义不大） */
     name?: string | ((arg: any, player: Player) => string)
     name2?: string | ((arg: any, player: Player) => string)
@@ -813,13 +878,18 @@ declare interface Skill {
      *
      * 也可以是个自定义的方法
      */
-    content?: string | ((storage: any, player: Player, skill: string) => string | void)
+    content?:
+      | string
+      | ((storage: any, player: Player, skill: string) => string | undefined)
     /**
      * 标记数
      *
      * 主要在player.updateMark时使用，实际顶替this.storage[i+'_markcount']获取标记数
      */
-    markcount?: number | ((storage: any, player: Player) => number | string) | string
+    markcount?:
+      | number
+      | ((storage: any, player: Player) => number | string)
+      | string
     /** 是否不启用技能标记计数 */
     nocount?: boolean
     /**
@@ -942,12 +1012,15 @@ declare interface Skill {
   viewAs?:
     | string
     | CardBaseUIData
-    | ((cards: Card[], player: Player) => string | VCard | CardBaseUIData | null)
+    | ((
+        cards: Card[],
+        player: Player,
+      ) => string | VCard | CardBaseUIData | null)
   /**
    * 视为技按钮出现条件（即发动条件）
    * @param player
    */
-  viewAsFilter?(player: Player): boolean | void
+  viewAsFilter?(player: Player): boolean | undefined
   /**
    * 使用视为牌时触发内容。
    *
@@ -1018,7 +1091,9 @@ declare interface Skill {
    *
    * 若不是字符串，则执行该方法
    */
-  prepare?: string | ((cards: Card[], player: Player, targets: Player[]) => string | void)
+  prepare?:
+    | string
+    | ((cards: Card[], player: Player, targets: Player[]) => string | undefined)
   /** 在lose事件中使用，触发执行“lose_卡牌名”事件的content */
   onLose?: OldContentFuncByAll | OldContentFuncByAll[]
   /**
@@ -1089,9 +1164,14 @@ declare interface Skill {
    * @param event 事件，即event._trigger,相当于trigger时机（此时的event为触发该技能时机时的事件）
    * @param player
    * @param name 触发名，为event.triggername，目前只有在lib.filter.filterTrigger中才传该值，即被动触发，主动触发不检测该值，目前暂未完善
-   * @param target v1.10.11 触发的目标
+   * @param indexedData 由`getIndex`返回的对象
    */
-  filter?(event: GameEvent, player: Player, name?: string, target?: Player): boolean | void | null
+  filter?(
+    event: GameEvent,
+    player: Player,
+    name?: string,
+    indexedData?: any,
+  ): boolean | undefined | null
   /**
    * 选择的目标武将牌上出现什么字。
    *
@@ -1206,7 +1286,11 @@ declare interface Skill {
    * 注：game.check时，如果当前时viewAs“视为技”，则其过滤技能时filterCard,作为方法，多入参一个event参数，需要时可以使用；
    * （一般没有）
    */
-  filterCard?: boolean | CardBaseUIData | ((card: Card, player: Player) => boolean) | boolean
+  filterCard?:
+    | boolean
+    | CardBaseUIData
+    | ((card: Card, player: Player) => boolean)
+    | boolean
   /**
    * 是否使用mod检测
    *
@@ -1230,7 +1314,9 @@ declare interface Skill {
   /**
    * 选择的目标需要满足的条件
    */
-  filterTarget?: ((card: Card, player: Player, target: Player) => boolean) | boolean
+  filterTarget?:
+    | ((card: Card, player: Player, target: Player) => boolean)
+    | boolean
   /**
    * 指定位置：
    * 'h'：手牌区, 'e'：装备区, 'j'：判定区
@@ -1295,7 +1381,7 @@ declare interface Skill {
    * @param player
    * @param name
    */
-  hiddenCard?(player: Player, name: string): boolean | void
+  hiddenCard?(player: Player, name: string): boolean | undefined
 
   /** 录像相关，game.videoContent.skill中相关 */
   video?(player: Player, data: string | any[]): void
@@ -1370,7 +1456,7 @@ declare interface Skill {
    *
    * 若没有配置prompt，显示该配置的提示
    *
-   * @param target v1.10.11 触发的目标
+   * @param indexedData 由`getIndex`返回的对象
    */
   logTarget?:
     | string
@@ -1378,7 +1464,7 @@ declare interface Skill {
         event?: GameEvent,
         player?: Player,
         triggername?: string,
-        target?: Player,
+        indexedData?: any,
       ) => string | Player | Player[] | null | undefined)
   /**
    * 是否通过logTarget显示触发者的目标日志；
@@ -1463,14 +1549,14 @@ declare interface Skill {
    * 无参，简洁写法；
    */
   check?:
-    | ((card: Card) => number | boolean | void)
+    | ((card: Card) => number | boolean | undefined)
     | ((
         event: GameEvent,
         player: Player,
         triggername?: string,
-        target?: Player,
-      ) => number | boolean | void)
-    | (() => number | boolean | void)
+        indexedData?: any,
+      ) => number | boolean | undefined)
+    | (() => number | boolean | undefined)
   // check?(...any:any):number|boolean;
   // /** ai用于检测的方法：用于主动使用触发技能 */
   // check?(card:Card):number|boolean;
@@ -1534,7 +1620,11 @@ declare interface Skill {
    *
    * 如果返回值为数组或任意可遍历对象，则会分别结算每个目标；目标将存放在`event.indexedData`中，供cost和content使用。
    */
-  getIndex?<T>(event: GameEvent, player: Player, triggername: string): number | Iterable<T>
+  getIndex?(
+    event: GameEvent,
+    player: Player,
+    triggername: string,
+  ): number | Iterable<any>
 
   /**
    * 持恒技
@@ -1815,7 +1905,12 @@ declare interface SkillAI {
    * ai发动技能的优先度 【也用于卡牌的优先度】
    * 要具体比什么先发发动，可以使用函数返回结果
    */
-  order?: number | ((item?: string | Card | { name: string }, player?: Player) => number | void)
+  order?:
+    | number
+    | ((
+        item?: string | Card | { name: string },
+        player?: Player,
+      ) => number | undefined)
   /**
    * 发动技能是身份暴露度（0~1，相当于概率）
    * 取值范围为0~1,用于帮助AI判断身份,AI中未写expose其他AI将会无法判断其身份
@@ -1825,7 +1920,7 @@ declare interface SkillAI {
    * 嘲讽值：
    * 嘲讽值越大的角色越容易遭受到敌方的攻击,默认为1,一般在0~4中取值即可(缔盟threaten值为3)
    */
-  threaten?: number | ((player: Player, target: Player) => number | void)
+  threaten?: number | ((player: Player, target: Player) => number | undefined)
   /**
    * 态度：
    * 态度只由identity决定。不同身份对不同身份的att不同。
@@ -1908,7 +2003,14 @@ declare interface SkillAI {
       player: Player,
       target: Player,
       result1: number,
-    ): "zeroplayer" | "zerotarget" | "zeroplayertarget" | number | number[] | void | boolean
+    ):
+      | "zeroplayer"
+      | "zerotarget"
+      | "zeroplayertarget"
+      | number
+      | number[]
+      | undefined
+      | boolean
     /**
      * 你作为目标时，即你成为牌的目标时。返回的是对被使用者的影响（对你的影响）
      *
@@ -1922,7 +2024,14 @@ declare interface SkillAI {
       player: Player,
       target: Player,
       result2: number,
-    ): "zeroplayer" | "zerotarget" | "zeroplayertarget" | number | number[] | boolean | void
+    ):
+      | "zeroplayer"
+      | "zerotarget"
+      | "zeroplayertarget"
+      | number
+      | number[]
+      | boolean
+      | undefined
   }
   /**
    * 收益：
@@ -1940,21 +2049,42 @@ declare interface SkillAI {
      * 没有返回值则不选;
      * 注：写了这个就不用写player(player){}了，因为player可以在这里进行判断......先继续研究好，再下定论；
      */
-    target?: number | ((player: Player, taregt: Player, card: Card) => number | void | boolean)
+    target?:
+      | number
+      | ((
+          player: Player,
+          taregt: Player,
+          card: Card,
+        ) => number | undefined | boolean)
     /**
      * 主要用于get.effect_use中，优先于上面的target；
      */
-    target_use?: number | ((player: Player, taregt: Player, card: Card) => number | void) | boolean
+    target_use?:
+      | number
+      | ((player: Player, taregt: Player, card: Card) => number | undefined)
+      | boolean
     /**
      * ai是否发动此技能（对玩家（自身）的收益）：
      * 返回正，发动，否则不发动;
      * 注：最终
      */
-    player?: number | ((player: Player, taregt: Player, card: Card) => number | void | boolean)
+    player?:
+      | number
+      | ((
+          player: Player,
+          taregt: Player,
+          card: Card,
+        ) => number | undefined | boolean)
     /**
      * 主要用于get.effect_use中，优先于上面的player；
      */
-    player_use?: number | ((player: Player, taregt: Player, card: Card) => number | void | boolean)
+    player_use?:
+      | number
+      | ((
+          player: Player,
+          taregt: Player,
+          card: Card,
+        ) => number | undefined | boolean)
 
     /**
      * 取值为true时，不默认为“equip（装备）”卡牌，默认设置“card.ai.result.target”方法
@@ -1967,7 +2097,7 @@ declare interface SkillAI {
    * 例：视为技中使用，ai什么时候可以发动视为技（决定某些技能标签的true/false）
    * 在player.hasSkillTag,player.hasGlobalTag中使用
    */
-  skillTagFilter?(player: Player, tag: string, arg: any): boolean | void
+  skillTagFilter?(player: Player, tag: string, arg: any): boolean | undefined
 
   //------------------------------主要给卡牌使用的ai配置（也共享上面一些配置）--------------------------------
   //若武将使用以下配置，一般为该武将的“视为技”时使用，其配置对应“视为”的卡牌
@@ -2001,11 +2131,18 @@ declare interface SkillAI {
     /** 优先度 */
     order?: number | ((card: Card, player: Player) => number)
     /** 回合外留牌的价值(该牌可用价值),number为当前事件玩家的手牌的下标 */
-    useful?: SAAType<number> | ((card: Card, cardIndex: number) => SAAType<number>)
+    useful?:
+      | SAAType<number>
+      | ((card: Card, cardIndex: number) => SAAType<number>)
     /** 该牌的使用价值 */
     value?:
       | SAAType<number>
-      | ((card: Card, player: Player, num: number, method: any) => SAAType<number>)
+      | ((
+          card: Card,
+          player: Player,
+          num: number,
+          method: any,
+        ) => SAAType<number>)
 
     [key: string]: any
   }
@@ -2052,7 +2189,7 @@ declare interface SkillAI {
     /** 【装备替换价值】 */
     valueswap?: CardTagType
 
-    [key: string]: CardTagType | void
+    [key: string]: CardTagType | undefined
   }
 
   /**
@@ -2128,7 +2265,7 @@ interface ChooseButtonConfigData {
    * 既player.chooseButton的ai
    * @param button
    */
-  check?(button: Button): number | void | string
+  check?(button: Button): number | undefined | string
   /**
    * 选择数目，默认为1
    *

@@ -345,16 +345,12 @@ export default {
         if (!storage) {
           return "当前没有扩展装备栏"
         }
-        const keys = Object.keys(storage).sort(),
-          combined = get.is.mountCombined()
+        const keys = Object.keys(storage).sort()
         let str = ""
         for (const key of keys) {
           const num = storage[key]
           if (typeof num == "number" && num > 0) {
             let trans = get.translation(key)
-            if (combined && key == "equip3") {
-              trans = "坐骑"
-            }
             str += "<li>" + trans + "栏：" + num + "个<br>"
           }
         }

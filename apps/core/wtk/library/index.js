@@ -8,36 +8,27 @@
  * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
  * @typedef { InstanceType<typeof lib.element.Control> } Control
  */
-import { ai, get, game, _status, ui } from "wtk"
-import { LibInit } from "./init/index.js"
-import { Announce } from "./announce/index.js"
-import { experimental } from "./experimental/index.js"
-import * as Element from "./element/index.js"
-import { updateURLs } from "./update-urls.js"
-import { defaultHooks } from "./hooks/index.js"
-import { security, ErrorManager } from "@/util/sandbox.js"
+
+import { _status, ai, game, get, ui } from "wtk"
+import { defaultSplashs } from "@/init/onload/index.js"
 import {
   assetURL,
-  userAgentLowerCase,
-  GeneratorFunction,
-  AsyncFunction,
   characterDefaultPicturePath,
+  userAgentLowerCase,
 } from "@/util/index.js"
-
-import { defaultSplashs } from "@/init/onload/index.js"
-import dedent from "dedent"
-import { PoptipManager, HTMLPoptipElement } from "./poptip.js"
-import { ZhanfaManager } from "./zhanfa.js"
+import { ErrorManager, security } from "@/util/sandbox.js"
+import { Announce } from "./announce/index.js"
+import * as Element from "./element/index.js"
+import { experimental } from "./experimental/index.js"
+import { defaultHooks } from "./hooks/index.js"
+import { LibInit } from "./init/index.js"
+import { PoptipManager } from "./poptip.js"
 import skills from "./skill.js"
-
-const html = dedent
+import { ZhanfaManager } from "./zhanfa.js"
 
 export class Library {
   configprefix = "wtk_0.9_"
   versionOL = 27
-  updateURLS = updateURLs
-  updateURL = updateURLs.github
-  mirrorURL = updateURLs.coding
   hallURL = ""
   assetURL = assetURL
   userAgent = userAgentLowerCase
@@ -60,9 +51,12 @@ export class Library {
         return Reflect.get(target, prop, receiver)
       },
       set(target, prop, newValue) {
-        if (typeof prop == "string") {
+        if (typeof prop === "string") {
           // 新增武将包，且不是“收藏”和“禁用”
-          if (!["mode_favourite", "mode_banned"].includes(prop) && !Reflect.has(target, prop)) {
+          if (
+            !["mode_favourite", "mode_banned"].includes(prop) &&
+            !Reflect.has(target, prop)
+          ) {
             Promise.resolve().then(() => {
               ui.updateCharacterPackMenu.forEach((fun) => fun(prop))
             })
@@ -112,7 +106,7 @@ export class Library {
         return Reflect.get(target, prop, receiver)
       },
       set(target, prop, newValue) {
-        if (typeof prop == "string") {
+        if (typeof prop === "string") {
           if (!Reflect.has(target, prop)) {
             Promise.resolve().then(() => {
               ui.updateCardPackMenu.forEach((fun) => fun(prop))
@@ -171,18 +165,19 @@ export class Library {
    */
   arenaReady = [
     //提前缓存表情包
-    function () {
+    () => {
       _status.emotion_cache = {}
-      const findFiles = function (name) {
+      const findFiles = (name) => {
         const srcBase = `${lib.assetURL}image/emotion/${name}/`
         game.getFileList(
           srcBase,
-          function (folders, files) {
+          (_folders, files) => {
             if (!files.length) {
               return
             }
             _status.emotion_cache[name] = files.sort(
-              (a, b) => parseInt(a.split(".")[0]) - parseInt(b.split(".")[0]),
+              (a, b) =>
+                parseInt(a.split(".")[0], 10) - parseInt(b.split(".")[0], 10),
             )
           },
           () => {},
@@ -191,12 +186,12 @@ export class Library {
       const srcBase = `${lib.assetURL}image/emotion/`
       game.getFileList(
         srcBase,
-        function (folders, files) {
+        (folders, _files) => {
           if (!folders.length) {
             return
           }
           for (const folder of folders) {
-            if (folder == "throw_emotion") {
+            if (folder === "throw_emotion") {
               continue
             }
             _status.emotion_cache[folder] = []
@@ -207,11 +202,11 @@ export class Library {
       )
     },
     //增加ui.window的监听
-    function () {
+    () => {
       lib.poptip.init()
     },
     //预处理技能拥有者
-    function () {
+    () => {
       _status.skillOwner = {}
       //武将包排序
       let packSort = [
@@ -244,14 +239,14 @@ export class Library {
         return packSort.indexOf(b) - packSort.indexOf(a)
       })
       const map = new Map()
-      for (let i of packs) {
-        for (let j in lib.characterPack[i]) {
+      for (const i of packs) {
+        for (const j in lib.characterPack[i]) {
           const info = get.character(j)
           if (!info || info[4]?.includes("unseen")) {
             continue
           }
           if (info[3]?.length > 0) {
-            let skills = info[3].slice(0)
+            const skills = info[3].slice(0)
             for (const skill of skills) {
               const skillInfo = lib.skill[skill]
               if (!skillInfo) {
@@ -282,7 +277,7 @@ export class Library {
       }
     },
     //fullimage卡背css属性载入（决定卡背）
-    function () {
+    () => {
       let url = ""
       switch (lib.config.cardback_style) {
         case "official":
@@ -306,56 +301,14 @@ export class Library {
         case "music":
           url = "theme/music/wood3.png"
           break
-        case "custom":
-          game.getDB("image", "cardback_style", function (fileToLoad) {
-            if (!fileToLoad) {
-              return
-            }
-            var fileReader = new FileReader()
-            fileReader.onload = function (fileLoadedEvent) {
-              if (ui.css.cardback_stylesheet) {
-                ui.css.cardback_stylesheet.remove()
-              }
-              ui.css.cardback_stylesheet = lib.init.sheet(
-                ".card:empty,.card.infohidden{background-image:url(" +
-                  fileLoadedEvent.target.result +
-                  ")}",
-              )
-              document.documentElement.style.setProperty(
-                "--cardback-url",
-                `url(${fileLoadedEvent.target.result})`,
-              )
-              game.getDB("image", "cardback_style2", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  if (ui.css.cardback_stylesheet2) {
-                    ui.css.cardback_stylesheet2.remove()
-                  }
-                  ui.css.cardback_stylesheet2 = lib.init.sheet(
-                    ".card.infohidden:not(.infoflip){background-image:url(" +
-                      fileLoadedEvent.target.result +
-                      ")}",
-                  )
-                  document.documentElement.style.setProperty(
-                    "--cardback-url",
-                    `url(${fileLoadedEvent.target.result})`,
-                  )
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
-            }
-            fileReader.readAsDataURL(fileToLoad, "UTF-8")
-          })
-          return
-        case "default":
         default:
           document.documentElement.style.removeProperty("--cardback-url")
           return
       }
-      document.documentElement.style.setProperty("--cardback-url", `url(${lib.assetURL}/${url})`)
+      document.documentElement.style.setProperty(
+        "--cardback-url",
+        `url(${lib.assetURL}/${url})`,
+      )
     },
   ]
   onfree = []
@@ -555,30 +508,37 @@ export class Library {
                   }
                   var type = get.type2(card),
                     str = get.translation(source)
-                  if (targets && targets.length) {
+                  if (targets?.length) {
                     str += `对${get.translation(targets)}`
                   }
                   str += `使用了${get.translation(card)}，是否弃置一张${get.translation(type)}为其助战？`
                   player.chooseCard({
                     filterCard: (card, player) =>
-                      get.type2(card) == type && lib.filter.cardDiscardable(card, player),
+                      get.type2(card) === type &&
+                      lib.filter.cardDiscardable(card, player),
                     prompt: str,
                     position: "h",
                     _global_waiting: true,
                     id: id,
                     id2: id2,
                     ai:
-                      typeof yingbianZhuzhanAI == "function"
+                      typeof yingbianZhuzhanAI === "function"
                         ? yingbianZhuzhanAI(player, card, source, targets)
                         : (cardx) => {
                             var info = get.info(card)
-                            if (info && info.ai && info.ai.yingbian) {
-                              var ai = info.ai.yingbian(card, source, targets, player)
+                            if (info?.ai?.yingbian) {
+                              var ai = info.ai.yingbian(
+                                card,
+                                source,
+                                targets,
+                                player,
+                              )
                               if (!ai) {
                                 return 0
                               }
                               return ai - get.value(cardx)
-                            } else if (get.attitude(player, source) <= 0) {
+                            }
+                            if (get.attitude(player, source) <= 0) {
                               return 0
                             }
                             return 5 - get.value(cardx)
@@ -591,15 +551,18 @@ export class Library {
                   game.resume()
                 }
               },
-              async (event, trigger, player) => {
+              async (event, _trigger, player) => {
                 var type = get.type2(event.card)
                 event.list = game
                   .filterPlayer(
                     (current) =>
-                      current != player &&
+                      current !== player &&
                       current.countCards("h") > 0 &&
                       (_status.connectMode ||
-                        current.hasCard((cardx) => get.type2(cardx) == type, "h")),
+                        current.hasCard(
+                          (cardx) => get.type2(cardx) === type,
+                          "h",
+                        )),
                   )
                   .sortBySeat(_status.currentPhase || player)
                 event.id = get.id()
@@ -609,7 +572,7 @@ export class Library {
                   event.finish()
                 } else if (
                   _status.connectMode &&
-                  (event.list[0].isOnline() || event.list[0] == game.me)
+                  (event.list[0].isOnline() || event.list[0] === game.me)
                 ) {
                   event.goto(4)
                 } else {
@@ -628,7 +591,7 @@ export class Library {
                 if (event._result.bool) {
                   event.zhuzhanresult = event.current
                   event.zhuzhanresult2 = event._result
-                  if (event.current != game.me) {
+                  if (event.current !== game.me) {
                     game.delayx()
                   }
                   event.goto(8)
@@ -639,13 +602,18 @@ export class Library {
               async (event, trigger, player) => {
                 var id = event.id,
                   sendback = (result, player) => {
-                    if (result && result.id == id && !event.zhuzhanresult && result.bool) {
+                    if (
+                      result &&
+                      result.id === id &&
+                      !event.zhuzhanresult &&
+                      result.bool
+                    ) {
                       event.zhuzhanresult = player
                       event.zhuzhanresult2 = result
                       game.broadcast("cancel", id)
                       if (
-                        _status.event.id == id &&
-                        _status.event.name == "chooseCard" &&
+                        _status.event.id === id &&
+                        _status.event.name === "chooseCard" &&
                         _status.paused
                       ) {
                         return () => {
@@ -657,8 +625,8 @@ export class Library {
                         }
                       }
                     } else if (
-                      _status.event.id == id &&
-                      _status.event.name == "chooseCard" &&
+                      _status.event.id === id &&
+                      _status.event.name === "chooseCard" &&
                       _status.paused
                     ) {
                       return () => (event.resultOL = _status.event.resultOL)
@@ -684,7 +652,7 @@ export class Library {
                       get.skillState(current),
                     )
                     list.splice(i--, 1)
-                  } else if (current == game.me) {
+                  } else if (current === game.me) {
                     withme = true
                     event.send(
                       current,
@@ -703,7 +671,7 @@ export class Library {
                 }
                 if (_status.connectMode && (withme || withol)) {
                   game.players.forEach((value) => {
-                    if (value != player) {
+                    if (value !== player) {
                       value.showTimer()
                     }
                   })
@@ -711,7 +679,7 @@ export class Library {
                 event.withol = withol
               },
               async (event) => {
-                if (!event._result || !event._result.bool || event.zhuzhanresult) {
+                if (!event._result?.bool || event.zhuzhanresult) {
                   return
                 }
                 game.broadcast("cancel", event.id)
@@ -723,7 +691,7 @@ export class Library {
                   game.pause()
                 }
               },
-              async (event) => {
+              async (_event) => {
                 game.players.forEach((value) => value.hideTimer())
               },
               async (event, trigger, player) => {
@@ -731,7 +699,7 @@ export class Library {
                   var target = event.zhuzhanresult
                   target.line(player, "green")
                   target.modedDiscard(event.zhuzhanresult2.cards)
-                  if (typeof event.afterYingbianZhuzhan == "function") {
+                  if (typeof event.afterYingbianZhuzhan === "function") {
                     event.afterYingbianZhuzhan(event, trigger)
                   }
                   var yingbianCondition = event.name.slice(8).toLowerCase(),
@@ -740,7 +708,13 @@ export class Library {
                     yingbianConditionTag,
                     lib.yingbian.condition.color.get(yingbianCondition),
                   )
-                  game.log(target, "响应了", player, "发起的", yingbianConditionTag)
+                  game.log(
+                    target,
+                    "响应了",
+                    player,
+                    "发起的",
+                    yingbianConditionTag,
+                  )
                   target.addExpose(0.2)
                   event.result = {
                     bool: true,
@@ -760,26 +734,26 @@ export class Library {
       simple: new Map([
         ["kongchao", (event) => !event.player.countCards("h")],
         ["fujia", (event) => event.player.isMaxHandcard()],
-        ["canqu", (event) => event.player.getHp() == 1],
+        ["canqu", (event) => event.player.getHp() === 1],
       ]),
     },
     effect: new Map([
       [
         "add",
-        (event, trigger, player) => {
+        (_event, trigger, _player) => {
           trigger.yingbian_addTarget = true
         },
       ],
       [
         "remove",
-        (event, trigger, player) => {
+        (_event, trigger, _player) => {
           trigger.yingbian_removeTarget = true
         },
       ],
       [
         "damage",
-        (event, trigger, player) => {
-          if (typeof trigger.baseDamage != "number") {
+        (event, trigger, _player) => {
+          if (typeof trigger.baseDamage !== "number") {
             trigger.baseDamage = 1
           }
           trigger.baseDamage++
@@ -788,29 +762,29 @@ export class Library {
       ],
       [
         "draw",
-        (event, trigger, player) => {
+        (_event, _trigger, player) => {
           player.draw()
         },
       ],
       [
         "gain",
-        (event, trigger, player) => {
+        (_event, trigger, player) => {
           const cardx = trigger.respondTo
-          if (cardx && cardx[1] && cardx[1].cards && cardx[1].cards.filterInD("od").length) {
+          if (cardx?.[1]?.cards?.filterInD("od").length) {
             player.gain(cardx[1].cards.filterInD("od"), "gain2")
           }
         },
       ],
       [
         "hit",
-        (event, trigger, player) => {
+        (event, trigger, _player) => {
           trigger.directHit.addArray(game.players).addArray(game.dead)
           game.log(event.card, "不可被响应")
         },
       ],
       [
         "all",
-        (event, trigger, player) => {
+        (event, _trigger, _player) => {
           event.card.yingbian_all = true
           game.log(event.card, "执行所有选项")
         },
@@ -844,7 +818,7 @@ export class Library {
       [
         "sha",
         (event, option) => {
-          if (event.step != 0 || option.state != "end") {
+          if (event.step !== 0 || option.state !== "end") {
             return
           }
           game.log(event.player, "触发了强化效果")
@@ -862,7 +836,7 @@ export class Library {
             if (!map[id]) {
               map[id] = {}
             }
-            if (typeof map[id].shanRequired == "number") {
+            if (typeof map[id].shanRequired === "number") {
               map[id].shanRequired++
             } else {
               map[id].shanRequired = 2
@@ -873,7 +847,7 @@ export class Library {
       [
         "shan",
         (event, option) => {
-          if (event.step != 0 || option.state != "end") {
+          if (event.step !== 0 || option.state !== "end") {
             return
           }
           game.log(event.player, "触发了强化效果")
@@ -888,8 +862,8 @@ export class Library {
           )
           event.player
             .when("useCard")
-            .filter((evt) => evt == event)
-            .step(async (event, trigger, player) => {
+            .filter((evt) => evt === event)
+            .step(async (_event, trigger, _player) => {
               const evt = trigger.getParent(2)
               if (!evt.shanRequired) {
                 evt.shanRequired = 0
@@ -901,7 +875,7 @@ export class Library {
       [
         "juedou",
         (event, option) => {
-          if (event.step != 0 || option.state != "end") {
+          if (event.step !== 0 || option.state !== "end") {
             return
           }
           game.log(event.player, "触发了强化效果")
@@ -910,8 +884,12 @@ export class Library {
             .when({
               source: "damageBegin1",
             })
-            .filter((evt) => evt.getParent(2) == event && event.targets.includes(evt.player))
-            .step(async (event, trigger) => {
+            .filter(
+              (evt) =>
+                evt.getParent(2) === event &&
+                event.targets.includes(evt.player),
+            )
+            .step(async (_event, trigger) => {
               trigger.num++
             })
         },
@@ -919,7 +897,7 @@ export class Library {
       [
         "huogong",
         (event, option) => {
-          if (event.step != 0 || option.state != "end") {
+          if (event.step !== 0 || option.state !== "end") {
             return
           }
           game.log(event.player, "触发了强化效果")
@@ -930,7 +908,7 @@ export class Library {
       [
         "tao",
         (event, option) => {
-          if (event.step != 0 || option.state != "end") {
+          if (event.step !== 0 || option.state !== "end") {
             return
           }
           game.log(event.player, "触发了强化效果")
@@ -991,7 +969,7 @@ export class Library {
     //所有基本牌或普通锦囊牌都可以响应
     all: [],
     //也可以放函数
-    khquanjiu: ["jiu", (card, player) => get.number(card, player) == 9],
+    khquanjiu: ["jiu", (card, player) => get.number(card, player) === 9],
   }
 
   #poptip = new PoptipManager()
@@ -1012,22 +990,26 @@ export class Library {
         /** #player.gain/.addToExpansion中的参数名，表示来源区域 */
         fromName: "fromRenku",
         /** 处理添加到相应区域中的卡牌，由于仁库需要处理溢出，所以采用事件的content*/
-        async addHandeler(event, trigger, player) {
+        async addHandeler(event, _trigger, _player) {
           const { cards } = event
           _status.renku.addArray(
-            cards.filter(function (card) {
-              return !card.willBeDestroyed("renku", null, event.relatedEvent)
-            }),
+            cards.filter(
+              (card) =>
+                !card.willBeDestroyed("renku", null, event.relatedEvent),
+            ),
           )
           if (_status.renku.length > 6) {
             const cards2 = _status.renku.splice(0, _status.renku.length - 6)
             game.log(cards2, "从仁库进入了弃牌堆")
-            await game.cardsDiscard(cards2).set("outRange", true).set("fromRenku", true)
+            await game
+              .cardsDiscard(cards2)
+              .set("outRange", true)
+              .set("fromRenku", true)
           }
           game.updateRenku()
         },
         /** 处理从相应区域中移出的卡牌*/
-        async removeHandeler(event, trigger, player) {
+        async removeHandeler(event, _trigger, _player) {
           _status.renku.removeArray(event.cards)
           game.updateRenku()
         },
@@ -1036,10 +1018,9 @@ export class Library {
   ])
 
   characterDialogGroup = {
-    收藏: function (name, capt) {
-      return lib.config.favouriteCharacter.includes(name) ? capt : null
-    },
-    最近: function (name, capt) {
+    收藏: (name, capt) =>
+      lib.config.favouriteCharacter.includes(name) ? capt : null,
+    最近: (name, capt) => {
       var list = get.config("recentCharacter") || []
       return list.includes(name) ? capt : null
     },
@@ -1047,7 +1028,7 @@ export class Library {
   listenEnd(node) {
     if (!node._listeningEnd) {
       node._listeningEnd = true
-      node.listenTransition(function () {
+      node.listenTransition(() => {
         delete node._listeningEnd
         if (node._onEndMoveDelete) {
           node.moveDelete(node._onEndMoveDelete)
@@ -1131,7 +1112,7 @@ export class Library {
           onclick(bool) {
             game.saveConfig("keep_awake", bool)
             if (bool) {
-              if (window.plugins && window.plugins.insomnia) {
+              if (window.plugins?.insomnia) {
                 window.plugins.insomnia.keepAwake()
               } else if (window.noSleep) {
                 document.addEventListener(
@@ -1148,20 +1129,13 @@ export class Library {
                 )
               }
             } else {
-              if (window.plugins && window.plugins.insomnia) {
+              if (window.plugins?.insomnia) {
                 window.plugins.insomnia.allowSleepAgain()
               } else if (window.noSleep) {
                 window.noSleep.disable()
               }
             }
           },
-        },
-        mount_combine: {
-          name: "合并坐骑栏",
-          init: false,
-          unfrequent: true,
-          intro: "<li>将进攻坐骑栏和防御坐骑栏合并为同一个位置（重启后生效）。",
-          restart: true,
         },
         auto_confirm: {
           name: "自动确认",
@@ -1432,14 +1406,14 @@ export class Library {
           clear: true,
           unfrequent: true,
           onclick() {
-            if (this.innerHTML == "<span>确认清除</span>") {
+            if (this.innerHTML === "<span>确认清除</span>") {
               game.saveConfig("favouriteCharacter", [], true)
               alert("已清除所有收藏武将")
             } else {
               this.innerHTML = "<span>确认清除</span>"
-              var that = this
-              setTimeout(function () {
-                that.innerHTML = "<span>清除已收藏武将</span>"
+
+              setTimeout(() => {
+                this.innerHTML = "<span>清除已收藏武将</span>"
               }, 1000)
             }
           },
@@ -1449,9 +1423,13 @@ export class Library {
           clear: true,
           unfrequent: true,
           onclick() {
-            if (this.innerHTML == "<span>确认清除</span>") {
-              if (confirm("点击确定清除全模式禁用武将，否则清除当前模式禁用武将")) {
-                lib.config.all.mode.forEach((mode) => game.saveConfig(`${mode}_banned`, [], mode))
+            if (this.innerHTML === "<span>确认清除</span>") {
+              if (
+                confirm("点击确定清除全模式禁用武将，否则清除当前模式禁用武将")
+              ) {
+                lib.config.all.mode.forEach((mode) =>
+                  game.saveConfig(`${mode}_banned`, [], mode),
+                )
                 alert("全模式禁用武将已清除！")
                 return
               }
@@ -1459,9 +1437,9 @@ export class Library {
               alert(`${lib.mode[get.mode()]?.name ?? "本"}模式禁用武将已清除！`)
             } else {
               this.innerHTML = "<span>确认清除</span>"
-              var that = this
-              setTimeout(function () {
-                that.innerHTML = "<span>清除已禁用武将</span>"
+
+              setTimeout(() => {
+                this.innerHTML = "<span>清除已禁用武将</span>"
               }, 1000)
             }
           },
@@ -1471,19 +1449,27 @@ export class Library {
           clear: true,
           unfrequent: true,
           onclick() {
-            if (this.innerHTML == "<span>确认清除</span>") {
-              if (confirm("点击确定清除全模式最近选将记录，否则清除当前模式最近选将记录")) {
-                lib.config.all.mode.forEach((mode) => game.saveConfig("recentCharacter", [], mode))
+            if (this.innerHTML === "<span>确认清除</span>") {
+              if (
+                confirm(
+                  "点击确定清除全模式最近选将记录，否则清除当前模式最近选将记录",
+                )
+              ) {
+                lib.config.all.mode.forEach((mode) =>
+                  game.saveConfig("recentCharacter", [], mode),
+                )
                 alert("全模式最近选将记录已清除！")
                 return
               }
               game.saveConfig("recentCharacter", [], true)
-              alert(`${lib.mode[get.mode()]?.name ?? "本"}模式最近选将记录已清除！`)
+              alert(
+                `${lib.mode[get.mode()]?.name ?? "本"}模式最近选将记录已清除！`,
+              )
             } else {
               this.innerHTML = "<span>确认清除</span>"
-              var that = this
-              setTimeout(function () {
-                that.innerHTML = "<span>清除最近使用武将</span>"
+
+              setTimeout(() => {
+                this.innerHTML = "<span>清除最近使用武将</span>"
               }, 1000)
             }
           },
@@ -1532,9 +1518,9 @@ export class Library {
           onclick(item) {
             game.saveConfig("max_loadtime", item)
             if (item === "5000") {
-              localStorage.removeItem(lib.configprefix + "loadtime")
+              localStorage.removeItem(`${lib.configprefix}loadtime`)
             } else {
-              localStorage.setItem(lib.configprefix + "loadtime", item)
+              localStorage.setItem(`${lib.configprefix}loadtime`, item)
             }
           },
         },
@@ -1542,7 +1528,8 @@ export class Library {
           name: "滚轮控制手牌",
           init: true,
           unfrequent: true,
-          intro: "开启后滚轮可使手牌横向滚动，在mac等可横向滚动的设备上建议关闭",
+          intro:
+            "开启后滚轮可使手牌横向滚动，在mac等可横向滚动的设备上建议关闭",
           onclick(bool) {
             game.saveConfig("mousewheel", bool)
             if (lib.config.touchscreen) {
@@ -1565,7 +1552,8 @@ export class Library {
         },
         lucky_star: {
           name: "幸运星模式",
-          intro: "在涉及随机数等的技能中，必定得到效果最好的结果。（联机模式无效）",
+          intro:
+            "在涉及随机数等的技能中，必定得到效果最好的结果。（联机模式无效）",
           init: false,
           unfrequent: true,
         },
@@ -1594,20 +1582,7 @@ export class Library {
           },
           unfrequent: true,
         },
-        update_link: {
-          name: "更新地址",
-          init: "coding",
-          unfrequent: true,
-          item: {
-            coding: "URC",
-            github: "GitHub",
-          },
-          onclick(item) {
-            game.saveConfig("update_link", item)
-            lib.updateURL = lib.updateURLS[item] || lib.updateURLS.coding
-          },
-        },
-        update: function (config, map) {
+        update: (config, map) => {
           if ("ontouchstart" in document) {
             map.touchscreen.show()
           } else {
@@ -1694,7 +1669,7 @@ export class Library {
           } else {
             map.round_menu_func.show()
           }
-          if (!lib.node && lib.device != "ios") {
+          if (!lib.node && lib.device !== "ios") {
             map.confirm_exit.show()
           } else {
             map.confirm_exit.hide()
@@ -1709,10 +1684,14 @@ export class Library {
           name: "主题",
           init: "woodden",
           item: {},
-          visualMenu: function (node, link) {
+          visualMenu: (node, link) => {
             if (!node.menu) {
-              node.className = "button character themebutton " + link
-              node.menu = ui.create.div(node, "", "<div></div><div></div><div></div><div></div>")
+              node.className = `button character themebutton ${link}`
+              node.menu = ui.create.div(
+                node,
+                "",
+                "<div></div><div></div><div></div><div></div>",
+              )
             }
           },
           onclick: async (theme) => {
@@ -1730,7 +1709,10 @@ export class Library {
             await new Promise((resolve) => setTimeout(resolve, 500))
 
             const deletingTheme = ui.css.theme
-            ui.css.theme = lib.init.css(lib.assetURL + "theme/" + lib.config.theme, "style")
+            ui.css.theme = lib.init.css(
+              `${lib.assetURL}theme/${lib.config.theme}`,
+              "style",
+            )
             deletingTheme.remove()
             lib.announce.publish("WTK.Apperaence.Theme.onChanged", theme)
             await new Promise((resolve) => setTimeout(resolve, 100))
@@ -1750,8 +1732,8 @@ export class Library {
             long2: "手杀",
             nova: "新版",
           },
-          visualMenu: function (node, link) {
-            node.className = "button character themebutton " + lib.config.theme
+          visualMenu: (node, link) => {
+            node.className = `button character themebutton ${lib.config.theme}`
             if (!node.created) {
               node.created = true
               node.style.overflow = "hidden"
@@ -1763,16 +1745,16 @@ export class Library {
               // node.firstChild.style.textAlign='center';
               var me = ui.create.div(node)
               me.style.top = "auto"
-              if (link == "default" || link == "newlayout") {
+              if (link === "default" || link === "newlayout") {
                 me.style.width = "calc(100% - 6px)"
                 me.style.left = "3px"
                 me.style.bottom = "3px"
                 me.style.height = "25px"
-                if (link == "newlayout") {
+                if (link === "newlayout") {
                   me.style.height = "23px"
                   me.style.bottom = "4px"
                 }
-              } else if (link == "long2" || link == "nova") {
+              } else if (link === "long2" || link === "nova") {
                 me.style.display = "none"
               } else {
                 me.style.width = "120%"
@@ -1784,95 +1766,97 @@ export class Library {
               var list = ["re_caocao", "re_liubei", "sp_zhangjiao", "sunquan"]
               for (var i = 0; i < 4; i++) {
                 var player = ui.create.div(".fakeplayer", node)
-                ui.create.div(".avatar", player).setBackground(list.randomRemove(), "character")
+                ui.create
+                  .div(".avatar", player)
+                  .setBackground(list.randomRemove(), "character")
                 player.style.borderRadius = "2px"
-                if (i != 3) {
+                if (i !== 3) {
                   player.style.top = "auto"
                 }
-                if (link == "default") {
+                if (link === "default") {
                   player.style.height = "19px"
                   player.style.width = "38px"
                   player.classList.add("oldlayout")
-                } else if (link == "mobile" || link == "newlayout") {
+                } else if (link === "mobile" || link === "newlayout") {
                   player.style.width = "24px"
                   player.style.height = "29px"
-                } else if (link == "nova") {
+                } else if (link === "nova") {
                   player.style.width = "20px"
                   player.style.height = "24px"
                 } else {
                   player.style.width = "20px"
                   player.style.height = "34px"
                 }
-                if (i == 1) {
+                if (i === 1) {
                   player.style.left = "3px"
                 }
-                if (i == 2) {
+                if (i === 2) {
                   player.style.left = "auto"
                   player.style.right = "3px"
                 }
-                if (i == 3) {
+                if (i === 3) {
                   player.style.top = "3px"
                 }
-                if (link == "default") {
-                  if (i == 0) {
+                if (link === "default") {
+                  if (i === 0) {
                     player.style.bottom = "6px"
                   }
-                  if (i == 0 || i == 3) {
+                  if (i === 0 || i === 3) {
                     player.style.left = "calc(50% - 18px)"
                   }
-                  if (i == 1 || i == 2) {
+                  if (i === 1 || i === 2) {
                     player.style.bottom = "36px"
                   }
-                } else if (link == "newlayout") {
-                  if (i == 0) {
+                } else if (link === "newlayout") {
+                  if (i === 0) {
                     player.style.bottom = "1px"
                   }
-                  if (i == 0 || i == 3) {
+                  if (i === 0 || i === 3) {
                     player.style.left = "calc(50% - 12px)"
                   }
-                  if (i == 1 || i == 2) {
+                  if (i === 1 || i === 2) {
                     player.style.bottom = "32px"
                   }
-                } else if (link == "mobile") {
-                  if (i == 0 || i == 3) {
+                } else if (link === "mobile") {
+                  if (i === 0 || i === 3) {
                     player.style.left = "calc(50% - 12px)"
                   }
-                  if (i == 1 || i == 2) {
+                  if (i === 1 || i === 2) {
                     player.style.bottom = "30px"
                   }
-                } else if (link == "long") {
-                  if (i == 0 || i == 3) {
+                } else if (link === "long") {
+                  if (i === 0 || i === 3) {
                     player.style.left = "calc(50% - 10px)"
                   }
-                  if (i == 1 || i == 2) {
+                  if (i === 1 || i === 2) {
                     player.style.bottom = "45px"
                   }
-                } else if (link == "long2") {
-                  if (i == 0) {
+                } else if (link === "long2") {
+                  if (i === 0) {
                     player.style.bottom = "2px"
                     player.style.left = "3px"
                   }
-                  if (i == 3) {
+                  if (i === 3) {
                     player.style.left = "calc(50% - 10px)"
                   }
-                  if (i == 1 || i == 2) {
+                  if (i === 1 || i === 2) {
                     player.style.bottom = "45px"
                   }
-                } else if (link == "nova") {
-                  if (i == 0) {
+                } else if (link === "nova") {
+                  if (i === 0) {
                     player.style.bottom = "2px"
                     player.style.left = "3px"
                   }
-                  if (i == 3) {
+                  if (i === 3) {
                     player.style.left = "calc(50% - 10px)"
                   }
-                  if (i == 1 || i == 2) {
+                  if (i === 1 || i === 2) {
                     player.style.left = "3px"
-                    player.style.bottom = i * 30 + "px"
+                    player.style.bottom = `${i * 30}px`
                   }
                 }
 
-                if (i == 0 && (link == "mobile" || link == "long")) {
+                if (i === 0 && (link === "mobile" || link === "long")) {
                   player.classList.add("me")
                   player.style.borderRadius = "0px"
                   player.style.width = "25px"
@@ -1895,7 +1879,7 @@ export class Library {
             style2: "样式二",
           },
           visualMenu: async (node, link) => {
-            let splash = lib.onloadSplashes.find((item) => item.id == link)
+            const splash = lib.onloadSplashes.find((item) => item.id === link)
             if (splash) {
               await splash.preview(node)
             }
@@ -1996,16 +1980,17 @@ export class Library {
         // },
         ui_zoom: {
           name: "界面缩放",
-          intro: "填入50~300以内的整数作为界面缩放比例（系统会转换为对应缩放百分比）",
+          intro:
+            "填入50~300以内的整数作为界面缩放比例（系统会转换为对应缩放百分比）",
           init: "100%",
           input: true,
           restart: true,
           onblur(e) {
             const text = e.target
-            let zoom = Number.parseInt(text.innerText)
+            const zoom = Number.parseInt(text.innerText, 10)
             const originalValue = lib.config.ui_zoom
 
-            if (isNaN(zoom)) {
+            if (Number.isNaN(zoom)) {
               alert("请填写数值！")
             }
             if (zoom < 50 || zoom > 300) {
@@ -2016,7 +2001,9 @@ export class Library {
 
             const zoomText = `${zoom}%`
 
-            const confirmed = confirm(`确定要将界面缩放比例修改为 ${zoomText} 吗？`)
+            const confirmed = confirm(
+              `确定要将界面缩放比例修改为 ${zoomText} 吗？`,
+            )
             if (!confirmed) {
               text.innerText = originalValue
               return
@@ -2040,115 +2027,26 @@ export class Library {
           name: "游戏背景",
           init: "default",
           item: {},
-          visualBar: function (node, item, create) {
-            if (node.created) {
-              node.lastChild.classList.remove("active")
-              return
-            }
-            node.created = true
-            var fileInput = ui.create.filediv(".menubutton", "添加背景", node, function (file) {
-              var files = this.files
-              if (files && files.length > 0) {
-                // 支持多文件导入
-                var fileList = Array.from(files)
-                var totalFiles = fileList.length
-                var processedFiles = 0
-                fileList.forEach(function (file, index) {
-                  if (file) {
-                    var name = file.name
-                    if (name.includes(".")) {
-                      name = name.slice(0, name.indexOf("."))
-                    }
-                    var link = ( "custom_") + name
-                    if (item[link]) {
-                      for (var i = 1; i < 1000; i++) {
-                        if (!item[link + "_" + i]) {
-                          link = link + "_" + i
-                          break
-                        }
-                      }
-                    }
-                    item[link] = name
-                    var callback = function () {
-                      create(link, node.parentNode.defaultNode)
-                      node.parentNode.updateBr()
-                      lib.config.customBackgroundPack.add(link)
-                      game.saveConfig("customBackgroundPack", lib.config.customBackgroundPack)
-                      processedFiles++
-                      if (
-                        processedFiles === totalFiles &&
-                        node.lastChild.classList.contains("active")
-                      ) {
-                        editbg.call(node.lastChild)
-                      }
-                    }
-                      game.putDB("image", link, file, callback)
-                  }
-                })
-              }
-            })
-            fileInput.inputNode.accept = "image/*"
-            fileInput.inputNode.multiple = true
-            var editbg = function () {
-              this.classList.toggle("active")
-              var page = this.parentNode.parentNode
-              for (var i = 0; i < page.childElementCount; i++) {
-                if (page.childNodes[i].classList.contains("button")) {
-                  var link = page.childNodes[i]._link
-                  if (link && link != "default") {
-                    var str
-                    if (this.classList.contains("active")) {
-                      if (link.startsWith("custom_") || link.startsWith("cdv_")) {
-                        str = "删除"
-                      } else {
-                        str = "隐藏"
-                      }
-                    } else {
-                      str = item[link]
-                    }
-                    page.childNodes[i].firstChild.innerHTML = get.verticalStr(str)
-                  }
-                }
-              }
-            }
-            ui.create.div(".menubutton", "编辑背景", node, editbg)
-          },
-          visualMenu: function (node, link, name, config) {
+          visualMenu: (node, link, name, _config) => {
             node.className = "button character"
             node.style.backgroundImage = ""
             node.style.backgroundSize = ""
             if (node.firstChild) {
               node.firstChild.innerHTML = get.verticalStr(name)
             }
-            if (link == "default" || link.startsWith("custom_")) {
+            if (link === "default") {
               node.style.backgroundImage = "none"
               node.classList.add("dashedmenubutton")
-              if (link.startsWith("custom_")) {
-                game.getDB("image", link, function (fileToLoad) {
-                  if (!fileToLoad) {
-                    return
-                  }
-                  var fileReader = new FileReader()
-                  fileReader.onload = function (fileLoadedEvent) {
-                    var data = fileLoadedEvent.target.result
-                    node.style.backgroundImage = "url(" + data + ")"
-                    node.style.backgroundSize = "cover"
-                    node.classList.remove("dashedmenubutton")
-                  }
-                  fileReader.readAsDataURL(fileToLoad, "UTF-8")
-                })
-              } else {
-                node.parentNode.defaultNode = node
-              }
+              node.parentNode.defaultNode = node
             } else {
-              node.setBackgroundImage("image/background/" + link + ".jpg")
+              node.setBackgroundImage(`image/background/${link}.jpg`)
               node.style.backgroundSize = "cover"
             }
           },
           onclick(background, node) {
-            if (node && node.firstChild) {
+            if (node?.firstChild) {
               var menu = node.parentNode
-              if (node.firstChild.innerHTML == get.verticalStr("隐藏")) {
+              if (node.firstChild.innerHTML === get.verticalStr("隐藏")) {
                 menu.parentNode.noclose = true
                 node.remove()
                 menu.updateBr()
@@ -2157,9 +2055,14 @@ export class Library {
                   game.saveConfig("prompt_hidebg", true)
                 }
                 lib.config.hiddenBackgroundPack.add(background)
-                game.saveConfig("hiddenBackgroundPack", lib.config.hiddenBackgroundPack)
-                delete lib.configMenu.appearence.config.image_background.item[background]
-                if (lib.config.image_background == background) {
+                game.saveConfig(
+                  "hiddenBackgroundPack",
+                  lib.config.hiddenBackgroundPack,
+                )
+                delete lib.configMenu.appearence.config.image_background.item[
+                  background
+                ]
+                if (lib.config.image_background === background) {
                   background = "default"
                   this.lastChild.innerHTML = "默认"
                 } else {
@@ -2169,15 +2072,22 @@ export class Library {
                     ]
                   return
                 }
-              } else if (node.firstChild.innerHTML == get.verticalStr("删除")) {
+              } else if (
+                node.firstChild.innerHTML === get.verticalStr("删除")
+              ) {
                 menu.parentNode.noclose = true
                 if (confirm("是否删除此背景？（此操作不可撤销）")) {
                   node.remove()
                   menu.updateBr()
                   lib.config.customBackgroundPack.remove(background)
-                  game.saveConfig("customBackgroundPack", lib.config.customBackgroundPack)
-                  delete lib.configMenu.appearence.config.image_background.item[background]
-                  if (lib.config.image_background == background) {
+                  game.saveConfig(
+                    "customBackgroundPack",
+                    lib.config.customBackgroundPack,
+                  )
+                  delete lib.configMenu.appearence.config.image_background.item[
+                    background
+                  ]
+                  if (lib.config.image_background === background) {
                     background = "default"
                     this.lastChild.innerHTML = "默认"
                   } else {
@@ -2195,30 +2105,6 @@ export class Library {
             game.updateBackground()
           },
         },
-        image_background_random: {
-          name: "随机背景",
-          init: false,
-          onclick(bool) {
-            game.saveConfig("image_background_random", bool)
-            lib.init.background()
-          },
-        },
-        image_background_blur: {
-          name: "背景模糊",
-          init: false,
-          onclick(bool) {
-            game.saveConfig("image_background_blur", bool)
-            if (lib.config.image_background_blur) {
-              ui.background.style.filter = "blur(8px)"
-              ui.background.style.webkitFilter = "blur(8px)"
-              ui.background.style.transform = "scale(1.05)"
-            } else {
-              ui.background.style.filter = ""
-              ui.background.style.webkitFilter = ""
-              ui.background.style.transform = ""
-            }
-          },
-        },
         phonelayout: {
           name: "触屏布局",
           init: false,
@@ -2228,44 +2114,11 @@ export class Library {
             }
             game.saveConfig("phonelayout", bool)
             if (get.is.phoneLayout()) {
-              ui.css.phone.href = lib.assetURL + "layout/default/phone.css"
+              ui.css.phone.href = `${lib.assetURL}layout/default/phone.css`
               ui.arena.classList.add("phone")
             } else {
               ui.css.phone.href = ""
               ui.arena.classList.remove("phone")
-            }
-          },
-        },
-        change_skin: {
-          name: "开启换肤",
-          init: true,
-          intro: "在武将资料卡界面换肤，皮肤添加方法查看docs/skin-guide.md文件",
-          onclick(item) {
-            game.saveConfig("change_skin", item)
-            if (item == false) {
-              game.broadcastAll(() => {
-                lib.config.skin = {}
-                game.saveConfig("skin", lib.config.skin)
-              })
-            }
-          },
-        },
-        change_skin_auto: {
-          name: "自动换肤",
-          init: "off",
-          item: {
-            off: "关闭",
-            30000: "半分钟",
-            60000: "一分钟",
-            120000: "两分钟",
-            300000: "五分钟",
-          },
-          intro: "游戏每进行一段时间自动为一个随机角色更换皮肤",
-          onclick(item) {
-            game.saveConfig("change_skin_auto", item)
-            clearTimeout(_status.skintimeout)
-            if (item != "off") {
-              _status.skintimeout = setTimeout(ui.click.autoskin, parseInt(item))
             }
           },
         },
@@ -2279,65 +2132,17 @@ export class Library {
             simple: "原版",
             ol: "手杀",
             // new:'新版',
-            custom: "自定",
             default: "默认",
           },
-          visualBar: function (node, item, create, switcher) {
-            if (node.created) {
-              return
-            }
-            var button
-            for (var i = 0; i < node.parentNode.childElementCount; i++) {
-              if (node.parentNode.childNodes[i]._link == "custom") {
-                button = node.parentNode.childNodes[i]
-              }
-            }
-            if (!button) {
-              return
-            }
-            node.created = true
-            var deletepic
-            ui.create.filediv(".menubutton", "添加图片", node, function (file) {
-              if (file) {
-                game.putDB("image", "card_style", file, function () {
-                  game.getDB("image", "card_style", function (fileToLoad) {
-                    if (!fileToLoad) {
-                      return
-                    }
-                    var fileReader = new FileReader()
-                    fileReader.onload = function (fileLoadedEvent) {
-                      var data = fileLoadedEvent.target.result
-                      button.style.backgroundImage = "url(" + data + ")"
-                      button.className = "button card fullskin"
-                      node.classList.add("showdelete")
-                    }
-                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
-                  })
-                })
-              }
-            }).inputNode.accept = "image*"
-            deletepic = ui.create.div(".menubutton.deletebutton", "删除图片", node, function () {
-              if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
-                game.deleteDB("image", "card_style")
-                button.style.backgroundImage = "none"
-                button.className = "button character dashedmenubutton"
-                node.classList.remove("showdelete")
-                if (lib.config.card_style == "custom") {
-                  lib.configMenu.appearence.config.card_style.onclick("default")
-                  switcher.lastChild.innerHTML = "默认"
-                }
-                button.classList.add("transparent")
-              }
-            })
-          },
-          visualMenu: function (node, link, name, config) {
+          visualMenu: (node, link, _name, _config) => {
             node.className = "button card fullskin"
             node.style.backgroundSize = "100% 100%"
             switch (link) {
               case "default":
               case "custom": {
-                if (lib.config.theme == "simple") {
-                  node.style.backgroundImage = "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
+                if (lib.config.theme === "simple") {
+                  node.style.backgroundImage =
+                    "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
                   node.className = "button character"
                 } else {
                   node.style.backgroundImage = "none"
@@ -2362,53 +2167,18 @@ export class Library {
                 node.setBackgroundImage("theme/simple/card.png")
                 break
             }
-            if (link == "custom") {
-              node.classList.add("transparent")
-              game.getDB("image", "card_style", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  var data = fileLoadedEvent.target.result
-                  node.style.backgroundImage = "url(" + data + ")"
-                  node.className = "button card fullskin"
-                  node.parentNode.lastChild.classList.add("showdelete")
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
-            }
           },
           onclick(layout) {
             game.saveConfig("card_style", layout)
             var style = ui.css.card_style
             ui.css.card_style = lib.init.css(
-              lib.assetURL + "theme/style/card",
+              `${lib.assetURL}theme/style/card`,
               lib.config.card_style,
             )
             style.remove()
             if (ui.css.card_stylesheet) {
               ui.css.card_stylesheet.remove()
               delete ui.css.card_stylesheet
-            }
-            if (layout == "custom") {
-              game.getDB("image", "card_style", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  if (ui.css.card_stylesheet) {
-                    ui.css.card_stylesheet.remove()
-                  }
-                  ui.css.card_stylesheet = lib.init.sheet(
-                    ".card:not(*:empty){background-image:url(" +
-                      fileLoadedEvent.target.result +
-                      ")}",
-                  )
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
             }
           },
           unfrequent: true,
@@ -2425,89 +2195,27 @@ export class Library {
             feicheng: "废城",
             liusha: "流沙",
             ol: "手杀",
-            custom: "自定",
             default: "默认",
           },
-          visualBar(node, item, create, switcher) {
-            if (node.created) {
-              return
-            }
-            var button
-            for (var i = 0; i < node.parentNode.childElementCount; i++) {
-              if (node.parentNode.childNodes[i]._link == "custom") {
-                button = node.parentNode.childNodes[i]
-              }
-            }
-            if (!button) {
-              return
-            }
-            node.created = true
-            ui.create.filediv(".menubutton", "添加图片", node, function (file) {
-              if (file) {
-                game.putDB("image", "cardback_style", file, function () {
-                  game.getDB("image", "cardback_style", function (fileToLoad) {
-                    if (!fileToLoad) {
-                      return
-                    }
-                    var fileReader = new FileReader()
-                    fileReader.onload = function (fileLoadedEvent) {
-                      var data = fileLoadedEvent.target.result
-                      button.style.backgroundImage = "url(" + data + ")"
-                      button.className = "button character"
-                      node.classList.add("showdelete")
-                    }
-                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
-                  })
-                })
-              }
-            }).inputNode.accept = "image/*"
-            ui.create.filediv(
-              ".menubutton.deletebutton.addbutton",
-              "添加翻转图片",
-              node,
-              function (file) {
-                if (file) {
-                  game.putDB("image", "cardback_style2", file, function () {
-                    node.classList.add("hideadd")
-                  })
-                }
-              },
-            ).inputNode.accept = "image/*"
-            ui.create.div(".menubutton.deletebutton", "删除图片", node, function () {
-              if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
-                game.deleteDB("image", "cardback_style")
-                game.deleteDB("image", "cardback_style2")
-                button.style.backgroundImage = "none"
-                button.className = "button character dashedmenubutton"
-                node.classList.remove("showdelete")
-                node.classList.remove("hideadd")
-                if (lib.config.cardback_style == "custom") {
-                  lib.configMenu.appearence.config.cardback_style.onclick("default")
-                  switcher.lastChild.innerHTML = "默认"
-                }
-                button.classList.add("transparent")
-              }
-            })
-          },
-          visualMenu(node, link, name, config) {
+          visualMenu(node, link, _name, _config) {
             node.style.backgroundSize = "100% 100%"
             switch (link) {
               case "default":
-              case "custom":
-                node.style.backgroundImage = "none"
-                node.className = "button character dashedmenubutton"
-                break
               case "new":
                 node.className = "button character"
                 node.setBackgroundImage("theme/style/cardback/image/new.png")
                 break
               case "feicheng":
                 node.className = "button character"
-                node.setBackgroundImage("theme/style/cardback/image/feicheng.png")
+                node.setBackgroundImage(
+                  "theme/style/cardback/image/feicheng.png",
+                )
                 break
               case "official":
                 node.className = "button character"
-                node.setBackgroundImage("theme/style/cardback/image/official.png")
+                node.setBackgroundImage(
+                  "theme/style/cardback/image/official.png",
+                )
                 break
               case "liusha":
                 node.className = "button character"
@@ -2527,33 +2235,12 @@ export class Library {
                 node.setBackgroundImage("theme/music/wood3.png")
                 break
             }
-            if (link == "custom") {
-              node.classList.add("transparent")
-              game.getDB("image", "cardback_style", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  var data = fileLoadedEvent.target.result
-                  node.style.backgroundImage = "url(" + data + ")"
-                  node.className = "button character"
-                  node.parentNode.lastChild.classList.add("showdelete")
-                  game.getDB("image", "cardback_style2", function (file) {
-                    if (file) {
-                      node.parentNode.lastChild.classList.add("hideadd")
-                    }
-                  })
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
-            }
           },
           onclick(layout) {
             game.saveConfig("cardback_style", layout)
             var style = ui.css.cardback_style
             ui.css.cardback_style = lib.init.css(
-              lib.assetURL + "theme/style/cardback",
+              `${lib.assetURL}theme/style/cardback`,
               lib.config.cardback_style,
             )
             style.remove()
@@ -2588,51 +2275,6 @@ export class Library {
               case "music":
                 url = "theme/music/wood3.png"
                 break
-              case "custom":
-                game.getDB("image", "cardback_style", function (fileToLoad) {
-                  if (!fileToLoad) {
-                    return
-                  }
-                  var fileReader = new FileReader()
-                  fileReader.onload = function (fileLoadedEvent) {
-                    if (ui.css.cardback_stylesheet) {
-                      ui.css.cardback_stylesheet.remove()
-                    }
-                    ui.css.cardback_stylesheet = lib.init.sheet(
-                      ".card:empty,.card.infohidden{background-image:url(" +
-                        fileLoadedEvent.target.result +
-                        ")}",
-                    )
-                    document.documentElement.style.setProperty(
-                      "--cardback-url",
-                      `url(${fileLoadedEvent.target.result})`,
-                    )
-                    game.getDB("image", "cardback_style2", function (fileToLoad) {
-                      if (!fileToLoad) {
-                        return
-                      }
-                      var fileReader = new FileReader()
-                      fileReader.onload = function (fileLoadedEvent) {
-                        if (ui.css.cardback_stylesheet2) {
-                          ui.css.cardback_stylesheet2.remove()
-                        }
-                        ui.css.cardback_stylesheet2 = lib.init.sheet(
-                          ".card.infohidden:not(.infoflip){background-image:url(" +
-                            fileLoadedEvent.target.result +
-                            ")}",
-                        )
-                        document.documentElement.style.setProperty(
-                          "--cardback-url",
-                          `url(${fileLoadedEvent.target.result})`,
-                        )
-                      }
-                      fileReader.readAsDataURL(fileToLoad, "UTF-8")
-                    })
-                  }
-                  fileReader.readAsDataURL(fileToLoad, "UTF-8")
-                })
-                return
-              case "default":
               default:
                 document.documentElement.style.removeProperty("--cardback-url")
                 return
@@ -2656,116 +2298,29 @@ export class Library {
             ol: "手杀",
             xinglass: "双鱼",
             xinround: "OL",
-            custom: "自定",
           },
-          visualBar: function (node, item, create, switcher) {
-            if (node.created) {
-              return
-            }
-            var button
-            for (var i = 0; i < node.parentNode.childElementCount; i++) {
-              if (node.parentNode.childNodes[i]._link == "custom") {
-                button = node.parentNode.childNodes[i]
-              }
-            }
-            if (!button) {
-              return
-            }
-            node.created = true
-            var deletepic
-            ui.create.filediv(".menubutton.addbutton", "添加图片", node, function (file) {
-              if (file && node.currentDB) {
-                game.putDB("image", "hp_style" + node.currentDB, file, function () {
-                  game.getDB("image", "hp_style" + node.currentDB, function (fileToLoad) {
-                    if (!fileToLoad) {
-                      return
-                    }
-                    var fileReader = new FileReader()
-                    fileReader.onload = function (fileLoadedEvent) {
-                      var data = fileLoadedEvent.target.result
-                      button.childNodes[node.currentDB - 1].style.backgroundImage =
-                        "url(" + data + ")"
-                      button.classList.add("shown")
-                      node.classList.add("showdelete")
-                      node.currentDB++
-                      if (node.currentDB > 4) {
-                        node.classList.add("hideadd")
-                        button.classList.remove("transparent")
-                        delete node.currentDB
-                      }
-                    }
-                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
-                  })
-                })
-              }
-            }).inputNode.accept = "image/*"
-            deletepic = ui.create.div(".menubutton.deletebutton", "删除图片", node, function () {
-              if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
-                game.deleteDB("image", "hp_style1")
-                game.deleteDB("image", "hp_style2")
-                game.deleteDB("image", "hp_style3")
-                game.deleteDB("image", "hp_style4")
-                for (var i = 0; i < button.childElementCount; i++) {
-                  button.childNodes[i].style.backgroundImage = "none"
-                }
-                node.classList.remove("showdelete")
-                node.classList.remove("hideadd")
-                if (lib.config.hp_style == "custom") {
-                  lib.configMenu.appearence.config.hp_style.onclick("default")
-                  switcher.lastChild.innerHTML = "默认"
-                }
-                button.classList.add("transparent")
-                button.classList.remove("shown")
-                node.currentDB = 1
-              }
-            })
-          },
-          visualMenu: function (node, link, name, config) {
+          visualMenu: (node, link, _name, _config) => {
             node.className = "button hpbutton dashedmenubutton"
             node.innerHTML = ""
             for (var i = 1; i <= 4; i++) {
               var div = ui.create.div(node)
-              if (link == "default") {
+              if (link === "default") {
                 ui.create.div(div)
-              } else if (link != "custom") {
-                div.setBackgroundImage("theme/style/hp/image/" + link + i + ".png")
+              } else if (link !== "custom") {
+                div.setBackgroundImage(`theme/style/hp/image/${link}${i}.png`)
               }
-              if (i == 4) {
+              if (i === 4) {
                 div.style.webkitFilter = "grayscale(1)"
               }
-            }
-            if (link == "custom") {
-              node.classList.add("transparent")
-              var getDB = function (num) {
-                node.parentNode.lastChild.currentDB = num
-                game.getDB("image", "hp_style" + num, function (fileToLoad) {
-                  if (!fileToLoad) {
-                    return
-                  }
-                  var fileReader = new FileReader()
-                  fileReader.onload = function (fileLoadedEvent) {
-                    var data = fileLoadedEvent.target.result
-                    node.childNodes[num - 1].style.backgroundImage = "url(" + data + ")"
-                    node.classList.add("shown")
-                    node.parentNode.lastChild.classList.add("showdelete")
-                    if (num < 4) {
-                      getDB(num + 1)
-                    } else {
-                      node.parentNode.lastChild.classList.add("hideadd")
-                      node.classList.remove("transparent")
-                      delete node.parentNode.firstChild.currentDB
-                    }
-                  }
-                  fileReader.readAsDataURL(fileToLoad, "UTF-8")
-                })
-              }
-              getDB(1)
             }
           },
           onclick(layout) {
             game.saveConfig("hp_style", layout)
             var style = ui.css.hp_style
-            ui.css.hp_style = lib.init.css(lib.assetURL + "theme/style/hp", lib.config.hp_style)
+            ui.css.hp_style = lib.init.css(
+              `${lib.assetURL}theme/style/hp`,
+              lib.config.hp_style,
+            )
             style.remove()
             if (ui.css.hp_stylesheet1) {
               ui.css.hp_stylesheet1.remove()
@@ -2783,76 +2338,6 @@ export class Library {
               ui.css.hp_stylesheet4.remove()
               delete ui.css.hp_stylesheet4
             }
-            if (layout == "custom") {
-              game.getDB("image", "hp_style1", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  if (ui.css.hp_stylesheet1) {
-                    ui.css.hp_stylesheet1.remove()
-                  }
-                  ui.css.hp_stylesheet1 = lib.init.sheet(
-                    '.hp:not(.text):not(.actcount)[data-condition="high"]>div:not(.lost){background-image:url(' +
-                      fileLoadedEvent.target.result +
-                      ")}",
-                  )
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
-              game.getDB("image", "hp_style2", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  if (ui.css.hp_stylesheet2) {
-                    ui.css.hp_stylesheet2.remove()
-                  }
-                  ui.css.hp_stylesheet2 = lib.init.sheet(
-                    '.hp:not(.text):not(.actcount)[data-condition="mid"]>div:not(.lost){background-image:url(' +
-                      fileLoadedEvent.target.result +
-                      ")}",
-                  )
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
-              game.getDB("image", "hp_style3", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  if (ui.css.hp_stylesheet3) {
-                    ui.css.hp_stylesheet3.remove()
-                  }
-                  ui.css.hp_stylesheet3 = lib.init.sheet(
-                    '.hp:not(.text):not(.actcount)[data-condition="low"]>div:not(.lost){background-image:url(' +
-                      fileLoadedEvent.target.result +
-                      ")}",
-                  )
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
-              game.getDB("image", "hp_style4", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  if (ui.css.hp_stylesheet4) {
-                    ui.css.hp_stylesheet4.remove()
-                  }
-                  ui.css.hp_stylesheet4 = lib.init.sheet(
-                    ".hp:not(.text):not(.actcount)>.lost{background-image:url(" +
-                      fileLoadedEvent.target.result +
-                      ")}",
-                  )
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
-            }
           },
           unfrequent: true,
         },
@@ -2864,69 +2349,14 @@ export class Library {
             wood: "木纹",
             music: "音乐",
             simple: "简约",
-            custom: "自定",
             default: "默认",
           },
-          visualBar: function (node, item, create, switcher) {
-            if (node.created) {
-              return
-            }
-            var button
-            for (var i = 0; i < node.parentNode.childElementCount; i++) {
-              if (node.parentNode.childNodes[i]._link == "custom") {
-                button = node.parentNode.childNodes[i]
-              }
-            }
-            if (!button) {
-              return
-            }
-            node.created = true
-            var deletepic
-            ui.create.filediv(".menubutton", "添加图片", node, function (file) {
-              if (file) {
-                game.putDB("image", "player_style", file, function () {
-                  game.getDB("image", "player_style", function (fileToLoad) {
-                    if (!fileToLoad) {
-                      return
-                    }
-                    var fileReader = new FileReader()
-                    fileReader.onload = function (fileLoadedEvent) {
-                      var data = fileLoadedEvent.target.result
-                      button.style.backgroundImage = "url(" + data + ")"
-                      button.className = "button character"
-                      button.style.backgroundSize = "100% 100%"
-                      node.classList.add("showdelete")
-                    }
-                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
-                  })
-                })
-              }
-            }).inputNode.accept = "image/*"
-            deletepic = ui.create.div(".menubutton.deletebutton", "删除图片", node, function () {
-              if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
-                game.deleteDB("image", "player_style")
-                button.style.backgroundImage = "none"
-                button.className = "button character dashedmenubutton"
-                node.classList.remove("showdelete")
-                if (lib.config.player_style == "custom") {
-                  lib.configMenu.appearence.config.player_style.onclick("default")
-                  switcher.lastChild.innerHTML = "默认"
-                }
-                button.classList.add("transparent")
-              }
-            })
-          },
-          visualMenu: function (node, link, name, config) {
+          visualMenu: (node, link, _name, _config) => {
             node.className = "button character"
             node.style.backgroundSize = ""
             node.style.height = "108px"
             switch (link) {
               case "default":
-              case "custom": {
-                node.style.backgroundImage = "none"
-                node.className = "button character dashedmenubutton"
-                break
-              }
               case "wood":
                 node.setBackgroundImage("theme/woodden/wood.jpg")
                 break
@@ -2934,25 +2364,9 @@ export class Library {
                 node.style.backgroundImage = "linear-gradient(#4b4b4b, #464646)"
                 break
               case "simple":
-                node.style.backgroundImage = "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
+                node.style.backgroundImage =
+                  "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
                 break
-            }
-            if (link == "custom") {
-              node.classList.add("transparent")
-              game.getDB("image", "player_style", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  var data = fileLoadedEvent.target.result
-                  node.style.backgroundImage = "url(" + data + ")"
-                  node.className = "button character"
-                  node.parentNode.lastChild.classList.add("showdelete")
-                  node.style.backgroundSize = "100% 100%"
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
             }
           },
           onclick(layout) {
@@ -2961,29 +2375,11 @@ export class Library {
               ui.css.player_stylesheet.remove()
               delete ui.css.player_stylesheet
             }
-            if (layout == "custom") {
-              game.getDB("image", "player_style", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  if (ui.css.player_stylesheet) {
-                    ui.css.player_stylesheet.remove()
-                  }
-                  ui.css.player_stylesheet = lib.init.sheet(
-                    '#window .player{background-image:url("' +
-                      fileLoadedEvent.target.result +
-                      '");background-size:100% 100%;}',
-                  )
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
-            } else if (layout != "default") {
+            if (layout !== "default") {
               var str = ""
               switch (layout) {
                 case "wood":
-                  str = 'url("' + lib.assetURL + 'theme/woodden/wood.jpg")'
+                  str = `url("${lib.assetURL}theme/woodden/wood.jpg")`
                   break
                 case "music":
                   str = "linear-gradient(#4b4b4b, #464646)"
@@ -2993,7 +2389,7 @@ export class Library {
                   break
               }
               ui.css.player_stylesheet = lib.init.sheet(
-                "#window .player{background-image:" + str + "}",
+                `#window .player{background-image:${str}}`,
               )
             }
           },
@@ -3024,17 +2420,18 @@ export class Library {
           },
           onclick(items) {
             game.saveConfig("zhishixian", items)
-            if (items == "default") {
+            if (items === "default") {
               game.linexy = game.zsOriginLineXy
             } else {
-              game.linexy = game["zs" + items + "LineXy"]
+              game.linexy = game[`zs${items}LineXy`]
             }
           },
         },
         border_style: {
           name: "角色边框",
           init: "default",
-          intro: "设置角色边框的样式，当设为自动时，样式将随着一局游戏中伤害或击杀的数量自动改变",
+          intro:
+            "设置角色边框的样式，当设为自动时，样式将随着一局游戏中伤害或击杀的数量自动改变",
           item: {
             gold: "金框",
             silver: "银框",
@@ -3042,65 +2439,15 @@ export class Library {
             dragon_gold: "金龙",
             dragon_silver: "银龙",
             dragon_bronze: "玉龙",
-            custom: "自定",
             auto: "自动",
             default: "默认",
           },
-          visualBar: function (node, item, create, switcher) {
-            if (node.created) {
-              return
-            }
-            var button
-            for (var i = 0; i < node.parentNode.childElementCount; i++) {
-              if (node.parentNode.childNodes[i]._link == "custom") {
-                button = node.parentNode.childNodes[i]
-              }
-            }
-            if (!button) {
-              return
-            }
-            node.created = true
-            var deletepic
-            ui.create.filediv(".menubutton", "添加图片", node, function (file) {
-              if (file) {
-                game.putDB("image", "border_style", file, function () {
-                  game.getDB("image", "border_style", function (fileToLoad) {
-                    if (!fileToLoad) {
-                      return
-                    }
-                    var fileReader = new FileReader()
-                    fileReader.onload = function (fileLoadedEvent) {
-                      var data = fileLoadedEvent.target.result
-                      button.style.backgroundImage = "url(" + data + ")"
-                      button.className = "button character"
-                      button.style.backgroundSize = "100% 100%"
-                      node.classList.add("showdelete")
-                    }
-                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
-                  })
-                })
-              }
-            }).inputNode.accept = "image/*"
-            deletepic = ui.create.div(".menubutton.deletebutton", "删除图片", node, function () {
-              if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
-                game.deleteDB("image", "border_style")
-                button.style.backgroundImage = "none"
-                button.className = "button character dashedmenubutton"
-                node.classList.remove("showdelete")
-                if (lib.config.border_style == "custom") {
-                  lib.configMenu.appearence.config.border_style.onclick("default")
-                  switcher.lastChild.innerHTML = "默认"
-                }
-                button.classList.add("transparent")
-              }
-            })
-          },
-          visualMenu: function (node, link, name, config) {
+          visualMenu: (node, link, _name, _config) => {
             node.className = "button character"
             node.style.backgroundSize = ""
             node.style.height = "108px"
             node.dataset.decoration = ""
-            if (link == "default" || link == "custom" || link == "auto") {
+            if (link === "default" || link === "custom" || link === "auto") {
               node.style.backgroundImage = "none"
               node.className = "button character dashedmenubutton"
             } else {
@@ -3108,25 +2455,8 @@ export class Library {
                 link = link.slice(7)
                 node.dataset.decoration = link
               }
-              node.setBackgroundImage("theme/style/player/" + link + "1.png")
+              node.setBackgroundImage(`theme/style/player/${link}1.png`)
               node.style.backgroundSize = "100% 100%"
-            }
-            if (link == "custom") {
-              node.classList.add("transparent")
-              game.getDB("image", "border_style", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  var data = fileLoadedEvent.target.result
-                  node.style.backgroundImage = "url(" + data + ")"
-                  node.className = "button character"
-                  node.parentNode.lastChild.classList.add("showdelete")
-                  node.style.backgroundSize = "100% 100%"
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
             }
           },
           onclick(layout) {
@@ -3135,32 +2465,7 @@ export class Library {
               ui.css.border_stylesheet.remove()
               delete ui.css.border_stylesheet
             }
-            if (layout == "custom") {
-              game.getDB("image", "border_style", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  if (ui.css.border_stylesheet) {
-                    ui.css.border_stylesheet.remove()
-                  }
-                  ui.css.border_stylesheet = lib.init.sheet()
-                  ui.css.border_stylesheet.id = "ui.css.border"
-                  ui.css.border_stylesheet.sheet.insertRule(
-                    '#window .player>.framebg{display:block;background-image:url("' +
-                      fileLoadedEvent.target.result +
-                      '")}',
-                    0,
-                  )
-                  ui.css.border_stylesheet.sheet.insertRule(
-                    ".player>.count{z-index: 3 !important;border-radius: 2px !important;text-align: center !important;}",
-                    0,
-                  )
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
-            } else if (layout != "default" && layout != "auto") {
+            if (layout !== "default" && layout !== "auto") {
               ui.css.border_stylesheet = lib.init.sheet()
               if (layout.startsWith("dragon_")) {
                 layout = layout.slice(7)
@@ -3227,25 +2532,29 @@ export class Library {
           },
           onclick(item) {
             game.saveConfig("player_border", item)
-            if (item != "wide" || game.layout == "long" || game.layout == "long2") {
+            if (
+              item !== "wide" ||
+              game.layout === "long" ||
+              game.layout === "long2"
+            ) {
               ui.arena.classList.add("slim_player")
             } else {
               ui.arena.classList.remove("slim_player")
             }
-            if (item == "slim") {
+            if (item === "slim") {
               ui.arena.classList.add("uslim_player")
             } else {
               ui.arena.classList.remove("uslim_player")
             }
-            if (item == "narrow") {
+            if (item === "narrow") {
               ui.arena.classList.add("mslim_player")
             } else {
               ui.arena.classList.remove("mslim_player")
             }
             if (
-              item == "normal" &&
-              lib.config.mode != "brawl" &&
-              (game.layout == "long" || game.layout == "long2")
+              item === "normal" &&
+              lib.config.mode !== "brawl" &&
+              (game.layout === "long" || game.layout === "long2")
             ) {
               ui.arena.classList.add("lslim_player")
             } else {
@@ -3261,60 +2570,9 @@ export class Library {
             wood: "木纹",
             music: "音乐",
             simple: "简约",
-            custom: "自定",
             default: "默认",
           },
-          visualBar: function (node, item, create, switcher) {
-            if (node.created) {
-              return
-            }
-            var button
-            for (var i = 0; i < node.parentNode.childElementCount; i++) {
-              if (node.parentNode.childNodes[i]._link == "custom") {
-                button = node.parentNode.childNodes[i]
-              }
-            }
-            if (!button) {
-              return
-            }
-            node.created = true
-            var deletepic
-            ui.create.filediv(".menubutton", "添加图片", node, function (file) {
-              if (file) {
-                game.putDB("image", "menu_style", file, function () {
-                  game.getDB("image", "menu_style", function (fileToLoad) {
-                    if (!fileToLoad) {
-                      return
-                    }
-                    var fileReader = new FileReader()
-                    fileReader.onload = function (fileLoadedEvent) {
-                      var data = fileLoadedEvent.target.result
-                      button.style.backgroundImage = "url(" + data + ")"
-                      button.style.backgroundSize = "cover"
-                      button.className = "button character"
-                      node.classList.add("showdelete")
-                    }
-                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
-                  })
-                })
-              }
-            }).inputNode.accept = "image/*"
-            deletepic = ui.create.div(".menubutton.deletebutton", "删除图片", node, function () {
-              if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
-                game.deleteDB("image", "menu_style")
-                button.style.backgroundImage = "none"
-                button.style.backgroundSize = "auto"
-                button.className = "button character dashedmenubutton"
-                node.classList.remove("showdelete")
-                if (lib.config.menu_style == "custom") {
-                  lib.configMenu.appearence.config.menu_style.onclick("default")
-                  switcher.lastChild.innerHTML = "默认"
-                }
-                button.classList.add("transparent")
-              }
-            })
-          },
-          visualMenu: function (node, link, name, config) {
+          visualMenu: (node, link, _name, _config) => {
             node.className = "button character"
             node.style.backgroundSize = "auto"
             switch (link) {
@@ -3331,25 +2589,9 @@ export class Library {
                 node.style.backgroundImage = "linear-gradient(#4b4b4b, #464646)"
                 break
               case "simple":
-                node.style.backgroundImage = "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
+                node.style.backgroundImage =
+                  "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
                 break
-            }
-            if (link == "custom") {
-              node.classList.add("transparent")
-              game.getDB("image", "menu_style", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  var data = fileLoadedEvent.target.result
-                  node.style.backgroundImage = "url(" + data + ")"
-                  node.style.backgroundSize = "cover"
-                  node.className = "button character"
-                  node.parentNode.lastChild.classList.add("showdelete")
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
             }
           },
           onclick(layout) {
@@ -3358,32 +2600,15 @@ export class Library {
               ui.css.menu_stylesheet.remove()
               delete ui.css.menu_stylesheet
             }
-            if (layout == "custom") {
-              game.getDB("image", "menu_style", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  if (ui.css.menu_stylesheet) {
-                    ui.css.menu_stylesheet.remove()
-                  }
-                  ui.css.menu_stylesheet = lib.init.sheet(
-                    'html #window>.dialog.popped,html .menu,html .menubg{background-image:url("' +
-                      fileLoadedEvent.target.result +
-                      '");background-size:cover}',
-                  )
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
-            } else if (layout != "default") {
+            if (layout !== "default") {
               var str = ""
               switch (layout) {
                 case "wood":
-                  str = 'url("' + lib.assetURL + 'theme/woodden/wood2.png")'
+                  str = `url("${lib.assetURL}theme/woodden/wood2.png")`
                   break
                 case "music":
-                  str = "linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px"
+                  str =
+                    "linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px"
                   break
                 case "simple":
                   str =
@@ -3391,7 +2616,7 @@ export class Library {
                   break
               }
               ui.css.menu_stylesheet = lib.init.sheet(
-                "html #window>.dialog.popped,html .menu,html .menubg{background-image:" + str + "}",
+                `html #window>.dialog.popped,html .menu,html .menubg{background-image:${str}}`,
               )
             }
           },
@@ -3404,58 +2629,9 @@ export class Library {
             wood: "木纹",
             music: "音乐",
             simple: "简约",
-            custom: "自定",
             default: "默认",
           },
-          visualBar: function (node, item, create, switcher) {
-            if (node.created) {
-              return
-            }
-            var button
-            for (var i = 0; i < node.parentNode.childElementCount; i++) {
-              if (node.parentNode.childNodes[i]._link == "custom") {
-                button = node.parentNode.childNodes[i]
-              }
-            }
-            if (!button) {
-              return
-            }
-            node.created = true
-            var deletepic
-            ui.create.filediv(".menubutton", "添加图片", node, function (file) {
-              if (file) {
-                game.putDB("image", "control_style", file, function () {
-                  game.getDB("image", "control_style", function (fileToLoad) {
-                    if (!fileToLoad) {
-                      return
-                    }
-                    var fileReader = new FileReader()
-                    fileReader.onload = function (fileLoadedEvent) {
-                      var data = fileLoadedEvent.target.result
-                      button.style.backgroundImage = "url(" + data + ")"
-                      button.className = "button character controlbutton"
-                      node.classList.add("showdelete")
-                    }
-                    fileReader.readAsDataURL(fileToLoad, "UTF-8")
-                  })
-                })
-              }
-            }).inputNode.accept = "image/*"
-            deletepic = ui.create.div(".menubutton.deletebutton", "删除图片", node, function () {
-              if (confirm("确定删除自定义图片？（此操作不可撤销）")) {
-                game.deleteDB("image", "control_style")
-                button.style.backgroundImage = "none"
-                button.className = "button character controlbutton dashedmenubutton"
-                node.classList.remove("showdelete")
-                if (lib.config.control_style == "custom") {
-                  lib.configMenu.appearence.config.control_style.onclick("default")
-                  switcher.lastChild.innerHTML = "默认"
-                }
-                button.classList.add("transparent")
-              }
-            })
-          },
-          visualMenu: function (node, link, name, config) {
+          visualMenu: (node, link, _name, _config) => {
             node.className = "button character controlbutton"
             node.style.backgroundSize = ""
             switch (link) {
@@ -3472,24 +2648,9 @@ export class Library {
                 node.style.backgroundImage = "linear-gradient(#4b4b4b, #464646)"
                 break
               case "simple":
-                node.style.backgroundImage = "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
+                node.style.backgroundImage =
+                  "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
                 break
-            }
-            if (link == "custom") {
-              node.classList.add("transparent")
-              game.getDB("image", "control_style", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  var data = fileLoadedEvent.target.result
-                  node.style.backgroundImage = "url(" + data + ")"
-                  node.className = "button character controlbutton"
-                  node.parentNode.lastChild.classList.add("showdelete")
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
             }
           },
           onclick(layout) {
@@ -3498,39 +2659,22 @@ export class Library {
               ui.css.control_stylesheet.remove()
               delete ui.css.control_stylesheet
             }
-            if (layout == "custom") {
-              game.getDB("image", "control_style", function (fileToLoad) {
-                if (!fileToLoad) {
-                  return
-                }
-                var fileReader = new FileReader()
-                fileReader.onload = function (fileLoadedEvent) {
-                  if (ui.css.control_stylesheet) {
-                    ui.css.control_stylesheet.remove()
-                  }
-                  ui.css.control_stylesheet = lib.init.sheet(
-                    '#window .control,.menubutton:not(.active):not(.highlight):not(.red):not(.blue),#window #system>div>div{background-image:url("' +
-                      fileLoadedEvent.target.result +
-                      '")}',
-                  )
-                }
-                fileReader.readAsDataURL(fileToLoad, "UTF-8")
-              })
-            } else if (layout != "default") {
+            if (layout !== "default") {
               var str = ""
               switch (layout) {
                 case "wood":
-                  str = 'url("' + lib.assetURL + 'theme/woodden/wood.jpg")'
+                  str = `url("${lib.assetURL}theme/woodden/wood.jpg")`
                   break
                 case "music":
-                  str = "linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px"
+                  str =
+                    "linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px"
                   break
                 case "simple":
                   str =
                     "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px"
                   break
               }
-              if (layout == "wood") {
+              if (layout === "wood") {
                 ui.css.control_stylesheet = lib.init.sheet(
                   "#window .control,#window .menubutton,#window #system>div>div,#window #system>div>.pressdown2{background-image:" +
                     str +
@@ -3559,10 +2703,14 @@ export class Library {
               ui.css.buttonsheet.remove()
             }
             if (lib.config.custom_button) {
-              var cbnum1 = 6 + (parseInt(lib.config.custom_button_system_top) || 0)
-              var cbnum2 = 6 + (parseInt(lib.config.custom_button_system_bottom) || 0)
-              var cbnum3 = 3 + (parseInt(lib.config.custom_button_control_top) || 0)
-              var cbnum4 = 3 + (parseInt(lib.config.custom_button_control_bottom) || 0)
+              var cbnum1 =
+                6 + (parseInt(lib.config.custom_button_system_top, 10) || 0)
+              var cbnum2 =
+                6 + (parseInt(lib.config.custom_button_system_bottom, 10) || 0)
+              var cbnum3 =
+                3 + (parseInt(lib.config.custom_button_control_top, 10) || 0)
+              var cbnum4 =
+                3 + (parseInt(lib.config.custom_button_control_bottom, 10) || 0)
               var cbnum5 = 2
               var cbnum6 = 2
               if (cbnum3 < 0) {
@@ -3579,12 +2727,8 @@ export class Library {
                   "px !important;padding-bottom:" +
                   cbnum2 +
                   "px !important}",
-                "#control>.control>div{padding-top:" +
-                  cbnum3 +
-                  "px;padding-bottom:" +
-                  cbnum4 +
-                  "px}",
-                "#control>.control{padding-top:" + cbnum5 + "px;padding-bottom:" + cbnum6 + "px}",
+                `#control>.control>div{padding-top:${cbnum3}px;padding-bottom:${cbnum4}px}`,
+                `#control>.control{padding-top:${cbnum5}px;padding-bottom:${cbnum6}px}`,
               )
             }
           },
@@ -3873,7 +3017,7 @@ export class Library {
                 list[i].classList.remove("linked2")
               }
             }
-            if (style == "chain") {
+            if (style === "chain") {
               ui.arena.classList.remove("nolink")
             } else {
               ui.arena.classList.add("nolink")
@@ -3892,16 +3036,16 @@ export class Library {
           },
           onclick(item) {
             var linked = false
-            if (game.me && game.me.isLinked()) {
+            if (game.me?.isLinked()) {
               linked = true
             }
             game.saveConfig("cardshape", item)
             if (
-              item == "oblong" &&
-              (game.layout == "long" ||
-                game.layout == "mobile" ||
-                game.layout == "long2" ||
-                game.layout == "nova")
+              item === "oblong" &&
+              (game.layout === "long" ||
+                game.layout === "mobile" ||
+                game.layout === "long2" ||
+                game.layout === "nova")
             ) {
               ui.arena.classList.add("oblongcard")
               ui.window.classList.add("oblongcard")
@@ -3934,7 +3078,7 @@ export class Library {
           },
           onclick(item) {
             game.saveConfig("cardtempname", item)
-            if (!game.me || !game.me.getCards) {
+            if (!game.me?.getCards) {
               return
             }
             var hs = game.me.getCards("h")
@@ -4003,7 +3147,7 @@ export class Library {
           },
           onclick(item) {
             game.saveConfig("cursor_style", item)
-            if (item == "pointer") {
+            if (item === "pointer") {
               ui.window.classList.add("nopointer")
             } else {
               ui.window.classList.remove("nopointer")
@@ -4015,8 +3159,8 @@ export class Library {
           init: "xingkai",
           unfrequent: true,
           item: {},
-          textMenu: function (node, link) {
-            if (link != "default") {
+          textMenu: (node, link) => {
+            if (link !== "default") {
               node.style.fontFamily = link
             }
             node.style.fontSize = "20px"
@@ -4031,8 +3175,8 @@ export class Library {
           init: "huangcao",
           unfrequent: true,
           item: {},
-          textMenu: function (node, link) {
-            if (link != "default") {
+          textMenu: (node, link) => {
+            if (link !== "default") {
               node.style.fontFamily = link
             }
             node.style.fontSize = "20px"
@@ -4047,8 +3191,8 @@ export class Library {
           init: "default",
           unfrequent: true,
           item: {},
-          textMenu: function (node, link) {
-            if (link != "default") {
+          textMenu: (node, link) => {
+            if (link !== "default") {
               node.style.fontFamily = link
             }
             node.style.fontSize = "20px"
@@ -4063,8 +3207,8 @@ export class Library {
           init: "default",
           unfrequent: true,
           item: {},
-          textMenu: function (node, link) {
-            if (link != "default") {
+          textMenu: (node, link) => {
+            if (link !== "default") {
               node.style.fontFamily = link
             } else {
               node.style.fontFamily =
@@ -4086,7 +3230,7 @@ export class Library {
             game.saveConfig("suits_font", bool)
           },
         },
-        update: function (config, map) {
+        update: (_config, map) => {
           if (lib.config.custom_button) {
             map.custom_button_system_top.show()
             map.custom_button_system_bottom.show()
@@ -4098,36 +3242,14 @@ export class Library {
             map.custom_button_control_top.hide()
             map.custom_button_control_bottom.hide()
           }
-          if (lib.config.change_skin) {
-            map.change_skin_auto.show()
-          } else {
-            map.change_skin_auto.hide()
-          }
-          if (lib.config.image_background_random) {
-            map.image_background_blur.show()
-            map.image_background.hide()
-            // map.import_background.hide();
-          } else {
-            map.image_background.show()
-            if (lib.config.image_background == "default") {
-              map.image_background_blur.hide()
-            } else {
-              map.image_background_blur.show()
-            }
-            // if(lib.config.image_background=='custom'&&lib.db){
-            // 	map.import_background.show();
-            // }
-            // else{
-            // 	map.import_background.hide();
-            // }
-          }
-          if (lib.config.layout == "long" || lib.config.layout == "mobile") {
+          map.image_background.show()
+          if (lib.config.layout === "long" || lib.config.layout === "mobile") {
             //map.textequip.show();
             map.cardshape.show()
             map.phonelayout.show()
           } else {
             //map.textequip.hide();
-            if (lib.config.layout == "long2" || lib.config.layout == "nova") {
+            if (lib.config.layout === "long2" || lib.config.layout === "nova") {
               map.phonelayout.show()
               map.cardshape.show()
             } else {
@@ -4135,18 +3257,18 @@ export class Library {
               map.cardshape.hide()
             }
           }
-          if (lib.config.layout == "long") {
+          if (lib.config.layout === "long") {
             // map.fewplayer.show();
             map.player_height.show()
           } else {
             // map.fewplayer.hide();
-            if (lib.config.layout == "long2") {
+            if (lib.config.layout === "long2") {
               map.player_height.show()
             } else {
               map.player_height.hide()
             }
           }
-          if (lib.config.layout == "nova") {
+          if (lib.config.layout === "nova") {
             map.player_height_nova.show()
           } else {
             map.player_height_nova.hide()
@@ -4156,7 +3278,7 @@ export class Library {
           } else {
             map.cursor_style.show()
           }
-          if (lib.config.border_style == "auto") {
+          if (lib.config.border_style === "auto") {
             map.autoborder_count.show()
             map.autoborder_start.show()
           } else {
@@ -4169,12 +3291,12 @@ export class Library {
     view: {
       name: "显示",
       config: {
-        update: function (config, map) {
+        update: (_config, map) => {
           if (
-            lib.config.mode == "versus" ||
-            lib.config.mode == "chess" ||
-            lib.config.mode == "tafang" ||
-            lib.config.mode == "boss"
+            lib.config.mode === "versus" ||
+            lib.config.mode === "chess" ||
+            lib.config.mode === "tafang" ||
+            lib.config.mode === "boss"
           ) {
             map.show_handcardbutton.show()
           } else {
@@ -4186,15 +3308,15 @@ export class Library {
             map.pop_logv.show()
           }
           if (lib.device) {
-            if (lib.device == "android") {
+            if (lib.device === "android") {
               map.show_statusbar_android.show()
               map.show_statusbar_ios.hide()
-            } else if (lib.device == "ios") {
+            } else if (lib.device === "ios") {
               map.show_statusbar_ios.show()
               map.show_statusbar_android.hide()
             }
             if (!game.download) {
-              setTimeout(function () {
+              setTimeout(() => {
                 if (!window.StatusBar) {
                   // map.show_statusbar.hide();
                 }
@@ -4228,7 +3350,7 @@ export class Library {
             map.hide_card_prompt_basic.hide()
             map.hide_card_prompt_equip.hide()
           }
-          if (lib.config.show_log != "off") {
+          if (lib.config.show_log !== "off") {
             map.clear_log.show()
           } else {
             map.clear_log.hide()
@@ -4263,17 +3385,17 @@ export class Library {
             right: "靠右",
           },
           onclick(bool) {
-            if (lib.config.show_history == "right") {
+            if (lib.config.show_history === "right") {
               ui.window.addTempClass("rightbar2")
             }
             game.saveConfig("show_history", bool)
             if (_status.video || !_status.prepareArena) {
               return
             }
-            if (bool == "left") {
+            if (bool === "left") {
               ui.window.classList.add("leftbar")
               ui.window.classList.remove("rightbar")
-            } else if (bool == "right") {
+            } else if (bool === "right") {
               ui.window.classList.remove("leftbar")
               ui.window.classList.add("rightbar")
             } else {
@@ -4300,7 +3422,7 @@ export class Library {
           },
           onclick(bool) {
             game.saveConfig("show_log", bool)
-            if (lib.config.show_log != "off") {
+            if (lib.config.show_log !== "off") {
               ui.arenalog.style.display = ""
               ui.arenalog.dataset.position = bool
             } else {
@@ -4373,7 +3495,7 @@ export class Library {
           unfrequent: true,
           onclick(bool) {
             game.saveConfig("show_statusbar_android", bool)
-            if (window.StatusBar && lib.device == "android") {
+            if (window.StatusBar && lib.device === "android") {
               if (bool) {
                 window.StatusBar.overlaysWebView(false)
                 window.StatusBar.backgroundColorByName("black")
@@ -4396,9 +3518,9 @@ export class Library {
           },
           onclick(bool) {
             game.saveConfig("show_statusbar_ios", bool)
-            if (window.StatusBar && lib.device == "ios") {
-              if (bool != "off" && bool != "auto") {
-                if (lib.config.show_statusbar_ios == "default") {
+            if (window.StatusBar && lib.device === "ios") {
+              if (bool !== "off" && bool !== "auto") {
+                if (lib.config.show_statusbar_ios === "default") {
                   window.StatusBar.overlaysWebView(false)
                   document.body.classList.remove("statusbar")
                 } else {
@@ -4501,7 +3623,7 @@ export class Library {
                 dialog._dragtouches
                 dialog._dragorigin
                 dialog._dragorigintransform
-                setTimeout(function () {
+                setTimeout(() => {
                   dialog.style.transition = ""
                 }, 500)
               }
@@ -4518,13 +3640,13 @@ export class Library {
             game.saveConfig("transparent_dialog", bool)
             if (bool) {
               for (var i = 0; i < ui.dialogs.length; i++) {
-                if (ui.dialogs[i] != ui.dialog && ui.dialogs[i].static) {
+                if (ui.dialogs[i] !== ui.dialog && ui.dialogs[i].static) {
                   ui.dialogs[i].unfocus()
                 }
               }
             } else {
               for (var i = 0; i < ui.dialogs.length; i++) {
-                if (ui.dialogs[i] != ui.dialog && ui.dialogs[i].static) {
+                if (ui.dialogs[i] !== ui.dialog && ui.dialogs[i].static) {
                   ui.dialogs[i].refocus()
                 }
               }
@@ -4570,7 +3692,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -4589,7 +3711,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -4829,7 +3951,10 @@ export class Library {
           unfrequent: true,
           onclick(bool) {
             game.saveConfig("show_tip", bool)
-            document.documentElement.style.setProperty("--tip-display", bool ? "flex" : "none")
+            document.documentElement.style.setProperty(
+              "--tip-display",
+              bool ? "flex" : "none",
+            )
           },
         },
         show_sortPack: {
@@ -4923,7 +4048,8 @@ export class Library {
             style.alignItems = "center"
             style.animation =
               "background-position-left-center-right-center-left-center 15s ease infinite"
-            style.background = "linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB)"
+            style.background =
+              "linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB)"
             style.backgroundSize = "400% 400%"
             style.display = "flex"
             style.height = "60px"
@@ -4932,22 +4058,27 @@ export class Library {
             const firstChild = node.firstChild
             firstChild.removeAttribute("class")
             firstChild.style.position = "initial"
-            if (link == "doNotShow") {
+            if (link === "doNotShow") {
               return
             }
             const ruby = document.createElement("ruby")
             ruby.textContent = name
             const rt = document.createElement("rt")
             rt.style.fontSize = "smaller"
-            if (link == "showPinyin2" || link == "showCodeIdentifier2") {
+            if (link === "showPinyin2" || link === "showCodeIdentifier2") {
               rt.textContent =
-                link == "showCodeIdentifier2" ? "[" + link + "]" : "[" + get.pinyin(name) + "]"
+                link === "showCodeIdentifier2"
+                  ? `[${link}]`
+                  : `[${get.pinyin(name)}]`
               ruby.appendChild(rt)
             } else {
               const leftParenthesisRP = document.createElement("rp")
               leftParenthesisRP.textContent = "（"
               ruby.appendChild(leftParenthesisRP)
-              rt.textContent = link == "showCodeIdentifier" ? link : get.pinyin(name).join(" ")
+              rt.textContent =
+                link === "showCodeIdentifier"
+                  ? link
+                  : get.pinyin(name).join(" ")
               ruby.appendChild(rt)
               const rightParenthesisRP = document.createElement("rp")
               rightParenthesisRP.textContent = "）"
@@ -4966,10 +4097,12 @@ export class Library {
             lib.configMenu.view.config.show_characternamepinyin.init = newVal
           },
           get unfrequent() {
-            return lib.configMenu.view.config.show_characternamepinyin.unfrequent
+            return lib.configMenu.view.config.show_characternamepinyin
+              .unfrequent
           },
           set unfrequent(newVal) {
-            lib.configMenu.view.config.show_characternamepinyin.unfrequent = newVal
+            lib.configMenu.view.config.show_characternamepinyin.unfrequent =
+              newVal
           },
           get item() {
             return lib.configMenu.view.config.show_characternamepinyin.item
@@ -4978,10 +4111,12 @@ export class Library {
             lib.configMenu.view.config.show_characternamepinyin.item = newVal
           },
           get visualMenu() {
-            return lib.configMenu.view.config.show_characternamepinyin.visualMenu
+            return lib.configMenu.view.config.show_characternamepinyin
+              .visualMenu
           },
           set visualMenu(newVal) {
-            lib.configMenu.view.config.show_characternamepinyin.visualMenu = newVal
+            lib.configMenu.view.config.show_characternamepinyin.visualMenu =
+              newVal
           },
         },
       },
@@ -4989,21 +4124,25 @@ export class Library {
     audio: {
       name: "音效",
       config: {
-        update: function (config, map) {
-          if (lib.config.background_music == "music_custom" && (lib.device || lib.node)) {
+        update: (_config, map) => {
+          if (
+            lib.config.background_music === "music_custom" &&
+            (lib.device || lib.node)
+          ) {
             map.import_music.show()
           } else {
             map.import_music.hide()
           }
-          map.clear_background_music[
-            get.is.object(lib.config.customBackgroundMusic) ? "show" : "hide"
-          ]()
           ui.background_music_setting = map.background_music
-          map.background_music._link.config.updatex.call(map.background_music, [])
+          map.background_music._link.config.updatex.call(
+            map.background_music,
+            [],
+          )
         },
         background_music: {
           updatex: function () {
-            this.lastChild.innerHTML = this._link.config.item[lib.config.background_music]
+            this.lastChild.innerHTML =
+              this._link.config.item[lib.config.background_music]
             var menu = this._link.menu
             for (var i = 0; i < menu.childElementCount; i++) {
               if (
@@ -5063,7 +4202,7 @@ export class Library {
             8: "八",
           },
           onclick(volume) {
-            game.saveConfig("volumn_audio", parseInt(volume))
+            game.saveConfig("volumn_audio", parseInt(volume, 10))
           },
         },
         volumn_background: {
@@ -5081,25 +4220,8 @@ export class Library {
             8: "八",
           },
           onclick(volume) {
-            game.saveConfig("volumn_background", parseInt(volume))
+            game.saveConfig("volumn_background", parseInt(volume, 10))
             ui.backgroundMusic.volume = volume / 8
-          },
-        },
-        clear_background_music: {
-          name: "清除自定义背景音乐",
-          clear: true,
-          onclick() {
-            if (confirm("是否清除已导入的所有自定义背景音乐？（该操作不可撤销！）")) {
-              for (var i in lib.config.customBackgroundMusic) {
-                lib.config.all.background_music.remove(i)
-              }
-              lib.config.customBackgroundMusic = null
-              game.saveConfig("customBackgroundMusic", null)
-              game.saveConfig("background_music", "music_off")
-              if (!_status._aozhan) {
-                game.playBackgroundMusic()
-              }
-            }
           },
         },
       },
@@ -5107,15 +4229,15 @@ export class Library {
     skill: {
       name: "技能",
       config: {
-        update: function (config, map) {
+        update: (_config, map) => {
           for (var i in map) {
-            if (map[i]._link.config.type == "autoskill") {
+            if (map[i]._link.config.type === "autoskill") {
               if (!lib.config.autoskilllist.includes(i)) {
                 map[i].classList.add("on")
               } else {
                 map[i].classList.remove("on")
               }
-            } else if (map[i]._link.config.type == "banskill") {
+            } else if (map[i]._link.config.type === "banskill") {
               if (!lib.config.forbidlist.includes(i)) {
                 map[i].classList.add("on")
               } else {
@@ -5129,58 +4251,33 @@ export class Library {
     others: {
       name: "其它",
       config: {
-        // reset_database:{
-        // 	name:'重置游戏',
-        // 	onclick(){
-        // 		var node=this;
-        // 		if(node._clearing){
-        // 			if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
-        // 			game.reload();
-        // 			return;
-        // 		}
-        // 		node._clearing=true;
-        // 		node.innerHTML='单击以确认 (3)';
-        // 		setTimeout(function(){
-        // 			node.innerHTML='单击以确认 (2)';
-        // 			setTimeout(function(){
-        // 				node.innerHTML='单击以确认 (1)';
-        // 				setTimeout(function(){
-        // 					node.innerHTML='重置游戏录像';
-        // 					delete node._clearing;
-        // 				},1000);
-        // 			},1000);
-        // 		},1000);
-        // 	},
-        // 	clear:true
-        // },
         reset_game: {
           name: "重置游戏设置",
           onclick() {
-            var node = this
-            if (node._clearing) {
+            if (this._clearing) {
               var wtk_inited = localStorage.getItem("wtk_inited")
-              var onlineKey = localStorage.getItem(lib.configprefix + "key")
+              var onlineKey = localStorage.getItem(`${lib.configprefix}key`)
               localStorage.clear()
               if (wtk_inited) {
                 localStorage.setItem("wtk_inited", wtk_inited)
               }
               if (onlineKey) {
-                localStorage.setItem(lib.configprefix + "key", onlineKey)
+                localStorage.setItem(`${lib.configprefix}key`, onlineKey)
               }
               game.deleteDB("config")
               game.deleteDB("data")
               game.reload()
               return
             }
-            node._clearing = true
-            node.firstChild.innerHTML = "单击以确认 (3)"
-            setTimeout(function () {
-              node.firstChild.innerHTML = "单击以确认 (2)"
-              setTimeout(function () {
-                node.firstChild.innerHTML = "单击以确认 (1)"
-                setTimeout(function () {
-                  node.firstChild.innerHTML = "重置游戏设置"
-                  delete node._clearing
+            this._clearing = true
+            this.firstChild.innerHTML = "单击以确认 (3)"
+            setTimeout(() => {
+              this.firstChild.innerHTML = "单击以确认 (2)"
+              setTimeout(() => {
+                this.firstChild.innerHTML = "单击以确认 (1)"
+                setTimeout(() => {
+                  this.firstChild.innerHTML = "重置游戏设置"
+                  delete this._clearing
                 }, 1000)
               }, 1000)
             }, 1000)
@@ -5190,17 +4287,17 @@ export class Library {
         reset_hiddenpack: {
           name: "重置隐藏内容",
           onclick() {
-            if (this.firstChild.innerHTML != "已重置") {
+            if (this.firstChild.innerHTML !== "已重置") {
               this.firstChild.innerHTML = "已重置"
               game.saveConfig("hiddenModePack", [])
               game.saveConfig("hiddenCharacterPack", [])
               game.saveConfig("hiddenCardPack", [])
               game.saveConfig("hiddenPlayPack", [])
               game.saveConfig("hiddenBackgroundPack", [])
-              var that = this
-              setTimeout(function () {
-                that.firstChild.innerHTML = "重置隐藏内容"
-                setTimeout(function () {
+
+              setTimeout(() => {
+                this.firstChild.innerHTML = "重置隐藏内容"
+                setTimeout(() => {
                   if (confirm("是否重新启动使改变生效？")) {
                     game.reload()
                   }
@@ -5213,14 +4310,14 @@ export class Library {
         reset_tutorial: {
           name: "重置新手向导",
           onclick() {
-            if (this.firstChild.innerHTML != "已重置") {
+            if (this.firstChild.innerHTML !== "已重置") {
               this.firstChild.innerHTML = "已重置"
               game.saveConfig("new_tutorial", false)
               game.saveConfig("prompt_hidebg")
               game.saveConfig("prompt_hidepack")
-              var that = this
-              setTimeout(function () {
-                that.firstChild.innerHTML = "重置新手向导"
+
+              setTimeout(() => {
+                this.firstChild.innerHTML = "重置新手向导"
               }, 500)
             }
           },
@@ -5244,10 +4341,10 @@ export class Library {
           name: "导出游戏设置",
           onclick() {
             var data
-            var export_data = function (data) {
+            var export_data = (data) => {
               game.export(
                 lib.init.encode(JSON.stringify(data)),
-                "三国杀 - 数据 - " + new Date().toLocaleString(),
+                `三国杀 - 数据 - ${new Date().toLocaleString()}`,
               )
             }
             if (!lib.db) {
@@ -5259,8 +4356,8 @@ export class Library {
               }
               export_data(data)
             } else {
-              game.getDB("config", null, function (data1) {
-                game.getDB("data", null, function (data2) {
+              game.getDB("config", null, (data1) => {
+                game.getDB("data", null, (data2) => {
                   export_data({
                     config: data1,
                     data: data2,
@@ -5274,28 +4371,27 @@ export class Library {
         redownload_game: {
           name: "重新下载游戏",
           onclick() {
-            var node = this
-            if (node._clearing) {
+            if (this._clearing) {
               localStorage.removeItem("wtk_inited")
               game.reload()
               return
             }
-            node._clearing = true
-            node.firstChild.innerHTML = "单击以确认 (3)"
-            setTimeout(function () {
-              node.firstChild.innerHTML = "单击以确认 (2)"
-              setTimeout(function () {
-                node.firstChild.innerHTML = "单击以确认 (1)"
-                setTimeout(function () {
-                  node.firstChild.innerHTML = "重新下载游戏"
-                  delete node._clearing
+            this._clearing = true
+            this.firstChild.innerHTML = "单击以确认 (3)"
+            setTimeout(() => {
+              this.firstChild.innerHTML = "单击以确认 (2)"
+              setTimeout(() => {
+                this.firstChild.innerHTML = "单击以确认 (1)"
+                setTimeout(() => {
+                  this.firstChild.innerHTML = "重新下载游戏"
+                  delete this._clearing
                 }, 1000)
               }, 1000)
             }, 1000)
           },
           clear: true,
         },
-        update: function (config, map) {
+        update: (_config, map) => {
           if (lib.device || lib.node) {
             map.redownload_game.show()
           } else {
@@ -5309,13 +4405,13 @@ export class Library {
     identity: {
       name: "身份",
       connect: {
-        update: function (config, map) {
-          if (config.connect_identity_mode == "stratagem") {
+        update: (config, map) => {
+          if (config.connect_identity_mode === "stratagem") {
             map.connect_round_one_use_fury.show()
           } else {
             map.connect_round_one_use_fury.hide()
           }
-          if (config.connect_identity_mode == "zhong") {
+          if (config.connect_identity_mode === "zhong") {
             map.connect_player_number.hide()
             map.connect_choice_zhu.hide()
             map.connect_limit_zhu.hide()
@@ -5331,7 +4427,7 @@ export class Library {
             map.connect_zhong_card.show()
             map.connect_special_identity.hide()
             map.connect_double_character.show()
-          } else if (config.connect_identity_mode == "stratagem") {
+          } else if (config.connect_identity_mode === "stratagem") {
             map.connect_double_character.show()
             map.connect_player_number.show()
             map.connect_choice_zhu.show()
@@ -5347,7 +4443,7 @@ export class Library {
             map.connect_enable_year_limit.show()
             map.connect_zhong_card.hide()
             map.connect_special_identity.hide()
-          } else if (config.connect_identity_mode == "purple") {
+          } else if (config.connect_identity_mode === "purple") {
             map.connect_player_number.hide()
             map.connect_choice_zhu.hide()
             map.connect_limit_zhu.hide()
@@ -5374,18 +4470,23 @@ export class Library {
             map.connect_choice_fan.show()
             map.connect_choice_nei.show()
             map.connect_double_nei[
-              config.connect_player_number != "2" && !config.connect_enable_commoner
+              config.connect_player_number !== "2" &&
+              !config.connect_enable_commoner
                 ? "show"
                 : "hide"
             ]()
             map.connect_enable_commoner[
-              config.connect_player_number != "2" && !config.connect_double_nei ? "show" : "hide"
+              config.connect_player_number !== "2" && !config.connect_double_nei
+                ? "show"
+                : "hide"
             ]()
-            map.connect_choice_commoner[config.connect_enable_commoner ? "show" : "hide"]()
+            map.connect_choice_commoner[
+              config.connect_enable_commoner ? "show" : "hide"
+            ]()
             map.connect_enable_year_limit.show()
             map.connect_zhong_card.hide()
 
-            if (config.connect_player_number == "8") {
+            if (config.connect_player_number === "8") {
               map.connect_special_identity.show()
             } else {
               map.connect_special_identity.hide()
@@ -5422,7 +4523,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -5433,7 +4534,7 @@ export class Library {
         },
         connect_limit_zhu: {
           name: "常备主候选武将数",
-          init: 3,
+          init: "3",
           restart: true,
           item: {
             off: "不限制",
@@ -5442,11 +4543,17 @@ export class Library {
           },
           async onclick(item) {
             if (item !== "number") {
-              await game.promises.saveConfig("connect_limit_zhu", item, "identity")
+              await game.promises.saveConfig(
+                "connect_limit_zhu",
+                item,
+                "identity",
+              )
               return
             }
             while (true) {
-              const result = await game.promises.prompt("请输入常备主候选武将数")
+              const result = await game.promises.prompt(
+                "请输入常备主候选武将数",
+              )
               if (!result) {
                 break
               }
@@ -5454,7 +4561,11 @@ export class Library {
                 const number = Number(result)
                 if (number > 0 && Number.isInteger(number)) {
                   this.querySelector("div").innerHTML = result
-                  await game.promises.saveConfig("connect_limit_zhu", result, "identity")
+                  await game.promises.saveConfig(
+                    "connect_limit_zhu",
+                    result,
+                    "identity",
+                  )
                   break
                 }
               }
@@ -5470,7 +4581,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -5493,7 +4604,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -5510,7 +4621,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -5545,7 +4656,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -5587,7 +4698,8 @@ export class Library {
           init: false,
           frequent: false,
           restart: true,
-          intro: "谋攻篇规则为第二轮开始才可使用怒气强化卡牌，开启此选项从游戏开始即可强化卡牌。",
+          intro:
+            "谋攻篇规则为第二轮开始才可使用怒气强化卡牌，开启此选项从游戏开始即可强化卡牌。",
         },
         connect_enhance_zhu: {
           name: "加强主公",
@@ -5612,15 +4724,15 @@ export class Library {
         },
       },
       config: {
-        update: function (config, map) {
-          if (config.identity_mode == "stratagem") {
+        update: (config, map) => {
+          if (config.identity_mode === "stratagem") {
             map.round_one_use_fury.show()
             map.nei_auto_mark_camouflage.show()
           } else {
             map.round_one_use_fury.hide()
             map.nei_auto_mark_camouflage.hide()
           }
-          if (config.identity_mode == "zhong") {
+          if (config.identity_mode === "zhong") {
             map.player_number.hide()
             map.enhance_zhu.hide()
             map.enable_mingcha.hide()
@@ -5651,13 +4763,13 @@ export class Library {
               map.double_hp.hide()
             }
             map.continue_game.show()
-          } else if (config.identity_mode == "stratagem") {
+          } else if (config.identity_mode === "stratagem") {
             map.continue_game.show()
             map.player_number.show()
             map.enhance_zhu.hide()
             map.enable_mingcha.hide()
             map.auto_identity.hide()
-            if (config.player_number != "2") {
+            if (config.player_number !== "2") {
               map.double_nei.show()
             } else {
               map.double_nei.hide()
@@ -5671,12 +4783,15 @@ export class Library {
             map.choice_commoner.hide()
             map.enable_year_limit.show()
             map.ban_identity.show()
-            if (config.ban_identity == "off") {
+            if (config.ban_identity === "off") {
               map.ban_identity2.hide()
             } else {
               map.ban_identity2.show()
             }
-            if (config.ban_identity == "off" || config.ban_identity2 == "off") {
+            if (
+              config.ban_identity === "off" ||
+              config.ban_identity2 === "off"
+            ) {
               map.ban_identity3.hide()
             } else {
               map.ban_identity3.show()
@@ -5694,7 +4809,7 @@ export class Library {
             } else {
               map.double_hp.hide()
             }
-          } else if (config.identity_mode == "purple") {
+          } else if (config.identity_mode === "purple") {
             map.player_number.hide()
             map.enhance_zhu.hide()
             map.enable_mingcha.hide()
@@ -5728,7 +4843,9 @@ export class Library {
             map.enable_mingcha.show()
             map.auto_identity.show()
             map.double_nei[
-              config.player_number != "2" && !config.enable_commoner ? "show" : "hide"
+              config.player_number !== "2" && !config.enable_commoner
+                ? "show"
+                : "hide"
             ]()
             map.choice_zhu.show()
             map.limit_zhu.show()
@@ -5736,17 +4853,22 @@ export class Library {
             map.choice_nei.show()
             map.choice_fan.show()
             map.enable_commoner[
-              config.player_number != "2" && !config.double_nei ? "show" : "hide"
+              config.player_number !== "2" && !config.double_nei
+                ? "show"
+                : "hide"
             ]()
             map.choice_commoner[config.enable_commoner ? "show" : "hide"]()
             map.enable_year_limit.show()
             map.ban_identity.show()
-            if (config.ban_identity == "off") {
+            if (config.ban_identity === "off") {
               map.ban_identity2.hide()
             } else {
               map.ban_identity2.show()
             }
-            if (config.ban_identity == "off" || config.ban_identity2 == "off") {
+            if (
+              config.ban_identity === "off" ||
+              config.ban_identity2 === "off"
+            ) {
               map.ban_identity3.hide()
             } else {
               map.ban_identity3.show()
@@ -5757,7 +4879,7 @@ export class Library {
             map.change_choice.show()
             map.free_choose.show()
             map.change_identity.show()
-            if (config.player_number == "8") {
+            if (config.player_number === "8") {
               map.special_identity.show()
             } else {
               map.special_identity.hide()
@@ -5818,7 +4940,8 @@ export class Library {
           init: true,
           restart: true,
           frequent: true,
-          intro: "若开启此选项，选择神武将的玩家需在亮出自己的武将牌之前为自己选择一个势力。",
+          intro:
+            "若开启此选项，选择神武将的玩家需在亮出自己的武将牌之前为自己选择一个势力。",
         },
         nei_fullscreenpop: {
           name: "主内单挑特效",
@@ -5869,7 +4992,7 @@ export class Library {
           init: "off",
           onclick(bool) {
             game.saveConfig("auto_identity", bool, this._link.config.mode)
-            if (get.config("identity_mode") == "zhong") {
+            if (get.config("identity_mode") === "zhong") {
               return
             }
             var num
@@ -5921,8 +5044,9 @@ export class Library {
           onclick(bool) {
             game.saveConfig("free_choose", bool, this._link.config.mode)
             if (
-              get.mode() != this._link.config.mode ||
-              (!_status.event.getParent().showConfig && !_status.event.showConfig)
+              get.mode() !== this._link.config.mode ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
             ) {
               return
             }
@@ -5940,19 +5064,23 @@ export class Library {
           onclick(bool) {
             game.saveConfig("change_identity", bool, this._link.config.mode)
             if (
-              get.mode() != "identity" ||
-              (!_status.event.getParent().showConfig && !_status.event.showConfig)
+              get.mode() !== "identity" ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
             ) {
               return
             }
             var dialog
-            if (ui.cheat2 && ui.cheat2.backup) {
+            if (ui.cheat2?.backup) {
               dialog = ui.cheat2.backup
             } else {
               dialog = _status.event.dialog
             }
-            if (!_status.brawl || !_status.brawl.noAddSetting) {
-              if (!dialog.querySelector("table") && get.config("change_identity")) {
+            if (!_status.brawl?.noAddSetting) {
+              if (
+                !dialog.querySelector("table") &&
+                get.config("change_identity")
+              ) {
                 _status.event.getParent().addSetting(dialog)
               } else {
                 _status.event.getParent().removeSetting(dialog)
@@ -5967,8 +5095,9 @@ export class Library {
           onclick(bool) {
             game.saveConfig("change_choice", bool, this._link.config.mode)
             if (
-              get.mode() != "identity" ||
-              (!_status.event.getParent().showConfig && !_status.event.showConfig)
+              get.mode() !== "identity" ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
             ) {
               return
             }
@@ -5995,7 +5124,8 @@ export class Library {
           init: false,
           frequent: false,
           restart: true,
-          intro: "谋攻篇规则为第二轮开始才可使用怒气强化卡牌，开启此选项从游戏开始即可强化卡牌。",
+          intro:
+            "谋攻篇规则为第二轮开始才可使用怒气强化卡牌，开启此选项从游戏开始即可强化卡牌。",
         },
         nei_auto_mark_camouflage: {
           name: "内奸自动标记伪装反贼",
@@ -6008,8 +5138,13 @@ export class Library {
           init: false,
           onclick(bool) {
             game.saveConfig("continue_game", bool, this._link.config.mode)
-            if (get.config("continue_game") && get.mode() == "identity") {
-              if (!ui.continue_game && _status.over && !_status.brawl && !game.no_continue_game) {
+            if (get.config("continue_game") && get.mode() === "identity") {
+              if (
+                !ui.continue_game &&
+                _status.over &&
+                !_status.brawl &&
+                !game.no_continue_game
+              ) {
                 ui.continue_game = ui.create.control("再战", game.reloadCurrent)
               }
             } else if (ui.continue_game) {
@@ -6024,7 +5159,7 @@ export class Library {
           init: true,
           onclick(bool) {
             game.saveConfig("dierestart", bool, this._link.config.mode)
-            if (get.config("dierestart") && get.mode() == "identity") {
+            if (get.config("dierestart") && get.mode() === "identity") {
               if (!ui.restart && game.me.isDead() && !_status.connectMode) {
                 ui.restart = ui.create.control("restart", game.reload)
               }
@@ -6039,7 +5174,7 @@ export class Library {
           init: false,
           onclick(bool) {
             game.saveConfig("revive", bool, this._link.config.mode)
-            if (get.config("revive") && get.mode() == "identity") {
+            if (get.config("revive") && get.mode() === "identity") {
               if (!ui.revive && game.me.isDead()) {
                 ui.revive = ui.create.control("revive", ui.click.dierevive)
               }
@@ -6112,7 +5247,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -6123,7 +5258,7 @@ export class Library {
         },
         limit_zhu: {
           name: "常备主候选武将数",
-          init: 3,
+          init: "3",
           restart: true,
           item: {
             off: "不限制",
@@ -6136,7 +5271,9 @@ export class Library {
               return
             }
             while (true) {
-              const result = await game.promises.prompt("请输入常备主候选武将数")
+              const result = await game.promises.prompt(
+                "请输入常备主候选武将数",
+              )
               if (!result) {
                 break
               }
@@ -6144,7 +5281,11 @@ export class Library {
                 const number = Number(result)
                 if (number > 0 && Number.isInteger(number)) {
                   this.querySelector("div").innerHTML = result
-                  await game.promises.saveConfig("limit_zhu", result, "identity")
+                  await game.promises.saveConfig(
+                    "limit_zhu",
+                    result,
+                    "identity",
+                  )
                   break
                 }
               }
@@ -6160,7 +5301,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -6177,7 +5318,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -6194,7 +5335,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -6208,7 +5349,8 @@ export class Library {
           init: false,
           restart: true,
           frequent: false,
-          intro: "开启后游戏中将有一个平民（身份）加入游戏。<br>具体规则请查看帮助。",
+          intro:
+            "开启后游戏中将有一个平民（身份）加入游戏。<br>具体规则请查看帮助。",
         },
         choice_commoner: {
           name: "平民候选武将数",
@@ -6218,7 +5360,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -6328,7 +5470,7 @@ export class Library {
         },
       },
       config: {
-        update: function (config, map) {
+        update: (config, map) => {
           if (config.onlyguozhan) {
             map.junzhu.show()
           } else {
@@ -6455,7 +5597,7 @@ export class Library {
           init: "rewrite",
           onclick(item) {
             game.saveConfig("aozhan_bgm", item, this._link.config.mode)
-            if (_status._aozhan == true) {
+            if (_status._aozhan === true) {
               game.playBackgroundMusic()
             }
           },
@@ -6523,8 +5665,9 @@ export class Library {
           onclick(bool) {
             game.saveConfig("free_choose", bool, this._link.config.mode)
             if (
-              get.mode() != this._link.config.mode ||
-              (!_status.event.getParent().showConfig && !_status.event.showConfig)
+              get.mode() !== this._link.config.mode ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
             ) {
               return
             }
@@ -6548,19 +5691,23 @@ export class Library {
           onclick(bool) {
             game.saveConfig("change_identity", bool, this._link.config.mode)
             if (
-              get.mode() != "guozhan" ||
-              (!_status.event.getParent().showConfig && !_status.event.showConfig)
+              get.mode() !== "guozhan" ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
             ) {
               return
             }
             var dialog
-            if (ui.cheat2 && ui.cheat2.backup) {
+            if (ui.cheat2?.backup) {
               dialog = ui.cheat2.backup
             } else {
               dialog = _status.event.dialog
             }
-            if (!_status.brawl || !_status.brawl.noAddSetting) {
-              if (!dialog.querySelector("table") && get.config("change_identity")) {
+            if (!_status.brawl?.noAddSetting) {
+              if (
+                !dialog.querySelector("table") &&
+                get.config("change_identity")
+              ) {
                 _status.event.getParent().addSetting(dialog)
               } else {
                 _status.event.getParent().removeSetting(dialog)
@@ -6575,8 +5722,9 @@ export class Library {
           onclick(bool) {
             game.saveConfig("change_choice", bool, this._link.config.mode)
             if (
-              get.mode() != "guozhan" ||
-              (!_status.event.getParent().showConfig && !_status.event.showConfig)
+              get.mode() !== "guozhan" ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
             ) {
               return
             }
@@ -6604,8 +5752,13 @@ export class Library {
           intro: "游戏结束后可选择用相同的武将再进行一局游戏",
           onclick(bool) {
             game.saveConfig("continue_game", bool, this._link.config.mode)
-            if (get.config("continue_game") && get.mode() == "guozhan") {
-              if (!ui.continue_game && _status.over && !_status.brawl && !game.no_continue_game) {
+            if (get.config("continue_game") && get.mode() === "guozhan") {
+              if (
+                !ui.continue_game &&
+                _status.over &&
+                !_status.brawl &&
+                !game.no_continue_game
+              ) {
                 ui.continue_game = ui.create.control("再战", game.reloadCurrent)
               }
             } else if (ui.continue_game) {
@@ -6619,7 +5772,7 @@ export class Library {
           init: true,
           onclick(bool) {
             game.saveConfig("dierestart", bool, this._link.config.mode)
-            if (get.config("dierestart") && get.mode() == "guozhan") {
+            if (get.config("dierestart") && get.mode() === "guozhan") {
               if (!ui.restart && game.me.isDead() && !_status.connectMode) {
                 ui.restart = ui.create.control("restart", game.reload)
               }
@@ -6634,7 +5787,7 @@ export class Library {
           init: false,
           onclick(bool) {
             game.saveConfig("revive", bool, this._link.config.mode)
-            if (get.config("revive") && get.mode() == "guozhan") {
+            if (get.config("revive") && get.mode() === "guozhan") {
               if (!ui.revive && game.me.isDead()) {
                 ui.revive = ui.create.control("revive", ui.click.dierevive)
               }
@@ -6671,17 +5824,20 @@ export class Library {
     versus: {
       name: "对决",
       connect: {
-        update: function (config, map) {
-          if (config.connect_versus_mode == "1v1") {
+        update: (config, map) => {
+          if (config.connect_versus_mode === "1v1") {
             map.connect_choice_num.show()
             map.connect_replace_number.show()
           } else {
             map.connect_choice_num.hide()
             map.connect_replace_number.hide()
           }
-          if (config.connect_versus_mode == "2v2" || config.connect_versus_mode == "3v3") {
+          if (
+            config.connect_versus_mode === "2v2" ||
+            config.connect_versus_mode === "3v3"
+          ) {
             map.connect_replace_handcard.show()
-            if (config.connect_versus_mode == "2v2") {
+            if (config.connect_versus_mode === "2v2") {
               map.connect_olfeiyang_four.show()
             } else {
               map.connect_olfeiyang_four.hide()
@@ -6743,8 +5899,8 @@ export class Library {
         },
       },
       config: {
-        update: function (config, map) {
-          if (config.versus_mode == "four") {
+        update: (config, map) => {
+          if (config.versus_mode === "four") {
             map.change_choice.hide()
             map.ladder.show()
             if (config.ladder) {
@@ -6776,14 +5932,14 @@ export class Library {
             map.edit_character_four.hide()
             map.reset_character_four.hide()
           }
-          if (config.versus_mode == "three") {
+          if (config.versus_mode === "three") {
             map.edit_character_three.show()
             map.reset_character_three.show()
           } else {
             map.edit_character_three.hide()
             map.reset_character_three.hide()
           }
-          if (config.versus_mode == "three" || config.versus_mode == "one") {
+          if (config.versus_mode === "three" || config.versus_mode === "one") {
             map.enable_all_three.show()
             map.enable_all_cards.show()
           } else {
@@ -6791,23 +5947,23 @@ export class Library {
             map.enable_all_cards.hide()
           }
           if (
-            config.versus_mode == "jiange" ||
-            config.versus_mode == "two" ||
-            config.versus_mode == "endless" ||
-            config.versus_mode == "three" ||
-            config.versus_mode == "one" ||
-            config.versus_mode == "siguo"
+            config.versus_mode === "jiange" ||
+            config.versus_mode === "two" ||
+            config.versus_mode === "endless" ||
+            config.versus_mode === "three" ||
+            config.versus_mode === "one" ||
+            config.versus_mode === "siguo"
           ) {
             map.free_choose.show()
           } else {
             map.free_choose.hide()
           }
-          if (config.versus_mode == "jiange") {
+          if (config.versus_mode === "jiange") {
             map.double_character_jiange.show()
           } else {
             map.double_character_jiange.hide()
           }
-          if (config.versus_mode == "two") {
+          if (config.versus_mode === "two") {
             map.replace_handcard_two.show()
             map.olfeiyang_four.show()
             map.replace_character_two.show()
@@ -6821,11 +5977,14 @@ export class Library {
             map.two_phaseswap.hide()
           }
           if (
-            config.versus_mode == "two" ||
-            config.versus_mode == "siguo" ||
-            config.versus_mode == "four"
+            config.versus_mode === "two" ||
+            config.versus_mode === "siguo" ||
+            config.versus_mode === "four"
           ) {
-            if (config.versus_mode == "four" && (config.four_assign || config.four_phaseswap)) {
+            if (
+              config.versus_mode === "four" &&
+              (config.four_assign || config.four_phaseswap)
+            ) {
               map.change_identity.hide()
             } else {
               map.change_identity.show()
@@ -6833,7 +5992,7 @@ export class Library {
           } else {
             map.change_identity.hide()
           }
-          if (config.versus_mode == "siguo") {
+          if (config.versus_mode === "siguo") {
             map.siguo_character.show()
           } else {
             map.siguo_character.hide()
@@ -6922,8 +6081,9 @@ export class Library {
               return
             }
             if (
-              get.mode() != this._link.config.mode ||
-              (!_status.event.getParent().showConfig && !_status.event.showConfig)
+              get.mode() !== this._link.config.mode ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
             ) {
               return
             }
@@ -6944,10 +6104,13 @@ export class Library {
           init: true,
           onclick(bool) {
             game.saveConfig("change_identity", bool, this._link.config.mode)
-            if (!_status.event.getParent().showConfig && !_status.event.showConfig) {
+            if (
+              !_status.event.getParent().showConfig &&
+              !_status.event.showConfig
+            ) {
               return
             }
-            if (_status.mode == "four") {
+            if (_status.mode === "four") {
               if (get.config("four_assign") || get.config("four_phaseswap")) {
                 return
               }
@@ -6966,13 +6129,16 @@ export class Library {
               }
             } else {
               var dialog
-              if (ui.cheat2 && ui.cheat2.backup) {
+              if (ui.cheat2?.backup) {
                 dialog = ui.cheat2.backup
               } else {
                 dialog = _status.event.dialog
               }
-              if (!_status.brawl || !_status.brawl.noAddSetting) {
-                if (!dialog.querySelector("table") && get.config("change_identity")) {
+              if (!_status.brawl?.noAddSetting) {
+                if (
+                  !dialog.querySelector("table") &&
+                  get.config("change_identity")
+                ) {
                   _status.event.getParent().addSetting(dialog)
                 } else {
                   _status.event.getParent().removeSetting(dialog)
@@ -6987,7 +6153,10 @@ export class Library {
           init: true,
           onclick(bool) {
             game.saveConfig("change_choice", bool, this._link.config.mode)
-            if (!_status.event.getParent().showConfig && !_status.event.showConfig) {
+            if (
+              !_status.event.getParent().showConfig &&
+              !_status.event.showConfig
+            ) {
               return
             }
             if (!ui.cheat && get.config("change_choice")) {
@@ -7021,7 +6190,8 @@ export class Library {
           name: "替补模式",
           init: false,
           frequent: true,
-          intro: "每个额外选择一名武将，死亡后用该武将代替重新上场，替补武将用完时失败",
+          intro:
+            "每个额外选择一名武将，死亡后用该武将代替重新上场，替补武将用完时失败",
         },
         expand_dialog: {
           name: "默认展开选将框",
@@ -7041,27 +6211,26 @@ export class Library {
         ladder_reset: {
           name: "重置天梯数据",
           onclick() {
-            var node = this
-            if (node._clearing) {
+            if (this._clearing) {
               game.save("ladder", {
                 current: 900,
                 top: 900,
                 month: new Date().getMonth(),
               })
               ui.ladder.innerHTML = "卫士五"
-              clearTimeout(node._clearing)
-              node.firstChild.innerHTML = "重置天梯数据"
-              delete node._clearing
+              clearTimeout(this._clearing)
+              this.firstChild.innerHTML = "重置天梯数据"
+              delete this._clearing
               return
             }
-            node.firstChild.innerHTML = "单击以确认 (3)"
-            node._clearing = setTimeout(function () {
-              node.firstChild.innerHTML = "单击以确认 (2)"
-              node._clearing = setTimeout(function () {
-                node.firstChild.innerHTML = "单击以确认 (1)"
-                node._clearing = setTimeout(function () {
-                  node.firstChild.innerHTML = "重置天梯数据"
-                  delete node._clearing
+            this.firstChild.innerHTML = "单击以确认 (3)"
+            this._clearing = setTimeout(() => {
+              this.firstChild.innerHTML = "单击以确认 (2)"
+              this._clearing = setTimeout(() => {
+                this.firstChild.innerHTML = "单击以确认 (1)"
+                this._clearing = setTimeout(() => {
+                  this.firstChild.innerHTML = "重置天梯数据"
+                  delete this._clearing
                 }, 1000)
               }, 1000)
             }, 1000)
@@ -7072,7 +6241,7 @@ export class Library {
           name: "编辑统率将池",
           clear: true,
           onclick() {
-            if (get.mode() != "versus") {
+            if (get.mode() !== "versus") {
               alert("请进入对决模式，然后再编辑将池")
               return
             }
@@ -7096,7 +6265,9 @@ export class Library {
           clear: true,
           onclick() {
             if (
-              confirm("该操作不可撤销！是否清除统率三军模式的自定义将池，并将其重置为默认将池？")
+              confirm(
+                "该操作不可撤销！是否清除统率三军模式的自定义将池，并将其重置为默认将池？",
+              )
             ) {
               game.saveConfig("character_three", null, "versus")
               alert("将池已重置")
@@ -7107,7 +6278,7 @@ export class Library {
           name: "编辑4v4将池",
           clear: true,
           onclick() {
-            if (get.mode() != "versus") {
+            if (get.mode() !== "versus") {
               alert("请进入对决模式，然后再编辑将池")
               return
             }
@@ -7130,7 +6301,11 @@ export class Library {
           intro: "将4v4模式下的将池重置为默认将池",
           clear: true,
           onclick() {
-            if (confirm("该操作不可撤销！是否清除4v4模式的自定义将池，并将其重置为默认将池？")) {
+            if (
+              confirm(
+                "该操作不可撤销！是否清除4v4模式的自定义将池，并将其重置为默认将池？",
+              )
+            ) {
               game.saveConfig("character_four", null, "versus")
               alert("将池已重置")
             }
@@ -7160,24 +6335,23 @@ export class Library {
             game.saveConfig("connect_avatar", item, "connect")
           },
           onblur() {
-            const input = this
-            const value = input.innerHTML.replace(/<br>/g, "").trim()
+            const value = this.innerHTML.replace(/<br>/g, "").trim()
             if (!value) {
               const currentId = lib.config.connect_avatar || "caocao"
               const currentName = lib.translate[currentId] || "曹操"
-              input.innerHTML = currentName
+              this.innerHTML = currentName
               return
             }
             const matches = []
             const searchReg = new RegExp(value, "i")
-            for (let id in lib.character) {
+            for (const id in lib.character) {
               const name = lib.translate[id]
               if (!name) continue
 
               if (
                 searchReg.test(name) ||
                 searchReg.test(id) ||
-                searchReg.test(lib.translate[id + "_ab"])
+                searchReg.test(lib.translate[`${id}_ab`])
               ) {
                 matches.push(id)
               }
@@ -7186,24 +6360,28 @@ export class Library {
               alert(`未找到武将"${value}"`)
               const currentId = lib.config.connect_avatar || "caocao"
               const currentName = lib.translate[currentId] || "曹操"
-              input.innerHTML = currentName
+              this.innerHTML = currentName
             } else if (matches.length === 1) {
               const id = matches[0]
               game.saveConfig("connect_avatar", id)
               game.saveConfig("connect_avatar", id, "connect")
-              input.innerHTML = lib.translate[id]
+              this.innerHTML = lib.translate[id]
             } else {
               game.closeMenu()
-              const dialog = ui.create.dialog("选择头像", [matches, "character"], "hidden")
+              const dialog = ui.create.dialog(
+                "选择头像",
+                [matches, "character"],
+                "hidden",
+              )
               dialog.classList.add("fixed")
               for (let i = 0; i < dialog.buttons.length; i++) {
                 const button = dialog.buttons[i]
                 const characterId = button.link
                 button.classList.add("pointerdiv")
-                button.listen(function () {
+                button.listen(() => {
                   game.saveConfig("connect_avatar", characterId)
                   game.saveConfig("connect_avatar", characterId, "connect")
-                  input.innerHTML = lib.translate[characterId]
+                  this.innerHTML = lib.translate[characterId]
                   dialog.close()
                 })
               }
@@ -7237,7 +6415,12 @@ export class Library {
           intro:
             "在用户填写的IP地址没有直接指定使用WS/WSS协议的情况下，默认使用WSS协议，而非WS协议来连接到联机服务器。<br>请不要轻易勾选此项！",
           onclick(bool) {
-            if (bool && !confirm("此为开发者选项，开启后将无法直接联机。您确定要开启WSS模式吗？")) {
+            if (
+              bool &&
+              !confirm(
+                "此为开发者选项，开启后将无法直接联机。您确定要开启WSS模式吗？",
+              )
+            ) {
               return
             }
             game.saveConfig("wss_mode", bool, "connect")
@@ -7257,13 +6440,13 @@ export class Library {
         reset_banBlacklist: {
           name: "重置黑名单",
           onclick() {
-            if (this.firstChild.innerHTML != "已重置") {
+            if (this.firstChild.innerHTML !== "已重置") {
               this.firstChild.innerHTML = "已重置"
               var banBlacklist = []
               game.saveConfig("banBlacklist", banBlacklist)
-              var that = this
-              setTimeout(function () {
-                that.firstChild.innerHTML = "重置黑名单"
+
+              setTimeout(() => {
+                this.firstChild.innerHTML = "重置黑名单"
               }, 1000)
             }
           },
@@ -7272,7 +6455,7 @@ export class Library {
         reset_grantedServers: {
           name: "重置受信任的服务器列表",
           onclick() {
-            if (this.firstChild.innerHTML != "已重置") {
+            if (this.firstChild.innerHTML !== "已重置") {
               this.firstChild.innerHTML = "已重置"
               security.resetGrantedServers()
               setTimeout(() => {
@@ -7298,8 +6481,9 @@ export class Library {
           onclick(bool) {
             game.saveConfig("free_choose", bool, this._link.config.mode)
             if (
-              get.mode() != this._link.config.mode ||
-              (!_status.event.getParent().showConfig && !_status.event.showConfig)
+              get.mode() !== this._link.config.mode ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
             ) {
               return
             }
@@ -7316,7 +6500,10 @@ export class Library {
           init: true,
           onclick(bool) {
             game.saveConfig("change_choice", bool, this._link.config.mode)
-            if (!_status.event.getParent().showConfig && !_status.event.showConfig) {
+            if (
+              !_status.event.getParent().showConfig &&
+              !_status.event.showConfig
+            ) {
               return
             }
             if (!ui.cheat && get.config("change_choice")) {
@@ -7334,7 +6521,7 @@ export class Library {
           frequent: true,
           onclick(bool) {
             game.saveConfig("single_control", bool, this._link.config.mode)
-            if (ui.single_swap && game.me != game.boss) {
+            if (ui.single_swap && game.me !== game.boss) {
               if (bool) {
                 ui.single_swap.style.display = "none"
               } else {
@@ -7349,8 +6536,8 @@ export class Library {
     doudizhu: {
       name: "斗地主",
       connect: {
-        update: function (config, map) {
-          if (config.connect_doudizhu_mode == "online") {
+        update: (config, map) => {
+          if (config.connect_doudizhu_mode === "online") {
             map.connect_change_card.hide()
           } else {
             map.connect_change_card.show()
@@ -7403,7 +6590,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -7420,7 +6607,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -7470,8 +6657,8 @@ export class Library {
         },
       },
       config: {
-        update: function (config, map) {
-          if (config.doudizhu_mode == "online") {
+        update: (config, map) => {
+          if (config.doudizhu_mode === "online") {
             map.change_card.hide()
             map.edit_character.show()
             map.reset_character.show()
@@ -7512,7 +6699,7 @@ export class Library {
             map.enhance_nongmin.show()
             map.feiyang_version.show()
           }
-          if (config.double_character && config.doudizhu_mode == "normal") {
+          if (config.double_character && config.doudizhu_mode === "normal") {
             map.double_hp.show()
           } else {
             map.double_hp.hide()
@@ -7557,7 +6744,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -7574,7 +6761,7 @@ export class Library {
           onblur(e) {
             let text = e.target,
               num = Number(text.innerText)
-            if (isNaN(num) || num < 1) {
+            if (Number.isNaN(num) || num < 1) {
               num = 1
             } else if (!Number.isInteger(num)) {
               num = Math.round(num)
@@ -7589,8 +6776,9 @@ export class Library {
           onclick(bool) {
             game.saveConfig("free_choose", bool, this._link.config.mode)
             if (
-              get.mode() != this._link.config.mode ||
-              (!_status.event.getParent().showConfig && !_status.event.showConfig)
+              get.mode() !== this._link.config.mode ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
             ) {
               return
             }
@@ -7607,17 +6795,23 @@ export class Library {
           init: true,
           onclick(bool) {
             game.saveConfig("change_identity", bool, this._link.config.mode)
-            if (!_status.event.getParent().showConfig && !_status.event.showConfig) {
+            if (
+              !_status.event.getParent().showConfig &&
+              !_status.event.showConfig
+            ) {
               return
             }
             var dialog
-            if (ui.cheat2 && ui.cheat2.backup) {
+            if (ui.cheat2?.backup) {
               dialog = ui.cheat2.backup
             } else {
               dialog = _status.event.dialog
             }
-            if (!_status.brawl || !_status.brawl.noAddSetting) {
-              if (!dialog.querySelector("table") && get.config("change_identity")) {
+            if (!_status.brawl?.noAddSetting) {
+              if (
+                !dialog.querySelector("table") &&
+                get.config("change_identity")
+              ) {
                 _status.event.getParent().addSetting(dialog)
               } else {
                 _status.event.getParent().removeSetting(dialog)
@@ -7631,7 +6825,10 @@ export class Library {
           init: true,
           onclick(bool) {
             game.saveConfig("change_choice", bool, this._link.config.mode)
-            if (!_status.event.getParent().showConfig && !_status.event.showConfig) {
+            if (
+              !_status.event.getParent().showConfig &&
+              !_status.event.showConfig
+            ) {
               return
             }
             if (!ui.cheat && get.config("change_choice")) {
@@ -7658,7 +6855,12 @@ export class Library {
           onclick(bool) {
             game.saveConfig("continue_game", bool, this._link.config.mode)
             if (get.config("continue_game")) {
-              if (!ui.continue_game && _status.over && !_status.brawl && !game.no_continue_game) {
+              if (
+                !ui.continue_game &&
+                _status.over &&
+                !_status.brawl &&
+                !game.no_continue_game
+              ) {
                 ui.continue_game = ui.create.control("再战", game.reloadCurrent)
               }
             } else if (ui.continue_game) {
@@ -7737,7 +6939,7 @@ export class Library {
             "这里是智斗三国模式的武将将池。<br/>您可以在这里编辑对武将将池进行编辑，然后点击“保存”按钮即可保存。<br/>将池中的Key势力武将，仅同时在没有被禁用的情况下，才会出现在选将框中。<br/>而非Key势力的武将，只要所在的武将包没有被隐藏，即可出现在选将框中。<br/>该将池为单机模式/联机模式通用将池。在这里编辑后，即使进入联机模式，也依然会生效。<br/>但联机模式本身禁用的武将（如神貂蝉）不会出现在联机模式的选将框中。",
           clear: true,
           onclick() {
-            if (get.mode() != "doudizhu") {
+            if (get.mode() !== "doudizhu") {
               alert("请进入斗地主模式，然后再编辑将池")
               return
             }
@@ -7753,14 +6955,18 @@ export class Library {
                 var groups = []
                 for (var i in character) {
                   if (!Array.isArray(character[i])) {
-                    throw new Error("请严格按照格式填写，不要写入不为数组的数据")
+                    throw new Error(
+                      "请严格按照格式填写，不要写入不为数组的数据",
+                    )
                   }
                   if (character[i].length >= 3) {
                     groups.push(i)
                   }
                 }
                 if (groups.length < 3) {
-                  throw new Error("请保证至少写入了3个势力，且每个势力至少有3个武将")
+                  throw new Error(
+                    "请保证至少写入了3个势力，且每个势力至少有3个武将",
+                  )
                 }
                 game.saveConfig("character_online", character, "doudizhu")
               },
@@ -7773,7 +6979,9 @@ export class Library {
           clear: true,
           onclick() {
             if (
-              confirm("该操作不可撤销！是否清除智斗三国模式的自定义将池，并将其重置为默认将池？")
+              confirm(
+                "该操作不可撤销！是否清除智斗三国模式的自定义将池，并将其重置为默认将池？",
+              )
             ) {
               game.saveConfig("character_online", null, "doudizhu")
               alert("将池已重置")
@@ -7831,23 +7039,25 @@ export class Library {
           },
           restart: true,
         },
-        update: function (config, map) {
-          if (config.connect_single_mode != "normal") {
+        update: (config, map) => {
+          if (config.connect_single_mode !== "normal") {
             map.connect_enable_jin.hide()
           } else {
             map.connect_enable_jin.show()
           }
-          if (config.connect_single_mode != "wuxianhuoli") {
+          if (config.connect_single_mode !== "wuxianhuoli") {
             map.connect_change_card.hide()
           } else {
             map.connect_change_card.show()
           }
-          if (config.connect_single_mode != "dianjiang") {
+          if (config.connect_single_mode !== "dianjiang") {
             map.connect_double_character.hide()
             map.connect_double_hp.hide()
           } else {
             map.connect_double_character.show()
-            if (["double", "singble"].includes(config.connect_double_character)) {
+            if (
+              ["double", "singble"].includes(config.connect_double_character)
+            ) {
               map.connect_double_hp.show()
             } else {
               map.connect_double_hp.hide()
@@ -7919,8 +7129,9 @@ export class Library {
           onclick(bool) {
             game.saveConfig("free_choose", bool, this._link.config.mode)
             if (
-              get.mode() != this._link.config.mode ||
-              (!_status.event.getParent().showConfig && !_status.event.showConfig)
+              get.mode() !== this._link.config.mode ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
             ) {
               return
             }
@@ -7932,18 +7143,18 @@ export class Library {
             }
           },
         },
-        update: function (config, map) {
-          if (config.single_mode != "normal") {
+        update: (config, map) => {
+          if (config.single_mode !== "normal") {
             map.enable_jin.hide()
           } else {
             map.enable_jin.show()
           }
-          if (config.single_mode != "wuxianhuoli") {
+          if (config.single_mode !== "wuxianhuoli") {
             map.change_card.hide()
           } else {
             map.change_card.show()
           }
-          if (config.single_mode != "dianjiang") {
+          if (config.single_mode !== "dianjiang") {
             map.double_character.hide()
             map.double_hp.hide()
             map.single_control.hide()
@@ -7956,7 +7167,10 @@ export class Library {
               map.double_hp.hide()
             }
           }
-          if (config.single_mode == "wuxianhuoli" || config.single_mode == "dianjiang") {
+          if (
+            config.single_mode === "wuxianhuoli" ||
+            config.single_mode === "dianjiang"
+          ) {
             map.free_choose.show()
           } else {
             map.free_choose.hide()
@@ -8047,7 +7261,7 @@ export class Library {
   }
   help = {
     关于游戏:
-      '<div style="margin:10px">关于三国杀</div><ul style="margin-top:0"><li>三国杀基于GPLv3开源协议。<br><a href="https://www.gnu.org/licenses/gpl-3.0.html">点击查看GPLv3协议</a><br><li>其他所有的所谓“三国杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与三国杀官方无关！',
+      '<div style="margin:10px">关于三国杀</div><ul style="margin-top:0"><li>无名杀官方发布地址仅有GitHub仓库！<br><a href="https://github.com/libnoname/noname">点击前往Github仓库</a><br><li>三国杀基于GPLv3开源协议。<br><a href="https://www.gnu.org/licenses/gpl-3.0.html">点击查看GPLv3协议</a><br><li>其他所有的所谓“三国杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与三国杀官方无关！',
     游戏操作:
       "<ul><li>长按/鼠标悬停/右键单击显示信息。<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管。<li>键盘快捷键<br>" +
       "<table><tr><td>A<td>切换托管<tr><td>W<td>切换不询问无懈<tr><td>空格<td>暂停</table><li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。</ul>",
@@ -8085,14 +7299,14 @@ export class Library {
   // @ts-expect-error ignore
   path = {}
   getErrorTip(msg) {
-    if (typeof msg != "string") {
+    if (typeof msg !== "string") {
       try {
         msg = msg.toString()
-        if (typeof msg != "string") {
+        if (typeof msg !== "string") {
           throw new Error("err")
         }
       } catch (_) {
-        throw new Error("传参错误:" + msg)
+        throw new Error(`传参错误:${msg}`)
       }
     }
     if (msg.startsWith("Uncaught ")) {
@@ -8103,22 +7317,26 @@ export class Library {
       if (newMessage.includes("Maximum call stack size exceeded")) {
         newMessage = "堆栈溢出"
       } else if (/argument must be between 0 and 20/.test(newMessage)) {
-        let funName = newMessage.slice(
+        const funName = newMessage.slice(
           newMessage.indexOf("RangeError: ") + 12,
           newMessage.indexOf(")") + 1,
         )
-        newMessage = funName + "参数必须在0和20之间"
+        newMessage = `${funName}参数必须在0和20之间`
       } else {
         newMessage = "传递错误值到数值计算方法"
       }
     } else if (/ReferenceError/.test(newMessage)) {
       let messageName
       if (newMessage.includes("is not defined")) {
-        messageName = newMessage.replace("ReferenceError: ", "").replace(" is not defined", "")
-        newMessage = "引用了一个未定义的变量：" + messageName
+        messageName = newMessage
+          .replace("ReferenceError: ", "")
+          .replace(" is not defined", "")
+        newMessage = `引用了一个未定义的变量：${messageName}`
       } else if (newMessage.includes("invalid assignment left-hand side")) {
         newMessage = "赋值运算符或比较运算符不匹配"
-      } else if (newMessage.includes("Octal literals are not allowed in strict mode")) {
+      } else if (
+        newMessage.includes("Octal literals are not allowed in strict mode")
+      ) {
         newMessage = "八进制字面量与八进制转义序列语法已经被废弃"
       } else if (
         newMessage.includes(
@@ -8133,7 +7351,7 @@ export class Library {
       let messageName
       if (newMessage.includes("Unexpected token ")) {
         messageName = newMessage.replace("SyntaxError: Unexpected token ", "")
-        newMessage = "使用了未定义或错误的语法 : (" + messageName + ")"
+        newMessage = `使用了未定义或错误的语法 : (${messageName})`
       } else if (
         newMessage.includes(
           "Block-scoped declarations (let, const, function, class) not yet supported outside strict mode",
@@ -8141,14 +7359,22 @@ export class Library {
       ) {
         newMessage = "请在严格模式下运行let，const，class"
       } else if (
-        newMessage.includes("for-of loop variable declaration may not have an initializer.")
+        newMessage.includes(
+          "for-of loop variable declaration may not have an initializer.",
+        )
       ) {
         newMessage = "for...of 循环的头部包含有初始化表达式"
       } else if (
-        newMessage.includes("for-in loop variable declaration may not have an initializer.")
+        newMessage.includes(
+          "for-in loop variable declaration may not have an initializer.",
+        )
       ) {
         newMessage = "for...in 循环的头部包含有初始化表达式"
-      } else if (newMessage.includes("Delete of an unqualified identifier in strict mode.")) {
+      } else if (
+        newMessage.includes(
+          "Delete of an unqualified identifier in strict mode.",
+        )
+      ) {
         newMessage = "普通变量不能通过 delete 操作符来删除"
       } else if (newMessage.includes("Unexpected identifier")) {
         newMessage = "不合法的标识符或错误的语法"
@@ -8158,9 +7384,13 @@ export class Library {
         newMessage = "无效的正则表达式的标记"
       } else if (newMessage.includes("missing ) after argument list")) {
         newMessage = "参数列表后面缺少 ')' (丢失运算符或者转义字符等)"
-      } else if (newMessage.includes("Invalid shorthand property initializer")) {
+      } else if (
+        newMessage.includes("Invalid shorthand property initializer")
+      ) {
         newMessage = "在定义一个{}对象时，应该使用':'而不是'='"
-      } else if (newMessage.includes("Missing initializer in const declaration")) {
+      } else if (
+        newMessage.includes("Missing initializer in const declaration")
+      ) {
         newMessage = "在使用const定义一个对象时，必须指定初始值"
       } else if (
         newMessage.includes("Unexpected number") ||
@@ -8173,8 +7403,12 @@ export class Library {
         messageName = newMessage
           .replace("SyntaxError: Identifier ", "")
           .replace(" has already been declared", "")
-        newMessage = messageName + "变量已经被声明过，不能被重新声明"
-      } else if (newMessage.includes("Duplicate parameter name not allowed in this context")) {
+        newMessage = `${messageName}变量已经被声明过，不能被重新声明`
+      } else if (
+        newMessage.includes(
+          "Duplicate parameter name not allowed in this context",
+        )
+      ) {
         newMessage = "参数名不允许重复"
       } else if (
         newMessage.includes("Unexpected reserved word") ||
@@ -8185,36 +7419,49 @@ export class Library {
     } else if (/TypeError/.test(newMessage)) {
       let messageName
       if (newMessage.includes(" is not a function")) {
-        messageName = newMessage.replace("TypeError: ", "").replace(" is not a function", "")
-        newMessage = messageName + "不是一个函数"
+        messageName = newMessage
+          .replace("TypeError: ", "")
+          .replace(" is not a function", "")
+        newMessage = `${messageName}不是一个函数`
       } else if (newMessage.includes(" is not a constructor")) {
-        messageName = newMessage.replace("TypeError: ", "").replace(" is not a constructor", "")
-        newMessage = messageName + "不是一个构造函数"
+        messageName = newMessage
+          .replace("TypeError: ", "")
+          .replace(" is not a constructor", "")
+        newMessage = `${messageName}不是一个构造函数`
       } else if (newMessage.includes("Cannot read property")) {
         messageName = newMessage
           .replace("TypeError: Cannot read property ", "")
           .replace(" of null", "")
           .replace(" of undefined", "")
-        let ofName = newMessage.slice(newMessage.indexOf(" of ") + 4)
-        newMessage = "无法读取'" + ofName + "'的属性值" + messageName
+        const ofName = newMessage.slice(newMessage.indexOf(" of ") + 4)
+        newMessage = `无法读取'${ofName}'的属性值${messageName}`
       } else if (newMessage.includes("Cannot read properties")) {
         messageName = newMessage.slice(newMessage.indexOf("reading '") + 9, -2)
-        let ofName = newMessage.slice(newMessage.indexOf(" of ") + 4, newMessage.indexOf("(") - 1)
-        newMessage = "无法读取'" + ofName + "'的属性值" + messageName
-      } else if (newMessage.includes("Property description must be an object")) {
-        messageName = newMessage.replace("TypeError: Property description must be an object: ", "")
-        newMessage = messageName + "是非对象类型的值"
+        const ofName = newMessage.slice(
+          newMessage.indexOf(" of ") + 4,
+          newMessage.indexOf("(") - 1,
+        )
+        newMessage = `无法读取'${ofName}'的属性值${messageName}`
+      } else if (
+        newMessage.includes("Property description must be an object")
+      ) {
+        messageName = newMessage.replace(
+          "TypeError: Property description must be an object: ",
+          "",
+        )
+        newMessage = `${messageName}是非对象类型的值`
       } else if (newMessage.includes("Cannot assign to read only property ")) {
         messageName = newMessage.slice(47, newMessage.lastIndexOf(" of ") + 1)
-        newMessage = messageName + "属性禁止写入"
-      } else if (newMessage.includes("Object prototype may only be an Object or null")) {
-        newMessage = messageName + "对象原型只能是对象或null"
+        newMessage = `${messageName}属性禁止写入`
+      } else if (
+        newMessage.includes("Object prototype may only be an Object or null")
+      ) {
+        newMessage = `${messageName}对象原型只能是对象或null`
       } else if (newMessage.includes("Cannot create property")) {
         messageName = newMessage.slice(newMessage.indexOf("'") + 1)
         messageName = messageName.slice(0, messageName.indexOf("'"))
-        let obj = newMessage.slice(newMessage.indexOf(messageName) + 16)
-        newMessage =
-          obj + "不能添加或修改'" + messageName + "'属性，任何 Primitive 值都不允许有property"
+        const obj = newMessage.slice(newMessage.indexOf(messageName) + 16)
+        newMessage = `${obj}不能添加或修改'${messageName}'属性，任何 Primitive 值都不允许有property`
       } else if (
         newMessage.includes("Can't add property") &&
         newMessage.includes("is not extensible")
@@ -8222,13 +7469,17 @@ export class Library {
         newMessage = "对象不可添加属性（不可扩展）"
       } else if (newMessage.includes("Cannot redefine property")) {
         messageName = newMessage.slice(37)
-        newMessage = messageName + "不可配置"
+        newMessage = `${messageName}不可配置`
       } else if (newMessage.includes("Converting circular structure to JSON")) {
         messageName = newMessage.slice(37)
         newMessage = "JSON.stringify() 方法处理循环引用结构的JSON会失败"
-      } else if (newMessage.includes("Cannot use 'in' operator to search for ")) {
+      } else if (
+        newMessage.includes("Cannot use 'in' operator to search for ")
+      ) {
         newMessage = "in不能用来在字符串、数字或者其他基本类型的数据中进行检索"
-      } else if (newMessage.includes("Right-hand side of 'instanceof' is not an object")) {
+      } else if (
+        newMessage.includes("Right-hand side of 'instanceof' is not an object")
+      ) {
         newMessage =
           "instanceof 操作符 希望右边的操作数为一个构造对象，即一个有 prototype 属性且可以调用的对象"
       } else if (newMessage.includes("Assignment to constant variable")) {
@@ -8237,7 +7488,9 @@ export class Library {
         newMessage = "不可配置的属性不能删除"
       } else if (newMessage.includes("which has only a getter")) {
         newMessage = "仅设置了getter特性的属性不可被赋值"
-      } else if (newMessage.includes("called on incompatible receiver undefined")) {
+      } else if (
+        newMessage.includes("called on incompatible receiver undefined")
+      ) {
         newMessage = "this提供的绑定对象与预期的不匹配"
       }
     } else if (/URIError/.test(newMessage)) {
@@ -8247,7 +7500,9 @@ export class Library {
     } else if (/InternalError/.test(newMessage)) {
       if (newMessage.includes("too many switch cases")) {
         newMessage = "过多case子句"
-      } else if (newMessage.includes("too many parentheses in regular expression")) {
+      } else if (
+        newMessage.includes("too many parentheses in regular expression")
+      ) {
         newMessage = "正则表达式中括号过多"
       } else if (newMessage.includes("array initializer too large")) {
         newMessage = "超出数组大小的限制"
@@ -8255,7 +7510,7 @@ export class Library {
         newMessage = "递归过深"
       }
     }
-    if (newMessage != msg) {
+    if (newMessage !== msg) {
       return newMessage
     }
   }
@@ -8313,33 +7568,41 @@ export class Library {
         dialog._place_text.style.width = "calc(100% - 28px)"
       }
     }
-    if (e.touches && e.touches[0]) {
+    if (e.touches?.[0]) {
       e = e.touches[0]
     }
-    var height = Math.min(ui.window.offsetHeight - 20, dialog.content.scrollHeight)
+    var height = Math.min(
+      ui.window.offsetHeight - 20,
+      dialog.content.scrollHeight,
+    )
     if (dialog._mod_height) {
       height += dialog._mod_height
     }
-    dialog.style.height = height + "px"
+    dialog.style.height = `${height}px`
     if (e.clientX / game.documentZoom < ui.window.offsetWidth / 2) {
-      dialog.style.left = e.clientX / game.documentZoom + 10 + "px"
+      dialog.style.left = `${e.clientX / game.documentZoom + 10}px`
     } else {
-      dialog.style.left = e.clientX / game.documentZoom - dialog.offsetWidth - 10 + "px"
+      dialog.style.left = `${e.clientX / game.documentZoom - dialog.offsetWidth - 10}px`
     }
-    var idealtop = (e.clientY || 0) / game.documentZoom - dialog.offsetHeight / 2
-    if (typeof idealtop != "number" || isNaN(idealtop) || idealtop <= 5) {
+    var idealtop =
+      (e.clientY || 0) / game.documentZoom - dialog.offsetHeight / 2
+    if (
+      typeof idealtop !== "number" ||
+      Number.isNaN(idealtop) ||
+      idealtop <= 5
+    ) {
       idealtop = 5
     } else if (idealtop + dialog.offsetHeight + 10 > ui.window.offsetHeight) {
       idealtop = ui.window.offsetHeight - 10 - dialog.offsetHeight
     }
-    dialog.style.top = idealtop + "px"
+    dialog.style.top = `${idealtop}px`
   }
   setHover(node, func, hoveration, width) {
     node._hoverfunc = func
-    if (typeof hoveration == "number") {
+    if (typeof hoveration === "number") {
       node._hoveration = hoveration
     }
-    if (typeof width == "number") {
+    if (typeof width === "number") {
       node._hoverwidth = width
     }
     node.addEventListener("mouseenter", ui.click.mouseenter)
@@ -8397,7 +7660,10 @@ export class Library {
       if (!("_time" in lib.updates[i])) {
         lib.updates[i]._time = time
       }
-      if (lib.updates[i](time - lib.updates[i]._time - lib.status.delayed) === false) {
+      if (
+        lib.updates[i](time - lib.updates[i]._time - lib.status.delayed) ===
+        false
+      ) {
         lib.updates.splice(i--, 1)
       }
     }
@@ -8415,7 +7681,7 @@ export class Library {
     if (_status.videoToSave) {
       game.export(
         lib.init.encode(JSON.stringify(_status.videoToSave)),
-        "三国杀 - 录像 - " + _status.videoToSave.name[0] + " - " + _status.videoToSave.name[1],
+        `三国杀 - 录像 - ${_status.videoToSave.name[0]} - ${_status.videoToSave.name[1]}`,
       )
     }
   }
@@ -8441,7 +7707,7 @@ export class Library {
     dy() {
       let next = game.me.next
       for (let i = 0; i < 10; i++) {
-        if (next.identity != "zhu") {
+        if (next.identity !== "zhu") {
           break
         }
         next = next.next
@@ -8610,7 +7876,7 @@ export class Library {
         "ow_yuanshi",
         "zuoci",
       ]
-      const vintage = [
+      const _vintage = [
         "tianjian",
         "shuiyun",
         "zhuyue",
@@ -8670,10 +7936,10 @@ export class Library {
         "xshixin",
         "qingzun",
       ]
-      const favmodes = ["versus|three", "versus|four", "versus|two", "chess|combat"]
+      const favmodes = ["versus|three", "versus|four", "versus|two"]
       for (let i = 0; i < mode.length; i++) {
-        game.saveConfig(mode[i] + "_banned", banned)
-        game.saveConfig(mode[i] + "_bannedcards", bannedcards)
+        game.saveConfig(`${mode[i]}_banned`, banned)
+        game.saveConfig(`${mode[i]}_bannedcards`, bannedcards)
       }
       const characters = lib.config.all.characters.slice(0)
       characters.remove("standard")
@@ -8684,7 +7950,6 @@ export class Library {
       game.saveConfig("player_border", "slim")
       game.saveConfig("cards", lib.config.all.cards)
       game.saveConfig("characters", characters)
-      game.saveConfig("change_skin", false)
       game.saveConfig("show_splash", "off")
       game.saveConfig("show_favourite", false)
       game.saveConfig("animation", false)
@@ -8737,16 +8002,22 @@ export class Library {
      */
     q(...args) {
       // if(lib.config.layout!='mobile') lib.init.layout('mobile');
-      if (args.length == 0) {
+      if (args.length === 0) {
         if (ui.css.card_style) {
           ui.css.card_style.remove()
         }
-        if (lib.config.card_style != "simple") {
+        if (lib.config.card_style !== "simple") {
           lib.config.card_style = "simple"
-          ui.css.card_style = lib.init.css(lib.assetURL + "theme/style/card", "simple")
+          ui.css.card_style = lib.init.css(
+            `${lib.assetURL}theme/style/card`,
+            "simple",
+          )
         } else {
           lib.config.card_style = "default"
-          ui.css.card_style = lib.init.css(lib.assetURL + "theme/style/card", "default")
+          ui.css.card_style = lib.init.css(
+            `${lib.assetURL}theme/style/card`,
+            "default",
+          )
         }
       } else {
         for (let i = 0; i < args.length; i++) {
@@ -8755,47 +8026,6 @@ export class Library {
       }
       ui.arena.classList.remove("selecting")
       ui.arena.classList.remove("tempnoe")
-    },
-    /**
-     * 替换皮肤
-     * @param { string } name 武将名称
-     * @param { number | true } [i] 指定game.players的第几个元素，不填指定为自己的下家。为true时切换玩家布局
-     * @param { string } [skin] 皮肤id
-     */
-    p(name, i, skin) {
-      const list = ["swd", "hs", "pal", "gjqt", "ow", "gw"]
-      if (!lib.character[name]) {
-        for (let j = 0; j < list.length; j++) {
-          if (lib.character[list[j] + "_" + name]) {
-            name = list[j] + "_" + name
-            break
-          }
-        }
-      }
-      let target
-      if (typeof i == "number") {
-        target = game.players[i]
-      } else {
-        target = game.me.next
-      }
-      if (!lib.character[name]) {
-        target.node.avatar.setBackground(name, "character")
-        target.node.avatar.show()
-      } else {
-        target.init(name)
-      }
-      if (skin) {
-        lib.config.skin[name] = skin - 1
-        // 换肤时skin - 1变成skin
-        ui.click.skin(target.node.avatar, name)
-      }
-      if (i === true) {
-        if (lib.config.layout == "long2") {
-          lib.init.layout("mobile")
-        } else {
-          lib.init.layout("long2")
-        }
-      }
     },
     /**
      * @overload
@@ -8808,17 +8038,17 @@ export class Library {
      * @param  {...Player | string} args 玩家或卡牌名
      * @returns { void }
      */
-    e(...args) {
+    e(..._args) {
       /**
        * @type { Card[] }
        */
-      let cards = []
+      const cards = []
       /**
        * @type { Player }
        */
       let target
       for (let i = 0; i < arguments.length; i++) {
-        if (get.itemtype(arguments[i]) == "player") {
+        if (get.itemtype(arguments[i]) === "player") {
           target = arguments[i]
         } else {
           cards.push(game.createCard(arguments[i]))
@@ -8845,11 +8075,11 @@ export class Library {
      * 检测当前游戏开启的武将数，卡堆的数量分布情况
      */
     c() {
-      const log = function (...args) {
+      const log = (...args) => {
         console.log(...args)
         game.print(...args)
       }
-      ;(function () {
+      ;(() => {
         let a = 0,
           b = 0,
           c = 0,
@@ -8864,7 +8094,7 @@ export class Library {
           se = 0,
           sf = 0,
           sg = 0
-        for (let i in lib.character) {
+        for (const i in lib.character) {
           switch (lib.character[i][1]) {
             case "wei":
               a++
@@ -8910,18 +8140,15 @@ export class Library {
               break
           }
         }
-        log("魏：" + (a - sa) + "/" + a)
-        log("蜀：" + (b - sb) + "/" + b)
-        log("吴：" + (c - sc) + "/" + c)
-        log("群：" + (d - sd) + "/" + d)
-        log("晋：" + (g - sg) + "/" + g)
-        log("西：" + (e - se) + "/" + e)
-        log("键：" + (f - sf) + "/" + f)
+        log(`魏：${a - sa}/${a}`)
+        log(`蜀：${b - sb}/${b}`)
+        log(`吴：${c - sc}/${c}`)
+        log(`群：${d - sd}/${d}`)
+        log(`晋：${g - sg}/${g}`)
+        log(`西：${e - se}/${e}`)
+        log(`键：${f - sf}/${f}`)
         log(
-          "已启用：" +
-            (a + b + c + d + e + f - (sa + sb + sc + sd + se + sf)) +
-            "/" +
-            (a + b + c + d + e + f),
+          `已启用：${a + b + c + d + e + f - (sa + sb + sc + sd + se + sf)}/${a + b + c + d + e + f}`,
         )
       })()
       ;(function () {
@@ -8944,7 +8171,7 @@ export class Library {
           wuxie = 0,
           heisha = 0,
           hongsha = 0
-        let num = {
+        const num = {
           1: 0,
           2: 0,
           3: 0,
@@ -8959,8 +8186,11 @@ export class Library {
           12: 0,
           13: 0,
         }
-        for (let i in lib.card) {
-          if (get.objtype(lib.card[i]) == "object" && lib.translate[i + "_info"]) {
+        for (const i in lib.card) {
+          if (
+            get.objtype(lib.card[i]) === "object" &&
+            lib.translate[`${i}_info`]
+          ) {
             switch (lib.card[i].type) {
               case "basic":
                 a++
@@ -8978,7 +8208,7 @@ export class Library {
           }
         }
         for (let i = 0; i < lib.card.list.length; i++) {
-          if (typeof lib.card[lib.card.list[i][2]] == "object") {
+          if (typeof lib.card[lib.card.list[i][2]] === "object") {
             switch (lib.card[lib.card.list[i][2]].type) {
               case "basic":
                 aa++
@@ -9008,33 +8238,35 @@ export class Library {
                 sd++
                 break
             }
-            if (lib.card.list[i][2] == "sha") {
+            if (lib.card.list[i][2] === "sha") {
               sha++
-              if (lib.card.list[i][0] == "club" || lib.card.list[i][0] == "spade") {
+              if (
+                lib.card.list[i][0] === "club" ||
+                lib.card.list[i][0] === "spade"
+              ) {
                 heisha++
               } else {
                 hongsha++
               }
             }
-            if (lib.card.list[i][2] == "shan") {
+            if (lib.card.list[i][2] === "shan") {
               shan++
             }
-            if (lib.card.list[i][2] == "tao") {
+            if (lib.card.list[i][2] === "tao") {
               tao++
             }
-            if (lib.card.list[i][2] == "jiu") {
+            if (lib.card.list[i][2] === "jiu") {
               jiu++
             }
-            if (lib.card.list[i][2] == "wuxie") {
+            if (lib.card.list[i][2] === "wuxie") {
               wuxie++
             }
             num[lib.card.list[i][1]]++
           }
         }
-        let str =
-          "基本牌" + aa + "； " + "锦囊牌" + bb + "； " + "装备牌" + cc + "； " + "其它牌" + dd
+        let str = `基本牌${aa}； 锦囊牌${bb}； 装备牌${cc}； 其它牌${dd}`
         log(str)
-        str = "红桃牌" + sa + "； " + "方片牌" + sb + "； " + "梅花牌" + sc + "； " + "黑桃牌" + sd
+        str = `红桃牌${sa}； 方片牌${sb}； 梅花牌${sc}； 黑桃牌${sd}`
         log(str)
         str =
           "杀" +
@@ -9061,17 +8293,17 @@ export class Library {
         if (arguments[1]) {
           for (let i = 1; i <= 13; i++) {
             if (i < 10) {
-              log(i + " ", num[i])
+              log(`${i} `, num[i])
             } else {
               log(i, num[i])
             }
           }
         }
-        let arr = []
+        const arr = []
         for (let i = 1; i <= 13; i++) {
           arr.push(num[i])
         }
-        log(a + b + c + d + "/" + (aa + bb + cc + dd), ...arr)
+        log(`${a + b + c + d}/${aa + bb + cc + dd}`, ...arr)
       })()
     },
     /**
@@ -9089,10 +8321,14 @@ export class Library {
      * ```
      */
     b(...args) {
-      if (!ui.dialog || !ui.dialog.buttons) {
+      if (!ui.dialog?.buttons) {
         return
       }
-      for (let i = 0; i < Math.min(args.length, ui.dialog.buttons.length); i++) {
+      for (
+        let i = 0;
+        i < Math.min(args.length, ui.dialog.buttons.length);
+        i++
+      ) {
         ui.dialog.buttons[i].link = args[i]
       }
     },
@@ -9115,7 +8351,7 @@ export class Library {
      * @param { boolean } [act]
      */
     gs(name = "yexinglanghun", act) {
-      const card = game.createCard("spell_" + name)
+      const card = game.createCard(`spell_${name}`)
       game.me.node.handcards1.appendChild(card)
       if (!act) {
         game.me.actused = -99
@@ -9133,7 +8369,7 @@ export class Library {
      * @param { boolean } [act]
      */
     gc(name = "falifulong", act) {
-      var card = game.createCard("stone_" + name + "_stonecharacter")
+      var card = game.createCard(`stone_${name}_stonecharacter`)
       game.me.node.handcards1.appendChild(card)
       if (!act) {
         game.me.actused = -99
@@ -9202,50 +8438,57 @@ export class Library {
         source = game.me.next,
         targets = []
       for (let i = 0; i < args.length; i++) {
-        if (get.itemtype(args[i]) == "player") {
+        if (get.itemtype(args[i]) === "player") {
           source = args[i]
         } else if (Array.isArray(args[i])) {
           targets = args[i]
         } else if (args instanceof lib.element.VCard) {
           card = args[i]
-        } else if (typeof args[i] == "object" && args[i] != null && args[i].name) {
+        } else if (
+          typeof args[i] === "object" &&
+          args[i] != null &&
+          args[i].name
+        ) {
           console.warn("lib.cheat.u: 以普通obj形式传入的类卡牌形式已经废弃")
           card = new lib.element.VCard(args[i])
-        } else if (typeof args[i] == "string") {
+        } else if (typeof args[i] === "string") {
           card = new lib.element.VCard({ name: args[i] })
         }
       }
       if (!targets.length) {
         targets.push(game.me)
       }
-      source.useCard(game.createCard(card.name, card.suit, card.number, card.nature), targets)
+      source.useCard(
+        game.createCard(card.name, card.suit, card.number, card.nature),
+        targets,
+      )
     },
     /**
      * 输出每个强度的武将数量、每个武将包的每个强度的武将数量、每个武将对应的id和翻译
      * @param { boolean } [bool] 为false不输出三国杀自带的武将id和翻译
      */
     r(bool) {
-      const log = function (...args) {
+      const log = (...args) => {
         console.log(...args)
         game.print(...args)
       }
-      let list = ["s", "ap", "a", "am", "bp", "b", "bm", "c", "d"]
+      const list = ["s", "ap", "a", "am", "bp", "b", "bm", "c", "d"]
       let str = ""
       for (let i = 0; i < list.length; i++) {
         if (str) {
           str += " 、 "
         }
-        str += list[i] + "-" + lib.rank[list[i]].length
+        str += `${list[i]}-${lib.rank[list[i]].length}`
       }
       log(str)
-      for (let i in lib.characterPack) {
+      for (const i in lib.characterPack) {
         if (!bool && lib.config.all.sgscharacters.includes(i)) {
           continue
         }
-        let map = {}
+        const map = {}
         let str = ""
-        for (let j in lib.characterPack[i]) {
-          let rank = get.rank(j)
+        for (const j in lib.characterPack[i]) {
+          const rank = get.rank(j)
           if (!map[rank]) {
             map[rank] = 1
           } else {
@@ -9257,15 +8500,15 @@ export class Library {
             if (str) {
               str += " 、 "
             }
-            str += list[j] + "-" + map[list[j]]
+            str += `${list[j]}-${map[list[j]]}`
           }
         }
         if (str) {
-          log(lib.translate[i + "_character_config"] + "：" + str)
+          log(`${lib.translate[`${i}_character_config`]}：${str}`)
         }
       }
 
-      let list2 = lib.rank.s
+      const list2 = lib.rank.s
         .concat(lib.rank.ap)
         .concat(lib.rank.a)
         .concat(lib.rank.am)
@@ -9303,7 +8546,7 @@ export class Library {
      */
     g(...args) {
       for (let i = 0; i < args.length; i++) {
-        if (i > 0 && typeof args[i] == "number") {
+        if (i > 0 && typeof args[i] === "number") {
           for (let j = 0; j < args[i] - 1; j++) {
             lib.cheat.gx(args[i - 1])
           }
@@ -9320,8 +8563,8 @@ export class Library {
      * @param { string } type
      */
     ga(type) {
-      for (let i in lib.card) {
-        if (lib.card[i].type == type || lib.card[i].subtype == type) {
+      for (const i in lib.card) {
+        if (lib.card[i].type === type || lib.card[i].subtype === type) {
           lib.cheat.g(i)
         }
       }
@@ -9386,7 +8629,7 @@ export class Library {
     gn(name) {
       let nature = null
       let suit = null
-      let suits = ["club", "spade", "diamond", "heart"]
+      const suits = ["club", "spade", "diamond", "heart"]
       for (let i = 0; i < suits.length; i++) {
         if (name.startsWith(suits[i])) {
           suit = suits[i]
@@ -9403,10 +8646,10 @@ export class Library {
         suit = ["spade", "club"].randomGet()
       }
 
-      if (name == "huosha") {
+      if (name === "huosha") {
         name = "sha"
         nature = "fire"
-      } else if (name == "leisha") {
+      } else if (name === "leisha") {
         name = "sha"
         nature = "thunder"
       }
@@ -9451,8 +8694,8 @@ export class Library {
      * 自己立即获得所有食物牌各一张
      */
     gf() {
-      for (let i in lib.card) {
-        if (lib.card[i].type == "food") {
+      for (const i in lib.card) {
+        if (lib.card[i].type === "food") {
           lib.cheat.g(i)
         }
       }
@@ -9462,7 +8705,7 @@ export class Library {
      * @param { number } [num]
      * @param { Player } [target]
      */
-    d(num = 1, target) {
+    d(num = 1, _target) {
       const cards = get.cards(num)
       for (let i = 0; i < num; i++) {
         const card = cards[i]
@@ -9501,7 +8744,7 @@ export class Library {
       if (game.players.includes(num)) {
         num = game.players.indexOf(num)
       }
-      if (num == undefined) {
+      if (num === undefined) {
         for (let i = 0; i < game.players.length; i++) {
           lib.cheat.t(i)
         }
@@ -9520,7 +8763,7 @@ export class Library {
      */
     to() {
       game.players
-        .filter((player) => player != game.me)
+        .filter((player) => player !== game.me)
         .forEach((_, i) => {
           lib.cheat.t(i)
         })
@@ -9807,8 +9050,10 @@ export class Library {
       zhengsu_bianzhen: "变阵",
       zhengsu_mingzhi: "鸣止",
       zhengsu_leijin_info: "回合内所有于出牌阶段使用的牌点数递增且不少于三张。",
-      zhengsu_bianzhen_info: "回合内所有于出牌阶段使用的牌花色相同且不少于两张。",
-      zhengsu_mingzhi_info: "回合内所有于弃牌阶段弃置的牌花色均不相同且不少于两张。",
+      zhengsu_bianzhen_info:
+        "回合内所有于出牌阶段使用的牌花色相同且不少于两张。",
+      zhengsu_mingzhi_info:
+        "回合内所有于弃牌阶段弃置的牌花色均不相同且不少于两张。",
       db_atk: "策略",
       db_atk1: "全军出击",
       db_atk2: "分兵围城",
@@ -9843,12 +9088,14 @@ export class Library {
       phaseJieshu: "结束阶段",
 
       dongcha: "洞察",
-      dongcha_info: "①游戏开始时，随机一名反贼的身份对你可见。②准备阶段，你可以弃置场上的一张牌。",
+      dongcha_info:
+        "①游戏开始时，随机一名反贼的身份对你可见。②准备阶段，你可以弃置场上的一张牌。",
       sheshen: "舍身",
       sheshen_info:
         "锁定技。当主公即将死亡时，你令其增加1点体力上限并回复体力至X点（X为你的体力值），然后其获得你的所有牌。若如此做，你死亡。",
       identity_mingcha: "明察",
-      identity_mingcha_info: "游戏开始时，你可以查看一名角色的身份是否为反贼（对所有玩家可见）。",
+      identity_mingcha_info:
+        "游戏开始时，你可以查看一名角色的身份是否为反贼（对所有玩家可见）。",
       visible_sxrm_connect_tag: "连接牌",
     },
     {
@@ -9912,21 +9159,24 @@ export class Library {
     NodeWS: Element.NodeWS,
     Character: Element.Character,
     ws: {
-      onopen: function () {
+      onopen: () => {
         if (_status.connectCallback) {
           _status.connectCallback(true)
           delete _status.connectCallback
         }
       },
       onmessage: function (messageevent) {
-        if (messageevent.data == "heartbeat") {
+        if (messageevent.data === "heartbeat") {
           this.send("heartbeat")
           return
         }
         var message
         try {
           message = JSON.parse(messageevent.data)
-          if (!Array.isArray(message) || typeof lib.message.client[message[0]] !== "function") {
+          if (
+            !Array.isArray(message) ||
+            typeof lib.message.client[message[0]] !== "function"
+          ) {
             throw new Error("err")
           }
           if (game.sandbox) {
@@ -9943,12 +9193,12 @@ export class Library {
           }
         } catch (e) {
           console.log(e)
-          console.log("invalid message: " + messageevent.data)
+          console.log(`invalid message: ${messageevent.data}`)
           return
         }
         lib.message.client[message.shift()].apply(null, message)
       },
-      onerror: function (e) {
+      onerror: function (_e) {
         if (this._nocallback) {
           return
         }
@@ -9971,7 +9221,7 @@ export class Library {
           if ((game.servermode || game.onlinehall) && _status.over) {
             void 0
           } else {
-            localStorage.setItem(lib.configprefix + "directstart", true)
+            localStorage.setItem(`${lib.configprefix}directstart`, true)
             game.reload()
           }
         } else {
@@ -10168,16 +9418,26 @@ export class Library {
      * @param { boolean } [strict]
      */
     cardGiftable: (card, player, target, strict) => {
-      const mod = game.checkMod(card, player, target, "unchanged", "cardGiftable", player)
+      const mod = game.checkMod(
+        card,
+        player,
+        target,
+        "unchanged",
+        "cardGiftable",
+        player,
+      )
       if (
         !mod ||
         (strict &&
-          ((mod == "unchanged" && (get.position(card) != "h" || !get.cardtag(card, "gifts"))) ||
-            player == target))
+          ((mod === "unchanged" &&
+            (get.position(card) !== "h" || !get.cardtag(card, "gifts"))) ||
+            player === target))
       ) {
         return false
       }
-      return get.type(card, null, target) != "equip" || target.canEquip(card, true)
+      return (
+        get.type(card, null, target) !== "equip" || target.canEquip(card, true)
+      )
     },
     /**
      * Check if the card is recastable
@@ -10191,22 +9451,33 @@ export class Library {
     cardRecastable: (card, player = get.owner(card), source, strict) => {
       if (!player) {
         if (player === null) {
-          console.trace(`cardRecastable的player参数不应传入null,可以用void 0或undefined占位`)
+          console.trace(
+            `cardRecastable的player参数不应传入null,可以用void 0或undefined占位`,
+          )
         }
         player = get.owner(card)
       }
-      const mod = game.checkMod(card, player, source, "unchanged", "cardRecastable", player)
+      const mod = game.checkMod(
+        card,
+        player,
+        source,
+        "unchanged",
+        "cardRecastable",
+        player,
+      )
       if (!mod) {
         return false
       }
-      if (strict && mod == "unchanged") {
-        if (get.position(card) != "h") {
+      if (strict && mod === "unchanged") {
+        if (get.position(card) !== "h") {
           return false
         }
         const info = get.info(card),
           recastable = info.recastable || info.chongzhu
         return Boolean(
-          typeof recastable == "function" ? recastable(_status.event, player) : recastable,
+          typeof recastable === "function"
+            ? recastable(_status.event, player)
+            : recastable,
         )
       }
       return true
@@ -10217,34 +9488,49 @@ export class Library {
      * @param { Player } player
      * @returns { boolean }
      */
-    canBeReplaced: function (card, player) {
-      var mod = game.checkMod(card, player, "unchanged", "canBeReplaced", player)
-      if (mod != "unchanged") {
+    canBeReplaced: (card, player) => {
+      var mod = game.checkMod(
+        card,
+        player,
+        "unchanged",
+        "canBeReplaced",
+        player,
+      )
+      if (mod !== "unchanged") {
         return mod
       }
       return true
     },
     //装备栏 END
-    buttonIncluded: function (button) {
-      return !(_status.event.excludeButton && _status.event.excludeButton.includes(button))
-    },
-    filterButton: function (button) {
-      return true
-    },
-    cardSavable: function (card, player, target) {
-      if (get.itemtype(card) == "card") {
-        var mod2 = game.checkMod(card, player, "unchanged", "cardEnabled2", player)
-        if (mod2 != "unchanged") {
+    buttonIncluded: (button) => !_status.event.excludeButton?.includes(button),
+    filterButton: (_button) => true,
+    cardSavable: (card, player, target) => {
+      if (get.itemtype(card) === "card") {
+        var mod2 = game.checkMod(
+          card,
+          player,
+          "unchanged",
+          "cardEnabled2",
+          player,
+        )
+        if (mod2 !== "unchanged") {
           return mod2
         }
       }
       card = get.autoViewAs(card)
-      var mod = game.checkMod(card, player, target, "unchanged", "cardSavable", player)
-      if (mod != "unchanged") {
+      var mod = game.checkMod(
+        card,
+        player,
+        target,
+        "unchanged",
+        "cardSavable",
+        player,
+      )
+      if (mod !== "unchanged") {
         return mod
       }
       var savable = get.info(card).savable
-      if (typeof savable == "function") {
+      if (typeof savable === "function") {
         savable = savable(card, player, target)
       }
       return savable
@@ -10257,12 +9543,11 @@ export class Library {
      * @param {string} skill
      * @returns {boolean}
      */
-    filterTrigger: function (event, player, triggername, skill, indexedData) {
+    filterTrigger: (event, player, triggername, skill, indexedData) => {
       if (
-        player._hookTrigger &&
-        player._hookTrigger.some((i) => {
+        player._hookTrigger?.some((i) => {
           const info = lib.skill[i].hookTrigger
-          return info && info.block && info.block(event, player, triggername, skill)
+          return info?.block?.(event, player, triggername, skill)
         })
       ) {
         return false
@@ -10273,13 +9558,19 @@ export class Library {
         return false
       }
       if (
-        !game.expandSkills(player.getSkills("invisible").concat(lib.skill.global)).includes(skill)
+        !game
+          .expandSkills(player.getSkills("invisible").concat(lib.skill.global))
+          .includes(skill)
       ) {
         return false
       }
-      if (!game.expandSkills(player.getSkills(false).concat(lib.skill.global)).includes(skill)) {
+      if (
+        !game
+          .expandSkills(player.getSkills(false).concat(lib.skill.global))
+          .includes(skill)
+      ) {
         //hiddenSkills
-        if (get.mode() != "guozhan") {
+        if (get.mode() !== "guozhan") {
           return false
         }
         if (info.noHidden) {
@@ -10297,11 +9588,11 @@ export class Library {
       }
       if (
         !Object.keys(info.trigger).some((role) => {
-          if (role != "global" && player != event[role]) {
+          if (role !== "global" && player !== event[role]) {
             return false
           }
           const list = []
-          if (typeof info.trigger[role] == "string") {
+          if (typeof info.trigger[role] === "string") {
             list.add(info.trigger[role])
           } else if (Array.isArray(info.trigger[role])) {
             list.addArray(info.trigger[role])
@@ -10314,7 +9605,9 @@ export class Library {
           for (const trigger of list.slice()) {
             for (const name of names) {
               if (trigger.startsWith(name)) {
-                list.addArray(map[name].map((i) => i + trigger.slice(name.length)))
+                list.addArray(
+                  map[name].map((i) => i + trigger.slice(name.length)),
+                )
               }
             }
           }
@@ -10323,10 +9616,16 @@ export class Library {
       ) {
         return false
       }
-      if (info.filter && !info.filter(event, player, triggername, indexedData)) {
+      if (
+        info.filter &&
+        !info.filter(event, player, triggername, indexedData)
+      ) {
         return false
       }
-      if (event._notrigger.includes(player) && !lib.skill.global.includes(skill)) {
+      if (
+        event._notrigger.includes(player) &&
+        !lib.skill.global.includes(skill)
+      ) {
         return false
       }
       if (info.usable !== undefined) {
@@ -10334,13 +9633,18 @@ export class Library {
         if (typeof num === "function") {
           num = info.usable(skill, player)
         }
-        if (typeof num === "number" && (player.getStat("triggerSkill")[skill] ?? 0) >= num) {
+        if (
+          typeof num === "number" &&
+          (player.getStat("triggerSkill")[skill] ?? 0) >= num
+        ) {
           return false
         }
       }
       if (
         info.round &&
-        info.round - (game.roundNumber - player.storage[skill + "_roundcount"]) > 0
+        info.round -
+          (game.roundNumber - player.storage[`${skill}_roundcount`]) >
+          0
       ) {
         return false
       }
@@ -10367,14 +9671,18 @@ export class Library {
      * @param {string} skill
      * @returns {boolean}
      */
-    filterEnable: function (event, player, skill) {
+    filterEnable: (event, player, skill) => {
       const info = get.info(skill)
       if (!info) {
         console.error(new ReferenceError("缺少info的技能:", skill))
         return false
       }
       // if (!game.expandSkills(player.getSkills('invisible').concat(lib.skill.global)).includes(skill)) return false;
-      if (!game.expandSkills(player.getSkills(false).concat(lib.skill.global)).includes(skill)) {
+      if (
+        !game
+          .expandSkills(player.getSkills(false).concat(lib.skill.global))
+          .includes(skill)
+      ) {
         //hiddenSkills
         if (player.hasSkillTag("nomingzhi", false, null, true)) {
           return false
@@ -10413,7 +9721,11 @@ export class Library {
         }
         if (
           event.filterCard &&
-          !event.filterCard(get.autoViewAs(info.viewAs, "unsure"), player, event)
+          !event.filterCard(
+            get.autoViewAs(info.viewAs, "unsure"),
+            player,
+            event,
+          )
         ) {
           return false
         }
@@ -10432,7 +9744,9 @@ export class Library {
       }
       if (
         info.round &&
-        info.round - (game.roundNumber - player.storage[skill + "_roundcount"]) > 0
+        info.round -
+          (game.roundNumber - player.storage[`${skill}_roundcount`]) >
+          0
       ) {
         return false
       }
@@ -10454,7 +9768,7 @@ export class Library {
       }
       return true
     },
-    characterDisabled: function (i, libCharacter) {
+    characterDisabled: function (i, _libCharacter) {
       const args = Array.from(arguments).slice(2)
       if (!lib.character[i]) {
         return true
@@ -10475,17 +9789,17 @@ export class Library {
           return true
         }
         var double_character = false
-        if (lib.configOL.mode == "guozhan") {
+        if (lib.configOL.mode === "guozhan") {
           double_character = true
         } else if (
           lib.configOL.double_character &&
-          (lib.configOL.mode == "identity" || lib.configOL.mode == "stone")
+          (lib.configOL.mode === "identity" || lib.configOL.mode === "stone")
         ) {
           double_character = true
         } else if (
           lib.configOL.double_character_jiange &&
-          lib.configOL.mode == "versus" &&
-          _status.mode == "jiange"
+          lib.configOL.mode === "versus" &&
+          _status.mode === "jiange"
         ) {
           double_character = true
         }
@@ -10497,17 +9811,17 @@ export class Library {
           return true
         }
         var double_character = false
-        if (get.mode() == "guozhan") {
+        if (get.mode() === "guozhan") {
           double_character = true
         } else if (
           get.config("double_character") &&
-          (lib.config.mode == "identity" || lib.config.mode == "stone")
+          lib.config.mode === "identity"
         ) {
           double_character = true
         } else if (
           get.config("double_character_jiange") &&
-          lib.config.mode == "versus" &&
-          _status.mode == "jiange"
+          lib.config.mode === "versus" &&
+          _status.mode === "jiange"
         ) {
           double_character = true
         }
@@ -10535,7 +9849,7 @@ export class Library {
         if (
           !args.includes("ignoreForibidden") &&
           info.isAiForbidden &&
-          (!_status.event.isMine || !_status.event.isMine())
+          !_status.event.isMine?.()
         ) {
           return true
         }
@@ -10545,146 +9859,196 @@ export class Library {
       }
       return false
     },
-    skillDisabled: function (skill) {
-      if (!lib.translate[skill] || !lib.translate[skill + "_info"]) {
+    skillDisabled: (skill) => {
+      if (!lib.translate[skill] || !lib.translate[`${skill}_info`]) {
         return true
       }
       var info = lib.skill[skill]
-      if (info && !info.unique && !info.temp && !info.sub && !info.fixed && !info.vanish) {
+      if (
+        info &&
+        !info.unique &&
+        !info.temp &&
+        !info.sub &&
+        !info.fixed &&
+        !info.vanish
+      ) {
         return false
       }
       return true
     },
-    cardEnabled: function (card, player, event) {
-      if (player == undefined) {
+    cardEnabled: (card, player, event) => {
+      if (player === undefined) {
         player = _status.event.player
       }
       if (!player) {
         return false
       }
-      if (get.itemtype(card) == "card") {
-        var mod2 = game.checkMod(card, player, event, "unchanged", "cardEnabled2", player)
-        if (mod2 != "unchanged") {
+      if (get.itemtype(card) === "card") {
+        var mod2 = game.checkMod(
+          card,
+          player,
+          event,
+          "unchanged",
+          "cardEnabled2",
+          player,
+        )
+        if (mod2 !== "unchanged") {
           return mod2
         }
       }
       card = get.autoViewAs(card)
       if (event === "forceEnable") {
-        var mod = game.checkMod(card, player, event, "unchanged", "cardEnabled", player)
-        if (mod != "unchanged") {
+        var mod = game.checkMod(
+          card,
+          player,
+          event,
+          "unchanged",
+          "cardEnabled",
+          player,
+        )
+        if (mod !== "unchanged") {
           return mod
         }
         return true
-      } else {
-        var filter = get.info(card).enable
-        if (!filter) {
-          return
-        }
-        var mod = game.checkMod(card, player, event, "unchanged", "cardEnabled", player)
-        if (mod != "unchanged") {
-          return mod
-        }
-        if (typeof filter == "boolean") {
-          return filter
-        }
-        if (typeof filter == "function") {
-          return filter(card, player, event)
-        }
+      }
+      var filter = get.info(card).enable
+      if (!filter) {
+        return
+      }
+      var mod = game.checkMod(
+        card,
+        player,
+        event,
+        "unchanged",
+        "cardEnabled",
+        player,
+      )
+      if (mod !== "unchanged") {
+        return mod
+      }
+      if (typeof filter === "boolean") {
+        return filter
+      }
+      if (typeof filter === "function") {
+        return filter(card, player, event)
       }
     },
-    cardRespondable: function (card, player, event) {
+    cardRespondable: (card, player, event) => {
       event = event || _status.event
-      if (event.name != "chooseToRespond") {
+      if (event.name !== "chooseToRespond") {
         return true
       }
-      if (player == undefined) {
+      if (player === undefined) {
         player = _status.event.player
       }
       if (!player) {
         return false
       }
       var source = event.getParent().player
-      if (source && source != player) {
-        if (source.hasSkillTag("norespond", false, [card, player, event], true)) {
+      if (source && source !== player) {
+        if (
+          source.hasSkillTag("norespond", false, [card, player, event], true)
+        ) {
           return false
         }
       }
-      if (get.itemtype(card) == "card") {
-        var mod2 = game.checkMod(card, player, event, "unchanged", "cardEnabled2", player)
-        if (mod2 != "unchanged") {
+      if (get.itemtype(card) === "card") {
+        var mod2 = game.checkMod(
+          card,
+          player,
+          event,
+          "unchanged",
+          "cardEnabled2",
+          player,
+        )
+        if (mod2 !== "unchanged") {
           return mod2
         }
       }
       card = get.autoViewAs(card)
-      var mod = game.checkMod(card, player, "unchanged", "cardRespondable", player)
-      if (mod != "unchanged") {
+      var mod = game.checkMod(
+        card,
+        player,
+        "unchanged",
+        "cardRespondable",
+        player,
+      )
+      if (mod !== "unchanged") {
         return mod
       }
       return true
     },
-    cardUsable2: function (card, player, event) {
+    cardUsable2: (card, player, event) => {
       card = get.autoViewAs(card)
       var info = get.info(card)
-      if (info.updateUsable == "phaseUse") {
+      if (info.updateUsable === "phaseUse") {
         event = event || _status.event
-        if (event.type == "chooseToUse_button") {
+        if (event.type === "chooseToUse_button") {
           event = event.getParent()
         }
-        if (player != _status.event.player) {
+        if (player !== _status.event.player) {
           return true
         }
-        if (event.getParent().name != "phaseUse") {
+        if (event.getParent().name !== "phaseUse") {
           return true
         }
-        if (event.getParent().player != player) {
+        if (event.getParent().player !== player) {
           return true
         }
       }
       var num = info.usable
-      if (typeof num == "function") {
+      if (typeof num === "function") {
         num = num(card, player)
       }
       num = game.checkMod(card, player, num, "cardUsable", player)
-      if (typeof num != "number") {
+      if (typeof num !== "number") {
         return true
-      } else {
-        return player.countUsed(card) < num
       }
+      return player.countUsed(card) < num
     },
     cardUsable(card, player, event) {
       card = get.autoViewAs(card)
       var info = get.info(card)
       event = event || _status.event
-      if (event.type == "chooseToUse_button") {
+      if (event.type === "chooseToUse_button") {
         event = event.getParent()
       }
-      if (player != event.player) {
+      if (player !== event.player) {
         return true
       }
-      if (info.updateUsable == "phaseUse") {
-        if (event.getParent().name != "phaseUse") {
+      if (info.updateUsable === "phaseUse") {
+        if (event.getParent().name !== "phaseUse") {
           return true
         }
-        if (event.getParent().player != player) {
+        if (event.getParent().player !== player) {
           return true
         }
       }
       event.addCount_extra = true
       var num = info.usable
-      if (typeof num == "function") {
+      if (typeof num === "function") {
         num = num(card, player)
       }
       num = game.checkMod(card, player, num, "cardUsable", player)
-      if (typeof num != "number") {
-        return typeof num == "boolean" ? num : true
+      if (typeof num !== "number") {
+        return typeof num === "boolean" ? num : true
       }
       if (player.countUsed(card) < num) {
         return true
       }
       if (
-        game.hasPlayer2(function (current) {
-          return game.checkMod(card, player, current, false, "cardUsableTarget", player)
-        }, true)
+        game.hasPlayer2(
+          (current) =>
+            game.checkMod(
+              card,
+              player,
+              current,
+              false,
+              "cardUsableTarget",
+              player,
+            ),
+          true,
+        )
       ) {
         return true
       }
@@ -10697,13 +10061,20 @@ export class Library {
      * @param { string } [event] 弃置牌事件的名称
      * @returns { boolean }
      */
-    cardDiscardable: function (card, player, event) {
+    cardDiscardable: (card, player, event) => {
       event = event || _status.event
-      if (typeof event != "string") {
+      if (typeof event !== "string") {
         event = event.getParent().name
       }
-      var mod = game.checkMod(card, player, event, "unchanged", "cardDiscardable", player)
-      if (mod != "unchanged") {
+      var mod = game.checkMod(
+        card,
+        player,
+        event,
+        "unchanged",
+        "cardDiscardable",
+        player,
+      )
+      if (mod !== "unchanged") {
         return mod
       }
       return true
@@ -10716,16 +10087,27 @@ export class Library {
      * @param { string } [event] 弃置牌事件的名称
      * @returns { boolean }
      */
-    canBeDiscarded: function (card, player, target, event) {
+    canBeDiscarded: (card, player, target, event) => {
       event = event || _status.event
-      if (typeof event != "string") {
+      if (typeof event !== "string") {
         event = event.getParent().name
       }
-      if (player == target && !lib.filter.cardDiscardable(card, player, event)) {
+      if (
+        player === target &&
+        !lib.filter.cardDiscardable(card, player, event)
+      ) {
         return false
       }
-      var mod = game.checkMod(card, player, target, event, "unchanged", "canBeDiscarded", target)
-      if (mod != "unchanged") {
+      var mod = game.checkMod(
+        card,
+        player,
+        target,
+        event,
+        "unchanged",
+        "canBeDiscarded",
+        target,
+      )
+      if (mod !== "unchanged") {
         return mod
       }
       return true
@@ -10738,27 +10120,35 @@ export class Library {
      * @param { string } [event] 获得牌事件的名称
      * @returns { boolean }
      */
-    canBeGained: function (card, player, target, event) {
+    canBeGained: (card, player, target, event) => {
       event = event || _status.event
-      if (typeof event != "string") {
+      if (typeof event !== "string") {
         event = event.getParent().name
       }
-      var mod = game.checkMod(card, player, target, event, "unchanged", "canBeGained", target)
-      if (mod != "unchanged") {
+      var mod = game.checkMod(
+        card,
+        player,
+        target,
+        event,
+        "unchanged",
+        "canBeGained",
+        target,
+      )
+      if (mod !== "unchanged") {
         return mod
       }
       return true
     },
-    cardAiIncluded: function (card) {
+    cardAiIncluded: (card) => {
       if (_status.event.isMine()) {
         return true
       }
-      return _status.event._aiexclude.includes(card) == false
+      return _status.event._aiexclude.includes(card) === false
     },
     filterCard(card, player, event) {
       var info = get.info(card)
       //if(info.toself&&!lib.filter.targetEnabled(card,player,player)) return false;
-      if (player == undefined) {
+      if (player === undefined) {
         player = _status.event.player
       }
       if (
@@ -10772,29 +10162,32 @@ export class Library {
       }
       var range
       var select = get.copy(info.selectTarget)
-      if (select == undefined) {
-        if (info.filterTarget == undefined) {
+      if (select === undefined) {
+        if (info.filterTarget === undefined) {
           return true
         }
         range = [1, 1]
-      } else if (typeof select == "number") {
+      } else if (typeof select === "number") {
         range = [select, select]
-      } else if (get.itemtype(select) == "select") {
+      } else if (get.itemtype(select) === "select") {
         range = select
-      } else if (typeof select == "function") {
+      } else if (typeof select === "function") {
         range = select(card, player)
-        if (typeof range == "number") {
+        if (typeof range === "number") {
           range = [range, range]
         }
       }
       game.checkMod(card, player, range, "selectTarget", player)
-      if (!range || range[1] != -1) {
+      if (!range || range[1] !== -1) {
         return true
       }
-      var filterTarget = event && event.filterTarget ? event.filterTarget : lib.filter.filterTarget
-      return game.hasPlayer2(function (current) {
-        return filterTarget(card, player, current)
-      }, true)
+      var filterTarget = event?.filterTarget
+        ? event.filterTarget
+        : lib.filter.filterTarget
+      return game.hasPlayer2(
+        (current) => filterTarget(card, player, current),
+        true,
+      )
     },
     targetEnabledx(card, player, target) {
       if (!card || !target || target.removed) {
@@ -10814,20 +10207,32 @@ export class Library {
       }
       if (
         event._backup &&
-        event._backup.filterCard == lib.filter.filterCard &&
-        (!lib.filter.cardEnabled(card, player, event) || !lib.filter.cardUsable(card, player, evt))
+        event._backup.filterCard === lib.filter.filterCard &&
+        (!lib.filter.cardEnabled(card, player, event) ||
+          !lib.filter.cardUsable(card, player, evt))
       ) {
         return false
       }
       if (event.addCount_extra) {
         if (
           !lib.filter.cardUsable2(card, player) &&
-          !game.checkMod(card, player, target, false, "cardUsableTarget", player)
+          !game.checkMod(
+            card,
+            player,
+            target,
+            false,
+            "cardUsableTarget",
+            player,
+          )
         ) {
           return false
         }
       }
-      if (info.singleCard && info.filterAddedTarget && ui.selected.targets.length) {
+      if (
+        info.singleCard &&
+        info.filterAddedTarget &&
+        ui.selected.targets.length
+      ) {
         return Boolean(
           info.filterAddedTarget(
             card,
@@ -10851,20 +10256,34 @@ export class Library {
         return false
       }
       const filter = info.filterTarget
-      if (!info.singleCard || ui.selected.targets.length == 0) {
-        let mod = game.checkMod(card, player, target, "unchanged", "playerEnabled", player)
-        if (mod != "unchanged") {
+      if (!info.singleCard || ui.selected.targets.length === 0) {
+        let mod = game.checkMod(
+          card,
+          player,
+          target,
+          "unchanged",
+          "playerEnabled",
+          player,
+        )
+        if (mod !== "unchanged") {
           return mod
         }
-        mod = game.checkMod(card, player, target, "unchanged", "targetEnabled", target)
-        if (mod != "unchanged") {
+        mod = game.checkMod(
+          card,
+          player,
+          target,
+          "unchanged",
+          "targetEnabled",
+          target,
+        )
+        if (mod !== "unchanged") {
           return mod
         }
       }
-      if (typeof filter == "boolean") {
+      if (typeof filter === "boolean") {
         return filter
       }
-      if (typeof filter == "function") {
+      if (typeof filter === "function") {
         return Boolean(filter(card, player, target))
       }
     },
@@ -10883,18 +10302,36 @@ export class Library {
         return true
       }
 
-      if (game.checkMod(card, player, target, "unchanged", "playerEnabled", player) == false) {
+      if (
+        game.checkMod(
+          card,
+          player,
+          target,
+          "unchanged",
+          "playerEnabled",
+          player,
+        ) === false
+      ) {
         return false
       }
-      if (game.checkMod(card, player, target, "unchanged", "targetEnabled", target) == false) {
+      if (
+        game.checkMod(
+          card,
+          player,
+          target,
+          "unchanged",
+          "targetEnabled",
+          target,
+        ) === false
+      ) {
         return false
       }
 
       const filter = get.info(card).modTarget
-      if (typeof filter == "boolean") {
+      if (typeof filter === "boolean") {
         return filter
       }
-      if (typeof filter == "function") {
+      if (typeof filter === "function") {
         return Boolean(filter(card, player, target))
       }
       return false
@@ -10911,40 +10348,53 @@ export class Library {
         return false
       }
 
-      if (info.filterTarget == true) {
+      if (info.filterTarget === true) {
         return true
       }
-      if (typeof info.filterTarget == "function" && info.filterTarget(card, player, target)) {
+      if (
+        typeof info.filterTarget === "function" &&
+        info.filterTarget(card, player, target)
+      ) {
         return true
       }
 
-      if (info.modTarget == true) {
+      if (info.modTarget === true) {
         return true
       }
-      if (typeof info.modTarget == "function" && info.modTarget(card, player, target)) {
+      if (
+        typeof info.modTarget === "function" &&
+        info.modTarget(card, player, target)
+      ) {
         return true
       }
       return false
     },
-    targetInRange: function (card, player, target) {
+    targetInRange: (card, player, target) => {
       var info = get.info(card)
       var range = info.range
       var outrange = info.outrange
-      if (range == undefined && outrange == undefined) {
+      if (range === undefined && outrange === undefined) {
         return true
       }
 
-      var mod = game.checkMod(card, player, target, "unchanged", "targetInRange", player)
+      var mod = game.checkMod(
+        card,
+        player,
+        target,
+        "unchanged",
+        "targetInRange",
+        player,
+      )
       var extra = 0
-      if (mod != "unchanged") {
-        if (typeof mod == "boolean") {
+      if (mod !== "unchanged") {
+        if (typeof mod === "boolean") {
           return mod
         }
-        if (typeof mod == "number") {
+        if (typeof mod === "number") {
           extra = mod
         }
       }
-      if (typeof info.range == "function") {
+      if (typeof info.range === "function") {
         return info.range(card, player, target)
       }
 
@@ -10952,7 +10402,7 @@ export class Library {
         return false
       }
       for (var i in range) {
-        if (i == "attack") {
+        if (i === "attack") {
           var range2 = player.getAttackRange()
           if (range2 <= 0) {
             return false
@@ -10969,7 +10419,7 @@ export class Library {
         }
       }
       for (var i in outrange) {
-        if (i == "attack") {
+        if (i === "attack") {
           var range2 = player.getAttackRange()
           if (range2 <= 0) {
             return false
@@ -10987,58 +10437,43 @@ export class Library {
       }
       return true
     },
-    filterTarget: function (card, player, target) {
-      return (
-        lib.filter.targetEnabledx(card, player, target) &&
-        lib.filter.targetInRange(card, player, target)
-      )
-    },
-    filterTarget2: function (card, player, target) {
-      return (
-        lib.filter.targetEnabled2(card, player, target) &&
-        lib.filter.targetInRange(card, player, target)
-      )
-    },
-    notMe: function (card, player, target) {
-      return player != target
-    },
-    isMe: function (card, player, target) {
-      return player == target
-    },
-    attackFrom: function (card, player, target) {
-      return get.distance(player, target, "attack") <= 1
-    },
-    globalFrom: function (card, player, target) {
-      return get.distance(player, target) <= 1
-    },
-    selectCard: function () {
-      return [1, 1]
-    },
-    selectTarget: function (card, player) {
+    filterTarget: (card, player, target) =>
+      lib.filter.targetEnabledx(card, player, target) &&
+      lib.filter.targetInRange(card, player, target),
+    filterTarget2: (card, player, target) =>
+      lib.filter.targetEnabled2(card, player, target) &&
+      lib.filter.targetInRange(card, player, target),
+    notMe: (_card, player, target) => player !== target,
+    isMe: (_card, player, target) => player === target,
+    attackFrom: (_card, player, target) =>
+      get.distance(player, target, "attack") <= 1,
+    globalFrom: (_card, player, target) => get.distance(player, target) <= 1,
+    selectCard: () => [1, 1],
+    selectTarget: (card, player) => {
       if (!card) {
         card = get.card()
       }
       if (!player) {
         player = get.player()
       }
-      if (card == undefined) {
+      if (card === undefined) {
         return
       }
       var range,
         info = get.info(card)
       var select = get.copy(info.selectTarget)
-      if (select == undefined) {
-        if (info.filterTarget == undefined) {
+      if (select === undefined) {
+        if (info.filterTarget === undefined) {
           return [0, 0]
         }
         range = [1, 1]
-      } else if (typeof select == "number") {
+      } else if (typeof select === "number") {
         range = [select, select]
-      } else if (get.itemtype(select) == "select") {
+      } else if (get.itemtype(select) === "select") {
         range = select
-      } else if (typeof select == "function") {
+      } else if (typeof select === "function") {
         range = select(card, player)
-        if (typeof range == "number") {
+        if (typeof range === "number") {
           range = [range, range]
         }
       }
@@ -11048,16 +10483,30 @@ export class Library {
       }
       return range
     },
-    judge: function (card, player, target) {
+    judge: (card, player, target) => {
       if (!target.canAddJudge(card, player)) {
         return false
       }
-      let mod = game.checkMod(card, player, target, "unchanged", "playerEnabled", player)
-      if (mod != "unchanged") {
+      const mod = game.checkMod(
+        card,
+        player,
+        target,
+        "unchanged",
+        "playerEnabled",
+        player,
+      )
+      if (mod !== "unchanged") {
         return mod
       }
-      let mod2 = game.checkMod(card, player, target, "unchanged", "targetEnabled", target)
-      if (mod2 != "unchanged") {
+      const mod2 = game.checkMod(
+        card,
+        player,
+        target,
+        "unchanged",
+        "targetEnabled",
+        target,
+      )
+      if (mod2 !== "unchanged") {
         return mod2
       }
       return true
@@ -11068,26 +10517,25 @@ export class Library {
     autoRespondShan: function () {
       return !this.player.hasShan("respond")
     },
-    wuxieSwap: function (event) {
-      if (event.type == "wuxie") {
-        if (ui.wuxie && ui.wuxie.classList.contains("glow")) {
+    wuxieSwap: (event) => {
+      if (event.type === "wuxie") {
+        if (ui.wuxie?.classList.contains("glow")) {
           return true
         }
-        if (ui.tempnowuxie && ui.tempnowuxie.classList.contains("glow") && event.state > 0) {
+        if (ui.tempnowuxie?.classList.contains("glow") && event.state > 0) {
           var triggerevent = event.getTrigger()
           if (triggerevent) {
-            if (ui.tempnowuxie._origin == triggerevent.parent.id) {
+            if (ui.tempnowuxie._origin === triggerevent.parent.id) {
               return true
             }
-          } else if (ui.tempnowuxie._origin == _status.event.id2) {
+          } else if (ui.tempnowuxie._origin === _status.event.id2) {
             return true
           }
         }
         if (lib.config.wuxie_self) {
           var tw = event.info_map
           if (
-            tw.player &&
-            tw.player.isUnderControl(true) &&
+            tw.player?.isUnderControl(true) &&
             !tw.player.hasSkillTag("noautowuxie") &&
             (!tw.targets || tw.targets.length <= 1) &&
             !tw.noai
@@ -11099,48 +10547,46 @@ export class Library {
     },
   }
   sort = {
-    nature: function (a, b) {
-      return (lib.nature.get(b) || 0) - (lib.nature.get(a) || 0)
-    },
-    group: function (a, b) {
-      const groupSort = function (group) {
-        let base = 0
-        if (group == "wei") {
+    nature: (a, b) => (lib.nature.get(b) || 0) - (lib.nature.get(a) || 0),
+    group: (a, b) => {
+      const groupSort = (group) => {
+        const base = 0
+        if (group === "wei") {
           return base
         }
-        if (group == "shu") {
+        if (group === "shu") {
           return base + 1
         }
-        if (group == "wu") {
+        if (group === "wu") {
           return base + 2
         }
-        if (group == "qun") {
+        if (group === "qun") {
           return base + 3
         }
-        if (group == "jin") {
+        if (group === "jin") {
           return base + 4
         }
-        if (group == "key") {
+        if (group === "key") {
           return base + 5
         }
-        if (group == "western") {
+        if (group === "western") {
           return base + 6
         }
-        if (group == "shen") {
+        if (group === "shen") {
           return base + 7
         }
-        if (group == "devil") {
+        if (group === "devil") {
           return base + 7
         }
-        if (group == "double") {
+        if (group === "double") {
           return base + 8
         }
         return base + 9
       }
       return groupSort(a) - groupSort(b)
     },
-    character: function (a, b) {
-      const groupSort = function (name) {
+    character: (a, b) => {
+      const groupSort = (name) => {
         const info = get.character(name)
         if (!info) {
           return 7
@@ -11150,34 +10596,34 @@ export class Library {
           base = 9
         }
         const group = info[1]
-        if (group == "shen" || group == "devil") {
+        if (group === "shen" || group === "devil") {
           return base - 1
         }
-        if (group == "wei") {
+        if (group === "wei") {
           return base
         }
-        if (group == "shu") {
+        if (group === "shu") {
           return base + 1
         }
-        if (group == "wu") {
+        if (group === "wu") {
           return base + 2
         }
-        if (group == "qun") {
+        if (group === "qun") {
           return base + 3
         }
-        if (group == "jin") {
+        if (group === "jin") {
           return base + 4
         }
-        if (group == "key") {
+        if (group === "key") {
           return base + 5
         }
-        if (group == "western") {
+        if (group === "western") {
           return base + 6
         }
         return base + 7
       }
       const del = groupSort(a) - groupSort(b)
-      if (del != 0) {
+      if (del !== 0) {
         return del
       }
       var aa = a,
@@ -11185,53 +10631,57 @@ export class Library {
       var firstUnderscoreIndexA = a.indexOf("_")
       var firstUnderscoreIndexB = b.indexOf("_")
       var secondUnderscoreIndexA =
-        firstUnderscoreIndexA != -1 ? a.indexOf("_", firstUnderscoreIndexA + 1) : -1
+        firstUnderscoreIndexA !== -1
+          ? a.indexOf("_", firstUnderscoreIndexA + 1)
+          : -1
       var secondUnderscoreIndexB =
-        firstUnderscoreIndexB != -1 ? b.indexOf("_", firstUnderscoreIndexB + 1) : -1
+        firstUnderscoreIndexB !== -1
+          ? b.indexOf("_", firstUnderscoreIndexB + 1)
+          : -1
 
-      if (secondUnderscoreIndexA != -1) {
+      if (secondUnderscoreIndexA !== -1) {
         a = a.slice(secondUnderscoreIndexA + 1)
-      } else if (firstUnderscoreIndexA != -1) {
+      } else if (firstUnderscoreIndexA !== -1) {
         a = a.slice(firstUnderscoreIndexA + 1)
       }
 
-      if (secondUnderscoreIndexB != -1) {
+      if (secondUnderscoreIndexB !== -1) {
         b = b.slice(secondUnderscoreIndexB + 1)
-      } else if (firstUnderscoreIndexB != -1) {
+      } else if (firstUnderscoreIndexB !== -1) {
         b = b.slice(firstUnderscoreIndexB + 1)
       }
 
-      if (a != b) {
+      if (a !== b) {
         return a > b ? 1 : -1
       }
       return aa > bb ? 1 : -1
     },
-    card: function (a, b) {
-      var typeSort = function (name) {
+    card: (a, b) => {
+      var typeSort = (name) => {
         var type = get.type(name)
         if (!type) {
           return 10
         }
-        if (type == "basic") {
+        if (type === "basic") {
           return -1
         }
-        if (type == "trick") {
+        if (type === "trick") {
           return 0
         }
-        if (type == "delay") {
+        if (type === "delay") {
           return 1
         }
-        if (type == "equip") {
+        if (type === "equip") {
           var type2 = get.subtype(name, false)
-          if (type2 && type2.slice) {
-            return 1 + parseInt(type2.slice(5) || 7)
+          if (type2?.slice) {
+            return 1 + parseInt(type2.slice(5) || 7, 10)
           }
           return 8.5
         }
         return 9
       }
       var del = typeSort(a) - typeSort(b)
-      if (del != 0) {
+      if (del !== 0) {
         return del
       }
       var aa = a,
@@ -11239,56 +10689,61 @@ export class Library {
       var firstUnderscoreIndexA = a.indexOf("_")
       var firstUnderscoreIndexB = b.indexOf("_")
       var secondUnderscoreIndexA =
-        firstUnderscoreIndexA != -1 ? a.indexOf("_", firstUnderscoreIndexA + 1) : -1
+        firstUnderscoreIndexA !== -1
+          ? a.indexOf("_", firstUnderscoreIndexA + 1)
+          : -1
       var secondUnderscoreIndexB =
-        firstUnderscoreIndexB != -1 ? b.indexOf("_", firstUnderscoreIndexB + 1) : -1
+        firstUnderscoreIndexB !== -1
+          ? b.indexOf("_", firstUnderscoreIndexB + 1)
+          : -1
 
-      if (secondUnderscoreIndexA != -1) {
+      if (secondUnderscoreIndexA !== -1) {
         a = a.slice(secondUnderscoreIndexA + 1)
-      } else if (firstUnderscoreIndexA != -1) {
+      } else if (firstUnderscoreIndexA !== -1) {
         a = a.slice(firstUnderscoreIndexA + 1)
       }
 
-      if (secondUnderscoreIndexB != -1) {
+      if (secondUnderscoreIndexB !== -1) {
         b = b.slice(secondUnderscoreIndexB + 1)
-      } else if (firstUnderscoreIndexB != -1) {
+      } else if (firstUnderscoreIndexB !== -1) {
         b = b.slice(firstUnderscoreIndexB + 1)
       }
 
-      if (a != b) {
+      if (a !== b) {
         return a > b ? 1 : -1
       }
       return aa > bb ? 1 : -1
     },
-    random: function () {
-      return Math.random() - 0.5
-    },
-    seat: function (a, b) {
-      var player = lib.tempSortSeat || _status.event.player || game.me || game.players[0]
-      var delta = get.distance(player, a, "absolute") - get.distance(player, b, "absolute")
+    random: () => Math.random() - 0.5,
+    seat: (a, b) => {
+      var player =
+        lib.tempSortSeat || _status.event.player || game.me || game.players[0]
+      var delta =
+        get.distance(player, a, "absolute") -
+        get.distance(player, b, "absolute")
       if (delta) {
         return delta
       }
-      delta = parseInt(a.dataset.position) - parseInt(b.dataset.position)
-      if (player.side == game.me.side) {
+      delta =
+        parseInt(a.dataset.position, 10) - parseInt(b.dataset.position, 10)
+      if (player.side === game.me.side) {
         return delta
       }
       return -delta
     },
-    position: function (a, b) {
-      return parseInt(a.dataset.position) - parseInt(b.dataset.position)
-    },
-    priority: function (a, b) {
+    position: (a, b) =>
+      parseInt(a.dataset.position, 10) - parseInt(b.dataset.position, 10),
+    priority: (a, b) => {
       var i1 = get.info(a[0]),
         i2 = get.info(b[0])
-      if (i1.priority == undefined) {
+      if (i1.priority === undefined) {
         i1.priority = 0
       }
-      if (i2.priority == undefined) {
+      if (i2.priority === undefined) {
         i2.priority = 0
       }
-      if (i1.priority == i2.priority) {
-        if (i1.forced == undefined && i2.forced == undefined) {
+      if (i1.priority === i2.priority) {
+        if (i1.forced === undefined && i2.forced === undefined) {
           return 0
         }
         if (i1.forced && i2.forced) {
@@ -11303,40 +10758,40 @@ export class Library {
       }
       return i2.priority - i1.priority
     },
-    number: function (a, b) {
-      return get.number(a) - get.number(b)
-    },
-    number2: function (a, b) {
-      return get.number(b) - get.number(a)
-    },
-    capt: function (a, b) {
+    number: (a, b) => get.number(a) - get.number(b),
+    number2: (a, b) => get.number(b) - get.number(a),
+    capt: (a, b) => {
       var aa = a,
         bb = b
       var firstUnderscoreIndexAA = aa.indexOf("_")
       var firstUnderscoreIndexBB = bb.indexOf("_")
       var secondUnderscoreIndexAA =
-        firstUnderscoreIndexAA != -1 ? aa.indexOf("_", firstUnderscoreIndexAA + 1) : -1
+        firstUnderscoreIndexAA !== -1
+          ? aa.indexOf("_", firstUnderscoreIndexAA + 1)
+          : -1
       var secondUnderscoreIndexBB =
-        firstUnderscoreIndexBB != -1 ? bb.indexOf("_", firstUnderscoreIndexBB + 1) : -1
+        firstUnderscoreIndexBB !== -1
+          ? bb.indexOf("_", firstUnderscoreIndexBB + 1)
+          : -1
 
-      if (secondUnderscoreIndexAA != -1) {
+      if (secondUnderscoreIndexAA !== -1) {
         aa = aa.slice(secondUnderscoreIndexAA + 1)
-      } else if (firstUnderscoreIndexAA != -1) {
+      } else if (firstUnderscoreIndexAA !== -1) {
         aa = aa.slice(firstUnderscoreIndexAA + 1)
       }
 
-      if (secondUnderscoreIndexBB != -1) {
+      if (secondUnderscoreIndexBB !== -1) {
         bb = bb.slice(secondUnderscoreIndexBB + 1)
-      } else if (firstUnderscoreIndexBB != -1) {
+      } else if (firstUnderscoreIndexBB !== -1) {
         bb = bb.slice(firstUnderscoreIndexBB + 1)
       }
 
-      if (aa != bb) {
+      if (aa !== bb) {
         return aa > bb ? 1 : -1
       }
       return a > b ? 1 : -1
     },
-    name: function (a, b) {
+    name: (a, b) => {
       if (a > b) {
         return 1
       }
@@ -11414,16 +10869,20 @@ export class Library {
 					}
 				}, show_deckMonitor);*/
         this.onlineKey = config.onlineKey
-        var banBlacklist = lib.config.banBlacklist === undefined ? [] : lib.config.banBlacklist
-        if (lib.node.banned.includes(banned_info) || banBlacklist.includes(config.onlineKey)) {
+        var banBlacklist =
+          lib.config.banBlacklist === undefined ? [] : lib.config.banBlacklist
+        if (
+          lib.node.banned.includes(banned_info) ||
+          banBlacklist.includes(config.onlineKey)
+        ) {
           this.send("denied", "banned")
-        } else if (config.id && lib.playerOL && lib.playerOL[config.id]) {
+        } else if (config.id && lib.playerOL?.[config.id]) {
           var player = lib.playerOL[config.id]
           player.setNickname()
           player.ws = this
           player.isAuto = false
           this.id = config.id
-          game.broadcast(function (player) {
+          game.broadcast((player) => {
             player.setNickname()
           }, player)
           this.send(
@@ -11437,13 +10896,13 @@ export class Library {
             _status.cardtag,
             _status.postReconnect,
           )
-        } else if (version != lib.versionOL) {
+        } else if (version !== lib.versionOL) {
           this.send("denied", "version")
           lib.node.clients.remove(this)
           this.closed = true
         } else if (
           get.config("check_versionLocal", "connect") &&
-          config.versionLocal != lib.version
+          config.versionLocal !== lib.version
         ) {
           this.send("denied", "version")
           lib.node.clients.remove(this)
@@ -11467,7 +10926,11 @@ export class Library {
               _status.postReconnect,
             )
             // 没有系统提示的接口喵？
-            game.log("玩家 ", `#y${get.plainText(config.nickname)}`, " 进入房间观战")
+            game.log(
+              "玩家 ",
+              `#y${get.plainText(config.nickname)}`,
+              " 进入房间观战",
+            )
             game.me.chat(
               `玩家 <span style="font-weight: bold; color: rgb(126, 180, 255)">${get.plainText(config.nickname)}</span> 进入房间观战`,
             )
@@ -11494,7 +10957,9 @@ export class Library {
             lib.node.clients.remove(this)
             this.closed = true
           }
-        } else if (lib.node.clients.length >= parseInt(lib.configOL.number)) {
+        } else if (
+          lib.node.clients.length >= parseInt(lib.configOL.number, 10)
+        ) {
           this.send("denied", "number")
           lib.node.clients.remove(this)
           this.closed = true
@@ -11507,7 +10972,10 @@ export class Library {
             if (game.connectPlayers[i].classList.contains("unselectable2")) {
               continue
             }
-            if (game.connectPlayers[i] != game.me && !game.connectPlayers[i].playerid) {
+            if (
+              game.connectPlayers[i] !== game.me &&
+              !game.connectPlayers[i].playerid
+            ) {
               game.connectPlayers[i].playerid = this.id
               game.connectPlayers[i].initOL(this.nickname, this.avatar)
               game.connectPlayers[i].ws = this
@@ -11560,7 +11028,7 @@ export class Library {
        * @this {import("./element/client.js").Client}
        */
       startGame() {
-        if (this.id == game.onlinezhu) {
+        if (this.id === game.onlinezhu) {
           game.resume()
         }
       },
@@ -11568,18 +11036,21 @@ export class Library {
        * @this {import("./element/client.js").Client}
        */
       changeRoomConfig(config) {
-        if (this.id == game.onlinezhu) {
-          game.broadcastAll(function (config) {
+        if (this.id === game.onlinezhu) {
+          game.broadcastAll((config) => {
             for (var i in config) {
               lib.configOL[i] = config[i]
             }
             if (ui.connectStartBar) {
-              ui.connectStartBar.firstChild.innerHTML = get.modetrans(lib.configOL, true)
+              ui.connectStartBar.firstChild.innerHTML = get.modetrans(
+                lib.configOL,
+                true,
+              )
             }
           }, config)
           if (
-            lib.configOL.mode == "identity" &&
-            lib.configOL.identity_mode == "zhong" &&
+            lib.configOL.mode === "identity" &&
+            lib.configOL.identity_mode === "zhong" &&
             game.connectPlayers
           ) {
             for (var i = 0; i < game.connectPlayers.length; i++) {
@@ -11592,7 +11063,7 @@ export class Library {
             game.send("server", "config", lib.configOL)
           }
           for (var i = 0; i < game.connectPlayers.length; i++) {
-            if (game.connectPlayers[i].playerid == this.id) {
+            if (game.connectPlayers[i].playerid === this.id) {
               game.connectPlayers[i].chat("房间设置已更改")
             }
           }
@@ -11602,10 +11073,10 @@ export class Library {
        * @this {import("./element/client.js").Client}
        */
       changeNumConfig(num, index, bool) {
-        if (this.id == game.onlinezhu) {
+        if (this.id === game.onlinezhu) {
           lib.configOL.number = num
           game.send("server", "config", lib.configOL)
-          if (game.connectPlayers && game.connectPlayers[index]) {
+          if (game.connectPlayers?.[index]) {
             if (bool) {
               game.connectPlayers[index].classList.add("unselectable2")
             } else {
@@ -11634,14 +11105,14 @@ export class Library {
         if (lib.node.observing.includes(this)) {
           return
         }
-        var that = this
+
         if (
           !this.id ||
           (!lib.playerOL[this.id] &&
             (!game.connectPlayers ||
-              !(function () {
+              !(() => {
                 for (var i = 0; i < game.connectPlayers.length; i++) {
-                  if (game.connectPlayers[i].playerid == that.id) {
+                  if (game.connectPlayers[i].playerid === this.id) {
                     return true
                   }
                 }
@@ -11655,7 +11126,7 @@ export class Library {
           player = lib.playerOL[id]
         } else if (game.connectPlayers) {
           for (var i = 0; i < game.connectPlayers.length; i++) {
-            if (game.connectPlayers[i].playerid == id) {
+            if (game.connectPlayers[i].playerid === id) {
               player = game.connectPlayers[i]
               break
             }
@@ -11672,14 +11143,14 @@ export class Library {
         if (lib.node.observing.includes(this)) {
           return
         }
-        var that = this
+
         if (
           !this.id ||
           (!lib.playerOL[this.id] &&
             (!game.connectPlayers ||
-              !(function () {
+              !(() => {
                 for (var i = 0; i < game.connectPlayers.length; i++) {
-                  if (game.connectPlayers[i].playerid == that.id) {
+                  if (game.connectPlayers[i].playerid === this.id) {
                     return true
                   }
                 }
@@ -11693,7 +11164,7 @@ export class Library {
           player = lib.playerOL[id]
         } else if (game.connectPlayers) {
           for (var i = 0; i < game.connectPlayers.length; i++) {
-            if (game.connectPlayers[i].playerid == id) {
+            if (game.connectPlayers[i].playerid === id) {
               player = game.connectPlayers[i]
               break
             }
@@ -11723,7 +11194,7 @@ export class Library {
         game
           .createEvent("giveup", false)
           .set("includeOut", true)
-          .setContent(function () {
+          .setContent(() => {
             game.log(player, "投降")
             player.popup("投降")
             player.die("nosource").includeOut = true
@@ -11739,9 +11210,9 @@ export class Library {
         var player = lib.playerOL[this.id]
         if (player) {
           player.isAuto = true
-          player.setNickname(player.nickname + " - 托管")
-          game.broadcast(function (player) {
-            player.setNickname(player.nickname + " - 托管")
+          player.setNickname(`${player.nickname} - 托管`)
+          game.broadcast((player) => {
+            player.setNickname(`${player.nickname} - 托管`)
           }, player)
         }
       },
@@ -11756,17 +11227,10 @@ export class Library {
         if (player) {
           player.isAuto = false
           player.setNickname(player.nickname)
-          game.broadcast(function (player) {
+          game.broadcast((player) => {
             player.setNickname(player.nickname)
           }, player)
         }
-      },
-      exec(func) {
-        // if(typeof func=='function'){
-        //     var args=Array.from(arguments);
-        //     args.shift();
-        //     func.apply(this,args);
-        // }
       },
       /**
        * 用于代替exec进行主机许可的请求喵
@@ -11785,7 +11249,11 @@ export class Library {
           let result = null
 
           try {
-            if (!subject || typeof subject !== "object" || typeof subject.type !== "string") {
+            if (
+              !subject ||
+              typeof subject !== "object" ||
+              typeof subject.type !== "string"
+            ) {
               return
             }
 
@@ -11800,7 +11268,11 @@ export class Library {
             switch (type) {
               // 如果要增加类型请走这里喵
               case "skill":
-                directResult = await game.respondSkillData(id, requester, subject)
+                directResult = await game.respondSkillData(
+                  id,
+                  requester,
+                  subject,
+                )
                 break
             }
 
@@ -11823,7 +11295,7 @@ export class Library {
           for (var i = 0; i < arguments.length; i++) {
             items.push(this.sandbox.exec(`return ${arguments[i]}`))
           }
-        } catch (e) {
+        } catch (_e) {
           this.send("log", ["err"])
           return
         }
@@ -11848,14 +11320,14 @@ export class Library {
       },
     },
     client: {
-      log: function (arr) {
+      log: (arr) => {
         if (Array.isArray(arr)) {
           for (var i = 0; i < arr.length; i++) {
             console.log(arr[i])
           }
         }
       },
-      opened: function () {
+      opened: () => {
         game.send(
           "init",
           lib.versionOL,
@@ -11872,18 +11344,19 @@ export class Library {
           ui.connecting.firstChild.innerHTML = "重连成功"
         }
       },
-      onconnection: (id) => lib.init.connection((lib.wsOL[id] = new lib.element.NodeWS(id))),
-      onmessage: function (id, message) {
+      onconnection: (id) =>
+        lib.init.connection((lib.wsOL[id] = new lib.element.NodeWS(id))),
+      onmessage: (id, message) => {
         if (lib.wsOL[id]) {
           lib.wsOL[id].onmessage(message)
         }
       },
-      onclose: function (id) {
+      onclose: (id) => {
         if (lib.wsOL[id]) {
           lib.wsOL[id].onclose()
         }
       },
-      selfclose: function () {
+      selfclose: () => {
         if (game.online || game.onlineroom) {
           if ((game.servermode || game.onlinehall) && _status.over) {
             // later
@@ -11893,12 +11366,7 @@ export class Library {
         }
         game.ws.close()
       },
-      reloadroom: function (forced) {
-        // if (window.isWTKServer && (forced || !_status.protectingroom)) {
-        // 	game.reload();
-        // }
-      },
-      createroom: function (index, config, mode) {
+      createroom: (index, _config, _mode) => {
         game.online = false
         game.onlineroom = true
         game.roomId = index
@@ -11906,19 +11374,22 @@ export class Library {
         game.switchMode(lib.configOL.mode)
         ui.create.connecting(true)
       },
-      enterroomfailed: function () {
+      enterroomfailed: () => {
         alert("请稍后再试")
         _status.enteringroom = false
         ui.create.connecting(true)
       },
-      roomlist: function (list, events, clients, wsid) {
+      roomlist: (list, events, clients, wsid) => {
         game.send("server", "key", [game.onlineKey, lib.version])
         game.online = true
         game.onlinehall = true
         lib.config.recentIP.remove(_status.ip)
         lib.config.recentIP.unshift(_status.ip)
         lib.config.recentIP.splice(5)
-        if (!lib.config.reconnect_info || lib.config.reconnect_info[0] != _status.ip) {
+        if (
+          !lib.config.reconnect_info ||
+          lib.config.reconnect_info[0] !== _status.ip
+        ) {
           game.saveConfig("reconnect_info", [_status.ip, null])
         }
         game.saveConfig("recentIP", lib.config.recentIP)
@@ -11930,9 +11401,14 @@ export class Library {
         ui.auto.hide()
 
         clearTimeout(_status.createNodeTimeout)
-        game.send("server", "changeAvatar", get.connectNickname(), lib.config.connect_avatar)
+        game.send(
+          "server",
+          "changeAvatar",
+          get.connectNickname(),
+          lib.config.connect_avatar,
+        )
 
-        var proceed = function () {
+        var proceed = () => {
           game.ip = get.trimip(_status.ip)
           ui.create.connectRooms(list)
           if (events) {
@@ -11962,7 +11438,7 @@ export class Library {
               ".forceopaque.menubutton.large.connectevents.pointerdiv.left2",
               "创建房间",
               ui.window,
-              function () {
+              () => {
                 if (!_status.creatingroom) {
                   _status.creatingroom = true
                   ui.click.connectMenu()
@@ -11970,9 +11446,11 @@ export class Library {
               },
             )
             if (events.length) {
-              ui.connectEventsCount.innerHTML = events.filter(function (evt) {
-                return evt.creator == game.onlineKey || !get.is.banWords(evt.content)
-              }).length
+              ui.connectEventsCount.innerHTML = events.filter(
+                (evt) =>
+                  evt.creator === game.onlineKey ||
+                  !get.is.banWords(evt.content),
+              ).length
               ui.connectEventsCount.show()
             }
           }
@@ -11981,7 +11459,7 @@ export class Library {
           lib.message.client.updateevents(events)
           ui.exitroom = ui.create.system(
             "退出房间",
-            function () {
+            () => {
               game.saveConfig("tmp_owner_roomId")
               game.saveConfig("tmp_user_roomId")
               if (ui.rooms) {
@@ -11997,31 +11475,34 @@ export class Library {
             true,
           )
 
-          var findRoom = function (id) {
+          var findRoom = (id) => {
             for (var room of ui.rooms) {
-              if (room.key == id) {
+              if (room.key === id) {
                 return room
               }
             }
             return false
           }
-          if (typeof lib.config.tmp_owner_roomId == "string") {
-            if (typeof game.roomId != "string" && !findRoom(lib.config.tmp_owner_roomId)) {
+          if (typeof lib.config.tmp_owner_roomId === "string") {
+            if (
+              typeof game.roomId !== "string" &&
+              !findRoom(lib.config.tmp_owner_roomId)
+            ) {
               lib.configOL.mode = lib.config.connect_mode
               game.roomId = lib.config.tmp_owner_roomId
             }
             game.saveConfig("tmp_owner_roomId")
           }
-          if (typeof lib.config.tmp_user_roomId == "string") {
-            if (typeof game.roomId != "string") {
+          if (typeof lib.config.tmp_user_roomId === "string") {
+            if (typeof game.roomId !== "string") {
               if (findRoom(lib.config.tmp_user_roomId)) {
                 game.roomId = lib.config.tmp_user_roomId
               } else {
                 ui.create.connecting()
-                ;(function () {
+                ;(() => {
                   var n = 10
                   var id = lib.config.tmp_user_roomId
-                  var interval = setInterval(function () {
+                  var interval = setInterval(() => {
                     if (n > 0) {
                       n--
                       if (findRoom(id)) {
@@ -12045,7 +11526,7 @@ export class Library {
             game.saveConfig("tmp_user_roomId")
           }
 
-          if (typeof game.roomId == "string") {
+          if (typeof game.roomId === "string") {
             var room = findRoom(game.roomId)
             if (game.roomIdServer && room && (room.serving || !room.version)) {
               console.log()
@@ -12057,7 +11538,7 @@ export class Library {
               ui.create.connecting()
               game.send(
                 "server",
-                game.roomId == game.onlineKey ? "create" : "enter",
+                game.roomId === game.onlineKey ? "create" : "enter",
                 game.roomId,
                 get.connectNickname(),
                 lib.config.connect_avatar,
@@ -12072,7 +11553,7 @@ export class Library {
           proceed()
         }
       },
-      updaterooms: function (list, clients) {
+      updaterooms: (list, clients) => {
         if (ui.rooms) {
           var map = {},
             map2 = {}
@@ -12113,14 +11594,18 @@ export class Library {
               ui.rooms.push(player)
             }
           }
-          if (!_status.requestReadClipboard && get.config("read_clipboard", "connect")) {
+          if (
+            !_status.requestReadClipboard &&
+            get.config("read_clipboard", "connect")
+          ) {
             const read = (text) => {
               try {
                 var roomId = text.split("\n")[1].match(/\d+/)
-                var caption = ui.rooms.find((caption) => caption.key == roomId)
+                var caption = ui.rooms.find((caption) => caption.key === roomId)
                 if (
                   caption &&
-                  (_status.read_clipboard_text || confirm(`是否通过复制的内容加入${roomId}房间？`))
+                  (_status.read_clipboard_text ||
+                    confirm(`是否通过复制的内容加入${roomId}房间？`))
                 ) {
                   ui.click.connectroom.call(caption)
                   delete _status.read_clipboard_text
@@ -12141,7 +11626,9 @@ export class Library {
                   .then(read)
                   .catch((_) => {})
               } else {
-                var input = ui.create.node("textarea", ui.window, { opacity: "0" })
+                var input = ui.create.node("textarea", ui.window, {
+                  opacity: "0",
+                })
                 input.select()
                 var result = document.execCommand("paste")
                 input.blur()
@@ -12161,7 +11648,7 @@ export class Library {
         }
         lib.message.client.updateclients(clients, true)
       },
-      updateclients: function (clients, bool) {
+      updateclients: (clients, _bool) => {
         if (clients && ui.connectClients) {
           ui.connectClients.info = clients
           ui.connectClientsCount.innerHTML = clients.length
@@ -12170,15 +11657,14 @@ export class Library {
           _status.connectClientsCallback()
         }
       },
-      updateevents: function (events) {
+      updateevents: (events) => {
         if (events && ui.connectEvents) {
           ui.connectEvents.info = events
-          var num = events.filter(function (evt) {
-            return (
-              typeof evt.creator == "string" &&
-              (evt.creator == game.onlineKey || !get.is.banWords(evt.content))
-            )
-          }).length
+          var num = events.filter(
+            (evt) =>
+              typeof evt.creator === "string" &&
+              (evt.creator === game.onlineKey || !get.is.banWords(evt.content)),
+          ).length
           if (num) {
             ui.connectEventsCount.innerHTML = num
             ui.connectEventsCount.show()
@@ -12190,18 +11676,18 @@ export class Library {
           }
         }
       },
-      eventsdenied: function (reason) {
+      eventsdenied: (reason) => {
         var str = "创建约战失败"
-        if (reason == "total") {
+        if (reason === "total") {
           str += "，约战总数不能超过20"
-        } else if (reason == "time") {
+        } else if (reason === "time") {
           str += "，时间已过"
-        } else if (reason == "ban") {
+        } else if (reason === "ban") {
           str += "，请注意文明发言"
         }
         alert(str)
       },
-      init: function (id, config, ip, servermode, roomId) {
+      init: (id, config, ip, servermode, roomId) => {
         game.online = true
         game.onlineID = id
         game.ip = ip
@@ -12237,11 +11723,11 @@ export class Library {
         game.clearConnect()
         clearTimeout(_status.createNodeTimeout)
 
-        var proceed = function () {
-          game.loadModeAsync(config.mode, function (mode) {
+        var proceed = () => {
+          game.loadModeAsync(config.mode, (mode) => {
             for (var i in mode.ai) {
-              if (typeof mode.ai[i] == "object") {
-                if (ai[i] == undefined) {
+              if (typeof mode.ai[i] === "object") {
+                if (ai[i] === undefined) {
                   ai[i] = {}
                 }
                 for (var j in mode.ai[i]) {
@@ -12252,8 +11738,8 @@ export class Library {
               }
             }
             for (var i in mode.get) {
-              if (typeof mode.get[i] == "object") {
-                if (get[i] == undefined) {
+              if (typeof mode.get[i] === "object") {
+                if (get[i] === undefined) {
                   get[i] = {}
                 }
                 for (var j in mode.get[i]) {
@@ -12271,7 +11757,7 @@ export class Library {
               game.updateState = mode.game.updateState
               game.getRoomInfo = mode.game.getRoomInfo
             }
-            if (mode.element && mode.element.player) {
+            if (mode.element?.player) {
               Object.defineProperties(
                 lib.element.Player.prototype,
                 Object.getOwnPropertyDescriptors(mode.element.player),
@@ -12312,7 +11798,16 @@ export class Library {
           }
         }
       },
-      reinit: function (config, state, state2, ip, observe, onreconnect, cardtag, postReconnect) {
+      reinit: (
+        config,
+        state,
+        state2,
+        ip,
+        observe,
+        onreconnect,
+        cardtag,
+        postReconnect,
+      ) => {
         ui.auto.show()
         ui.pause.show()
         game.clearConnect()
@@ -12330,7 +11825,11 @@ export class Library {
           game.roomId = null
         }
         if (game.servermode && !observe) {
-          game.saveConfig("reconnect_info", [_status.ip, game.onlineID, game.roomId])
+          game.saveConfig("reconnect_info", [
+            _status.ip,
+            game.onlineID,
+            game.roomId,
+          ])
         } else {
           game.saveConfig("reconnect_info", [_status.ip, game.onlineID])
           if (!observe) {
@@ -12345,8 +11844,8 @@ export class Library {
 
         game.loadModeAsync(config.mode, function (mode) {
           for (var i in mode.ai) {
-            if (typeof mode.ai[i] == "object") {
-              if (ai[i] == undefined) {
+            if (typeof mode.ai[i] === "object") {
+              if (ai[i] === undefined) {
                 ai[i] = {}
               }
               for (var j in mode.ai[i]) {
@@ -12357,8 +11856,8 @@ export class Library {
             }
           }
           for (var i in mode.get) {
-            if (typeof mode.get[i] == "object") {
-              if (get[i] == undefined) {
+            if (typeof mode.get[i] === "object") {
+              if (get[i] === undefined) {
                 get[i] = {}
               }
               for (var j in mode.get[i]) {
@@ -12377,7 +11876,7 @@ export class Library {
             game.updateState = mode.game.updateState
             game.showIdentity = mode.game.showIdentity
           }
-          if (mode.element && mode.element.player) {
+          if (mode.element?.player) {
             Object.defineProperties(
               lib.element.Player.prototype,
               Object.getOwnPropertyDescriptors(mode.element.player),
@@ -12422,7 +11921,7 @@ export class Library {
             if (!ui.exitroom) {
               ui.create.system(
                 "退出旁观",
-                function () {
+                () => {
                   game.saveConfig("reconnect_info")
                   game.reload()
                 },
@@ -12442,27 +11941,27 @@ export class Library {
           state = get.parsedResult(state)
           ui.arena.setNumber(state.number)
           _status.mode = state.mode
-          for (const [key, value] of lib.commonArea) {
+          for (const [_key, value] of lib.commonArea) {
             _status[value.areaStatusName] = state[value.areaStatusName]
           }
           lib.inpile = state.inpile
           lib.inpile_nature = state.inpile_nature
           var pos = state.players[observe || game.onlineID].position
-          for (var i in state.players) {
+          for (var _i in state.players) {
             var info = state.players[i]
             var player = ui.create.player(ui.arena).addTempClass("start")
             player.dataset.position =
               info.position < pos
-                ? info.position - pos + parseInt(state.number)
+                ? info.position - pos + parseInt(state.number, 10)
                 : info.position - pos
-            if (i == observe || i == game.onlineID) {
+            if (i === observe || i === game.onlineID) {
               game.me = player
             }
             if (player.setModeState) {
               player.setModeState(info)
             } else {
               player.init(info.name1, info.name2)
-              if (info.name && info.name != info.name1) {
+              if (info.name && info.name !== info.name1) {
                 player.name = info.name
               }
             }
@@ -12532,7 +12031,7 @@ export class Library {
 							}
 						}*/
             for (var i = 0; i < info.equips.length; i++) {
-              let card = info.equips[i],
+              const card = info.equips[i],
                 id = card.cardid,
                 map = info.equips_map[id]
               card.fix()
@@ -12565,7 +12064,7 @@ export class Library {
                   card.subtypes = map.vcard.subtypes
                 }
                 if (map.vcard.cards?.length) {
-                  for (let j of map.vcard.cards) {
+                  for (const j of map.vcard.cards) {
                     j.goto(ui.special)
                     j.destiny = player.node.equips
                   }
@@ -12576,9 +12075,14 @@ export class Library {
                 equipNum = get.equipNum(card)
               if (player.node.equips.childNodes.length) {
                 for (let i = 0; i < player.node.equips.childNodes.length; i++) {
-                  if (get.equipNum(player.node.equips.childNodes[i]) >= equipNum) {
+                  if (
+                    get.equipNum(player.node.equips.childNodes[i]) >= equipNum
+                  ) {
                     equipped = true
-                    player.node.equips.insertBefore(card, player.node.equips.childNodes[i])
+                    player.node.equips.insertBefore(
+                      card,
+                      player.node.equips.childNodes[i],
+                    )
                     break
                   }
                 }
@@ -12588,7 +12092,7 @@ export class Library {
               }
             }
             for (var i = 0; i < info.judges.length; i++) {
-              let card = info.judges[i],
+              const card = info.judges[i],
                 id = card.cardid,
                 map = info.judges_map[id]
               card.fix()
@@ -12621,14 +12125,17 @@ export class Library {
                   card.subtypes = map.vcard.subtypes
                 }
                 if (map.vcard.cards?.length) {
-                  for (let j of map.vcard.cards) {
+                  for (const j of map.vcard.cards) {
                     j.goto(ui.special)
                     j.destiny = player.node.judges
                   }
                 }
                 player.addVirtualJudge(map.vcard, map.vcard.cards)
               }
-              player.node.judges.insertBefore(card, player.node.judges.firstChild)
+              player.node.judges.insertBefore(
+                card,
+                player.node.judges.firstChild,
+              )
             }
 
             for (var i = 0; i < info.handcards.length; i++) {
@@ -12649,11 +12156,12 @@ export class Library {
               }
             }
             for (var i = 0; i < info.judges.length; i++) {
-              if (info.views[i] && info.views[i] != info.judges[i]) {
+              if (info.views[i] && info.views[i] !== info.judges[i]) {
                 info.judges[i].classList.add("fakejudge")
                 info.judges[i].viewAs = info.views[i]
                 info.judges[i].node.background.innerHTML =
-                  lib.translate[info.views[i] + "_bg"] || get.translation(info.views[i])[0]
+                  lib.translate[`${info.views[i]}_bg`] ||
+                  get.translation(info.views[i])[0]
               }
               player.node.judges.appendChild(info.judges[i])
             }
@@ -12662,7 +12170,11 @@ export class Library {
               if (!game.getIdentityList && info.identityNode) {
                 player.node.identity.innerHTML = info.identityNode[0]
                 player.node.identity.dataset.color = info.identityNode[1]
-              } else if (player == game.me || player.identityShown || observe) {
+              } else if (
+                player === game.me ||
+                player.identityShown ||
+                observe
+              ) {
                 player.setIdentity()
                 player.forceShown = true
               } else {
@@ -12670,7 +12182,8 @@ export class Library {
               }
               if (
                 !lib.configOL.observe_handcard &&
-                (lib.configOL.mode == "identity" || lib.configOL.mode == "guozhan")
+                (lib.configOL.mode === "identity" ||
+                  lib.configOL.mode === "guozhan")
               ) {
                 if (observe && !player.identityShown) {
                   player.setIdentity("cai")
@@ -12693,17 +12206,20 @@ export class Library {
           var next = game.createEvent("game", false)
           next.setContent(lib.init.startOnline)
           if (observe) {
-            next.custom.replace.target = function (player) {
-              if (!lib.configOL.observe_handcard && lib.configOL.mode == "guozhan") {
+            next.custom.replace.target = (player) => {
+              if (
+                !lib.configOL.observe_handcard &&
+                lib.configOL.mode === "guozhan"
+              ) {
                 return
               }
               if (player.isAlive()) {
-                if (!game.me.identityShown && lib.configOL.mode == "guozhan") {
+                if (!game.me.identityShown && lib.configOL.mode === "guozhan") {
                   game.me.node.identity.firstChild.innerHTML = "猜"
                   game.me.node.identity.dataset.color = "unknown"
                 }
                 game.swapPlayer(player)
-                if (!game.me.identityShown && lib.configOL.mode == "guozhan") {
+                if (!game.me.identityShown && lib.configOL.mode === "guozhan") {
                   game.me.node.identity.firstChild.innerHTML = ""
                 }
               }
@@ -12732,9 +12248,10 @@ export class Library {
       },
       exec: function (func) {
         const key = game.onlineKey
-        if (typeof func == "function") {
+        if (typeof func === "function") {
           const isMarshalled =
-            security.isSandboxRequired() && security.importSandbox().Domain.current.isFrom(func)
+            security.isSandboxRequired() &&
+            security.importSandbox().Domain.current.isFrom(func)
           // 被封送的函数额外间隔了四层调用栈
           const level = isMarshalled ? 4 : 0
           const args = Array.from(arguments).slice(1)
@@ -12748,10 +12265,10 @@ export class Library {
         }
         if (key) {
           game.onlineKey = key
-          localStorage.setItem(lib.configprefix + "key", game.onlineKey)
+          localStorage.setItem(`${lib.configprefix}key`, game.onlineKey)
         }
       },
-      denied: function (reason) {
+      denied: (reason) => {
         switch (reason) {
           case "version":
             alert("加入失败：版本不匹配，请将游戏更新至最新版")
@@ -12775,7 +12292,7 @@ export class Library {
             game.saveConfig("reconnect_info")
             break
           case "offline":
-            if (_status.paused && _status.event.name == "game") {
+            if (_status.paused && _status.event.name === "game") {
               setTimeout(game.resume, 500)
             }
             break
@@ -12803,12 +12320,12 @@ export class Library {
           }
         }
       },
-      cancel: function (id) {
-        if (_status.event._parent_id == id) {
+      cancel: (id) => {
+        if (_status.event._parent_id === id) {
           ui.click.cancel()
           if (
-            _status.event.getParent().name == "chooseToUse" &&
-            _status.event.getParent().id == id
+            _status.event.getParent().name === "chooseToUse" &&
+            _status.event.getParent().id === id
           ) {
             _status.event.getParent().cancel(null, null, false)
             if (ui.confirm) {
@@ -12816,7 +12333,7 @@ export class Library {
             }
           }
         }
-        if (_status.event.id == id) {
+        if (_status.event.id === id) {
           if (_status.event._backup) {
             ui.click.cancel()
           }
@@ -12829,7 +12346,7 @@ export class Library {
           }
         }
       },
-      closeDialog: function (id) {
+      closeDialog: (id) => {
         var dialog = get.idDialog(id)
         if (dialog) {
           dialog.close()
@@ -12840,7 +12357,7 @@ export class Library {
         args.shift()
         ui.create.dialog.apply(this, args).videoId = id
       },
-      gameStart: function () {
+      gameStart: () => {
         for (var i = 0; i < game.connectPlayers.length; i++) {
           game.connectPlayers[i].delete()
         }
@@ -12876,7 +12393,7 @@ export class Library {
         _status.gameStarted = true
         game.showHistory()
       },
-      updateWaiting: function (map) {
+      updateWaiting: (map) => {
         if (!game.connectPlayers) {
           return
         }
@@ -12886,16 +12403,16 @@ export class Library {
         game.onlinezhu = false
         _status.waitingForPlayer = true
         for (var i = 0; i < map.length; i++) {
-          if (map[i] == "disabled") {
+          if (map[i] === "disabled") {
             game.connectPlayers[i].classList.add("unselectable2")
           } else {
             game.connectPlayers[i].classList.remove("unselectable2")
             if (map[i]) {
               game.connectPlayers[i].initOL(map[i][0], map[i][1])
               game.connectPlayers[i].playerid = map[i][2]
-              if (map[i][3] == "zhu") {
+              if (map[i][3] === "zhu") {
                 game.connectPlayers[i].setIdentity("zhu")
-                if (map[i][2] == game.onlineID) {
+                if (map[i][2] === game.onlineID) {
                   game.onlinezhu = true
                   if (ui.roomInfo) {
                     ui.roomInfo.innerHTML = "房间设置"
@@ -13310,7 +12827,7 @@ export class Library {
       "手杀",
       {
         getSpan: (prefix, name) => {
-          const simple = lib.config.buttoncharacter_prefix == "simple",
+          const simple = lib.config.buttoncharacter_prefix === "simple",
             span = document.createElement("span")
           if (lib.characterPack.shiji && name in lib.characterPack.shiji) {
             for (const entry of Object.entries(lib.characterSort.shiji)) {
@@ -14020,7 +13537,14 @@ export class Library {
     ["legend", [233, 131, 255]],
   ])
   selectGroup = ["shen", "devil"] //"western",
-  phaseName = ["phaseZhunbei", "phaseJudge", "phaseDraw", "phaseUse", "phaseDiscard", "phaseJieshu"]
+  phaseName = [
+    "phaseZhunbei",
+    "phaseJudge",
+    "phaseDraw",
+    "phaseUse",
+    "phaseDiscard",
+    "phaseJieshu",
+  ]
   quickVoice = [
     "我从未见过如此厚颜无耻之人！",
     "这波不亏",
@@ -14060,7 +13584,7 @@ export let lib = new Library()
 /**
  * @param { InstanceType<typeof Library> } [instance]
  */
-export let setLibrary = (instance) => {
+export const setLibrary = (instance) => {
   lib = instance || new Library()
   if (lib.config.dev) {
     window.lib = lib
@@ -14073,10 +13597,13 @@ export let setLibrary = (instance) => {
  */
 const setAllPropertiesEnumerable = (object) => {
   Object.getOwnPropertyNames(object).forEach((propertyKey) => {
-    if (propertyKey == "constructor") {
+    if (propertyKey === "constructor") {
       return
     }
-    const propertyDescriptor = Object.getOwnPropertyDescriptor(object, propertyKey)
+    const propertyDescriptor = Object.getOwnPropertyDescriptor(
+      object,
+      propertyKey,
+    )
     if (!propertyDescriptor.enumerable) {
       propertyDescriptor.enumerable = true
     }
@@ -14088,7 +13615,11 @@ setAllPropertiesEnumerable(lib.element.Player.prototype)
 const cardPrototype = setAllPropertiesEnumerable(lib.element.Card.prototype),
   vCardPrototype = setAllPropertiesEnumerable(lib.element.VCard.prototype)
 Object.keys(vCardPrototype).forEach((key) => {
-  Object.defineProperty(cardPrototype, key, Object.getOwnPropertyDescriptor(vCardPrototype, key))
+  Object.defineProperty(
+    cardPrototype,
+    key,
+    Object.getOwnPropertyDescriptor(vCardPrototype, key),
+  )
 })
 setAllPropertiesEnumerable(lib.element.Button.prototype)
 setAllPropertiesEnumerable(lib.element.GameEvent.prototype)

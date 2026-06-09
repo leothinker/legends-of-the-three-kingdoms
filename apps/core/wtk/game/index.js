@@ -1047,11 +1047,6 @@ export class Game {
     ui.background.delete()
     const uiBackground = (ui.background = ui.create.div(".background")),
       style = uiBackground.style
-    if (lib.config.image_background_blur) {
-      style.filter = "blur(8px)"
-      style.webkitFilter = "blur(8px)"
-      style.transform = "scale(1.05)"
-    }
     document.body.insertBefore(uiBackground, document.body.firstChild)
     if (background.startsWith("blob:") || background.startsWith("data:")) {
       uiBackground.setBackgroundImage(background)
@@ -3186,9 +3181,6 @@ export class Game {
    * @param {*} [dev]
    */
   multiDownload(list, onsuccess, onerror, onfinish, process, dev) {
-    if (lib.config.dev) {
-      game.print(get.url())
-    }
     const args = Array.from(arguments)
     if (list.length <= 3) {
       game.multiDownload2.apply(this, args)

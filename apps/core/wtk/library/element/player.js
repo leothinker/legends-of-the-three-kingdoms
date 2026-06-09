@@ -1757,10 +1757,8 @@ export class Player extends HTMLDivElement {
    */
   hasDisabledSlot(type) {
     if (type == "horse" || type == "equip3_4") {
-      return this.hasDisabledSlot(3) && (get.is.mountCombined() || this.hasDisabledSlot(4))
-    } else if (get.is.mountCombined() && type == "equip4") {
-      return false
-    }
+      return this.hasDisabledSlot(3) && ( this.hasDisabledSlot(4))
+    } 
     return this.countDisabledSlot(type) > 0
   }
   /**
@@ -1782,9 +1780,6 @@ export class Player extends HTMLDivElement {
       if (typeof type == "number") {
         type = "equip" + type
       }
-      if (get.is.mountCombined() && type == "equip4") {
-        return 0
-      }
       num = map[type]
       if (typeof num == "number" && num > 0) {
         return num
@@ -1799,9 +1794,7 @@ export class Player extends HTMLDivElement {
    */
   hasEmptySlot(type) {
     if (type == "horse" || type == "equip3_4") {
-      return this.hasEmptySlot(3) && (get.is.mountCombined() || this.hasEmptySlot(4))
-    } else if (get.is.mountCombined() && type == "equip4") {
-      return false
+      return this.hasEmptySlot(3) && ( this.hasEmptySlot(4))
     }
     return this.countEmptySlot(type) > 0
   }
@@ -1850,8 +1843,6 @@ export class Player extends HTMLDivElement {
       type = "equip" + type
     } else if (type == "equip3_4") {
       type = "equip3"
-    } else if (get.is.mountCombined() && type == "equip4") {
-      return 0
     }
     return Math.max(
       0,
@@ -1874,14 +1865,11 @@ export class Player extends HTMLDivElement {
    */
   hasEnabledSlot(type) {
     if (type == "horse" || type == "equip3_4") {
-      return this.hasEnabledSlot(3) && (get.is.mountCombined() || this.hasEnabledSlot(4))
+      return this.hasEnabledSlot(3) && (this.hasEnabledSlot(4))
     }
     // else if(type=='equip3_4'){
     // 	type='equip3';
     // }
-    else if (get.is.mountCombined() && type == "equip4") {
-      return false
-    }
     return this.countEnabledSlot(type) > 0
   }
   /**
@@ -1902,9 +1890,6 @@ export class Player extends HTMLDivElement {
     } else {
       if (typeof type == "number") {
         type = "equip" + type
-      }
-      if (get.is.mountCombined() && type == "equip4") {
-        return 0
       }
       let slots = 1
       num = map[type]
@@ -2164,9 +2149,6 @@ export class Player extends HTMLDivElement {
   $syncDisable(map) {
     //TODO:虚拟装备牌的添加暂时没有考虑到废除装备栏的情况，会出现排序错误的问题。需要手动设置排序。
     const suits = { equip3: "+1马栏", equip4: "-1马栏", equip6: "特殊栏" }
-    if (get.is.mountCombined()) {
-      suits.equip3 = "坐骑栏"
-    }
     if (!map) {
       map = this.disabledSlots || {}
     }
@@ -2244,19 +2226,8 @@ export class Player extends HTMLDivElement {
    */
   canEquip(name, replace) {
     const ranges = get.subtypes(name),
-      rangex = [],
-      combined = get.is.mountCombined()
-    if (combined) {
-      ranges.forEach((type) => {
-        if (type == "equip3" || type == "equip4") {
-          rangex.add("equip3_4")
-        } else {
-          rangex.add(type)
-        }
-      })
-    } else {
-      rangex.push(...new Set(ranges))
-    }
+      rangex = []
+    rangex.push(...new Set(ranges))
     if (get.itemtype(name) == "card") {
       const owner = get.owner(name, "judge")
       if (owner && !lib.filter.canBeGained(name, this, owner)) {
@@ -16152,9 +16123,7 @@ export class Player extends HTMLDivElement {
       let num = get.equipNum(card)
       let remove = false
       if (card.name.indexOf("empty_equip") == 0) {
-        if ((num == 4 || num == 3) && get.is.mountCombined()) {
-          remove = !player.hasEmptySlot("equip3_4") || player.getEquips("equip3_4").length
-        } else if (!player.hasEmptySlot(num) || player.getEquips(num).length) {
+        if (!player.hasEmptySlot(num) || player.getEquips(num).length) {
           remove = true
         }
         if (remove) {
@@ -16188,20 +16157,12 @@ export class Player extends HTMLDivElement {
     })
     for (let i = 1; i <= 5; i++) {
       let add = false
-      if ((i == 4 || i == 3) && get.is.mountCombined()) {
-        add = player.hasEmptySlot("equip3_4") && !player.getEquips("equip3_4").length
-      } else {
-        add = player.hasEmptySlot(i) && !player.getEquips(i).length
-      }
+      add = player.hasEmptySlot(i) && !player.getEquips(i).length
       if (
         add &&
         !cardsResume.some((card) => {
           let num = get.equipNum(card)
-          if ((i == 4 || i == 3) && get.is.mountCombined()) {
-            return num == 4 || num == 3
-          } else {
-            return num == i
-          }
+          return num == i
         })
       ) {
         const card = game.createCard("empty_equip" + i, "", "")

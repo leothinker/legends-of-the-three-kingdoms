@@ -1047,12 +1047,6 @@ Object.assign(lib.init, {
         return
       }
       sScriptURL = lib.assetURL + str.slice(6)
-    } else {
-      let url = get.url(master)
-      if (url[url.length - 1] != "/") {
-        url += "/"
-      }
-      sScriptURL = url + str
     }
     const oReq = new XMLHttpRequest()
     if (typeof onload == "function") {

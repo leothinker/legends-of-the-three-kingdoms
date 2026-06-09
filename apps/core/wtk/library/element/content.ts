@@ -767,17 +767,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     const cards = []
     event.cards = cards
     const slots = []
-    if (get.is.mountCombined()) {
-      for (const slot of event.slots) {
-        if (slot == "equip3" || slot == "equip4") {
-          slots.add("equip3_4")
-        } else {
-          slots.add(slot)
-        }
-      }
-    } else {
-      slots.addArray(event.slots)
-    }
+    slots.addArray(event.slots)
 
     slots.sort()
     if (!slots.length) {
@@ -895,17 +885,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
 
     const slotsx = []
-    if (get.is.mountCombined()) {
-      for (const slot of slots) {
-        if (slot == "equip3" || slot == "equip4") {
-          slotsx.add("equip3_4")
-        } else {
-          slotsx.add(slot)
-        }
-      }
-    } else {
-      slotsx.addArray(slots)
-    }
+    slotsx.addArray(slots)
     slotsx.sort()
 
     for (const slot of slotsx) {
@@ -947,17 +927,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     if (types.length > 0) {
       const slots = types
       const slotsx = []
-      if (get.is.mountCombined()) {
-        slots.forEach((type) => {
-          if (type == "equip3" || type == "equip4") {
-            slotsx.add("equip3_4")
-          } else {
-            slotsx.add(type)
-          }
-        })
-      } else {
-        slotsx.addArray(slots)
-      }
+      slotsx.addArray(slots)
       slotsx.sort()
       for (const slot of slotsx) {
         const left = player.countEquipableSlot(slot)
@@ -3393,7 +3363,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       const realList = list.filter((current) => player.hasEnabledSlot(current))
       if (event.horse) {
-        if (list.includes("equip3") && (get.is.mountCombined() || list.includes("equip4"))) {
+        if (list.includes("equip3") && ( list.includes("equip4"))) {
           list.push("equip3_4")
           realList.push("equip3_4")
         }
@@ -3446,7 +3416,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
       if (event.horse) {
-        if (list.includes("equip3") && (get.is.mountCombined() || list.includes("equip4"))) {
+        if (list.includes("equip3") && ( list.includes("equip4"))) {
           list.push("equip3_4")
         }
         list.remove("equip3")

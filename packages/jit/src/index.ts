@@ -3,7 +3,7 @@ import path from "node:path"
 import type { Plugin } from "vite"
 
 export default function vitePluginJIT(): Plugin {
-  let _root = process.cwd()
+  let root = process.cwd()
   let isBuild = false
 
   return {
@@ -11,7 +11,7 @@ export default function vitePluginJIT(): Plugin {
 
     configResolved(config) {
       isBuild = config.command === "build"
-      _root = config.root
+      root = config.root
     },
 
     transformIndexHtml(html) {

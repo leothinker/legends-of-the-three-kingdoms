@@ -26,8 +26,8 @@ body {
   text-rendering: optimizeLegibility;
   transform-origin: top left;
   font-family:
-    "STHeiti", "SimHei", "Microsoft JhengHei", "Microsoft YaHei", "WenQuanYi Micro Hei", "Suits",
-    Helvetica, Arial, sans-serif;
+    "STHeiti", "SimHei", "Microsoft JhengHei", "Microsoft YaHei",
+    "WenQuanYi Micro Hei", "Suits", Helvetica, Arial, sans-serif;
 }
 
 div {
@@ -140,16 +140,21 @@ table {
 #window.shortcutpaused > .modeshortcutpause {
   opacity: 0.3 !important;
 }
-#window.shortcutpaused.modepaused > .modenopause.popup-container:not(.filter-character) {
+#window.shortcutpaused.modepaused
+  > .modenopause.popup-container:not(.filter-character) {
   opacity: 0.3;
 }
 #window.shortcutpaused
-  > div:not(.background):not(#shortcut):not(#system):not(#arena):not(.hidden):not(.removing):not(
-    .dialog
-  ):not(.centermenu):not(.popup-container):not(.forceopaque) {
+  > div:not(.background):not(#shortcut):not(#system):not(#arena):not(
+    .hidden
+  ):not(.removing):not(.dialog):not(.centermenu):not(.popup-container):not(
+    .forceopaque
+  ) {
   opacity: 0.3 !important;
 }
-#window.shortcutpaused > #arena > div:not(#timer):not(.removing):not(.hidden):not(#autonode) {
+#window.shortcutpaused
+  > #arena
+  > div:not(#timer):not(.removing):not(.hidden):not(#autonode) {
   opacity: 0.3 !important;
 }
 #window.shortcutpaused > #system {
@@ -575,7 +580,9 @@ table {
   position: absolute;
 }
 #arena.playerfocus
-  > div:not(#timer):not(.playerfocus):not(#chess-container):not(.removing):not(#autonode) {
+  > div:not(#timer):not(.playerfocus):not(#chess-container):not(.removing):not(
+    #autonode
+  ) {
   opacity: 0.3 !important;
 }
 #arena.playerfocus #chess > div:not(.playerfocus):not(.removing) {
@@ -686,7 +693,9 @@ table {
   transform: scale(1.1) rotate(-90deg);
 }
 .player.connect
-  > div:not(.avatar):not(.name):not(.nameol):not(.hp):not(.room):not(.gaming):not(.identity) {
+  > div:not(.avatar):not(.name):not(.nameol):not(.hp):not(.room):not(
+    .gaming
+  ):not(.identity) {
   display: none !important;
 }
 .player.connect > .gaming {
@@ -855,7 +864,7 @@ table {
   top: 24px;
   left: 24px;
   transform-origin: 1px 1px;
-  border-radius: 4px 40px 40px 4px/4px 4px 4px 4px;
+  border-radius: 4px 40px 40px 4px / 4px 4px 4px 4px;
 }
 #roundmenu.clock > div:nth-of-type(14) {
   width: 16px;
@@ -863,7 +872,7 @@ table {
   top: 23px;
   left: 23px;
   transform-origin: 2px 2px;
-  border-radius: 4px 23px 23px 4px/4px 4px 4px 4px;
+  border-radius: 4px 23px 23px 4px / 4px 4px 4px 4px;
 }
 #roundmenu.clock > div:nth-of-type(15) {
   width: 80%;
@@ -1492,7 +1501,8 @@ body > .background.land {
   height: calc(100% - var(--flow-radius));
   margin: calc(var(--flow-radius) / 2);
   background: white;
-  box-shadow: white 0 0 calc(var(--flow-radius) / 2) calc(var(--flow-radius) / 2);
+  box-shadow: white 0 0 calc(var(--flow-radius) / 2)
+    calc(var(--flow-radius) / 2);
 }
 
 #window[data-radius_size="reduce"] .card > .cardavatar {
@@ -1585,7 +1595,11 @@ div.select-all:not(.card):not(.player) {
 }
 .buttons.guanxing:not(.pointerdiv) {
   min-height: 106px;
-  width: calc(100% - var(--contentdiv-margin-left) - var(--contentdiv-margin-right));
+  width: calc(
+    100% -
+    var(--contentdiv-margin-left) -
+    var(--contentdiv-margin-right)
+  );
   box-sizing: border-box;
 }
 .buttons.smallzoom {
@@ -2488,21 +2502,30 @@ div.select-all:not(.card):not(.player) {
     rgba(0, 0, 0, 0.3) 0 0 0 1px,
     rgba(0, 0, 0, 0.5) 0 0 10px;
 }
-#window > .damage.fullscreenavatar[data-nature="thunder"]:not(.noshadow) > div:first-child > div {
+#window
+  > .damage.fullscreenavatar[data-nature="thunder"]:not(.noshadow)
+  > div:first-child
+  > div {
   box-shadow:
     rgba(0, 0, 0, 0.2) 0 0 0 1px,
     rgba(0, 0, 0, 0.5) 0 0 10px,
     rgba(0, 0, 0, 0.3) 0 0 30px,
     rgba(100, 74, 139, 1) 0 0 60px;
 }
-#window > .damage.fullscreenavatar[data-nature="kami"]:not(.noshadow) > div:first-child > div {
+#window
+  > .damage.fullscreenavatar[data-nature="kami"]:not(.noshadow)
+  > div:first-child
+  > div {
   box-shadow:
     rgba(0, 0, 0, 0.2) 0 0 0 1px,
     rgba(0, 0, 0, 0.5) 0 0 10px,
     rgba(0, 0, 0, 0.3) 0 0 30px,
     rgba(90, 118, 99, 1) 0 0 60px;
 }
-#window > .damage.fullscreenavatar[data-nature="metal"] > div:first-child > div {
+#window
+  > .damage.fullscreenavatar[data-nature="metal"]
+  > div:first-child
+  > div {
   box-shadow:
     rgba(0, 0, 0, 0.2) 0 0 0 1px,
     rgba(0, 0, 0, 0.5) 0 0 10px,
@@ -2516,7 +2539,10 @@ div.select-all:not(.card):not(.player) {
     rgba(0, 0, 0, 0.3) 0 0 30px,
     rgba(57, 123, 4, 1) 0 0 60px;
 }
-#window > .damage.fullscreenavatar[data-nature="water"] > div:first-child > div {
+#window
+  > .damage.fullscreenavatar[data-nature="water"]
+  > div:first-child
+  > div {
   box-shadow:
     rgba(0, 0, 0, 0.2) 0 0 0 1px,
     rgba(0, 0, 0, 0.5) 0 0 10px,
@@ -2552,7 +2578,10 @@ div.select-all:not(.card):not(.player) {
     rgba(0, 0, 0, 0.3) 0 0 40px,
     rgba(203, 177, 255, 1) 0 0 80px;
 }
-#window > .damage.fullscreenavatar[data-nature="orange"] > div:first-child > div {
+#window
+  > .damage.fullscreenavatar[data-nature="orange"]
+  > div:first-child
+  > div {
   box-shadow:
     rgba(0, 0, 0, 0.2) 0 0 0 1px,
     rgba(0, 0, 0, 0.5) 0 0 20px,
@@ -2695,7 +2724,10 @@ div.select-all:not(.card):not(.player) {
 }
 
 #window .player > .framebg[data-auto="gold"],
-#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"] > .framebg[data-auto="gold"] {
+#window
+  #arena.long.mobile:not(.fewplayer)
+  .player[data-position="0"]
+  > .framebg[data-auto="gold"] {
   display: block;
   background-image: url("../../theme/style/player/gold1.png");
 }
@@ -3050,27 +3082,51 @@ div.select-all:not(.card):not(.player) {
 }
 
 .identitycircle > div > div[data-color="wei"] {
-  background-image: radial-gradient(circle at bottom left, rgb(157, 198, 255), rgb(117, 147, 189));
+  background-image: radial-gradient(
+    circle at bottom left,
+    rgb(157, 198, 255),
+    rgb(117, 147, 189)
+  );
 }
 
 .identitycircle > div > div[data-color="shu"] {
-  background-image: radial-gradient(circle at bottom left, rgb(185, 72, 36), rgb(158, 62, 31));
+  background-image: radial-gradient(
+    circle at bottom left,
+    rgb(185, 72, 36),
+    rgb(158, 62, 31)
+  );
 }
 
 .identitycircle > div > div[data-color="wu"] {
-  background-image: radial-gradient(circle at bottom left, rgb(120, 218, 83), rgb(104, 189, 73));
+  background-image: radial-gradient(
+    circle at bottom left,
+    rgb(120, 218, 83),
+    rgb(104, 189, 73)
+  );
 }
 
 .identitycircle > div > div[data-color="qun"] {
-  background-image: radial-gradient(circle at bottom left, rgb(255, 218, 71), rgb(224, 191, 62));
+  background-image: radial-gradient(
+    circle at bottom left,
+    rgb(255, 218, 71),
+    rgb(224, 191, 62)
+  );
 }
 
 .identitycircle > div > div[data-color="jin"] {
-  background-image: radial-gradient(circle at bottom left, rgb(100, 74, 139), rgb(96, 72, 136));
+  background-image: radial-gradient(
+    circle at bottom left,
+    rgb(100, 74, 139),
+    rgb(96, 72, 136)
+  );
 }
 
 .identitycircle > div > div[data-color="key"] {
-  background-image: radial-gradient(circle at bottom left, rgb(203, 177, 255), rgb(203, 177, 255));
+  background-image: radial-gradient(
+    circle at bottom left,
+    rgb(203, 177, 255),
+    rgb(203, 177, 255)
+  );
 }
 
 .unseen > .avatar,
@@ -3082,7 +3138,9 @@ div.select-all:not(.card):not(.player) {
 
 #arena:not(.observe) .player[data-position="0"].unseen > .avatar,
 #arena:not(.observe) .player[data-position="0"].unseen2 > .avatar2,
-#arena:not(.observe) .player[data-position="0"].unseen > .name:not(.name2):not(.name_seat),
+#arena:not(.observe)
+  .player[data-position="0"].unseen
+  > .name:not(.name2):not(.name_seat),
 #arena:not(.observe) .player[data-position="0"].unseen2 > .name2,
 #arena:not(.observe) .unseen_v > .avatar,
 #arena:not(.observe) .unseen2_v > .avatar2,
@@ -3720,22 +3778,70 @@ div.select-all:not(.card):not(.player) {
   -webkit-animation: flip 1s;
 }
 /*--------样式--------*/
-#arena.selecting:not(.video) .player[data-position="0"] .card:not(.selectable) > .background,
-#arena.selecting:not(.video) .player[data-position="0"] .card:not(.selectable) > .image,
-#arena.selecting:not(.video) .player[data-position="0"] .card:not(.selectable) > .name,
-#arena.selecting:not(.video) .player[data-position="0"] .card:not(.selectable) > .name2,
-#arena.selecting:not(.video) .player[data-position="0"] .card:not(.selectable) > .info,
-#arena.selecting:not(.video) .player[data-position="0"] .card:not(.selectable) > .range,
-#arena.selecting:not(.video) .player[data-position="0"] .card:not(.selectable) > .gaintag,
-#arena.selecting:not(.video) .player[data-position="0"] .card:not(.selectable) > .addinfo,
-#arena.selecting:not(.video) .player.current_action .card:not(.selectable) > .background,
-#arena.selecting:not(.video) .player.current_action .card:not(.selectable) > .image,
-#arena.selecting:not(.video) .player.current_action .card:not(.selectable) > .name,
-#arena.selecting:not(.video) .player.current_action .card:not(.selectable) > .name2,
-#arena.selecting:not(.video) .player.current_action .card:not(.selectable) > .info,
-#arena.selecting:not(.video) .player.current_action .card:not(.selectable) > .range,
-#arena.selecting:not(.video) .player.current_action .card:not(.selectable) > .gaintag,
-#arena.selecting:not(.video) .player.current_action .card:not(.selectable) > .addinfo,
+#arena.selecting:not(.video)
+  .player[data-position="0"]
+  .card:not(.selectable)
+  > .background,
+#arena.selecting:not(.video)
+  .player[data-position="0"]
+  .card:not(.selectable)
+  > .image,
+#arena.selecting:not(.video)
+  .player[data-position="0"]
+  .card:not(.selectable)
+  > .name,
+#arena.selecting:not(.video)
+  .player[data-position="0"]
+  .card:not(.selectable)
+  > .name2,
+#arena.selecting:not(.video)
+  .player[data-position="0"]
+  .card:not(.selectable)
+  > .info,
+#arena.selecting:not(.video)
+  .player[data-position="0"]
+  .card:not(.selectable)
+  > .range,
+#arena.selecting:not(.video)
+  .player[data-position="0"]
+  .card:not(.selectable)
+  > .gaintag,
+#arena.selecting:not(.video)
+  .player[data-position="0"]
+  .card:not(.selectable)
+  > .addinfo,
+#arena.selecting:not(.video)
+  .player.current_action
+  .card:not(.selectable)
+  > .background,
+#arena.selecting:not(.video)
+  .player.current_action
+  .card:not(.selectable)
+  > .image,
+#arena.selecting:not(.video)
+  .player.current_action
+  .card:not(.selectable)
+  > .name,
+#arena.selecting:not(.video)
+  .player.current_action
+  .card:not(.selectable)
+  > .name2,
+#arena.selecting:not(.video)
+  .player.current_action
+  .card:not(.selectable)
+  > .info,
+#arena.selecting:not(.video)
+  .player.current_action
+  .card:not(.selectable)
+  > .range,
+#arena.selecting:not(.video)
+  .player.current_action
+  .card:not(.selectable)
+  > .gaintag,
+#arena.selecting:not(.video)
+  .player.current_action
+  .card:not(.selectable)
+  > .addinfo,
 #arena.selecting:not(.video) #me .card:not(.selectable) > .background,
 #arena.selecting:not(.video) #me .card:not(.selectable) > .image,
 #arena.selecting:not(.video) #me .card:not(.selectable) > .name,
@@ -3784,7 +3890,11 @@ div.select-all:not(.card):not(.player) {
   .dialog.fullheight
   .buttons
   .button:not(.selectedx):not(.glow):not(.glows):not(.forbidden),
-#window:not(.nopointer) #arena.selecting:not(.video) .player .equips > .card.selectable,
+#window:not(.nopointer)
+  #arena.selecting:not(.video)
+  .player
+  .equips
+  > .card.selectable,
 #window:not(.nopointer) #arena.selecting #me .card.selectable,
 #window:not(.nopointer) #arena.selecting .button.selectable,
 #window:not(.nopointer) #arena.selecting .player.selectable,
@@ -3805,8 +3915,16 @@ div.select-all:not(.card):not(.player) {
   cursor: -webkit-grabbing;
 }
 
-#arena.selecting:not(.video) .player[data-position="0"] .marks > .card:not(.selectable) > .image,
-#arena.selecting:not(.video) .player[data-position="0"] .judges > .card:not(.selectable) > .image,
+#arena.selecting:not(.video)
+  .player[data-position="0"]
+  .marks
+  > .card:not(.selectable)
+  > .image,
+#arena.selecting:not(.video)
+  .player[data-position="0"]
+  .judges
+  > .card:not(.selectable)
+  > .image,
 #arena.selecting:not(.video)
   .player[data-position="0"]
   .judges
@@ -3814,7 +3932,11 @@ div.select-all:not(.card):not(.player) {
   > .background,
 #arena.selecting:not(.video) .player .marks > .card:not(.selectable) > .image,
 #arena.selecting:not(.video) .player .judges > .card:not(.selectable) > .image,
-#arena.selecting:not(.video) .player .judges > .card:not(.selectable) > .background {
+#arena.selecting:not(.video)
+  .player
+  .judges
+  > .card:not(.selectable)
+  > .background {
   opacity: 1;
 }
 
@@ -3999,7 +4121,10 @@ div:hover > .intro {
   width: auto !important;
 }
 .tdnode.thundertext {
-  background-image: linear-gradient(rgba(47, 101, 150, 1), rgba(43, 90, 132, 1)) !important;
+  background-image: linear-gradient(
+    rgba(47, 101, 150, 1),
+    rgba(43, 90, 132, 1)
+  ) !important;
 }
 .tdnode.reduce_margin {
   margin-left: 4px !important;
@@ -4721,7 +4846,9 @@ div[data-decoration="gold"]::after,
 }
 
 div[data-decoration="silver"]::before,
-#arena:not(.autoframe)[data-framedecoration="silver"] .player > .framebg::before {
+#arena:not(.autoframe)[data-framedecoration="silver"]
+  .player
+  > .framebg::before {
   content: "";
   position: absolute;
   background-image: url("../../theme/style/player/silver_d1.png");
@@ -4735,7 +4862,9 @@ div[data-decoration="silver"]::before,
   transform: scale(0.75) translate(-2px, -3px);
 }
 div[data-decoration="silver"]::after,
-#arena:not(.autoframe)[data-framedecoration="silver"] .player > .framebg::after {
+#arena:not(.autoframe)[data-framedecoration="silver"]
+  .player
+  > .framebg::after {
   content: "";
   position: absolute;
   background-image: url("../../theme/style/player/silver_d2.png");
@@ -4752,7 +4881,9 @@ div[data-decoration="silver"]::after,
 }
 
 div[data-decoration="bronze"]::before,
-#arena:not(.autoframe)[data-framedecoration="bronze"] .player > .framebg::before {
+#arena:not(.autoframe)[data-framedecoration="bronze"]
+  .player
+  > .framebg::before {
   content: "";
   position: absolute;
   background-image: url("../../theme/style/player/bronze_d1.png");
@@ -4766,7 +4897,9 @@ div[data-decoration="bronze"]::before,
   transform: scale(0.75) translate(-2px, -3px);
 }
 div[data-decoration="bronze"]::after,
-#arena:not(.autoframe)[data-framedecoration="bronze"] .player > .framebg::after {
+#arena:not(.autoframe)[data-framedecoration="bronze"]
+  .player
+  > .framebg::after {
   content: "";
   position: absolute;
   background-image: url("../../theme/style/player/bronze_d2.png");
@@ -4892,45 +5025,6 @@ div[data-decoration="bronze"]::after {
 }
 .card.fullskin > .info.red {
   color: #a82424;
-}
-
-.card[data-card-type="zhanfa"] > .image {
-  background-size: 75%;
-  background-position: bottom right;
-  background-repeat: no-repeat;
-}
-
-.card.zf_common > .name,
-.card.zf_common > .info,
-.card.zf_rare > .name,
-.card.zf_rare > .info,
-.card.zf_epic > .name,
-.card.zf_epic > .info,
-.card.zf_legend > .name,
-.card.zf_legend > .info {
-  /*background-color: #59392b;
-	color: white;*/
-  font-weight: bolder;
-}
-
-.card.zf_common {
-  border: 2px solid #59392b;
-  filter: drop-shadow(0 0 10px #59392b);
-}
-
-.card.zf_rare {
-  border: 2px solid #5d3c77;
-  filter: drop-shadow(0 0 10px #5d3c77);
-}
-
-.card.zf_epic {
-  border: 2px solid #af572a;
-  filter: drop-shadow(0 0 10px #af572a);
-}
-
-.card.zf_legend {
-  border: 2px solid #b0293e;
-  filter: drop-shadow(0 0 10px #b0293e);
 }
 
 .config > .toggle.onoff {
@@ -5404,7 +5498,10 @@ div[data-decoration="bronze"]::after {
 }
 
 .control.blue {
-  background-image: linear-gradient(rgba(47, 101, 150, 1), rgba(43, 90, 132, 1));
+  background-image: linear-gradient(
+    rgba(47, 101, 150, 1),
+    rgba(43, 90, 132, 1)
+  );
 }
 .control.red {
   background-image: linear-gradient(rgba(150, 47, 47, 1), rgba(132, 43, 43, 1));
@@ -5607,7 +5704,9 @@ div[data-decoration="bronze"]::after {
 #window[data-radius_size="reduce"] .menu,
 #window[data-radius_size="reduce"] .left.pane > .menubutton,
 #window[data-radius_size="reduce"] #splash > div,
-#window[data-radius_size="reduce"].mobile:not(.chess) .player[data-position="0"] .equips {
+#window[data-radius_size="reduce"].mobile:not(.chess)
+  .player[data-position="0"]
+  .equips {
   border-radius: 4px;
 }
 
@@ -5628,7 +5727,9 @@ div[data-decoration="bronze"]::after {
 #window[data-radius_size="off"] .menu,
 #window[data-radius_size="off"] .left.pane > .menubutton,
 #window[data-radius_size="off"] #splash > div,
-#window[data-radius_size="off"].mobile:not(.chess) .player[data-position="0"] .equips {
+#window[data-radius_size="off"].mobile:not(.chess)
+  .player[data-position="0"]
+  .equips {
   border-radius: 0px;
 }
 
@@ -5649,7 +5750,9 @@ div[data-decoration="bronze"]::after {
 #window[data-radius_size="increase"] .menu,
 #window[data-radius_size="increase"] .left.pane > .menubutton,
 #window[data-radius_size="increase"] #splash > div,
-#window[data-radius_size="increase"].mobile:not(.chess) .player[data-position="0"] .equips {
+#window[data-radius_size="increase"].mobile:not(.chess)
+  .player[data-position="0"]
+  .equips {
   border-radius: 16px;
 }
 

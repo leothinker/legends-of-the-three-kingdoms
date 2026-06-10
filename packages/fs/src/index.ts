@@ -82,7 +82,7 @@ export default function createApp(config: Partial<typeof defaultConfig> = {}) {
   })
 
   // index.html
-  app.get("/", async (_req, reply) => reply.redirect("/index.html"))
+  app.get("/", async (req, reply) => reply.redirect("/index.html"))
 
   app.get(
     "/readFile",
@@ -152,11 +152,11 @@ export default function createApp(config: Partial<typeof defaultConfig> = {}) {
     }),
   )
 
-  app.setNotFoundHandler((_req, reply) => {
+  app.setNotFoundHandler((req, reply) => {
     reply.code(404).send("Sorry can't find that!")
   })
 
-  app.setErrorHandler((err, _req, reply) => {
+  app.setErrorHandler((err, req, reply) => {
     reply.send(failedJson(400, String(err)))
   })
 

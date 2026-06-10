@@ -3,7 +3,7 @@ const worker = globalThis as unknown as ServiceWorkerGlobalScope
 
 import * as CompileStrategy from "./compile-strategy"
 
-worker.addEventListener("install", (_event) => {
+worker.addEventListener("install", (event) => {
   // The promise that skipWaiting() returns can be safely ignored.
   worker.skipWaiting()
 })
@@ -54,7 +54,7 @@ const strategies: CompileStrategy.BaseStrategy[] = [
   new CompileStrategy.VueSFCStrategy(),
 ]
 
-const proxyedPath = ["/jit-test.ts"]
+const proxyedPath = ["/extension", "/jit-test.ts"]
 // --- fetch 拦截入口 ---
 worker.addEventListener("fetch", (event: FetchEvent) => {
   const request = event.request

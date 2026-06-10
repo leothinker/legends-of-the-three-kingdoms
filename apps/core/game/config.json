@@ -7,14 +7,44 @@
   "zhinang_tricks": ["guohe", "wuxie", "wuzhong", "dongzhuxianji"],
   "connect_zhinang_tricks": ["guohe", "wuxie", "wuzhong", "dongzhuxianji"],
   "all": {
-    "sgscharacters": ["standard", "shenhua", "refresh", "reshenhua", "shenwu", "old"],
-    "sgscards": ["standard", "extra", "sp", "guozhan", "zhulu", "yingbian", "yongjian"],
-    "sgsmodes": ["identity", "guozhan", "versus", "doudizhu", "single", "brawl", "connect"],
-    "stockmode": ["identity", "guozhan", "versus", "doudizhu", "single", "connect", "brawl"],
+    "sgscharacters": [
+      "standard",
+      "shenhua",
+      "refresh",
+      "reshenhua",
+      "shenwu",
+      "old"
+    ],
+    "sgscards": [
+      "standard",
+      "extra",
+      "sp",
+      "guozhan",
+      "zhulu",
+      "yingbian",
+      "yongjian"
+    ],
+    "sgsmodes": [
+      "identity",
+      "guozhan",
+      "versus",
+      "doudizhu",
+      "single",
+      "brawl",
+      "connect"
+    ],
+    "stockmode": [
+      "identity",
+      "guozhan",
+      "versus",
+      "doudizhu",
+      "single",
+      "connect",
+      "brawl"
+    ],
     "layout": ["default", "newlayout"],
     "theme": ["woodden", "music", "simple"],
     "card_font": ["xiaozhuan", "huangcao", "caoshu", "xingshu"],
-    "double_hp": ["hejiansan", "pingjun", "zuidazhi", "zuixiaozhi", "zonghe"],
     "image_background_filter": [
       "default",
       "blur",
@@ -120,10 +150,25 @@
   "sort": "type_sort",
   "cards": ["standard", "extra", "refresh"],
   "characters": ["refresh", "reshenhua"],
-  "moderned_characters": ["standard", "shenhua", "refresh", "reshenhua", "shenwu", "old"],
+  "moderned_characters": [
+    "standard",
+    "shenhua",
+    "refresh",
+    "reshenhua",
+    "shenwu",
+    "old"
+  ],
   "moderned_modes": ["guozhan"],
   "connect_characters": ["diy"],
-  "connect_cards": ["huodong", "guozhan", "sp", "zhulu", "yingbian", "yongjian", "xianxia"],
+  "connect_cards": [
+    "huodong",
+    "guozhan",
+    "sp",
+    "zhulu",
+    "yingbian",
+    "yongjian",
+    "xianxia"
+  ],
   "plays": [],
   "banned": [],
   "bannedcards": [],
@@ -136,13 +181,11 @@
     "global": {
       "player_number": 8,
       "auto_identity": "off",
-      "double_character": false,
       "save_progress": true,
       "free_choose": true,
       "swap": true,
       "change_identity": true,
-      "battle_number": 3,
-      "double_hp": "pingjun"
+      "battle_number": 3
     },
     "identity": {
       "identity": [
@@ -154,7 +197,18 @@
         ["zhu", "zhong", "zhong", "nei", "fan", "fan", "fan"],
         ["zhu", "zhong", "zhong", "nei", "fan", "fan", "fan", "fan"],
         ["zhu", "zhong", "zhong", "zhong", "nei", "fan", "fan", "fan", "fan"],
-        ["zhu", "zhong", "zhong", "zhong", "nei", "nei", "fan", "fan", "fan", "fan"]
+        [
+          "zhu",
+          "zhong",
+          "zhong",
+          "zhong",
+          "nei",
+          "nei",
+          "fan",
+          "fan",
+          "fan",
+          "fan"
+        ]
       ],
       "choice": {
         "zhu": 3,

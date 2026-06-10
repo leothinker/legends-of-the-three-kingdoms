@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
 export const type = "mode"
 /**
  * @type { () => importModeConfig }
@@ -7,9 +7,9 @@ export default () => {
   return {
     name: "versus",
     init() {
-      if (get.config("versus_mode") == "jiange") {
+      if (get.config("versus_mode") === "jiange") {
         lib.characterPack.mode_versus = lib.jiangeboss
-      } else if (get.config("versus_mode") == "siguo") {
+      } else if (get.config("versus_mode") === "siguo") {
         lib.characterPack.mode_versus = {
           tangzi: {
             sex: "male",
@@ -31,7 +31,12 @@ export default () => {
         }
         delete lib.character.sp_liuqi
         delete lib.character.xf_tangzi
-        lib.cardPack.mode_versus = ["zong", "xionghuangjiu", "tongzhougongji", "lizhengshangyou"]
+        lib.cardPack.mode_versus = [
+          "zong",
+          "xionghuangjiu",
+          "tongzhougongji",
+          "lizhengshangyou",
+        ]
         lib.translate.mode_versus_character_config = "四国武将"
       }
       if (!lib.cardPack.mode_versus) {
@@ -47,22 +52,24 @@ export default () => {
       if (_status.connectMode) {
         _status.mode = lib.configOL.versus_mode
       }
-      if (_status.brawl && _status.brawl.submode) {
+      if (_status.brawl?.submode) {
         _status.mode = _status.brawl.submode
       }
       if (lib.config.test_game) {
         _status.mode = "standard"
       }
       ;("step 1")
-      var playback = localStorage.getItem(lib.configprefix + "playback")
+      var playback = localStorage.getItem(`${lib.configprefix}playback`)
       if (playback) {
         ui.create.me()
         ui.arena.style.display = "none"
         ui.system.style.display = "none"
         _status.playback = playback
-        localStorage.removeItem(lib.configprefix + "playback")
-        var store = lib.db.transaction(["video"], "readwrite").objectStore("video")
-        store.get(parseInt(playback)).onsuccess = function (e) {
+        localStorage.removeItem(`${lib.configprefix}playback`)
+        var store = lib.db
+          .transaction(["video"], "readwrite")
+          .objectStore("video")
+        store.get(parseInt(playback, 10)).onsuccess = (e) => {
           if (e.target.result) {
             game.playVideoContent(e.target.result.video)
           } else {
@@ -74,7 +81,7 @@ export default () => {
         return
       }
       if (_status.connectMode) {
-        game.waitForPlayer(function () {
+        game.waitForPlayer(() => {
           switch (lib.configOL.versus_mode) {
             case "1v1":
               lib.configOL.number = 2
@@ -92,15 +99,15 @@ export default () => {
           }
         })
       } else if (
-        _status.mode == "jiange" ||
-        _status.mode == "siguo" ||
-        _status.mode == "four" ||
-        _status.mode == "guandu"
+        _status.mode === "jiange" ||
+        _status.mode === "siguo" ||
+        _status.mode === "four" ||
+        _status.mode === "guandu"
       ) {
-        if (_status.mode == "four" && !get.config("enable_all_cards_four")) {
+        if (_status.mode === "four" && !get.config("enable_all_cards_four")) {
           lib.card.list = lib.cardsFour
           game.fixedPile = true
-        } else if (_status.mode == "siguo") {
+        } else if (_status.mode === "siguo") {
           for (var i = 0; i < lib.card.list.length; i++) {
             switch (lib.card.list[i][2]) {
               case "tao":
@@ -118,7 +125,7 @@ export default () => {
                 break
             }
           }
-        } else if (_status.mode == "guandu") {
+        } else if (_status.mode === "guandu") {
           for (var i = 0; i < lib.card.list.length; i++) {
             switch (lib.card.list[i][2]) {
               case "jiu":
@@ -141,11 +148,11 @@ export default () => {
           }
         }
         game.prepareArena(8)
-      } else if (_status.mode == "two") {
+      } else if (_status.mode === "two") {
         game.prepareArena(4)
-      } else if (_status.mode == "endless") {
+      } else if (_status.mode === "endless") {
         game.prepareArena(2)
-      } else if (_status.mode == "three") {
+      } else if (_status.mode === "three") {
         if (lib.character.wenpin) {
           lib.character.wenpin[3] = ["zhenwei_three"]
         }
@@ -167,7 +174,8 @@ export default () => {
         }
         if (!get.config("enable_all_cards")) {
           lib.translate.wuzhong_info += "若对方存活角色多于己方，则额外摸一张牌"
-          lib.translate.zhuge_info = "锁定技，出牌阶段，你使用【杀】的次数上限+3"
+          lib.translate.zhuge_info =
+            "锁定技，出牌阶段，你使用【杀】的次数上限+3"
           lib.card.list = lib.cardsThree
           game.fixedPile = true
         } else if (Array.isArray(lib.config.forbidthreecard)) {
@@ -180,34 +188,34 @@ export default () => {
         ui.create.cardsAsync()
         game.finishCards()
       } else {
-        if (lib.storage.choice == undefined) {
+        if (lib.storage.choice === undefined) {
           game.save("choice", 20)
         }
-        if (lib.storage.zhu == undefined) {
+        if (lib.storage.zhu === undefined) {
           game.save("zhu", true)
         }
-        if (lib.storage.noreplace_end == undefined) {
+        if (lib.storage.noreplace_end === undefined) {
           game.save("noreplace_end", true)
         }
-        if (get.config("first_less") == undefined) {
+        if (get.config("first_less") === undefined) {
           game.saveConfig("first_less", true, true)
         }
-        if (lib.storage.autoreplaceinnerhtml == undefined) {
+        if (lib.storage.autoreplaceinnerhtml === undefined) {
           game.save("autoreplaceinnerhtml", true)
         }
-        if (lib.storage.single_control == undefined) {
+        if (lib.storage.single_control === undefined) {
           game.save("single_control", true)
         }
-        if (lib.storage.number == undefined) {
+        if (lib.storage.number === undefined) {
           game.save("number", 3)
         }
-        if (lib.storage.versus_reward == undefined) {
+        if (lib.storage.versus_reward === undefined) {
           game.save("versus_reward", 3)
         }
-        if (lib.storage.versus_punish == undefined) {
+        if (lib.storage.versus_punish === undefined) {
           game.save("versus_punish", "弃牌")
         }
-        if (lib.storage.replace_number == undefined) {
+        if (lib.storage.replace_number === undefined) {
           game.save("replace_number", 3)
         }
 
@@ -231,11 +239,15 @@ export default () => {
       }
       // game.delay();
       ;("step 2")
-      if (!_status.connectMode && _status.brawl && _status.brawl.chooseCharacterBefore) {
+      if (
+        !_status.connectMode &&
+        _status.brawl &&
+        _status.brawl.chooseCharacterBefore
+      ) {
         _status.brawl.chooseCharacterBefore()
       }
       if (_status.connectMode) {
-        if (_status.mode == "guandu") {
+        if (_status.mode === "guandu") {
           for (var i = 0; i < lib.card.list.length; i++) {
             switch (lib.card.list[i][2]) {
               case "jiu":
@@ -257,18 +269,63 @@ export default () => {
             }
           }
         }
-        if (lib.configOL.versus_mode == "1v1") {
+        if (lib.configOL.versus_mode === "1v1") {
           game.randomMapOL("hidden")
         } else {
           game.randomMapOL()
         }
-      } else if (_status.mode == "guandu") {
+      } else if (_status.mode === "guandu") {
         var list = [
-          ["zhu", "ezhu", "ezhong", "zhong", "ezhong", "zhong", "zhong", "ezhong"],
-          ["zhu", "ezhong", "zhong", "ezhu", "ezhong", "zhong", "ezhong", "zhong"],
-          ["zhu", "ezhong", "zhong", "ezhong", "zhong", "ezhong", "zhong", "ezhu"],
-          ["zhu", "ezhu", "zhong", "ezhong", "zhong", "ezhong", "zhong", "ezhong"],
-          ["zhu", "ezhong", "zhong", "ezhong", "zhong", "ezhu", "zhong", "ezhong"],
+          [
+            "zhu",
+            "ezhu",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "zhong",
+            "zhong",
+            "ezhong",
+          ],
+          [
+            "zhu",
+            "ezhong",
+            "zhong",
+            "ezhu",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "zhong",
+          ],
+          [
+            "zhu",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "zhong",
+            "ezhu",
+          ],
+          [
+            "zhu",
+            "ezhu",
+            "zhong",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "zhong",
+            "ezhong",
+          ],
+          [
+            "zhu",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "zhong",
+            "ezhu",
+            "zhong",
+            "ezhong",
+          ],
         ].randomGet()
 
         var side = true
@@ -276,43 +333,88 @@ export default () => {
         list = list.splice(8 - num).concat(list)
         _status.firstAct = game.players[num]
         for (var i = 0; i < 8; i++) {
-          if (list[i][0] == "e") {
+          if (list[i][0] === "e") {
             game.players[i].side = side
             game.players[i].identity = list[i].slice(1)
           } else {
             game.players[i].side = !side
             game.players[i].identity = list[i]
           }
-          if (game.players[i].identity == "zhu") {
-            game[game.players[i].side + "Zhu"] = game.players[i]
+          if (game.players[i].identity === "zhu") {
+            game[`${game.players[i].side}Zhu`] = game.players[i]
             game.players[i].isZhu = true
           }
           game.players[i].setIdentity(game.players[i].identity)
           game.players[i].node.identity.dataset.color = get.translation(
-            game.players[i].side + "Color",
+            `${game.players[i].side}Color`,
           )
           game.players[i].getId()
         }
         game.chooseCharacterGuandu()
-      } else if (_status.mode == "four") {
+      } else if (_status.mode === "four") {
         _status.fouralign = [0, 1, 2, 3, 4]
         var list = [
-          ["zhong", "ezhong", "ezhong", "zhong", "zhong", "ezhong", "ezhong", "zhong"],
-          ["zhong", "ezhong", "zhong", "ezhong", "ezhong", "zhong", "ezhong", "zhong"],
-          ["zhong", "ezhong", "ezhong", "zhong", "ezhong", "zhong", "zhong", "ezhong"],
-          ["zhong", "ezhong", "zhong", "ezhong", "zhong", "ezhong", "zhong", "ezhong"],
-          ["zhong", "ezhong", "ezhong", "zhong", "ezhong", "zhong", "ezhong", "zhong"],
+          [
+            "zhong",
+            "ezhong",
+            "ezhong",
+            "zhong",
+            "zhong",
+            "ezhong",
+            "ezhong",
+            "zhong",
+          ],
+          [
+            "zhong",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "zhong",
+          ],
+          [
+            "zhong",
+            "ezhong",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "zhong",
+            "zhong",
+            "ezhong",
+          ],
+          [
+            "zhong",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "zhong",
+            "ezhong",
+          ],
+          [
+            "zhong",
+            "ezhong",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "zhong",
+            "ezhong",
+            "zhong",
+          ],
         ][_status.fouralign.randomRemove()]
         var rand1 = Math.floor(Math.random() * 4)
         var rand2 = Math.floor(Math.random() * 4)
         for (var i = 0; i < list.length; i++) {
-          if (list[i] == "zhong") {
-            if (rand1 == 0) {
+          if (list[i] === "zhong") {
+            if (rand1 === 0) {
               list[i] = "zhu"
             }
             rand1--
           } else {
-            if (rand2 == 0) {
+            if (rand2 === 0) {
               list[i] = "ezhu"
             }
             rand2--
@@ -324,33 +426,42 @@ export default () => {
         list = list.splice(8 - num).concat(list)
         _status.firstAct = game.players[num]
         for (var i = 0; i < 8; i++) {
-          if (list[i][0] == "e") {
+          if (list[i][0] === "e") {
             game.players[i].side = side
             game.players[i].identity = list[i].slice(1)
           } else {
             game.players[i].side = !side
             game.players[i].identity = list[i]
           }
-          if (game.players[i].identity == "zhu") {
-            game[game.players[i].side + "Zhu"] = game.players[i]
+          if (game.players[i].identity === "zhu") {
+            game[`${game.players[i].side}Zhu`] = game.players[i]
             game.players[i].isZhu = true
           }
           game.players[i].setIdentity(game.players[i].identity)
           game.players[i].node.identity.dataset.color = get.translation(
-            game.players[i].side + "Color",
+            `${game.players[i].side}Color`,
           )
           game.players[i].getId()
         }
         game.chooseCharacterFour()
-      } else if (_status.mode == "two") {
+      } else if (_status.mode === "two") {
         for (var i = 0; i < game.players.length; i++) {
           game.players[i].getId()
         }
         game.chooseCharacterTwo()
-      } else if (_status.mode == "endless") {
+      } else if (_status.mode === "endless") {
         game.chooseCharacterEndless()
-      } else if (_status.mode == "siguo") {
-        var list = ["wei", "wei", "shu", "shu", "wu", "wu", "qun", "qun"].randomSort()
+      } else if (_status.mode === "siguo") {
+        var list = [
+          "wei",
+          "wei",
+          "shu",
+          "shu",
+          "wu",
+          "wu",
+          "qun",
+          "qun",
+        ].randomSort()
         for (var i = 0; i < game.players.length; i++) {
           game.players[i].side = list[i]
           game.players[i].identity = list[i]
@@ -364,15 +475,24 @@ export default () => {
           game.players[i].node.action.style.right = "3px"
         }
         game.chooseCharacterSiguo()
-      } else if (_status.mode == "jiange") {
-        var list = ["shumech", "shu", "shuboss", "shu", "wei", "weiboss", "wei", "weimech"]
+      } else if (_status.mode === "jiange") {
+        var list = [
+          "shumech",
+          "shu",
+          "shuboss",
+          "shu",
+          "wei",
+          "weiboss",
+          "wei",
+          "weimech",
+        ]
         var pos = Math.floor(Math.random() * 8)
         for (var i = 0; i < 8; i++) {
           var j = pos + i
           if (j >= 8) {
             j -= 8
           }
-          if (list[i][0] == "w") {
+          if (list[i][0] === "w") {
             game.players[j].side = true
             game.players[j].setIdentity("wei")
             game.players[j].identity = "wei"
@@ -381,9 +501,9 @@ export default () => {
             game.players[j].setIdentity("shu")
             game.players[j].identity = "shu"
           }
-          if (list[i].indexOf("mech") != -1) {
+          if (list[i].indexOf("mech") !== -1) {
             game.players[j].type = "mech"
-          } else if (list[i].indexOf("boss") != -1) {
+          } else if (list[i].indexOf("boss") !== -1) {
             game.players[j].type = "boss"
           } else {
             game.players[j].type = "human"
@@ -391,7 +511,7 @@ export default () => {
           game.players[i].getId()
         }
         game.chooseCharacterJiange()
-      } else if (_status.mode == "three") {
+      } else if (_status.mode === "three") {
         game.chooseCharacterThree()
       } else {
         game.chooseCharacter()
@@ -410,15 +530,15 @@ export default () => {
       }
       _status.videoInited = true
       if (
-        _status.mode == "four" ||
-        _status.mode == "jiange" ||
+        _status.mode === "four" ||
+        _status.mode === "jiange" ||
         _status.connectMode ||
-        _status.mode == "two" ||
-        _status.mode == "siguo" ||
-        _status.mode == "endless"
+        _status.mode === "two" ||
+        _status.mode === "siguo" ||
+        _status.mode === "endless"
       ) {
         info.push(false)
-      } else if (_status.mode == "three") {
+      } else if (_status.mode === "three") {
         info.push(true)
       } else {
         info.push(lib.storage.single_control && game.players.length >= 4)
@@ -426,73 +546,82 @@ export default () => {
       game.addVideo("init", null, info)
       event.trigger("gameStart")
       if (_status.connectMode) {
-        if (_status.mode == "1v1") {
+        if (_status.mode === "1v1") {
           _status.first_less = true
           game.gameDraw(_status.firstChoose.next)
           game.phaseLoop(_status.firstChoose.next)
-        } else if (_status.mode == "2v2" || _status.mode == "3v3") {
+        } else if (_status.mode === "2v2" || _status.mode === "3v3") {
           _status.first_less = true
           var firstChoose = _status.firstAct || game.players.randomGet()
-          if (firstChoose.next.side == firstChoose.side) {
+          if (firstChoose.next.side === firstChoose.side) {
             firstChoose = firstChoose.next
           }
-          game.gameDraw(firstChoose, function (player) {
-            if (lib.configOL.replace_handcard && player == firstChoose.previousSeat) {
+          game.gameDraw(firstChoose, (player) => {
+            if (
+              lib.configOL.replace_handcard &&
+              player === firstChoose.previousSeat
+            ) {
               return 5
             }
             return 4
           })
           game.phaseLoop(firstChoose)
-        } else if (_status.mode == "guandu") {
+        } else if (_status.mode === "guandu") {
           game.gameDraw(_status.firstAct)
           game.phaseLoop(_status.firstAct)
-        } else if (_status.mode == "4v4") {
-          game.gameDraw(_status.firstAct, function (player) {
-            if (player == _status.firstAct.previousSeat) {
+        } else if (_status.mode === "4v4") {
+          game.gameDraw(_status.firstAct, (player) => {
+            if (player === _status.firstAct.previousSeat) {
               return 5
             }
             return 4
           })
-          game.replaceHandcards(_status.firstAct.previous, _status.firstAct.previous.previous)
+          game.replaceHandcards(
+            _status.firstAct.previous,
+            _status.firstAct.previous.previous,
+          )
           game.phaseLoop(_status.firstAct)
         }
         event.finish()
       } else {
-        if (_status.mode == "guandu") {
+        if (_status.mode === "guandu") {
           game.gameDraw(_status.firstAct, 4)
           game.phaseLoop(_status.firstAct)
-        } else if (_status.mode == "two") {
+        } else if (_status.mode === "two") {
           _status.first_less = true
           _status.first_less_forced = true
           var firstChoose = _status.firstAct
-          game.gameDraw(firstChoose, function (player) {
-            if (player == _status.firstAct.previousSeat && get.config("replace_handcard_two")) {
+          game.gameDraw(firstChoose, (player) => {
+            if (
+              player === _status.firstAct.previousSeat &&
+              get.config("replace_handcard_two")
+            ) {
               return 5
             }
             return 4
           })
           game.phaseLoop(firstChoose)
-        } else if (_status.mode == "endless") {
+        } else if (_status.mode === "endless") {
           _status.first_less = true
           _status.first_less_forced = true
           var firstChoose = _status.firstAct
           game.gameDraw(firstChoose)
           game.phaseLoop(firstChoose)
-        } else if (_status.mode == "four") {
-          game.gameDraw(_status.firstAct, function (player) {
-            if (player == _status.firstAct.previousSeat) {
+        } else if (_status.mode === "four") {
+          game.gameDraw(_status.firstAct, (player) => {
+            if (player === _status.firstAct.previousSeat) {
               return 5
             }
             return 4
           })
           if (
-            game.me == _status.firstAct.previous ||
-            game.me == _status.firstAct.previous.previous
+            game.me === _status.firstAct.previous ||
+            game.me === _status.firstAct.previous.previous
           ) {
             game.me.chooseBool("是否置换手牌？")
             event.replaceCard = true
           }
-        } else if (_status.mode == "siguo") {
+        } else if (_status.mode === "siguo") {
           _status.siguoai = [
             [-7.5, -2, 0, -4.5, -6, -7.5],
             [-7.5, -2, 0, -4.5, -6, -7.5],
@@ -504,10 +633,13 @@ export default () => {
           var firstChoose = _status.firstAct
           game.gameDraw(firstChoose)
           game.phaseLoop(firstChoose)
-        } else if (_status.mode == "jiange") {
+        } else if (_status.mode === "jiange") {
           var firstAct
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].type == "mech" && game.players[i].group == "wei") {
+            if (
+              game.players[i].type === "mech" &&
+              game.players[i].group === "wei"
+            ) {
               firstAct = game.players[i]
               break
             }
@@ -524,7 +656,7 @@ export default () => {
           ]
           game.gameDraw(firstAct)
           game.phaseLoopJiange()
-        } else if (_status.mode == "three") {
+        } else if (_status.mode === "three") {
           var firstAct
           if (_status.color) {
             firstAct = game.enemyZhu
@@ -542,11 +674,18 @@ export default () => {
           var firstAct
           if (lib.storage.zhu) {
             _status.currentSide = true
-            firstAct = _status.currentSide == game.me.side ? game.friendZhu : game.enemyZhu
+            firstAct =
+              _status.currentSide === game.me.side
+                ? game.friendZhu
+                : game.enemyZhu
           } else {
-            if (!lib.storage.cross_seat && !lib.storage.random_seat && lib.storage.number > 1) {
+            if (
+              !lib.storage.cross_seat &&
+              !lib.storage.random_seat &&
+              lib.storage.number > 1
+            ) {
               for (var i = 0; i < game.players.length - 1; i++) {
-                if (game.players[i].side != game.players[i + 1].side) {
+                if (game.players[i].side !== game.players[i + 1].side) {
                   var actcount
                   if (Math.random() < 0.5) {
                     actcount = i
@@ -567,7 +706,8 @@ export default () => {
                 }
               }
             } else {
-              firstAct = game.players[Math.floor(Math.random() * game.players.length)]
+              firstAct =
+                game.players[Math.floor(Math.random() * game.players.length)]
             }
           }
           game.gameDraw(firstAct, 4)
@@ -580,8 +720,16 @@ export default () => {
               lib.setPopped(ui.versushs, game.versusHoverHandcards, 220)
             }
           }
-          _status.enemyCount = ui.create.system("杀敌: " + get.cnNumber(0, true), null, true)
-          _status.friendCount = ui.create.system("阵亡: " + get.cnNumber(0, true), null, true)
+          _status.enemyCount = ui.create.system(
+            `杀敌: ${get.cnNumber(0, true)}`,
+            null,
+            true,
+          )
+          _status.friendCount = ui.create.system(
+            `阵亡: ${get.cnNumber(0, true)}`,
+            null,
+            true,
+          )
 
           lib.setPopped(_status.friendCount, game.versusHoverFriend)
           lib.setPopped(_status.enemyCount, game.versusHoverEnemy)
@@ -592,7 +740,7 @@ export default () => {
             game.versusPhaseLoop(firstAct)
           }
         }
-        if (_status.mode != "four") {
+        if (_status.mode !== "four") {
           event.finish()
         }
       }
@@ -613,7 +761,7 @@ export default () => {
       game.phaseLoop(_status.firstAct)
     },
     game: {
-      getLadderName: function (score) {
+      getLadderName: (score) => {
         if (score < 900) {
           return "平民"
         }
@@ -667,64 +815,62 @@ export default () => {
         }
         return "枭雄"
       },
-      checkOnlineResult: function (player) {
-        if (_status.mode == "4v4" || _status.mode == "guandu") {
-          var zhu = game.findPlayer(function (current) {
-            return current.identity == "zhu"
-          })
-          return player.side == zhu.side
+      checkOnlineResult: (player) => {
+        if (_status.mode === "4v4" || _status.mode === "guandu") {
+          var zhu = game.findPlayer((current) => current.identity === "zhu")
+          return player.side === zhu.side
         }
-        return game.players[0].side == player.side
+        return game.players[0].side === player.side
       },
-      getRoomInfo: function (uiintro) {
-        if (lib.configOL.versus_mode == "1v1") {
-          uiintro.add('<div class="text chat">候选人数：' + lib.configOL.choice_num + "人")
-          uiintro.add('<div class="text chat">替补人数：' + lib.configOL.replace_number + "人")
-        }
-        if (lib.configOL.versus_mode == "2v2" || lib.configOL.versus_mode == "3v3") {
+      getRoomInfo: (uiintro) => {
+        if (lib.configOL.versus_mode === "1v1") {
           uiintro.add(
-            '<div class="text chat">四号位保护：' +
-              (lib.configOL.replace_handcard ? "开启" : "关闭"),
+            `<div class="text chat">候选人数：${lib.configOL.choice_num}人`,
           )
-          if (lib.configOL.versus_mode == "2v2") {
+          uiintro.add(
+            `<div class="text chat">替补人数：${lib.configOL.replace_number}人`,
+          )
+        }
+        if (
+          lib.configOL.versus_mode === "2v2" ||
+          lib.configOL.versus_mode === "3v3"
+        ) {
+          uiintro.add(
+            `<div class="text chat">四号位保护：${lib.configOL.replace_handcard ? "开启" : "关闭"}`,
+          )
+          if (lib.configOL.versus_mode === "2v2") {
             uiintro.add(
-              '<div class="text chat">四号位【飞扬】：' +
-                (lib.configOL.olfeiyang_four ? "开启" : "关闭"),
+              `<div class="text chat">四号位【飞扬】：${lib.configOL.olfeiyang_four ? "开启" : "关闭"}`,
             )
           }
         }
         var last = uiintro.add(
-          '<div class="text chat">出牌时限：' + lib.configOL.choose_timeout + "秒",
+          `<div class="text chat">出牌时限：${lib.configOL.choose_timeout}秒`,
         )
         if (lib.configOL.banned.length) {
           last = uiintro.add(
-            '<div class="text chat">禁用武将：' + get.translation(lib.configOL.banned),
+            `<div class="text chat">禁用武将：${get.translation(lib.configOL.banned)}`,
           )
         }
         if (lib.configOL.bannedcards.length) {
           last = uiintro.add(
-            '<div class="text chat">禁用卡牌：' + get.translation(lib.configOL.bannedcards),
+            `<div class="text chat">禁用卡牌：${get.translation(lib.configOL.bannedcards)}`,
           )
         }
         last.style.paddingBottom = "8px"
       },
-      getVideoName: function () {
-        if (_status.mode == "three") {
-          var zhu = game.findPlayer2(function (current) {
-            return current.side == game.me.side && current.identity == "zhu"
-          })
-          var str =
-            (game.me.side ? "暖/" : "冷/") +
-            get.translation(zhu.previousSeat.name1) +
-            "/" +
-            get.translation(zhu.name1) +
-            "/" +
-            get.translation(zhu.nextSeat.name1)
+      getVideoName: () => {
+        if (_status.mode === "three") {
+          var zhu = game.findPlayer2(
+            (current) =>
+              current.side === game.me.side && current.identity === "zhu",
+          )
+          var str = `${(game.me.side ? "暖/" : "冷/") + get.translation(zhu.previousSeat.name1)}/${get.translation(zhu.name1)}/${get.translation(zhu.nextSeat.name1)}`
           return ["统率三军", str]
         }
         var str = get.translation(game.me.name1)
         if (game.me.name2) {
-          str += "/" + get.translation(game.me.name2)
+          str += `/${get.translation(game.me.name2)}`
         }
         var str2
         if (game.versusVideoName) {
@@ -753,15 +899,15 @@ export default () => {
               str2 = "官渡之战"
               break
             default:
-              str2 = "对决 - " + lib.storage.number + "v" + lib.storage.number
+              str2 = `对决 - ${lib.storage.number}v${lib.storage.number}`
           }
         }
         return [str, str2]
       },
-      addRecord: function (bool) {
-        if (typeof bool == "boolean") {
+      addRecord: (bool) => {
+        if (typeof bool === "boolean") {
           var data = lib.config.gameRecord.versus.data
-          var identity = get.cnNumber(lib.storage.number) + "人"
+          var identity = `${get.cnNumber(lib.storage.number)}人`
           if (!data[identity]) {
             data[identity] = [0, 0]
           }
@@ -774,25 +920,27 @@ export default () => {
           var str = ""
           for (var i = 0; i < list.length; i++) {
             if (data[list[i]]) {
-              str += list[i] + "：" + data[list[i]][0] + "胜" + " " + data[list[i]][1] + "负<br>"
+              str += `${list[i]}：${data[list[i]][0]}胜 ${data[list[i]][1]}负<br>`
             }
           }
           lib.config.gameRecord.versus.str = str
           game.saveConfig("gameRecord", lib.config.gameRecord)
         }
       },
-      chooseCharacterJiange: function () {
+      chooseCharacterJiange: () => {
         var next = game.createEvent("chooseCharacter")
         next.showConfig = true
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           ui.arena.classList.add("choose-character")
           for (var i in lib.characterPack.mode_versus) {
             lib.character[i] = lib.characterPack.mode_versus[i]
           }
           lib.characterIntro.boss_liedixuande = lib.characterIntro.liubei
-          lib.characterIntro.boss_gongshenyueying = lib.characterIntro.huangyueying
-          lib.characterIntro.boss_tianhoukongming = lib.characterIntro.shen_zhugeliang
+          lib.characterIntro.boss_gongshenyueying =
+            lib.characterIntro.huangyueying
+          lib.characterIntro.boss_tianhoukongming =
+            lib.characterIntro.shen_zhugeliang
           lib.characterIntro.boss_yuhuoshiyuan = lib.characterIntro.pangtong
           lib.characterIntro.boss_qiaokuijunyi = lib.characterIntro.zhanghe
           lib.characterIntro.boss_jiarenzidan = lib.characterIntro.caozhen
@@ -804,14 +952,15 @@ export default () => {
           lib.characterIntro.boss_fuweizilong = lib.characterIntro.zhaoyun
           lib.characterIntro.boss_weiwuyide = lib.characterIntro.zhangfei
           lib.characterIntro.boss_elaiziman = lib.characterIntro.dianwei
-          lib.characterIntro.boss_shenjianhansheng = lib.characterIntro.huangzhong
+          lib.characterIntro.boss_shenjianhansheng =
+            lib.characterIntro.huangzhong
           lib.characterIntro.boss_yiyongwenze = lib.characterIntro.yujin
           ;("step 1")
           for (var i in lib.skill) {
             if (lib.skill[i].seatRelated === true) {
               lib.skill[i] = {}
-              if (lib.translate[i + "_info"]) {
-                lib.translate[i + "_info"] = "此模式下不可用"
+              if (lib.translate[`${i}_info`]) {
+                lib.translate[`${i}_info`] = "此模式下不可用"
               }
             }
           }
@@ -838,10 +987,11 @@ export default () => {
           }
           for (var i in lib.character) {
             if (lib.character[i].isJiangeBoss) {
-              list[lib.character[i].group + "boss"].push(i)
+              list[`${lib.character[i].group}boss`].push(i)
               continue
-            } else if (lib.character[i].isJiangeMech) {
-              list[lib.character[i].group + "mech"].push(i)
+            }
+            if (lib.character[i].isJiangeMech) {
+              list[`${lib.character[i].group}mech`].push(i)
               continue
             }
             if (lib.filter.characterDisabled(i)) {
@@ -850,30 +1000,32 @@ export default () => {
             if (get.is.double(i)) {
               continue
             }
-            if (lib.character[i].group == "wei") {
+            if (lib.character[i].group === "wei") {
               list.weilist.push(i)
-            } else if (lib.character[i].group == "shu") {
+            } else if (lib.character[i].group === "shu") {
               list.shulist.push(i)
             }
           }
           var dialog
           switch (game.me.type) {
-            case "human":
+            case "human": {
               for (var i = 0; i < game.players.length; i++) {
-                if (game.players[i].type != "human") {
+                if (game.players[i].type !== "human") {
                   game.players[i].init(
-                    list[game.players[i].identity + game.players[i].type].randomRemove(),
+                    list[
+                      game.players[i].identity + game.players[i].type
+                    ].randomRemove(),
                   )
                 }
               }
               dialog = ui.create.dialog("选择角色", [
-                list[game.me.identity + "list"].randomGets(8),
+                list[`${game.me.identity}list`].randomGets(8),
                 "character",
               ])
-              ui.create.cheat = function () {
+              ui.create.cheat = () => {
                 _status.createControl = ui.cheat2
-                ui.cheat = ui.create.control("更换", function () {
-                  if (ui.cheat2 && ui.cheat2.dialog == _status.event.dialog) {
+                ui.cheat = ui.create.control("更换", () => {
+                  if (ui.cheat2 && ui.cheat2.dialog === _status.event.dialog) {
                     return
                   }
                   if (game.changeCoin) {
@@ -882,7 +1034,7 @@ export default () => {
                   var buttons = ui.create.div(".buttons")
                   var node = _status.event.dialog.buttons[0].parentNode
                   _status.event.dialog.buttons = ui.create.buttons(
-                    list[game.me.identity + "list"].randomGets(8),
+                    list[`${game.me.identity}list`].randomGets(8),
                     "character",
                     buttons,
                   )
@@ -894,18 +1046,21 @@ export default () => {
                 })
                 delete _status.createControl
               }
-              var createCharacterDialog = function () {
-                event.dialogxx = ui.create.characterDialog("heightset", function (name) {
-                  if (lib.character[name].isJiangeBoss) {
-                    return true
-                  }
-                  if (lib.character[name].isJiangeMech) {
-                    return true
-                  }
-                  if (lib.character[name][1] != game.me.identity) {
-                    return true
-                  }
-                })
+              var createCharacterDialog = () => {
+                event.dialogxx = ui.create.characterDialog(
+                  "heightset",
+                  (name) => {
+                    if (lib.character[name].isJiangeBoss) {
+                      return true
+                    }
+                    if (lib.character[name].isJiangeMech) {
+                      return true
+                    }
+                    if (lib.character[name][1] !== game.me.identity) {
+                      return true
+                    }
+                  },
+                )
                 if (ui.cheat2) {
                   ui.cheat2.addTempClass("controlpressdownx", 500)
                   ui.cheat2.classList.remove("disabled")
@@ -916,9 +1071,9 @@ export default () => {
               } else {
                 createCharacterDialog()
               }
-              ui.create.cheat2 = function () {
+              ui.create.cheat2 = () => {
                 ui.cheat2 = ui.create.control("自由选将", function () {
-                  if (this.dialog == _status.event.dialog) {
+                  if (this.dialog === _status.event.dialog) {
                     if (game.changeCoin) {
                       game.changeCoin(10)
                     }
@@ -952,7 +1107,7 @@ export default () => {
                   ui.cheat2.classList.add("disabled")
                 }
               }
-              if (!_status.brawl || !_status.brawl.chooseCharacterFixed) {
+              if (!_status.brawl?.chooseCharacterFixed) {
                 if (!ui.cheat && get.config("change_choice")) {
                   ui.create.cheat()
                 }
@@ -961,26 +1116,33 @@ export default () => {
                 }
               }
               break
+            }
             case "mech":
-              dialog = ui.create.dialog("选择角色", [list[game.me.identity + "mech"], "character"])
+              dialog = ui.create.dialog("选择角色", [
+                list[`${game.me.identity}mech`],
+                "character",
+              ])
               break
             case "boss":
               for (var i = 0; i < game.players.length; i++) {
-                if (game.players[i].type == "mech") {
+                if (game.players[i].type === "mech") {
                   game.players[i].init(
-                    list[game.players[i].identity + game.players[i].type].randomRemove(),
+                    list[
+                      game.players[i].identity + game.players[i].type
+                    ].randomRemove(),
                   )
                 }
               }
-              dialog = ui.create.dialog("选择角色", [list[game.me.identity + "boss"], "character"])
+              dialog = ui.create.dialog("选择角色", [
+                list[`${game.me.identity}boss`],
+                "character",
+              ])
               break
           }
-          game.me.chooseButton(dialog, true).set("onfree", true).selectButton = function () {
-            if (get.config("double_character_jiange")) {
-              return [2, 2]
+          game.me.chooseButton(dialog, true).set("onfree", true).selectButton =
+            () => {
+              return [1, 1]
             }
-            return [1, 1]
-          }
           ;("step 2")
           if (ui.cheat) {
             ui.cheat.close()
@@ -990,43 +1152,46 @@ export default () => {
             ui.cheat2.close()
             delete ui.cheat2
           }
-          var double = result.links.length == 2
+          var double = result.links.length === 2
           game.me.init(result.links[0], result.links[1])
           for (var i = 0; i < game.players.length; i++) {
             if (game.players[i].name1) {
               continue
             }
-            if (game.players[i].type != "human") {
+            if (game.players[i].type !== "human") {
               game.players[i].init(
-                event.list[game.players[i].identity + game.players[i].type].randomRemove(),
+                event.list[
+                  game.players[i].identity + game.players[i].type
+                ].randomRemove(),
               )
             } else {
               if (double) {
                 game.players[i].init(
-                  event.list[game.players[i].identity + "list"].randomRemove(),
-                  event.list[game.players[i].identity + "list"].randomRemove(),
+                  event.list[`${game.players[i].identity}list`].randomRemove(),
+                  event.list[`${game.players[i].identity}list`].randomRemove(),
                 )
               } else {
-                game.players[i].init(event.list[game.players[i].identity + "list"].randomRemove())
+                game.players[i].init(
+                  event.list[`${game.players[i].identity}list`].randomRemove(),
+                )
               }
             }
           }
           game.addRecentCharacter(game.me.name, game.me.name2)
-          setTimeout(function () {
+          setTimeout(() => {
             ui.arena.classList.remove("choose-character")
           }, 500)
         })
       },
-      chooseCharacterSiguo: function () {
+      chooseCharacterSiguo: () => {
         var next = game.createEvent("chooseCharacter")
         next.showConfig = true
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           _status.firstAct = game.players.randomGet()
           for (var i = 0; i < game.players.length; i++) {
             game.players[i].node.name.innerHTML = get.verticalStr(
-              get.cnNumber(get.distance(_status.firstAct, game.players[i], "absolute") + 1, true) +
-                "号位",
+              `${get.cnNumber(get.distance(_status.firstAct, game.players[i], "absolute") + 1, true)}号位`,
             )
           }
           ui.arena.classList.add("choose-character")
@@ -1045,7 +1210,10 @@ export default () => {
             if (get.is.double(i)) {
               continue
             }
-            if (get.config("siguo_character") == "off" && lib.characterPack.mode_versus[i]) {
+            if (
+              get.config("siguo_character") === "off" &&
+              lib.characterPack.mode_versus[i]
+            ) {
               continue
             }
             if (list[lib.character[i][1]]) {
@@ -1053,9 +1221,9 @@ export default () => {
             }
           }
           var duallist = []
-          if (get.config("siguo_character") == "increase") {
+          if (get.config("siguo_character") === "increase") {
             for (var i in lib.characterPack.mode_versus) {
-              if (lib.characterPack.mode_versus[i][1] == game.me.identity) {
+              if (lib.characterPack.mode_versus[i][1] === game.me.identity) {
                 duallist.push(i)
               }
             }
@@ -1070,7 +1238,10 @@ export default () => {
           var myChoice = list[game.me.identity].randomGets(7)
           if (duallist.length) {
             var myChoiceName = duallist.randomGet()
-            if (list[game.me.identity].includes(myChoiceName) && !myChoice.includes(myChoiceName)) {
+            if (
+              list[game.me.identity].includes(myChoiceName) &&
+              !myChoice.includes(myChoiceName)
+            ) {
               myChoice.randomRemove()
               myChoice.push(myChoiceName)
             }
@@ -1081,7 +1252,7 @@ export default () => {
           ])
           dialog.buttons[7].node.name.innerHTML = get.verticalStr("队友选择")
 
-          var addSetting = function (dialog) {
+          var addSetting = (dialog) => {
             dialog.add("选择座位").classList.add("add-setting")
             var seats = document.createElement("table")
             seats.classList.add("add-setting")
@@ -1089,44 +1260,52 @@ export default () => {
             seats.style.width = "100%"
             seats.style.position = "relative"
             for (var i = 1; i <= game.players.length; i++) {
-              var td = ui.create.div(".shadowed.reduce_radius.pointerdiv.tdnode")
+              var td = ui.create.div(
+                ".shadowed.reduce_radius.pointerdiv.tdnode",
+              )
               td.innerHTML = get.cnNumber(i, true)
               td.link = i - 1
               seats.appendChild(td)
-              if (get.distance(_status.firstAct, game.me, "absolute") === i - 1) {
+              if (
+                get.distance(_status.firstAct, game.me, "absolute") ===
+                i - 1
+              ) {
                 td.classList.add("bluebg")
               }
-              td.addEventListener(lib.config.touchscreen ? "touchend" : "click", function () {
-                if (_status.dragged) {
-                  return
-                }
-                if (_status.justdragged) {
-                  return
-                }
-                if (get.distance(_status.firstAct, game.me, "absolute") == this.link) {
-                  return
-                }
-                var current = this.parentNode.querySelector(".bluebg")
-                if (current) {
-                  current.classList.remove("bluebg")
-                }
-                this.classList.add("bluebg")
-                _status.firstAct = game.me
-                for (var i = 0; i < this.link; i++) {
-                  _status.firstAct = _status.firstAct.previous
-                }
-                for (var i = 0; i < game.players.length; i++) {
-                  game.players[i].node.name.innerHTML = get.verticalStr(
-                    get.cnNumber(
-                      get.distance(_status.firstAct, game.players[i], "absolute") + 1,
-                      true,
-                    ) + "号位",
-                  )
-                }
-              })
+              td.addEventListener(
+                lib.config.touchscreen ? "touchend" : "click",
+                function () {
+                  if (_status.dragged) {
+                    return
+                  }
+                  if (_status.justdragged) {
+                    return
+                  }
+                  if (
+                    get.distance(_status.firstAct, game.me, "absolute") ===
+                    this.link
+                  ) {
+                    return
+                  }
+                  var current = this.parentNode.querySelector(".bluebg")
+                  if (current) {
+                    current.classList.remove("bluebg")
+                  }
+                  this.classList.add("bluebg")
+                  _status.firstAct = game.me
+                  for (var i = 0; i < this.link; i++) {
+                    _status.firstAct = _status.firstAct.previous
+                  }
+                  for (var i = 0; i < game.players.length; i++) {
+                    game.players[i].node.name.innerHTML = get.verticalStr(
+                      `${get.cnNumber(get.distance(_status.firstAct, game.players[i], "absolute") + 1, true)}号位`,
+                    )
+                  }
+                },
+              )
             }
             dialog.content.appendChild(seats)
-            if (game.me == game.zhu) {
+            if (game.me === game.zhu) {
               seats.previousSibling.style.display = "none"
               seats.style.display = "none"
             }
@@ -1137,7 +1316,7 @@ export default () => {
               dialog.add(ui.create.div(".placeholder.add-setting"))
             }
           }
-          var removeSetting = function () {
+          var removeSetting = () => {
             var dialog = _status.event.dialog
             if (dialog) {
               dialog.style.height = ""
@@ -1156,10 +1335,10 @@ export default () => {
             addSetting(dialog)
           }
 
-          ui.create.cheat = function () {
+          ui.create.cheat = () => {
             _status.createControl = ui.cheat2
-            ui.cheat = ui.create.control("更换", function () {
-              if (ui.cheat2 && ui.cheat2.dialog == _status.event.dialog) {
+            ui.cheat = ui.create.control("更换", () => {
+              if (ui.cheat2 && ui.cheat2.dialog === _status.event.dialog) {
                 return
               }
               if (game.changeCoin) {
@@ -1170,11 +1349,14 @@ export default () => {
               list[game.me.identity].add(event.friendChoice)
               event.friendChoice = list[game.me.identity].randomRemove()
               _status.event.dialog.buttons = ui.create.buttons(
-                list[game.me.identity].randomGets(7).concat([event.friendChoice]),
+                list[game.me.identity]
+                  .randomGets(7)
+                  .concat([event.friendChoice]),
                 "character",
                 buttons,
               )
-              _status.event.dialog.buttons[7].node.name.innerHTML = get.verticalStr("队友选择")
+              _status.event.dialog.buttons[7].node.name.innerHTML =
+                get.verticalStr("队友选择")
               _status.event.dialog.content.insertBefore(buttons, node)
               buttons.addTempClass("start")
               node.remove()
@@ -1183,10 +1365,10 @@ export default () => {
             })
             delete _status.createControl
           }
-          var createCharacterDialog = function () {
-            event.dialogxx = ui.create.characterDialog("heightset", function (name) {
+          var createCharacterDialog = () => {
+            event.dialogxx = ui.create.characterDialog("heightset", (name) => {
               // if(name==event.friendChoice) return true;
-              if (lib.character[name][1] != game.me.identity) {
+              if (lib.character[name][1] !== game.me.identity) {
                 return true
               }
             })
@@ -1200,9 +1382,9 @@ export default () => {
           } else {
             createCharacterDialog()
           }
-          ui.create.cheat2 = function () {
+          ui.create.cheat2 = () => {
             ui.cheat2 = ui.create.control("自由选将", function () {
-              if (this.dialog == _status.event.dialog) {
+              if (this.dialog === _status.event.dialog) {
                 if (game.changeCoin) {
                   game.changeCoin(10)
                 }
@@ -1239,8 +1421,8 @@ export default () => {
           game.me
             .chooseButton(dialog, true)
             .set("onfree", true)
-            .set("filterButton", function (button) {
-              if (button.link == _status.event.friendChoice) {
+            .set("filterButton", (button) => {
+              if (button.link === _status.event.friendChoice) {
                 return false
               }
               return true
@@ -1265,7 +1447,7 @@ export default () => {
           event.list[game.me.side].remove(result.links[0])
           var added = { wei: 0, shu: 0, wu: 0, qun: 0 }
           var dualside = { wei: [], shu: [], wu: [], qun: [] }
-          if (get.config("siguo_character") == "increase") {
+          if (get.config("siguo_character") === "increase") {
             for (var i in lib.characterPack.mode_versus) {
               if (Math.random() < 0.5) {
                 dualside[lib.characterPack.mode_versus[i][1]].push(i)
@@ -1274,15 +1456,20 @@ export default () => {
           }
           for (var i = 0; i < game.players.length; i++) {
             game.players[i].node.identity.style.display = ""
-            if (game.players[i] != game.me) {
-              if (game.players[i].identity == game.me.identity) {
+            if (game.players[i] !== game.me) {
+              if (game.players[i].identity === game.me.identity) {
                 game.players[i].init(event.friendChoice)
               } else {
-                if (dualside[game.players[i].side] && dualside[game.players[i].side].length) {
+                if (
+                  dualside[game.players[i].side] &&
+                  dualside[game.players[i].side].length
+                ) {
                   var enemyChoice = dualside[game.players[i].side]
                   if (enemyChoice._skipped || Math.random() < 0.5) {
                     var enemyChoiceName = enemyChoice.randomRemove()
-                    if (event.list[game.players[i].side].includes(enemyChoiceName)) {
+                    if (
+                      event.list[game.players[i].side].includes(enemyChoiceName)
+                    ) {
                       game.players[i].init(enemyChoiceName)
                       event.list[game.players[i].side].remove(enemyChoiceName)
                     }
@@ -1291,12 +1478,14 @@ export default () => {
                   }
                 }
                 if (!game.players[i].name1) {
-                  game.players[i].init(event.list[game.players[i].side].randomRemove())
+                  game.players[i].init(
+                    event.list[game.players[i].side].randomRemove(),
+                  )
                 }
               }
             }
             game.players[i].addSkill("longchuanzhibao")
-            if (added[game.players[i].side] == 0) {
+            if (added[game.players[i].side] === 0) {
               if (Math.random() < 0.5) {
                 game.players[i].gainZhibao()
                 added[game.players[i].side] = 1
@@ -1309,7 +1498,7 @@ export default () => {
           }
           _status.firstAct.gainZhibao()
           game.addRecentCharacter(game.me.name1)
-          setTimeout(function () {
+          setTimeout(() => {
             ui.arena.classList.remove("choose-character")
           }, 500)
 
@@ -1317,7 +1506,7 @@ export default () => {
           // ui.longchuanzhibao.style.display='none';
           lib.setPopped(
             ui.longchuanzhibao,
-            function () {
+            () => {
               var map = { wei: 0, shu: 0, wu: 0, qun: 0 }
               for (var i = 0; i < game.players.length; i++) {
                 var current = game.players[i]
@@ -1325,7 +1514,9 @@ export default () => {
               }
               var uiintro = ui.create.dialog("hidden")
               for (var i in map) {
-                uiintro.addText(get.translation(i) + "势力：" + get.cnNumber(map[i]) + "个")
+                uiintro.addText(
+                  `${get.translation(i)}势力：${get.cnNumber(map[i])}个`,
+                )
               }
               uiintro.content.lastChild.style.paddingBottom = "8px"
               return uiintro
@@ -1334,10 +1525,10 @@ export default () => {
           )
         })
       },
-      chooseCharacterTwo: function () {
+      chooseCharacterTwo: () => {
         var next = game.createEvent("chooseCharacter")
         next.showConfig = true
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           ui.arena.classList.add("choose-character")
           var bool = Math.random() < 0.5
@@ -1350,22 +1541,25 @@ export default () => {
           ref.previous.side = !bool2
 
           var firstChoose = game.players.randomGet()
-          if (firstChoose.next.side == firstChoose.side) {
+          if (firstChoose.next.side === firstChoose.side) {
             firstChoose = firstChoose.next
           }
           _status.firstAct = firstChoose
           for (var i = 0; i < 4; i++) {
-            firstChoose.node.name.innerHTML = get.verticalStr(get.cnNumber(i + 1, true) + "号位")
+            firstChoose.node.name.innerHTML = get.verticalStr(
+              `${get.cnNumber(i + 1, true)}号位`,
+            )
             firstChoose = firstChoose.next
           }
 
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side == game.me.side) {
+            if (game.players[i].side === game.me.side) {
               game.players[i].node.identity.firstChild.innerHTML = "友"
             } else {
               game.players[i].node.identity.firstChild.innerHTML = "敌"
             }
-            game.players[i].node.identity.dataset.color = game.players[i].side + "zhu"
+            game.players[i].node.identity.dataset.color =
+              `${game.players[i].side}zhu`
           }
           //22选将框分配
           var list = []
@@ -1392,7 +1586,7 @@ export default () => {
           event.list = list
           _status.characterlist = list4
 
-          var addSetting = function (dialog) {
+          var addSetting = (dialog) => {
             dialog.add("选择座位").classList.add("add-setting")
             var seats = document.createElement("table")
             seats.classList.add("add-setting")
@@ -1400,54 +1594,66 @@ export default () => {
             seats.style.width = "100%"
             seats.style.position = "relative"
             for (var i = 1; i <= game.players.length; i++) {
-              var td = ui.create.div(".shadowed.reduce_radius.pointerdiv.tdnode")
+              var td = ui.create.div(
+                ".shadowed.reduce_radius.pointerdiv.tdnode",
+              )
               td.innerHTML = get.cnNumber(i, true)
               td.link = i - 1
               seats.appendChild(td)
-              if (get.distance(_status.firstAct, game.me, "absolute") === i - 1) {
+              if (
+                get.distance(_status.firstAct, game.me, "absolute") ===
+                i - 1
+              ) {
                 td.classList.add("bluebg")
               }
-              td.addEventListener(lib.config.touchscreen ? "touchend" : "click", function () {
-                if (_status.dragged) {
-                  return
-                }
-                if (_status.justdragged) {
-                  return
-                }
-                if (get.distance(_status.firstAct, game.me, "absolute") == this.link) {
-                  return
-                }
-                var current = this.parentNode.querySelector(".bluebg")
-                if (current) {
-                  current.classList.remove("bluebg")
-                }
-                this.classList.add("bluebg")
-                _status.firstAct = game.me
-                for (var i = 0; i < this.link; i++) {
-                  _status.firstAct = _status.firstAct.previous
-                }
-                var firstChoose = _status.firstAct
-                firstChoose.next.side = !firstChoose.side
-                firstChoose.next.next.side = !firstChoose.side
-                firstChoose.previous.side = firstChoose.side
-                for (var i = 0; i < game.players.length; i++) {
-                  if (game.players[i].side == game.me.side) {
-                    game.players[i].node.identity.firstChild.innerHTML = "友"
-                  } else {
-                    game.players[i].node.identity.firstChild.innerHTML = "敌"
+              td.addEventListener(
+                lib.config.touchscreen ? "touchend" : "click",
+                function () {
+                  if (_status.dragged) {
+                    return
                   }
-                  game.players[i].node.identity.dataset.color = game.players[i].side + "zhu"
-                }
-                for (var i = 0; i < 4; i++) {
-                  firstChoose.node.name.innerHTML = get.verticalStr(
-                    get.cnNumber(i + 1, true) + "号位",
-                  )
-                  firstChoose = firstChoose.next
-                }
-              })
+                  if (_status.justdragged) {
+                    return
+                  }
+                  if (
+                    get.distance(_status.firstAct, game.me, "absolute") ===
+                    this.link
+                  ) {
+                    return
+                  }
+                  var current = this.parentNode.querySelector(".bluebg")
+                  if (current) {
+                    current.classList.remove("bluebg")
+                  }
+                  this.classList.add("bluebg")
+                  _status.firstAct = game.me
+                  for (var i = 0; i < this.link; i++) {
+                    _status.firstAct = _status.firstAct.previous
+                  }
+                  var firstChoose = _status.firstAct
+                  firstChoose.next.side = !firstChoose.side
+                  firstChoose.next.next.side = !firstChoose.side
+                  firstChoose.previous.side = firstChoose.side
+                  for (var i = 0; i < game.players.length; i++) {
+                    if (game.players[i].side === game.me.side) {
+                      game.players[i].node.identity.firstChild.innerHTML = "友"
+                    } else {
+                      game.players[i].node.identity.firstChild.innerHTML = "敌"
+                    }
+                    game.players[i].node.identity.dataset.color =
+                      `${game.players[i].side}zhu`
+                  }
+                  for (var i = 0; i < 4; i++) {
+                    firstChoose.node.name.innerHTML = get.verticalStr(
+                      `${get.cnNumber(i + 1, true)}号位`,
+                    )
+                    firstChoose = firstChoose.next
+                  }
+                },
+              )
             }
             dialog.content.appendChild(seats)
-            if (game.me == game.zhu) {
+            if (game.me === game.zhu) {
               seats.previousSibling.style.display = "none"
               seats.style.display = "none"
             }
@@ -1458,7 +1664,7 @@ export default () => {
               dialog.add(ui.create.div(".placeholder.add-setting"))
             }
           }
-          var removeSetting = function () {
+          var removeSetting = () => {
             var dialog = _status.event.dialog
             if (dialog) {
               dialog.style.height = ""
@@ -1474,7 +1680,7 @@ export default () => {
           event.removeSetting = removeSetting
 
           var characterChoice
-          if (_status.brawl && _status.brawl.chooseCharacter) {
+          if (_status.brawl?.chooseCharacter) {
             characterChoice = _status.brawl.chooseCharacter(list, game.me)
           } else {
             characterChoice = list.randomGets(7)
@@ -1492,18 +1698,21 @@ export default () => {
             game.additionaldead = []
             basenum *= 2
           }
-          var dialog = ui.create.dialog(basestr, [characterChoice, "characterx"])
+          var dialog = ui.create.dialog(basestr, [
+            characterChoice,
+            "characterx",
+          ])
           game.me.chooseButton(true, dialog, basenum).set("onfree", true)
-          if (!_status.brawl || !_status.brawl.noAddSetting) {
+          if (!_status.brawl?.noAddSetting) {
             if (get.config("change_identity")) {
               addSetting(dialog)
             }
           }
 
-          ui.create.cheat = function () {
+          ui.create.cheat = () => {
             _status.createControl = ui.cheat2
-            ui.cheat = ui.create.control("更换", function () {
-              if (ui.cheat2 && ui.cheat2.dialog == _status.event.dialog) {
+            ui.cheat = ui.create.control("更换", () => {
+              if (ui.cheat2 && ui.cheat2.dialog === _status.event.dialog) {
                 return
               }
               if (game.changeCoin) {
@@ -1525,7 +1734,7 @@ export default () => {
             delete _status.createControl
           }
           if (lib.onfree) {
-            lib.onfree.push(function () {
+            lib.onfree.push(() => {
               event.dialogxx = ui.create.characterDialog("heightset")
               if (ui.cheat2) {
                 ui.cheat2.addTempClass("controlpressdownx", 500)
@@ -1535,9 +1744,9 @@ export default () => {
           } else {
             event.dialogxx = ui.create.characterDialog("heightset")
           }
-          ui.create.cheat2 = function () {
+          ui.create.cheat2 = () => {
             ui.cheat2 = ui.create.control("自由选将", function () {
-              if (this.dialog == _status.event.dialog) {
+              if (this.dialog === _status.event.dialog) {
                 if (game.changeCoin) {
                   game.changeCoin(10)
                 }
@@ -1569,7 +1778,7 @@ export default () => {
             })
             ui.cheat2.classList.add("disabled")
           }
-          if (!_status.brawl || !_status.brawl.chooseCharacterFixed) {
+          if (!_status.brawl?.chooseCharacterFixed) {
             if (!ui.cheat && get.config("change_choice")) {
               ui.create.cheat()
             }
@@ -1595,17 +1804,22 @@ export default () => {
           }
           event.list.remove(game.me.name1)
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i] != game.me) {
-              if (_status.brawl && _status.brawl.chooseCharacter) {
-                var list = _status.brawl.chooseCharacter(event.list, game.players[i])
+            if (game.players[i] !== game.me) {
+              if (_status.brawl?.chooseCharacter) {
+                var list = _status.brawl.chooseCharacter(
+                  event.list,
+                  game.players[i],
+                )
                 game.players[i].init(list.randomGet())
                 event.list.remove(game.players[i].name1)
                 if (_status.replacetwo) {
-                  game.players[i].replacetwo = list.randomGet(game.players[i].name1)
+                  game.players[i].replacetwo = list.randomGet(
+                    game.players[i].name1,
+                  )
                   event.list.remove(game.players[i].replacetwo)
                 }
               } else {
-                if (event.two_assign && game.players[i].side == game.me.side) {
+                if (event.two_assign && game.players[i].side === game.me.side) {
                   if (_status.replacetwo) {
                     game.players[i].init(result.links[2])
                     game.players[i].replacetwo = result.links[3]
@@ -1614,13 +1828,13 @@ export default () => {
                   }
                 } else {
                   var name = event.list.randomRemove()
-                  if (lib.characterReplace[name] && lib.characterReplace[name].length) {
+                  if (lib.characterReplace[name]?.length) {
                     name = lib.characterReplace[name].randomGet()
                   }
                   game.players[i].init(name)
                   if (_status.replacetwo) {
                     var name2 = event.list.randomRemove()
-                    if (lib.characterReplace[name2] && lib.characterReplace[name2].length) {
+                    if (lib.characterReplace[name2]?.length) {
                       name2 = lib.characterReplace[name2].randomGet()
                     }
                     game.players[i].replacetwo = name2
@@ -1633,7 +1847,7 @@ export default () => {
             _status.characterlist.remove(game.players[i].name1)
             _status.characterlist.remove(game.players[i].replacetwo)
           }
-          setTimeout(function () {
+          setTimeout(() => {
             ui.arena.classList.remove("choose-character")
           }, 500)
           if (get.config("olfeiyang_four")) {
@@ -1652,17 +1866,17 @@ export default () => {
           }
         })
       },
-      chooseCharacterEndless: function () {
+      chooseCharacterEndless: () => {
         var next = game.createEvent("chooseCharacter")
         next.showConfig = true
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           ui.arena.classList.add("choose-character")
           for (var i in lib.skill) {
             if (lib.skill[i].seatRelated === true) {
               lib.skill[i] = {}
-              if (lib.translate[i + "_info"]) {
-                lib.translate[i + "_info"] = "此模式下不可用"
+              if (lib.translate[`${i}_info`]) {
+                lib.translate[`${i}_info`] = "此模式下不可用"
               }
             }
           }
@@ -1674,12 +1888,13 @@ export default () => {
           firstChoose.next.side = true
 
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side == game.me.side) {
+            if (game.players[i].side === game.me.side) {
               game.players[i].node.identity.firstChild.innerHTML = "友"
             } else {
               game.players[i].node.identity.firstChild.innerHTML = "敌"
             }
-            game.players[i].node.identity.dataset.color = game.players[i].side + "zhu"
+            game.players[i].node.identity.dataset.color =
+              `${game.players[i].side}zhu`
           }
           var list = []
           for (i in lib.character) {
@@ -1692,13 +1907,16 @@ export default () => {
           _status.endlessListAll = list.slice(0)
 
           var characterChoice = list.randomGets(6)
-          var dialog = ui.create.dialog("选择角色", [characterChoice, "character"])
+          var dialog = ui.create.dialog("选择角色", [
+            characterChoice,
+            "character",
+          ])
           game.me.chooseButton(true, dialog).set("onfree", true)
 
-          ui.create.cheat = function () {
+          ui.create.cheat = () => {
             _status.createControl = ui.cheat2
-            ui.cheat = ui.create.control("更换", function () {
-              if (ui.cheat2 && ui.cheat2.dialog == _status.event.dialog) {
+            ui.cheat = ui.create.control("更换", () => {
+              if (ui.cheat2 && ui.cheat2.dialog === _status.event.dialog) {
                 return
               }
               if (game.changeCoin) {
@@ -1720,7 +1938,7 @@ export default () => {
             delete _status.createControl
           }
           if (lib.onfree) {
-            lib.onfree.push(function () {
+            lib.onfree.push(() => {
               event.dialogxx = ui.create.characterDialog("heightset")
               if (ui.cheat2) {
                 ui.cheat2.addTempClass("controlpressdownx", 500)
@@ -1730,9 +1948,9 @@ export default () => {
           } else {
             event.dialogxx = ui.create.characterDialog("heightset")
           }
-          ui.create.cheat2 = function () {
+          ui.create.cheat2 = () => {
             ui.cheat2 = ui.create.control("自由选将", function () {
-              if (this.dialog == _status.event.dialog) {
+              if (this.dialog === _status.event.dialog) {
                 if (game.changeCoin) {
                   game.changeCoin(10)
                 }
@@ -1764,7 +1982,7 @@ export default () => {
             })
             ui.cheat2.classList.add("disabled")
           }
-          if (!_status.brawl || !_status.brawl.chooseCharacterFixed) {
+          if (!_status.brawl?.chooseCharacterFixed) {
             if (!ui.cheat && get.config("change_choice")) {
               ui.create.cheat()
             }
@@ -1787,7 +2005,7 @@ export default () => {
           game.me.init(result.links[0])
           event.list.remove(game.me.name1)
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i] != game.me) {
+            if (game.players[i] !== game.me) {
               game.players[i].init(event.list.randomRemove())
               if (_status.replacetwo) {
                 game.players[i].replacetwo = event.list.randomRemove()
@@ -1795,16 +2013,16 @@ export default () => {
             }
           }
           _status.endlessList = event.list
-          setTimeout(function () {
+          setTimeout(() => {
             ui.arena.classList.remove("choose-character")
           }, 500)
         })
       },
-      chooseCharacterFour: function () {
+      chooseCharacterFour: () => {
         var next = game.createEvent("chooseCharacter")
         next.showConfig = true
         next.ai = function (player, list, list2) {
-          if (player.identity == "zhu") {
+          if (player.identity === "zhu") {
             list2.randomSort()
             var choice
             if (Math.random() - 0.8 < 0 && list2.length) {
@@ -1821,7 +2039,9 @@ export default () => {
           } else if (Math.random() < 0.5) {
             var choice = 0
             for (var i = 0; i < list.length; i++) {
-              if (lib.character[list[i]][1] == game[player.side + "Zhu"].group) {
+              if (
+                lib.character[list[i]][1] === game[`${player.side}Zhu`].group
+              ) {
                 choice = i
                 break
               }
@@ -1833,7 +2053,7 @@ export default () => {
           this.list.remove(player.name1)
           this.list2.remove(player.name1)
         }
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           ui.arena.classList.add("choose-character")
           var i
@@ -1842,7 +2062,7 @@ export default () => {
 
           event.list = []
           event.choiceFour = get.config("character_four") || lib.choiceFour
-          event.filterChoice = function (name) {
+          event.filterChoice = (name) => {
             if (get.config("enable_all")) {
               return false
             }
@@ -1860,7 +2080,7 @@ export default () => {
               list2.push(i)
             }
           }
-          if (_status.brawl && _status.brawl.chooseCharacterFilter) {
+          if (_status.brawl?.chooseCharacterFilter) {
             event.list = _status.brawl.chooseCharacterFilter(event.list)
           }
           event.list.randomSort()
@@ -1876,7 +2096,7 @@ export default () => {
             for (var i = 0; i < game.players.length; i++) {
               game.players[i].side = !game.players[i].side
               game.players[i].node.identity.dataset.color = get.translation(
-                game.players[i].side + "Color",
+                `${game.players[i].side}Color`,
               )
             }
           }
@@ -1885,7 +2105,9 @@ export default () => {
               game.players[i].node.name_seat = ui.create.div(
                 ".name.name_seat",
                 get.verticalStr(
-                  get.seatTranslation(get.distance(_status.firstAct, game.players[i], "absolute")),
+                  get.seatTranslation(
+                    get.distance(_status.firstAct, game.players[i], "absolute"),
+                  ),
                 ),
                 game.players[i],
               )
@@ -1902,7 +2124,7 @@ export default () => {
               }
               game.save("ladder", lib.storage.ladder)
             } else if (
-              date.getMonth() != lib.storage.ladder.month &&
+              date.getMonth() !== lib.storage.ladder.month &&
               get.config("ladder_monthly")
             ) {
               lib.storage.ladder.month = date.getMonth()
@@ -1918,17 +2140,13 @@ export default () => {
             }
             lib.setPopped(
               ui.ladder,
-              function (uiintro) {
+              (uiintro) => {
                 var uiintro = ui.create.dialog("hidden")
                 uiintro.add(
-                  '<div class="text center">当前分数：<div style="width:40px;text-align:left;font-family:xinwei">' +
-                    (lib.storage.ladder.current + (_status.ladder_tmp ? 40 : 0)) +
-                    "</div></div>",
+                  `<div class="text center">当前分数：<div style="width:40px;text-align:left;font-family:xinwei">${lib.storage.ladder.current + (_status.ladder_tmp ? 40 : 0)}</div></div>`,
                 )
                 uiintro.add(
-                  '<div class="text center">历史最高：<div style="width:40px;text-align:left;font-family:xinwei">' +
-                    lib.storage.ladder.top +
-                    "</div></div>",
+                  `<div class="text center">历史最高：<div style="width:40px;text-align:left;font-family:xinwei">${lib.storage.ladder.top}</div></div>`,
                 )
                 uiintro.content.lastChild.style.paddingBottom = "8px"
                 return uiintro
@@ -1938,8 +2156,8 @@ export default () => {
             _status.ladder = true
             _status.ladder_mmr = 0
           }
-          event.addSetting = function () {
-            var cs = function (link, node) {
+          event.addSetting = () => {
+            var cs = (link, node) => {
               game.swapPlayer(node._link)
               _status.rechoose = true
               for (var i = 0; i < game.players.length; i++) {
@@ -1956,8 +2174,8 @@ export default () => {
                 ui.create.control("一号位", cs),
                 ui.create.control("一号位", cs),
                 ui.create.control("一号位", cs),
-                ui.create.control("换边", function () {
-                  if (_status.firstAct.side == game.me.side) {
+                ui.create.control("换边", () => {
+                  if (_status.firstAct.side === game.me.side) {
                     cs(null, { _link: _status.firstAct.nextSeat })
                   } else {
                     cs(null, { _link: _status.firstAct })
@@ -1967,19 +2185,22 @@ export default () => {
             }
             var seats = []
             for (var i = 0; i < game.players.length; i++) {
-              if (game.players[i] != game.me && game.players[i].side == game.me.side) {
+              if (
+                game.players[i] !== game.me &&
+                game.players[i].side === game.me.side
+              ) {
                 seats.add([
-                  1 + get.distance(_status.firstAct, game.players[i], "absolute"),
+                  1 +
+                    get.distance(_status.firstAct, game.players[i], "absolute"),
                   game.players[i],
                 ])
               }
-              seats.sort(function (a, b) {
-                return a[0] - b[0]
-              })
+              seats.sort((a, b) => a[0] - b[0])
             }
             for (var i = 0; i < event.seatsbutton.length; i++) {
               if (i < seats.length) {
-                event.seatsbutton[i].firstChild.innerHTML = get.cnNumber(seats[i][0], true) + "号位"
+                event.seatsbutton[i].firstChild.innerHTML =
+                  `${get.cnNumber(seats[i][0], true)}号位`
                 event.seatsbutton[i].firstChild._link = seats[i][1]
               }
             }
@@ -1989,30 +2210,75 @@ export default () => {
               event.addSetting()
             }
             if (get.config("fouralign") && !event.fouralignbutton) {
-              event.fouralignbutton = ui.create.control("变阵", function () {
+              event.fouralignbutton = ui.create.control("变阵", () => {
                 if (
                   !_status.fouralign.length ||
-                  (_status.fouralign.length == 1 && _status.fouralign[0] == 0)
+                  (_status.fouralign.length === 1 && _status.fouralign[0] === 0)
                 ) {
                   _status.fouralign = [0, 1, 2, 3, 4]
                 }
                 var list = [
-                  ["zhong", "ezhong", "ezhong", "zhong", "zhong", "ezhong", "ezhong", "zhong"],
-                  ["zhong", "ezhong", "zhong", "ezhong", "ezhong", "zhong", "ezhong", "zhong"],
-                  ["zhong", "ezhong", "ezhong", "zhong", "ezhong", "zhong", "zhong", "ezhong"],
-                  ["zhong", "ezhong", "zhong", "ezhong", "zhong", "ezhong", "zhong", "ezhong"],
-                  ["zhong", "ezhong", "ezhong", "zhong", "ezhong", "zhong", "ezhong", "zhong"],
+                  [
+                    "zhong",
+                    "ezhong",
+                    "ezhong",
+                    "zhong",
+                    "zhong",
+                    "ezhong",
+                    "ezhong",
+                    "zhong",
+                  ],
+                  [
+                    "zhong",
+                    "ezhong",
+                    "zhong",
+                    "ezhong",
+                    "ezhong",
+                    "zhong",
+                    "ezhong",
+                    "zhong",
+                  ],
+                  [
+                    "zhong",
+                    "ezhong",
+                    "ezhong",
+                    "zhong",
+                    "ezhong",
+                    "zhong",
+                    "zhong",
+                    "ezhong",
+                  ],
+                  [
+                    "zhong",
+                    "ezhong",
+                    "zhong",
+                    "ezhong",
+                    "zhong",
+                    "ezhong",
+                    "zhong",
+                    "ezhong",
+                  ],
+                  [
+                    "zhong",
+                    "ezhong",
+                    "ezhong",
+                    "zhong",
+                    "ezhong",
+                    "zhong",
+                    "ezhong",
+                    "zhong",
+                  ],
                 ][_status.fouralign.shift()]
                 var rand1 = Math.floor(Math.random() * 4)
                 var rand2 = Math.floor(Math.random() * 4)
                 for (var i = 0; i < list.length; i++) {
-                  if (list[i] == "zhong") {
-                    if (rand1 == 0) {
+                  if (list[i] === "zhong") {
+                    if (rand1 === 0) {
                       list[i] = "zhu"
                     }
                     rand1--
                   } else {
-                    if (rand2 == 0) {
+                    if (rand2 === 0) {
                       list[i] = "ezhu"
                     }
                     rand2--
@@ -2024,20 +2290,20 @@ export default () => {
                 list = list.splice(8 - num).concat(list)
 
                 for (var i = 0; i < 8; i++) {
-                  if (list[i][0] == "e") {
+                  if (list[i][0] === "e") {
                     game.players[i].side = side
                     game.players[i].identity = list[i].slice(1)
                   } else {
                     game.players[i].side = !side
                     game.players[i].identity = list[i]
                   }
-                  if (game.players[i].identity == "zhu") {
-                    game[game.players[i].side + "Zhu"] = game.players[i]
+                  if (game.players[i].identity === "zhu") {
+                    game[`${game.players[i].side}Zhu`] = game.players[i]
                     game.players[i].isZhu = true
                   }
                   game.players[i].setIdentity(game.players[i].identity)
                   game.players[i].node.identity.dataset.color = get.translation(
-                    game.players[i].side + "Color",
+                    `${game.players[i].side}Color`,
                   )
                   if (game.players[i].node.name_seat) {
                     game.players[i].node.name_seat.remove()
@@ -2059,17 +2325,23 @@ export default () => {
           }
           ;("step 1")
           if (
-            event.current == game.me ||
-            (event.four_assign && event.current.side == game.me.side)
+            event.current === game.me ||
+            (event.four_assign && event.current.side === game.me.side)
           ) {
             var dialog = event.xdialog
             if (!dialog) {
               if (get.config("expand_dialog")) {
                 dialog =
                   event.xdialog ||
-                  ui.create.characterDialog("heightset", event.filterChoice, "expandall")
+                  ui.create.characterDialog(
+                    "heightset",
+                    event.filterChoice,
+                    "expandall",
+                  )
               } else {
-                dialog = event.xdialog || ui.create.characterDialog("heightset", event.filterChoice)
+                dialog =
+                  event.xdialog ||
+                  ui.create.characterDialog("heightset", event.filterChoice)
               }
             }
             var names = []
@@ -2084,7 +2356,9 @@ export default () => {
                 dialog.buttons[i].classList.add("noclick")
               }
             }
-            game.me.chooseButton(dialog, true).set("onfree", true).closeDialog = false
+            game.me
+              .chooseButton(dialog, true)
+              .set("onfree", true).closeDialog = false
             event.xdialog = dialog
             dialog.static = true
             event.current.classList.add("selectedx")
@@ -2117,14 +2391,14 @@ export default () => {
             delete event.seatsbutton
           }
           event.current.classList.remove("selectedx")
-          if (event.current.side == game.me.side) {
+          if (event.current.side === game.me.side) {
             event.current.init(result.buttons[0].link)
-            if (event.current == game.me) {
+            if (event.current === game.me) {
               game.addRecentCharacter(result.buttons[0].link)
             }
             event.list.remove(event.current.name1)
             event.list2.remove(event.current.name1)
-            if (event.current.identity == "zhu") {
+            if (event.current.identity === "zhu") {
               if (!event.current.isInitFilter("noZhuHp")) {
                 event.current.hp++
                 event.current.maxHp++
@@ -2145,14 +2419,14 @@ export default () => {
               if (event.flipassign) {
                 for (var iwhile = 0; iwhile < 8; iwhile++) {
                   event.current = event.current.next
-                  if (event.current.side != side && !event.current.name1) {
+                  if (event.current.side !== side && !event.current.name1) {
                     break
                   }
                 }
               } else {
                 for (var iwhile = 0; iwhile < 8; iwhile++) {
                   event.current = event.current.previous
-                  if (event.current.side == side && !event.current.name1) {
+                  if (event.current.side === side && !event.current.name1) {
                     break
                   }
                 }
@@ -2183,7 +2457,7 @@ export default () => {
           ui.control.style.transitionDuration = "0s"
           ui.refresh(ui.control)
           ui.arena.classList.remove("choose-character")
-          setTimeout(function () {
+          setTimeout(() => {
             ui.control.style.transitionDuration = ""
           }, 500)
           lib.init.onfree()
@@ -2194,7 +2468,7 @@ export default () => {
           }
         })
       },
-      chooseCharacterThree: function () {
+      chooseCharacterThree: () => {
         var next = game.createEvent("chooseCharacter")
         next.setContent(function () {
           "step 0"
@@ -2209,19 +2483,16 @@ export default () => {
           } else {
             var chara = get.config("character_three") || lib.choiceThree
             game.chooseCharacterDouble(
-              function (i) {
+              (i) => {
                 if (get.config("enable_all_three")) {
                   if (lib.filter.characterDisabled(i)) {
                     return false
                   }
                   return !lib.filter.characterDisabled(i)
-                } else {
-                  return chara.includes(i)
                 }
+                return chara.includes(i)
               },
-              function (i) {
-                return i == 1 ? "主帅" : "前锋"
-              },
+              (i) => (i === 1 ? "主帅" : "前锋"),
             )
           }
           ;("step 1")
@@ -2240,7 +2511,8 @@ export default () => {
           }
           ui.arena.setNumber(7)
           for (var i = 0; i < game.players.length; i++) {
-            game.players[i].dataset.position = parseInt(game.players[i].dataset.position) + 1
+            game.players[i].dataset.position =
+              parseInt(game.players[i].dataset.position, 10) + 1
           }
           game.singleHandcard = true
           ui.arena.classList.add("single-handcard")
@@ -2256,8 +2528,8 @@ export default () => {
           for (var i in lib.skill) {
             if (lib.skill[i].seatRelated === true) {
               lib.skill[i] = {}
-              if (lib.translate[i + "_info"]) {
-                lib.translate[i + "_info"] = "此模式下不可用"
+              if (lib.translate[`${i}_info`]) {
+                lib.translate[`${i}_info`] = "此模式下不可用"
               }
             }
           }
@@ -2273,24 +2545,28 @@ export default () => {
           for (var i = 0; i < 3; i++) {
             game.friend[i].side = _status.color
             game.enemy[i].side = !_status.color
-            if (game.friendZhu == game.friend[i]) {
+            if (game.friendZhu === game.friend[i]) {
               game.friend[i].identity = "zhu"
-              game.friend[i].setIdentity(_status.color + "Zhu")
+              game.friend[i].setIdentity(`${_status.color}Zhu`)
             } else {
               game.friend[i].identity = "zhong"
-              game.friend[i].setIdentity(_status.color + "Zhong")
+              game.friend[i].setIdentity(`${_status.color}Zhong`)
             }
-            if (game.enemyZhu == game.enemy[i]) {
+            if (game.enemyZhu === game.enemy[i]) {
               game.enemy[i].identity = "zhu"
-              game.enemy[i].setIdentity(!_status.color + "Zhu")
+              game.enemy[i].setIdentity(`${!_status.color}Zhu`)
             } else {
               game.enemy[i].identity = "zhong"
-              game.enemy[i].setIdentity(!_status.color + "Zhong")
+              game.enemy[i].setIdentity(`${!_status.color}Zhong`)
             }
             game.friend[i].init(event.friendlist[i])
             game.enemy[i].init(event.enemylist[i])
-            game.friend[i].node.identity.dataset.color = get.translation(_status.color + "Color")
-            game.enemy[i].node.identity.dataset.color = get.translation(!_status.color + "Color")
+            game.friend[i].node.identity.dataset.color = get.translation(
+              `${_status.color}Color`,
+            )
+            game.enemy[i].node.identity.dataset.color = get.translation(
+              `${!_status.color}Color`,
+            )
           }
           if (!game.friendZhu.isInitFilter("noZhuHp")) {
             game.friendZhu.maxHp++
@@ -2307,10 +2583,10 @@ export default () => {
           game.onSwapControl()
         })
       },
-      chooseCharacter: function () {
+      chooseCharacter: () => {
         var next = game.createEvent("chooseCharacter")
         next.showConfig = true
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           if (lib.config.continue_name_versus) {
             _status.friend = lib.config.continue_name_versus.friend
@@ -2339,7 +2615,9 @@ export default () => {
               .querySelector(".toggle")
             if (lib.storage.zhu) {
               // this.dialog.versus_only_zhu.parentNode.classList.remove('disabled');
-              this.dialog.versus_main_zhu.parentNode.classList.remove("disabled")
+              this.dialog.versus_main_zhu.parentNode.classList.remove(
+                "disabled",
+              )
             } else {
               // this.dialog.versus_only_zhu.parentNode.classList.add('disabled');
               this.dialog.versus_main_zhu.parentNode.classList.add("disabled")
@@ -2347,19 +2625,45 @@ export default () => {
             // this.dialog.versus_cross_seat=this.dialog.add(ui.create.switcher('versus_cross_seat',lib.storage.cross_seat)).querySelector('.toggle');
             // this.dialog.versus_random_seat=this.dialog.add(ui.create.switcher('versus_random_seat',lib.storage.random_seat)).querySelector('.toggle');
             this.dialog.versus_noreplace_end = this.dialog
-              .add(ui.create.switcher("versus_noreplace_end", lib.storage.noreplace_end))
+              .add(
+                ui.create.switcher(
+                  "versus_noreplace_end",
+                  lib.storage.noreplace_end,
+                ),
+              )
               .querySelector(".toggle")
             this.dialog.versus_assign_enemy = this.dialog
-              .add(ui.create.switcher("versus_assign_enemy", lib.storage.assign_enemy))
+              .add(
+                ui.create.switcher(
+                  "versus_assign_enemy",
+                  lib.storage.assign_enemy,
+                ),
+              )
               .querySelector(".toggle")
             this.dialog.versus_single_control = this.dialog
-              .add(ui.create.switcher("versus_single_control", lib.storage.single_control))
+              .add(
+                ui.create.switcher(
+                  "versus_single_control",
+                  lib.storage.single_control,
+                ),
+              )
               .querySelector(".toggle")
             this.dialog.versus_first_less = this.dialog
-              .add(ui.create.switcher("versus_first_less", get.config("first_less")))
+              .add(
+                ui.create.switcher(
+                  "versus_first_less",
+                  get.config("first_less"),
+                ),
+              )
               .querySelector(".toggle")
             this.dialog.versus_reward = this.dialog
-              .add(ui.create.switcher("versus_reward", [0, 1, 2, 3, 4], lib.storage.versus_reward))
+              .add(
+                ui.create.switcher(
+                  "versus_reward",
+                  [0, 1, 2, 3, 4],
+                  lib.storage.versus_reward,
+                ),
+              )
               .querySelector(".toggle")
             this.dialog.versus_punish = this.dialog
               .add(
@@ -2372,11 +2676,21 @@ export default () => {
               .querySelector(".toggle")
             this.dialog.versus_seat_order = this.dialog
               .add(
-                ui.create.switcher("seat_order", ["对阵", "交叉", "随机"], lib.storage.seat_order),
+                ui.create.switcher(
+                  "seat_order",
+                  ["对阵", "交叉", "随机"],
+                  lib.storage.seat_order,
+                ),
               )
               .querySelector(".toggle")
             this.dialog.versus_number = this.dialog
-              .add(ui.create.switcher("versus_number", [1, 2, 3], lib.storage.number))
+              .add(
+                ui.create.switcher(
+                  "versus_number",
+                  [1, 2, 3],
+                  lib.storage.number,
+                ),
+              )
               .querySelector(".toggle")
             this.dialog.replace_number = this.dialog
               .add(
@@ -2388,7 +2702,13 @@ export default () => {
               )
               .querySelector(".toggle")
             this.dialog.choice = this.dialog
-              .add(ui.create.switcher("choice", [12, 16, 20, 24, 40, "∞"], lib.storage.choice))
+              .add(
+                ui.create.switcher(
+                  "choice",
+                  [12, 16, 20, 24, 40, "∞"],
+                  lib.storage.choice,
+                ),
+              )
               .querySelector(".toggle")
 
             // if(lib.storage.cross_seat){
@@ -2404,7 +2724,7 @@ export default () => {
             // 	}
             // }
           }
-          event.confirm = function () {
+          event.confirm = () => {
             var dialog = event.dialog
             var num = lib.storage.number + lib.storage.replace_number
             _status.friend.splice(num)
@@ -2418,7 +2738,7 @@ export default () => {
           ui.control.style.transition = "all 0s"
           if (get.is.phoneLayout()) {
             ui.control.style.top = "calc(100% - 80px)"
-          } else if (game.layout == "newlayout") {
+          } else if (game.layout === "newlayout") {
             ui.control.style.top = "calc(100% - 30px)"
           } else {
             ui.control.style.top = "calc(100% - 70px)"
@@ -2436,60 +2756,65 @@ export default () => {
             }
             list.push(i)
           }
-          var groupSort = function (name) {
-            if (lib.character[name][1] == "wei") {
+          var groupSort = (name) => {
+            if (lib.character[name][1] === "wei") {
               return 0
             }
-            if (lib.character[name][1] == "shu") {
+            if (lib.character[name][1] === "shu") {
               return 1
             }
-            if (lib.character[name][1] == "wu") {
+            if (lib.character[name][1] === "wu") {
               return 2
             }
-            if (lib.character[name][1] == "qun") {
+            if (lib.character[name][1] === "qun") {
               return 3
             }
           }
-          var sortByGroup = function (a, b) {
+          var sortByGroup = (a, b) => {
             var del = groupSort(a) - groupSort(b)
-            if (del != 0) {
+            if (del !== 0) {
               return del
             }
-            if (a.indexOf("_") != -1) {
+            if (a.indexOf("_") !== -1) {
               a = a.slice(a.indexOf("_") + 1)
             }
-            if (b.indexOf("_") != -1) {
+            if (b.indexOf("_") !== -1) {
               b = b.slice(b.indexOf("_") + 1)
             }
             return a > b ? 1 : -1
           }
-          if (lib.storage.choice == "∞") {
+          if (lib.storage.choice === "∞") {
             list.sort(sortByGroup)
           } else {
             list.randomSort()
           }
           _status.list = list
-          var choice = lib.storage.choice == "∞" ? list.length : lib.storage.choice
-          event.dialog = ui.create.dialog("选择角色", [list.slice(0, choice), "character"])
+          var choice =
+            lib.storage.choice === "∞" ? list.length : lib.storage.choice
+          event.dialog = ui.create.dialog("选择角色", [
+            list.slice(0, choice),
+            "character",
+          ])
           event.dialog.classList.add("fixed")
           // for(var i=0;i<event.dialog.buttons.length;i++){
           // 	event.dialog.buttons[i].style.transform='scale(0.95)';
           // }
           event.check()
-          ui.create.cheat = function () {
+          ui.create.cheat = () => {
             _status.createControl = event.fill
-            ui.cheat = ui.create.control("更换", function () {
+            ui.cheat = ui.create.control("更换", () => {
               if (_status.choosefinished) {
                 return
               }
-              if (lib.storage.choice == "∞") {
+              if (lib.storage.choice === "∞") {
                 list.sort(sortByGroup)
               } else {
                 list.randomSort()
               }
               _status.friend.length = 0
               _status.enemy.length = 0
-              var choice = lib.storage.choice == "∞" ? list.length : lib.storage.choice
+              var choice =
+                lib.storage.choice === "∞" ? list.length : lib.storage.choice
 
               ui.dialog.content.firstChild.innerHTML = "选择角色"
               var buttons = ui.create.div(".buttons")
@@ -2511,11 +2836,11 @@ export default () => {
             ui.create.cheat()
           }
           if (lib.config.test_game) {
-            setTimeout(function () {
+            setTimeout(() => {
               event.switchToAuto()
             }, 500)
           }
-          event.switchToAuto = function () {
+          event.switchToAuto = () => {
             delete _status.choosefinished
             event.fill.close()
             var buttons = _status.event.dialog.buttons.slice(0)
@@ -2549,7 +2874,7 @@ export default () => {
             game.resume()
           }
           event.fill = ui.create.control("补全", event.switchToAuto)
-          event.custom.replace.button = function (button) {
+          event.custom.replace.button = (button) => {
             if (_status.choose_enemy) {
               if (
                 button.classList.contains("glow") ||
@@ -2606,7 +2931,8 @@ export default () => {
               if (lib.storage.assign_enemy) {
                 _status.choose_enemy = true
               } else {
-                var button2 = buttons[Math.floor(Math.random() * buttons.length)]
+                var button2 =
+                  buttons[Math.floor(Math.random() * buttons.length)]
                 if (_status.color) {
                   button2.classList.add("glow")
                   // button2.style.transform='rotate(-3deg)';
@@ -2615,16 +2941,16 @@ export default () => {
                   // button2.style.transform='rotate(-3deg)';
                 }
                 _status.enemy.push(button2.link)
-                _status.event.dialog.content.firstChild.innerHTML =
-                  "对方选择了" + get.translation(button2.link)
+                _status.event.dialog.content.firstChild.innerHTML = `对方选择了${get.translation(button2.link)}`
               }
             }
           }
-          event.custom.add.window = function () {
+          event.custom.add.window = () => {
             var dialog = _status.event.dialog
             if (
-              _status.friend.length == _status.enemy.length &&
-              _status.friend.length >= dialog.versus_number.link + dialog.replace_number.link
+              _status.friend.length === _status.enemy.length &&
+              _status.friend.length >=
+                dialog.versus_number.link + dialog.replace_number.link
             ) {
               event.fill.firstChild.innerHTML = "开始"
               _status.choosefinished = true
@@ -2673,8 +2999,8 @@ export default () => {
               var removed = []
               for (i = dialog.buttons.length - 1; i >= 0 && count > 0; i--) {
                 if (
-                  dialog.buttons[i].classList.contains("target") == false &&
-                  dialog.buttons[i].classList.contains("glow") == false
+                  dialog.buttons[i].classList.contains("target") === false &&
+                  dialog.buttons[i].classList.contains("glow") === false
                 ) {
                   dialog.buttons[i].remove()
                   _status.list.remove(dialog.buttons[i].link)
@@ -2686,13 +3012,19 @@ export default () => {
               for (i = 0; i < removed.length; i++) {
                 _status.list.splice(lib.storage.choice, 0, removed[i])
               }
-            } else if (dialog.buttons.length < lib.storage.choice || lib.storage.choice == "∞") {
+            } else if (
+              dialog.buttons.length < lib.storage.choice ||
+              lib.storage.choice === "∞"
+            ) {
               var list = _status.list
-              var choice = lib.storage.choice == "∞" ? list.length : lib.storage.choice
+              var choice =
+                lib.storage.choice === "∞" ? list.length : lib.storage.choice
               var buttons = dialog.querySelector(".buttons")
               var button
               for (i = dialog.buttons.length; i < choice; i++) {
-                button = ui.create.button(list[i], "character", buttons).addTempClass("zoom")
+                button = ui.create
+                  .button(list[i], "character", buttons)
+                  .addTempClass("zoom")
                 dialog.buttons.push(button)
                 button.style.opacity = 1
               }
@@ -2712,7 +3044,7 @@ export default () => {
           // ui.auto.show();
           ui.wuxie.show()
           ui.control.style.display = "none"
-          setTimeout(function () {
+          setTimeout(() => {
             ui.control.style.top = ""
             ui.control.style.display = ""
             ui.control.style.transition = ""
@@ -2729,9 +3061,10 @@ export default () => {
             game.players[i].node.action.innerHTML = "行动"
           }
           if (lib.storage.single_control && game.players.length >= 4) {
-            ui.arena.setNumber(parseInt(ui.arena.dataset.number) + 1)
+            ui.arena.setNumber(parseInt(ui.arena.dataset.number, 10) + 1)
             for (var i = 0; i < game.players.length; i++) {
-              game.players[i].dataset.position = parseInt(game.players[i].dataset.position) + 1
+              game.players[i].dataset.position =
+                parseInt(game.players[i].dataset.position, 10) + 1
             }
             game.singleHandcard = true
             ui.arena.classList.add("single-handcard")
@@ -2767,14 +3100,14 @@ export default () => {
             for (var i in lib.skill) {
               if (lib.skill[i].seatRelated === true) {
                 lib.skill[i] = {}
-                if (lib.translate[i + "_info"]) {
-                  lib.translate[i + "_info"] = "此模式下不可用"
+                if (lib.translate[`${i}_info`]) {
+                  lib.translate[`${i}_info`] = "此模式下不可用"
                 }
               }
             }
             if (lib.storage.cross_seat) {
               for (i = 0; i < game.players.length; i++) {
-                if (i % 2 == 0) {
+                if (i % 2 === 0) {
                   game.friend.push(game.players[i])
                 } else {
                   game.enemy.push(game.players[i])
@@ -2793,10 +3126,13 @@ export default () => {
             }
           }
           if (
-            (position == Math.ceil(num / 2) - 1 && lib.storage.zhu) ||
+            (position === Math.ceil(num / 2) - 1 && lib.storage.zhu) ||
             (lib.storage.zhu && lib.storage.single_control)
           ) {
-            var dialog = ui.create.dialog("按顺序选择出场角色", [_status.friend, "character"])
+            var dialog = ui.create.dialog("按顺序选择出场角色", [
+              _status.friend,
+              "character",
+            ])
             game.me.chooseButton(dialog, num, true)
           }
           if (lib.storage.random_seat && lib.storage.zhu) {
@@ -2811,51 +3147,58 @@ export default () => {
             game.friend[i].side = _status.color
             game.enemy[i].side = !_status.color
             if (lib.storage.random_seat && lib.storage.zhu) {
-              if (game.friendZhu == game.friend[i]) {
+              if (game.friendZhu === game.friend[i]) {
                 game.friend[i].identity = "zhu"
-                game.friend[i].setIdentity(_status.color + "Zhu")
+                game.friend[i].setIdentity(`${_status.color}Zhu`)
               } else {
                 game.friend[i].identity = "zhong"
-                game.friend[i].setIdentity(_status.color + "Zhong")
+                game.friend[i].setIdentity(`${_status.color}Zhong`)
               }
-              if (game.enemyZhu == game.enemy[i]) {
+              if (game.enemyZhu === game.enemy[i]) {
                 game.enemy[i].identity = "zhu"
-                game.enemy[i].setIdentity(!_status.color + "Zhu")
+                game.enemy[i].setIdentity(`${!_status.color}Zhu`)
               } else {
                 game.enemy[i].identity = "zhong"
-                game.enemy[i].setIdentity(!_status.color + "Zhong")
+                game.enemy[i].setIdentity(`${!_status.color}Zhong`)
               }
             } else {
-              if (game.me == game.friend[i] && lib.storage.zhu) {
+              if (game.me === game.friend[i] && lib.storage.zhu) {
                 game.friend[i].identity = "zhu"
-                game.friend[i].setIdentity(_status.color + "Zhu")
+                game.friend[i].setIdentity(`${_status.color}Zhu`)
                 game.friendZhu = game.friend[i]
               } else {
                 game.friend[i].identity = "zhong"
-                game.friend[i].setIdentity(_status.color + "Zhong")
+                game.friend[i].setIdentity(`${_status.color}Zhong`)
               }
-              if (lib.storage.zhu && get.distance(game.enemy[i], game.me, "pure") == num) {
+              if (
+                lib.storage.zhu &&
+                get.distance(game.enemy[i], game.me, "pure") === num
+              ) {
                 game.enemy[i].identity = "zhu"
-                game.enemy[i].setIdentity(!_status.color + "Zhu")
+                game.enemy[i].setIdentity(`${!_status.color}Zhu`)
                 game.enemyZhu = game.enemy[i]
               } else {
                 game.enemy[i].identity = "zhong"
-                game.enemy[i].setIdentity(!_status.color + "Zhong")
+                game.enemy[i].setIdentity(`${!_status.color}Zhong`)
               }
             }
-            game.friend[i].node.identity.dataset.color = get.translation(_status.color + "Color")
-            game.enemy[i].node.identity.dataset.color = get.translation(!_status.color + "Color")
+            game.friend[i].node.identity.dataset.color = get.translation(
+              `${_status.color}Color`,
+            )
+            game.enemy[i].node.identity.dataset.color = get.translation(
+              `${!_status.color}Color`,
+            )
             // game.friend[i].node.identity.style.backgroundColor=get.translation(_status.color+'Color');
             // game.enemy[i].node.identity.style.backgroundColor=get.translation(!_status.color+'Color');
           }
           if (lib.storage.zhu && !game.enemyZhu) {
             game.enemy[0].identity = "zhu"
-            game.enemy[0].setIdentity(!_status.color + "Zhu")
+            game.enemy[0].setIdentity(`${!_status.color}Zhu`)
             game.enemyZhu = game.enemy[0]
           }
           ;("step 2")
           var num = lib.storage.number
-          if (result && result.buttons) {
+          if (result?.buttons) {
             var list = []
             for (i = 0; i < result.buttons.length; i++) {
               list.push(result.buttons[i].link)
@@ -2867,8 +3210,12 @@ export default () => {
             game.friend[i].init(_status.friend[i])
             game.enemy[i].init(_status.enemy[i])
 
-            game.friend[i].node.identity.dataset.color = get.translation(_status.color + "Color")
-            game.enemy[i].node.identity.dataset.color = get.translation(!_status.color + "Color")
+            game.friend[i].node.identity.dataset.color = get.translation(
+              `${_status.color}Color`,
+            )
+            game.enemy[i].node.identity.dataset.color = get.translation(
+              `${!_status.color}Color`,
+            )
           }
           if (lib.storage.zhu && lib.storage.main_zhu) {
             if (!game.friendZhu.isInitFilter("noZhuHp")) {
@@ -2891,7 +3238,7 @@ export default () => {
           }
         })
       },
-      chooseCharacterOL: function () {
+      chooseCharacterOL: () => {
         switch (lib.configOL.versus_mode) {
           case "1v1":
             game.chooseCharacterOL1()
@@ -2910,36 +3257,81 @@ export default () => {
             break
         }
       },
-      chooseCharacterOLGuandu: function () {
+      chooseCharacterOLGuandu: () => {
         var next = game.createEvent("chooseCharacter")
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           var list = [
-            ["zhu", "ezhu", "ezhong", "zhong", "ezhong", "zhong", "zhong", "ezhong"],
-            ["zhu", "ezhong", "zhong", "ezhu", "ezhong", "zhong", "ezhong", "zhong"],
-            ["zhu", "ezhong", "zhong", "ezhong", "zhong", "ezhong", "zhong", "ezhu"],
-            ["zhu", "ezhu", "zhong", "ezhong", "zhong", "ezhong", "zhong", "ezhong"],
-            ["zhu", "ezhong", "zhong", "ezhong", "zhong", "ezhu", "zhong", "ezhong"],
+            [
+              "zhu",
+              "ezhu",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "zhong",
+              "zhong",
+              "ezhong",
+            ],
+            [
+              "zhu",
+              "ezhong",
+              "zhong",
+              "ezhu",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "zhong",
+            ],
+            [
+              "zhu",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "zhong",
+              "ezhu",
+            ],
+            [
+              "zhu",
+              "ezhu",
+              "zhong",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "zhong",
+              "ezhong",
+            ],
+            [
+              "zhu",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "zhong",
+              "ezhu",
+              "zhong",
+              "ezhong",
+            ],
           ].randomGet()
 
           var side = true
           var num = Math.floor(Math.random() * 8)
           list = list.splice(8 - num).concat(list)
           for (var i = 0; i < 8; i++) {
-            if (list[i][0] == "e") {
+            if (list[i][0] === "e") {
               game.players[i].side = side
               game.players[i].identity = list[i].slice(1)
             } else {
               game.players[i].side = !side
               game.players[i].identity = list[i]
             }
-            if (game.players[i].identity == "zhu") {
-              game[game.players[i].side + "Zhu"] = game.players[i]
+            if (game.players[i].identity === "zhu") {
+              game[`${game.players[i].side}Zhu`] = game.players[i]
               game.players[i].isZhu = true
             }
             game.players[i].setIdentity(game.players[i].identity)
             game.players[i].node.identity.dataset.color = get.translation(
-              game.players[i].side + "Color",
+              `${game.players[i].side}Color`,
             )
             game.players[i].getId()
           }
@@ -2949,14 +3341,17 @@ export default () => {
           var num = Math.floor(Math.random() * 8)
           list = list.splice(8 - num).concat(list)
           for (var i = 0; i < 8; i++) {
-            if (list[i][0] == "e") {
+            if (list[i][0] === "e") {
               game.players[i].side = side
               game.players[i].identity = list[i].slice(1)
             } else {
               game.players[i].side = !side
               game.players[i].identity = list[i]
             }
-            map[game.players[i].playerid] = [game.players[i].side, game.players[i].identity]
+            map[game.players[i].playerid] = [
+              game.players[i].side,
+              game.players[i].identity,
+            ]
           }
           var evt_list = [
             ["huoshaowuchao", "chunyuqiong"],
@@ -2973,39 +3368,45 @@ export default () => {
             character = evt_list[1]
           game.addGlobalSkill(evt)
 
-          var func = function (map, evt, character) {
+          var func = (map, evt, character) => {
             for (var i in map) {
               var player = lib.playerOL[i]
               if (player) {
                 player.side = map[i][0]
                 player.identity = map[i][1]
                 player.setIdentity()
-                player.node.identity.dataset.color = get.translation(player.side + "Color")
-                if (player.identity == "zhu") {
-                  game[player.side + "Zhu"] = player
+                player.node.identity.dataset.color = get.translation(
+                  `${player.side}Color`,
+                )
+                if (player.identity === "zhu") {
+                  game[`${player.side}Zhu`] = player
                   player.isZhu = true
                 }
               }
             }
             ui.arena.classList.add("choose-character")
-            if (evt == "shishengshibai") {
+            if (evt === "shishengshibai") {
               ui.guanduInfo = get.is.phoneLayout()
                 ? ui.create.div(".touchinfo.left", ui.window)
                 : ui.create.div(ui.gameinfo)
               ui.guanduInfo.innerHTML = "十胜十败（0）"
             }
-            const showGuanduEvent = function (evt, character) {
-              if (ui["GuanduEvent_" + evt]) {
+            const showGuanduEvent = (evt, character) => {
+              if (ui[`GuanduEvent_${evt}`]) {
                 return
               }
-              ui["GuanduEvent_" + evt] = ui.create.system(get.translation(evt), null, true)
+              ui[`GuanduEvent_${evt}`] = ui.create.system(
+                get.translation(evt),
+                null,
+                true,
+              )
               lib.setPopped(
-                ui["GuanduEvent_" + evt],
-                function () {
+                ui[`GuanduEvent_${evt}`],
+                () => {
                   var uiintro = ui.create.dialog("hidden")
                   uiintro.add(get.translation(evt))
                   uiintro.add(
-                    '<div class="text center">' + get.translation(evt + "_info") + "</div>",
+                    `<div class="text center">${get.translation(`${evt}_info`)}</div>`,
                   )
                   var ul = uiintro.querySelector("ul")
                   if (ul) {
@@ -3019,7 +3420,7 @@ export default () => {
             }
             for (const i in lib.playerOL) {
               const target = lib.playerOL[i]
-              if (target == game.me) {
+              if (target === game.me) {
                 showGuanduEvent(evt, character)
               } else if (target.isOnline2()) {
                 target.send(showGuanduEvent, evt, character)
@@ -3028,10 +3429,12 @@ export default () => {
             if (lib.config.background_speak) {
               game.playAudio("skill", evt)
             }
-            var dialog = ui.create.dialog("本局特殊事件：" + get.translation(evt))
-            dialog.addText(get.translation(evt + "_info"), false)
+            var dialog = ui.create.dialog(
+              `本局特殊事件：${get.translation(evt)}`,
+            )
+            dialog.addText(get.translation(`${evt}_info`), false)
             dialog.add([[character], "character"])
-            setTimeout(function () {
+            setTimeout(() => {
               dialog.close()
             }, 5000)
           }
@@ -3042,16 +3445,20 @@ export default () => {
           game.falseZhu.chooseButtonOL(
             [
               [game.falseZhu, ["请选择武将", [["caocao"], "characterx"]], true],
-              [game.trueZhu, ["请选择武将", [["re_yuanshao"], "characterx"]], true],
+              [
+                game.trueZhu,
+                ["请选择武将", [["re_yuanshao"], "characterx"]],
+                true,
+              ],
             ],
-            function (player, result) {
-              if (game.online || player == game.me) {
+            (player, result) => {
+              if (game.online || player === game.me) {
                 player.init(result.links[0])
               }
             },
           )
           ;("step 2")
-          game.broadcastAll(function (result) {
+          game.broadcastAll((result) => {
             for (var i in result) {
               if (!lib.playerOL[i].name) {
                 lib.playerOL[i].init(result[i].links[0])
@@ -3081,17 +3488,18 @@ export default () => {
             "xunyou",
             "zhangxiu",
             "sp_jiaxu",
-          ].filter(function (name) {
+          ].filter((name) => {
             if (lib.characterReplace[name]) {
               let goon = false
-              for (let i of lib.characterReplace[name]) {
+              for (const i of lib.characterReplace[name]) {
                 if (lib.character[i]) {
                   lib.character[i][1] = "wei"
                   goon = true
                 }
               }
               return goon
-            } else if (lib.character[name]) {
+            }
+            if (lib.character[name]) {
               lib.character[name][1] = "wei"
               return true
             }
@@ -3115,27 +3523,28 @@ export default () => {
             "tianfeng",
             "chunyuqiong",
             "shenpei",
-          ].filter(function (name) {
+          ].filter((name) => {
             if (lib.characterReplace[name]) {
               let goon = false
-              for (let i of lib.characterReplace[name]) {
+              for (const i of lib.characterReplace[name]) {
                 if (lib.character[i]) {
                   lib.character[i][1] = "qun"
                   goon = true
                 }
               }
               return goon
-            } else if (lib.character[name]) {
+            }
+            if (lib.character[name]) {
               lib.character[name][1] = "qun"
               return true
             }
             return false
           })
           game.broadcast(
-            function (list1, list2) {
-              for (let name of list1) {
+            (list1, list2) => {
+              for (const name of list1) {
                 if (lib.characterReplace[name]) {
-                  for (let i of lib.characterReplace[name]) {
+                  for (const i of lib.characterReplace[name]) {
                     if (lib.character[i]) {
                       lib.character[i][1] = "wei"
                     }
@@ -3144,9 +3553,9 @@ export default () => {
                   lib.character[name][1] = "wei"
                 }
               }
-              for (let name of list2) {
+              for (const name of list2) {
                 if (lib.characterReplace[name]) {
-                  for (let i of lib.characterReplace[name]) {
+                  for (const i of lib.characterReplace[name]) {
                     if (lib.character[i]) {
                       lib.character[i][1] = "qun"
                     }
@@ -3161,47 +3570,47 @@ export default () => {
           )
           event.map = {}
           var list = []
-          game.countPlayer(function (current) {
-            if (current.identity == "zhong") {
-              var choice = event[current.side + "List"].randomRemove(2)
+          game.countPlayer((current) => {
+            if (current.identity === "zhong") {
+              var choice = event[`${current.side}List`].randomRemove(2)
               event.map[current.playerid] = choice
               list.push([current, ["请选择武将", [choice, "characterx"]], true])
             }
           })
-          game.me.chooseButtonOL(list, function (player, result) {
-            if (game.online || player == game.me) {
+          game.me.chooseButtonOL(list, (player, result) => {
+            if (game.online || player === game.me) {
               player.init(result.links[0])
             }
           })
           ;("step 4")
           for (var i in result) {
-            if (result[i] == "ai") {
+            if (result[i] === "ai") {
               result[i] = event.map[i].randomRemove(1)[0]
             } else {
               result[i] = result[i].links[0]
             }
           }
-          game.broadcastAll(function (result) {
+          game.broadcastAll((result) => {
             for (var i in result) {
               if (!lib.playerOL[i].name) {
                 lib.playerOL[i].init(result[i])
               }
             }
-            setTimeout(function () {
+            setTimeout(() => {
               ui.arena.classList.remove("choose-character")
             }, 500)
           }, result)
         })
       },
-      chooseCharacterGuandu: function () {
+      chooseCharacterGuandu: () => {
         var next = game.createEvent("chooseCharacter")
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           lib.init.onfree()
           ui.arena.classList.add("choose-character")
           const side = game.me.side.toString()
           event.friendSide = side
-          event.enemySide = side == "true" ? "false" : "true"
+          event.enemySide = side === "true" ? "false" : "true"
           event.zhuList = [["caocao"], ["re_yuanshao"]]
           event.falseList = [
             "xiahouyuan",
@@ -3222,17 +3631,18 @@ export default () => {
             "xunyou",
             "zhangxiu",
             "sp_jiaxu",
-          ].filter(function (name) {
+          ].filter((name) => {
             if (lib.characterReplace[name]) {
               let goon = false
-              for (let i of lib.characterReplace[name]) {
+              for (const i of lib.characterReplace[name]) {
                 if (lib.character[i]) {
                   lib.character[i][1] = "wei"
                   goon = true
                 }
               }
               return goon
-            } else if (lib.character[name]) {
+            }
+            if (lib.character[name]) {
               lib.character[name][1] = "wei"
               return true
             }
@@ -3256,36 +3666,43 @@ export default () => {
             "tianfeng",
             "chunyuqiong",
             "shenpei",
-          ].filter(function (name) {
+          ].filter((name) => {
             if (lib.characterReplace[name]) {
               let goon = false
-              for (let i of lib.characterReplace[name]) {
+              for (const i of lib.characterReplace[name]) {
                 if (lib.character[i]) {
                   lib.character[i][1] = "qun"
                   goon = true
                 }
               }
               return goon
-            } else if (lib.character[name]) {
+            }
+            if (lib.character[name]) {
               lib.character[name][1] = "qun"
               return true
             }
             return false
           })
           ;("step 1")
-          game[event.enemySide + "Zhu"].chooseButton(
-            ["请选择你的武将牌", [event.zhuList[event.enemySide == "true" ? 1 : 0], "characterx"]],
+          game[`${event.enemySide}Zhu`].chooseButton(
+            [
+              "请选择你的武将牌",
+              [event.zhuList[event.enemySide === "true" ? 1 : 0], "characterx"],
+            ],
             true,
           )
           ;("step 2")
-          game[event.enemySide + "Zhu"].init(result.links[0])
-          game[event.enemySide + "Zhu"].maxHp++
-          game[event.enemySide + "Zhu"].hp++
-          game[event.enemySide + "Zhu"].update()
+          game[`${event.enemySide}Zhu`].init(result.links[0])
+          game[`${event.enemySide}Zhu`].maxHp++
+          game[`${event.enemySide}Zhu`].hp++
+          game[`${event.enemySide}Zhu`].update()
           ;("step 3")
           game.countPlayer((current) => {
-            if (current.side.toString() == event.enemySide && current.identity == "zhong") {
-              let choice = event[event.enemySide + "List"].randomRemove(2)[0]
+            if (
+              current.side.toString() === event.enemySide &&
+              current.identity === "zhong"
+            ) {
+              let choice = event[`${event.enemySide}List`].randomRemove(2)[0]
               if (lib.characterReplace[choice]) {
                 choice = lib.characterReplace[choice].randomGet()
               }
@@ -3307,17 +3724,23 @@ export default () => {
           var evt = evt_list[0],
             character = evt_list[1]
           game.addGlobalSkill(evt)
-          const showGuanduEvent = function (evt) {
-            if (ui["GuanduEvent_" + evt]) {
+          const showGuanduEvent = (evt) => {
+            if (ui[`GuanduEvent_${evt}`]) {
               return
             }
-            ui["GuanduEvent_" + evt] = ui.create.system(get.translation(evt), null, true)
+            ui[`GuanduEvent_${evt}`] = ui.create.system(
+              get.translation(evt),
+              null,
+              true,
+            )
             lib.setPopped(
-              ui["GuanduEvent_" + evt],
-              function () {
+              ui[`GuanduEvent_${evt}`],
+              () => {
                 var uiintro = ui.create.dialog("hidden")
                 uiintro.add(get.translation(evt))
-                uiintro.add('<div class="text center">' + get.translation(evt + "_info") + "</div>")
+                uiintro.add(
+                  `<div class="text center">${get.translation(`${evt}_info`)}</div>`,
+                )
                 var ul = uiintro.querySelector("ul")
                 if (ul) {
                   ul.style.width = "180px"
@@ -3329,11 +3752,11 @@ export default () => {
             )
           }
           showGuanduEvent(evt)
-          game.broadcastAll(function (evt) {
+          game.broadcastAll((evt) => {
             if (lib.config.background_speak) {
               game.playAudio("skill", evt)
             }
-            if (evt == "shishengshibai") {
+            if (evt === "shishengshibai") {
               ui.guanduInfo = get.is.phoneLayout()
                 ? ui.create.div(".touchinfo.left", ui.window)
                 : ui.create.div(ui.gameinfo)
@@ -3343,30 +3766,39 @@ export default () => {
           game.me
             .chooseControl("ok")
             .set("dialog", [
-              "###本局特殊事件：" + get.translation(evt) + "###" + get.translation(evt + "_info"),
+              `###本局特殊事件：${get.translation(evt)}###${get.translation(`${evt}_info`)}`,
               [[character], "character"],
             ])
           ;("step 5")
-          game[event.friendSide + "Zhu"].chooseButton(
-            ["请选择你的武将牌", [event.zhuList[event.friendSide == "true" ? 1 : 0], "characterx"]],
+          game[`${event.friendSide}Zhu`].chooseButton(
+            [
+              "请选择你的武将牌",
+              [
+                event.zhuList[event.friendSide === "true" ? 1 : 0],
+                "characterx",
+              ],
+            ],
             true,
           )
           ;("step 6")
-          if (game[event.friendSide + "Zhu"] == game.me) {
-            game[event.friendSide + "Zhu"].init(result.links[0])
-            game[event.friendSide + "Zhu"].maxHp++
-            game[event.friendSide + "Zhu"].hp++
-            game[event.friendSide + "Zhu"].update()
+          if (game[`${event.friendSide}Zhu`] === game.me) {
+            game[`${event.friendSide}Zhu`].init(result.links[0])
+            game[`${event.friendSide}Zhu`].maxHp++
+            game[`${event.friendSide}Zhu`].hp++
+            game[`${event.friendSide}Zhu`].update()
           } else {
             event.zhuChoice = result.links[0]
           }
           ;("step 7")
-          if (game.me.identity != "zhu") {
+          if (game.me.identity !== "zhu") {
             event.choose_me = true
             game.me.chooseButton(
               [
                 "请选择你的武将牌",
-                [event[event.friendSide + "List"].randomRemove(2), "characterx"],
+                [
+                  event[`${event.friendSide}List`].randomRemove(2),
+                  "characterx",
+                ],
               ],
               true,
             )
@@ -3375,10 +3807,13 @@ export default () => {
           if (event.choose_me) {
             game.me.init(result.links[0])
           }
-          game.countPlayer(function (current) {
-            if (current != game.me && current.side.toString() == event.friendSide) {
-              if (current.identity == "zhong") {
-                let choice = event[event.friendSide + "List"].randomRemove(2)[0]
+          game.countPlayer((current) => {
+            if (
+              current !== game.me &&
+              current.side.toString() === event.friendSide
+            ) {
+              if (current.identity === "zhong") {
+                let choice = event[`${event.friendSide}List`].randomRemove(2)[0]
                 if (lib.characterReplace[choice]) {
                   choice = lib.characterReplace[choice].randomGet()
                 }
@@ -3392,32 +3827,77 @@ export default () => {
             }
           })
           ;("step 9")
-          setTimeout(function () {
+          setTimeout(() => {
             ui.arena.classList.remove("choose-character")
           }, 500)
         })
       },
-      chooseCharacterOL4: function () {
+      chooseCharacterOL4: () => {
         var next = game.createEvent("chooseCharacter")
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           var list = [
-            ["zhong", "ezhong", "ezhong", "zhong", "zhong", "ezhong", "ezhong", "zhong"],
-            ["zhong", "ezhong", "zhong", "ezhong", "ezhong", "zhong", "ezhong", "zhong"],
-            ["zhong", "ezhong", "ezhong", "zhong", "ezhong", "zhong", "zhong", "ezhong"],
-            ["zhong", "ezhong", "zhong", "ezhong", "zhong", "ezhong", "zhong", "ezhong"],
-            ["zhong", "ezhong", "ezhong", "zhong", "ezhong", "zhong", "ezhong", "zhong"],
+            [
+              "zhong",
+              "ezhong",
+              "ezhong",
+              "zhong",
+              "zhong",
+              "ezhong",
+              "ezhong",
+              "zhong",
+            ],
+            [
+              "zhong",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "zhong",
+            ],
+            [
+              "zhong",
+              "ezhong",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "zhong",
+              "zhong",
+              "ezhong",
+            ],
+            [
+              "zhong",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "zhong",
+              "ezhong",
+            ],
+            [
+              "zhong",
+              "ezhong",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "zhong",
+              "ezhong",
+              "zhong",
+            ],
           ].randomGet()
           var rand1 = Math.floor(Math.random() * 4)
           var rand2 = Math.floor(Math.random() * 4)
           for (var i = 0; i < list.length; i++) {
-            if (list[i] == "zhong") {
-              if (rand1 == 0) {
+            if (list[i] === "zhong") {
+              if (rand1 === 0) {
                 list[i] = "zhu"
               }
               rand1--
             } else {
-              if (rand2 == 0) {
+              if (rand2 === 0) {
                 list[i] = "ezhu"
               }
               rand2--
@@ -3431,27 +3911,35 @@ export default () => {
           _status.firstAct = game.players[num]
           event.current = _status.firstAct.next
           for (var i = 0; i < 8; i++) {
-            if (list[i][0] == "e") {
+            if (list[i][0] === "e") {
               game.players[i].side = side
               game.players[i].identity = list[i].slice(1)
             } else {
               game.players[i].side = !side
               game.players[i].identity = list[i]
             }
-            map[game.players[i].playerid] = [game.players[i].side, game.players[i].identity]
+            map[game.players[i].playerid] = [
+              game.players[i].side,
+              game.players[i].identity,
+            ]
           }
           if (_status.firstAct.side) {
             for (var i = 0; i < game.players.length; i++) {
               game.players[i].side = !game.players[i].side
-              map[game.players[i].playerid] = [game.players[i].side, game.players[i].identity]
+              map[game.players[i].playerid] = [
+                game.players[i].side,
+                game.players[i].identity,
+              ]
             }
           }
-          game.broadcastAll(function (current) {
+          game.broadcastAll((current) => {
             for (var i = 0; i < game.players.length; i++) {
               game.players[i].node.name_seat = ui.create.div(
                 ".name.name_seat",
                 get.verticalStr(
-                  lib.translate["unknown" + get.distance(current, game.players[i], "absolute")],
+                  lib.translate[
+                    `unknown${get.distance(current, game.players[i], "absolute")}`
+                  ],
                 ),
                 game.players[i],
               )
@@ -3459,42 +3947,42 @@ export default () => {
             }
           }, _status.firstAct)
 
-          var filterChoice = function (name) {
+          var filterChoice = (name) => {
             // if(name=='zuoci'||name=='miheng') return true;
             if (!lib.choiceFour.includes(name)) {
               return true
             }
-            if (lib.characterPack.refresh && lib.characterPack.refresh[name]) {
+            if (lib.characterPack.refresh?.[name]) {
               if (!lib.configOL.characterPack.includes("refresh")) {
                 return true
               }
               return false
             }
-            if (lib.characterPack.standard && lib.characterPack.standard[name]) {
+            if (lib.characterPack.standard?.[name]) {
               if (!lib.configOL.characterPack.includes("standard")) {
                 return true
               }
               if (
                 lib.configOL.characterPack.includes("refresh") &&
-                lib.characterPack.refresh["re_" + name]
+                lib.characterPack.refresh[`re_${name}`]
               ) {
                 return true
               }
               return false
             }
-            if (lib.characterPack.shenhua && lib.characterPack.shenhua[name]) {
+            if (lib.characterPack.shenhua?.[name]) {
               if (!lib.configOL.characterPack.includes("shenhua")) {
                 return true
               }
               return false
             }
-            if (lib.characterPack.sp && lib.characterPack.sp[name]) {
+            if (lib.characterPack.sp?.[name]) {
               if (!lib.configOL.characterPack.includes("sp")) {
                 return true
               }
               return false
             }
-            if (lib.characterPack.yijiang && lib.characterPack.yijiang[name]) {
+            if (lib.characterPack.yijiang?.[name]) {
               if (!lib.configOL.characterPack.includes("yijiang")) {
                 return true
               }
@@ -3504,9 +3992,11 @@ export default () => {
           }
           event.flipassign = true
           event.videoId = lib.status.videoId++
-          var func = function (filter, id, selected, map, choiceFour) {
+          var func = (filter, id, selected, map, choiceFour) => {
             lib.choiceFour = choiceFour
-            var dialog = ui.create.characterDialog("heightset", filter, "expandall").open()
+            var dialog = ui.create
+              .characterDialog("heightset", filter, "expandall")
+              .open()
             dialog.videoId = id
             for (var i in map) {
               var player = lib.playerOL[i]
@@ -3514,9 +4004,11 @@ export default () => {
                 player.side = map[i][0]
                 player.identity = map[i][1]
                 player.setIdentity()
-                player.node.identity.dataset.color = get.translation(player.side + "Color")
-                if (player.identity == "zhu") {
-                  game[player.side + "Zhu"] = player
+                player.node.identity.dataset.color = get.translation(
+                  `${player.side}Color`,
+                )
+                if (player.identity === "zhu") {
+                  game[`${player.side}Zhu`] = player
                   player.isZhu = true
                 }
               }
@@ -3525,7 +4017,14 @@ export default () => {
           }
           event.map = map
           event.selected = []
-          game.broadcastAll(func, filterChoice, event.videoId, event.selected, map, lib.choiceFour)
+          game.broadcastAll(
+            func,
+            filterChoice,
+            event.videoId,
+            event.selected,
+            map,
+            lib.choiceFour,
+          )
           _status.onreconnect = [
             func,
             filterChoice,
@@ -3535,19 +4034,20 @@ export default () => {
             lib.choiceFour,
           ]
           ;("step 1")
-          game.broadcastAll(function (player) {
+          game.broadcastAll((player) => {
             player.classList.add("selectedx")
           }, event.current)
           event.current
             .chooseButton(true)
-            .set("filterButton", function (button) {
-              return !_status.event.selected.includes(button.link)
-            })
-            .set("ai", function (button) {
-              if (_status.event.player.identity == "zhu") {
+            .set(
+              "filterButton",
+              (button) => !_status.event.selected.includes(button.link),
+            )
+            .set("ai", (button) => {
+              if (_status.event.player.identity === "zhu") {
                 if (Math.random() < 0.8) {
                   var info = lib.character[button.link]
-                  if (!info || !info.isZhugong) {
+                  if (!info?.isZhugong) {
                     return 0
                   }
                 }
@@ -3556,11 +4056,11 @@ export default () => {
               var rank = get.rank(button.link, true)
               if (seed > 0.4) {
                 return rank >= 6 ? Math.random() : -Math.random()
-              } else if (seed > 0.1) {
-                return rank >= 4 && rank < 6 ? Math.random() : -Math.random()
-              } else {
-                return rank < 4 ? Math.random() : -Math.random()
               }
+              if (seed > 0.1) {
+                return rank >= 4 && rank < 6 ? Math.random() : -Math.random()
+              }
+              return rank < 4 ? Math.random() : -Math.random()
             })
             .set("selected", _status.event.selected)
             .set("dialog", event.videoId)
@@ -3568,7 +4068,7 @@ export default () => {
           ;("step 2")
           event.selected.push(result.links[0])
           game.broadcastAll(
-            function (player, name, zhu) {
+            (player, name, zhu) => {
               player.classList.remove("selectedx")
               player.init(name)
               if (player.node.name_seat) {
@@ -3578,7 +4078,7 @@ export default () => {
             event.current,
             result.links[0],
           )
-          if (event.current.identity == "zhu") {
+          if (event.current.identity === "zhu") {
             if (!event.current.isInitFilter("noZhuHp")) {
               event.current.maxHp++
               event.current.hp++
@@ -3597,14 +4097,14 @@ export default () => {
             if (event.flipassign) {
               for (var iwhile = 0; iwhile < 8; iwhile++) {
                 event.current = event.current.next
-                if (event.current.side != side && !event.current.name1) {
+                if (event.current.side !== side && !event.current.name1) {
                   break
                 }
               }
             } else {
               for (var iwhile = 0; iwhile < 8; iwhile++) {
                 event.current = event.current.previous
-                if (event.current.side == side && !event.current.name1) {
+                if (event.current.side === side && !event.current.name1) {
                   break
                 }
               }
@@ -3614,34 +4114,34 @@ export default () => {
           }
           ;("step 3")
           _status.onreconnect = [
-            function () {
+            () => {
               for (var i = 0; i < game.players.length; i++) {
                 var player = game.players[i]
-                if (player.identity == "zhu") {
-                  game[player.side + "Zhu"] = player
+                if (player.identity === "zhu") {
+                  game[`${player.side}Zhu`] = player
                   player.isZhu = true
                 }
               }
             },
           ]
-          game.broadcastAll(function (id) {
+          game.broadcastAll((id) => {
             var dialog = get.idDialog(id)
             if (dialog) {
               dialog.close()
             }
-            setTimeout(function () {
+            setTimeout(() => {
               ui.arena.classList.remove("choose-character")
             }, 500)
           }, event.videoId)
         })
       },
-      chooseCharacterOL3: function () {
+      chooseCharacterOL3: () => {
         var next = game.createEvent("chooseCharacterOL")
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           game.additionaldead = []
           game.broadcastAll(
-            function (ref, bool) {
+            (ref, bool) => {
               ui.arena.classList.add("choose-character")
               for (var i = 0; i < 6; i++) {
                 ref.side = bool
@@ -3649,25 +4149,26 @@ export default () => {
                 bool = !bool
               }
               for (var i = 0; i < game.players.length; i++) {
-                if (game.players[i].side == game.me.side) {
+                if (game.players[i].side === game.me.side) {
                   game.players[i].node.identity.firstChild.innerHTML = "友"
                 } else {
                   game.players[i].node.identity.firstChild.innerHTML = "敌"
                 }
-                game.players[i].node.identity.dataset.color = game.players[i].side + "zhu"
+                game.players[i].node.identity.dataset.color =
+                  `${game.players[i].side}zhu`
               }
             },
             game.players[0],
             Math.random() < 0.5,
           )
-          if (game.me.side == undefined) {
+          if (game.me.side === undefined) {
             game.me.side = game.players[0].side
           }
           _status.onreconnect = [
-            function () {
+            () => {
               var players = game.players.concat(game.dead)
               for (var i = 0; i < players.length; i++) {
-                if (players[i].side == game.me.side) {
+                if (players[i].side === game.me.side) {
                   players[i].node.identity.firstChild.innerHTML = "友"
                 } else {
                   players[i].node.identity.firstChild.innerHTML = "敌"
@@ -3686,22 +4187,22 @@ export default () => {
               true,
             ])
           }
-          game.me.chooseButtonOL(choose, function (player, result) {
-            if (game.online || player == game.me) {
+          game.me.chooseButtonOL(choose, (player, result) => {
+            if (game.online || player === game.me) {
               player.init(result.links[0])
             }
           })
           ;("step 1")
           for (var i in result) {
-            if (result[i] == "ai") {
+            if (result[i] === "ai") {
               result[i] = event.list.randomRemove(2)
             } else {
               result[i] = result[i].links
             }
           }
           game.broadcastAll(
-            function (result, func1, func2) {
-              setTimeout(function () {
+            (result, func1, func2) => {
+              setTimeout(() => {
                 ui.arena.classList.remove("choose-character")
               }, 500)
               _status.friendDied = []
@@ -3710,8 +4211,16 @@ export default () => {
               _status.friend = []
               _status.enemy = []
 
-              _status.enemyCount = ui.create.system("杀敌: " + get.cnNumber(0, true), null, true)
-              _status.friendCount = ui.create.system("阵亡: " + get.cnNumber(0, true), null, true)
+              _status.enemyCount = ui.create.system(
+                `杀敌: ${get.cnNumber(0, true)}`,
+                null,
+                true,
+              )
+              _status.friendCount = ui.create.system(
+                `阵亡: ${get.cnNumber(0, true)}`,
+                null,
+                true,
+              )
 
               lib.setPopped(_status.friendCount, func1)
               lib.setPopped(_status.enemyCount, func2)
@@ -3720,7 +4229,7 @@ export default () => {
                 if (!lib.playerOL[i].name1) {
                   lib.playerOL[i].init(result[i][0])
                 }
-                if (lib.playerOL[i].side == game.me.side) {
+                if (lib.playerOL[i].side === game.me.side) {
                   _status.friend.push(result[i][1])
                 } else {
                   _status.enemy.push(result[i][1])
@@ -3732,8 +4241,8 @@ export default () => {
             game.versusHoverEnemy,
           )
           _status.onreconnect = [
-            function (list1, list2, list3, list4, side, func1, func2) {
-              if (side != game.me.side) {
+            (list1, list2, list3, list4, side, func1, func2) => {
+              if (side !== game.me.side) {
                 var tmp
                 tmp = list1
                 list1 = list2
@@ -3749,12 +4258,12 @@ export default () => {
               _status.enemy = list4
 
               _status.enemyCount = ui.create.system(
-                "杀敌: " + get.cnNumber(_status.enemyDied.length, true),
+                `杀敌: ${get.cnNumber(_status.enemyDied.length, true)}`,
                 null,
                 true,
               )
               _status.friendCount = ui.create.system(
-                "阵亡: " + get.cnNumber(_status.friendDied.length, true),
+                `阵亡: ${get.cnNumber(_status.friendDied.length, true)}`,
                 null,
                 true,
               )
@@ -3763,7 +4272,7 @@ export default () => {
               lib.setPopped(_status.enemyCount, func2)
 
               for (var i = 0; i < game.players.length; i++) {
-                if (game.players[i].side == game.me.side) {
+                if (game.players[i].side === game.me.side) {
                   game.players[i].node.identity.firstChild.innerHTML = "友"
                 } else {
                   game.players[i].node.identity.firstChild.innerHTML = "敌"
@@ -3780,9 +4289,9 @@ export default () => {
           ]
         })
       },
-      chooseCharacterOL2: function () {
+      chooseCharacterOL2: () => {
         var next = game.createEvent("chooseCharacterOL")
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           var ref = game.players[0]
           var bool = Math.random() < 0.5
@@ -3792,42 +4301,46 @@ export default () => {
           ref.next.next.side = !bool
           ref.previous.side = !bool2
           var firstChoose = game.players.randomGet()
-          if (firstChoose.next.side == firstChoose.side) {
+          if (firstChoose.next.side === firstChoose.side) {
             firstChoose = firstChoose.next
           }
           _status.firstAct = firstChoose
           for (var i = 0; i < 4; i++) {
-            firstChoose.node.name.innerHTML = get.verticalStr(get.cnNumber(i + 1, true) + "号位")
+            firstChoose.node.name.innerHTML = get.verticalStr(
+              `${get.cnNumber(i + 1, true)}号位`,
+            )
             firstChoose = firstChoose.next
           }
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side == game.me.side) {
+            if (game.players[i].side === game.me.side) {
               game.players[i].node.identity.firstChild.innerHTML = "友"
             } else {
               game.players[i].node.identity.firstChild.innerHTML = "敌"
             }
-            game.players[i].node.identity.dataset.color = game.players[i].side + "zhu"
+            game.players[i].node.identity.dataset.color =
+              `${game.players[i].side}zhu`
           }
           ui.arena.classList.add("choose-character")
           game.broadcast(
-            function (ref, bool, bool2, firstChoose) {
+            (ref, bool, bool2, firstChoose) => {
               ref.side = bool
               ref.next.side = bool2
               ref.next.next.side = !bool
               ref.previous.side = !bool2
               for (var i = 0; i < 4; i++) {
                 firstChoose.node.name.innerHTML = get.verticalStr(
-                  get.cnNumber(i + 1, true) + "号位",
+                  `${get.cnNumber(i + 1, true)}号位`,
                 )
                 firstChoose = firstChoose.next
               }
               for (var i = 0; i < game.players.length; i++) {
-                if (game.players[i].side == game.me.side) {
+                if (game.players[i].side === game.me.side) {
                   game.players[i].node.identity.firstChild.innerHTML = "友"
                 } else {
                   game.players[i].node.identity.firstChild.innerHTML = "敌"
                 }
-                game.players[i].node.identity.dataset.color = game.players[i].side + "zhu"
+                game.players[i].node.identity.dataset.color =
+                  `${game.players[i].side}zhu`
               }
               ui.arena.classList.add("choose-character")
             },
@@ -3837,10 +4350,10 @@ export default () => {
             _status.firstAct,
           )
           _status.onreconnect = [
-            function () {
+            () => {
               var players = game.players.concat(game.dead)
               for (var i = 0; i < players.length; i++) {
-                if (players[i].side == game.me.side) {
+                if (players[i].side === game.me.side) {
                   players[i].node.identity.firstChild.innerHTML = "友"
                 } else {
                   players[i].node.identity.firstChild.innerHTML = "敌"
@@ -3867,7 +4380,10 @@ export default () => {
           for (i in lib.characterReplace) {
             var ix = lib.characterReplace[i]
             for (var j = 0; j < ix.length; j++) {
-              if (!libCharacter[ix[j]] || lib.filter.characterDisabled(ix[j], libCharacter)) {
+              if (
+                !libCharacter[ix[j]] ||
+                lib.filter.characterDisabled(ix[j], libCharacter)
+              ) {
                 ix.splice(j--, 1)
               }
             }
@@ -3876,7 +4392,7 @@ export default () => {
               list4.addArray(ix)
             }
           }
-          game.broadcast(function (list) {
+          game.broadcast((list) => {
             for (var i in lib.characterReplace) {
               var ix = lib.characterReplace[i]
               for (var j = 0; j < ix.length; j++) {
@@ -3887,7 +4403,10 @@ export default () => {
             }
           }, list4)
           for (i in libCharacter) {
-            if (list4.includes(i) || lib.filter.characterDisabled(i, libCharacter)) {
+            if (
+              list4.includes(i) ||
+              lib.filter.characterDisabled(i, libCharacter)
+            ) {
               continue
             }
             list.push(i)
@@ -3905,7 +4424,7 @@ export default () => {
           event._choiceMap = {}
           event.videoId = lib.status.videoId++
           game.broadcastAll(
-            function (id, choice) {
+            (id, choice) => {
               game._characterChoice = choice
               game._characterDialogID = id
               var dialog = ui.create.dialog("请选择武将")
@@ -3914,9 +4433,9 @@ export default () => {
               var player = game.me
               for (var i in choice) {
                 var current = lib.playerOL[i]
-                if (current == player) {
+                if (current === player) {
                   players = choice[i]
-                } else if (current.side == player.side) {
+                } else if (current.side === player.side) {
                   friends = choice[i]
                 }
               }
@@ -3933,10 +4452,10 @@ export default () => {
             choose,
           )
           //发送选择事件
-          var send = function () {
+          var send = () => {
             var next = game.me.chooseButton([1, 2], true)
             next.set("dialog", game._characterDialogID)
-            next.set("callback", function (player, result) {
+            next.set("callback", (player, result) => {
               player.init(result.links[0], null, null, false)
               var button = game._playerChoice
               button.classList.remove("glow2")
@@ -3944,12 +4463,12 @@ export default () => {
               delete game._playerChoice
             })
             //托管选择
-            next.set("ai", function (button) {
+            next.set("ai", (button) => {
               if (ui.selected.buttons.length) {
                 return 0
               }
               var dialog = get.idDialog(game._characterDialogID)
-              if (dialog.friends && dialog.friends.includes(button)) {
+              if (dialog.friends?.includes(button)) {
                 return 0
               }
               if (dialog.classList.contains("glow2")) {
@@ -3960,7 +4479,7 @@ export default () => {
             //修改点击按钮后的反应
             next.set("custom", {
               replace: {
-                button: function (button) {
+                button: (button) => {
                   var dialog = get.idDialog(game._characterDialogID)
                   var origin = button._link,
                     choice = button.link
@@ -3971,7 +4490,10 @@ export default () => {
                       ui.selected.buttons.add(button)
                       game._playerChoice = button
                       for (var other of dialog.players) {
-                        if (other != button && other.classList.contains("selected")) {
+                        if (
+                          other !== button &&
+                          other.classList.contains("selected")
+                        ) {
                           other.classList.remove("selected")
                           ui.selected.buttons.remove(other)
                         }
@@ -3983,13 +4505,16 @@ export default () => {
                     if (game._friendConfirmed) {
                       return
                     }
-                    if (button == dialog._recommending) {
+                    if (button === dialog._recommending) {
                       return
                     }
                     dialog._recommending = button
                     button.classList.add("glow2")
                     for (var other of dialog.friends) {
-                      if (other != button && other.classList.contains("glow2")) {
+                      if (
+                        other !== button &&
+                        other.classList.contains("glow2")
+                      ) {
                         other.classList.remove("glow2")
                       }
                     }
@@ -4002,13 +4527,13 @@ export default () => {
                     } else {
                       game.me.tempUnwait(origin)
                     }
-                    dialog.delay = setTimeout(function () {
+                    dialog.delay = setTimeout(() => {
                       delete dialog.delay
                       if (game._friendConfirmed) {
                         return
                       }
                       var recommend = dialog._recommending._link
-                      if (recommend != origin) {
+                      if (recommend !== origin) {
                         if (game.online) {
                           game.send("tempResult", recommend)
                         } else {
@@ -4026,14 +4551,14 @@ export default () => {
             }
           }
           //推荐选将后的回传函数
-          event.recommend = function (player, choice) {
-            if (player.name1 || game._characterDialogID == undefined) {
+          event.recommend = (player, choice) => {
+            if (player.name1 || game._characterDialogID === undefined) {
               return
             }
             var dialog = get.idDialog(game._characterDialogID)
             if (dialog) {
               for (var button of dialog.players) {
-                if (button._link == choice) {
+                if (button._link === choice) {
                   button.classList.add("glow2")
                 } else if (button.classList.contains("glow2")) {
                   button.classList.remove("glow2")
@@ -4042,12 +4567,12 @@ export default () => {
             }
           }
           //确认选将后的回传函数
-          event.confirm = function (player, choice) {
+          event.confirm = (player, choice) => {
             if (!player.name1) {
               player.init(choice, null, null, false)
             }
             game._friendConfirmed = true
-            if (game._characterDialogID == undefined) {
+            if (game._characterDialogID === undefined) {
               return
             }
             var dialog = get.idDialog(game._characterDialogID)
@@ -4057,7 +4582,7 @@ export default () => {
             for (var button of dialog.friends) {
               button.classList.remove("glow2")
               if (
-                button.link == choice ||
+                button.link === choice ||
                 (lib.characterReplace[button._link] &&
                   lib.characterReplace[button._link].includes(choice))
               ) {
@@ -4066,14 +4591,14 @@ export default () => {
             }
           }
           //处理result
-          var sendback = function (result, player) {
+          var sendback = (result, player) => {
             var type = typeof result
-            var friend = game.findPlayer(function (current) {
-              return current != player && current.side == player.side
-            })
+            var friend = game.findPlayer(
+              (current) => current !== player && current.side === player.side,
+            )
             //处理推荐选将
-            if (type == "string") {
-              if (friend == game.me) {
+            if (type === "string") {
+              if (friend === game.me) {
                 event.recommend(friend, result)
               } else if (friend.isOnline()) {
                 friend.send(event.recommend, friend, result)
@@ -4082,10 +4607,10 @@ export default () => {
               }
             }
             //处理确认选将
-            else if (result && type == "object") {
+            else if (result && type === "object") {
               var choice = result.links[0]
               event._choiceMap[player.playerid] = choice
-              if (friend == game.me) {
+              if (friend === game.me) {
                 event.confirm(player, choice)
               } else if (friend.isOnline()) {
                 friend.send(event.confirm, player, choice)
@@ -4101,7 +4626,7 @@ export default () => {
               event.withol = true
               game.players[i].send(send)
               game.players[i].wait(sendback)
-            } else if (game.players[i] == game.me) {
+            } else if (game.players[i] === game.me) {
               event.withme = true
               send()
               game.me.wait(sendback)
@@ -4113,8 +4638,8 @@ export default () => {
           //模拟AI思考后选择
           if (event.ai_targets.length) {
             event.ai_targets.randomSort()
-            setTimeout(function () {
-              event.interval = setInterval(function () {
+            setTimeout(() => {
+              event.interval = setInterval(() => {
                 var target = event.ai_targets.shift()
                 var list = game._characterChoice[target.playerid]
                 var choice
@@ -4158,7 +4683,7 @@ export default () => {
             game.pause()
           }
           ;("step 4")
-          game.broadcastAll(function (id) {
+          game.broadcastAll((id) => {
             var dialog = get.idDialog(id)
             if (dialog) {
               dialog.close()
@@ -4176,18 +4701,18 @@ export default () => {
             }
             lib.playerOL[i].update()
           }
-          game.broadcast(function (result) {
+          game.broadcast((result) => {
             for (var i in result) {
               if (!lib.playerOL[i].name1) {
                 lib.playerOL[i].init(result[i])
                 lib.playerOL[i].update()
               }
             }
-            setTimeout(function () {
+            setTimeout(() => {
               ui.arena.classList.remove("choose-character")
             }, 500)
           }, result)
-          setTimeout(function () {
+          setTimeout(() => {
             ui.arena.classList.remove("choose-character")
           }, 500)
           if (lib.configOL.olfeiyang_four) {
@@ -4199,14 +4724,14 @@ export default () => {
           game.addGlobalSkill("versus_viewHandcard")
         })
       },
-      chooseCharacterOL1: function () {
+      chooseCharacterOL1: () => {
         var next = game.createEvent("chooseCharacterOL")
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           game.removeCard("shengdong")
           game.additionaldead = []
           var list = get.charactersOL()
-          list = list.randomGets(parseInt(lib.configOL.choice_num))
+          list = list.randomGets(parseInt(lib.configOL.choice_num, 10))
           list.remove("huatuo")
           list.remove("sunquan")
           event.videoId = lib.status.videoId++
@@ -4215,7 +4740,7 @@ export default () => {
           } else {
             event.choosing = game.players[1]
           }
-          var createDialog = function (list, id, list1, list2) {
+          var createDialog = (list, id, list1, list2) => {
             var dialog = ui.create.dialog("选择角色", [list, "character"])
             dialog.classList.add("fullwidth")
             dialog.classList.add("fullheight")
@@ -4233,7 +4758,7 @@ export default () => {
                 }
               }
             } else {
-              if (list1 != game.me) {
+              if (list1 !== game.me) {
                 dialog.content.firstChild.innerHTML = "等待对手选择"
               }
             }
@@ -4243,7 +4768,7 @@ export default () => {
           game.players[1].storage.versuslist = []
           event.selected = []
           _status.firstChoose = event.choosing
-          event.num = (parseInt(lib.configOL.replace_number) + 1) * 2
+          event.num = (parseInt(lib.configOL.replace_number, 10) + 1) * 2
           _status.onreconnect = [
             createDialog,
             list,
@@ -4251,36 +4776,34 @@ export default () => {
             _status.firstChoose.storage.versuslist,
             _status.firstChoose.next.storage.versuslist,
           ]
-          game.broadcastAll(function (player) {
+          game.broadcastAll((player) => {
             player.setIdentity("truezhu")
             player.next.setIdentity("falsezhu")
           }, _status.firstChoose)
           ;("step 1")
           var next = event.choosing.chooseButton(event.videoId, 1, true)
-          next.set("filterButton", function (button) {
+          next.set("filterButton", (button) => {
             if (_status.event.selected.includes(button.link)) {
               return false
             }
             return true
           })
           next.set("selected", event.selected)
-          next.set("ai", function () {
-            return Math.random()
-          })
+          next.set("ai", () => Math.random())
           ;("step 2")
           event.choosing.storage.versuslist.push(result.links[0])
           game.broadcastAll(
-            function (link, choosing, first, id) {
+            (link, choosing, first, id) => {
               var dialog = get.idDialog(id)
               if (dialog) {
-                if (choosing == game.me) {
+                if (choosing === game.me) {
                   choosing = "你"
                 } else {
                   choosing = "对手"
                 }
-                dialog.content.firstChild.innerHTML = choosing + "选择了" + get.translation(link)
+                dialog.content.firstChild.innerHTML = `${choosing}选择了${get.translation(link)}`
                 for (var i = 0; i < dialog.buttons.length; i++) {
-                  if (dialog.buttons[i].link == link) {
+                  if (dialog.buttons[i].link === link) {
                     if (first) {
                       dialog.buttons[i].classList.add("selectedx")
                     } else {
@@ -4292,7 +4815,7 @@ export default () => {
             },
             result.links[0],
             event.choosing,
-            event.choosing == _status.firstChoose,
+            event.choosing === _status.firstChoose,
             event.videoId,
           )
           event.selected.push(result.links[0])
@@ -4304,7 +4827,7 @@ export default () => {
           ;("step 3")
           game.delay(2)
           ;("step 4")
-          game.broadcastAll(function (id) {
+          game.broadcastAll((id) => {
             ui.arena.classList.remove("playerhidden")
             var dialog = get.idDialog(id)
             if (dialog) {
@@ -4321,8 +4844,16 @@ export default () => {
           delete game.players[0].storage.versuslist
           delete game.players[1].versuslist
 
-          _status.enemyCount = ui.create.system("杀敌: " + get.cnNumber(0, true), null, true)
-          _status.friendCount = ui.create.system("阵亡: " + get.cnNumber(0, true), null, true)
+          _status.enemyCount = ui.create.system(
+            `杀敌: ${get.cnNumber(0, true)}`,
+            null,
+            true,
+          )
+          _status.friendCount = ui.create.system(
+            `阵亡: ${get.cnNumber(0, true)}`,
+            null,
+            true,
+          )
 
           lib.setPopped(_status.friendCount, game.versusHoverFriend)
           lib.setPopped(_status.enemyCount, game.versusHoverEnemy)
@@ -4331,8 +4862,8 @@ export default () => {
           game.players[0].side = true
           game.players[1].side = false
 
-          var func = function (list1, list2, list3, list4, func1, func2, playerid) {
-            if (game.me.playerid == playerid) {
+          var func = (list1, list2, list3, list4, func1, func2, playerid) => {
+            if (game.me.playerid === playerid) {
               game.me.side = true
               game.me.next.side = false
             } else {
@@ -4355,12 +4886,12 @@ export default () => {
             }
 
             _status.enemyCount = ui.create.system(
-              "杀敌: " + get.cnNumber(_status.enemyDied.length, true),
+              `杀敌: ${get.cnNumber(_status.enemyDied.length, true)}`,
               null,
               true,
             )
             _status.friendCount = ui.create.system(
-              "阵亡: " + get.cnNumber(_status.friendDied.length, true),
+              `阵亡: ${get.cnNumber(_status.friendDied.length, true)}`,
               null,
               true,
             )
@@ -4393,22 +4924,22 @@ export default () => {
             [game.players[0], ["选择出场角色", [_status.friend, "character"]]],
             [game.players[1], ["选择出场角色", [_status.enemy, "character"]]],
           ]
-          game.me.chooseButtonOL(list, function (player, result) {
-            if (game.online || player == game.me) {
+          game.me.chooseButtonOL(list, (player, result) => {
+            if (game.online || player === game.me) {
               player.init(result.links[0])
             }
           })
           ;("step 5")
           var result1
           var friend = result[game.players[0].playerid]
-          if (friend && friend.links && friend.links.length) {
+          if (friend?.links?.length) {
             result1 = friend.links[0]
           } else {
             result1 = _status.friend.randomGet()
           }
           var result2
           var enemy = result[game.players[1].playerid]
-          if (enemy && enemy.links && enemy.links.length) {
+          if (enemy?.links?.length) {
             result2 = enemy.links[0]
           } else {
             result2 = _status.enemy.randomGet()
@@ -4422,7 +4953,7 @@ export default () => {
           _status.friend.remove(result1)
           _status.enemy.remove(result2)
           game.broadcast(
-            function (result1, result2) {
+            (result1, result2) => {
               if (game.me.side) {
                 if (!game.me.name1) {
                   game.me.init(result1)
@@ -4448,18 +4979,15 @@ export default () => {
           )
         })
       },
-      phaseLoopThree: function (player) {
-        _status.isRoundFilter = function (event) {
-          return event._isThreeRound === true
-        }
+      phaseLoopThree: (player) => {
+        _status.isRoundFilter = (event) => event._isThreeRound === true
         const next = game.createEvent("phaseLoop")
         next.player = player
-        next.swap = function (player) {
-          if (player.side == game.me.side) {
+        next.swap = (player) => {
+          if (player.side === game.me.side) {
             return game.enemyZhu
-          } else {
-            return game.me
           }
+          return game.me
         }
         //已改为contents
         next.setContent([
@@ -4468,7 +4996,11 @@ export default () => {
             if (game.players.includes(event.player)) {
               lib.onphase.forEach((i) => i())
               const phase = event.player.phase()
-              if (!game.players.some((current) => current.classList.contains("acted"))) {
+              if (
+                !game.players.some((current) =>
+                  current.classList.contains("acted"),
+                )
+              ) {
                 phase._isThreeRound = true
               }
               event.next.remove(phase)
@@ -4479,18 +5011,21 @@ export default () => {
                   isRoundEnd = _status.isRoundFilter(phase, event.player)
                 } else if (_status.seatNumSettled) {
                   const seatNum = event.player.getSeatNum()
-                  if (seatNum != 0) {
+                  if (seatNum !== 0) {
                     if (
-                      get.itemtype(_status.lastPhasedPlayer) != "player" ||
+                      get.itemtype(_status.lastPhasedPlayer) !== "player" ||
                       seatNum < _status.lastPhasedPlayer.getSeatNum()
                     ) {
                       isRoundEnd = true
                     }
                   }
-                } else if (event.player == _status.roundStart) {
+                } else if (event.player === _status.roundStart) {
                   isRoundEnd = true
                 }
-                if (isRoundEnd && _status.globalHistory.some((i) => i.isRound)) {
+                if (
+                  isRoundEnd &&
+                  _status.globalHistory.some((i) => i.isRound)
+                ) {
                   for (let i = 0; i < game.players.length; i++) {
                     game.players[i].classList.remove("acted")
                   }
@@ -4506,18 +5041,22 @@ export default () => {
           },
           async (event, trigger, player) => {
             //继续执行某一方的回合
-            if (player.identity != "zhu") {
+            if (player.identity !== "zhu") {
               for (let i = 0; i < game.players.length; i++) {
                 if (
-                  game.players[i].side == player.side &&
-                  game.players[i].identity != "zhu" &&
-                  game.players[i] != player &&
+                  game.players[i].side === player.side &&
+                  game.players[i].identity !== "zhu" &&
+                  game.players[i] !== player &&
                   !game.players[i].classList.contains("acted")
                 ) {
                   event.player = game.players[i]
                   lib.onphase.forEach((i) => i())
                   const phase = event.player.phase()
-                  if (!game.players.some((current) => current.classList.contains("acted"))) {
+                  if (
+                    !game.players.some((current) =>
+                      current.classList.contains("acted"),
+                    )
+                  ) {
                     phase._isThreeRound = true
                   }
                   event.next.remove(phase)
@@ -4528,18 +5067,21 @@ export default () => {
                       isRoundEnd = _status.isRoundFilter(phase, event.player)
                     } else if (_status.seatNumSettled) {
                       const seatNum = event.player.getSeatNum()
-                      if (seatNum != 0) {
+                      if (seatNum !== 0) {
                         if (
-                          get.itemtype(_status.lastPhasedPlayer) != "player" ||
+                          get.itemtype(_status.lastPhasedPlayer) !== "player" ||
                           seatNum < _status.lastPhasedPlayer.getSeatNum()
                         ) {
                           isRoundEnd = true
                         }
                       }
-                    } else if (event.player == _status.roundStart) {
+                    } else if (event.player === _status.roundStart) {
                       isRoundEnd = true
                     }
-                    if (isRoundEnd && _status.globalHistory.some((i) => i.isRound)) {
+                    if (
+                      isRoundEnd &&
+                      _status.globalHistory.some((i) => i.isRound)
+                    ) {
                       for (let i = 0; i < game.players.length; i++) {
                         game.players[i].classList.remove("acted")
                       }
@@ -4563,14 +5105,14 @@ export default () => {
               swap2 = []
             for (let i = 0; i < game.players.length; i++) {
               if (!game.players[i].classList.contains("acted")) {
-                if (game.players[i].side == target.side) {
+                if (game.players[i].side === target.side) {
                   swap.push(game.players[i])
                 } else {
                   swap2.push(game.players[i])
                 }
               }
             }
-            if (swap.length == 0) {
+            if (swap.length === 0) {
               if (swap2.length) {
                 target = event.swap(target)
                 swap = swap2
@@ -4585,7 +5127,7 @@ export default () => {
                 return
               }
             }
-            if (swap.length == 1) {
+            if (swap.length === 1) {
               event.directresult = swap[0]
             } else {
               //选择要先行动的角色
@@ -4593,23 +5135,23 @@ export default () => {
               const next = target.chooseTarget(
                 "选择行动的角色",
                 true,
-                function (card, player, target2) {
-                  return target2.side == target.side && !target2.classList.contains("acted")
-                },
+                (card, player, target2) =>
+                  target2.side === target.side &&
+                  !target2.classList.contains("acted"),
               )
               next._triggered = null
               next.includeOut = true
-              next.ai = function (target2) {
+              next.ai = (target2) => {
                 let num = 0
                 if (target2.countCards("j")) {
                   num -= 5
                 }
-                if (target2.identity != "zhu") {
+                if (target2.identity !== "zhu") {
                   for (let i = 0; i < game.players.length; i++) {
                     if (
-                      game.players[i].identity != "zhu" &&
-                      game.players[i] != target2 &&
-                      game.players[i].side == target2.side &&
+                      game.players[i].identity !== "zhu" &&
+                      game.players[i] !== target2 &&
+                      game.players[i].side === target2.side &&
                       game.players[i].countCards("j")
                     ) {
                       num -= 2
@@ -4636,7 +5178,7 @@ export default () => {
           },
         ])
       },
-      versusPhaseLoop: function (player) {
+      versusPhaseLoop: (player) => {
         const next = game.createEvent("phaseLoop")
         next.player = player
         //已改为contents
@@ -4654,18 +5196,21 @@ export default () => {
                   isRoundEnd = _status.isRoundFilter(phase, event.player)
                 } else if (_status.seatNumSettled) {
                   const seatNum = event.player.getSeatNum()
-                  if (seatNum != 0) {
+                  if (seatNum !== 0) {
                     if (
-                      get.itemtype(_status.lastPhasedPlayer) != "player" ||
+                      get.itemtype(_status.lastPhasedPlayer) !== "player" ||
                       seatNum < _status.lastPhasedPlayer.getSeatNum()
                     ) {
                       isRoundEnd = true
                     }
                   }
-                } else if (event.player == _status.roundStart) {
+                } else if (event.player === _status.roundStart) {
                   isRoundEnd = true
                 }
-                if (isRoundEnd && _status.globalHistory.some((i) => i.isRound)) {
+                if (
+                  isRoundEnd &&
+                  _status.globalHistory.some((i) => i.isRound)
+                ) {
                   for (let i = 0; i < game.players.length; i++) {
                     game.players[i].classList.remove("acted")
                   }
@@ -4686,7 +5231,10 @@ export default () => {
             if (lib.storage.zhu) {
               _status.currentSide = !_status.currentSide
               _status.round++
-              if (_status.round >= 2 * Math.max(game.friend.length, game.enemy.length)) {
+              if (
+                _status.round >=
+                2 * Math.max(game.friend.length, game.enemy.length)
+              ) {
                 //行动次数达到上限
                 _status.round = 0
                 for (let i = 0; i < game.players.length; i++) {
@@ -4694,22 +5242,24 @@ export default () => {
                 }
                 delete _status.roundStart
               }
-              let list =
-                _status.currentSide == game.me.side ? game.friend.slice(0) : game.enemy.slice(0)
+              const list =
+                _status.currentSide === game.me.side
+                  ? game.friend.slice(0)
+                  : game.enemy.slice(0)
               for (let i = 0; i < list.length; i++) {
                 if (list[i].classList.contains("acted") || list[i].isOut()) {
                   list.splice(i, 1)
                   i--
                 }
               }
-              if (list.length == 0) {
+              if (list.length === 0) {
                 event.redo()
               } else if (
-                list.length == 1 ||
-                (game.me != game.friendZhu && !lib.storage.single_control) ||
-                _status.currentSide != game.me.side
+                list.length === 1 ||
+                (game.me !== game.friendZhu && !lib.storage.single_control) ||
+                _status.currentSide !== game.me.side
               ) {
-                list.sort(function (a, b) {
+                list.sort((a, b) => {
                   if (a.countCards("j") > b.countCards("j")) {
                     return 1
                   }
@@ -4719,11 +5269,13 @@ export default () => {
                 event.goto(0)
               } else {
                 const result = await game.me
-                  .chooseTarget("选择要行动的角色", true, function (card, player, target) {
-                    return (
-                      target.classList.contains("acted") == false && target.side == game.me.side
-                    )
-                  })
+                  .chooseTarget(
+                    "选择要行动的角色",
+                    true,
+                    (card, player, target) =>
+                      target.classList.contains("acted") === false &&
+                      target.side === game.me.side,
+                  )
                   .set("includeOut", true)
                   .forResult()
                 event.player = result.targets[0]
@@ -4736,7 +5288,7 @@ export default () => {
           },
         ])
       },
-      phaseLoopJiange: function () {
+      phaseLoopJiange: () => {
         const next = game.createEvent("phaseLoop")
         next.num = 0
         next.player = _status.actlist[0]
@@ -4753,18 +5305,21 @@ export default () => {
                   isRoundEnd = _status.isRoundFilter(phase, event.player)
                 } else if (_status.seatNumSettled) {
                   const seatNum = event.player.getSeatNum()
-                  if (seatNum != 0) {
+                  if (seatNum !== 0) {
                     if (
-                      get.itemtype(_status.lastPhasedPlayer) != "player" ||
+                      get.itemtype(_status.lastPhasedPlayer) !== "player" ||
                       seatNum < _status.lastPhasedPlayer.getSeatNum()
                     ) {
                       isRoundEnd = true
                     }
                   }
-                } else if (event.player == _status.roundStart) {
+                } else if (event.player === _status.roundStart) {
                   isRoundEnd = true
                 }
-                if (isRoundEnd && _status.globalHistory.some((i) => i.isRound)) {
+                if (
+                  isRoundEnd &&
+                  _status.globalHistory.some((i) => i.isRound)
+                ) {
                   game.log()
                   await event.trigger("roundEnd")
                 }
@@ -4773,7 +5328,7 @@ export default () => {
               await phase
             }
             await event.trigger("phaseOver")
-            let findNext = (current) => {
+            const findNext = (current) => {
               const index = _status.actlist.indexOf(current)
               return _status.actlist[(index + 1) % _status.actlist.length]
             }
@@ -4781,18 +5336,30 @@ export default () => {
           }
         })
       },
-      replacePlayerOL: function (player) {
-        var next = game.createEvent("replacePlayer", false, _status.event.getParent())
+      replacePlayerOL: (player) => {
+        var next = game.createEvent(
+          "replacePlayer",
+          false,
+          _status.event.getParent(),
+        )
         next.source = player
         next.setContent("replacePlayerOL")
       },
-      replacePlayer: function (player) {
-        var next = game.createEvent("replacePlayer", false, _status.event.getParent())
+      replacePlayer: (player) => {
+        var next = game.createEvent(
+          "replacePlayer",
+          false,
+          _status.event.getParent(),
+        )
         next.source = player
         next.setContent("replacePlayer")
       },
-      replacePlayerTwo: function (player, character) {
-        var next = game.createEvent("replacePlayerTwo", false, _status.event.getParent())
+      replacePlayerTwo: (player, character) => {
+        var next = game.createEvent(
+          "replacePlayerTwo",
+          false,
+          _status.event.getParent(),
+        )
         next.source = player
         next.character = character
         next.setContent("replacePlayerTwo")
@@ -4801,18 +5368,18 @@ export default () => {
         if (_status.dragged) {
           return
         }
-        if (this.link == game.me) {
+        if (this.link === game.me) {
           if (!this.classList.contains("buttonclick")) {
             this.addTempClass("buttonclick")
           }
-        } else if (_status.event.player == game.me && !_status.auto) {
+        } else if (_status.event.player === game.me && !_status.auto) {
           game.me.popup("请稍后再换人")
           e.stopPropagation()
         } else {
           game.modeSwapPlayer(this.link)
         }
       },
-      versusHoverEnemy: function () {
+      versusHoverEnemy: () => {
         var uiintro = ui.create.dialog("hidden")
 
         if (_status.enemyDied.length) {
@@ -4829,7 +5396,7 @@ export default () => {
 
         return uiintro
       },
-      versusHoverFriend: function () {
+      versusHoverFriend: () => {
         var uiintro = ui.create.dialog("hidden")
 
         if (_status.friendDied.length) {
@@ -4846,14 +5413,14 @@ export default () => {
 
         return uiintro
       },
-      versusHoverHandcards: function () {
+      versusHoverHandcards: () => {
         var uiintro = ui.create.dialog("hidden")
         var added = false
         for (var i = 0; i < game.players.length; i++) {
           if (
             game.players[i].name &&
-            game.players[i].side == game.me.side &&
-            game.players[i] != game.me
+            game.players[i].side === game.me.side &&
+            game.players[i] !== game.me
           ) {
             added = true
             uiintro.add(get.translation(game.players[i]))
@@ -4869,11 +5436,11 @@ export default () => {
           return uiintro
         }
       },
-      versusCheckEnemy: function () {
+      versusCheckEnemy: () => {
         _status.clicked = true
         if (ui.intro) {
           ui.intro.close()
-          if (ui.intro.source == "versusCheckEnemy") {
+          if (ui.intro.source === "versusCheckEnemy") {
             delete ui.intro
             ui.control.show()
             game.resume2()
@@ -4897,11 +5464,11 @@ export default () => {
           ui.intro.add("（无）")
         }
       },
-      versusCheckFriend: function () {
+      versusCheckFriend: () => {
         _status.clicked = true
         if (ui.intro) {
           ui.intro.close()
-          if (ui.intro.source == "versusCheckFriend") {
+          if (ui.intro.source === "versusCheckFriend") {
             delete ui.intro
             ui.control.show()
             game.resume2()
@@ -4928,20 +5495,23 @@ export default () => {
       versusSwapPlayer: function () {
         if (ui.intro) {
           ui.intro.close()
-          if (ui.intro.source == "versusSwapPlayer") {
+          if (ui.intro.source === "versusSwapPlayer") {
             delete ui.intro
             ui.control.show()
             game.resume2()
             return
           }
         }
-        if ((_status.event.player == game.me && _status.paused) || _status.paused2) {
+        if (
+          (_status.event.player === game.me && _status.paused) ||
+          _status.paused2
+        ) {
           game.me.popup("请稍后再换人")
         } else {
           _status.clicked = true
           if (ui.intro) {
             ui.intro.close()
-            if (ui.intro.source == this.parentNode) {
+            if (ui.intro.source === this.parentNode) {
               delete ui.intro
               ui.control.show()
               game.resume2()
@@ -4954,7 +5524,10 @@ export default () => {
           ui.intro.source = "versusSwapPlayer"
           var players = []
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side == game.me.side && game.players[i] != game.me) {
+            if (
+              game.players[i].side === game.me.side &&
+              game.players[i] !== game.me
+            ) {
               players.push(game.players[i])
             }
           }
@@ -4973,29 +5546,33 @@ export default () => {
         this.classList.toggle("on")
         game.save("autoreplaceinnerhtml", this.classList.contains("on"))
       },
-      onSwapControl: function () {
+      onSwapControl: () => {
         game.addVideo("onSwapControl")
         var name = game.me.name
-        if (ui.fakeme && ui.fakeme.current != name) {
+        if (ui.fakeme && ui.fakeme.current !== name) {
           ui.fakeme.current = name
-          if (ui.versushighlight && ui.versushighlight != game.me) {
+          if (ui.versushighlight && ui.versushighlight !== game.me) {
             ui.versushighlight.classList.remove("current_action")
           }
           ui.versushighlight = game.me
           game.me.classList.add("current_action")
 
-          ui.fakeme.style.backgroundImage = game.me.node.avatar.style.backgroundImage
+          ui.fakeme.style.backgroundImage =
+            game.me.node.avatar.style.backgroundImage
         }
       },
-      modeSwapPlayer: function (player) {
-        if (_status.mode == "three" || (_status.mode == "standard" && lib.storage.single_control)) {
+      modeSwapPlayer: (player) => {
+        if (
+          _status.mode === "three" ||
+          (_status.mode === "standard" && lib.storage.single_control)
+        ) {
           game.swapControl(player)
           game.onSwapControl()
         } else {
           game.swapPlayer(player)
         }
       },
-      updateLineMe: function (opacity, player) {
+      updateLineMe: (opacity, player) => {
         if (!player) {
           player = game.me
         }
@@ -5006,19 +5583,24 @@ export default () => {
         ctx.shadowBlur = 5
         ctx.shadowColor = "rgba(0,0,0,0.3)"
         ctx.fillStyle = "white"
-        if (typeof opacity != "number") {
+        if (typeof opacity !== "number") {
           opacity = 0.5
         }
-        ctx.strokeStyle = "rgba(255,255,255," + opacity + ")"
+        ctx.strokeStyle = `rgba(255,255,255,${opacity})`
         ctx.lineWidth = 3
         ctx.setLineDash([8, 2])
 
         ctx.beginPath()
 
         var startx, endx, pos
-        var endy = game.me.offsetHeight / 2 + game.me.offsetTop + ui.arena.offsetTop
-        var starty = ui.me.offsetTop + ui.arena.offsetTop + ui.me.offsetHeight / 2
-        if (game.me.offsetLeft + game.me.offsetWidth / 2 <= ui.arena.offsetWidth / 2) {
+        var endy =
+          game.me.offsetHeight / 2 + game.me.offsetTop + ui.arena.offsetTop
+        var starty =
+          ui.me.offsetTop + ui.arena.offsetTop + ui.me.offsetHeight / 2
+        if (
+          game.me.offsetLeft + game.me.offsetWidth / 2 <=
+          ui.arena.offsetWidth / 2
+        ) {
           startx = ui.me.offsetLeft + ui.arena.offsetLeft
           endx = game.me.offsetLeft + ui.arena.offsetLeft
           pos = -1
@@ -5029,7 +5611,12 @@ export default () => {
         }
         ctx.moveTo(startx, starty)
         startx += (pos * ui.arena.offsetLeft) / 2
-        ctx.quadraticCurveTo(startx, starty, startx, starty - (starty - endy) / 2)
+        ctx.quadraticCurveTo(
+          startx,
+          starty,
+          startx,
+          starty - (starty - endy) / 2,
+        )
         ctx.quadraticCurveTo(startx, endy, endx, endy)
         ctx.stroke()
       },
@@ -5912,7 +6499,8 @@ export default () => {
       boss_shenjianhansheng: "神箭汉升",
       boss_yiyongwenze: "毅勇文则",
       boss_mengwu: "猛武",
-      boss_mengwu_info: "锁定技，你使用【杀】无距离次数限制，使用【杀】被抵消后摸一张牌。",
+      boss_mengwu_info:
+        "锁定技，你使用【杀】无距离次数限制，使用【杀】被抵消后摸一张牌。",
       boss_hupo: "虎魄",
       boss_hupo_info: "锁定技，你的锦囊牌视为【杀】。",
       boss_shuhun: "蜀魂",
@@ -5921,11 +6509,13 @@ export default () => {
       boss_yingji_info:
         "出牌阶段限一次，你可以展示所有手牌视为使用一张【杀】，且此【杀】的伤害基数改为你以此法展示的类别数。",
       boss_zhene: "镇恶",
-      boss_zhene_info: "锁定技，你于出牌阶段使用牌指定目标后，若其手牌数不大于你，其不能响应此牌。",
+      boss_zhene_info:
+        "锁定技，你于出牌阶段使用牌指定目标后，若其手牌数不大于你，其不能响应此牌。",
       boss_weizhu: "卫主",
       boss_weizhu_info: "友方角色受到伤害时，你可以弃置一张手牌防止之。",
       boss_qixian: "启弦",
-      boss_qixian_info: "你于出牌阶段内获得一张牌后，令你本回合下一次使用【杀】的伤害+1。",
+      boss_qixian_info:
+        "你于出牌阶段内获得一张牌后，令你本回合下一次使用【杀】的伤害+1。",
       boss_jinggong: "惊弓",
       boss_jinggong_info:
         "锁定技，你使用【杀】无距离限制；你的回合结束时，若你本回合未使用【杀】，你失去1点体力。",
@@ -5938,16 +6528,19 @@ export default () => {
       boss_pigua_info:
         "锁定技，准备阶段，若你的装备区没有牌，你失去1点体力并从牌堆或弃牌堆获得一张装备牌。",
       boss_zhengji: "整纪",
-      boss_zhengji_info: "锁定技，友方角色的装备被弃置后，你令所有友方角色各摸一张牌。",
+      boss_zhengji_info:
+        "锁定技，友方角色的装备被弃置后，你令所有友方角色各摸一张牌。",
 
       boss_xiaorui: "骁锐",
       boss_xiaorui2: "骁锐",
-      boss_xiaorui_info: "友方角色于其回合内使用【杀】造成伤害后，其使用【杀】的次数+1。",
+      boss_xiaorui_info:
+        "友方角色于其回合内使用【杀】造成伤害后，其使用【杀】的次数+1。",
       boss_huchen: "虎臣",
       boss_huchen_info: "锁定技，你摸牌阶段摸牌数+X（X为你击杀的敌方角色数）。",
       boss_fengjian: "封缄",
       boss_fengjian2: "封缄",
-      boss_fengjian_info: "受到你伤害的角色于其下个回合结束前，无法使用牌指定你为目标。",
+      boss_fengjian_info:
+        "受到你伤害的角色于其下个回合结束前，无法使用牌指定你为目标。",
       boss_keding: "克定",
       boss_keding_info:
         "当你使用【杀】或普通锦囊牌仅指定唯一目标时，你可以弃置任意张手牌，为其指定等量的额外目标。",
@@ -5964,7 +6557,8 @@ export default () => {
       boss_didongjg: "地动",
       boss_didongjg_info: "结束阶段，你可以选择一名敌方角色将其武将牌翻面。",
       boss_mojianjg: "魔箭",
-      boss_mojianjg_info: "出牌阶段开始时，你可以对所有敌方角色使用一张【万箭齐发】。",
+      boss_mojianjg_info:
+        "出牌阶段开始时，你可以对所有敌方角色使用一张【万箭齐发】。",
       boss_jiguan: "机关",
       boss_jiguan_info: "锁定技，你不能成为【乐不思蜀】的目标。",
       boss_lingyu: "灵愈",
@@ -5976,13 +6570,16 @@ export default () => {
       boss_zhenwei: "镇卫",
       boss_zhenwei_info: "锁定技，其他己方角色的防御距离+1。",
       boss_benlei: "奔雷",
-      boss_benlei_info: "锁定技，准备阶段，你对敌方攻城器械随机造成2~3点雷电伤害。",
+      boss_benlei_info:
+        "锁定技，准备阶段，你对敌方攻城器械随机造成2~3点雷电伤害。",
       boss_nailuo: "奈落",
-      boss_nailuo_info: "结束阶段，你可以将你的武将牌翻面，令所有敌方角色弃置装备区内的所有牌。",
+      boss_nailuo_info:
+        "结束阶段，你可以将你的武将牌翻面，令所有敌方角色弃置装备区内的所有牌。",
       boss_tanshi: "贪食",
       boss_tanshi_info: "锁定技，结束阶段开始时，你须弃置一张手牌。",
       boss_tunshi: "吞噬",
-      boss_tunshi_info: "锁定技，准备阶段，你对所有手牌数量大于你的敌方角色造成1点伤害。",
+      boss_tunshi_info:
+        "锁定技，准备阶段，你对所有手牌数量大于你的敌方角色造成1点伤害。",
       boss_yuhuojg: "浴火",
       boss_yuhuojg_info: "锁定技，每当你受到火焰伤害时，防止此伤害。",
       boss_qiwu: "栖梧",
@@ -5996,7 +6593,8 @@ export default () => {
       boss_zhinang_info:
         "准备阶段，你可以亮出牌堆顶的五张牌，你可以将其中锦囊或装备牌交给一名己方角色。",
       boss_jingmiao: "精妙",
-      boss_jingmiao_info: "锁定技，每当敌方角色使用的无懈可击生效后，你令其失去1点体力。",
+      boss_jingmiao_info:
+        "锁定技，每当敌方角色使用的无懈可击生效后，你令其失去1点体力。",
       boss_biantian: "变天",
       boss_biantian_info:
         "锁定技，准备阶段，你进行一次判定，若为红色，直到下个回合开始前，令敌方所有角色处于“狂风”状态，若为黑色，直到下个回合开始前，令己方所有角色处于“大雾”状态。",
@@ -6013,20 +6611,25 @@ export default () => {
       boss_jueji: "绝汲",
       boss_jueji_info: "敌方角色摸牌阶段，若其已受伤，你可以令其少摸一张牌。",
       boss_chuanyun: "穿云",
-      boss_chuanyun_info: "结束阶段，你可以对体力比你多的一名其他角色造成1点伤害。",
+      boss_chuanyun_info:
+        "结束阶段，你可以对体力比你多的一名其他角色造成1点伤害。",
       boss_leili: "雷厉",
-      boss_leili_info: "每当你的【杀】造成伤害后，你可以对另一名敌方角色造成1点雷电伤害。",
+      boss_leili_info:
+        "每当你的【杀】造成伤害后，你可以对另一名敌方角色造成1点雷电伤害。",
       boss_fengxing: "风行",
-      boss_fengxing_info: "准备阶段，你可以选择一名敌方角色，若如此做，视为对其使用了一张【杀】。",
+      boss_fengxing_info:
+        "准备阶段，你可以选择一名敌方角色，若如此做，视为对其使用了一张【杀】。",
       boss_skonghun: "控魂",
       boss_skonghun_info:
         "出牌阶段开始时，若你已损失体力值不小于敌方角色数，你可以对所有敌方角色各造成1点雷电伤害，然后你恢复X点体力（X为受到伤害的角色数）。",
       boss_fanshi: "反噬",
       boss_fanshi_info: "锁定技，结束阶段，你失去1点体力。",
       boss_xuanlei: "玄雷",
-      boss_xuanlei_info: "锁定技，准备阶段，令所有判定区内有牌的敌方角色受到1点雷电伤害。",
+      boss_xuanlei_info:
+        "锁定技，准备阶段，令所有判定区内有牌的敌方角色受到1点雷电伤害。",
       boss_chiying: "持盈",
-      boss_chiying_info: "锁定技，每当己方角色受到多于1伤害时，你防止其余伤害。",
+      boss_chiying_info:
+        "锁定技，每当己方角色受到多于1伤害时，你防止其余伤害。",
       boss_jingfan: "惊帆",
       boss_jingfan_info: "锁定技，己方其他角色的进攻距离+1。",
       longchuanzhibao: "龙船至宝",
@@ -6046,7 +6649,8 @@ export default () => {
       tunliang: "屯粮",
       tunliang_info: "出牌阶段，对至多三名角色使用。目标角色各摸一张牌。",
       yuanjun: "援军",
-      yuanjun_info: "出牌阶段，对至多两名已受伤的角色使用。目标角色回复1点体力。",
+      yuanjun_info:
+        "出牌阶段，对至多两名已受伤的角色使用。目标角色回复1点体力。",
       xujiu: "酗酒",
       xujiu2: "酗酒",
       xujiu_info: "出牌阶段，对一名敌方角色使用，其本回合受到的伤害+1。",
@@ -6072,7 +6676,8 @@ export default () => {
       jianshoudaiyuan_info:
         "所有角色均可以将【杀】当作【闪】，【闪】当作【杀】使用或打出，然后其手牌上限-1直到其下一个弃牌阶段结束。",
       yiruoshengqiang: "以弱胜强",
-      yiruoshengqiang_info: "造成伤害时，若受伤角色体力值大于伤害来源，此伤害+1。",
+      yiruoshengqiang_info:
+        "造成伤害时，若受伤角色体力值大于伤害来源，此伤害+1。",
       shichongerjiao: "恃宠而骄",
       shichongerjiao_info:
         "结束阶段，若你的体力值为全场唯一最多，你弃一张牌；若你的手牌数为全场最多，你失去1点体力。",
@@ -6081,37 +6686,32 @@ export default () => {
       versus_viewHandcard: {
         ai: {
           viewHandcard: true,
-          skillTagFilter: function (player, tag, target) {
-            return player.side == target.side
-          },
+          skillTagFilter: (player, tag, target) => player.side === target.side,
         },
       },
       huoshaowuchao: {
         trigger: { global: "damageBefore" },
         silent: true,
         firstDo: true,
-        filter: function (event, player) {
-          return !event.hasNature("linked")
-        },
-        content: function () {
+        filter: (event, player) => !event.hasNature("linked"),
+        content: () => {
           game.setNature(trigger, "fire")
         },
       },
       liangcaokuifa: {
         trigger: { player: ["useCardAfter", "phaseDrawBegin"] },
         silent: true,
-        filter: function (event, player) {
-          if (event.name == "phaseDraw") {
+        filter: (event, player) => {
+          if (event.name === "phaseDraw") {
             return true
           }
           return (
-            player.getHistory("sourceDamage", function (evt) {
-              return evt.card == event.card
-            }).length > 0
+            player.getHistory("sourceDamage", (evt) => evt.card === event.card)
+              .length > 0
           )
         },
-        content: function () {
-          if (trigger.name == "phaseDraw") {
+        content: () => {
+          if (trigger.name === "phaseDraw") {
             trigger.num--
           } else {
             player.draw()
@@ -6121,7 +6721,7 @@ export default () => {
       zhanyanliangzhuwenchou: {
         trigger: { player: "phaseBegin" },
         silent: true,
-        content: function () {
+        content: () => {
           "step 0"
           player.chooseUseTarget(
             {
@@ -6143,7 +6743,7 @@ export default () => {
         onremove: true,
         trigger: { player: "damageBegin2" },
         forced: true,
-        content: function () {
+        content: () => {
           trigger.num += player.countMark("xujiu2")
         },
         intro: { content: "本回合受到的伤害+#" },
@@ -6151,8 +6751,8 @@ export default () => {
       },
       shishengshibai: {
         mod: {
-          aiOrder: function (player, card, num) {
-            if (_status.shishengshibai && _status.shishengshibai % 10 == 9) {
+          aiOrder: (player, card, num) => {
+            if (_status.shishengshibai && _status.shishengshibai % 10 === 9) {
               if (
                 [
                   "sha",
@@ -6174,19 +6774,19 @@ export default () => {
           player: "useCard1",
         },
         silent: true,
-        content: function () {
-          if (event.triggername == "useCard1") {
+        content: () => {
+          if (event.triggername === "useCard1") {
             if (!_status.shishengshibai) {
               _status.shishengshibai = 0
             }
             _status.shishengshibai++
-            game.broadcastAll(function (num) {
+            game.broadcastAll((num) => {
               if (ui.guanduInfo) {
-                ui.guanduInfo.innerHTML = "十胜十败（" + num + "）"
+                ui.guanduInfo.innerHTML = `十胜十败（${num}）`
               }
             }, _status.shishengshibai)
             if (
-              _status.shishengshibai % 10 == 0 &&
+              _status.shishengshibai % 10 === 0 &&
               trigger.targets &&
               trigger.targets.length > 0 &&
               !["delay", "equip"].includes(get.type(trigger.card))
@@ -6197,11 +6797,11 @@ export default () => {
         },
         ai: {
           result: {
-            player: function (card, player, target) {
+            player: (card, player, target) => {
               if (
                 _status.shishengshibai &&
-                _status.shishengshibai % 10 == 9 &&
-                card.name == "tiesuo"
+                _status.shishengshibai % 10 === 9 &&
+                card.name === "tiesuo"
               ) {
                 return [0, 0, 0, 0]
               }
@@ -6211,57 +6811,69 @@ export default () => {
       },
       liangjunxiangchi: {
         mod: {
-          maxHandcard: function (player, num) {
+          maxHandcard: (player, num) => {
             if (game.roundNumber <= 4) {
               return num + game.roundNumber
             }
           },
         },
         trigger: { source: "damageBegin1" },
-        filter: function (event, player) {
+        filter: (event, player) => {
           if (game.roundNumber <= 4) {
             return false
           }
           var evt2 = event.getParent("phaseUse")
-          if (evt2.player != player) {
+          if (evt2.player !== player) {
             return false
           }
           return (
             player
-              .getHistory("useCard", function (evt) {
-                return evt.card.name == "sha" && evt.getParent("phaseUse") == evt2
-              })
-              .indexOf(event.getParent()) == 0
+              .getHistory(
+                "useCard",
+                (evt) =>
+                  evt.card.name === "sha" && evt.getParent("phaseUse") === evt2,
+              )
+              .indexOf(event.getParent()) === 0
           )
         },
         silent: true,
         forced: true,
-        content: function () {
+        content: () => {
           trigger.num++
         },
       },
       xutuhuanjin: {
         trigger: { player: "phaseUseEnd" },
-        filter: function (event, player) {
+        filter: (event, player) => {
           if (
-            player.getHistory("useCard", function (evt) {
-              return evt.card && evt.card.name == "sha" && evt.getParent("phaseUse") == event
-            }).length > 0
+            player.getHistory(
+              "useCard",
+              (evt) =>
+                evt.card &&
+                evt.card.name === "sha" &&
+                evt.getParent("phaseUse") === event,
+            ).length > 0
           ) {
             return false
           }
           if (
-            player.getHistory("respond", function (evt) {
-              return evt.card && evt.card.name == "sha" && evt.getParent("phaseUse") == event
-            }).length > 0
+            player.getHistory(
+              "respond",
+              (evt) =>
+                evt.card &&
+                evt.card.name === "sha" &&
+                evt.getParent("phaseUse") === event,
+            ).length > 0
           ) {
             return false
           }
           return true
         },
         forced: true,
-        content: function () {
-          player.addTempSkill("xutuhuanjin_yingzi", { player: "phaseDrawAfter" })
+        content: () => {
+          player.addTempSkill("xutuhuanjin_yingzi", {
+            player: "phaseDrawAfter",
+          })
           player.addMark("xutuhuanjin_yingzi", 1, false)
         },
         subSkill: {
@@ -6269,11 +6881,10 @@ export default () => {
             charlotte: true,
             onremove: true,
             trigger: { player: "phaseDrawBegin2" },
-            filter: function (event, player) {
-              return !event.numFixed && player.hasMark("xutuhuanjin_yingzi")
-            },
+            filter: (event, player) =>
+              !event.numFixed && player.hasMark("xutuhuanjin_yingzi"),
             forced: true,
-            content: function () {
+            content: () => {
               trigger.num += player.countMark("xutuhuanjin_yingzi")
             },
             marktext: "缓",
@@ -6284,14 +6895,15 @@ export default () => {
       jianshoudaiyuan: {
         charlotte: true,
         mod: {
-          aiValue: function (player, card, num) {
-            if (card.name != "sha" && card.name != "shan") {
+          aiValue: (player, card, num) => {
+            if (card.name !== "sha" && card.name !== "shan") {
               return
             }
-            var geti = function () {
-              var cards = player.getCards("hs", function (card) {
-                return card.name == "sha" || card.name == "shan"
-              })
+            var geti = () => {
+              var cards = player.getCards(
+                "hs",
+                (card) => card.name === "sha" || card.name === "shan",
+              )
               if (cards.contains(card)) {
                 return cards.indexOf(card)
               }
@@ -6308,7 +6920,7 @@ export default () => {
         position: "hs",
         prompt:
           "将【杀】当作【闪】，或将【闪】当作的【杀】使用或打出，然后你的下个弃牌阶段的手牌上限-1",
-        viewAs: function (cards, player) {
+        viewAs: (cards, player) => {
           if (cards.length) {
             var name = false
             switch (get.name(cards[0], player)) {
@@ -6325,26 +6937,33 @@ export default () => {
           }
           return null
         },
-        onuse: function (links, player) {
-          player.addTempSkill("jianshoudaiyuan_less", { player: "phaseDiscardAfter" })
+        onuse: (links, player) => {
+          player.addTempSkill("jianshoudaiyuan_less", {
+            player: "phaseDiscardAfter",
+          })
           player.addMark("jianshoudaiyuan_less", 1, false)
           player.markSkill("jianshoudaiyuan_less")
         },
-        onrespond: function (links, player) {
-          player.addTempSkill("jianshoudaiyuan_less", { player: "phaseDiscardAfter" })
+        onrespond: (links, player) => {
+          player.addTempSkill("jianshoudaiyuan_less", {
+            player: "phaseDiscardAfter",
+          })
           player.addMark("jianshoudaiyuan_less", 1, false)
           player.markSkill("jianshoudaiyuan_less")
         },
-        check: function (card) {
+        check: (card) => {
           var player = _status.event.player
-          if (_status.event.type == "phase") {
+          if (_status.event.type === "phase") {
             var max = 0
             var name2
             var list = ["sha"]
             var map = { sha: "shan" }
             for (var i = 0; i < list.length; i++) {
               var name = list[i]
-              if (player.countCards("hs", map[name]) && player.getUseValue({ name: name }) > 0) {
+              if (
+                player.countCards("hs", map[name]) &&
+                player.getUseValue({ name: name }) > 0
+              ) {
                 var temp = get.order({ name: name })
                 if (temp > max) {
                   max = temp
@@ -6352,31 +6971,43 @@ export default () => {
                 }
               }
             }
-            if (name2 == get.name(card, player)) {
+            if (name2 === get.name(card, player)) {
               return 1
             }
             return 0
           }
           return 1
         },
-        filterCard: function (card, player, event) {
+        filterCard: (card, player, event) => {
           event = event || _status.event
           var filter = event._backup.filterCard
           var name = get.name(card, player)
-          if (name == "sha" && filter({ name: "shan", cards: [card] }, player, event)) {
+          if (
+            name === "sha" &&
+            filter({ name: "shan", cards: [card] }, player, event)
+          ) {
             return true
           }
-          if (name == "shan" && filter({ name: "sha", cards: [card] }, player, event)) {
+          if (
+            name === "shan" &&
+            filter({ name: "sha", cards: [card] }, player, event)
+          ) {
             return true
           }
           return false
         },
-        filter: function (event, player) {
+        filter: (event, player) => {
           var filter = event.filterCard
-          if (filter({ name: "sha" }, player, event) && player.countCards("hs", "shan")) {
+          if (
+            filter({ name: "sha" }, player, event) &&
+            player.countCards("hs", "shan")
+          ) {
             return true
           }
-          if (filter({ name: "shan" }, player, event) && player.countCards("hs", "sha")) {
+          if (
+            filter({ name: "shan" }, player, event) &&
+            player.countCards("hs", "sha")
+          ) {
             return true
           }
           return false
@@ -6384,7 +7015,7 @@ export default () => {
         ai: {
           respondSha: true,
           respondShan: true,
-          skillTagFilter: function (player, tag) {
+          skillTagFilter: (player, tag) => {
             var name
             switch (tag) {
               case "respondSha":
@@ -6398,9 +7029,12 @@ export default () => {
               return false
             }
           },
-          order: function (item, player) {
-            if (player && _status.event.type == "phase") {
-              if (player.countCards("hs", "shan") && player.getUseValue({ name: "sha" }) > 0) {
+          order: (item, player) => {
+            if (player && _status.event.type === "phase") {
+              if (
+                player.countCards("hs", "shan") &&
+                player.getUseValue({ name: "sha" }) > 0
+              ) {
                 return get.order({ name: "sha" }, player) * 0.99
               }
               return 0
@@ -6415,42 +7049,32 @@ export default () => {
             market: "守",
             intro: { content: "手牌上限-#" },
             mod: {
-              maxHandcard: function (player, num) {
-                return num - player.countMark("jianshoudaiyuan_less")
-              },
+              maxHandcard: (player, num) =>
+                num - player.countMark("jianshoudaiyuan_less"),
             },
           },
         },
       },
       yiruoshengqiang: {
         trigger: { source: "damageBegin2" },
-        filter: function (event, player) {
-          return event.player.hp > player.hp
-        },
+        filter: (event, player) => event.player.hp > player.hp,
         forced: true,
         silent: true,
-        content: function () {
+        content: () => {
           trigger.num++
         },
       },
       shichongerjiao: {
         charlotte: true,
         trigger: { player: "phaseJieshu" },
-        filter: function (event, player) {
-          return (
-            lib.skill.shichongerjiao.filterx(event, player) ||
-            lib.skill.shichongerjiao.filtery(event, player)
-          )
-        },
-        filterx: function (event, player) {
-          return player.isMaxHp()
-        },
-        filtery: function (event, player) {
-          return player.isMaxHandcard()
-        },
+        filter: (event, player) =>
+          lib.skill.shichongerjiao.filterx(event, player) ||
+          lib.skill.shichongerjiao.filtery(event, player),
+        filterx: (event, player) => player.isMaxHp(),
+        filtery: (event, player) => player.isMaxHandcard(),
         forced: true,
         silent: true,
-        content: function () {
+        content: () => {
           var bool1 = lib.skill.shichongerjiao.filterx(trigger, player)
           var bool2 = lib.skill.shichongerjiao.filtery(trigger, player)
           if (bool1) {
@@ -6463,34 +7087,30 @@ export default () => {
       },
       wenji: {
         trigger: { global: "phaseUseBegin" },
-        filter: function (event, player) {
-          return (
-            event.player.side == player.side &&
-            event.player != player &&
-            event.player.countCards("h")
-          )
-        },
+        filter: (event, player) =>
+          event.player.side === player.side &&
+          event.player !== player &&
+          event.player.countCards("h"),
         logTarget: "player",
-        check: function (event, player) {
-          return (
-            event.player.needsToDiscard(1) ||
-            event.player.countCards("h") > player.countCards("h") + 1 ||
-            player.hp == 1
-          )
-        },
-        content: function () {
+        check: (event, player) =>
+          event.player.needsToDiscard(1) ||
+          event.player.countCards("h") > player.countCards("h") + 1 ||
+          player.hp === 1,
+        content: () => {
           "step 0"
-          trigger.player.chooseCard("将一张手牌交给" + get.translation(player), true).ai =
-            function (card) {
-              if (get.type(card) == "trick") {
-                return 8 - get.value(card)
-              }
-              return 6 - get.value(card)
+          trigger.player.chooseCard(
+            `将一张手牌交给${get.translation(player)}`,
+            true,
+          ).ai = (card) => {
+            if (get.type(card) === "trick") {
+              return 8 - get.value(card)
             }
+            return 6 - get.value(card)
+          }
           ;("step 1")
           if (result.bool && result.cards.length) {
             player.gain(result.cards, trigger.player, "give")
-            if (get.type(result.cards[0]) == "trick") {
+            if (get.type(result.cards[0]) === "trick") {
               player.addTempSkill("wenji2", { player: "phaseBegin" })
             }
           }
@@ -6502,8 +7122,8 @@ export default () => {
           content: "非队友角色计算与你的距离+1",
         },
         mod: {
-          globalTo: function (from, to, distance) {
-            if (from.side != to.side) {
+          globalTo: (from, to, distance) => {
+            if (from.side !== to.side) {
               return distance + 1
             }
           },
@@ -6512,14 +7132,16 @@ export default () => {
       tunjiang: {
         trigger: { player: "phaseEnd" },
         direct: true,
-        filter: function (event, player) {
-          return !player.getStat("damage") && player.countUsed() >= 2
-        },
-        content: function () {
+        filter: (event, player) =>
+          !player.getStat("damage") && player.countUsed() >= 2,
+        content: () => {
           "step 0"
           var target = null
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side == player.side && game.players[i] != player) {
+            if (
+              game.players[i].side === player.side &&
+              game.players[i] !== player
+            ) {
               target = game.players[i]
               break
             }
@@ -6527,23 +7149,26 @@ export default () => {
           if (target) {
             event.target = target
             player
-              .chooseControl("cancel2", function () {
+              .chooseControl("cancel2", () => {
                 if (target.countCards("h") >= player.countCards("h")) {
                   return 1
                 }
                 return 0
               })
               .set("prompt", get.prompt("xingzhao"))
-              .set("choiceList", ["摸两张牌", "令" + get.translation(target) + "摸两张牌"])
+              .set("choiceList", [
+                "摸两张牌",
+                `令${get.translation(target)}摸两张牌`,
+              ])
           } else {
             player.chooseBool(get.prompt("xingzhao"))
           }
           ;("step 1")
           if (event.target) {
-            if (result.index == 0) {
+            if (result.index === 0) {
               player.logSkill("xingzhao")
               player.draw(2)
-            } else if (result.index == 1) {
+            } else if (result.index === 1) {
               player.logSkill("xingzhao", event.target)
               event.target.draw(2)
             }
@@ -6559,10 +7184,10 @@ export default () => {
         inherit: "xunxun",
         mark: true,
         intro: {
-          content: function (storage, player) {
+          content: (storage, player) => {
             var num = 0
             for (var i = 0; i < game.players.length; i++) {
-              if (game.players[i].side == player.side) {
+              if (game.players[i].side === player.side) {
                 num += game.players[i].storage.longchuanzhibao
               }
             }
@@ -6579,10 +7204,10 @@ export default () => {
             return str
           },
         },
-        filter: function (event, player) {
+        filter: (event, player) => {
           var num = 0
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side == player.side) {
+            if (game.players[i].side === player.side) {
               if (game.players[i].storage.longchuanzhibao) {
                 return true
               }
@@ -6595,14 +7220,14 @@ export default () => {
       xingzhao2: {
         trigger: { player: "useCard" },
         forced: true,
-        filter: function (event, player) {
-          if (get.type(event.card) != "equip") {
+        filter: (event, player) => {
+          if (get.type(event.card) !== "equip") {
             return false
           }
           var num = 0,
             bool = false
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side == player.side) {
+            if (game.players[i].side === player.side) {
               num += game.players[i].storage.longchuanzhibao
               if (game.players[i].hasSkill("xingzhao")) {
                 bool = true
@@ -6611,18 +7236,18 @@ export default () => {
           }
           return bool && num >= 2
         },
-        content: function () {
+        content: () => {
           player.draw()
         },
       },
       xingzhao3: {
         trigger: { player: "phaseJudgeBefore" },
         forced: true,
-        filter: function (event, player) {
+        filter: (event, player) => {
           var num = 0,
             bool = false
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side == player.side) {
+            if (game.players[i].side === player.side) {
               num += game.players[i].storage.longchuanzhibao
               if (game.players[i].hasSkill("xingzhao")) {
                 bool = true
@@ -6631,23 +7256,24 @@ export default () => {
           }
           return bool && num >= 3
         },
-        content: function () {
+        content: () => {
           trigger.cancel()
           game.log(player, "跳过了判定阶段")
         },
       },
       xionghuangjiu: {
         trigger: { source: "damageBegin1" },
-        filter: function (event, player) {
-          return event.card && event.card == player.storage.xionghuangjiu && event.notLink()
-        },
+        filter: (event, player) =>
+          event.card &&
+          event.card === player.storage.xionghuangjiu &&
+          event.notLink(),
         forced: true,
-        content: function () {
+        content: () => {
           trigger.num++
         },
         temp: true,
         vanish: true,
-        onremove: function (player) {
+        onremove: (player) => {
           game.addVideo("jiuNode", player, false)
           if (player.node.jiu) {
             player.node.jiu.delete()
@@ -6662,17 +7288,17 @@ export default () => {
       xionghuangjiu2: {
         trigger: { player: "useCardAfter", global: "phaseAfter" },
         priority: 2,
-        filter: function (event, player) {
-          if (event.name == "useCard") {
-            return event.card && event.card == player.storage.xionghuangjiu
+        filter: (event, player) => {
+          if (event.name === "useCard") {
+            return event.card && event.card === player.storage.xionghuangjiu
           }
           return true
         },
         forced: true,
         popup: false,
         audio: false,
-        content: function () {
-          game.broadcastAll(function (player) {
+        content: () => {
+          game.broadcastAll((player) => {
             player.removeSkill("xionghuangjiu")
           }, player)
         },
@@ -6680,39 +7306,38 @@ export default () => {
       xionghuangjiu3: {
         trigger: { player: "useCard" },
         silent: true,
-        filter: function (event, player) {
-          return !player.storage.xionghuangjiu
-        },
-        content: function () {
+        filter: (event, player) => !player.storage.xionghuangjiu,
+        content: () => {
           player.storage.xionghuangjiu = trigger.card
         },
       },
       longchuanzhibao: {
         mark: "auto",
         nopop: true,
-        init: function (player) {
+        init: (player) => {
           player.storage.longchuanzhibao = 0
         },
         intro: {
-          content: function (storage, player) {
-            var str = "已有" + storage + "个龙船至宝，" + get.translation(player.side) + "势力共有"
+          content: (storage, player) => {
+            var str = `已有${storage}个龙船至宝，${get.translation(player.side)}势力共有`
             var num = storage
             for (var i = 0; i < game.players.length; i++) {
-              if (game.players[i].side == player.side && game.players[i] != player) {
+              if (
+                game.players[i].side === player.side &&
+                game.players[i] !== player
+              ) {
                 num += game.players[i].storage.longchuanzhibao
                 break
               }
             }
-            str += num + "个龙船至宝。新一轮开始时，拥有至少4个龙船至宝的势力获胜"
+            str += `${num}个龙船至宝。新一轮开始时，拥有至少4个龙船至宝的势力获胜`
             return str
           },
         },
         trigger: { source: "damageEnd" },
         silent: true,
-        filter: function (event, player) {
-          return event.player.storage.longchuanzhibao > 0
-        },
-        content: function () {
+        filter: (event, player) => event.player.storage.longchuanzhibao > 0,
+        content: () => {
           player.gainZhibao(1, trigger.player)
           game.delay()
         },
@@ -6721,7 +7346,7 @@ export default () => {
           over: {
             trigger: { player: "roundStart" },
             silent: true,
-            filter: function () {
+            filter: () => {
               var map = { wei: 0, shu: 0, wu: 0, qun: 0 }
               for (var i = 0; i < game.players.length; i++) {
                 var current = game.players[i]
@@ -6732,12 +7357,12 @@ export default () => {
                 }
               }
             },
-            content: function () {
+            content: () => {
               for (var i = 0; i < game.players.length; i++) {
                 game.players[i].classList.remove("current_action")
               }
               var me = game.me._trueMe || game.me
-              game.over(_status.winside == me.side)
+              game.over(_status.winside === me.side)
             },
           },
         },
@@ -6753,12 +7378,12 @@ export default () => {
         },
         mod: {
           cardUsable(card, player) {
-            if (card.name == "sha") {
+            if (card.name === "sha") {
               return Infinity
             }
           },
           targetInRange(card, player) {
-            if (card.name == "sha") {
+            if (card.name === "sha") {
               return true
             }
           },
@@ -6816,12 +7441,17 @@ export default () => {
           player.logSkill("boss_yingji")
           await player.showCards(cards)
           event.result.cards = []
-          event.result.card = new lib.element.VCard({ name: "sha", isCard: true })
+          event.result.card = new lib.element.VCard({
+            name: "sha",
+            isCard: true,
+          })
           player
             .when("useCard1")
-            .filter((evt) => evt.getParent() == event.getParent())
+            .filter((evt) => evt.getParent() === event.getParent())
             .step(async (event, trigger, player) => {
-              trigger.baseDamage = cards.map((card) => get.type2(card)).toUniqued().length
+              trigger.baseDamage = cards
+                .map((card) => get.type2(card))
+                .toUniqued().length
             })
         },
         ai: {
@@ -6852,7 +7482,14 @@ export default () => {
           event.result = await player
             .chooseToDiscard(get.prompt2(event.skill, trigger.player), "h")
             .set("chooseonly", true)
-            .set("eff", get.damageEffect(trigger.player, trigger.source ?? trigger.player, player))
+            .set(
+              "eff",
+              get.damageEffect(
+                trigger.player,
+                trigger.source ?? trigger.player,
+                player,
+              ),
+            )
             .set("ai", (card) => {
               const { eff } = get.event()
               if (eff >= 0) {
@@ -6888,7 +7525,7 @@ export default () => {
         async content(event, trigger, player) {
           player
             .when("useCard1")
-            .filter((evt) => evt.card?.name == "sha")
+            .filter((evt) => evt.card?.name === "sha")
             .step(async (event, trigger, player) => {
               trigger.baseDamage ??= 1
               trigger.baseDamage++
@@ -6901,14 +7538,17 @@ export default () => {
         },
         forced: true,
         filter(event, player) {
-          return !player.hasHistory("useCard", (evt) => evt?.card?.name == "sha")
+          return !player.hasHistory(
+            "useCard",
+            (evt) => evt?.card?.name === "sha",
+          )
         },
         async content(event, trigger, player) {
           await player.loseHp()
         },
         mod: {
           targetInRange(card, player) {
-            if (card.name == "sha") {
+            if (card.name === "sha") {
               return true
             }
           },
@@ -6923,7 +7563,7 @@ export default () => {
           if (event.player.isFriendOf(player)) {
             return false
           }
-          return event.source?.isFriendOf(player) && event.source != player
+          return event.source?.isFriendOf(player) && event.source !== player
         },
         logTarget: "source",
         async content(event, trigger, player) {
@@ -6935,11 +7575,17 @@ export default () => {
         usable: 1,
         filter(event, player) {
           return game.hasPlayer((current) => {
-            return !current.isFriendOf(player) && current.countDiscardableCards(player, "he")
+            return (
+              !current.isFriendOf(player) &&
+              current.countDiscardableCards(player, "he")
+            )
           })
         },
         filterTarget(card, player, target) {
-          return !target.isFriendOf(player) && target.countDiscardableCards(player, "he")
+          return (
+            !target.isFriendOf(player) &&
+            target.countDiscardableCards(player, "he")
+          )
         },
         selectTarget: -1,
         async content(event, trigger, player) {
@@ -6954,8 +7600,8 @@ export default () => {
         async contentAfter(event, trigger, player) {
           const cards = event.getParent().hanjunCards
           if (cards.length) {
-            const equips = cards.filter((card) => get.type(card) == "equip"),
-              noequips = cards.filter((card) => get.type(card) != "equip")
+            const equips = cards.filter((card) => get.type(card) === "equip"),
+              noequips = cards.filter((card) => get.type(card) !== "equip")
             const result =
               equips.length && noequips.length
                 ? await player
@@ -6971,7 +7617,7 @@ export default () => {
                 : {
                     index: equips.length ? 0 : 1,
                   }
-            if (result.index == 0) {
+            if (result.index === 0) {
               await player.gain(equips, "gain2")
             } else {
               await player.gain(noequips, "gain2")
@@ -6989,7 +7635,7 @@ export default () => {
         forced: true,
         async content(event, trigger, player) {
           await player.loseHp()
-          const card = get.cardPile((card) => get.type(card) == "equip")
+          const card = get.cardPile((card) => get.type(card) === "equip")
           if (card) {
             await player.gain(card, "gain2")
           }
@@ -7000,7 +7646,7 @@ export default () => {
           global: ["loseAfter", "loseAsyncAfter"],
         },
         getIndex(event, player) {
-          if (!event.getl || event.type != "discard") {
+          if (!event.getl || event.type !== "discard") {
             return []
           }
           return game
@@ -7026,19 +7672,19 @@ export default () => {
         forced: true,
         locked: false,
         logTarget: "source",
-        filter: function (event, player) {
+        filter: (event, player) => {
           var target = event.source
           return (
             target &&
-            target == _status.currentPhase &&
+            target === _status.currentPhase &&
             target.isAlive() &&
             target.isFriendOf(player) &&
             event.card &&
-            event.card.name == "sha" &&
-            event.getParent().type == "card"
+            event.card.name === "sha" &&
+            event.getParent().type === "card"
           )
         },
-        content: function () {
+        content: () => {
           var source = trigger.source
           source.addTempSkill("boss_xiaorui2")
           source.addMark("boss_xiaorui2", 1, false)
@@ -7048,8 +7694,8 @@ export default () => {
         onremove: true,
         charlotte: true,
         mod: {
-          cardUsable: function (card, player, num) {
-            if (card.name == "sha") {
+          cardUsable: (card, player, num) => {
+            if (card.name === "sha") {
               return num + player.countMark("boss_xiaorui2")
             }
           },
@@ -7061,14 +7707,14 @@ export default () => {
           source: "dieAfter",
         },
         forced: true,
-        filter: function (event, player) {
-          if (event.name == "die") {
+        filter: (event, player) => {
+          if (event.name === "die") {
             return event.player.isEnemyOf(player)
           }
           return !event.numFixed && player.countMark("boss_huchen") > 0
         },
-        content: function () {
-          if (trigger.name == "die") {
+        content: () => {
+          if (trigger.name === "die") {
             player.addMark("boss_huchen", 1)
           } else {
             trigger.num += player.countMark("boss_huchen")
@@ -7082,12 +7728,12 @@ export default () => {
         trigger: { source: "damageSource" },
         forced: true,
         locked: false,
-        filter: function (event, player) {
-          return event.player.isAlive()
-        },
+        filter: (event, player) => event.player.isAlive(),
         logTarget: "player",
-        content: function () {
-          trigger.player.addTempSkill("boss_fengjian2", { player: "phaseAfter" })
+        content: () => {
+          trigger.player.addTempSkill("boss_fengjian2", {
+            player: "phaseAfter",
+          })
           trigger.player.markAuto("boss_fengjian2", [player])
         },
       },
@@ -7097,7 +7743,7 @@ export default () => {
           content: "不能对$使用牌",
         },
         mod: {
-          playerEnabled: function (card, player, target) {
+          playerEnabled: (card, player, target) => {
             if (player.getStorage("boss_fengjian2").includes(target)) {
               return false
             }
@@ -7107,16 +7753,16 @@ export default () => {
       boss_keding: {
         trigger: { player: "useCard2" },
         direct: true,
-        filter: function (event, player) {
-          if (!event.targets || event.targets.length != 1) {
+        filter: (event, player) => {
+          if (event.targets?.length !== 1) {
             return false
           }
           var card = event.card
-          if (card.name != "sha" && get.type(card) != "trick") {
+          if (card.name !== "sha" && get.type(card) !== "trick") {
             return false
           }
           var info = get.info(card)
-          if (info.allowMultiple == false) {
+          if (info.allowMultiple === false) {
             return false
           }
           if (!player.countCards("h")) {
@@ -7124,40 +7770,38 @@ export default () => {
           }
           if (!info.multitarget) {
             if (
-              game.hasPlayer(function (current) {
-                return (
+              game.hasPlayer(
+                (current) =>
                   !event.targets.includes(current) &&
                   lib.filter.targetEnabled2(card, player, current) &&
-                  lib.filter.targetInRange(card, player, current)
-                )
-              })
+                  lib.filter.targetInRange(card, player, current),
+              )
             ) {
               return true
             }
           }
           return false
         },
-        content: function () {
+        content: () => {
           "step 0"
           var card = trigger.card
-          var prompt2 = "弃置任意张手牌，并为" + get.translation(card) + "增加等量的目标"
-          var targets = game.filterPlayer(function (current) {
-            return (
+          var prompt2 = `弃置任意张手牌，并为${get.translation(card)}增加等量的目标`
+          var targets = game.filterPlayer(
+            (current) =>
               !trigger.targets.includes(current) &&
               lib.filter.targetEnabled2(card, player, current) &&
-              lib.filter.targetInRange(card, player, current)
-            )
-          })
+              lib.filter.targetInRange(card, player, current),
+          )
           var max = 0
           if (!trigger.targets[0].hasSkill("heiguangkai_skill")) {
-            max = targets.filter(function (target) {
-              return get.effect(target, card, player, player) > 0
-            }).length
+            max = targets.filter(
+              (target) => get.effect(target, card, player, player) > 0,
+            ).length
           }
           player.chooseCardTarget({
             prompt: get.prompt("boss_keding"),
             prompt2: prompt2,
-            selectCard: function () {
+            selectCard: () => {
               var player = _status.event.player
               var targets = _status.event.targets
               return [
@@ -7165,22 +7809,19 @@ export default () => {
                 Math.min(targets.length, player.countCards("h")),
               ]
             },
-            selectTarget: function () {
-              return ui.selected.cards.length
-            },
+            selectTarget: () => ui.selected.cards.length,
             position: "h",
             filterCard: lib.filter.cardDiscardable,
-            filterTarget: function (card, player, target) {
-              return _status.event.targets.includes(target)
-            },
+            filterTarget: (card, player, target) =>
+              _status.event.targets.includes(target),
             targets: targets,
-            ai1: function (card) {
+            ai1: (card) => {
               if (ui.selected.cards.length >= _status.event.max) {
                 return 0
               }
               return 5 - get.value(card)
             },
-            ai2: function (target) {
+            ai2: (target) => {
               if (target.hasSkill("heiguangkai_skill")) {
                 return 0
               }
@@ -7200,16 +7841,13 @@ export default () => {
         },
       },
       boss_bashi: {
-        filter: function (event, player) {
-          return (
-            event.player != player &&
-            event.card &&
-            (event.card.name == "sha" || get.type(event.card) == "trick") &&
-            !player.isTurnedOver()
-          )
-        },
+        filter: (event, player) =>
+          event.player !== player &&
+          event.card &&
+          (event.card.name === "sha" || get.type(event.card) === "trick") &&
+          !player.isTurnedOver(),
         logTarget: "player",
-        check: function (event, player) {
+        check: (event, player) => {
           if (event.getParent().excluded.includes(player)) {
             return false
           }
@@ -7217,15 +7855,15 @@ export default () => {
             return false
           }
           if (get.tag(event.card, "respondSha")) {
-            if (player.countCards("h", { name: "sha" }) == 0) {
+            if (player.countCards("h", { name: "sha" }) === 0) {
               return true
             }
           } else if (get.tag(event.card, "respondShan")) {
-            if (player.countCards("h", { name: "shan" }) == 0) {
+            if (player.countCards("h", { name: "shan" }) === 0) {
               return true
             }
           } else if (get.tag(event.card, "damage")) {
-            if (event.card.name == "shuiyanqijunx") {
+            if (event.card.name === "shuiyanqijunx") {
               return player.countCards("e") < 2
             }
             return true
@@ -7234,25 +7872,30 @@ export default () => {
           return false
         },
         trigger: { target: "useCardToTargeted" },
-        content: function () {
+        content: () => {
           player.turnOver()
           trigger.getParent().excluded.add(player)
         },
       },
       boss_danjing: {
         trigger: { global: "dying" },
-        filter: function (event, player) {
-          return player.hp > 1 && event.player.hp < 1 && event.player.isFriendOf(player)
-        },
-        check: function (event, player) {
+        filter: (event, player) =>
+          player.hp > 1 &&
+          event.player.hp < 1 &&
+          event.player.isFriendOf(player),
+        check: (event, player) => {
           var target = event.player
           return (
             get.attitude(player, target) > 0 &&
-            lib.filter.cardSavable({ name: "tao", isCard: true }, player, target)
+            lib.filter.cardSavable(
+              { name: "tao", isCard: true },
+              player,
+              target,
+            )
           )
         },
         logTarget: "player",
-        content: function () {
+        content: () => {
           "step 0"
           player.loseHp()
           ;("step 1")
@@ -7265,20 +7908,24 @@ export default () => {
       boss_jiaoxie: {
         enable: "phaseUse",
         usable: 1,
-        filter: function (event, player) {
-          return game.hasPlayer(function (current) {
-            return lib.skill.boss_jiaoxie.filterTarget(null, player, current)
-          })
-        },
-        filterTarget: function (card, player, target) {
-          return target.isEnemyOf(player) && target.type == "mech" && target.countCards("he") > 0
-        },
-        content: function () {
+        filter: (event, player) =>
+          game.hasPlayer((current) =>
+            lib.skill.boss_jiaoxie.filterTarget(null, player, current),
+          ),
+        filterTarget: (card, player, target) =>
+          target.isEnemyOf(player) &&
+          target.type === "mech" &&
+          target.countCards("he") > 0,
+        content: () => {
           "step 0"
           if (!target.countCards("he")) {
             event.finish()
           } else {
-            target.chooseCard("he", true, "将一张牌交给" + get.translation(player))
+            target.chooseCard(
+              "he",
+              true,
+              `将一张牌交给${get.translation(player)}`,
+            )
           }
           ;("step 1")
           if (result.bool) {
@@ -7288,11 +7935,10 @@ export default () => {
         ai: {
           order: 9,
           result: {
-            target: function (player, target) {
+            target: (player, target) => {
               if (
-                target.countCards("e", function (card) {
-                  return get.value(card, target) <= 0
-                }) > 0
+                target.countCards("e", (card) => get.value(card, target) <= 0) >
+                0
               ) {
                 return 1
               }
@@ -7304,11 +7950,12 @@ export default () => {
       boss_didongjg: {
         trigger: { player: "phaseEnd" },
         direct: true,
-        content: function () {
+        content: () => {
           "step 0"
-          player.chooseTarget(get.prompt("boss_didongjg"), function (card, player, target) {
-            return target.isEnemyOf(player)
-          }).ai = function (target) {
+          player.chooseTarget(
+            get.prompt("boss_didongjg"),
+            (card, player, target) => target.isEnemyOf(player),
+          ).ai = (target) => {
             var att = get.attitude(player, target)
             if (target.isTurnedOver()) {
               if (att > 0) {
@@ -7334,11 +7981,11 @@ export default () => {
       boss_lianyujg: {
         trigger: { player: "phaseEnd" },
         unique: true,
-        content: function () {
+        content: () => {
           "step 0"
-          event.players = game.filterPlayer(function (current) {
-            return current.isEnemyOf(player)
-          })
+          event.players = game.filterPlayer((current) =>
+            current.isEnemyOf(player),
+          )
           ;("step 1")
           if (event.players.length) {
             var current = event.players.shift()
@@ -7353,10 +8000,11 @@ export default () => {
       },
       boss_mojianjg: {
         trigger: { player: "phaseUseBegin" },
-        content: function () {
-          var list = game.filterPlayer(function (current) {
-            return player.canUse("wanjian", current) && current.isEnemyOf(player)
-          })
+        content: () => {
+          var list = game.filterPlayer(
+            (current) =>
+              player.canUse("wanjian", current) && current.isEnemyOf(player),
+          )
           list.sort(lib.sort.seat)
           player.useCard({ name: "wanjian" }, list)
         },
@@ -7368,30 +8016,32 @@ export default () => {
         audio: true,
         trigger: { player: "useCard" },
         direct: true,
-        filter: function (event, player) {
-          if (get.suit(event.card) == "club") {
-            return game.hasPlayer(function (current) {
-              return current.isFriendOf(player) && current.isDamaged()
-            })
+        filter: (event, player) => {
+          if (get.suit(event.card) === "club") {
+            return game.hasPlayer(
+              (current) => current.isFriendOf(player) && current.isDamaged(),
+            )
           }
           return false
         },
-        content: function () {
+        content: () => {
           "step 0"
           var noneed =
-            trigger.card.name == "tao" &&
-            trigger.targets[0] == player &&
-            player.hp == player.maxHp - 1
-          player.chooseTarget(get.prompt("boss_qiwu"), function (card, player, target) {
-            return target.hp < target.maxHp && target.isFriendOf(player)
-          }).ai = function (target) {
+            trigger.card.name === "tao" &&
+            trigger.targets[0] === player &&
+            player.hp === player.maxHp - 1
+          player.chooseTarget(
+            get.prompt("boss_qiwu"),
+            (card, player, target) =>
+              target.hp < target.maxHp && target.isFriendOf(player),
+          ).ai = (target) => {
             var num = get.attitude(player, target)
             if (num > 0) {
-              if (noneed && player == target) {
+              if (noneed && player === target) {
                 num = 0.5
-              } else if (target.hp == 1) {
+              } else if (target.hp === 1) {
                 num += 3
-              } else if (target.hp == 2) {
+              } else if (target.hp === 2) {
                 num += 1
               }
             }
@@ -7412,12 +8062,11 @@ export default () => {
         audio: true,
         trigger: { player: "phaseEnd" },
         forced: true,
-        filter: function (event, player) {
-          return game.hasPlayer(function (current) {
-            return current.isEnemyOf(player) && !current.isLinked()
-          })
-        },
-        content: function () {
+        filter: (event, player) =>
+          game.hasPlayer(
+            (current) => current.isEnemyOf(player) && !current.isLinked(),
+          ),
+        content: () => {
           "step 0"
           event.targets = game.filterPlayer()
           event.targets.sort(lib.sort.seat)
@@ -7435,14 +8084,18 @@ export default () => {
       boss_jueji: {
         audio: 2,
         trigger: { global: "phaseDrawBegin" },
-        filter: function (event, player) {
+        filter: (event, player) => {
           if (event.player.isFriendOf(player)) {
             return false
           }
-          return event.num > 0 && event.player != player && event.player.hp < event.player.maxHp
+          return (
+            event.num > 0 &&
+            event.player !== player &&
+            event.player.hp < event.player.maxHp
+          )
         },
         logTarget: "player",
-        content: function () {
+        content: () => {
           player.line(trigger.player, "green")
           trigger.num--
         },
@@ -7455,16 +8108,16 @@ export default () => {
         audio: 2,
         trigger: { player: "phaseEnd" },
         direct: true,
-        filter: function (event, player) {
-          return game.hasPlayer(function (current) {
-            return current.isFriendOf(player) && current.isTurnedOver()
-          })
-        },
-        content: function () {
+        filter: (event, player) =>
+          game.hasPlayer(
+            (current) => current.isFriendOf(player) && current.isTurnedOver(),
+          ),
+        content: () => {
           "step 0"
-          player.chooseTarget(get.prompt("boss_huodi"), function (card, player, target) {
-            return !target.isFriendOf(player)
-          }).ai = function (target) {
+          player.chooseTarget(
+            get.prompt("boss_huodi"),
+            (card, player, target) => !target.isFriendOf(player),
+          ).ai = (target) => {
             if (target.isTurnedOver()) {
               return 0
             }
@@ -7484,13 +8137,12 @@ export default () => {
         audio: true,
         trigger: { player: "phaseEnd" },
         direct: true,
-        content: function () {
+        content: () => {
           "step 0"
-          player.chooseTarget(get.prompt("boss_chuanyun"), function (card, player, target) {
-            return player.hp < target.hp
-          }).ai = function (target) {
-            return get.damageEffect(target, player, player)
-          }
+          player.chooseTarget(
+            get.prompt("boss_chuanyun"),
+            (card, player, target) => player.hp < target.hp,
+          ).ai = (target) => get.damageEffect(target, player, player)
           ;("step 1")
           if (result.bool) {
             player.logSkill("boss_chuanyun", result.targets)
@@ -7502,19 +8154,18 @@ export default () => {
         audio: 2,
         trigger: { source: "damageEnd" },
         direct: true,
-        filter: function (event) {
-          return event.card && event.card.name == "sha"
-        },
-        content: function () {
+        filter: (event) => event.card && event.card.name === "sha",
+        content: () => {
           "step 0"
-          player.chooseTarget(get.prompt("boss_leili"), function (card, player, target) {
-            if (target == trigger.player) {
-              return false
-            }
-            return target.isEnemyOf(player)
-          }).ai = function (target) {
-            return get.damageEffect(target, player, player, "thunder")
-          }
+          player.chooseTarget(
+            get.prompt("boss_leili"),
+            (card, player, target) => {
+              if (target === trigger.player) {
+                return false
+              }
+              return target.isEnemyOf(player)
+            },
+          ).ai = (target) => get.damageEffect(target, player, player, "thunder")
           ;("step 1")
           if (result.bool) {
             player.logSkill("boss_leili", result.targets)
@@ -7530,16 +8181,17 @@ export default () => {
         audio: true,
         trigger: { player: "phaseBegin" },
         direct: true,
-        content: function () {
+        content: () => {
           "step 0"
-          player.chooseTarget(get.prompt("boss_fengxing"), function (card, player, target) {
-            if (target.isFriendOf(player)) {
-              return false
-            }
-            return lib.filter.targetEnabled({ name: "sha" }, player, target)
-          }).ai = function (target) {
-            return get.effect(target, { name: "sha" }, player)
-          }
+          player.chooseTarget(
+            get.prompt("boss_fengxing"),
+            (card, player, target) => {
+              if (target.isFriendOf(player)) {
+                return false
+              }
+              return lib.filter.targetEnabled({ name: "sha" }, player, target)
+            },
+          ).ai = (target) => get.effect(target, { name: "sha" }, player)
           ;("step 1")
           if (result.bool) {
             player.logSkill("boss_fengxing")
@@ -7555,16 +8207,15 @@ export default () => {
         audio: true,
         trigger: { player: "phaseBegin" },
         forced: true,
-        filter: function (event, player) {
-          return game.hasPlayer(function (current) {
-            return current.isEnemyOf(player) && current.countCards("j")
-          })
-        },
-        content: function () {
+        filter: (event, player) =>
+          game.hasPlayer(
+            (current) => current.isEnemyOf(player) && current.countCards("j"),
+          ),
+        content: () => {
           "step 0"
-          event.targets = game.filterPlayer(function (current) {
-            return current.isEnemyOf(player) && current.countCards("j")
-          })
+          event.targets = game.filterPlayer(
+            (current) => current.isEnemyOf(player) && current.countCards("j"),
+          )
           event.targets.sort(lib.sort.seat)
           player.line(event.targets, "thunder")
           ;("step 1")
@@ -7578,23 +8229,21 @@ export default () => {
         audio: true,
         trigger: { player: "phaseEnd" },
         forced: true,
-        check: function () {
-          return false
-        },
-        content: function () {
+        check: () => false,
+        content: () => {
           player.loseHp()
         },
       },
       boss_skonghun: {
         audio: true,
         trigger: { player: "phaseUseBegin" },
-        filter: function (event, player) {
+        filter: (event, player) => {
           var num = player.maxHp - player.hp
-          if (num == 0) {
+          if (num === 0) {
             return false
           }
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side != player.side) {
+            if (game.players[i].side !== player.side) {
               num--
             }
           }
@@ -7602,11 +8251,11 @@ export default () => {
         },
         forced: true,
         locked: false,
-        content: function () {
+        content: () => {
           "step 0"
-          var targets = game.filterPlayer(function (current) {
-            return current.isEnemyOf(player)
-          })
+          var targets = game.filterPlayer((current) =>
+            current.isEnemyOf(player),
+          )
           targets.sort(lib.sort.seat)
           event.targets = targets
           player.line(targets, "thunder")
@@ -7620,11 +8269,11 @@ export default () => {
           player.recover(event.num)
         },
         ai: {
-          threaten: function (player, target) {
-            if (target.hp == 1) {
+          threaten: (player, target) => {
+            if (target.hp === 1) {
               return 2
             }
-            if (target.hp == 2 && game.players.length < 8) {
+            if (target.hp === 2 && game.players.length < 8) {
               return 1.5
             }
             return 0.5
@@ -7635,13 +8284,13 @@ export default () => {
         audio: 2,
         trigger: { global: "damageBegin4" },
         forced: true,
-        filter: function (event, player) {
+        filter: (event, player) => {
           if (event.num <= 1) {
             return false
           }
           return event.player.isFriendOf(player)
         },
-        content: function () {
+        content: () => {
           trigger.num = 1
         },
       },
@@ -7650,7 +8299,7 @@ export default () => {
       },
       boss_jingfan2: {
         mod: {
-          globalFrom: function (from, to, distance) {
+          globalFrom: (from, to, distance) => {
             if (to.isEnemyOf(from)) {
               return
             }
@@ -7659,7 +8308,7 @@ export default () => {
               if (
                 players[i].hasSkill("boss_jingfan") &&
                 players[i].isFriendOf(from) &&
-                players[i] != from
+                players[i] !== from
               ) {
                 return distance - 1
               }
@@ -7669,7 +8318,7 @@ export default () => {
       },
       boss_lingyu: {
         trigger: { player: "phaseEnd" },
-        check: function (event, player) {
+        check: (event, player) => {
           if (player.isTurnedOver()) {
             return true
           }
@@ -7681,7 +8330,7 @@ export default () => {
               players[i].isFriendOf(player) &&
               get.recoverEffect(players[i]) > 0
             ) {
-              if (players[i].hp == 1) {
+              if (players[i].hp === 1) {
                 return true
               }
               num++
@@ -7692,13 +8341,13 @@ export default () => {
           }
           return false
         },
-        content: function () {
+        content: () => {
           "step 0"
           player.turnOver()
           ;("step 1")
-          var list = game.filterPlayer(function (current) {
-            return current.isDamaged() && current.isFriendOf(player)
-          })
+          var list = game.filterPlayer(
+            (current) => current.isDamaged() && current.isFriendOf(player),
+          )
           player.line(list, "green")
           event.targets = list
           ;("step 2")
@@ -7719,7 +8368,7 @@ export default () => {
       },
       boss_zhenwei2: {
         mod: {
-          globalTo: function (from, to, distance) {
+          globalTo: (from, to, distance) => {
             if (to.isFriendOf(from)) {
               return
             }
@@ -7728,7 +8377,7 @@ export default () => {
               if (
                 players[i].hasSkill("boss_zhenwei") &&
                 players[i].isFriendOf(to) &&
-                players[i] != to
+                players[i] !== to
               ) {
                 return distance + 1
               }
@@ -7740,31 +8389,34 @@ export default () => {
         mode: ["versus"],
         trigger: { player: "phaseBegin" },
         forced: true,
-        filter: function (event, player) {
-          if (_status.mode != "jiange") {
+        filter: (event, player) => {
+          if (_status.mode !== "jiange") {
             return false
           }
           var players = game.filterPlayer()
           for (var i = 0; i < players.length; i++) {
-            if (players[i].type == "mech" && players[i].isEnemyOf(player)) {
+            if (players[i].type === "mech" && players[i].isEnemyOf(player)) {
               return true
             }
           }
         },
-        content: function () {
-          var target = game.findPlayer(function (current) {
-            return current.type == "mech" && current.isEnemyOf(player)
-          })
+        content: () => {
+          var target = game.findPlayer(
+            (current) => current.type === "mech" && current.isEnemyOf(player),
+          )
           if (target) {
             player.line(target, "thunder")
             target.damage(Math.random() > 0.4 ? 2 : 3, "thunder")
           }
         },
         ai: {
-          threaten: function (player, target) {
-            if (_status.mode == "jiange") {
+          threaten: (player, target) => {
+            if (_status.mode === "jiange") {
               for (var i = 0; i < game.players.length; i++) {
-                if (game.players[i].type == "mech" && game.players[i].isEnemyOf(target)) {
+                if (
+                  game.players[i].type === "mech" &&
+                  game.players[i].isEnemyOf(target)
+                ) {
                   return 2
                 }
               }
@@ -7775,7 +8427,7 @@ export default () => {
       },
       boss_nailuo: {
         trigger: { player: "phaseEnd" },
-        check: function (event, player) {
+        check: (event, player) => {
           if (player.isTurnedOver()) {
             return true
           }
@@ -7805,16 +8457,19 @@ export default () => {
               }
             }
           }
-          if (_status.mode == "jiange") {
+          if (_status.mode === "jiange") {
             for (var i = 0; i < players.length; i++) {
-              if (players[i].isFriendOf(player) && players[i].hasSkill("huodi")) {
+              if (
+                players[i].isFriendOf(player) &&
+                players[i].hasSkill("huodi")
+              ) {
                 return num > 0
               }
             }
           }
           return num >= 4
         },
-        filter: function (event, player) {
+        filter: (event, player) => {
           var players = game.filterPlayer()
           for (var i = 0; i < players.length; i++) {
             if (players[i].isEnemyOf(player) && players[i].countCards("e")) {
@@ -7823,7 +8478,7 @@ export default () => {
           }
           return false
         },
-        content: function () {
+        content: () => {
           "step 0"
           player.turnOver()
           ;("step 1")
@@ -7845,31 +8500,29 @@ export default () => {
       boss_tanshi: {
         trigger: { player: "phaseEnd" },
         forced: true,
-        check: function () {
-          return false
-        },
-        filter: function (event, player) {
-          return player.countCards("h") > 0
-        },
-        content: function () {
+        check: () => false,
+        filter: (event, player) => player.countCards("h") > 0,
+        content: () => {
           player.chooseToDiscard("h", true)
         },
       },
       boss_tunshi: {
         trigger: { player: "phaseBegin" },
         forced: true,
-        filter: function (event, player) {
+        filter: (event, player) => {
           var nh = player.countCards("h")
-          return game.hasPlayer(function (current) {
-            return current.isEnemyOf(player) && current.countCards("h") > nh
-          })
+          return game.hasPlayer(
+            (current) =>
+              current.isEnemyOf(player) && current.countCards("h") > nh,
+          )
         },
-        content: function () {
+        content: () => {
           "step 0"
           var nh = player.countCards("h")
-          var targets = game.filterPlayer(function (current) {
-            return current.isEnemyOf(player) && current.countCards("h") > nh
-          })
+          var targets = game.filterPlayer(
+            (current) =>
+              current.isEnemyOf(player) && current.countCards("h") > nh,
+          )
           targets.sort(lib.sort.seat)
           event.targets = targets
           ;("step 1")
@@ -7883,8 +8536,8 @@ export default () => {
       },
       boss_jiguan: {
         mod: {
-          targetEnabled: function (card, player, target) {
-            if (card.name == "lebu") {
+          targetEnabled: (card, player, target) => {
+            if (card.name === "lebu") {
               return false
             }
           },
@@ -7894,13 +8547,13 @@ export default () => {
         audio: 2,
         trigger: { player: "phaseEnd" },
         mode: ["versus"],
-        filter: function (event, player) {
-          if (_status.mode != "jiange") {
+        filter: (event, player) => {
+          if (_status.mode !== "jiange") {
             return false
           }
           var players = game.filterPlayer()
           for (var i = 0; i < players.length; i++) {
-            if (players[i].type == "mech") {
+            if (players[i].type === "mech") {
               if (players[i].isEnemyOf(player)) {
                 return true
               }
@@ -7911,11 +8564,11 @@ export default () => {
           }
           return false
         },
-        content: function () {
+        content: () => {
           var enemy,
             players = game.filterPlayer()
           for (var i = 0; i < players.length; i++) {
-            if (players[i].type == "mech") {
+            if (players[i].type === "mech") {
               if (players[i].isFriendOf(player)) {
                 if (players[i].hp < players[i].maxHp) {
                   player.line(players[i], "green")
@@ -7935,14 +8588,11 @@ export default () => {
       },
       boss_jingmiao: {
         trigger: { global: "useCardAfter" },
-        filter: function (event, player) {
-          return event.player.isEnemyOf(player) && event.card.name == "wuxie"
-        },
+        filter: (event, player) =>
+          event.player.isEnemyOf(player) && event.card.name === "wuxie",
         logTarget: "player",
-        check: function (event, player) {
-          return get.attitude(player, event.player) < 0
-        },
-        content: function () {
+        check: (event, player) => get.attitude(player, event.player) < 0,
+        content: () => {
           player.line(trigger.player, "green")
           trigger.player.loseHp()
         },
@@ -7954,24 +8604,27 @@ export default () => {
       boss_zhinang: {
         trigger: { player: "phaseBegin" },
         frequent: true,
-        content: function () {
+        content: () => {
           "step 0"
           event.cards = get.cards(5)
           event.cards2 = []
           for (var i = 0; i < event.cards.length; i++) {
             var type = get.type(event.cards[i], "trick")
-            if (type == "trick" || type == "equip") {
+            if (type === "trick" || type === "equip") {
               event.cards2.push(event.cards[i])
             }
           }
-          if (!event.isMine() || event.cards2.length == 0) {
+          if (!event.isMine() || event.cards2.length === 0) {
             player.showCards(event.cards)
           }
           ;("step 1")
-          if (event.cards2.length == 0) {
+          if (event.cards2.length === 0) {
             event.finish()
           } else {
-            var dialog = ui.create.dialog("将五张牌中的锦囊牌或装备牌交给一名己方角色", "hidden")
+            var dialog = ui.create.dialog(
+              "将五张牌中的锦囊牌或装备牌交给一名己方角色",
+              "hidden",
+            )
             dialog.add(event.cards)
             for (var i = 0; i < dialog.buttons.length; i++) {
               if (event.cards2.includes(dialog.buttons[i].link)) {
@@ -7980,27 +8633,29 @@ export default () => {
                 dialog.buttons[i].style.opacity = 0.5
               }
             }
-            var next = player.chooseTarget(true, dialog, function (card, player, target) {
-              return target.isFriendOf(player)
-            })
-            next.ai = function (target) {
+            var next = player.chooseTarget(
+              true,
+              dialog,
+              (card, player, target) => target.isFriendOf(player),
+            )
+            next.ai = (target) => {
               var att = get.attitude(player, target)
               if (att > 0 && target.hasJudge("lebu")) {
                 return 0.1
               }
               if (player.countCards("h") > player.hp) {
-                if (target == player) {
+                if (target === player) {
                   return Math.max(1, att - 2)
                 }
               }
-              if (target == player) {
+              if (target === player) {
                 return att + 5
               }
               return att
             }
           }
           ;("step 2")
-          if (result && result.targets && result.targets.length) {
+          if (result?.targets?.length) {
             event.target = result.targets[0]
           }
           if (event.cards2.length) {
@@ -8016,7 +8671,7 @@ export default () => {
         trigger: { player: "dieBegin" },
         forced: true,
         popup: false,
-        content: function () {
+        content: () => {
           for (var i = 0; i < game.players.length; i++) {
             if (game.players[i].hasSkill("boss_biantian3")) {
               game.players[i].removeSkill("boss_biantian3")
@@ -8035,7 +8690,7 @@ export default () => {
         unique: true,
         audio: false,
         group: "boss_biantian4",
-        content: function () {
+        content: () => {
           "step 0"
           for (var i = 0; i < game.players.length; i++) {
             if (game.players[i].hasSkill("boss_biantian3")) {
@@ -8047,12 +8702,12 @@ export default () => {
               game.players[i].popup("boss_biantian2")
             }
           }
-          player.judge(function (card) {
+          player.judge((card) => {
             var color = get.color(card)
-            if (color == "black") {
+            if (color === "black") {
               return 1
             }
-            if (color == "red") {
+            if (color === "red") {
               return 0
             }
             return -1
@@ -8060,7 +8715,7 @@ export default () => {
           ;("step 1")
           var targets = [],
             players = game.filterPlayer()
-          if (result.color == "red") {
+          if (result.color === "red") {
             game.trySkillAudio("boss_biantianx2")
             for (var i = 0; i < players.length; i++) {
               if (!players[i].isFriendOf(player)) {
@@ -8070,7 +8725,7 @@ export default () => {
               }
             }
             player.logSkill("kuangfeng", targets, "fire")
-          } else if (result.color == "black") {
+          } else if (result.color === "black") {
             game.trySkillAudio("boss_biantianx1")
             for (var i = 0; i < players.length; i++) {
               if (players[i].isFriendOf(player)) {
@@ -8089,7 +8744,7 @@ export default () => {
       boss_biantian2: {
         audio: false,
         trigger: { player: "damageBefore" },
-        filter: function (event) {
+        filter: (event) => {
           if (!event.hasNature("thunder")) {
             return true
           }
@@ -8101,14 +8756,14 @@ export default () => {
         intro: {
           content: "已获得大雾标记",
         },
-        content: function () {
+        content: () => {
           trigger.cancel()
         },
         ai: {
           nofire: true,
           nodamage: true,
           effect: {
-            target: function (card, player, target, current) {
+            target: (card, player, target, current) => {
               if (get.tag(card, "damage") && !get.tag(card, "thunderDamage")) {
                 return "zeroplayertarget"
               }
@@ -8118,7 +8773,7 @@ export default () => {
       },
       boss_biantian3: {
         trigger: { player: "damageBegin3" },
-        filter: function (event) {
+        filter: (event) => {
           if (event.hasNature("fire")) {
             return true
           }
@@ -8130,12 +8785,12 @@ export default () => {
           content: "已获得狂风标记",
         },
         forced: true,
-        content: function () {
+        content: () => {
           trigger.num++
         },
         ai: {
           effect: {
-            target: function (card, player, target, current) {
+            target: (card, player, target, current) => {
               if (get.tag(card, "fireDamage")) {
                 return 1.5
               }
@@ -8147,15 +8802,14 @@ export default () => {
         audio: 2,
         trigger: { player: "phaseEnd" },
         forced: true,
-        filter: function (event, player) {
-          return game.hasPlayer(function (current) {
-            return current.isFriendOf(player) && current.isDamaged()
-          })
-        },
-        content: function () {
-          var list = game.filterPlayer(function (current) {
-            return current.isFriendOf(player) && current.isDamaged()
-          })
+        filter: (event, player) =>
+          game.hasPlayer(
+            (current) => current.isFriendOf(player) && current.isDamaged(),
+          ),
+        content: () => {
+          var list = game.filterPlayer(
+            (current) => current.isFriendOf(player) && current.isDamaged(),
+          )
           if (list.length) {
             player.line(list, "green")
             game.asyncDraw(list)
@@ -8168,21 +8822,20 @@ export default () => {
       boss_lingfeng: {
         audio: 2,
         trigger: { player: "phaseDrawBefore" },
-        content: function () {
+        content: () => {
           "step 0"
           trigger.cancel()
           event.cards = get.cards(2)
           player.showCards(event.cards)
           ;("step 1")
-          if (get.color(event.cards[0]) != get.color(event.cards[1])) {
-            player.chooseTarget("是否令一名敌方角色失去1点体力？", function (card, player, target) {
-              return !target.isFriendOf(player)
-            }).ai = function (target) {
-              return -get.attitude(player, target)
-            }
+          if (get.color(event.cards[0]) !== get.color(event.cards[1])) {
+            player.chooseTarget(
+              "是否令一名敌方角色失去1点体力？",
+              (card, player, target) => !target.isFriendOf(player),
+            ).ai = (target) => -get.attitude(player, target)
           }
           ;("step 2")
-          if (result.bool && result.targets && result.targets.length) {
+          if (result.bool && result.targets?.length) {
             player.line(result.targets, "green")
             result.targets[0].loseHp()
           }
@@ -8198,17 +8851,15 @@ export default () => {
       boss_yuhuojg: {
         audio: true,
         trigger: { player: "damageBegin2" },
-        filter: function (event) {
-          return event.hasNature("fire")
-        },
+        filter: (event) => event.hasNature("fire"),
         forced: true,
-        content: function () {
+        content: () => {
           trigger.cancel()
         },
         ai: {
           nofire: true,
           effect: {
-            target: function (card, player, target, current) {
+            target: (card, player, target, current) => {
               if (get.tag(card, "fireDamage")) {
                 return "zeroplayertarget"
               }
@@ -8219,12 +8870,13 @@ export default () => {
       boss_tianyun: {
         trigger: { player: "phaseEnd" },
         direct: true,
-        content: function () {
+        content: () => {
           "step 0"
           event.forceDie = true
-          player.chooseTarget(get.prompt("boss_tianyun"), function (card, player, target) {
-            return target.isEnemyOf(player)
-          }).ai = function (target) {
+          player.chooseTarget(
+            get.prompt("boss_tianyun"),
+            (card, player, target) => target.isEnemyOf(player),
+          ).ai = (target) => {
             if (player.hp <= 1) {
               return 0
             }
@@ -8262,9 +8914,17 @@ export default () => {
         },
       },
       versus_ladder: {
-        trigger: { global: ["damageEnd", "recoverEnd", "dieEnd", "gainEnd", "phaseDiscardEnd"] },
+        trigger: {
+          global: [
+            "damageEnd",
+            "recoverEnd",
+            "dieEnd",
+            "gainEnd",
+            "phaseDiscardEnd",
+          ],
+        },
         silent: true,
-        filter: function (event, player) {
+        filter: (event, player) => {
           if (!_status.ladder) {
             return false
           }
@@ -8274,13 +8934,13 @@ export default () => {
           if (!event.source) {
             return false
           }
-          return event.source == game.me || event.player == game.me
+          return event.source === game.me || event.player === game.me
         },
-        content: function () {
+        content: () => {
           switch (event.triggername) {
             case "damageEnd": {
-              if (trigger.source.side != trigger.player.side) {
-                if (trigger.source == game.me) {
+              if (trigger.source.side !== trigger.player.side) {
+                if (trigger.source === game.me) {
                   _status.ladder_mmr += 0.5 * Math.max(1, trigger.num)
                 } else {
                   _status.ladder_mmr += 0.2 * Math.max(1, trigger.num)
@@ -8289,9 +8949,9 @@ export default () => {
               break
             }
             case "recoverEnd": {
-              if (trigger.source != trigger.player) {
-                if (trigger.source == game.me) {
-                  if (trigger.player.side == game.me.side) {
+              if (trigger.source !== trigger.player) {
+                if (trigger.source === game.me) {
+                  if (trigger.player.side === game.me.side) {
                     _status.ladder_mmr += 0.5 * trigger.num
                   } else {
                     _status.ladder_mmr -= 0.3 * trigger.num
@@ -8303,22 +8963,25 @@ export default () => {
               break
             }
             case "dieEnd": {
-              if (trigger.source == game.me && trigger.player.side != game.me.side) {
+              if (
+                trigger.source === game.me &&
+                trigger.player.side !== game.me.side
+              ) {
                 _status.ladder_mmr += 2
               }
               break
             }
             case "gainEnd": {
-              if (trigger.cards && trigger.cards.length) {
-                if (trigger.source == game.me && trigger.player != game.me) {
-                  if (trigger.player.side == game.me.side) {
+              if (trigger.cards?.length) {
+                if (trigger.source === game.me && trigger.player !== game.me) {
+                  if (trigger.player.side === game.me.side) {
                     _status.ladder_mmr += 0.3 * trigger.cards.length
                   } else {
                     _status.ladder_mmr -= 0.1 * trigger.cards.length
                   }
                 } else {
                   if (trigger.source) {
-                    if (trigger.source.side != game.me.side) {
+                    if (trigger.source.side !== game.me.side) {
                       _status.ladder_mmr += 0.3 * trigger.cards.length
                     }
                   } else {
@@ -8329,8 +8992,8 @@ export default () => {
               break
             }
             case "phaseDiscardEnd": {
-              if (trigger.player == player) {
-                if (trigger.cards && trigger.cards.length) {
+              if (trigger.player === player) {
+                if (trigger.cards?.length) {
                   _status.ladder_mmr -= 0.2 * trigger.cards.length
                 }
               }
@@ -8349,7 +9012,7 @@ export default () => {
         enable: true,
         selectTarget: [1, 3],
         filterTarget: true,
-        content: function () {
+        content: () => {
           target.draw()
         },
         ai: {
@@ -8371,15 +9034,14 @@ export default () => {
         type: "trick",
         selectTarget: [1, 2],
         enable: true,
-        filterTarget: function (card, player, target) {
-          return target != player && target.hp < target.maxHp
-        },
-        content: function () {
+        filterTarget: (card, player, target) =>
+          target !== player && target.hp < target.maxHp,
+        content: () => {
           target.recover()
         },
         ai: {
           basic: {
-            order: function (card, player) {
+            order: (card, player) => {
               if (player.hasSkillTag("pretao")) {
                 return 5
               }
@@ -8389,9 +9051,7 @@ export default () => {
             value: [6, 4],
           },
           result: {
-            target: function (player, target) {
-              return 2
-            },
+            target: (player, target) => 2,
           },
           tag: {
             recover: 1,
@@ -8404,11 +9064,9 @@ export default () => {
         fullskin: true,
         type: "basic",
         enable: true,
-        filterTarget: function (card, player, target) {
-          return target.isEnemyOf(player)
-        },
+        filterTarget: (card, player, target) => target.isEnemyOf(player),
         selectTarget: 1,
-        content: function () {
+        content: () => {
           target.addTempSkill("xujiu2")
           target.addMark("xujiu2", event.baseDamage || 1, false)
         },
@@ -8417,18 +9075,27 @@ export default () => {
             order: (item, player) => {
               var cards = player.getCards(
                 "hs",
-                (card) => get.tag(card, "damage") && player.hasValueTarget(card),
+                (card) =>
+                  get.tag(card, "damage") && player.hasValueTarget(card),
               )
               if (!cards.length) {
                 return 0
               }
-              var cardx = cards.filter((card) => get.name(card) == "sha")
-              cardx.sort((a, b) => player.getUseValue(b) - player.getUseValue(a))
-              cardx = cardx.slice(Math.min(cardx.length, player.getCardUsable("sha")), cardx.length)
+              var cardx = cards.filter((card) => get.name(card) === "sha")
+              cardx.sort(
+                (a, b) => player.getUseValue(b) - player.getUseValue(a),
+              )
+              cardx = cardx.slice(
+                Math.min(cardx.length, player.getCardUsable("sha")),
+                cardx.length,
+              )
               cards.removeArray(cardx)
               return (
-                get.order(cards.sort((a, b) => get.order(b, player) - get.order(a, player))[0]) +
-                0.3
+                get.order(
+                  cards.sort(
+                    (a, b) => get.order(b, player) - get.order(a, player),
+                  )[0],
+                ) + 0.3
               )
             },
             useful: 5,
@@ -8436,7 +9103,10 @@ export default () => {
           },
           result: {
             target: (player, target) => {
-              if (target.hasSkill("gangzhi") || get.attitude(player, target) >= 0) {
+              if (
+                target.hasSkill("gangzhi") ||
+                get.attitude(player, target) >= 0
+              ) {
                 return 0
               }
               var cards = player.getCards(
@@ -8449,14 +9119,21 @@ export default () => {
               if (!cards.length) {
                 return 0
               }
-              var cardx = cards.filter((card) => get.name(card) == "sha")
+              var cardx = cards.filter((card) => get.name(card) === "sha")
               cardx.sort(
                 (a, b) =>
-                  get.effect(target, b, player, player) - get.effect(target, a, player, player),
+                  get.effect(target, b, player, player) -
+                  get.effect(target, a, player, player),
               )
-              cardx = cardx.slice(Math.min(cardx.length, player.getCardUsable("sha")), cardx.length)
+              cardx = cardx.slice(
+                Math.min(cardx.length, player.getCardUsable("sha")),
+                cardx.length,
+              )
               cards.removeArray(cardx)
-              return -cards.reduce((sum, card) => sum + get.effect(target, card, player, player), 0)
+              return -cards.reduce(
+                (sum, card) => sum + get.effect(target, card, player, player),
+                0,
+              )
             },
           },
         },
@@ -8465,25 +9142,18 @@ export default () => {
         fullskin: true,
         type: "basic",
         cardcolor: "red",
-        enable: function (card, player) {
-          return player.hp < player.maxHp
-        },
-        savable: function (card, player, dying) {
-          return dying.side == player.side
-        },
+        enable: (card, player) => player.hp < player.maxHp,
+        savable: (card, player, dying) => dying.side === player.side,
         selectTarget: -1,
-        filterTarget: function (card, player, target) {
-          return target == player && target.hp < target.maxHp
-        },
-        modTarget: function (card, player, target) {
-          return target.hp < target.maxHp
-        },
-        content: function () {
+        filterTarget: (card, player, target) =>
+          target === player && target.hp < target.maxHp,
+        modTarget: (card, player, target) => target.hp < target.maxHp,
+        content: () => {
           target.recover()
         },
         ai: {
           basic: {
-            order: function (card, player) {
+            order: (card, player) => {
               if (player.hasSkillTag("pretao")) {
                 return 5
               }
@@ -8493,7 +9163,7 @@ export default () => {
             value: [8, 6.5, 5, 4],
           },
           result: {
-            target: function (player, target) {
+            target: (player, target) => {
               if (target.hp <= 0) {
                 return 2
               }
@@ -8501,18 +9171,25 @@ export default () => {
               var keep = false
               if (nd <= 0) {
                 keep = true
-              } else if (nd == 1 && target.hp >= 2 && target.countCards("h", "tao") <= 1) {
+              } else if (
+                nd === 1 &&
+                target.hp >= 2 &&
+                target.countCards("h", "tao") <= 1
+              ) {
                 keep = true
               }
               var mode = get.mode()
               if (target.hp >= 2 && keep && target.hasFriend()) {
-                if (target.hp > 2 || nd == 0) {
+                if (target.hp > 2 || nd === 0) {
                   return 0
                 }
-                if (target.hp == 2) {
+                if (target.hp === 2) {
                   if (
-                    game.hasPlayer(function (current) {
-                      if (target != current && get.attitude(target, current) >= 3) {
+                    game.hasPlayer((current) => {
+                      if (
+                        target !== current &&
+                        get.attitude(target, current) >= 3
+                      ) {
                         if (current.hp <= 1) {
                           return true
                         }
@@ -8535,33 +9212,28 @@ export default () => {
       xionghuangjiu: {
         fullskin: true,
         type: "basic",
-        enable: function (event, player) {
-          return !player.hasSkill("jiu") && !player.hasSkill("xionghuangjiu")
-        },
+        enable: (event, player) =>
+          !player.hasSkill("jiu") && !player.hasSkill("xionghuangjiu"),
         lianheng: true,
         logv: false,
-        savable: function (card, player, dying) {
-          return dying == player
-        },
+        savable: (card, player, dying) => dying === player,
         usable: 1,
         selectTarget: -1,
         modTarget: true,
-        filterTarget: function (card, player, target) {
-          return target == player
-        },
-        content: function () {
+        filterTarget: (card, player, target) => target === player,
+        content: () => {
           if (target.isDying()) {
             target.recover()
-            if (_status.currentPhase == target) {
+            if (_status.currentPhase === target) {
               target.getStat().card.jiu--
             }
           } else {
-            if (cards && cards.length) {
+            if (cards?.length) {
               card = cards[0]
             }
             game.broadcastAll(
-              function (target, card, gain2) {
-                if (get.population(target.side) == 1) {
+              (target, card, gain2) => {
+                if (get.population(target.side) === 1) {
                   target.addSkill("xionghuangjiu")
                 } else {
                   if (!target.storage.jiu) {
@@ -8572,25 +9244,33 @@ export default () => {
                 }
                 game.addVideo("jiuNode", target, true)
                 if (!target.node.jiu && lib.config.jiu_effect) {
-                  target.node.jiu = ui.create.div(".playerjiu", target.node.avatar)
-                  target.node.jiu2 = ui.create.div(".playerjiu", target.node.avatar2)
+                  target.node.jiu = ui.create.div(
+                    ".playerjiu",
+                    target.node.avatar,
+                  )
+                  target.node.jiu2 = ui.create.div(
+                    ".playerjiu",
+                    target.node.avatar2,
+                  )
                 }
                 if (
                   gain2 &&
                   card.clone &&
-                  (card.clone.parentNode == target.parentNode || card.clone.parentNode == ui.arena)
+                  (card.clone.parentNode === target.parentNode ||
+                    card.clone.parentNode === ui.arena)
                 ) {
                   card.clone.moveDelete(target)
                 }
               },
               target,
               card,
-              target == targets[0],
+              target === targets[0],
             )
-            if (target == targets[0]) {
+            if (target === targets[0]) {
               if (
                 card.clone &&
-                (card.clone.parentNode == target.parentNode || card.clone.parentNode == ui.arena)
+                (card.clone.parentNode === target.parentNode ||
+                  card.clone.parentNode === ui.arena)
               ) {
                 game.addVideo("gain2", target, get.cardsInfo([card]))
               }
@@ -8599,43 +9279,36 @@ export default () => {
         },
         ai: {
           basic: {
-            useful: function (card, i) {
+            useful: (card, i) => {
               if (_status.event.player.hp > 1) {
-                if (i == 0) {
+                if (i === 0) {
                   return 5
                 }
                 return 1
               }
-              if (i == 0) {
+              if (i === 0) {
                 return 7.3
               }
               return 3
             },
-            value: function (card, player, i) {
+            value: (card, player, i) => {
               if (player.hp > 1) {
-                if (i == 0) {
+                if (i === 0) {
                   return 5
                 }
                 return 1
               }
-              if (i == 0) {
+              if (i === 0) {
                 return 7.3
               }
               return 3
             },
           },
-          order: function () {
-            return get.order({ name: "sha" }) + 0.2
-          },
+          order: () => get.order({ name: "sha" }) + 0.2,
           result: {
-            target: function (player, target) {
-              if (target && target.isDying()) {
+            target: (player, target) => {
+              if (target?.isDying()) {
                 return 2
-              }
-              if (lib.config.mode == "stone" && !player.isMin()) {
-                if (player.getActCount() + 1 >= player.actcount) {
-                  return 0
-                }
               }
               var shas = player.getCards("h", "sha")
               if (shas.length > 1 && player.getCardUsable("sha") > 1) {
@@ -8650,20 +9323,19 @@ export default () => {
                   }
                 }
               } else if (player.hasSha() && player.needsToDiscard()) {
-                if (player.countCards("h", "hufu") != 1) {
+                if (player.countCards("h", "hufu") !== 1) {
                   card = { name: "sha" }
                 }
               }
               if (card) {
                 if (
-                  game.hasPlayer(function (current) {
-                    return (
+                  game.hasPlayer(
+                    (current) =>
                       get.attitude(target, current) < 0 &&
                       target.canUse(card, current, true, true) &&
                       !current.getEquip("baiyin") &&
-                      get.effect(current, card, target) > 0
-                    )
-                  })
+                      get.effect(current, card, target) > 0,
+                  )
                 ) {
                   return 1
                 }
@@ -8682,31 +9354,34 @@ export default () => {
         notarget: true,
         enable: true,
         type: "trick",
-        content: function () {
+        content: () => {
           "step 0"
           var num = 0
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side == player.side) {
-              if (game.players[i] != player) {
+            if (game.players[i].side === player.side) {
+              if (game.players[i] !== player) {
                 event.friend = game.players[i]
               }
               num += game.players[i].storage.longchuanzhibao
             }
           }
           player
-            .chooseControl(function () {
+            .chooseControl(() => {
               if (num > 2) {
                 return 0
               }
-              if (num == 2 && get.population(player.side) == 1) {
+              if (num === 2 && get.population(player.side) === 1) {
                 return 0
               }
               return 1
             })
-            .set("choiceList", ["摸" + get.cnNumber(num) + "张牌", "你和队友各摸一张牌"])
+            .set("choiceList", [
+              `摸${get.cnNumber(num)}张牌`,
+              "你和队友各摸一张牌",
+            ])
           event.num = num
           ;("step 1")
-          if (result.index == 0) {
+          if (result.index === 0) {
             if (event.num) {
               player.draw(event.num)
             }
@@ -8740,17 +9415,23 @@ export default () => {
         enable: true,
         selectTarget: -1,
         reverseOrder: true,
-        filterTarget: function (card, player, target) {
+        filterTarget: (card, player, target) => {
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side == target.side && game.players[i].storage.longchuanzhibao) {
+            if (
+              game.players[i].side === target.side &&
+              game.players[i].storage.longchuanzhibao
+            ) {
               return target.isDamaged()
             }
           }
           return target.countCards("he")
         },
-        content: function () {
+        content: () => {
           for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side == target.side && game.players[i].storage.longchuanzhibao) {
+            if (
+              game.players[i].side === target.side &&
+              game.players[i].storage.longchuanzhibao
+            ) {
               target.recover()
               return
             }
@@ -8764,10 +9445,10 @@ export default () => {
             value: 0,
           },
           result: {
-            target: function (player, target) {
+            target: (player, target) => {
               for (var i = 0; i < game.players.length; i++) {
                 if (
-                  game.players[i].side == target.side &&
+                  game.players[i].side === target.side &&
                   game.players[i].storage.longchuanzhibao
                 ) {
                   return 1.5
@@ -8799,8 +9480,9 @@ export default () => {
           },
           async (event, trigger, player) => {
             const { source } = event
-            const list = source.side == game.me.side ? _status.friend : _status.enemy
-            if (list.length == 0) {
+            const list =
+              source.side === game.me.side ? _status.friend : _status.enemy
+            if (list.length === 0) {
               // if(game.friend.includes(source)){
               // 	game.over(false);
               // }
@@ -8809,38 +9491,42 @@ export default () => {
               // }
               game.friend.remove(source)
               game.enemy.remove(source)
-              if (game.friend.length == 0) {
+              if (game.friend.length === 0) {
                 game.over(false)
-              } else if (game.enemy.length == 0) {
+              } else if (game.enemy.length === 0) {
                 game.over(true)
               }
               if (
-                game.friendZhu &&
-                game.friendZhu.classList.contains("dead") &&
+                game.friendZhu?.classList.contains("dead") &&
                 game.friend.length
               ) {
                 game.friendZhu = game.friend[0]
-                game.friendZhu.setIdentity(_status.color + "Zhu")
+                game.friendZhu.setIdentity(`${_status.color}Zhu`)
               }
-              if (game.enemyZhu && game.enemyZhu.classList.contains("dead") && game.enemy.length) {
+              if (
+                game.enemyZhu?.classList.contains("dead") &&
+                game.enemy.length
+              ) {
                 game.enemyZhu = game.enemy[0]
-                game.enemyZhu.setIdentity(!_status.color + "Zhu")
+                game.enemyZhu.setIdentity(`${!_status.color}Zhu`)
               }
               return event.finish()
             }
             if (
-              source.side == game.me.side &&
+              source.side === game.me.side &&
               list.length > 1 &&
-              (game.me == game.friendZhu || (lib.storage.zhu && lib.storage.single_control)) &&
+              (game.me === game.friendZhu ||
+                (lib.storage.zhu && lib.storage.single_control)) &&
               !_status.auto
             ) {
-              event.dialog = ui.create.dialog("选择替补角色", [list, "character"])
-              event.filterButton = function () {
-                return true
-              }
+              event.dialog = ui.create.dialog("选择替补角色", [
+                list,
+                "character",
+              ])
+              event.filterButton = () => true
               event.player = game.me
               event.forced = true
-              event.custom.replace.confirm = function () {
+              event.custom.replace.confirm = () => {
                 event.character = ui.selected.buttons[0].link
                 event.dialog.close()
                 if (ui.confirm) {
@@ -8867,23 +9553,25 @@ export default () => {
             })
             game.addVideo("reinit", source, [
               event.character,
-              get.translation(source.side + "Color"),
+              get.translation(`${source.side}Color`),
             ])
             source.uninit()
             source.init(event.character)
             game.log(source, "出场")
-            source.node.identity.dataset.color = get.translation(source.side + "Color")
+            source.node.identity.dataset.color = get.translation(
+              `${source.side}Color`,
+            )
             await source.draw(4)
             var evt = event.getParent("dying")
-            if (evt && evt.parent) {
+            if (evt?.parent) {
               evt = evt.parent
               evt.untrigger(false, source)
               for (var i = 0; i < 100; i++) {
                 evt = evt.parent
-                if (evt.player == source) {
+                if (evt.player === source) {
                   evt.finish()
                 }
-                if (evt.name == "phase") {
+                if (evt.name === "phase") {
                   break
                 }
               }
@@ -8922,7 +9610,7 @@ export default () => {
             })
             game.addVideo("reinit", source, [
               event.character,
-              get.translation(source.side + "Color"),
+              get.translation(`${source.side}Color`),
             ])
             source.uninit()
             source.init(event.character)
@@ -8930,15 +9618,15 @@ export default () => {
             // source.node.identity.dataset.color=source.side+'zhu';
             await source.draw(4)
             var evt = event.getParent("dying")
-            if (evt && evt.parent) {
+            if (evt?.parent) {
               evt = evt.parent
               evt.untrigger(false, source)
               for (var i = 0; i < 100; i++) {
                 evt = evt.parent
-                if (evt.player == source) {
+                if (evt.player === source) {
                   evt.finish()
                 }
-                if (evt.name == "phase") {
+                if (evt.name === "phase") {
                   break
                 }
               }
@@ -8961,10 +9649,10 @@ export default () => {
           },
           async (event, trigger, player) => {
             const { source } = event
-            if (event.source.side == game.me.side) {
-              if (_status.friend.length == 1) {
+            if (event.source.side === game.me.side) {
+              if (_status.friend.length === 1) {
                 event.directresult = _status.friend[0]
-              } else if (event.source == game.me) {
+              } else if (event.source === game.me) {
                 if (_status.auto) {
                   event.directresult = _status.friend.randomGet()
                 }
@@ -8974,7 +9662,7 @@ export default () => {
                 }
               }
             } else {
-              if (_status.enemy.length == 1) {
+              if (_status.enemy.length === 1) {
                 event.directresult = _status.enemy[0]
               } else {
                 if (!event.source.isOnline()) {
@@ -8983,14 +9671,15 @@ export default () => {
               }
             }
             if (!event.directresult) {
-              if (event.source == game.me) {
-                event.dialog = ui.create.dialog("选择替补角色", [_status.friend, "character"])
-                event.filterButton = function () {
-                  return true
-                }
+              if (event.source === game.me) {
+                event.dialog = ui.create.dialog("选择替补角色", [
+                  _status.friend,
+                  "character",
+                ])
+                event.filterButton = () => true
                 event.player = game.me
                 event.forced = true
-                event.custom.replace.confirm = function () {
+                event.custom.replace.confirm = () => {
                   event.directresult = ui.selected.buttons[0].link
                   event.dialog.close()
                   if (ui.confirm) {
@@ -8999,7 +9688,7 @@ export default () => {
                   delete event.player
                   game.resume()
                 }
-                event.switchToAuto = function () {
+                event.switchToAuto = () => {
                   event.directresult = _status.friend.randomGet()
                   event.dialog.close()
                   if (ui.confirm) {
@@ -9010,20 +9699,21 @@ export default () => {
                 game.check()
                 game.pause()
               } else {
-                event.source.send(function (player) {
+                event.source.send((player) => {
                   if (_status.auto) {
                     _status.event._result = _status.friend.randomGet()
                   } else {
                     var next = game.createEvent("replacePlayer")
                     next.source = player
-                    next.setContent(function () {
-                      event.dialog = ui.create.dialog("选择替补角色", [_status.friend, "character"])
-                      event.filterButton = function () {
-                        return true
-                      }
+                    next.setContent(() => {
+                      event.dialog = ui.create.dialog("选择替补角色", [
+                        _status.friend,
+                        "character",
+                      ])
+                      event.filterButton = () => true
                       event.player = event.source
                       event.forced = true
-                      event.custom.replace.confirm = function () {
+                      event.custom.replace.confirm = () => {
                         event.result = ui.selected.buttons[0].link
                         event.dialog.close()
                         if (ui.confirm) {
@@ -9033,7 +9723,7 @@ export default () => {
                         game.resume()
                         game.uncheck()
                       }
-                      event.switchToAuto = function () {
+                      event.switchToAuto = () => {
                         event.result = _status.friend.randomGet()
                         event.dialog.close()
                         if (ui.confirm) {
@@ -9060,8 +9750,8 @@ export default () => {
               if (event.resultOL) {
                 event.directresult = event.resultOL[source.playerid]
               }
-              if (!event.directresult || event.directresult == "ai") {
-                if (source.side == game.me.side) {
+              if (!event.directresult || event.directresult === "ai") {
+                if (source.side === game.me.side) {
                   event.directresult = _status.friend.randomGet()
                 } else {
                   event.directresult = _status.enemy.randomGet()
@@ -9076,14 +9766,14 @@ export default () => {
             })
 
             game.broadcastAll(
-              function (source, name, color) {
+              (source, name, color) => {
                 _status.friend.remove(name)
                 _status.enemy.remove(name)
                 source.revive(null, false)
                 source.uninit()
                 source.init(name)
                 source.node.identity.dataset.color = color
-                if (source == game.me) {
+                if (source === game.me) {
                   ui.arena.classList.remove("selecting")
                 }
               },
@@ -9095,15 +9785,15 @@ export default () => {
 
             await source.draw(4)
             var evt = event.getParent("dying")
-            if (evt && evt.parent) {
+            if (evt?.parent) {
               evt = evt.parent
               evt.untrigger(false, source)
               for (var i = 0; i < 100; i++) {
                 evt = evt.parent
-                if (evt.player == source) {
+                if (evt.player === source) {
                   evt.finish()
                 }
-                if (evt.name == "phase") {
+                if (evt.name === "phase") {
                   break
                 }
               }
@@ -9120,11 +9810,11 @@ export default () => {
               num = source.storage.longchuanzhibao
             }
           } else {
-            if (typeof num != "number") {
+            if (typeof num !== "number") {
               num = 1
             }
           }
-          if (!num || typeof num != "number") {
+          if (!num || typeof num !== "number") {
             return this
           }
 
@@ -9134,17 +9824,23 @@ export default () => {
           if (source) {
             source.storage.longchuanzhibao -= num
             source.updateMark("longchuanzhibao")
-            game.log(this, "从", source, "处获得了" + get.cnNumber(num) + "个", "#y龙船至宝")
+            game.log(
+              this,
+              "从",
+              source,
+              `处获得了${get.cnNumber(num)}个`,
+              "#y龙船至宝",
+            )
           } else {
-            game.log(this, "获得了" + get.cnNumber(num) + "个", "#y龙船至宝")
+            game.log(this, `获得了${get.cnNumber(num)}个`, "#y龙船至宝")
           }
 
-          if (source && source.side != this.side) {
+          if (source && source.side !== this.side) {
             this.draw(num, "nodelay")
-            var that = this
-            var friend = game.findPlayer(function (current) {
-              return current.side == that.side && current != that
-            })
+
+            var friend = game.findPlayer(
+              (current) => current.side === this.side && current !== this,
+            )
             if (friend) {
               friend.draw(num, "nodelay")
             }
@@ -9166,20 +9862,21 @@ export default () => {
           return this
         },
         dieAfter2: function (source) {
-          if (_status.connectMode && _status.mode != "guandu") {
-            if (_status.mode == "1v1" || _status.mode == "3v3") {
+          if (_status.connectMode && _status.mode !== "guandu") {
+            if (_status.mode === "1v1" || _status.mode === "3v3") {
               return
-            } else if (_status.mode == "2v2") {
+            }
+            if (_status.mode === "2v2") {
               var friend
               for (var i = 0; i < game.players.length; i++) {
-                if (game.players[i].side == this.side) {
+                if (game.players[i].side === this.side) {
                   friend = game.players[i]
                   break
                 }
               }
               if (friend) {
                 var next = game.createEvent("versusDraw")
-                next.setContent(function () {
+                next.setContent(() => {
                   "step 0"
                   player.chooseBool("是否摸一张牌？")
                   ;("step 1")
@@ -9189,63 +9886,62 @@ export default () => {
                 })
                 next.player = friend
               }
-            } else if (_status.mode == "4v4") {
-              if (this.identity == "zhu") {
+            } else if (_status.mode === "4v4") {
+              if (this.identity === "zhu") {
                 return
-              } else {
-                if (source) {
-                  if (source.side == this.side) {
-                    if (source.identity == "zhu") {
-                      source.discard(source.getCards("he"))
-                    }
-                  } else {
-                    var num1 = 0,
-                      num2 = 1
-                    for (var i = 0; i < game.players.length; i++) {
-                      if (game.players[i].side == source.side) {
-                        num1++
-                      } else {
-                        num2++
-                      }
-                    }
-                    source.draw(2 + Math.max(0, num2 - num1))
+              }
+              if (source) {
+                if (source.side === this.side) {
+                  if (source.identity === "zhu") {
+                    source.discard(source.getCards("he"))
                   }
+                } else {
+                  var num1 = 0,
+                    num2 = 1
+                  for (var i = 0; i < game.players.length; i++) {
+                    if (game.players[i].side === source.side) {
+                      num1++
+                    } else {
+                      num2++
+                    }
+                  }
+                  source.draw(2 + Math.max(0, num2 - num1))
                 }
               }
               return
             }
           } else {
-            if (_status.mode == "four" || _status.mode == "guandu") {
-              if (this.identity == "zhu") {
+            if (_status.mode === "four" || _status.mode === "guandu") {
+              if (this.identity === "zhu") {
                 return
-              } else {
-                if (source) {
-                  if (source.side == this.side) {
-                    if (_status.mode == "guandu" || source.identity == "zhu") {
-                      source.discard(source.getCards("he"))
-                    }
-                  } else {
-                    if (_status.mode == "guandu") {
-                      return
-                    }
-                    var num1 = 0,
-                      num2 = 1
-                    for (var i = 0; i < game.players.length; i++) {
-                      if (game.players[i].side == source.side) {
-                        num1++
-                      } else {
-                        num2++
-                      }
-                    }
-                    source.draw(2 + Math.max(0, num2 - num1))
+              }
+              if (source) {
+                if (source.side === this.side) {
+                  if (_status.mode === "guandu" || source.identity === "zhu") {
+                    source.discard(source.getCards("he"))
                   }
+                } else {
+                  if (_status.mode === "guandu") {
+                    return
+                  }
+                  var num1 = 0,
+                    num2 = 1
+                  for (var i = 0; i < game.players.length; i++) {
+                    if (game.players[i].side === source.side) {
+                      num1++
+                    } else {
+                      num2++
+                    }
+                  }
+                  source.draw(2 + Math.max(0, num2 - num1))
                 }
               }
               return
-            } else if (_status.mode == "two") {
+            }
+            if (_status.mode === "two") {
               var friend
               for (var i = 0; i < game.players.length; i++) {
-                if (game.players[i].side == this.side) {
+                if (game.players[i].side === this.side) {
                   friend = game.players[i]
                   break
                 }
@@ -9253,7 +9949,7 @@ export default () => {
               if (_status.replacetwo) {
                 if (this.replacetwo) {
                   if (source) {
-                    if (source.side == this.side) {
+                    if (source.side === this.side) {
                       var he = source.getCards("he")
                       if (he.length) {
                         source.discard(he)
@@ -9262,9 +9958,9 @@ export default () => {
                       source.draw(3)
                     }
                   }
-                } else if (friend && friend.replacetwo) {
+                } else if (friend?.replacetwo) {
                   if (source) {
-                    if (source.side == this.side) {
+                    if (source.side === this.side) {
                       var he = source.getCards("he")
                       if (he.length) {
                         source.discard(he)
@@ -9277,7 +9973,7 @@ export default () => {
               } else {
                 if (friend) {
                   var next = game.createEvent("versusDraw")
-                  next.setContent(function () {
+                  next.setContent(() => {
                     "step 0"
                     player.chooseBool("是否摸一张牌？")
                     ;("step 1")
@@ -9289,110 +9985,119 @@ export default () => {
                 }
               }
               return
-            } else if (_status.mode == "siguo") {
+            }
+            if (_status.mode === "siguo") {
               return
-            } else if (_status.mode == "jiange") {
+            }
+            if (_status.mode === "jiange") {
               return
-            } else if (_status.mode == "three") {
-              if (this.identity == "zhu") {
+            }
+            if (_status.mode === "three") {
+              if (this.identity === "zhu") {
                 return
-              } else {
-                game.friend.remove(this)
-                game.enemy.remove(this)
-                if (source) {
-                  source.draw(2)
-                }
+              }
+              game.friend.remove(this)
+              game.enemy.remove(this)
+              if (source) {
+                source.draw(2)
               }
               return
             }
 
-            var list = this.side == game.me.side ? _status.friend : _status.enemy
+            var list =
+              this.side === game.me.side ? _status.friend : _status.enemy
             if (
-              (list.length == 0 && lib.storage.noreplace_end) ||
+              (list.length === 0 && lib.storage.noreplace_end) ||
               (lib.storage.zhu &&
                 lib.storage.main_zhu &&
-                this.identity == "zhu" &&
+                this.identity === "zhu" &&
                 game.players.length > 2)
             ) {
               return
-            } else if (
-              game.friend.length == 1 &&
-              this == game.friend[0] &&
-              _status.friend.length == 0
+            }
+            if (
+              game.friend.length === 1 &&
+              this === game.friend[0] &&
+              _status.friend.length === 0
             ) {
               return
-            } else if (
-              game.enemy.length == 1 &&
-              this == game.enemy[0] &&
-              _status.enemy.length == 0
+            }
+            if (
+              game.enemy.length === 1 &&
+              this === game.enemy[0] &&
+              _status.enemy.length === 0
             ) {
               return
-            } else {
-              if (source) {
-                if (source.side != this.side) {
-                  if (lib.storage.versus_reward) {
-                    source.draw(lib.storage.versus_reward)
-                  }
-                } else {
-                  if (lib.storage.versus_punish == "弃牌") {
-                    source.discard(source.getCards("he"))
-                  } else if (lib.storage.versus_punish == "摸牌" && lib.storage.versus_reward) {
-                    source.draw(lib.storage.versus_reward)
-                  }
+            }
+            if (source) {
+              if (source.side !== this.side) {
+                if (lib.storage.versus_reward) {
+                  source.draw(lib.storage.versus_reward)
                 }
               } else {
-                game.delay()
+                if (lib.storage.versus_punish === "弃牌") {
+                  source.discard(source.getCards("he"))
+                } else if (
+                  lib.storage.versus_punish === "摸牌" &&
+                  lib.storage.versus_reward
+                ) {
+                  source.draw(lib.storage.versus_reward)
+                }
               }
+            } else {
+              game.delay()
             }
           }
         },
         dieAfter: function (source) {
           if (_status.connectMode) {
-            if (_status.mode == "1v1" || _status.mode == "3v3") {
-              game.broadcastAll(function (dead) {
-                if (dead.side == game.me.side) {
+            if (_status.mode === "1v1" || _status.mode === "3v3") {
+              game.broadcastAll((dead) => {
+                if (dead.side === game.me.side) {
                   _status.friendDied.push(dead.name1)
-                  _status.friendCount.innerHTML =
-                    "阵亡: " + get.cnNumber(_status.friendDied.length, true)
+                  _status.friendCount.innerHTML = `阵亡: ${get.cnNumber(_status.friendDied.length, true)}`
                 } else {
                   _status.enemyDied.push(dead.name1)
-                  _status.enemyCount.innerHTML =
-                    "杀敌: " + get.cnNumber(_status.enemyDied.length, true)
+                  _status.enemyCount.innerHTML = `杀敌: ${get.cnNumber(_status.enemyDied.length, true)}`
                 }
               }, this)
-              if (this.side == game.me.side) {
-                if (_status.friend.length == 0) {
+              if (this.side === game.me.side) {
+                if (_status.friend.length === 0) {
                   game.over(false)
                   return
                 }
               } else {
-                if (_status.enemy.length == 0) {
+                if (_status.enemy.length === 0) {
                   game.over(true)
                   return
                 }
               }
               game.replacePlayerOL(this)
-            } else if (_status.mode == "2v2") {
+            } else if (_status.mode === "2v2") {
               if (_status.replacetwo) {
                 // later ?
               }
               var friend
               for (var i = 0; i < game.players.length; i++) {
-                if (game.players[i].side == this.side) {
+                if (game.players[i].side === this.side) {
                   friend = game.players[i]
                   break
                 }
               }
               if (!friend) {
-                game.over(this.side != game.me.side)
+                game.over(this.side !== game.me.side)
               } else {
                 friend.showGiveup()
               }
-            } else if (_status.mode == "4v4" || _status.mode == "guandu") {
-              if (this.identity == "zhu") {
-                game.over(this.side != game.me.side)
+            } else if (_status.mode === "4v4" || _status.mode === "guandu") {
+              if (this.identity === "zhu") {
+                game.over(this.side !== game.me.side)
               } else {
-                if (_status.mode == "guandu" && source && source.side != this.side) {
+                if (
+                  _status.mode === "guandu" &&
+                  source &&
+                  source.side !== this.side
+                ) {
                   var hs = this.getCards("h")
                   if (hs.length) {
                     source.gain(hs, this, "giveAuto")
@@ -9407,10 +10112,10 @@ export default () => {
                     side2.push(game.players[i])
                   }
                 }
-                if (side1.length == 1) {
+                if (side1.length === 1) {
                   side1[0].showGiveup()
                 }
-                if (side2.length == 1) {
+                if (side2.length === 1) {
                   side2[0].showGiveup()
                 }
               }
@@ -9418,11 +10123,15 @@ export default () => {
             }
           } else {
             var me = game.me._trueMe || game.me
-            if (_status.mode == "four" || _status.mode == "guandu") {
-              if (this.identity == "zhu") {
-                game.over(this.side != me.side)
+            if (_status.mode === "four" || _status.mode === "guandu") {
+              if (this.identity === "zhu") {
+                game.over(this.side !== me.side)
               } else {
-                if (_status.mode == "guandu" && source && source.side != this.side) {
+                if (
+                  _status.mode === "guandu" &&
+                  source &&
+                  source.side !== this.side
+                ) {
                   var hs = this.getCards("h")
                   if (hs.length) {
                     source.gain(hs, this, "giveAuto")
@@ -9448,10 +10157,11 @@ export default () => {
                 }
               }
               return
-            } else if (_status.mode == "two") {
+            }
+            if (_status.mode === "two") {
               var friend
               for (var i = 0; i < game.players.length; i++) {
-                if (game.players[i].side == this.side) {
+                if (game.players[i].side === this.side) {
                   friend = game.players[i]
                   break
                 }
@@ -9460,32 +10170,40 @@ export default () => {
                 if (this.replacetwo) {
                   game.replacePlayerTwo(this, this.replacetwo)
                   delete this.replacetwo
-                  if (get.config("olfeiyang_four") && this == _status.firstAct.previous) {
+                  if (
+                    get.config("olfeiyang_four") &&
+                    this === _status.firstAct.previous
+                  ) {
                     this.addSkill("olfeiyang")
                   }
-                } else if (friend && friend.replacetwo) {
+                } else if (friend?.replacetwo) {
                   game.replacePlayerTwo(this, friend.replacetwo)
                   delete friend.replacetwo
-                  if (get.config("olfeiyang_four") && this == _status.firstAct.previous) {
+                  if (
+                    get.config("olfeiyang_four") &&
+                    this === _status.firstAct.previous
+                  ) {
                     this.addSkill("olfeiyang")
                   }
                 } else {
-                  game.over(this.side != me.side)
+                  game.over(this.side !== me.side)
                 }
               } else {
                 if (!friend) {
-                  game.over(this.side != me.side)
+                  game.over(this.side !== me.side)
                 } else {
                   friend.showGiveup()
                 }
               }
               return
-            } else if (_status.mode == "siguo") {
+            }
+            if (_status.mode === "siguo") {
               if (
-                game.players.length == 1 ||
-                (game.players.length == 2 && game.players[0].side == game.players[1].side)
+                game.players.length === 1 ||
+                (game.players.length === 2 &&
+                  game.players[0].side === game.players[1].side)
               ) {
-                game.over(me.side == game.players[0].side)
+                game.over(me.side === game.players[0].side)
               }
               var assignzhibao = function () {
                 var list = game.players.slice(0)
@@ -9500,17 +10218,20 @@ export default () => {
                   }
                 }
                 for (var i = 0; i < list.length; i++) {
-                  if (list[i].storage.longchuanzhibao == max) {
+                  if (list[i].storage.longchuanzhibao === max) {
                     if (list2.length) {
                       list2 = list
                       break
-                    } else {
-                      list2.push(list[i])
                     }
+                    list2.push(list[i])
                   }
                 }
                 for (var i = 0; i < arguments.length; i++) {
-                  for (var j = 0; j < arguments[i].storage.longchuanzhibao; j++) {
+                  for (
+                    var j = 0;
+                    j < arguments[i].storage.longchuanzhibao;
+                    j++
+                  ) {
                     var current = list2.randomGet()
                     if (!current.storage._longchuanzhibao) {
                       current.storage._longchuanzhibao = 1
@@ -9521,14 +10242,17 @@ export default () => {
                   for (var j = 0; j < list2.length; j++) {
                     if (list2[j].storage._longchuanzhibao) {
                       arguments[i].line(list2[j], "green")
-                      list2[j].gainZhibao(list2[j].storage._longchuanzhibao, arguments[i])
+                      list2[j].gainZhibao(
+                        list2[j].storage._longchuanzhibao,
+                        arguments[i],
+                      )
                       delete list2[j].storage._longchuanzhibao
                     }
                   }
                 }
               }
               if (source) {
-                if (source.side == this.side) {
+                if (source.side === this.side) {
                   assignzhibao(this, source)
                 } else {
                   if (this.storage.longchuanzhibao) {
@@ -9539,22 +10263,24 @@ export default () => {
                 assignzhibao(this)
               }
               return
-            } else if (_status.mode == "jiange") {
-              if (get.population("wei") == 0) {
-                game.over(me.identity == "shu")
-              } else if (get.population("shu") == 0) {
-                game.over(me.identity == "wei")
+            }
+            if (_status.mode === "jiange") {
+              if (get.population("wei") === 0) {
+                game.over(me.identity === "shu")
+              } else if (get.population("shu") === 0) {
+                game.over(me.identity === "wei")
               }
               return
-            } else if (_status.mode == "three") {
-              if (this.identity == "zhu") {
+            }
+            if (_status.mode === "three") {
+              if (this.identity === "zhu") {
                 if (game.friend.includes(this)) {
                   game.over(false)
                 } else {
                   game.over(true)
                 }
               } else {
-                if (this == me) {
+                if (this === me) {
                   game.modeSwapPlayer(game.friendZhu)
                 }
                 game.friend.remove(this)
@@ -9562,21 +10288,20 @@ export default () => {
               }
               return
             }
-            if (this.side == me.side) {
+            if (this.side === me.side) {
               _status.friendDied.push(this.name1)
-              _status.friendCount.innerHTML =
-                "阵亡: " + get.cnNumber(_status.friendDied.length, true)
+              _status.friendCount.innerHTML = `阵亡: ${get.cnNumber(_status.friendDied.length, true)}`
             } else {
               _status.enemyDied.push(this.name1)
-              _status.enemyCount.innerHTML = "杀敌: " + get.cnNumber(_status.enemyDied.length, true)
+              _status.enemyCount.innerHTML = `杀敌: ${get.cnNumber(_status.enemyDied.length, true)}`
             }
 
-            var list = this.side == me.side ? _status.friend : _status.enemy
+            var list = this.side === me.side ? _status.friend : _status.enemy
             if (
-              (list.length == 0 && lib.storage.noreplace_end) ||
+              (list.length === 0 && lib.storage.noreplace_end) ||
               (lib.storage.zhu &&
                 lib.storage.main_zhu &&
-                this.identity == "zhu" &&
+                this.identity === "zhu" &&
                 game.players.length > 2)
             ) {
               if (game.friend.includes(this)) {
@@ -9585,15 +10310,15 @@ export default () => {
                 game.over(true)
               }
             } else if (
-              game.friend.length == 1 &&
-              this == game.friend[0] &&
-              _status.friend.length == 0
+              game.friend.length === 1 &&
+              this === game.friend[0] &&
+              _status.friend.length === 0
             ) {
               game.over(false)
             } else if (
-              game.enemy.length == 1 &&
-              this == game.enemy[0] &&
-              _status.enemy.length == 0
+              game.enemy.length === 1 &&
+              this === game.enemy[0] &&
+              _status.enemy.length === 0
             ) {
               game.over(true)
             } else {
@@ -9604,119 +10329,124 @@ export default () => {
       },
     },
     get: {
-      rawAttitude: function (from, to) {
-        if (from.side == to.side) {
-          if (to.identity == "zhu") {
+      rawAttitude: (from, to) => {
+        if (from.side === to.side) {
+          if (to.identity === "zhu") {
             if (_status.connectMode) {
-              if (_status.mode == "4v4" || _status.mode == "guandu") {
+              if (_status.mode === "4v4" || _status.mode === "guandu") {
                 return 7
               }
             } else {
-              if (lib.storage.main_zhu || _status.mode == "four" || _status.mode == "guandu") {
+              if (
+                lib.storage.main_zhu ||
+                _status.mode === "four" ||
+                _status.mode === "guandu"
+              ) {
                 return 7
               }
             }
           }
           return 6
-        } else {
-          if (_status.mode == "siguo") {
-            var list = ["wei", "shu", "wu", "qun"]
-            var map = { wei: 0, shu: 0, wu: 0, qun: 0 }
-            var map2 = { wei: 0, shu: 0, wu: 0, qun: 0 }
-            for (var i = 0; i < game.players.length; i++) {
-              var current = game.players[i]
-              map[current.side] += get.condition(current) * get.threaten(current, false, false)
-              map2[current.side] += current.storage.longchuanzhibao
+        }
+        if (_status.mode === "siguo") {
+          var list = ["wei", "shu", "wu", "qun"]
+          var map = { wei: 0, shu: 0, wu: 0, qun: 0 }
+          var map2 = { wei: 0, shu: 0, wu: 0, qun: 0 }
+          for (var i = 0; i < game.players.length; i++) {
+            var current = game.players[i]
+            map[current.side] +=
+              get.condition(current) * get.threaten(current, false, false)
+            map2[current.side] += current.storage.longchuanzhibao
+          }
+          var allin = false
+          for (var i in map) {
+            if (get.population(i) === 1) {
+              map[i] /= 1.5
             }
-            var allin = false
-            for (var i in map) {
-              if (get.population(i) == 1) {
-                map[i] /= 1.5
-              }
-              if (map2[i] >= 4) {
-                allin = i
-                break
-              } else if (map2[i] == 3) {
-                map[i] += 10
-              } else if (map2[i] == 2) {
-                map[i]++
-              }
+            if (map2[i] >= 4) {
+              allin = i
+              break
             }
-            if (allin) {
-              return to.side == allin ? -20 : 0
+            if (map2[i] === 3) {
+              map[i] += 10
+            } else if (map2[i] === 2) {
+              map[i]++
             }
-            list.sort(function (a, b) {
-              return map[b] - map[a]
-            })
-            var id1 = list.indexOf(from.side)
-            var id2 = list.indexOf(to.side)
-            var att = -1
-            switch (id1) {
-              case 0:
-                att = _status.siguoai[id2 + 2]
-                break
-              case 1:
-                switch (id2) {
-                  case 0:
-                    att = _status.siguoai[0]
-                    break
-                  case 2:
-                    att = _status.siguoai[1]
-                    break
-                  case 3:
-                    att = _status.siguoai[2]
-                    break
-                }
-                break
-              case 2:
-                switch (id2) {
-                  case 0:
-                    att = _status.siguoai[0]
-                    break
-                  case 1:
-                    att = _status.siguoai[1]
-                    break
-                  case 3:
-                    att = _status.siguoai[2]
-                    break
-                }
-                break
-              case 3: {
-                if (id2 == 0) {
+          }
+          if (allin) {
+            return to.side === allin ? -20 : 0
+          }
+          list.sort((a, b) => map[b] - map[a])
+          var id1 = list.indexOf(from.side)
+          var id2 = list.indexOf(to.side)
+          var att = -1
+          switch (id1) {
+            case 0:
+              att = _status.siguoai[id2 + 2]
+              break
+            case 1:
+              switch (id2) {
+                case 0:
+                  att = _status.siguoai[0]
+                  break
+                case 2:
                   att = _status.siguoai[1]
                   break
-                } else {
+                case 3:
                   att = _status.siguoai[2]
                   break
-                }
               }
+              break
+            case 2:
+              switch (id2) {
+                case 0:
+                  att = _status.siguoai[0]
+                  break
+                case 1:
+                  att = _status.siguoai[1]
+                  break
+                case 3:
+                  att = _status.siguoai[2]
+                  break
+              }
+              break
+            case 3: {
+              if (id2 === 0) {
+                att = _status.siguoai[1]
+                break
+              }
+              att = _status.siguoai[2]
+              break
             }
-            if (map2[to.side] >= 4) {
-              att -= 10
-            } else if (map2[to.side] == 3) {
-              att -= 3
-            } else if (map2[to.side] == 2) {
-              att -= 0.5
+          }
+          if (map2[to.side] >= 4) {
+            att -= 10
+          } else if (map2[to.side] === 3) {
+            att -= 3
+          } else if (map2[to.side] === 2) {
+            att -= 0.5
+          }
+          if (to.storage.longchuanzhibao) {
+            return att * 1.2
+          }
+          return att
+        }
+        if (to.identity === "zhu") {
+          if (_status.connectMode) {
+            if (_status.mode === "4v4" || _status.mode === "guandu") {
+              return -10
             }
-            if (to.storage.longchuanzhibao) {
-              return att * 1.2
-            }
-            return att
           } else {
-            if (to.identity == "zhu") {
-              if (_status.connectMode) {
-                if (_status.mode == "4v4" || _status.mode == "guandu") {
-                  return -10
-                }
-              } else {
-                if (lib.storage.main_zhu || _status.mode == "four" || _status.mode == "guandu") {
-                  return -10
-                }
-              }
+            if (
+              lib.storage.main_zhu ||
+              _status.mode === "four" ||
+              _status.mode === "guandu"
+            ) {
+              return -10
             }
-            return -6
           }
         }
+        return -6
       },
     },
     help: {

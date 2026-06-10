@@ -72,7 +72,7 @@ const util = {
     const clientCount = new Map<string, number>()
 
     // init counter
-    rooms.forEach((_room, key) => clientCount.set(key, 0))
+    rooms.forEach((room, key) => clientCount.set(key, 0))
 
     // count clients per room
     clients.forEach((c) => {
@@ -151,8 +151,8 @@ const handlers = {
     key: string,
     nickname: string,
     avatar: string,
-    _config: any,
-    _mode: string,
+    config: any,
+    mode: string,
   ) {
     if (client.onlineKey !== key) return
 

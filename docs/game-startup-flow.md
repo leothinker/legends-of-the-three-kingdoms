@@ -267,6 +267,7 @@ loadCardPile()
 loadCard(imported card packs)
 过滤/转换 card.list
 loadPlay(imported play packs)
+loadExtension(enabled extensions)
 ```
 
 角色包中的 `skill.js` 会进入 `lib.skill`。

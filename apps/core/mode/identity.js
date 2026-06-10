@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
 export const type = "mode"
 /**
  * @type { () => importModeConfig }
@@ -12,7 +12,7 @@ export default () => {
           ui.arena.classList.add("only_dialog")
         }
         _status.mode = get.config("identity_mode")
-        if (_status.brawl && _status.brawl.submode) {
+        if (_status.brawl?.submode) {
           _status.mode = _status.brawl.submode
         }
         event.replacePile = () => {
@@ -39,7 +39,9 @@ export default () => {
             qinglong: "zhungangshuo",
             bagua: "lanyinjia",
           }
-          lib.card.list = lib.card.list.filter((cardInfo) => list.includes(cardInfo[2]))
+          lib.card.list = lib.card.list.filter((cardInfo) =>
+            list.includes(cardInfo[2]),
+          )
           for (const cardInfo of lib.card.list) {
             if (map[name]) {
               cardInfo[2] = map[name]
@@ -49,15 +51,17 @@ export default () => {
         }
       },
       async (event, trigger, player) => {
-        const playback = localStorage.getItem(lib.configprefix + "playback")
+        const playback = localStorage.getItem(`${lib.configprefix}playback`)
         if (playback) {
           ui.create.me()
           ui.arena.style.display = "none"
           ui.system.style.display = "none"
           _status.playback = playback
-          localStorage.removeItem(lib.configprefix + "playback")
-          const store = lib.db.transaction(["video"], "readwrite").objectStore("video")
-          store.get(parseInt(playback)).onsuccess = (e) => {
+          localStorage.removeItem(`${lib.configprefix}playback`)
+          const store = lib.db
+            .transaction(["video"], "readwrite")
+            .objectStore("video")
+          store.get(parseInt(playback, 10)).onsuccess = (e) => {
             if (e.target.result) {
               game.playVideoContent(e.target.result.video)
             } else {
@@ -67,12 +71,12 @@ export default () => {
           }
           event.finish()
         } else if (!_status.connectMode) {
-          if (_status.mode == "zhong") {
+          if (_status.mode === "zhong") {
             if (get.config("zhong_card")) {
               event.replacePile()
             }
             game.prepareArena(8)
-          } else if (_status.mode == "purple") {
+          } else if (_status.mode === "purple") {
             game.prepareArena(8)
           } else {
             game.prepareArena()
@@ -93,7 +97,9 @@ export default () => {
 
         await game.promises.saveConfig("new_tutorial", true)
         ui.create.dialog("欢迎来到三国杀，是否进入新手向导？")
-        ui.dialog.add('<div class="text center">跳过后，你可以在选项-其它中重置新手向导')
+        ui.dialog.add(
+          '<div class="text center">跳过后，你可以在选项-其它中重置新手向导',
+        )
         ui.auto.hide()
 
         const { promise, resolve } = Promise.withResolvers()
@@ -115,9 +121,12 @@ export default () => {
           if (!lib.config.phonelayout) {
             clear()
             ui.create.dialog(
-              "如果你在使用手机，可能会觉得按钮有点小" + "，将布局改成移动可以使按钮变大",
+              "如果你在使用手机，可能会觉得按钮有点小" +
+                "，将布局改成移动可以使按钮变大",
             )
-            ui.dialog.add('<div class="text center">你可以在选项-外观-布局中更改此设置')
+            ui.dialog.add(
+              '<div class="text center">你可以在选项-外观-布局中更改此设置',
+            )
             ui.create.control("使用移动布局", () => {
               if (lib.config.phonelayout) {
                 ui.control.firstChild.firstChild.innerHTML = "使用移动布局"
@@ -134,8 +143,12 @@ export default () => {
 
           if (lib.config.touchscreen) {
             clear()
-            ui.create.dialog("触屏模式中，下划可以显示菜单，上划可以切换托管，双指单击可以暂停")
-            ui.dialog.add('<div class="text center">你可以在选项-通用-中更改手势设置')
+            ui.create.dialog(
+              "触屏模式中，下划可以显示菜单，上划可以切换托管，双指单击可以暂停",
+            )
+            ui.dialog.add(
+              '<div class="text center">你可以在选项-通用-中更改手势设置',
+            )
             await new Promise((resolve) => ui.create.control("继续", resolve))
           }
 
@@ -144,21 +157,35 @@ export default () => {
           ui.click.configMenu()
           ui.control.classList.add("noclick_click_important")
           ui.control.style.top = "calc(100% - 105px)"
-          await new Promise((resolve) => ui.create.control("在菜单中，可以进行各项设置", resolve))
+          await new Promise((resolve) =>
+            ui.create.control("在菜单中，可以进行各项设置", resolve),
+          )
           ui.click.menuTab("选项")
           await new Promise((resolve) =>
-            ui.controls[0].replace("如果你感到游戏较卡，可以开启流畅模式", resolve),
+            ui.controls[0].replace(
+              "如果你感到游戏较卡，可以开启流畅模式",
+              resolve,
+            ),
           )
           await new Promise((resolve) =>
-            ui.controls[0].replace("在技能一栏中，可以设置自动发动或双将禁配的技能", resolve),
+            ui.controls[0].replace(
+              "在技能一栏中，可以设置自动发动或双将禁配的技能",
+              resolve,
+            ),
           )
           ui.click.menuTab("武将")
           await new Promise((resolve) =>
-            ui.controls[0].replace("在武将或卡牌一栏中，单击武将/卡牌可以将其禁用", resolve),
+            ui.controls[0].replace(
+              "在武将或卡牌一栏中，单击武将/卡牌可以将其禁用",
+              resolve,
+            ),
           )
           ui.click.menuTab("其它")
           await new Promise((resolve) =>
-            ui.controls[0].replace("在其它的关于一栏中，可以检查更新和下载素材", resolve),
+            ui.controls[0].replace(
+              "在其它的关于一栏中，可以检查更新和下载素材",
+              resolve,
+            ),
           )
           await new Promise((resolve) =>
             ui.controls[0].replace(
@@ -187,13 +214,16 @@ export default () => {
         }
       },
       async (event, trigger, player) => {
-        if (typeof _status.new_tutorial == "function") {
+        if (typeof _status.new_tutorial === "function") {
           _status.new_tutorial()
         }
         delete _status.new_tutorial
         if (_status.connectMode) {
           game.waitForPlayer(() => {
-            if (lib.configOL.identity_mode == "zhong" || lib.configOL.identity_mode == "purple") {
+            if (
+              lib.configOL.identity_mode === "zhong" ||
+              lib.configOL.identity_mode === "purple"
+            ) {
               lib.configOL.number = 8
             }
           })
@@ -208,39 +238,40 @@ export default () => {
             game.log("游戏进入了", `#y第${str}年`)
             if (game.shuffleNumber + 1 < game.countPlayer2()) {
               return
-            } else {
-              await game.delay(2)
             }
+            await game.delay(2)
             game.me.$fullscreenpop("年份已到", "metal")
             game.log("年份已到，主忠方判定为胜利")
             await game.delay(2)
             game.over(
-              game.me.identity == "zhu" ||
-                game.me.identity == "zhong" ||
-                game.me.identity == "mingzhong" ||
-                (game.me.identity == "commoner" && game.me.isIn()),
+              game.me.identity === "zhu" ||
+                game.me.identity === "zhong" ||
+                game.me.identity === "mingzhong" ||
+                (game.me.identity === "commoner" && game.me.isIn()),
             )
           })
         }
         if (_status.connectMode) {
           _status.mode = lib.configOL.identity_mode
-          if (_status.mode == "zhong") {
+          if (_status.mode === "zhong") {
             lib.configOL.number = 8
             if (lib.configOL.zhong_card) {
               event.replacePile()
             }
-          } else if (_status.mode == "purple") {
+          } else if (_status.mode === "purple") {
             lib.configOL.number = 8
-          } else if (_status.mode == "normal") {
+          } else if (_status.mode === "normal") {
             if (lib.configOL.enable_commoner || lib.configOL.double_nei) {
               const identity = lib.configOL.enable_commoner ? "commoner" : "nei"
-              for (const list of lib.config.mode_config.identity.identity.slice(1)) {
+              for (const list of lib.config.mode_config.identity.identity.slice(
+                1,
+              )) {
                 let toReplace
-                if (list.filter((role) => role == "nei").length >= 2) {
+                if (list.filter((role) => role === "nei").length >= 2) {
                   toReplace = "nei"
                 } else if (
-                  list.filter((role) => role == "zhong").length >
-                  list.filter((role) => role == "fan").length / 2
+                  list.filter((role) => role === "zhong").length >
+                  list.filter((role) => role === "fan").length / 2
                 ) {
                   toReplace = "zhong"
                 } else {
@@ -250,7 +281,8 @@ export default () => {
                 list.push(identity)
               }
               game.broadcast(
-                (identityList) => (lib.config.mode_config.identity.identity = identityList),
+                (identityList) =>
+                  (lib.config.mode_config.identity.identity = identityList),
                 lib.config.mode_config.identity.identity,
               )
             }
@@ -258,23 +290,25 @@ export default () => {
           if (lib.configOL.number < 2) {
             lib.configOL.number = 2
           }
-          if (_status.mode != "purple" && lib.configOL.enable_year_limit) {
+          if (_status.mode !== "purple" && lib.configOL.enable_year_limit) {
             lib.onwash.push(yearLimitCheck)
           }
           game.randomMapOL()
         } else {
           if (
-            _status.mode == "normal" &&
+            _status.mode === "normal" &&
             (get.config("enable_commoner") || get.config("double_nei"))
           ) {
             const identity = get.config("enable_commoner") ? "commoner" : "nei"
-            for (const list of lib.config.mode_config.identity.identity.slice(1)) {
+            for (const list of lib.config.mode_config.identity.identity.slice(
+              1,
+            )) {
               let toReplace
-              if (list.filter((role) => role == "nei").length >= 2) {
+              if (list.filter((role) => role === "nei").length >= 2) {
                 toReplace = "nei"
               } else if (
-                list.filter((role) => role == "zhong").length >
-                list.filter((role) => role == "fan").length / 2
+                list.filter((role) => role === "zhong").length >
+                list.filter((role) => role === "fan").length / 2
               ) {
                 toReplace = "zhong"
               } else {
@@ -284,13 +318,13 @@ export default () => {
               list.push(identity)
             }
           }
-          if (_status.mode != "purple" && get.config("enable_year_limit")) {
+          if (_status.mode !== "purple" && get.config("enable_year_limit")) {
             lib.onwash.push(yearLimitCheck)
           }
           for (const current of game.players) {
             current.getId()
           }
-          if (_status.brawl && _status.brawl.chooseCharacterBefore) {
+          if (_status.brawl?.chooseCharacterBefore) {
             _status.brawl.chooseCharacterBefore()
           }
           game.chooseCharacter()
@@ -300,7 +334,7 @@ export default () => {
         if (ui.coin) {
           _status.coinCoeff = get.coinCoeff([game.me.name])
         }
-        if (game.players.length == 2) {
+        if (game.players.length === 2) {
           game.showIdentity(true)
           const map = {}
           for (const id in lib.playerOL) {
@@ -318,18 +352,20 @@ export default () => {
             current.ai.shown = 0
           }
         }
-        const stratagemMode = _status.mode == "stratagem"
+        const stratagemMode = _status.mode === "stratagem"
         if (stratagemMode) {
           let beginner
           if (_status.cheat_seat) {
             const seat = _status.cheat_seat.link
-            beginner = seat == 0 ? game.me : game.players[game.players.length - seat]
+            beginner =
+              seat === 0 ? game.me : game.players[game.players.length - seat]
             if (!beginner) {
               beginner = game.me
             }
             delete _status.cheat_seat
           } else {
-            beginner = game.players[Math.floor(Math.random() * game.players.length)]
+            beginner =
+              game.players[Math.floor(Math.random() * game.players.length)]
           }
           event.beginner = beginner
 
@@ -352,19 +388,18 @@ export default () => {
             _status.postReconnect.stratagemReinit = [stratagemBroadcast, {}]
           }
           for (const current of game.players) {
-            if (current.identity == "zhu") {
+            if (current.identity === "zhu") {
               current.addSkill("stratagem_monarchy")
             }
-            if (current.identity == "fan") {
+            if (current.identity === "fan") {
               current.addSkill("stratagem_revitalization")
             }
           }
         }
         if (
-          game.zhu == game.me &&
-          game.zhu.identity != "zhu" &&
-          _status.brawl &&
-          _status.brawl.identityShown
+          game.zhu === game.me &&
+          game.zhu.identity !== "zhu" &&
+          _status.brawl?.identityShown
         ) {
           delete game.zhu
         } else {
@@ -375,13 +410,15 @@ export default () => {
             game.zhong = game.zhu
             game.zhu = game.zhu2
             delete game.zhu2
-            if (game.zhong.sex == "male" && game.zhong.maxHp <= 4) {
+            if (game.zhong.sex === "male" && game.zhong.maxHp <= 4) {
               game.zhong.addSkill("dongcha")
             } else {
               game.zhong.addSkill("sheshen")
             }
           }
-          let enhance_zhu = !["zhong", "stratagem", "purple"].includes(_status.mode),
+          let enhance_zhu = !["zhong", "stratagem", "purple"].includes(
+              _status.mode,
+            ),
             skill
           if (enhance_zhu) {
             if (_status.connectMode) {
@@ -391,7 +428,7 @@ export default () => {
             }
           }
           if (enhance_zhu === "sixiang") {
-            skill = "sixiang_" + ["zhuque", "xuanwu", "qinglong", "baihu"].randomGet()
+            skill = `sixiang_${["zhuque", "xuanwu", "qinglong", "baihu"].randomGet()}`
           } else if (enhance_zhu === "specific" && get.population("fan") >= 3) {
             switch (game.zhu.name) {
               case "key_yuri":
@@ -499,12 +536,16 @@ export default () => {
         }
       },
       async (event, trigger, player) => {
-        if (_status.mode != "stratagem") {
+        if (_status.mode !== "stratagem") {
           event.beginner =
-            _status.firstAct2 || game.zhong || game.zhu || _status.firstAct || game.me
+            _status.firstAct2 ||
+            game.zhong ||
+            game.zhu ||
+            _status.firstAct ||
+            game.me
         }
         game.gameDraw(event.beginner, (player) => {
-          if (_status.mode == "purple" && player.seatNum > 5) {
+          if (_status.mode === "purple" && player.seatNum > 5) {
             return 5
           }
           return 4
@@ -535,10 +576,10 @@ export default () => {
         for (const id in lib.playerOL) {
           const player = lib.playerOL[id]
           state[id] = { identity: player.identity }
-          if (player == game.zhu) {
+          if (player === game.zhu) {
             state[id].zhu = true
           }
-          if (player == game.zhong) {
+          if (player === game.zhong) {
             state[id].zhong = true
           }
           if (player.isZhu) {
@@ -560,15 +601,20 @@ export default () => {
           const player = lib.playerOL[id]
           if (player) {
             player.identity = state[id].identity
-            if (state[id].identity == "rZhu" || state[id].identity == "bZhu") {
+            if (
+              state[id].identity === "rZhu" ||
+              state[id].identity === "bZhu"
+            ) {
               game[state[id].identity] = player
             }
             if (state[id].special_identity) {
               player.special_identity = state[id].special_identity
               if (player.node.dieidentity) {
-                player.node.dieidentity.innerHTML = get.translation(state[id].special_identity)
+                player.node.dieidentity.innerHTML = get.translation(
+                  state[id].special_identity,
+                )
                 player.node.identity.firstChild.innerHTML = get.translation(
-                  state[id].special_identity + "_bg",
+                  `${state[id].special_identity}_bg`,
                 )
               }
             }
@@ -593,22 +639,19 @@ export default () => {
       getRoomInfo(uiintro) {
         uiintro.add(
           '<div class="text chat">游戏模式：' +
-            (lib.configOL.identity_mode == "zhong" ? "明忠" : "标准"),
+            (lib.configOL.identity_mode === "zhong" ? "明忠" : "标准"),
         )
-        uiintro.add(
-          '<div class="text chat">双将模式：' + (lib.configOL.double_character ? "开启" : "关闭"),
-        )
-        if (lib.configOL.identity_mode != "zhong") {
-          if (lib.configOL.identity_mode == "stratagem") {
+        if (lib.configOL.identity_mode !== "zhong") {
+          if (lib.configOL.identity_mode === "stratagem") {
             uiintro.add(
               '<div class="text chat">首轮强化：' +
                 (lib.configOL.round_one_use_fury ? "开启" : "关闭"),
             )
-          } else if (lib.configOL.identity_mode != "purple") {
+          } else if (lib.configOL.identity_mode !== "purple") {
             uiintro.add(
-              '<div class="text chat">双内奸：' + (lib.configOL.double_nei ? "开启" : "关闭"),
+              `<div class="text chat">双内奸：${lib.configOL.double_nei ? "开启" : "关闭"}`,
             )
-            if (lib.configOL.identity_mode != "stratagem") {
+            if (lib.configOL.identity_mode !== "stratagem") {
               uiintro.add(
                 `<div class="text chat">加强主公：${(() => {
                   switch (lib.configOL.enhance_zhu) {
@@ -633,20 +676,20 @@ export default () => {
           }
         } else {
           uiintro.add(
-            '<div class="text chat">卡牌替换：' + (lib.configOL.zhong_card ? "开启" : "关闭"),
+            `<div class="text chat">卡牌替换：${lib.configOL.zhong_card ? "开启" : "关闭"}`,
           )
         }
         let last = uiintro.add(
-          '<div class="text chat">出牌时限：' + lib.configOL.choose_timeout + "秒",
+          `<div class="text chat">出牌时限：${lib.configOL.choose_timeout}秒`,
         )
         if (lib.configOL.banned.length) {
           last = uiintro.add(
-            '<div class="text chat">禁用武将：' + get.translation(lib.configOL.banned),
+            `<div class="text chat">禁用武将：${get.translation(lib.configOL.banned)}`,
           )
         }
         if (lib.configOL.bannedcards.length) {
           last = uiintro.add(
-            '<div class="text chat">禁用卡牌：' + get.translation(lib.configOL.bannedcards),
+            `<div class="text chat">禁用卡牌：${get.translation(lib.configOL.bannedcards)}`,
           )
         }
         last.style.paddingBottom = "8px"
@@ -660,10 +703,10 @@ export default () => {
         if (player.identityShown) {
           return
         }
-        if (player == game.me) {
+        if (player === game.me) {
           return
         }
-        if (_status.mode == "purple") {
+        if (_status.mode === "purple") {
           if (
             _status.yeconfirm &&
             ["rNei", "bNei"].includes(game.me.identity) &&
@@ -671,7 +714,7 @@ export default () => {
           ) {
             return
           }
-          if (player.identity.slice(0, 1) == "r") {
+          if (player.identity.slice(0, 1) === "r") {
             return {
               cai2: "猜",
               rZhong: "忠",
@@ -685,28 +728,32 @@ export default () => {
             bNei: "内",
             bYe: "野",
           }
-        } else if (_status.mode == "zhong") {
+        }
+        if (_status.mode === "zhong") {
           if (player.fanfixed) {
             return
           }
-          if (game.zhu && game.zhu.isZhu) {
+          if (game.zhu?.isZhu) {
             return {
               fan: "反",
               zhong: "忠",
               nei: "内",
-              cai: "猜",
-            }
-          } else {
-            return {
-              fan: "反",
-              zhong: "忠",
-              nei: "内",
-              zhu: "主",
               cai: "猜",
             }
           }
-        } else if (_status.mode == "stratagem") {
-          if ((game.zhu && game.zhu.isZhu && game.zhu.identityShown) || game.me.identity == "zhu") {
+          return {
+            fan: "反",
+            zhong: "忠",
+            nei: "内",
+            zhu: "主",
+            cai: "猜",
+          }
+        }
+        if (_status.mode === "stratagem") {
+          if (
+            (game.zhu?.isZhu && game.zhu.identityShown) ||
+            game.me.identity === "zhu"
+          ) {
             return {
               fan: "反",
               zhong: "忠",
@@ -715,34 +762,31 @@ export default () => {
               friend: "友",
               cai: "猜",
             }
-          } else {
-            return {
-              fan: "反",
-              zhong: "忠",
-              nei: "内",
-              zhu: "主",
-              enemy: "敌",
-              friend: "友",
-              cai: "猜",
-            }
           }
-        } else {
-          if (get.config("enable_commoner")) {
-            return {
-              fan: "反",
-              zhong: "忠",
-              nei: "内",
-              commoner: "民",
-              cai: "猜",
-            }
-          } else {
-            return {
-              fan: "反",
-              zhong: "忠",
-              nei: "内",
-              cai: "猜",
-            }
+          return {
+            fan: "反",
+            zhong: "忠",
+            nei: "内",
+            zhu: "主",
+            enemy: "敌",
+            friend: "友",
+            cai: "猜",
           }
+        }
+        if (get.config("enable_commoner")) {
+          return {
+            fan: "反",
+            zhong: "忠",
+            nei: "内",
+            commoner: "民",
+            cai: "猜",
+          }
+        }
+        return {
+          fan: "反",
+          zhong: "忠",
+          nei: "内",
+          cai: "猜",
         }
       },
       /**
@@ -802,7 +846,7 @@ export default () => {
       getVideoName() {
         let str = get.translation(game.me.name)
         if (game.me.name2) {
-          str += "/" + get.translation(game.me.name2)
+          str += `/${get.translation(game.me.name2)}`
         }
         let str2 = ""
         if (game.identityVideoName) {
@@ -812,18 +856,18 @@ export default () => {
             case "purple":
               str2 =
                 "3v3v2 - " +
-                (game.me.identity.indexOf("r") == 0 ? "暖色" : "冷色") +
-                lib.translate[game.me.identity + "2"]
+                (game.me.identity.indexOf("r") === 0 ? "暖色" : "冷色") +
+                lib.translate[`${game.me.identity}2`]
               break
             case "zhong":
-              str2 = "忠胆英杰 - " + lib.translate[game.me.identity + "2"]
+              str2 = `忠胆英杰 - ${lib.translate[`${game.me.identity}2`]}`
               break
             case "stratagem":
               str2 =
                 get.cnNumber(get.playerNumber()) +
                 "人谋攻" +
                 "-" +
-                lib.translate[game.me.identity + "2"]
+                lib.translate[`${game.me.identity}2`]
               break
             default:
               str2 =
@@ -831,7 +875,7 @@ export default () => {
                 "人" +
                 get.translation(lib.config.mode) +
                 " - " +
-                lib.translate[game.me.identity + "2"]
+                lib.translate[`${game.me.identity}2`]
           }
         }
         return [str, str2]
@@ -842,7 +886,7 @@ export default () => {
        * @param {Boolean} bool - 当前对局是否胜利
        */
       async addRecord(bool) {
-        if (typeof bool == "boolean") {
+        if (typeof bool === "boolean") {
           const data = lib.config.gameRecord.identity.data
 
           let identity = game.me.identity
@@ -862,7 +906,7 @@ export default () => {
           for (const identity of identities) {
             if (data[identity]) {
               str +=
-                lib.translate[identity + "2"] +
+                lib.translate[`${identity}2`] +
                 "：" +
                 data[identity][0] +
                 "胜" +
@@ -896,7 +940,7 @@ export default () => {
               `${player.special_identity}_bg`,
             )
           }
-          if (player.identity == "zhu") {
+          if (player.identity === "zhu") {
             player.isZhu = true
           }
         }
@@ -917,10 +961,11 @@ export default () => {
        */
       checkResult() {
         const me = game.me._trueMe || game.me
-        if (_status.brawl && _status.brawl.checkResult) {
+        if (_status.brawl?.checkResult) {
           _status.brawl.checkResult()
           return
-        } else if (_status.mode == "purple") {
+        }
+        if (_status.mode === "purple") {
           const winner = []
           const loser = []
           const ye = game.filterPlayer(
@@ -941,7 +986,7 @@ export default () => {
           game.countPlayer2((current) => {
             switch (current.identity) {
               case "rZhu":
-                if (ye.length == 0 && game.bZhu.isDead()) {
+                if (ye.length === 0 && game.bZhu.isDead()) {
                   winner.push(current)
                 }
                 if (current.isDead()) {
@@ -950,7 +995,7 @@ export default () => {
                 break
               case "rZhong":
               case "bNei":
-                if (ye.length == 0 && game.bZhu.isDead()) {
+                if (ye.length === 0 && game.bZhu.isDead()) {
                   winner.push(current)
                 }
                 if (game.rZhu.isDead()) {
@@ -958,7 +1003,7 @@ export default () => {
                 }
                 break
               case "bZhu":
-                if (ye.length == 0 && game.rZhu.isDead()) {
+                if (ye.length === 0 && game.rZhu.isDead()) {
                   winner.push(current)
                 }
                 if (current.isDead()) {
@@ -967,7 +1012,7 @@ export default () => {
                 break
               case "bZhong":
               case "rNei":
-                if (ye.length == 0 && game.rZhu.isDead()) {
+                if (ye.length === 0 && game.rZhu.isDead()) {
                   winner.push(current)
                 }
                 if (game.bZhu.isDead()) {
@@ -975,7 +1020,7 @@ export default () => {
                 }
                 break
               default:
-                if (red.length + blue.length == 0) {
+                if (red.length + blue.length === 0) {
                   winner.push(current)
                 } else if (game.rZhu.isDead() && game.bZhu.isDead()) {
                   loser.push(current)
@@ -995,7 +1040,7 @@ export default () => {
               loser.remove(current)
             }
           }
-          if (winner.length > 0 || loser.length == game.players.length) {
+          if (winner.length > 0 || loser.length === game.players.length) {
             game.broadcastAll(
               (winner, loser) => {
                 _status.winner = winner
@@ -1004,7 +1049,7 @@ export default () => {
               winner,
               loser,
             )
-            if (loser.length == game.players.length) {
+            if (loser.length === game.players.length) {
               game.showIdentity()
               game.over("游戏平局")
             } else if (winner2.includes(me)) {
@@ -1022,7 +1067,7 @@ export default () => {
           return
         }
         if (!game.zhu) {
-          if (get.population("fan") == 0) {
+          if (get.population("fan") === 0) {
             switch (me.identity) {
               case "fan":
                 game.over(false)
@@ -1037,7 +1082,7 @@ export default () => {
                 game.over()
                 break
             }
-          } else if (get.population("zhong") == 0) {
+          } else if (get.population("zhong") === 0) {
             switch (me.identity) {
               case "fan":
                 game.over(true)
@@ -1055,39 +1100,48 @@ export default () => {
           }
           return
         }
-        if (game.zhu.isAlive() && get.population("fan") + get.population("nei") > 0) {
+        if (
+          game.zhu.isAlive() &&
+          get.population("fan") + get.population("nei") > 0
+        ) {
           return
         }
         if (game.zhong) {
           game.zhong.identity = "zhong"
         }
         game.showIdentity()
-        if (me.identity == "zhu" || me.identity == "zhong" || me.identity == "mingzhong") {
+        if (
+          me.identity === "zhu" ||
+          me.identity === "zhong" ||
+          me.identity === "mingzhong"
+        ) {
           if (game.zhu.classList.contains("dead")) {
             game.over(false)
           } else {
             game.over(true)
           }
-        } else if (me.identity == "nei") {
+        } else if (me.identity === "nei") {
           if (
-            game.players.length ==
-              1 + game.players.filter((i) => i.identity == "commoner").length &&
+            game.players.length ===
+              1 +
+                game.players.filter((i) => i.identity === "commoner").length &&
             me.isAlive()
           ) {
             game.over(true)
           } else {
             game.over(false)
           }
-        } else if (me.identity == "fan") {
+        } else if (me.identity === "fan") {
           if (
-            (get.population("fan") + get.population("zhong") > 0 || get.population("nei") > 1) &&
+            (get.population("fan") + get.population("zhong") > 0 ||
+              get.population("nei") > 1) &&
             game.zhu.classList.contains("dead")
           ) {
             game.over(true)
           } else {
             game.over(false)
           }
-        } else if (me.identity == "commoner") {
+        } else if (me.identity === "commoner") {
           game.over(true)
         }
       },
@@ -1116,16 +1170,19 @@ export default () => {
             player.identity === "mingzhong" ||
             (player.identity === "commoner" && player.isAlive())
           )
-        } else if (
-          (game.players.length ==
+        }
+        if (
+          (game.players.length ===
             1 + game.players.filter((i) => i.identity === "commoner").length &&
             game.players[0].identity === "nei") ||
           game.players[0].identity === "commoner"
         ) {
           return player.isAlive()
-        } else {
-          return player.identity === "fan" || (player.identity === "commoner" && player.isAlive())
         }
+        return (
+          player.identity === "fan" ||
+          (player.identity === "commoner" && player.isAlive())
+        )
       },
       /**
        * @this {Game}
@@ -1147,7 +1204,9 @@ export default () => {
             const identityList = list.concat(list2)
 
             const num = get.rand(0, 7)
-            const players = game.players.slice(num).concat(game.players.slice(0, num))
+            const players = game.players
+              .slice(num)
+              .concat(game.players.slice(0, num))
 
             game.broadcastAll(
               /**
@@ -1160,11 +1219,14 @@ export default () => {
                 if (game.online) {
                   ui.arena.classList.add("choose-character")
                 }
-                for (const [current, identity] of Iterator.zip([players, identityList])) {
+                for (const [current, identity] of Iterator.zip([
+                  players,
+                  identityList,
+                ])) {
                   current.node.identity.classList.add("guessing")
                   current.identity = identity
                   current.setIdentity(list.includes(identity) ? "cai2" : "cai")
-                  if (identity == "rZhu" || identity == "bZhu") {
+                  if (identity === "rZhu" || identity === "bZhu") {
                     game[identity] = current
                     current.setIdentity(identity)
                     current.identityShown = true
@@ -1206,7 +1268,7 @@ export default () => {
               if (lib.filter.characterDisabled(name, libCharacter)) {
                 continue
               }
-              if (name.indexOf("lingju") != -1 || get.is.double(name)) {
+              if (name.indexOf("lingju") !== -1 || get.is.double(name)) {
                 continue
               }
               const group = lib.character[name][1]
@@ -1241,9 +1303,7 @@ export default () => {
             let result = await game.bZhu
               .chooseControl(list)
               .set("prompt", "请选择冷方武将势力")
-              .set("ai", function () {
-                return _status.event.choice
-              })
+              .set("ai", () => _status.event.choice)
               .set("choice", event.list.randomGet())
               .forResult()
             event.bZhu = result.control
@@ -1252,9 +1312,7 @@ export default () => {
             result = await game.rZhu
               .chooseControl(event.list)
               .set("prompt", "请选择暖方武将的势力")
-              .set("ai", function () {
-                return _status.event.choice
-              })
+              .set("ai", () => _status.event.choice)
               .set("choice", event.list.randomGet())
               .forResult()
             event.rZhu = result.control
@@ -1287,7 +1345,11 @@ export default () => {
           // step 4
           async (event, trigger, player, result) => {
             for (const current in result) {
-              if (result[current] === "ai" || !result[current] || !result[current].links) {
+              if (
+                result[current] === "ai" ||
+                !result[current] ||
+                !result[current].links
+              ) {
                 result[current] = event.map[current].randomGet()
               } else {
                 result[current] = result[current].links
@@ -1301,7 +1363,10 @@ export default () => {
             game.broadcast((result) => {
               for (const current in result) {
                 if (!lib.playerOL[current].name) {
-                  lib.playerOL[current].init(result[current][0], result[current][1])
+                  lib.playerOL[current].init(
+                    result[current][0],
+                    result[current][1],
+                  )
                   if (!lib.playerOL[current].isInitFilter("noZhuHp")) {
                     lib.playerOL[current].hp++
                     lib.playerOL[current].maxHp++
@@ -1315,7 +1380,7 @@ export default () => {
             const players = game.players.slice(0)
             players.removeArray([game.rZhu, game.bZhu])
             for (const current of players) {
-              var group = event[current.identity.slice(0, 1) + "Zhu"]
+              var group = event[`${current.identity.slice(0, 1)}Zhu`]
               var str = "选择角色"
               var list2 = event.map[group].randomRemove(event.mapNum[group])
               event.map[current.playerid] = list2
@@ -1330,7 +1395,11 @@ export default () => {
           // step 5
           async (event, trigger, player, result) => {
             for (const current in result) {
-              if (result[current] == "ai" || !result[current] || !result[current].links) {
+              if (
+                result[current] === "ai" ||
+                !result[current] ||
+                !result[current].links
+              ) {
                 result[current] = event.map[current].randomGet()
               } else {
                 result[current] = result[current].links
@@ -1344,7 +1413,10 @@ export default () => {
             game.broadcast((result) => {
               for (const current in result) {
                 if (!lib.playerOL[current].name) {
-                  lib.playerOL[current].init(result[current][0], result[current][1])
+                  lib.playerOL[current].init(
+                    result[current][0],
+                    result[current][1],
+                  )
                 }
               }
               setTimeout(() => {
@@ -1380,8 +1452,13 @@ export default () => {
             const identityList = list.concat(list2)
             const num = get.rand(0, 7)
 
-            const players = game.players.slice(num).concat(game.players.slice(0, num))
-            for (const [current, identity] of Iterator.zip([players, identityList])) {
+            const players = game.players
+              .slice(num)
+              .concat(game.players.slice(0, num))
+            for (const [current, identity] of Iterator.zip([
+              players,
+              identityList,
+            ])) {
               current.node.identity.classList.add("guessing")
               current.identity = identity
               current.setIdentity(list.includes(identity) ? "cai2" : "cai")
@@ -1411,7 +1488,10 @@ export default () => {
               if (lib.filter.characterDisabled(charaName)) {
                 continue
               }
-              if (charaName.indexOf("lingju") != -1 || get.is.double(charaName)) {
+              if (
+                charaName.indexOf("lingju") !== -1 ||
+                get.is.double(charaName)
+              ) {
                 continue
               }
               const group = lib.character[charaName][1]
@@ -1444,9 +1524,7 @@ export default () => {
             let result = await game.bZhu
               .chooseControl(list)
               .set("prompt", "请选择冷方武将势力")
-              .set("ai", function () {
-                return _status.event.choice
-              })
+              .set("ai", () => _status.event.choice)
               .set("choice", event.list.randomGet())
               .forResult()
             event.bZhu = result.control
@@ -1455,9 +1533,7 @@ export default () => {
             result = await game.rZhu
               .chooseControl(event.list)
               .set("prompt", "请选择暖方武将的势力")
-              .set("ai", function () {
-                return _status.event.choice
-              })
+              .set("ai", () => _status.event.choice)
               .set("choice", event.list.randomGet())
               .forResult()
             event.rZhu = result.control
@@ -1468,9 +1544,14 @@ export default () => {
               event.isZhu = true
               const list = event.map[event[game.me.identity]].randomGets(4)
               if (event.map_zhu[event[game.me.identity]]) {
-                list.addArray(event.map_zhu[event[game.me.identity]].randomGets(2))
+                list.addArray(
+                  event.map_zhu[event[game.me.identity]].randomGets(2),
+                )
               }
-              game.me.chooseButton(true, ["请选择您的武将牌", [list, "character"]])
+              game.me.chooseButton(true, [
+                "请选择您的武将牌",
+                [list, "character"],
+              ])
             }
           },
           // step 4
@@ -1508,7 +1589,8 @@ export default () => {
               game.bZhu.update()
             }
             if (!event.isZhu) {
-              var group = game.me.identity.indexOf("r") == 0 ? event.rZhu : event.bZhu
+              var group =
+                game.me.identity.indexOf("r") === 0 ? event.rZhu : event.bZhu
               game.me.chooseButton(true, [
                 "请选择您的武将牌",
                 [event.map[group].randomRemove(5), "character"],
@@ -1522,7 +1604,8 @@ export default () => {
             }
             for (const current of game.filterPlayer()) {
               if (!current.name) {
-                const group = current.identity.indexOf("r") === 0 ? event.rZhu : event.bZhu
+                const group =
+                  current.identity.indexOf("r") === 0 ? event.rZhu : event.bZhu
                 current.init(event.map[group].randomRemove(1)[0])
               }
             }
@@ -1577,7 +1660,10 @@ export default () => {
               }
             }
             identityList.randomSort()
-            for (const [current, identity] of Iterator.zip([game.players, identityList])) {
+            for (const [current, identity] of Iterator.zip([
+              game.players,
+              identityList,
+            ])) {
               current.identity = identity
               current.setIdentity("cai")
               current.node.identity.classList.add("guessing")
@@ -1597,7 +1683,7 @@ export default () => {
                     lib.playerOL[i].node.identity.classList.add("guessing")
                   }
                   zhu.identity = zhuid
-                  if (zhuid == "zhu") {
+                  if (zhuid === "zhu") {
                     zhu.isZhu = true
                   }
                   me.node.identity.classList.remove("guessing")
@@ -1626,7 +1712,10 @@ export default () => {
             for (const name in lib.characterReplace) {
               const names = lib.characterReplace[name]
               for (let j = 0; j < names.length; ++j) {
-                if (!libCharacter[names[j]] || lib.filter.characterDisabled(names[j])) {
+                if (
+                  !libCharacter[names[j]] ||
+                  lib.filter.characterDisabled(names[j])
+                ) {
                   names.splice(j--, 1)
                 }
               }
@@ -1663,14 +1752,19 @@ export default () => {
           async (event, trigger, player) => {
             const list = []
 
-            const num = Math.floor(event.list.length / (game.players.length - 1))
-            const selectButton = lib.configOL.double_character ? 2 : 1
+            const num = Math.floor(
+              event.list.length / (game.players.length - 1),
+            )
+            const selectButton = 1
             for (const current of game.players) {
-              const num2 = lib.configOL["choice_" + current.identity]
+              const num2 = lib.configOL[`choice_${current.identity}`]
               const str = "选择角色"
               list.push([
                 current,
-                [str, [event.list.randomRemove(Math.min(num, num2)), "characterx"]],
+                [
+                  str,
+                  [event.list.randomRemove(Math.min(num, num2)), "characterx"],
+                ],
                 selectButton,
                 true,
               ])
@@ -1678,8 +1772,8 @@ export default () => {
 
             /** @type { Record<string, Partial<Result>> } */
             const result = await game.me
-              .chooseButtonOL(list, function (player, result) {
-                if (game.online || player == game.me) {
+              .chooseButtonOL(list, (player, result) => {
+                if (game.online || player === game.me) {
                   player.init(result.links[0], result.links[1])
                 }
               })
@@ -1687,7 +1781,7 @@ export default () => {
 
             const shen = []
             for (const id in result) {
-              if (result[id] && result[id].links) {
+              if (result[id]?.links) {
                 for (const character of result[id].links) {
                   event.list2.remove(get.sourceCharacter(character))
                 }
@@ -1695,10 +1789,10 @@ export default () => {
             }
             for (const id in result) {
               if (result[id] === "ai") {
-                result[id] = event.list2.randomRemove(lib.configOL.double_character ? 2 : 1)
+                result[id] = event.list2.randomRemove(1)
                 for (let j = 0; j < result[id].length; j++) {
                   const listx = lib.characterReplace[result[id][j]]
-                  if (listx && listx.length) {
+                  if (listx?.length) {
                     result[id][j] = listx.randomGet()
                   }
                 }
@@ -1714,15 +1808,26 @@ export default () => {
             if (shen.length) {
               for (let i = 0; i < shen.length; i++) {
                 const name = result[shen[i].playerid][0]
-                const groups = get.selectGroup(name).map((group) => ["", "", `group_${group}`])
+                const groups = get
+                  .selectGroup(name)
+                  .map((group) => ["", "", `group_${group}`])
                 const type = get.selectGroup(name, true)
                 shen[i]._groupChosen = type
-                shen[i] = [shen[i], ["请选择你的势力", [groups, "vcard"]], 1, true]
+                shen[i] = [
+                  shen[i],
+                  ["请选择你的势力", [groups, "vcard"]],
+                  1,
+                  true,
+                ]
               }
               game.me
                 .chooseButtonOL(shen, (player, result) => {
                   if (player === game.me) {
-                    player.changeGroup(result.links[0][2].slice(6), false, false)
+                    player.changeGroup(
+                      result.links[0][2].slice(6),
+                      false,
+                      false,
+                    )
                   }
                 })
                 .set("switchToAuto", () => {
@@ -1744,10 +1849,17 @@ export default () => {
               result = {}
             }
             for (const id in result) {
-              if (result[id] && result[id].links) {
+              if (result[id]?.links) {
                 result[id] = result[id].links[0][2].slice(6)
               } else if (result[id] === "ai") {
-                result[id] = ["wei", "shu", "wu", "qun", "jin", "key"].randomGet()
+                result[id] = [
+                  "wei",
+                  "shu",
+                  "wu",
+                  "qun",
+                  "jin",
+                  "key",
+                ].randomGet()
               }
             }
             const result2 = event.result2
@@ -1757,7 +1869,7 @@ export default () => {
                   if (!lib.playerOL[id].name) {
                     lib.playerOL[id].init(result[id][0], result[id][1])
                   }
-                  if (result2[id] && result2[id].length) {
+                  if (result2[id]?.length) {
                     lib.playerOL[id].changeGroup(result2[id], false, false)
                   }
                 }
@@ -1773,7 +1885,7 @@ export default () => {
               if (!lib.playerOL[id].name) {
                 lib.playerOL[id].init(result2[id][0], result2[id][1])
               }
-              if (result[id] && result[id].length) {
+              if (result[id]?.length) {
                 lib.playerOL[id].changeGroup(result[id], false, false)
               }
             }
@@ -1784,9 +1896,11 @@ export default () => {
               _status.characterlist.remove(game.players[i].name2)
             }
 
-            ;["stratagem_gain", "stratagem_insight", "stratagem_expose"].forEach((globalSkill) =>
-              game.addGlobalSkill(globalSkill),
-            )
+            ;[
+              "stratagem_gain",
+              "stratagem_insight",
+              "stratagem_expose",
+            ].forEach((globalSkill) => game.addGlobalSkill(globalSkill))
             game.players.forEach((current) => {
               current.storage.zhibi = []
               current.storage.stratagem_expose = []
@@ -1804,7 +1918,7 @@ export default () => {
        * @this {Game}
        */
       chooseCharacter() {
-        if (_status.mode == "purple") {
+        if (_status.mode === "purple") {
           game.chooseCharacterPurple()
           return
         }
@@ -1825,8 +1939,7 @@ export default () => {
         }
         next.ai = (player, list, list2, back) => {
           if (
-            _status.brawl &&
-            _status.brawl.chooseCharacterAi &&
+            _status.brawl?.chooseCharacterAi &&
             _status.brawl.chooseCharacterAi(player, list, list2, back) !== false
           ) {
             return
@@ -1836,16 +1949,15 @@ export default () => {
             const listc = list.slice(0, 2)
             for (const index of listc.keys()) {
               const listx = lib.characterReplace[listc[index]]
-              if (listx && listx.length) {
+              if (listx?.length) {
                 listc[index] = listx.randomGet()
               }
             }
-            if (get.config("double_character")) {
-              player.init(listc[0], listc[1])
-            } else {
-              player.init(listc[0])
-            }
-            if (player.identity === "mingzhong" && !player.isInitFilter("noZhuHp")) {
+            player.init(listc[0])
+            if (
+              player.identity === "mingzhong" &&
+              !player.isInitFilter("noZhuHp")
+            ) {
               player.hp++
               player.maxHp++
               player.update()
@@ -1854,26 +1966,26 @@ export default () => {
             list2.randomSort()
             let choice = list[0]
             let choice2 = list[1]
-            if (!_status.event.zhongmode && Math.random() - 0.8 < 0 && list2.length) {
+            if (
+              !_status.event.zhongmode &&
+              Math.random() - 0.8 < 0 &&
+              list2.length
+            ) {
               choice = list2[0]
               choice2 = list[0]
-              if (choice2 == choice) {
+              if (choice2 === choice) {
                 choice2 = list[1]
               }
             }
             const choiceList = lib.characterReplace[choice]
-            if (choiceList && choiceList.length) {
+            if (choiceList?.length) {
               choice = choiceList.randomGet()
             }
             const choice2List = lib.characterReplace[choice2]
-            if (choice2List && choice2List.length) {
+            if (choice2List?.length) {
               choice2 = choice2List.randomGet()
             }
-            if (get.config("double_character")) {
-              player.init(choice, choice2)
-            } else {
-              player.init(choice)
-            }
+            player.init(choice)
             if (game.players.length > 4 && !player.isInitFilter("noZhuHp")) {
               player.hp++
               player.maxHp++
@@ -1881,41 +1993,34 @@ export default () => {
             }
           } else if (
             player.identity === "zhong" &&
-            (Math.random() < 0.5 || ["sunliang", "key_akane"].includes(game.zhu.name)) &&
+            (Math.random() < 0.5 ||
+              ["sunliang", "key_akane"].includes(game.zhu.name)) &&
             !stratagemMode
           ) {
             const listc = list.slice(0)
             for (const index of listc.keys()) {
               const listx = lib.characterReplace[listc[index]]
-              if (listx && listx.length) {
+              if (listx?.length) {
                 listc[index] = listx.randomGet()
               }
             }
             let choice = 0
             for (const index of listc.keys()) {
-              if (lib.character[listc[index]][1] == game.zhu.group) {
+              if (lib.character[listc[index]][1] === game.zhu.group) {
                 choice = index
                 break
               }
             }
-            if (get.config("double_character")) {
-              player.init(listc[choice], listc[choice == 0 ? choice + 1 : choice - 1])
-            } else {
-              player.init(listc[choice])
-            }
+            player.init(listc[choice])
           } else {
             const listc = list.slice(0, 2)
             for (const index of listc.keys()) {
               const listx = lib.characterReplace[listc[index]]
-              if (listx && listx.length) {
+              if (listx?.length) {
                 listc[index] = listx.randomGet()
               }
             }
-            if (get.config("double_character")) {
-              player.init(listc[0], listc[1])
-            } else {
-              player.init(listc[0])
-            }
+            player.init(listc[0])
           }
           if (back) {
             list.remove(get.sourceCharacter(player.name1))
@@ -1997,7 +2102,7 @@ export default () => {
                     "liubian",
                   ].includes(game.zhu.name)
                 ) {
-                  if (player.identity == "zhong") {
+                  if (player.identity === "zhong") {
                     return game.zhu.group
                   }
                   groups.remove(game.zhu.group)
@@ -2025,7 +2130,16 @@ export default () => {
             event.chosen = chosen
             if (_status.mode === "zhong") {
               event.zhongmode = true
-              identityList = ["zhu", "zhong", "mingzhong", "nei", "fan", "fan", "fan", "fan"]
+              identityList = [
+                "zhu",
+                "zhong",
+                "mingzhong",
+                "nei",
+                "fan",
+                "fan",
+                "fan",
+                "fan",
+              ]
             } else {
               if (_status.mode === "stratagem") {
                 event.stratagemMode = true
@@ -2043,7 +2157,14 @@ export default () => {
               let identityChoices
               let seats
               if (event.zhongmode) {
-                identityChoices = ["random", "zhu", "mingzhong", "zhong", "fan", "nei"]
+                identityChoices = [
+                  "random",
+                  "zhu",
+                  "mingzhong",
+                  "zhong",
+                  "fan",
+                  "nei",
+                ]
               } else {
                 identityChoices = ["random", "zhu", "zhong", "fan", "nei"]
                 if (get.config("enable_commoner") && !event.stratagemMode) {
@@ -2052,110 +2173,140 @@ export default () => {
               }
 
               for (const identity of identityChoices) {
-                const td = ui.create.div(".shadowed.reduce_radius.pointerdiv.tdnode")
+                const td = ui.create.div(
+                  ".shadowed.reduce_radius.pointerdiv.tdnode",
+                )
                 td.link = identity
                 if (td.link === game.me.identity) {
                   td.classList.add("bluebg")
                 }
                 table.appendChild(td)
                 td.innerHTML = `<span>${get.translation(`${identity}2`)}</span>`
-                td.addEventListener(lib.config.touchscreen ? "touchend" : "click", (e) => {
-                  const target = e.currentTarget
-                  if (_status.dragged) {
-                    return
-                  }
-                  if (_status.justdragged) {
-                    return
-                  }
-                  _status.tempNoButton = true
-                  setTimeout(() => {
-                    _status.tempNoButton = false
-                  }, 500)
-                  let link = target.link
-                  if (game.zhu) {
-                    if (link !== "random") {
-                      _status.event.parent.fixedseat = get.distance(game.me, game.zhu, "absolute")
-                    }
-                    if (game.zhu.name) {
-                      game.zhu.uninit()
-                    }
-                    delete game.zhu.isZhu
-                    delete game.zhu.identityShown
-                  }
-                  let current = target.parentNode.querySelector(".bluebg")
-                  if (current) {
-                    current.classList.remove("bluebg")
-                  }
-                  current = _status.cheat_seat || seats.querySelector(".bluebg")
-                  if (current) {
-                    current.classList.remove("bluebg")
-                  }
-                  if (link === "random") {
-                    if (event.zhongmode) {
-                      link = ["zhu", "zhong", "nei", "fan", "mingzhong"].randomGet()
-                    } else {
-                      const randomIdentities = ["zhu", "zhong", "nei", "fan"]
-                      if (get.config("enable_commoner") && !event.stratagemMode) {
-                        randomIdentities.push("commoner")
-                      }
-                      link = randomIdentities.randomGet()
-                    }
-                    for (const identityNode of target.parentNode.childNodes) {
-                      if (identityNode.link === link) {
-                        identityNode.classList.add("bluebg")
-                      }
-                    }
-                  } else {
-                    target.classList.add("bluebg")
-                  }
-                  num = get.config(`choice_${link}`)
-                  if (event.zhongmode) {
-                    num = 6
-                    if (link === "zhu" || link === "nei" || link === "mingzhong") {
-                      num = 8
-                    }
-                  }
-                  _status.event.parent.swapnodialog = (dialog, list) => {
-                    const buttons = ui.create.div(".buttons")
-                    const node = dialog.buttons[0].parentNode
-                    dialog.buttons = ui.create.buttons(list, "characterx", buttons)
-                    dialog.content.insertBefore(buttons, node)
-                    buttons.addTempClass("start")
-                    node.remove()
-                    game.uncheck()
-                    game.check()
-                    if (event.stratagemMode) {
+                td.addEventListener(
+                  lib.config.touchscreen ? "touchend" : "click",
+                  (e) => {
+                    const target = e.currentTarget
+                    if (_status.dragged) {
                       return
                     }
-                    for (const seatNode of seats.childNodes) {
-                      if (get.distance(game.zhu, game.me, "absolute") === seatNode.link) {
-                        seatNode.classList.add("bluebg")
-                      }
+                    if (_status.justdragged) {
+                      return
                     }
-                  }
-                  _status.event = _status.event.parent
-                  _status.event.step = 0
-                  _status.event.identity = link
-                  if (ui.selected.buttons.length > 0) {
-                    ui.selected.buttons.forEach((button) => {
-                      if (button && button.parentNode) {
-                        button.classList.remove("selected")
+                    _status.tempNoButton = true
+                    setTimeout(() => {
+                      _status.tempNoButton = false
+                    }, 500)
+                    let link = target.link
+                    if (game.zhu) {
+                      if (link !== "random") {
+                        _status.event.parent.fixedseat = get.distance(
+                          game.me,
+                          game.zhu,
+                          "absolute",
+                        )
                       }
-                    })
-                    ui.selected.buttons.length = 0
-                  }
-                  if (!event.stratagemMode) {
-                    const zhuIdentity = event.zhongmode ? "mingzhong" : "zhu"
-                    if (link === zhuIdentity) {
-                      seats.previousSibling.style.display = "none"
-                      seats.style.display = "none"
+                      if (game.zhu.name) {
+                        game.zhu.uninit()
+                      }
+                      delete game.zhu.isZhu
+                      delete game.zhu.identityShown
+                    }
+                    let current = target.parentNode.querySelector(".bluebg")
+                    if (current) {
+                      current.classList.remove("bluebg")
+                    }
+                    current =
+                      _status.cheat_seat || seats.querySelector(".bluebg")
+                    if (current) {
+                      current.classList.remove("bluebg")
+                    }
+                    if (link === "random") {
+                      if (event.zhongmode) {
+                        link = [
+                          "zhu",
+                          "zhong",
+                          "nei",
+                          "fan",
+                          "mingzhong",
+                        ].randomGet()
+                      } else {
+                        const randomIdentities = ["zhu", "zhong", "nei", "fan"]
+                        if (
+                          get.config("enable_commoner") &&
+                          !event.stratagemMode
+                        ) {
+                          randomIdentities.push("commoner")
+                        }
+                        link = randomIdentities.randomGet()
+                      }
+                      for (const identityNode of target.parentNode.childNodes) {
+                        if (identityNode.link === link) {
+                          identityNode.classList.add("bluebg")
+                        }
+                      }
                     } else {
-                      seats.previousSibling.style.display = ""
-                      seats.style.display = ""
+                      target.classList.add("bluebg")
                     }
-                  }
-                  game.resume()
-                })
+                    num = get.config(`choice_${link}`)
+                    if (event.zhongmode) {
+                      num = 6
+                      if (
+                        link === "zhu" ||
+                        link === "nei" ||
+                        link === "mingzhong"
+                      ) {
+                        num = 8
+                      }
+                    }
+                    _status.event.parent.swapnodialog = (dialog, list) => {
+                      const buttons = ui.create.div(".buttons")
+                      const node = dialog.buttons[0].parentNode
+                      dialog.buttons = ui.create.buttons(
+                        list,
+                        "characterx",
+                        buttons,
+                      )
+                      dialog.content.insertBefore(buttons, node)
+                      buttons.addTempClass("start")
+                      node.remove()
+                      game.uncheck()
+                      game.check()
+                      if (event.stratagemMode) {
+                        return
+                      }
+                      for (const seatNode of seats.childNodes) {
+                        if (
+                          get.distance(game.zhu, game.me, "absolute") ===
+                          seatNode.link
+                        ) {
+                          seatNode.classList.add("bluebg")
+                        }
+                      }
+                    }
+                    _status.event = _status.event.parent
+                    _status.event.step = 0
+                    _status.event.identity = link
+                    if (ui.selected.buttons.length > 0) {
+                      ui.selected.buttons.forEach((button) => {
+                        if (button?.parentNode) {
+                          button.classList.remove("selected")
+                        }
+                      })
+                      ui.selected.buttons.length = 0
+                    }
+                    if (!event.stratagemMode) {
+                      const zhuIdentity = event.zhongmode ? "mingzhong" : "zhu"
+                      if (link === zhuIdentity) {
+                        seats.previousSibling.style.display = "none"
+                        seats.style.display = "none"
+                      } else {
+                        seats.previousSibling.style.display = ""
+                        seats.style.display = ""
+                      }
+                    }
+                    game.resume()
+                  },
+                )
               }
               dialog.content.appendChild(table)
 
@@ -2166,8 +2317,14 @@ export default () => {
               seats.style.width = "100%"
               seats.style.position = "relative"
               const firstSeat = stratagemMode ? 1 : 2
-              for (let seatNumber = firstSeat; seatNumber <= game.players.length; seatNumber++) {
-                const td = ui.create.div(".shadowed.reduce_radius.pointerdiv.tdnode")
+              for (
+                let seatNumber = firstSeat;
+                seatNumber <= game.players.length;
+                seatNumber++
+              ) {
+                const td = ui.create.div(
+                  ".shadowed.reduce_radius.pointerdiv.tdnode",
+                )
                 td.innerHTML = get.cnNumber(seatNumber, true)
                 td.link = seatNumber - 1
                 seats.appendChild(td)
@@ -2177,41 +2334,50 @@ export default () => {
                 ) {
                   td.classList.add("bluebg")
                 }
-                td.addEventListener(lib.config.touchscreen ? "touchend" : "click", (e) => {
-                  const target = e.currentTarget
-                  if (_status.dragged) {
-                    return
-                  }
-                  if (_status.justdragged) {
-                    return
-                  }
-                  if (_status.cheat_seat) {
-                    _status.cheat_seat.classList.remove("bluebg")
-                    if (_status.cheat_seat === target) {
-                      delete _status.cheat_seat
+                td.addEventListener(
+                  lib.config.touchscreen ? "touchend" : "click",
+                  (e) => {
+                    const target = e.currentTarget
+                    if (_status.dragged) {
                       return
                     }
-                  }
-                  if (stratagemMode) {
+                    if (_status.justdragged) {
+                      return
+                    }
+                    if (_status.cheat_seat) {
+                      _status.cheat_seat.classList.remove("bluebg")
+                      if (_status.cheat_seat === target) {
+                        delete _status.cheat_seat
+                        return
+                      }
+                    }
+                    if (stratagemMode) {
+                      target.classList.add("bluebg")
+                      _status.cheat_seat = target
+                      return
+                    }
+                    if (
+                      get.distance(game.zhu, game.me, "absolute") ===
+                      target.link
+                    ) {
+                      return
+                    }
+                    const current = target.parentNode.querySelector(".bluebg")
+                    if (current) {
+                      current.classList.remove("bluebg")
+                    }
                     target.classList.add("bluebg")
-                    _status.cheat_seat = target
-                    return
-                  }
-                  if (get.distance(game.zhu, game.me, "absolute") === target.link) {
-                    return
-                  }
-                  const current = target.parentNode.querySelector(".bluebg")
-                  if (current) {
-                    current.classList.remove("bluebg")
-                  }
-                  target.classList.add("bluebg")
-                  for (const currentPlayer of game.players) {
-                    if (get.distance(currentPlayer, game.me, "absolute") === target.link) {
-                      game.swapSeat(game.zhu, currentPlayer, false)
-                      return
+                    for (const currentPlayer of game.players) {
+                      if (
+                        get.distance(currentPlayer, game.me, "absolute") ===
+                        target.link
+                      ) {
+                        game.swapSeat(game.zhu, currentPlayer, false)
+                        return
+                      }
                     }
-                  }
-                })
+                  },
+                )
               }
               dialog.content.appendChild(seats)
               if (!stratagemMode && game.me === game.zhu) {
@@ -2232,7 +2398,9 @@ export default () => {
               }
               dialog.style.height = ""
               delete dialog._scrollset
-              const settingNodes = Array.from(dialog.querySelectorAll(".add-setting"))
+              const settingNodes = Array.from(
+                dialog.querySelectorAll(".add-setting"),
+              )
               while (settingNodes.length) {
                 settingNodes.shift().remove()
               }
@@ -2246,7 +2414,8 @@ export default () => {
               identityList.remove(event.identity)
               identityList.unshift(event.identity)
               if (event.fixedseat) {
-                const zhuIdentity = _status.mode === "zhong" ? "mingzhong" : "zhu"
+                const zhuIdentity =
+                  _status.mode === "zhong" ? "mingzhong" : "zhu"
                 if (zhuIdentity !== event.identity) {
                   identityList.remove(zhuIdentity)
                   identityList.splice(event.fixedseat, 0, zhuIdentity)
@@ -2256,7 +2425,7 @@ export default () => {
               delete event.identity
             } else if (
               _status.mode !== "zhong" &&
-              (!_status.brawl || !_status.brawl.identityShown)
+              !_status.brawl?.identityShown
             ) {
               const banIdentity = []
               banIdentity.push(get.config("ban_identity") || "off")
@@ -2276,14 +2445,18 @@ export default () => {
                 }
                 const selectedIdentity = identityList2.randomGet()
                 identityList.remove(selectedIdentity)
-                identityList.splice(game.players.indexOf(game.me), 0, selectedIdentity)
+                identityList.splice(
+                  game.players.indexOf(game.me),
+                  0,
+                  selectedIdentity,
+                )
               }
             }
             let playerIndex = 0
             for (const currentPlayer of game.players) {
               const currentIdentity = identityList[playerIndex]
               playerIndex++
-              if (_status.brawl && _status.brawl.identityShown) {
+              if (_status.brawl?.identityShown) {
                 if (currentPlayer.identity === "zhu") {
                   game.zhu = currentPlayer
                 }
@@ -2317,8 +2490,12 @@ export default () => {
                 delete currentPlayer.special_identity
               }
               event.special_identity = []
-              const zhongs = game.filterPlayer((current) => current.identity === "zhong")
-              const fans = game.filterPlayer((current) => current.identity === "fan")
+              const zhongs = game.filterPlayer(
+                (current) => current.identity === "zhong",
+              )
+              const fans = game.filterPlayer(
+                (current) => current.identity === "fan",
+              )
               if (fans.length >= 1) {
                 fans.randomRemove().special_identity = "identity_zeishou"
                 event.special_identity.push("identity_zeishou")
@@ -2356,7 +2533,10 @@ export default () => {
               const replacements = lib.characterReplace[name]
               for (let index = replacements.length - 1; index >= 0; index--) {
                 const replacement = replacements[index]
-                if (chosen.includes(replacement) || lib.filter.characterDisabled(replacement)) {
+                if (
+                  chosen.includes(replacement) ||
+                  lib.filter.characterDisabled(replacement)
+                ) {
                   replacements.splice(index, 1)
                 }
               }
@@ -2406,12 +2586,15 @@ export default () => {
                 return list2.slice(0).sort(lib.sort.character)
               }
               if (limitZhu !== "group") {
-                const zhuCount = parseInt(limitZhu) || 6
+                const zhuCount = parseInt(limitZhu, 10) || 6
                 return list2.randomGets(zhuCount).sort(lib.sort.character)
               }
               const getGroup = (name) => {
                 const characterReplace = lib.characterReplace[name]
-                if (characterReplace && characterReplace[0] && lib.character[characterReplace[0]]) {
+                if (
+                  characterReplace?.[0] &&
+                  lib.character[characterReplace[0]]
+                ) {
                   return lib.character[characterReplace[0]][1]
                 }
                 return lib.character[name][1]
@@ -2434,8 +2617,12 @@ export default () => {
             event.list.randomSort()
             _status.characterlist = list4.slice(0).randomSort()
             list3.randomSort()
-            if (_status.brawl && _status.brawl.chooseCharacterFilter) {
-              _status.brawl.chooseCharacterFilter(event.list, getZhuList(), list3)
+            if (_status.brawl?.chooseCharacterFilter) {
+              _status.brawl.chooseCharacterFilter(
+                event.list,
+                getZhuList(),
+                list3,
+              )
             }
             num = get.config(`choice_${game.me.identity}`)
             if (event.zhongmode) {
@@ -2454,7 +2641,7 @@ export default () => {
               event.ai(game.zhu, event.list, getZhuList())
               event.list.remove(get.sourceCharacter(game.zhu.name1))
               event.list.remove(get.sourceCharacter(game.zhu.name2))
-              if (_status.brawl && _status.brawl.chooseCharacter) {
+              if (_status.brawl?.chooseCharacter) {
                 list = _status.brawl.chooseCharacter(event.list, num)
                 if (list === false || list === "nozhu") {
                   list = event.list.slice(0, num)
@@ -2463,7 +2650,7 @@ export default () => {
                 list = event.list.slice(0, num)
               }
             } else {
-              if (_status.brawl && _status.brawl.chooseCharacter) {
+              if (_status.brawl?.chooseCharacter) {
                 list = _status.brawl.chooseCharacter(getZhuList(), list3, num)
                 if (list === false) {
                   if (event.zhongmode) {
@@ -2490,19 +2677,21 @@ export default () => {
               delete event.swapnodialog
             } else {
               let str = "选择角色"
-              if (_status.brawl && _status.brawl.chooseCharacterStr) {
+              if (_status.brawl?.chooseCharacterStr) {
                 str = _status.brawl.chooseCharacterStr
               }
               dialog = ui.create.dialog(str, "hidden", [list, "characterx"])
               if (
-                (!_status.brawl || !_status.brawl.noAddSetting) &&
+                !_status.brawl?.noAddSetting &&
                 get.config("change_identity")
               ) {
                 addSetting(dialog)
               }
             }
             if (game.me.special_identity) {
-              dialog.setCaption(`选择角色（${get.translation(game.me.special_identity)}）`)
+              dialog.setCaption(
+                `选择角色（${get.translation(game.me.special_identity)}）`,
+              )
               game.me.node.identity.firstChild.innerHTML = get.translation(
                 `${game.me.special_identity}_bg`,
               )
@@ -2511,10 +2700,10 @@ export default () => {
               game.me.setIdentity()
             }
             if (!event.chosen.length) {
-              game.me.chooseButton(dialog, true).set("onfree", true).selectButton = () =>
-                (_status.brawl && _status.brawl.doubleCharacter) || get.config("double_character")
-                  ? 2
-                  : 1
+              game.me
+                .chooseButton(dialog, true)
+                .set("onfree", true).selectButton = () =>
+                _status.brawl?.doubleCharacter ? 2 : 1
             } else {
               lib.init.onfree()
             }
@@ -2529,7 +2718,7 @@ export default () => {
                 }
                 if (game.zhu !== game.me) {
                   event.list.randomSort()
-                  if (_status.brawl && _status.brawl.chooseCharacter) {
+                  if (_status.brawl?.chooseCharacter) {
                     list = _status.brawl.chooseCharacter(event.list, num)
                     if (list === false || list === "nozhu") {
                       list = event.list.slice(0, num)
@@ -2540,8 +2729,12 @@ export default () => {
                 } else {
                   getZhuList().sort(lib.sort.character)
                   list3.randomSort()
-                  if (_status.brawl && _status.brawl.chooseCharacter) {
-                    list = _status.brawl.chooseCharacter(getZhuList(), list3, num)
+                  if (_status.brawl?.chooseCharacter) {
+                    list = _status.brawl.chooseCharacter(
+                      getZhuList(),
+                      list3,
+                      num,
+                    )
                     if (list === false) {
                       if (event.zhongmode) {
                         list = list3.slice(0, 6)
@@ -2562,7 +2755,11 @@ export default () => {
                 }
                 const buttons = ui.create.div(".buttons")
                 const node = _status.event.dialog.buttons[0].parentNode
-                _status.event.dialog.buttons = ui.create.buttons(list, "characterx", buttons)
+                _status.event.dialog.buttons = ui.create.buttons(
+                  list,
+                  "characterx",
+                  buttons,
+                )
                 _status.event.dialog.content.insertBefore(buttons, node)
                 buttons.addTempClass("start")
                 node.remove()
@@ -2620,7 +2817,7 @@ export default () => {
                 ui.cheat2.classList.add("disabled")
               }
             }
-            if (!_status.brawl || !_status.brawl.chooseCharacterFixed) {
+            if (!_status.brawl?.chooseCharacterFixed) {
               if (!ui.cheat && get.config("change_choice")) {
                 ui.create.cheat()
               }
@@ -2650,7 +2847,10 @@ export default () => {
               event.choosed = event.modchosen
             } else if (result.buttons.length === 2) {
               event.choosed = [result.buttons[0].link, result.buttons[1].link]
-              game.addRecentCharacter(result.buttons[0].link, result.buttons[1].link)
+              game.addRecentCharacter(
+                result.buttons[0].link,
+                result.buttons[1].link,
+              )
             } else {
               event.choosed = [result.buttons[0].link]
               game.addRecentCharacter(result.buttons[0].link)
@@ -2664,7 +2864,13 @@ export default () => {
             if (groups.length) {
               const groupResult = await game.me
                 .chooseButton(
-                  ["请选择你的势力", [groups.map((group) => ["", "", `group_${group}`]), "vcard"]],
+                  [
+                    "请选择你的势力",
+                    [
+                      groups.map((group) => ["", "", `group_${group}`]),
+                      "vcard",
+                    ],
+                  ],
                   true,
                 )
                 .set("direct", true)
@@ -2699,7 +2905,10 @@ export default () => {
                 event.list.randomSort()
                 event.ai(
                   currentPlayer,
-                  event.list.splice(0, get.config(`choice_${currentPlayer.identity}`)),
+                  event.list.splice(
+                    0,
+                    get.config(`choice_${currentPlayer.identity}`),
+                  ),
                   null,
                   event.list,
                 )
@@ -2719,9 +2928,11 @@ export default () => {
               _status.characterlist.remove(currentPlayer.name2)
             }
             if (event.stratagemMode) {
-              ;["stratagem_gain", "stratagem_insight", "stratagem_expose"].forEach((globalSkill) =>
-                game.addGlobalSkill(globalSkill),
-              )
+              ;[
+                "stratagem_gain",
+                "stratagem_insight",
+                "stratagem_expose",
+              ].forEach((globalSkill) => game.addGlobalSkill(globalSkill))
               game.players.forEach((i) => {
                 i.storage.zhibi = []
                 i.storage.stratagem_expose = []
@@ -2748,7 +2959,8 @@ export default () => {
         if (_status.mode === "purple") {
           game.chooseCharacterPurpleOL()
           return
-        } else if (_status.mode === "stratagem") {
+        }
+        if (_status.mode === "stratagem") {
           game.chooseCharacterStratagemOL()
           return
         }
@@ -2763,7 +2975,16 @@ export default () => {
             let identityList
             if (_status.mode === "zhong") {
               event.zhongmode = true
-              identityList = ["zhu", "zhong", "mingzhong", "nei", "fan", "fan", "fan", "fan"]
+              identityList = [
+                "zhu",
+                "zhong",
+                "mingzhong",
+                "nei",
+                "fan",
+                "fan",
+                "fan",
+                "fan",
+              ]
             } else {
               identityList = get.identityList(game.players.length)
             }
@@ -2786,10 +3007,18 @@ export default () => {
               }
               currentPlayer.identityShown = false
             }
-            if (lib.configOL.special_identity && !event.zhongmode && game.players.length === 8) {
+            if (
+              lib.configOL.special_identity &&
+              !event.zhongmode &&
+              game.players.length === 8
+            ) {
               const map = {}
-              const zhongs = game.filterPlayer((current) => current.identity === "zhong")
-              const fans = game.filterPlayer((current) => current.identity === "fan")
+              const zhongs = game.filterPlayer(
+                (current) => current.identity === "zhong",
+              )
+              const fans = game.filterPlayer(
+                (current) => current.identity === "fan",
+              )
               if (fans.length >= 1) {
                 map.identity_zeishou = fans.randomRemove()
               }
@@ -2878,7 +3107,10 @@ export default () => {
               const replacements = lib.characterReplace[name]
               for (let index = replacements.length - 1; index >= 0; index--) {
                 const replacement = replacements[index]
-                if (!libCharacter[replacement] || lib.filter.characterDisabled(replacement)) {
+                if (
+                  !libCharacter[replacement] ||
+                  lib.filter.characterDisabled(replacement)
+                ) {
                   replacements.splice(index, 1)
                 }
               }
@@ -2933,7 +3165,7 @@ export default () => {
                   return zhuList.slice(0).sort(lib.sort.character)
                 }
                 if (limitZhu !== "group") {
-                  const zhuCount = parseInt(limitZhu) || 6
+                  const zhuCount = parseInt(limitZhu, 10) || 6
                   return zhuList.randomGets(zhuCount).sort(lib.sort.character)
                 }
                 const getGroup = (name) => {
@@ -2957,11 +3189,16 @@ export default () => {
                 zhuListUnique.sort(lib.sort.character)
                 return zhuListUnique
               }
-              list = getZhuList(list2).concat(list3.randomGets(lib.configOL.choice_zhu))
+              list = getZhuList(list2).concat(
+                list3.randomGets(lib.configOL.choice_zhu),
+              )
             }
             const chooseButtonEvent = game.zhu.chooseButton(true)
-            chooseButtonEvent.set("selectButton", lib.configOL.double_character ? 2 : 1)
-            chooseButtonEvent.set("createDialog", ["选择角色", [list, "characterx"]])
+            chooseButtonEvent.set("selectButton", 1)
+            chooseButtonEvent.set("createDialog", [
+              "选择角色",
+              [list, "characterx"],
+            ])
             chooseButtonEvent.set("ai", () => Math.random())
           },
           // "step 1"
@@ -3003,7 +3240,13 @@ export default () => {
             if (groups.length) {
               const groupResult = await game.zhu
                 .chooseButton(
-                  ["请选择你的势力", [groups.map((group) => ["", "", `group_${group}`]), "vcard"]],
+                  [
+                    "请选择你的势力",
+                    [
+                      groups.map((group) => ["", "", `group_${group}`]),
+                      "vcard",
+                    ],
+                  ],
                   true,
                 )
                 .set("ai", () => Math.random())
@@ -3017,9 +3260,11 @@ export default () => {
           // step 2
           async (event, trigger, player) => {
             const list = []
-            const selectButton = lib.configOL.double_character ? 2 : 1
+            const selectButton = 1
 
-            const num = Math.floor(event.list.length / (game.players.length - 1))
+            const num = Math.floor(
+              event.list.length / (game.players.length - 1),
+            )
             for (const currentPlayer of game.players) {
               if (currentPlayer === game.zhu) {
                 continue
@@ -3041,7 +3286,10 @@ export default () => {
               }
               list.push([
                 currentPlayer,
-                [str, [event.list.randomRemove(Math.min(num, num2)), "characterx"]],
+                [
+                  str,
+                  [event.list.randomRemove(Math.min(num, num2)), "characterx"],
+                ],
                 selectButton,
                 true,
               ])
@@ -3056,7 +3304,7 @@ export default () => {
           async (event, trigger, player, result) => {
             let shen = []
             for (const id in result) {
-              if (result[id] && result[id].links) {
+              if (result[id]?.links) {
                 for (const link of result[id].links) {
                   event.list2.remove(get.sourceCharacter(link))
                 }
@@ -3064,15 +3312,13 @@ export default () => {
             }
             for (const id in result) {
               if (result[id] === "ai") {
-                result[id] = event.list2
-                  .randomRemove(lib.configOL.double_character ? 2 : 1)
-                  .map((name) => {
-                    const listx = lib.characterReplace[name]
-                    if (listx && listx.length) {
-                      return listx.randomGet()
-                    }
-                    return name
-                  })
+                result[id] = event.list2.randomRemove(1).map((name) => {
+                  const listx = lib.characterReplace[name]
+                  if (listx?.length) {
+                    return listx.randomGet()
+                  }
+                  return name
+                })
               } else {
                 result[id] = result[id].links
               }
@@ -3084,17 +3330,29 @@ export default () => {
             if (shen.length) {
               shen = shen.map((currentPlayer) => {
                 const name = result[currentPlayer.playerid][0]
-                const groups = get.selectGroup(name).map((group) => ["", "", `group_${group}`])
+                const groups = get
+                  .selectGroup(name)
+                  .map((group) => ["", "", `group_${group}`])
                 const type = get.selectGroup(name, true)
                 if (type !== "default") {
                   currentPlayer._groupChosen = type
                 }
-                return [currentPlayer, ["请选择你的势力", [groups, "vcard"]], 1, true, "direct"]
+                return [
+                  currentPlayer,
+                  ["请选择你的势力", [groups, "vcard"]],
+                  1,
+                  true,
+                  "direct",
+                ]
               })
               game.me
                 .chooseButtonOL(shen, (player, result) => {
                   if (player === game.me) {
-                    player.changeGroup(result.links[0][2].slice(6), false, false)
+                    player.changeGroup(
+                      result.links[0][2].slice(6),
+                      false,
+                      false,
+                    )
                   }
                 })
                 .set("switchToAuto", () => {
@@ -3114,15 +3372,24 @@ export default () => {
               result = {}
             }
             for (const id in result) {
-              if (result[id] && result[id].links) {
+              if (result[id]?.links) {
                 result[id] = result[id].links[0][2].slice(6)
               } else if (result[id] === "ai") {
                 result[id] = (() => {
                   const currentPlayer = lib.playerOL[id]
-                  const groups = ["wei", "shu", "wu", "qun", "jin", "key"].filter((group) =>
-                    lib.group.includes(group),
-                  )
-                  if (_status.mode === "zhong" || !game.zhu || !game.zhu.group) {
+                  const groups = [
+                    "wei",
+                    "shu",
+                    "wu",
+                    "qun",
+                    "jin",
+                    "key",
+                  ].filter((group) => lib.group.includes(group))
+                  if (
+                    _status.mode === "zhong" ||
+                    !game.zhu ||
+                    !game.zhu.group
+                  ) {
                     return groups.randomGet()
                   }
                   if (
@@ -3190,7 +3457,7 @@ export default () => {
                   if (!lib.playerOL[id].name) {
                     lib.playerOL[id].init(result[id][0], result[id][1])
                   }
-                  if (result2[id] && result2[id].length) {
+                  if (result2[id]?.length) {
                     lib.playerOL[id].changeGroup(result2[id], false, false)
                   }
                 }
@@ -3206,7 +3473,7 @@ export default () => {
               if (!lib.playerOL[id].name) {
                 lib.playerOL[id].init(result2[id][0], result2[id][1])
               }
-              if (result[id] && result[id].length) {
+              if (result[id]?.length) {
                 lib.playerOL[id].changeGroup(result[id], false, false)
               }
             }
@@ -3320,10 +3587,14 @@ export default () => {
          * @returns {Player}
          */
         addExpose(num) {
-          if (!game.zhu || !game.zhu.isZhu || !game.zhu.identityShown) {
+          if (!game.zhu?.isZhu || !game.zhu.identityShown) {
             return this
           }
-          if (typeof this.ai.shown == "number" && !this.identityShown && this.ai.shown < 1) {
+          if (
+            typeof this.ai.shown === "number" &&
+            !this.identityShown &&
+            this.ai.shown < 1
+          ) {
             this.ai.shown += num
             if (this.ai.shown > 0.95) {
               this.ai.shown = 0.95
@@ -3398,7 +3669,10 @@ export default () => {
                 if (this.identity.slice(0, 1) !== source.identity.slice(0, 1)) {
                   source.recover()
                 }
-              } else if (this.identity === "rZhong" || this.identity === "bZhong") {
+              } else if (
+                this.identity === "rZhong" ||
+                this.identity === "bZhong"
+              ) {
                 if (this.identity.slice(0, 1) !== source.identity.slice(0, 1)) {
                   source.draw(2)
                 } else if (source.identity.indexOf("Zhu") === 1) {
@@ -3418,7 +3692,8 @@ export default () => {
                   const player = game.findPlayer(
                     (current) =>
                       current !== game.me &&
-                      (current.identity === "bYe" || current.identity === "rYe"),
+                      (current.identity === "bYe" ||
+                        current.identity === "rYe"),
                   )
                   if (player) {
                     player.showIdentity()
@@ -3461,10 +3736,16 @@ export default () => {
                 player.identityShown = true
                 player.node.identity.classList.remove("guessing")
                 if (identity) {
-                  player.node.identity.firstChild.innerHTML = get.translation(`${identity}_bg`)
+                  player.node.identity.firstChild.innerHTML = get.translation(
+                    `${identity}_bg`,
+                  )
                   game.log(player, "的身份是", `#g${get.translation(identity)}`)
                 } else {
-                  game.log(player, "的身份是", `#g${get.translation(`${identity2}2`)}`)
+                  game.log(
+                    player,
+                    "的身份是",
+                    `#g${get.translation(`${identity2}2`)}`,
+                  )
                 }
               },
               this,
@@ -3501,8 +3782,7 @@ export default () => {
             return
           }
           if (
-            game.zhu &&
-            game.zhu.isZhu &&
+            game.zhu?.isZhu &&
             (get.population("zhong") + get.population("nei") === 0 ||
               get.population("zhong") + get.population("fan") === 0) &&
             get.population("commoner") === 0
@@ -3512,8 +3792,7 @@ export default () => {
                 game.showIdentity()
               }
               if (
-                game.zhu &&
-                game.zhu.isAlive() &&
+                game.zhu?.isAlive() &&
                 get.population("nei") === 1 &&
                 get.config("nei_fullscreenpop")
               ) {
@@ -3527,8 +3806,7 @@ export default () => {
             })
           }
           if (
-            game.zhu &&
-            game.zhu.storage.enhance_zhu &&
+            game.zhu?.storage.enhance_zhu &&
             !game.zhu.storage.enhance_zhu.startsWith("sixiang_") &&
             get.population("fan") < 3
           ) {
@@ -3542,13 +3820,15 @@ export default () => {
               game.zhu.ai.shown = 1
               game.zhu.setIdentity()
               game.zhu.isZhu = true
-              const skills = player.getStockSkills(true, true).filter((skill) => {
-                if (player.hasSkill(skill)) {
-                  return false
-                }
-                const info = get.info(skill)
-                return info && info.zhuSkill
-              })
+              const skills = player
+                .getStockSkills(true, true)
+                .filter((skill) => {
+                  if (player.hasSkill(skill)) {
+                    return false
+                  }
+                  const info = get.info(skill)
+                  return info?.zhuSkill
+                })
               if (skills.length) {
                 player.addSkills(skills)
               }
@@ -3557,7 +3837,10 @@ export default () => {
                 game.zhu.$legend()
               }
               delete game.zhong
-              if (_status.clickingidentity && _status.clickingidentity[0] === game.zhu) {
+              if (
+                _status.clickingidentity &&
+                _status.clickingidentity[0] === game.zhu
+              ) {
                 for (const node of _status.clickingidentity[1]) {
                   node.delete()
                   node.style.transform = ""
@@ -3573,10 +3856,13 @@ export default () => {
             let giveup
             if (get.population("fan") + get.population("nei") === 1) {
               giveup = game.players.find(
-                (current) => current.identity === "fan" || current.identity === "nei",
+                (current) =>
+                  current.identity === "fan" || current.identity === "nei",
               )
             } else if (
-              get.population("zhong") + get.population("mingzhong") + get.population("nei") ===
+              get.population("zhong") +
+                get.population("mingzhong") +
+                get.population("nei") ===
               0
             ) {
               giveup = game.zhu
@@ -3596,28 +3882,28 @@ export default () => {
          * @param { Card | VCard } card - 触发暴露判断的牌或技能。
          */
         logAi(targets, card) {
-          if (this.ai.shown == 1 || this.isMad()) {
+          if (this.ai.shown === 1 || this.isMad()) {
             return
           }
-          const stratagemMode = get.mode() == "identity" && _status.mode == "stratagem"
-          if (stratagemMode && (!game.zhu || !game.zhu.isZhu || !game.zhu.identityShown)) {
+          const stratagemMode =
+            get.mode() === "identity" && _status.mode === "stratagem"
+          if (stratagemMode && (!game.zhu?.isZhu || !game.zhu.identityShown)) {
             return
           }
-          if (typeof targets == "number") {
+          if (typeof targets === "number") {
             this.ai.shown += targets
           } else {
             let effect = 0
             const info = get.info(card)
-            if (info.ai && info.ai.expose) {
-              if (_status.event.name != "_wuxie" || card.name != "wuxie") {
+            if (info.ai?.expose) {
+              if (_status.event.name !== "_wuxie" || card.name !== "wuxie") {
                 this.ai.shown += info.ai.expose
               } else {
                 const infomap = _status.event._info_map
                 if (
                   infomap &&
-                  this != infomap.target &&
-                  infomap.player &&
-                  infomap.player.ai.shown
+                  this !== infomap.target &&
+                  infomap.player?.ai.shown
                 ) {
                   this.ai.shown += 0.2
                 }
@@ -3626,7 +3912,7 @@ export default () => {
             for (const target of targets) {
               const shown = Math.abs(target.ai.shown)
               let coefficient = 1
-              if (shown < 0.2 || target.identity == "nei") {
+              if (shown < 0.2 || target.identity === "nei") {
                 coefficient = 0
               } else if (shown < 0.4) {
                 coefficient = 0.5
@@ -3636,30 +3922,30 @@ export default () => {
               const eff = get.effect(target, card, this)
               effect += eff * coefficient
               if (
-                eff == 0 &&
-                shown == 0 &&
+                eff === 0 &&
+                shown === 0 &&
                 ["zhong", "rZhong", "bZhong"].includes(this.identity) &&
-                target != this
+                target !== this
               ) {
                 effect += 0.1
               }
             }
-            const targetsSelfOnly = targets.length == 1 && targets[0] == this
+            const targetsSelfOnly = targets.length === 1 && targets[0] === this
             if (effect > 0 && !targetsSelfOnly) {
               const coefficient = effect < 1 ? 0.5 : 1
-              const expose = targets.length == 1 ? 0.2 : 0.1
+              const expose = targets.length === 1 ? 0.2 : 0.1
               this.ai.shown += expose * coefficient
             } else if (
               effect < 0 &&
               !targetsSelfOnly &&
-              this == game.me &&
+              this === game.me &&
               ["nei", "commoner", "rYe", "bYe"].includes(game.me.identity)
             ) {
-              const expose = targets.length == 1 ? 0.2 : 0.1
+              const expose = targets.length === 1 ? 0.2 : 0.1
               this.ai.shown -= expose
             }
           }
-          if (!stratagemMode && this != game.me) {
+          if (!stratagemMode && this !== game.me) {
             this.ai.shown *= 2
           }
           if (this.ai.shown > 0.95) {
@@ -3668,7 +3954,7 @@ export default () => {
           if (this.ai.shown < -0.5) {
             this.ai.shown = -0.5
           }
-          if (_status.mode == "purple") {
+          if (_status.mode === "purple") {
             return
           }
           if (stratagemMode) {
@@ -3677,10 +3963,14 @@ export default () => {
 
           const marknow =
             !_status.connectMode &&
-            this != game.me &&
+            this !== game.me &&
             get.config("auto_mark_identity") &&
-            this.ai.identity_mark != "finished"
-          if (marknow && _status.clickingidentity && _status.clickingidentity[0] == this) {
+            this.ai.identity_mark !== "finished"
+          if (
+            marknow &&
+            _status.clickingidentity &&
+            _status.clickingidentity[0] === this
+          ) {
             for (const identityNode of _status.clickingidentity[1]) {
               identityNode.delete()
               identityNode.style.transform = ""
@@ -3692,18 +3982,19 @@ export default () => {
           }
           let effect = 0
           let zhu = game.zhu
-          if (_status.mode == "zhong" && !game.zhu.isZhu) {
+          if (_status.mode === "zhong" && !game.zhu.isZhu) {
             zhu = game.zhong
           }
-          const targetsSelfOnly = targets.length == 1 && targets[0] == this
-          const hiddenIdentity = this.identity == "nei" || this.identity == "commoner"
+          const targetsSelfOnly = targets.length === 1 && targets[0] === this
+          const hiddenIdentity =
+            this.identity === "nei" || this.identity === "commoner"
           if (!targetsSelfOnly && !hiddenIdentity && this.ai.shown > 0) {
-            effect = this.identity == "fan" ? -1 : 1
+            effect = this.identity === "fan" ? -1 : 1
           } else if (!targetsSelfOnly && hiddenIdentity) {
             for (const target of targets) {
               const shown = Math.abs(target.ai.shown)
               let coefficient = 1
-              if (shown < 0.2 || target.identity == "nei") {
+              if (shown < 0.2 || target.identity === "nei") {
                 coefficient = 0
               } else if (shown < 0.4) {
                 coefficient = 0.5
@@ -3717,10 +4008,10 @@ export default () => {
             if (!marknow) {
               return
             }
-            if (effect > 0 && this.identity != "fan") {
+            if (effect > 0 && this.identity !== "fan") {
               this.setIdentity("zhong")
               this.ai.identity_mark = "finished"
-            } else if (effect < 0 && this.identity == "fan") {
+            } else if (effect < 0 && this.identity === "fan") {
               this.setIdentity("fan")
               this.ai.identity_mark = "finished"
             }
@@ -3733,9 +4024,9 @@ export default () => {
             this.ai.identity_mark = identity || "finished"
           }
           if (effect > 0) {
-            markIdentity(this.ai.identity_mark == "fan" ? undefined : "zhong")
+            markIdentity(this.ai.identity_mark === "fan" ? undefined : "zhong")
           } else if (effect < 0 && get.population("fan") > 0) {
-            markIdentity(this.ai.identity_mark == "zhong" ? undefined : "fan")
+            markIdentity(this.ai.identity_mark === "zhong" ? undefined : "fan")
           }
         },
         /**
@@ -3750,7 +4041,9 @@ export default () => {
           this.ai.shown = 1
           this.setIdentity()
           if (this.special_identity) {
-            this.node.identity.firstChild.innerHTML = get.translation(`${this.special_identity}_bg`)
+            this.node.identity.firstChild.innerHTML = get.translation(
+              `${this.special_identity}_bg`,
+            )
           }
           if (this.identity === "zhu") {
             this.isZhu = true
@@ -3780,7 +4073,10 @@ export default () => {
             if (!zhibi.includes(target)) {
               zhibi.push(target)
             }
-            const insightResult = (event.insightResult = get.insightResult(player, target))
+            const insightResult = (event.insightResult = get.insightResult(
+              player,
+              target,
+            ))
             event.videoId = lib.status.videoId++
 
             const send = (clientTarget, clientInsightResult, id) => {
@@ -3815,7 +4111,7 @@ export default () => {
             }
             game.broadcastAll(
               (clientPlayer, clientTarget, id) => {
-                if (clientPlayer != game.me) {
+                if (clientPlayer !== game.me) {
                   ui.create.dialog(
                     `${get.translation(clientPlayer)}正在洞察${get.translation(clientTarget)}的阵营...<br>`,
                   ).videoId = id
@@ -3861,7 +4157,9 @@ export default () => {
                 return
               }
               const classList = clientTarget.classList
-              if (classList.contains("flash-animation-iteration-count-infinite")) {
+              if (
+                classList.contains("flash-animation-iteration-count-infinite")
+              ) {
                 classList.remove("flash-animation-iteration-count-infinite")
               }
             }
@@ -3874,7 +4172,10 @@ export default () => {
         ],
         async stratagemCamouflage(event) {
           const targets = game.players
-            .filter((current) => current.identity == "fan" && !current.ai.stratagemCamouflage)
+            .filter(
+              (current) =>
+                current.identity === "fan" && !current.ai.stratagemCamouflage,
+            )
             .randomGets(Math.max(Math.round(get.population() / 6), 1))
 
           for (const target of targets) {
@@ -3906,7 +4207,9 @@ export default () => {
             }
             choosing = me.chooseControl("ok").set("dialog", dialog)
           }
-          for (const current of game.filterPlayer((current) => current === "nei")) {
+          for (const current of game.filterPlayer(
+            (current) => current === "nei",
+          )) {
             const storage = current.storage
             storage.zhibi ??= []
             storage.zhibi.addArray(targets)
@@ -3917,7 +4220,10 @@ export default () => {
           }
 
           for (const current of targets) {
-            if (game.me.identity == "nei" && get.config("nei_auto_mark_camouflage")) {
+            if (
+              game.me.identity === "nei" &&
+              get.config("nei_auto_mark_camouflage")
+            ) {
               current.setIdentity()
             }
             current.unprompt()
@@ -3926,7 +4232,9 @@ export default () => {
               continue
             }
             const classList = current.classList
-            if (classList.contains("flash-animation-iteration-count-infinite")) {
+            if (
+              classList.contains("flash-animation-iteration-count-infinite")
+            ) {
               classList.remove("flash-animation-iteration-count-infinite")
             }
           }
@@ -3936,7 +4244,7 @@ export default () => {
             const send = (clientCamouflaged, id, online) => {
               const me = game.me
               let choosing
-              if (me.identity == "nei") {
+              if (me.identity === "nei") {
                 const storage = me.storage
                 storage.zhibi ??= []
                 storage.zhibi.addArray(clientCamouflaged)
@@ -3969,13 +4277,18 @@ export default () => {
               return choosing
             }
             const camouflaged = (event.targets = game.players
-              .filter((current) => current.identity == "fan" && !current.ai.stratagemCamouflage)
+              .filter(
+                (current) =>
+                  current.identity === "fan" && !current.ai.stratagemCamouflage,
+              )
               .randomGets(Math.max(Math.round(get.population() / 6), 1)))
-            camouflaged.forEach((current) => (current.ai.stratagemCamouflage = true))
+            camouflaged.forEach(
+              (current) => (current.ai.stratagemCamouflage = true),
+            )
             event.videoId = lib.status.videoId++
             let time = 10000
-            if (lib.configOL && lib.configOL.choose_timeout) {
-              time = parseInt(lib.configOL.choose_timeout) * 1000
+            if (lib.configOL?.choose_timeout) {
+              time = parseInt(lib.configOL.choose_timeout, 10) * 1000
             }
             const aiTargets = (event.aiTargets = [])
             let localChoosing
@@ -3983,17 +4296,17 @@ export default () => {
               current.showTimer(time)
               if (current.isOnline()) {
                 current.send(send, camouflaged, event.videoId, true)
-                if (current.identity == "nei") {
+                if (current.identity === "nei") {
                   current.wait()
                   event.withOL = true
                 }
                 return
               }
               const me = game.me
-              if (current == me) {
+              if (current === me) {
                 event.withMe = true
                 localChoosing = send(camouflaged, event.videoId)
-                if (me.identity == "nei") {
+                if (me.identity === "nei") {
                   me.wait()
                 } else {
                   event._result = {
@@ -4003,7 +4316,7 @@ export default () => {
                 }
                 return
               }
-              if (current.identity == "nei") {
+              if (current.identity === "nei") {
                 aiTargets.push(current)
               }
             })
@@ -4056,7 +4369,9 @@ export default () => {
                   return
                 }
                 const classList = victim.classList
-                if (classList.contains("flash-animation-iteration-count-infinite")) {
+                if (
+                  classList.contains("flash-animation-iteration-count-infinite")
+                ) {
                   classList.remove("flash-animation-iteration-count-infinite")
                 }
               })
@@ -4067,7 +4382,7 @@ export default () => {
                 return
               }
               const me = game.me
-              if (current == me && me.identity == "nei") {
+              if (current === me && me.identity === "nei") {
                 afterCamouflage(targets)
               }
             })
@@ -4103,7 +4418,7 @@ export default () => {
           if (
             from === to ||
             to.identityShown ||
-            (from.storage.zhibi && from.storage.zhibi.includes(to)) ||
+            from.storage.zhibi?.includes(to) ||
             (_status.yeconfirm &&
               ["rYe", "bYe"].includes(to.identity) &&
               ["rYe", "bYe"].includes(to.identity))
@@ -4112,7 +4427,8 @@ export default () => {
           }
           return (
             (to.ai.shown + 0.1) * real +
-            (from.identity.slice(0, 1) === to.identity.slice(0, 1) ? 3 : -3) * (1 - to.ai.shown)
+            (from.identity.slice(0, 1) === to.identity.slice(0, 1) ? 3 : -3) *
+              (1 - to.ai.shown)
           )
         }
         if (_status.mode === "stratagem") {
@@ -4141,7 +4457,9 @@ export default () => {
                 (from.identity === to.identity ||
                 (from.identity === "zhu" && to.identity === "zhong") ||
                 (from.identity === "zhong" && to.identity === "zhu") ||
-                (from.identity === "nei" && to.identity === "zhu" && get.situation() <= 1) ||
+                (from.identity === "nei" &&
+                  to.identity === "zhu" &&
+                  get.situation() <= 1) ||
                 (to.identity === "nei" &&
                   get.situation() <= 0 &&
                   ["zhu", "zhong"].includes(from.identity)) ||
@@ -4153,7 +4471,7 @@ export default () => {
           if (
             from === to ||
             to.identityShown ||
-            (((stratagemExpose && stratagemExpose.includes(to)) || (zhibi && zhibi.includes(to))) &&
+            ((stratagemExpose?.includes(to) || zhibi?.includes(to)) &&
               !to.ai.stratagemCamouflage)
           ) {
             return real * 1.1
@@ -4172,8 +4490,7 @@ export default () => {
               if (
                 from.storage.zhibi.includes(current) &&
                 current.ai.stratagemCamouflage &&
-                from.storage.stratagem_expose &&
-                from.storage.stratagem_expose.includes(to)
+                from.storage.stratagem_expose?.includes(to)
               ) {
                 return -7
               }
@@ -4191,14 +4508,19 @@ export default () => {
               .map((current) => current.identity)
               .reduce(
                 (previous, current) =>
-                  !previous.includes(current) ? previous.push(current) && previous : previous,
+                  !previous.includes(current)
+                    ? previous.push(current) && previous
+                    : previous,
                 [],
               ).length === 1
           ) {
             return real
           }
           for (const fan of game.dead) {
-            if (fan.identity !== "fan" || !fan.storage.stratagem_revitalization) {
+            if (
+              fan.identity !== "fan" ||
+              !fan.storage.stratagem_revitalization
+            ) {
               continue
             }
             for (const current of fan.storage.stratagem_expose) {
@@ -4210,29 +4532,21 @@ export default () => {
           if (from.identity === "fan" && to.identity === "fan") {
             if (from.ai.stratagemCamouflage) {
               const zhu =
-                game.zhu && game.zhu.isZhu && game.zhu.identityShown ? game.zhu : undefined
-              if (
-                zhu &&
-                zhu.storage.stratagem_expose &&
-                zhu.storage.stratagem_expose.includes(to)
-              ) {
+                game.zhu?.isZhu && game.zhu.identityShown ? game.zhu : undefined
+              if (zhu?.storage.stratagem_expose?.includes(to)) {
                 return 0
               }
-              if (zhibi && zhibi.includes(to)) {
+              if (zhibi?.includes(to)) {
                 return -7
               }
             }
             if (to.ai.stratagemCamouflage) {
               const zhu =
-                game.zhu && game.zhu.isZhu && game.zhu.identityShown ? game.zhu : undefined
-              if (
-                zhu &&
-                zhu.storage.stratagem_expose &&
-                zhu.storage.stratagem_expose.includes(to)
-              ) {
+                game.zhu?.isZhu && game.zhu.identityShown ? game.zhu : undefined
+              if (zhu?.storage.stratagem_expose?.includes(to)) {
                 return 0
               }
-              if (zhibi && zhibi.includes(to)) {
+              if (zhibi?.includes(to)) {
                 return -7
               }
             }
@@ -4273,7 +4587,10 @@ export default () => {
                 continue
               }
               for (const to3 of to2.storage.stratagem_expose) {
-                if (!zhibi.slice().addArray(stratagemExpose).includes(to3) && to === to3) {
+                if (
+                  !zhibi.slice().addArray(stratagemExpose).includes(to3) &&
+                  to === to3
+                ) {
                   return get.rawAttitude(to3, to) * Math.sign(real)
                 }
               }
@@ -4283,7 +4600,9 @@ export default () => {
             -1,
             Math.min(
               -0.1,
-              (-Math.min(5, to.countCards("hes") / 2 + 1) / 5 - Math.max(0, 5 - to.hp) / 4) / 2,
+              (-Math.min(5, to.countCards("hes") / 2 + 1) / 5 -
+                Math.max(0, 5 - to.hp) / 4) /
+                2,
             ),
           )
         }
@@ -4297,7 +4616,7 @@ export default () => {
           to.identityShown ||
           from.storage.dongcha === to ||
           to.identityShown ||
-          (from.storage.zhibi && from.storage.zhibi.includes(to))
+          from.storage.zhibi?.includes(to)
         ) {
           return get.realAttitude(from, to) + difficulty * 1.5
         }
@@ -4320,10 +4639,18 @@ export default () => {
           (to.ai.identity_mark === "fan" || to.ai.identity_mark === "zhong")
         ) {
           aishown = 0.5
-        } else if (aishown === 0 && to.identity !== "fan" && to.identity !== "zhu") {
+        } else if (
+          aishown === 0 &&
+          to.identity !== "fan" &&
+          to.identity !== "zhu"
+        ) {
           let fanshown = true
           for (const current of game.players) {
-            if (current.identity === "fan" && current.ai.shown === 0 && current !== from) {
+            if (
+              current.identity === "fan" &&
+              current.ai.shown === 0 &&
+              current !== from
+            ) {
               fanshown = false
               break
             }
@@ -4443,7 +4770,9 @@ export default () => {
                     get.population("nei") === 1 &&
                     game.players.length === 3
                   ) {
-                    const fan = game.players.find((current) => current.identity === "fan")
+                    const fan = game.players.find(
+                      (current) => current.identity === "fan",
+                    )
                     if (
                       fan &&
                       to.hp > 1 &&
@@ -4465,7 +4794,9 @@ export default () => {
                     get.population("nei") === 1 &&
                     game.players.length === 3
                   ) {
-                    const nei = game.players.find((current) => current.identity === "nei")
+                    const nei = game.players.find(
+                      (current) => current.identity === "nei",
+                    )
                     if (
                       nei &&
                       nei.hp > 1 &&
@@ -4494,7 +4825,10 @@ export default () => {
                   }
                   return 4
                 case "nei":
-                  if (get.population("fan") === 0 && get.population("zhong") === 1) {
+                  if (
+                    get.population("fan") === 0 &&
+                    get.population("zhong") === 1
+                  ) {
                     return -2
                   }
                   if (get.population("zhong") >= 1) {
@@ -4509,7 +4843,11 @@ export default () => {
               if (identity2 === "zhu" && game.players.length === 2) {
                 return -10
               }
-              if (from !== to && identity2 !== "zhu" && game.players.length === 3) {
+              if (
+                from !== to &&
+                identity2 !== "zhu" &&
+                game.players.length === 3
+              ) {
                 return -8
               }
               const strategy = get.aiStrategy()
@@ -4532,7 +4870,9 @@ export default () => {
                     return 10
                   }
                   if (get.population("fan") === 1) {
-                    const fan = game.players.find((current) => current.identity === "fan")
+                    const fan = game.players.find(
+                      (current) => current.identity === "fan",
+                    )
                     if (
                       fan &&
                       to.hp > 1 &&
@@ -4600,11 +4940,17 @@ export default () => {
                   if (strategy === 6) {
                     return Math.min(0, situation)
                   }
-                  if ((game.zhu && game.zhu.hp <= 2 && situation < 0) || situation < -1) {
+                  if (
+                    (game.zhu && game.zhu.hp <= 2 && situation < 0) ||
+                    situation < -1
+                  ) {
                     num = -3
                   } else if (situation < 0 || get.population("zhong") === 0) {
                     num = -2
-                  } else if ((game.zhu && game.zhu.hp >= 4 && situation > 0) || situation > 1) {
+                  } else if (
+                    (game.zhu && game.zhu.hp >= 4 && situation > 0) ||
+                    situation > 1
+                  ) {
                     num = 1
                   } else {
                     num = 0
@@ -4700,7 +5046,8 @@ export default () => {
             ) {
               identity2 = "nei"
               break
-            } else if (
+            }
+            if (
               current.identity === "commoner" &&
               current.ai.identity_mark === "zhong" &&
               current.ai.shown < 1
@@ -4740,7 +5087,9 @@ export default () => {
                   get.population("nei") === 1 &&
                   game.players.length === 3
                 ) {
-                  const fan = game.players.find((current) => current.identity === "fan")
+                  const fan = game.players.find(
+                    (current) => current.identity === "fan",
+                  )
                   if (
                     fan &&
                     to.hp > 1 &&
@@ -4762,7 +5111,9 @@ export default () => {
                   get.population("nei") === 1 &&
                   game.players.length === 3
                 ) {
-                  const nei = game.players.find((current) => current.identity === "nei")
+                  const nei = game.players.find(
+                    (current) => current.identity === "nei",
+                  )
                   if (
                     nei &&
                     nei.hp > 1 &&
@@ -4789,7 +5140,9 @@ export default () => {
                   return 6
                 }
                 if (game.players.length === 3) {
-                  const fan = game.players.find((current) => current.identity === "fan")
+                  const fan = game.players.find(
+                    (current) => current.identity === "fan",
+                  )
                   if (
                     fan &&
                     to.hp > 1 &&
@@ -4862,7 +5215,9 @@ export default () => {
                   return 10
                 }
                 if (get.population("fan") === 1) {
-                  const fan = game.players.find((current) => current.identity === "fan")
+                  const fan = game.players.find(
+                    (current) => current.identity === "fan",
+                  )
                   if (
                     fan &&
                     to.hp > 1 &&
@@ -4962,14 +5317,20 @@ export default () => {
                 if (strategy === 6) {
                   return Math.min(0, situation)
                 }
-                if ((game.zhu && game.zhu.hp <= 2 && situation < 0) || situation < -1) {
+                if (
+                  (game.zhu && game.zhu.hp <= 2 && situation < 0) ||
+                  situation < -1
+                ) {
                   num = -3
                 } else if (
                   situation < 0 ||
                   get.population("zhong") + get.population("mingzhong") === 0
                 ) {
                   num = -2
-                } else if ((game.zhu && game.zhu.hp >= 4 && situation > 0) || situation > 1) {
+                } else if (
+                  (game.zhu && game.zhu.hp >= 4 && situation > 0) ||
+                  situation > 1
+                ) {
                   num = 1
                 } else {
                   num = 0
@@ -5015,7 +5376,10 @@ export default () => {
                 if (get.population("fan") === 1) {
                   return 0
                 }
-                if (get.population("zhong") + get.population("mingzhong") === 0) {
+                if (
+                  get.population("zhong") + get.population("mingzhong") ===
+                  0
+                ) {
                   return -7
                 }
                 if (game.zhu && game.zhu.hp <= 2) {
@@ -5041,7 +5405,10 @@ export default () => {
               case "zhong":
                 if (situation > 0) {
                   if (to.hp >= 2) {
-                    return Math.min(3, Math.max(1, to.hp + to.countCards("h") / 4 - 4))
+                    return Math.min(
+                      3,
+                      Math.max(1, to.hp + to.countCards("h") / 4 - 4),
+                    )
                   }
                   return 0
                 }
@@ -5062,7 +5429,12 @@ export default () => {
                 return 0
               case "fan":
                 if (situation < 0) {
-                  return to.hp + to.countCards("h") / 4 - 1.7 * get.population("fan") + 2
+                  return (
+                    to.hp +
+                    to.countCards("h") / 4 -
+                    1.7 * get.population("fan") +
+                    2
+                  )
                 }
                 if (situation === 0) {
                   return 0
@@ -5092,12 +5464,16 @@ export default () => {
           } else if (php > 6) {
             php = 6
           }
-          const score = player.countCards("h") + player.countCards("e") * 1.5 + php * 2
+          const score =
+            player.countCards("h") + player.countCards("e") * 1.5 + php * 2
           if (player.identity === "zhu") {
             zhuzhong += score * 1.2 + 5
             total += score * 1.2 + 5
             zhu = score
-          } else if (player.identity === "zhong" || player.identity === "mingzhong") {
+          } else if (
+            player.identity === "zhong" ||
+            player.identity === "mingzhong"
+          ) {
             zhuzhong += score * 0.8 + 3
             total += score * 0.8 + 3
           } else if (player.identity === "fan") {
@@ -5109,7 +5485,7 @@ export default () => {
         if (absolute) {
           return zhuzhong
         }
-        let result = parseInt(10 * Math.abs(zhuzhong / total))
+        let result = parseInt(10 * Math.abs(zhuzhong / total), 10)
         if (zhuzhong < 0) {
           result = -result
         }
@@ -5233,14 +5609,17 @@ export default () => {
             return false
           }
           if (name === "dieAfter") {
-            return game.dead.length >= Math.max(Math.round(get.population() / 3), 2)
+            return (
+              game.dead.length >= Math.max(Math.round(get.population() / 3), 2)
+            )
           }
           return (
-            name === "dying" || game.roundNumber >= Math.max(Math.round(get.population() / 2), 3)
+            name === "dying" ||
+            game.roundNumber >= Math.max(Math.round(get.population() / 2), 3)
           )
         },
         async content(event, _trigger, player) {
-          if (event.triggername == "dying") {
+          if (event.triggername === "dying") {
             await game.delayx()
           }
           player.storage.stratagem_monarchy = true
@@ -5258,7 +5637,7 @@ export default () => {
               clientPlayer.$legend()
             }
             const clickingIdentity = _status.clickingidentity
-            if (!clickingIdentity || clickingIdentity[0] != clientPlayer) {
+            if (!clickingIdentity || clickingIdentity[0] !== clientPlayer) {
               return
             }
             clickingIdentity[1].forEach((element) => {
@@ -5273,16 +5652,18 @@ export default () => {
           await event.trigger("zhuUpdate")
           await player.recover()
           await player.draw()
-          const skills = player.getStockSkills(true, true).filter((stockSkill) => {
-            if (player.hasSkill(stockSkill)) {
-              return false
-            }
-            const info = get.info(stockSkill)
-            if (!info?.zhuSkill) {
-              return false
-            }
-            return true
-          })
+          const skills = player
+            .getStockSkills(true, true)
+            .filter((stockSkill) => {
+              if (player.hasSkill(stockSkill)) {
+                return false
+              }
+              const info = get.info(stockSkill)
+              if (!info?.zhuSkill) {
+                return false
+              }
+              return true
+            })
           if (skills.length) {
             await player.addSkills(skills)
           }
@@ -5351,7 +5732,8 @@ export default () => {
                 }
                 const storage = current.storage
                 return (
-                  (storage.stratagem_revitalization || storage.stratagem_monarchy) &&
+                  (storage.stratagem_revitalization ||
+                    storage.stratagem_monarchy) &&
                   storage.stratagem_expose.includes(target)
                 )
               }))
@@ -5386,7 +5768,8 @@ export default () => {
                 game.countPlayer(
                   (current) =>
                     current !== player &&
-                    (current.identity === "rYe" || current.identity === "bYe") &&
+                    (current.identity === "rYe" ||
+                      current.identity === "bYe") &&
                     (current === game.me || current.isOnline()),
                 )
               )
@@ -5423,13 +5806,14 @@ export default () => {
                     if (judge(cards[0]) < 0) {
                       stopped = true
                       break
-                    } else {
-                      top.unshift(cards.shift())
                     }
+                    top.unshift(cards.shift())
                   }
                 }
                 if (!stopped) {
-                  cards.sort((a, b) => get.value(b, player) - get.value(a, player))
+                  cards.sort(
+                    (a, b) => get.value(b, player) - get.value(a, player),
+                  )
                   while (cards.length) {
                     if (get.value(cards[0], player) <= 5) {
                       break
@@ -5446,14 +5830,20 @@ export default () => {
           const top = result.moved[0]
           const bottom = result.moved[1]
           top.reverse()
-          await game.cardsGotoPile(top.concat(bottom), ["top_cards", top], (event, card) => {
-            if (event.top_cards.includes(card)) {
-              return ui.cardPile.firstChild
-            }
-            return null
-          })
-          player.popup(get.cnNumber(top.length) + "上" + get.cnNumber(bottom.length) + "下")
-          game.log(player, "将" + get.cnNumber(top.length) + "张牌置于牌堆顶")
+          await game.cardsGotoPile(
+            top.concat(bottom),
+            ["top_cards", top],
+            (event, card) => {
+              if (event.top_cards.includes(card)) {
+                return ui.cardPile.firstChild
+              }
+              return null
+            },
+          )
+          player.popup(
+            `${get.cnNumber(top.length)}上${get.cnNumber(bottom.length)}下`,
+          )
+          game.log(player, `将${get.cnNumber(top.length)}张牌置于牌堆顶`)
           game.updateRoundNumber()
           await game.delayx()
         },
@@ -5495,7 +5885,10 @@ export default () => {
         charlotte: true,
         prompt: "弃置一张非基本牌，对一名角色造成1点伤害",
         filter(event, player) {
-          return player.hasCard((card) => get.type(card, null, player) !== "basic", "he")
+          return player.hasCard(
+            (card) => get.type(card, null, player) !== "basic",
+            "he",
+          )
         },
         filterCard(card, player) {
           return get.type(card, null, player) !== "basic"
@@ -5626,7 +6019,10 @@ export default () => {
             .set(
               "goon",
               (() => {
-                if (player.hasSkillTag("rejudge") && player.countCards("j") < 2) {
+                if (
+                  player.hasSkillTag("rejudge") &&
+                  player.countCards("j") < 2
+                ) {
                   return false
                 }
                 const cards = player.getCards("j", (card) => {
@@ -5715,7 +6111,8 @@ export default () => {
         mark: true,
         markimage: "image/mode/identity/mark/sixiang_qinglong.jpg",
         intro: {
-          content: "回合开始时，你可以弃置两张牌，弃置你判定区的【乐不思蜀】或【兵粮寸断】。",
+          content:
+            "回合开始时，你可以弃置两张牌，弃置你判定区的【乐不思蜀】或【兵粮寸断】。",
         },
       },
       sixiang_baihu: {
@@ -5743,7 +6140,12 @@ export default () => {
           respondSha: true,
           result: {
             player(player, target) {
-              return -ui.selected.cards.reduce((p, c) => p + get.value(c, player), 0) / 6
+              return (
+                -ui.selected.cards.reduce(
+                  (p, c) => p + get.value(c, player),
+                  0,
+                ) / 6
+              )
             },
           },
         },
@@ -5767,7 +6169,14 @@ export default () => {
               respondShan: true,
               result: {
                 player(player, target) {
-                  return 1 - ui.selected.cards.reduce((p, c) => p + get.value(c, player), 0) / 6
+                  return (
+                    1 -
+                    ui.selected.cards.reduce(
+                      (p, c) => p + get.value(c, player),
+                      0,
+                    ) /
+                      6
+                  )
                 },
               },
               effect: {

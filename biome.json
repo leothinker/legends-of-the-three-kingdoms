@@ -26,6 +26,13 @@
         "noParameterAssign": "error",
         "useSelfClosingElements": "error",
         "noUselessElse": "error"
+      },
+      "complexity": {
+        "noImportantStyles": "off"
+      },
+      "correctness": {
+        "noUnusedFunctionParameters": "off",
+        "noUnusedVariables": "off"
       }
     }
   },

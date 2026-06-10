@@ -95,7 +95,7 @@ export class RawResourceStrategy extends CompileStrategy {
   match(ctx: RequestContext): boolean {
     return ctx.url.searchParams.has("raw")
   }
-  async transform(_ctx: RequestContext, text: string): Promise<Response> {
+  async transform(ctx: RequestContext, text: string): Promise<Response> {
     return getResponse(`export default ${text}`)
   }
 }
@@ -123,7 +123,7 @@ export class WorkerResourceStrategy extends CompileStrategy {
       ctx.url.searchParams.has("sharedworker")
     )
   }
-  async transform(ctx: RequestContext, _text: string): Promise<Response> {
+  async transform(ctx: RequestContext, text: string): Promise<Response> {
     return getResponse(dedent`
 			const url = new URL(import.meta.url);
 			url.searchParams.delete("worker");
@@ -147,7 +147,7 @@ export class UrlResourceStrategy extends CompileStrategy {
   match(ctx: RequestContext): boolean {
     return ctx.url.searchParams.has("url")
   }
-  async transform(_ctx: RequestContext, _text: string): Promise<Response> {
+  async transform(ctx: RequestContext, text: string): Promise<Response> {
     // TODO: 返回资源 URL 字符串
     return getResponse(`
 			const url = new URL(import.meta.url);

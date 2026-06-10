@@ -1,20 +1,19 @@
-import { Is } from "./is.js"
-import { Promises } from "./promises.js"
-import { rootURL, game, lib, _status, ui } from "wtk"
+import JSZip from "jszip"
 import * as pinyinPro from "pinyin-pro"
-import WTKDictionary from "./pinyins/wtk-dict.js"
-import { Audio } from "./audio.ts"
+import { _status, game, lib, rootURL, ui } from "wtk"
+import { CacheContext } from "@/library/cache/cacheContext.js"
+import { HTMLPoptipElement } from "@/library/poptip.js"
 import {
-  GeneratorFunction,
   AsyncFunction,
   AsyncGeneratorFunction,
+  GeneratorFunction,
   userAgentLowerCase,
 } from "@/util/index.js"
-import { security, CodeSnippet, ErrorManager } from "@/util/sandbox.js"
-
-import JSZip from "jszip"
-import { HTMLPoptipElement } from "@/library/poptip.js"
-import { CacheContext } from "@/library/cache/cacheContext.js"
+import { CodeSnippet, ErrorManager, security } from "@/util/sandbox.js"
+import { Audio } from "./audio.ts"
+import { Is } from "./is.js"
+import WTKDictionary from "./pinyins/wtk-dict.js"
+import { Promises } from "./promises.js"
 
 // 用于标识Map、Set等对象在序列化中的类型
 // 使用了md5("__wtk_type")的值作为键
@@ -72,7 +71,7 @@ export class Get {
           }
           return str.replace(/(?:♥︎|♦︎)/g, '<span style="color: red; ">$&</span>')
         }
-        let div = ui.create.div(itemContainer)
+        const div = ui.create.div(itemContainer)
         const innerHTML = count
           ? formatStr(`${get.translation(link)}牌${count}张`, type)
           : formatStr(`没有${get.translation(link)}牌`, type)
@@ -93,25 +92,25 @@ export class Get {
     }
     //框的样式，不要太宽，高度最小也要100px，防止空框没有高度
     /**@type {Row_Item_Option['itemContainerCss']} */
-    let itemContainerCss = {
+    const itemContainerCss = {
       border: "solid #c6b3b3 2px",
       minHeight: "100px",
     }
     const groupCards = Object.groupBy(cards, (card) => get[type](card, player))
-    if (type == "suit") {
+    if (type === "suit") {
       groupCards.heart ??= []
       groupCards.diamond ??= []
       groupCards.spade ??= []
       groupCards.club ??= []
-    } else if (type == "color") {
+    } else if (type === "color") {
       groupCards.red ??= []
       groupCards.black ??= []
     }
     const keys = Object.keys(groupCards).sort((a, b) => {
       let arr = []
-      if (type == "suit") {
+      if (type === "suit") {
         arr = lib.suits.slice()
-      } else if (type == "color") {
+      } else if (type === "color") {
         arr = Object.keys(lib.color)
       }
       return arr.indexOf(a) - arr.indexOf(b)
@@ -119,10 +118,10 @@ export class Get {
     const list = []
     //添加框
     while (keys.length) {
-      let key1 = keys.shift()
-      let cards1 = groupCards[key1]
-      let key2 = keys.shift()
-      let cards2 = groupCards[key2]
+      const key1 = keys.shift()
+      const cards1 = groupCards[key1]
+      const key2 = keys.shift()
+      const cards2 = groupCards[key2]
       if (key2) {
         list.push([
           {
@@ -167,23 +166,23 @@ export class Get {
   cardDescription(node, player) {
     let str = "",
       name = node.name
-    if (lib.translate[name + "_info"]) {
+    if (lib.translate[`${name}_info`]) {
       if (lib.card[name].type && lib.translate[lib.card[name].type]) {
-        str += "" + get.translation(lib.card[name].type) + "牌|"
+        str += `${get.translation(lib.card[name].type)}牌|`
       }
       if (get.subtype(name)) {
-        str += "" + get.translation(get.subtype(name)) + "|"
+        str += `${get.translation(get.subtype(name))}|`
       }
-      if (lib.card[name] && lib.card[name].addinfomenu) {
-        str += "" + lib.card[name].addinfomenu + "|"
+      if (lib.card[name]?.addinfomenu) {
+        str += `${lib.card[name].addinfomenu}|`
       }
-      if (get.subtype(name) == "equip1") {
+      if (get.subtype(name) === "equip1") {
         let added = false
         if (lib.card[node.name] && lib.card[node.name].distance) {
           const dist = lib.card[node.name].distance
           if (dist.attackFrom) {
             added = true
-            str += "攻击范围：" + (-dist.attackFrom + 1) + "|"
+            str += `攻击范围：${-dist.attackFrom + 1}|`
           }
         }
         if (!added) {
@@ -192,12 +191,12 @@ export class Get {
       }
     }
     if (lib.card[name].cardPrompt) {
-      str += "" + lib.card[name].cardPrompt(node, player) + "|"
-    } else if (lib.translate[name + "_info"]) {
-      str += "" + lib.translate[name + "_info"] + "|"
+      str += `${lib.card[name].cardPrompt(node, player)}|`
+    } else if (lib.translate[`${name}_info`]) {
+      str += `${lib.translate[`${name}_info`]}|`
     }
-    if (lib.translate[name + "_append"]) {
-      str += "" + lib.translate[name + "_append"] + "|"
+    if (lib.translate[`${name}_append`]) {
+      str += `${lib.translate[`${name}_append`]}|`
     }
     if (get.is.yingbianConditional(node)) {
       const yingbianEffects = get.yingbianEffects(node)
@@ -232,11 +231,12 @@ export class Get {
     const SeatNum = player.getSeatNum()
     const addSeat =
       game.hasPlayer2(
-        (current) => current != player && get.slimName(current?.name) == playername,
+        (current) =>
+          current !== player && get.slimName(current?.name) === playername,
         true,
-      ) && typeof SeatNum == "number"
-    let border = get.groupnature(get.bordergroup(player?.name))
-    let eventInfo = `<span style="font-weight:700"><span data-nature=${border}><span style="letter-spacing:0.1em">${playername}${addSeat ? "[" + SeatNum + "]" : ""}</span></span><br/><span style="color:#FFD700">`
+      ) && typeof SeatNum === "number"
+    const border = get.groupnature(get.bordergroup(player?.name))
+    let eventInfo = `<span style="font-weight:700"><span data-nature=${border}><span style="letter-spacing:0.1em">${playername}${addSeat ? `[${SeatNum}]` : ""}</span></span><br/><span style="color:#FFD700">`
     let name1 = name,
       name2 = _status.event.getParent().name,
       th_skill = false,
@@ -245,8 +245,8 @@ export class Get {
     if (
       (["lose", "loseAsync"].includes(name) &&
         !lib.skill[name2] &&
-        _status.event.getParent(2).name != "die") ||
-      (name == "gain" && !info[get.event().getParent().name])
+        _status.event.getParent(2).name !== "die") ||
+      (name === "gain" && !info[get.event().getParent().name])
     ) {
       name1 = _status.event.getParent(2).name
       evt1 = _status.event.getParent(2)
@@ -254,16 +254,20 @@ export class Get {
       evt2 = _status.event.getParent(3)
     }
     if (
-      name1 == "compareMultiple" ||
-      name2 == "compareMultiple" ||
-      name1?.indexOf("Callback") != -1 ||
-      name2?.indexOf("Callback") != -1
+      name1 === "compareMultiple" ||
+      name2 === "compareMultiple" ||
+      name1?.indexOf("Callback") !== -1 ||
+      name2?.indexOf("Callback") !== -1
     ) {
       name1 = _status.event.getParent(4).name
       evt1 = _status.event.getParent(4)
       name2 = _status.event.getParent(5).name
       evt2 = _status.event.getParent(5)
-    } else if (name1 == "useCard" && name2 == "chooseUseTarget" && !evt1.skill) {
+    } else if (
+      name1 === "useCard" &&
+      name2 === "chooseUseTarget" &&
+      !evt1.skill
+    ) {
       name1 = _status.event.getParent(2).name
       evt1 = _status.event.getParent(2)
       name2 = _status.event.getParent(3).name
@@ -280,27 +284,32 @@ export class Get {
       evt2 = false
     }
     if (name1 && !info[name1]) {
-      if (name1.indexOf("equip_") == 0) {
+      if (name1.indexOf("equip_") === 0) {
         name1 = name1.slice(6)
-      } else if (name1.indexOf("pre_") == 0) {
+      } else if (name1.indexOf("pre_") === 0) {
         name1 = name1.slice(4)
-        if (name1.indexOf("_backup") != -1 && !info[name1]) {
+        if (name1.indexOf("_backup") !== -1 && !info[name1]) {
           name1 = name1.slice(0, name1.indexOf("_backup"))
         }
-      } else if (name1.indexOf("lose_") == 0) {
+      } else if (name1.indexOf("lose_") === 0) {
         name1 = name1.slice(5)
-      } else if (name1.indexOf("_lose") != -1 && name1.length - name1.indexOf("_lose") == 5) {
+      } else if (
+        name1.indexOf("_lose") !== -1 &&
+        name1.length - name1.indexOf("_lose") === 5
+      ) {
         name1 = name1.slice(0, name1.length - 5)
       }
     }
     if (name2 && !info[name2]) {
       if (
-        (name2 == "chooseToUse" || name2 == "chooseToRespond" || name2 == "_wuxie") &&
+        (name2 === "chooseToUse" ||
+          name2 === "chooseToRespond" ||
+          name2 === "_wuxie") &&
         evt2.childEvents
       ) {
         let tempEvt
-        for (let key of evt2.childEvents) {
-          if (key.name.indexOf("pre_") == 0) {
+        for (const key of evt2.childEvents) {
+          if (key.name.indexOf("pre_") === 0) {
             tempEvt = key
             break
           }
@@ -308,7 +317,7 @@ export class Get {
         if (tempEvt) {
           name2 = tempEvt.name
         } else if (
-          name2 == "chooseToUse" &&
+          name2 === "chooseToUse" &&
           info[evt2.getParent().name] &&
           lib.skill[evt2.getParent().name] &&
           !banned.includes(evt2.getParent().name)
@@ -317,27 +326,30 @@ export class Get {
           name2 = evt2.name
         }
       }
-      if (name2.indexOf("equip_") == 0) {
+      if (name2.indexOf("equip_") === 0) {
         name2 = name2.slice(6)
-      } else if (name2.indexOf("pre_") == 0) {
+      } else if (name2.indexOf("pre_") === 0) {
         name2 = name2.slice(4)
-        if (name2.indexOf("_backup") != -1) {
+        if (name2.indexOf("_backup") !== -1) {
           name2 = name2.slice(0, name2.indexOf("_backup"))
         }
-      } else if (name2.indexOf("lose_") == 0) {
+      } else if (name2.indexOf("lose_") === 0) {
         name2 = name2.slice(5)
-      } else if (name2.indexOf("_lose") != -1 && name2.length - name2.indexOf("_lose") == 5) {
+      } else if (
+        name2.indexOf("_lose") !== -1 &&
+        name2.length - name2.indexOf("_lose") === 5
+      ) {
         name2 = name2.slice(0, name2.length - 5)
       }
     }
-    if (name1 == "useSkill") {
+    if (name1 === "useSkill") {
       name1 = get.sourceSkillFor(evt1.skill)
     }
-    if (name2 == "useSkill") {
+    if (name2 === "useSkill") {
       name2 = get.sourceSkillFor(evt2.skill)
     }
     if (_status.event.skill) {
-      let skill = _status.event.skill
+      const skill = _status.event.skill
       if (info[get.sourceSkillFor(skill)]) {
         th_skill = true
         eventInfo += info[get.sourceSkillFor(skill)]
@@ -345,9 +357,12 @@ export class Get {
           return _status.event
         }
       }
-    } else if ((name1 && info[name1]) || (evt1.skill && info[get.sourceSkillFor(evt1.skill)])) {
+    } else if (
+      (name1 && info[name1]) ||
+      (evt1.skill && info[get.sourceSkillFor(evt1.skill)])
+    ) {
       if (name1 && info[name1]) {
-        if (lib.card[name1] && evt1.card && evt1.card.nature && info[evt1.card.nature]) {
+        if (lib.card[name1] && evt1.card?.nature && info[evt1.card.nature]) {
           eventInfo += info[evt1.card.nature]
         }
         eventInfo += info[name1]
@@ -358,9 +373,12 @@ export class Get {
       if (sourceEvent) {
         return evt1
       }
-    } else if ((name2 && info[name2]) || (evt2.skill && info[get.sourceSkillFor(evt2.skill)])) {
+    } else if (
+      (name2 && info[name2]) ||
+      (evt2.skill && info[get.sourceSkillFor(evt2.skill)])
+    ) {
       if (name2 && info[name2]) {
-        if (lib.card[name2] && evt2.card && evt2.card.nature && info[evt2.card.nature]) {
+        if (lib.card[name2] && evt2.card?.nature && info[evt2.card.nature]) {
           eventInfo += info[evt2.card.nature]
         }
         eventInfo += info[name2]
@@ -382,8 +400,8 @@ export class Get {
         break
       }
       case "phaseJudge": {
-        let card = _status.event.card
-        let cardName = card.viewAs || card.name
+        const card = _status.event.card
+        const cardName = card.viewAs || card.name
         eventInfo += get.translation(cardName)
         break
       }
@@ -392,29 +410,27 @@ export class Get {
         break
       }
       case "lose": {
-        let event = _status.event,
+        const event = _status.event,
           evt = event.getParent()
-        if (event.type && event.type == "discard") {
+        if (event.type && event.type === "discard") {
           eventInfo += "弃置"
-        } else if (event.getParent(2).name == "recast" && event.getParent(3).name != "_recasting") {
+        } else if (
+          event.getParent(2).name === "recast" &&
+          event.getParent(3).name !== "_recasting"
+        ) {
           eventInfo += "重铸"
         }
         break
       }
       case "loseAsync": {
-        let event = _status.event
-        if (event.type && event.type == "discard") {
+        const event = _status.event
+        if (event.type && event.type === "discard") {
           eventInfo += "弃置"
         }
         break
       }
       case "useSkill": {
-        let skill = _status.event.skill
-        // /-?
-        // if (!skill || typeof skill != "string") {
-        // } else if (skill == "_chongzhu") {
-        // 	//eventInfo+="重铸"
-        // }
+        const skill = _status.event.skill
         break
       }
       case "respond": {
@@ -422,7 +438,7 @@ export class Get {
         break
       }
       case "judge": {
-        eventInfo += (!th_skill && judgestr ? judgestr : "") + "判定"
+        eventInfo += `${!th_skill && judgestr ? judgestr : ""}判定`
         break
       }
     }
@@ -483,14 +499,14 @@ export class Get {
    * @returns {string[][]}
    */
   inpileVCardList(filter) {
-    let list = []
+    const list = []
     for (const name of lib.inpile) {
       const type = get.type(name)
       const info = [type, "", name]
       if (!filter || filter(info)) {
         list.push(info)
       }
-      if (name == "sha") {
+      if (name === "sha") {
         for (const nature of lib.inpile_nature) {
           const info = [type, "", name, nature]
           if (!filter || filter(info)) {
@@ -585,7 +601,9 @@ export class Get {
    */
   cardNameLength(card, player) {
     const actualCardName = lib.actualCardName,
-      name = get.translation(typeof card == "string" ? card : get.name(card, player))
+      name = get.translation(
+        typeof card === "string" ? card : get.name(card, player),
+      )
     return (actualCardName.has(name) ? actualCardName.get(name) : name).length
   }
   //Yingbian
@@ -596,18 +614,28 @@ export class Get {
    * 获取（此牌的）应变条件
    */
   yingbianConditions(card) {
-    return get.complexYingbianConditions(card).concat(get.simpleYingbianConditions(card))
+    return get
+      .complexYingbianConditions(card)
+      .concat(get.simpleYingbianConditions(card))
   }
   complexYingbianConditions(card) {
-    const complexYingbianConditions = Array.from(lib.yingbian.condition.complex.keys())
+    const complexYingbianConditions = Array.from(
+      lib.yingbian.condition.complex.keys(),
+    )
     return card
-      ? complexYingbianConditions.filter((value) => get.cardtag(card, `yingbian_${value}`))
+      ? complexYingbianConditions.filter((value) =>
+          get.cardtag(card, `yingbian_${value}`),
+        )
       : complexYingbianConditions
   }
   simpleYingbianConditions(card) {
-    const simpleYingbianConditions = Array.from(lib.yingbian.condition.simple.keys())
+    const simpleYingbianConditions = Array.from(
+      lib.yingbian.condition.simple.keys(),
+    )
     return card
-      ? simpleYingbianConditions.filter((value) => get.cardtag(card, `yingbian_${value}`))
+      ? simpleYingbianConditions.filter((value) =>
+          get.cardtag(card, `yingbian_${value}`),
+        )
       : simpleYingbianConditions
   }
   /**
@@ -618,7 +646,9 @@ export class Get {
   yingbianEffects(card) {
     const yingbianEffects = Array.from(lib.yingbian.effect.keys())
     return card
-      ? yingbianEffects.filter((value) => get.cardtag(card, `yingbian_${value}`))
+      ? yingbianEffects.filter((value) =>
+          get.cardtag(card, `yingbian_${value}`),
+        )
       : yingbianEffects
   }
   /**
@@ -628,7 +658,7 @@ export class Get {
    */
   defaultYingbianEffect(card) {
     const info = get.info(card)
-    return (info && info.defaultYingbianEffect) || null
+    return info?.defaultYingbianEffect || null
   }
   /**
    * 优先度判断
@@ -674,10 +704,10 @@ export class Get {
    * @returns { string[] }
    */
   subtypes(obj, player) {
-    if (typeof obj == "string") {
+    if (typeof obj === "string") {
       obj = { name: obj }
     }
-    if (typeof obj != "object" || obj === null) {
+    if (typeof obj !== "object" || obj === null) {
       return []
     }
     if (Array.isArray(obj.subtypes)) {
@@ -690,7 +720,8 @@ export class Get {
     if (lib.card[name].subtypes) {
       const subtypes = get.copy(lib.card[name].subtypes)
       return subtypes
-    } else if (lib.card[name].subtype) {
+    }
+    if (lib.card[name].subtype) {
       const subtype = lib.card[name].subtype
       return [subtype]
     }
@@ -705,7 +736,7 @@ export class Get {
   pinyin(chinese, withTone) {
     let result = []
     const pinyins = lib.pinyins
-    if (pinyins && pinyins[chinese] && Array.isArray(pinyins[chinese])) {
+    if (pinyins?.[chinese] && Array.isArray(pinyins[chinese])) {
       result = pinyins[chinese].slice(0)
     } else {
       // @ts-expect-error ignore
@@ -725,26 +756,31 @@ export class Get {
     //部分整体认读音节特化处理
     // @ts-expect-error ignore
     if (
-      lib.pinyins._metadata.zhengtirendu.includes(pinyinPro.convert(str, { format: "toneNone" }))
+      lib.pinyins._metadata.zhengtirendu.includes(
+        pinyinPro.convert(str, { format: "toneNone" }),
+      )
     ) {
-      return "-" + str[str.length - 1]
+      return `-${str[str.length - 1]}`
     }
     //排除声母
-    for (let i of lib.pinyins._metadata.shengmu) {
+    for (const i of lib.pinyins._metadata.shengmu) {
       if (str.startsWith(i)) {
         str = str.slice(i.length)
-        if (str[0] == "u" && lib.pinyins._metadata.special_shengmu.includes(i)) {
-          str = "ü" + str.slice(1)
+        if (
+          str[0] === "u" &&
+          lib.pinyins._metadata.special_shengmu.includes(i)
+        ) {
+          str = `ü${str.slice(1)}`
         }
         break
       }
     }
     //排除介母
     if (str.length > 0) {
-      for (let i in lib.pinyins._metadata.feijiemu) {
-        if (str[0] == i) {
+      for (const i in lib.pinyins._metadata.feijiemu) {
+        if (str[0] === i) {
           let goon = false
-          for (let j of lib.pinyins._metadata.feijiemu[i]) {
+          for (const j of lib.pinyins._metadata.feijiemu[i]) {
             if (str.startsWith(j)) {
               goon = true
             }
@@ -765,17 +801,17 @@ export class Get {
     var str = ""
     for (var arg of arguments) {
       if (arg === null || arg === undefined) {
-        str += arg + "-"
+        str += `${arg}-`
         continue
       }
       if (arg.playerid) {
-        str += "p:" + arg.playerid
+        str += `p:${arg.playerid}`
       } else if (arg.cardid) {
-        str += "c:" + arg.cardid
+        str += `c:${arg.cardid}`
       } else if (arg.name) {
-        str += "n:" + arg.name
+        str += `n:${arg.name}`
       } else {
-        str += "s:" + arg
+        str += `s:${arg}`
       }
       str += "-"
     }
@@ -789,19 +825,22 @@ export class Get {
     // @ts-expect-error ignore
     str = pinyinPro.convert(str, { format: "toneNone" })
     if (lib.pinyins._metadata.zhengtirendu.includes(str)) {
-      str = "-" + str[str.length - 1]
+      str = `-${str[str.length - 1]}`
     } else {
-      for (let i of lib.pinyins._metadata.shengmu) {
+      for (const i of lib.pinyins._metadata.shengmu) {
         if (str.startsWith(i)) {
           str = str.slice(i.length)
-          if (str[0] == "u" && lib.pinyins._metadata.special_shengmu.includes(i)) {
-            str = "ü" + str.slice(1)
+          if (
+            str[0] === "u" &&
+            lib.pinyins._metadata.special_shengmu.includes(i)
+          ) {
+            str = `ü${str.slice(1)}`
           }
           break
         }
       }
     }
-    for (let i in lib.pinyins._metadata.yunjiao) {
+    for (const i in lib.pinyins._metadata.yunjiao) {
       if (lib.pinyins._metadata.yunjiao[i].includes(str)) {
         return i
       }
@@ -888,10 +927,10 @@ export class Get {
     return list
   }
   numOf(obj, item) {
-    return obj.filter((element) => element == item).length
+    return obj.filter((element) => element === item).length
   }
   connectNickname() {
-    return typeof lib.config.connect_nickname == "string"
+    return typeof lib.config.connect_nickname === "string"
       ? lib.config.connect_nickname.slice(0, 12)
       : "无名玩家"
   }
@@ -902,7 +941,7 @@ export class Get {
    */
   zhinangs(filter) {
     var list = (_status.connectMode ? lib.configOL : lib.config).zhinang_tricks
-    if (!list || !list.filter || !list.length) {
+    if (!list?.filter || !list.length) {
       return get.inpile("trick", "trick").randomGets(3)
     }
     if (filter === false) {
@@ -924,13 +963,13 @@ export class Get {
   characterSurname(str, defaultSurname, defaultName) {
     const info = get.character(str).names
     if (!info) {
-      let rawName = get.rawName(str)
+      const rawName = get.rawName(str)
       return [[rawName[0], rawName.slice(1)]]
     }
-    let infoarr = info.split("-")
-    let names = []
+    const infoarr = info.split("-")
+    const names = []
     for (let i = 0; i < infoarr.length; i++) {
-      let name = infoarr[i].split("|")
+      const name = infoarr[i].split("|")
       if (name[0] === "null") {
         name[0] = defaultSurname || ""
       }
@@ -949,7 +988,7 @@ export class Get {
    * @returns {string} 称号
    */
   characterTitle(player, name2 = false, plainText = true) {
-    if (get.itemtype(player) == "player") {
+    if (get.itemtype(player) === "player") {
       player = name2 ? player.name2 : player.name
     }
     let characterTitle = lib.characterTitle[player] || ""
@@ -986,63 +1025,63 @@ export class Get {
    * @returns { boolean }
    */
   isLuckyStar(player) {
-    if (player && player.hasSkillTag("luckyStar")) {
+    if (player?.hasSkillTag("luckyStar")) {
       return true
     }
     if (_status.connectMode) {
       return false
     }
     return (
-      (!player || player == game.me || player.isUnderControl()) && lib.config.lucky_star == true
+      (!player || player === game.me || player.isUnderControl()) &&
+      lib.config.lucky_star === true
     )
   }
   infoHp(hp) {
-    if (typeof hp == "number") {
+    if (typeof hp === "number") {
       return hp
-    } else if (typeof hp == "string") {
+    }
+    if (typeof hp === "string") {
       if (hp.includes("/")) {
         const num = hp.split("/")[0]
         if (num) {
-          if (num == "Infinity" || num == "∞") {
+          if (num === "Infinity" || num === "∞") {
             return Infinity
-          } else {
-            return parseInt(num)
           }
+          return parseInt(num, 10)
         }
-      } else if (hp == "Infinity" || hp == "∞") {
+      } else if (hp === "Infinity" || hp === "∞") {
         return Infinity
       }
     }
     return 0
   }
   infoMaxHp(hp) {
-    if (typeof hp == "number") {
+    if (typeof hp === "number") {
       return hp
-    } else if (typeof hp == "string") {
+    }
+    if (typeof hp === "string") {
       if (hp.includes("/")) {
         const num = hp.split("/")[1]
         if (num) {
-          if (num == "Infinity" || num == "∞") {
+          if (num === "Infinity" || num === "∞") {
             return Infinity
-          } else {
-            return parseInt(num)
           }
+          return parseInt(num, 10)
         }
-      } else if (hp == "Infinity" || hp == "∞") {
+      } else if (hp === "Infinity" || hp === "∞") {
         return Infinity
       }
     }
     return 0
   }
   infoHujia(hp) {
-    if (typeof hp == "string" && hp.includes("/")) {
+    if (typeof hp === "string" && hp.includes("/")) {
       const num = hp.split("/")[2]
       if (num) {
-        if (num == "Infinity" || num == "∞") {
+        if (num === "Infinity" || num === "∞") {
           return Infinity
-        } else {
-          return parseInt(num)
         }
+        return parseInt(num, 10)
       }
     }
     return 0
@@ -1059,17 +1098,17 @@ export class Get {
       delete _status.waitingForCards
     }
     var list = []
-    if (typeof num != "number") {
+    if (typeof num !== "number") {
       num = 1
     }
     if (num <= 0) {
       return []
     }
     while (num--) {
-      if (ui.cardPile.hasChildNodes() == false) {
+      if (ui.cardPile.hasChildNodes() === false) {
         game.washCard()
       }
-      if (ui.cardPile.hasChildNodes() == false) {
+      if (ui.cardPile.hasChildNodes() === false) {
         game.over("平局")
         return []
       }
@@ -1095,7 +1134,7 @@ export class Get {
         if (!evt.cards?.length) {
           return false
         }
-        return evt.name === "cardsDiscard" || evt.position == ui.discardPile
+        return evt.name === "cardsDiscard" || evt.position === ui.discardPile
       })
       .reduce((cards, evt) => cards.addArray(evt.cards), [])
   }
@@ -1105,7 +1144,7 @@ export class Get {
     return -y.width / 2 + (x.left + x.width / 2)
   }
   colorspan(str) {
-    if (str[0] == "#") {
+    if (str[0] === "#") {
       var color
       switch (str[1]) {
         case "r":
@@ -1123,7 +1162,7 @@ export class Get {
         default:
           return str.slice(2)
       }
-      return '<span class="' + color + "text " + color + 'auto">' + str.slice(2) + "</span>"
+      return `<span class="${color}text ${color}auto">${str.slice(2)}</span>`
     }
     return str
   }
@@ -1160,99 +1199,92 @@ export class Get {
         return {
           name: info.autoViewAs,
         }
-      } else if (Array.isArray(cards)) {
+      }
+      if (Array.isArray(cards)) {
         return {
           name: info.autoViewAs,
           cards: cards.slice(0),
         }
-      } else if (get.itemtype(card) == "card") {
+      }
+      if (get.itemtype(card) === "card") {
         return {
           name: info.autoViewAs,
           cards: [card],
         }
-      } else {
-        return {
-          name: info.autoViewAs,
-          suit: card.suit,
-          number: card.number,
-          nature: card.nature,
-        }
       }
-    } else {
-      if (card.isCard || get.itemtype(card) == "card") {
-        var next = {
-          name: get.name(card),
-          suit: get.suit(card),
-          number: get.number(card),
-          nature: get.nature(card),
-          isCard: true,
-          cardid: card.cardid,
-          wunature: card.wunature,
-          storage: get.copy(card.storage),
-          cards: get.copy(card.cards),
-        }
-        if (get.itemtype(cards) == "cards" && !card.cards) {
-          next.cards = cards.slice(0)
-        } else if (get.itemtype(card) == "card") {
-          next.cards = [card]
-        }
-        return next
-      } else if (get.is.object(card) && get.itemtype(cards) == "cards" && !card.cards) {
-        card = get.copy(card)
-        card.cards = cards.slice(0)
+      return {
+        name: info.autoViewAs,
+        suit: card.suit,
+        number: card.number,
+        nature: card.nature,
       }
-      return card
     }
+    if (card.isCard || get.itemtype(card) === "card") {
+      var next = {
+        name: get.name(card),
+        suit: get.suit(card),
+        number: get.number(card),
+        nature: get.nature(card),
+        isCard: true,
+        cardid: card.cardid,
+        wunature: card.wunature,
+        storage: get.copy(card.storage),
+        cards: get.copy(card.cards),
+      }
+      if (get.itemtype(cards) === "cards" && !card.cards) {
+        next.cards = cards.slice(0)
+      } else if (get.itemtype(card) === "card") {
+        next.cards = [card]
+      }
+      return next
+    }
+    if (get.is.object(card) && get.itemtype(cards) === "cards" && !card.cards) {
+      card = get.copy(card)
+      card.cards = cards.slice(0)
+    }
+    return card
   }
   max(list, func, type) {
     list = list.slice(0)
-    if (typeof func == "string") {
+    if (typeof func === "string") {
       var key = func
-      func = function (item) {
-        return item[key]
-      }
+      func = (item) => item[key]
     }
-    list.sort(function (a, b) {
-      return func(b) - func(a)
-    })
-    if (type == "list") {
+    list.sort((a, b) => func(b) - func(a))
+    if (type === "list") {
       var list2 = []
       for (var i = 0; i < list.length; i++) {
-        if (func(list[i]) == func(list[0])) {
+        if (func(list[i]) === func(list[0])) {
           list2.push(list[i])
         }
       }
       return list2
-    } else if (type == "item") {
-      return list[0]
-    } else {
-      return func(list[0])
     }
+    if (type === "item") {
+      return list[0]
+    }
+    return func(list[0])
   }
   min(list, func, type) {
     list = list.slice(0)
-    if (typeof func == "string") {
+    if (typeof func === "string") {
       var key = func
-      func = function (item) {
-        return item[key]
-      }
+      func = (item) => item[key]
     }
-    list.sort(function (a, b) {
-      return func(a) - func(b)
-    })
-    if (type == "list") {
+    list.sort((a, b) => func(a) - func(b))
+    if (type === "list") {
       var list2 = []
       for (var i = 0; i < list.length; i++) {
-        if (func(list[i]) == func(list[0])) {
+        if (func(list[i]) === func(list[0])) {
           list2.push(list[i])
         }
       }
       return list2
-    } else if (type == "item") {
-      return list[0]
-    } else {
-      return func(list[0])
     }
+    if (type === "item") {
+      return list[0]
+    }
+    return func(list[0])
   }
   /**
    * 获取一张装备牌的兵主
@@ -1260,7 +1292,7 @@ export class Get {
    * @returns {String[]}
    */
   bingzhu(name) {
-    if (typeof name != "string") {
+    if (typeof name !== "string") {
       name = get.name(name)
     }
     const list = [],
@@ -1269,7 +1301,9 @@ export class Get {
       list.addArray(lib.cardBingzhu[name])
     }
     if (info.derivation) {
-      const names = get.characterSurname(info.derivation).map((list) => list.join(""))
+      const names = get
+        .characterSurname(info.derivation)
+        .map((list) => list.join(""))
       list.addArray(names)
     }
     if (info.bingzhu) {
@@ -1292,7 +1326,9 @@ export class Get {
   character(name, num) {
     let info = lib.character[name]
     if (!info) {
-      const pack = Object.keys(lib.characterPack).find((pack) => name in lib.characterPack[pack])
+      const pack = Object.keys(lib.characterPack).find(
+        (pack) => name in lib.characterPack[pack],
+      )
       if (pack) {
         info = lib.characterPack[pack][name]
       }
@@ -1344,7 +1380,7 @@ export class Get {
     return "暂无武将介绍"
   }
   bordergroup(info, raw) {
-    if (typeof info == "string") {
+    if (typeof info === "string") {
       info = get.character(info)
     }
     if (info.groupBorder) {
@@ -1357,10 +1393,10 @@ export class Get {
     if (!nature) {
       return ""
     }
-    if (method == "raw") {
+    if (method === "raw") {
       return nature
     }
-    return nature + "mm"
+    return `${nature}mm`
   }
   /**
    * Get the source of the skill or event
@@ -1408,14 +1444,13 @@ export class Get {
    * @returns { number }
    */
   rand(num, num2) {
-    if (typeof num2 == "number") {
+    if (typeof num2 === "number") {
       return num + Math.floor(Math.random() * (num2 - num + 1))
-    } else {
-      return Math.floor(Math.random() * num)
     }
+    return Math.floor(Math.random() * num)
   }
   sort(arr, method, arg) {
-    return method == "seat" ? arr.sortBySeat(arg) : void 0
+    return method === "seat" ? arr.sortBySeat(arg) : void 0
   }
   /**
    * 返回一个按座次排序的玩家数组
@@ -1433,10 +1468,10 @@ export class Get {
     callback(new JSZip())
   }
   delayx(num, max) {
-    if (typeof num != "number") {
+    if (typeof num !== "number") {
       num = 1
     }
-    if (typeof max != "number") {
+    if (typeof max !== "number") {
       max = Infinity
     }
     switch (lib.config.game_speed) {
@@ -1458,33 +1493,32 @@ export class Get {
     player = player || _status.event.player
     if (target) {
       var str = get.translation(target)
-      if (target == player) {
+      if (target === player) {
         str += "（你）"
       }
-      return "是否对" + str + "发动【" + get.skillTranslation(skill, player) + "】？"
-    } else {
-      return "是否发动【" + get.skillTranslation(skill, player) + "】？"
+      return `是否对${str}发动【${get.skillTranslation(skill, player)}】？`
     }
+    return `是否发动【${get.skillTranslation(skill, player)}】？`
   }
   prompt2(skill, target, player) {
     var str = get.prompt.apply(this, arguments)
-    if (!lib.translate[skill + "_info"]) {
+    if (!lib.translate[`${skill}_info`]) {
       return str
     }
-    return "###" + str + "###" + lib.translate[skill + "_info"]
+    return `###${str}###${lib.translate[`${skill}_info`]}`
   }
   round(num, f) {
-    var round = Math.pow(10, f)
+    var round = 10 ** f
     return Math.round(num * round) / round
   }
   playerNumber() {
     var num
-    if (_status.brawl && _status.brawl.playerNumber) {
+    if (_status.brawl?.playerNumber) {
       num = _status.brawl.playerNumber
     } else {
       num = get.config("player_number")
     }
-    return parseInt(num) || 2
+    return parseInt(num, 10) || 2
   }
   benchmark(func1, func2, iteration, arg) {
     var tic, toc
@@ -1495,10 +1529,10 @@ export class Get {
     if (Array.isArray(func2)) {
       key1 = func2[0]
       key2 = func2[1]
-    } else if (typeof func2 == "string") {
+    } else if (typeof func2 === "string") {
       key1 = func2
       func2 = iteration || 100
-    } else if (typeof func2 == "number") {
+    } else if (typeof func2 === "number") {
       arg = iteration || arg
       iteration = func2
     }
@@ -1511,10 +1545,10 @@ export class Get {
       }
     }
     toc = get.utc()
-    if (typeof func2 == "number") {
+    if (typeof func2 === "number") {
       return toc - tic
     }
-    console.log("time1: " + (toc - tic))
+    console.log(`time1: ${toc - tic}`)
     tic = get.utc()
     for (var i = 0; i < iteration; i++) {
       if (key2) {
@@ -1524,7 +1558,7 @@ export class Get {
       }
     }
     toc = get.utc()
-    console.log("time2: " + (toc - tic))
+    console.log(`time2: ${toc - tic}`)
   }
   /**
    * 此方法仅用作将技能/卡牌代码转为字符串，返回值无法直接进行反序列化
@@ -1537,22 +1571,28 @@ export class Get {
       indent += "    "
     }
     try {
-      if (get.objtype(obj) === "object" /*  || obj instanceof lib.element.GameEvent */) {
+      if (
+        get.objtype(obj) ===
+        "object" /*  || obj instanceof lib.element.GameEvent */
+      ) {
         let str = "{\n"
         for (const key in obj) {
-          let keyString = (/[^a-zA-Z]/.test(key) ? `"${key}"` : key) + ": "
+          let keyString = `${/[^a-zA-Z]/.test(key) ? `"${key}"` : key}: `
           const valueString = get.stringify(obj[key], level + 1)
           if (get.is.functionMethod(obj, key)) {
             keyString = ""
           }
-          str += indent + "    " + keyString + valueString + ",\n"
+          str += `${indent}    ${keyString}${valueString},\n`
         }
-        str += indent + "}"
+        str += `${indent}}`
         return str
-      } else if (typeof obj === "function") {
+      }
+      if (typeof obj === "function") {
         let str = obj.toString().replace(/\t/g, "    ")
-        let lastLine = str.slice(str.lastIndexOf("\n"))
-        let originIndent = Math.floor((/\S/.exec(lastLine)?.index ?? lastLine.length) / 4)
+        const lastLine = str.slice(str.lastIndexOf("\n"))
+        const originIndent = Math.floor(
+          (/\S/.exec(lastLine)?.index ?? lastLine.length) / 4,
+        )
         for (let i = 0; i < Math.abs(originIndent - level); i++) {
           if (originIndent >= level) {
             str = str.replace(/\n {4}/g, "\n")
@@ -1561,19 +1601,24 @@ export class Get {
           }
         }
         return str
-      } else if (Array.isArray(obj)) {
-        const rand = parseInt(get.id())
-        obj = obj.map((i) => (i === Infinity ? rand : i === -Infinity ? -rand : i))
-        return JSON.stringify(obj).replace(new RegExp(rand.toString(), "g"), "Infinity")
-      } else {
-        if (obj === Infinity) {
-          return "Infinity"
-        }
-        if (obj === -Infinity) {
-          return "-Infinity"
-        }
-        return JSON.stringify(obj)
       }
+      if (Array.isArray(obj)) {
+        const rand = parseInt(get.id(), 10)
+        obj = obj.map((i) =>
+          i === Infinity ? rand : i === -Infinity ? -rand : i,
+        )
+        return JSON.stringify(obj).replace(
+          new RegExp(rand.toString(), "g"),
+          "Infinity",
+        )
+      }
+      if (obj === Infinity) {
+        return "Infinity"
+      }
+      if (obj === -Infinity) {
+        return "-Infinity"
+      }
+      return JSON.stringify(obj)
     } catch (e) {
       return ""
     }
@@ -1603,7 +1648,11 @@ export class Get {
       "[object Date]": true,
     }
 
-    if (typeof obj !== "object" || obj === null || !canTranverse[getType(obj)]) {
+    if (
+      typeof obj !== "object" ||
+      obj === null ||
+      !canTranverse[getType(obj)]
+    ) {
       return obj
     }
 
@@ -1618,10 +1667,14 @@ export class Get {
     // （实际上需要处理的只有Map和Set）
     // 除此之外的就只能祝愿有拷贝构造函数了
     const target = constructor
-      ? Array.isArray(obj) || obj instanceof Map || obj instanceof Set || constructor === Object
+      ? Array.isArray(obj) ||
+        obj instanceof Map ||
+        obj instanceof Set ||
+        constructor === Object
         ? // @ts-expect-error ignore
           new constructor()
-        : constructor.name in window && /\[native code\]/.test(constructor.toString())
+        : constructor.name in window &&
+            /\[native code\]/.test(constructor.toString())
           ? // @ts-expect-error ignore
             new constructor(obj)
           : obj
@@ -1649,9 +1702,9 @@ export class Get {
     if (descriptors) {
       for (const [key, descriptor] of Object.entries(descriptors)) {
         const { enumerable, configurable } = descriptor
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (Object.hasOwn(obj, key)) {
           const result = { enumerable, configurable }
-          if (Object.prototype.hasOwnProperty.call(descriptor, "value")) {
+          if (Object.hasOwn(descriptor, "value")) {
             result.value = get.copy(descriptor.value, copyKeyDeep, map)
             result.writable = descriptor.writable
           } else {
@@ -1703,7 +1756,7 @@ export class Get {
     for (var i in lib.cardPile) {
       for (var j = 0; j < lib.cardPile[i].length; j++) {
         var info = lib.cardPile[i][j]
-        if (lib.inpile.includes(info[2]) && get.type(info[2]) == type) {
+        if (lib.inpile.includes(info[2]) && get.type(info[2]) === type) {
           list.push({
             name: info[2],
             suit: info[0],
@@ -1717,28 +1770,28 @@ export class Get {
   }
   inpile(type, filter) {
     var list = []
-    if (filter == "trick") {
+    if (filter === "trick") {
       for (var i = 0; i < lib.inpile.length; i++) {
-        if (get.type(lib.inpile[i], "trick") == type) {
+        if (get.type(lib.inpile[i], "trick") === type) {
           list.push(lib.inpile[i])
         }
       }
     } else {
       for (var i = 0; i < lib.inpile.length; i++) {
-        if (typeof type == "function") {
+        if (typeof type === "function") {
           if (type(lib.inpile[i])) {
             list.push(lib.inpile[i])
           }
         } else {
-          if (typeof filter == "function" && !filter(lib.inpile[i])) {
+          if (typeof filter === "function" && !filter(lib.inpile[i])) {
             continue
           }
-          if (type.startsWith("equip") && type.length == 6) {
-            if (get.subtype(lib.inpile[i]) == type) {
+          if (type.startsWith("equip") && type.length === 6) {
+            if (get.subtype(lib.inpile[i]) === type) {
               list.push(lib.inpile[i])
             }
           } else {
-            if (get.type(lib.inpile[i]) == type) {
+            if (get.type(lib.inpile[i]) === type) {
               list.push(lib.inpile[i])
             }
           }
@@ -1753,33 +1806,33 @@ export class Get {
   typeCard(type, filter) {
     var list = []
     for (var i in lib.card) {
-      if (lib.card[i].mode && lib.card[i].mode.includes(get.mode()) == false) {
+      if (lib.card[i].mode && lib.card[i].mode.includes(get.mode()) === false) {
         continue
       }
       // if(lib.card[i].vanish||lib.card[i].destroy) continue;
       if (lib.card[i].destroy) {
         continue
       }
-      if (typeof filter == "function" && !filter(i)) {
+      if (typeof filter === "function" && !filter(i)) {
         continue
       }
       if (lib.config.bannedcards.includes(i)) {
         continue
       }
-      if (!lib.translate[i + "_info"]) {
+      if (!lib.translate[`${i}_info`]) {
         continue
       }
       if (
-        (type.startsWith("equip") && type.length == 6) ||
-        (type.startsWith("hslingjian") && type.length == 11) ||
+        (type.startsWith("equip") && type.length === 6) ||
+        (type.startsWith("hslingjian") && type.length === 11) ||
         type.startsWith("spell_")
       ) {
         // hslingjian 是『轩辕剑』里面的
-        if (get.subtype(i) == type) {
+        if (get.subtype(i) === type) {
           list.push(i)
         }
       } else {
-        if (get.type(i) == type) {
+        if (get.type(i) === type) {
           list.push(i)
         }
       }
@@ -1789,7 +1842,7 @@ export class Get {
   libCard(filter) {
     var list = []
     for (var i in lib.card) {
-      if (lib.card[i].mode && lib.card[i].mode.includes(get.mode()) == false) {
+      if (lib.card[i].mode && lib.card[i].mode.includes(get.mode()) === false) {
         continue
       }
       // if(lib.card[i].vanish||lib.card[i].destroy) continue;
@@ -1799,7 +1852,7 @@ export class Get {
       if (lib.config.bannedcards.includes(i)) {
         continue
       }
-      if (!lib.translate[i + "_info"]) {
+      if (!lib.translate[`${i}_info`]) {
         continue
       }
       if (filter(lib.card[i], i)) {
@@ -1812,7 +1865,7 @@ export class Get {
     if (!require) {
       return ""
     }
-    var interfaces = require("os").networkInterfaces()
+    var interfaces = require("node:os").networkInterfaces()
     for (var devName in interfaces) {
       if (devName.includes("VMware")) {
         continue
@@ -1820,14 +1873,18 @@ export class Get {
       var iface = interfaces[devName]
       for (var i = 0; i < iface.length; i++) {
         var alias = iface[i]
-        if (alias.family === "IPv4" && alias.address !== "127.0.0.1" && !alias.internal) {
+        if (
+          alias.family === "IPv4" &&
+          alias.address !== "127.0.0.1" &&
+          !alias.internal
+        ) {
           return alias.address
         }
       }
     }
   }
   modetrans(config, server) {
-    if (config.mode == "doudizhu") {
+    if (config.mode === "doudizhu") {
       switch (config.doudizhu_mode) {
         case "kaihei":
           return "开黑斗地主"
@@ -1838,10 +1895,10 @@ export class Get {
         case "online":
           return "智斗三国"
         default:
-          return "休闲" + (config.double_character ? "双将" : "") + "斗地主"
+          return "休闲斗地主"
       }
     }
-    if (config.mode == "versus") {
+    if (config.mode === "versus") {
       switch (config.versus_mode) {
         case "1v1":
           return "单人对决"
@@ -1855,7 +1912,7 @@ export class Get {
           return "官渡之战"
       }
     }
-    if (config.mode == "single") {
+    if (config.mode === "single") {
       switch (config.single_mode) {
         case "normal":
           return "新１ｖ１"
@@ -1867,28 +1924,23 @@ export class Get {
           return "无限火力"
       }
     }
-    if (config.mode == "identity") {
+    if (config.mode === "identity") {
       switch (config.identity_mode) {
         case "purple":
           return "三对三对二"
         case "zhong":
-          return (config.double_character ? "双将" : "") + "忠胆英杰"
+          return "忠胆英杰"
         case "stratagem":
-          return (
-            get.cnNumber(parseInt(config.number)) +
-            "人" +
-            (config.double_character ? "双将" : "") +
-            "谋攻"
-          )
+          return `${get.cnNumber(parseInt(config.number, 10))}人谋攻`
         default:
-          return `${get.cnNumber(parseInt(config.number))}人${config.double_nei ? "双内" : ""}${config.enable_commoner ? "带民" : ""}${config.double_character ? "双将" : ""}身份`
+          return `${get.cnNumber(parseInt(config.number, 10))}人${config.double_nei ? "双内" : ""}${config.enable_commoner ? "带民" : ""}身份`
       }
     }
-    if (config.mode == "guozhan") {
+    if (config.mode === "guozhan") {
       if (config.separatism) {
         return "群雄割据"
       }
-      if (config.guozhan_mode != "normal") {
+      if (config.guozhan_mode !== "normal") {
         switch (config.guozhan_mode) {
           case "yingbian":
             return "应变国战"
@@ -1898,12 +1950,9 @@ export class Get {
       }
     }
     if (server) {
-      return get.translation(get.plainText(config.mode)) + "模式"
-    } else {
-      return (
-        get.cnNumber(parseInt(config.number)) + "人" + get.translation(get.plainText(config.mode))
-      )
+      return `${get.translation(get.plainText(config.mode))}模式`
     }
+    return `${get.cnNumber(parseInt(config.number, 10))}人${get.translation(get.plainText(config.mode))}`
   }
   /**
    * 获取联机可用武将列表
@@ -1911,12 +1960,12 @@ export class Get {
    * @returns { string[] }
    */
   charactersOL(func) {
-    let list = []
-    let libCharacter = {}
+    const list = []
+    const libCharacter = {}
     for (let i = 0; i < lib.configOL.characterPack.length; i++) {
       const pack = lib.characterPack[lib.configOL.characterPack[i]]
-      for (let j in pack) {
-        if (typeof func == "function" && func(j)) {
+      for (const j in pack) {
+        if (typeof func === "function" && func(j)) {
           continue
         }
         if (lib.connectBanned.includes(j)) {
@@ -1927,7 +1976,7 @@ export class Get {
         }
       }
     }
-    for (let i in libCharacter) {
+    for (const i in libCharacter) {
       if (lib.filter.characterDisabled(i, libCharacter)) {
         continue
       }
@@ -1937,7 +1986,7 @@ export class Get {
   }
   trimip(str) {
     var len = str.length - 5
-    if (str.lastIndexOf(":8080") == len) {
+    if (str.lastIndexOf(":8080") === len) {
       str = str.slice(0, len)
     }
     return str
@@ -1946,7 +1995,7 @@ export class Get {
     return lib[_status.connectMode ? "configOL" : "config"].mode
   }
   idDialog(id) {
-    return ui.dialogs.find((dialog) => dialog.videoId == id) || null
+    return ui.dialogs.find((dialog) => dialog.videoId === id) || null
   }
   arenaState() {
     var state = {
@@ -1996,20 +2045,23 @@ export class Get {
     return skills
   }
   id() {
-    return Math.floor(1000000 + 9000000 * Math.random()).toString() + (10 + lib.status.globalId++)
+    return (
+      Math.floor(1000000 + 9000000 * Math.random()).toString() +
+      (10 + lib.status.globalId++)
+    )
   }
   zhu(player, skill, group) {
-    if (typeof player == "string") {
+    if (typeof player === "string") {
       skill = player
       player = null
     }
     var mode = get.mode()
-    if (mode == "identity") {
-      if (_status.mode == "purple") {
+    if (mode === "identity") {
+      if (_status.mode === "purple") {
         if (!player) {
           return null
         }
-        var zhu = game[player.identity.slice(0, 1) + "Zhu"]
+        var zhu = game[`${player.identity.slice(0, 1)}Zhu`]
         if (!zhu) {
           return null
         }
@@ -2027,7 +2079,10 @@ export class Get {
       if (game.zhu.isZhu) {
         return game.zhu
       }
-    } else if (mode == "versus" && (_status.mode == "four" || _status.mode == "guandu")) {
+    } else if (
+      mode === "versus" &&
+      (_status.mode === "four" || _status.mode === "guandu")
+    ) {
       for (var i = 0; i < game.players.length; i++) {
         if (game.players[i].isZhu) {
           if (skill && !game.players[i].hasSkill(skill)) {
@@ -2036,12 +2091,12 @@ export class Get {
           if (!player) {
             return game.players[i]
           }
-          if (player.side == game.players[i].side) {
+          if (player.side === game.players[i].side) {
             return game.players[i]
           }
         }
       }
-    } else if (mode == "guozhan") {
+    } else if (mode === "guozhan") {
       for (var i = 0; i < game.players.length; i++) {
         if (get.is.jun(game.players[i]) && !game.players[i].isUnseen()) {
           if (skill && !game.players[i].hasSkill(skill)) {
@@ -2050,9 +2105,10 @@ export class Get {
           if (!player) {
             return game.players[i]
           }
-          if (player.identity == game.players[i].identity) {
+          if (player.identity === game.players[i].identity) {
             return game.players[i]
-          } else if (group && group == game.players[i].identity) {
+          }
+          if (group && group === game.players[i].identity) {
             return game.players[i]
           }
         }
@@ -2155,7 +2211,9 @@ export class Get {
         if (!Array.isArray(skills)) {
           skills = [skills]
         }
-        if (!skills.every((skill) => player.hasSkill(skill, null, null, false))) {
+        if (
+          !skills.every((skill) => player.hasSkill(skill, null, null, false))
+        ) {
           return 0
         }
       }
@@ -2165,19 +2223,21 @@ export class Get {
     }
     var num = 1
     var threaten = 1
-    if (info.ai && info.ai.threaten) {
-      if (typeof info.ai.threaten == "number") {
+    if (info.ai?.threaten) {
+      if (typeof info.ai.threaten === "number") {
         threaten = info.ai.threaten
-      } else if (typeof info.ai.threaten == "function" && player) {
+      } else if (typeof info.ai.threaten === "function" && player) {
         threaten = info.ai.threaten(player, player)
       }
     }
-    if (type && type.includes("in")) {
-      if (info.enable == "phaseUse") {
+    if (type?.includes("in")) {
+      if (info.enable === "phaseUse") {
         num += 0.5
       }
-      if (info.trigger && info.trigger.player) {
-        var list = Array.isArray(info.trigger.player) ? info.trigger.player : [info.trigger.player]
+      if (info.trigger?.player) {
+        var list = Array.isArray(info.trigger.player)
+          ? info.trigger.player
+          : [info.trigger.player]
         var add = false
         for (var i of list) {
           if (i.startsWith("phase")) {
@@ -2185,7 +2245,7 @@ export class Get {
             add = true
           } else {
             for (var j of lib.phaseName) {
-              if (i.indexOf[j] == 0) {
+              if (i.indexOf[j] === 0) {
                 num += 0.5
                 add = true
                 break
@@ -2199,7 +2259,8 @@ export class Get {
       }
       if (
         info.trigger &&
-        ((typeof info.trigger.player == "string" && info.trigger.player.startsWith("use")) ||
+        ((typeof info.trigger.player === "string" &&
+          info.trigger.player.startsWith("use")) ||
           info.trigger.source)
       ) {
         num += 0.3
@@ -2208,7 +2269,7 @@ export class Get {
         num += Math.sqrt(threaten) - 1
       }
     }
-    if (type && type.includes("out")) {
+    if (type?.includes("out")) {
       if (threaten < 1) {
         num *= 1 / Math.sqrt(threaten)
       }
@@ -2229,8 +2290,9 @@ export class Get {
         }
         if (
           info.trigger.target ||
-          (typeof info.trigger.player == "string" &&
-            (info.trigger.player.startsWith("damage") || info.trigger.player.startsWith("lose")))
+          (typeof info.trigger.player === "string" &&
+            (info.trigger.player.startsWith("damage") ||
+              info.trigger.player.startsWith("lose")))
         ) {
           num += 0.1
         }
@@ -2287,12 +2349,12 @@ export class Get {
       const id = info[4]
       if (!id) {
         card = ui.create.card()
-        if (info && info[2]) {
+        if (info?.[2]) {
           card.init(info)
         }
       } else if (lib.cardOL[id]) {
-        if (lib.cardOL[id].name != info[2]) {
-          if (info && info[2]) {
+        if (lib.cardOL[id].name !== info[2]) {
+          if (info?.[2]) {
             lib.cardOL[id].init(info)
           }
         }
@@ -2300,7 +2362,7 @@ export class Get {
       } else {
         card = ui.create.card()
         card.cardid = id
-        if (info && info[2]) {
+        if (info?.[2]) {
           card.init(info)
         }
         lib.cardOL[id] = card
@@ -2374,9 +2436,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return Array.from(infos || []).map(get.infoVCard)
   }
   cardInfoOL(card) {
-    return (
-      "_wtk_card:" + JSON.stringify([card.cardid, card.suit, card.number, card.name, card.nature])
-    )
+    return `_wtk_card:${JSON.stringify([card.cardid, card.suit, card.number, card.name, card.nature])}`
   }
   infoCardOL(info) {
     if (!lib.cardOL) {
@@ -2388,12 +2448,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       var id = info.shift()
       if (!id) {
         card = ui.create.card()
-        if (info && info[2]) {
+        if (info?.[2]) {
           card.init(info)
         }
       } else if (lib.cardOL[id]) {
-        if (lib.cardOL[id].name != info[2]) {
-          if (info && info[2]) {
+        if (lib.cardOL[id].name !== info[2]) {
+          if (info?.[2]) {
             lib.cardOL[id].init(info)
           }
         }
@@ -2401,7 +2461,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       } else if (game.online) {
         card = ui.create.card()
         card.cardid = id
-        if (info && info[2]) {
+        if (info?.[2]) {
           card.init(info)
         }
         lib.cardOL[id] = card
@@ -2418,7 +2478,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return Array.from(infos || []).map(get.infoCardOL)
   }
   playerInfoOL(player) {
-    return "_wtk_player:" + player.playerid
+    return `_wtk_player:${player.playerid}`
   }
   infoPlayerOL(info) {
     return lib.playerOL ? lib.playerOL[info.slice(15)] || info : info
@@ -2432,7 +2492,8 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   /** @type {RegExp} */
   #specialHeadPattern = /^(?:async\b)?\s*[\w$]+\s*=>/
   /** @type {RegExp} */
-  #functionHeadPattern = /^(?:async\b\s*)?(?:function\b\s*)?(?:\*\s*)?(?:[\w$]+\b\s*)?\(/
+  #functionHeadPattern =
+    /^(?:async\b\s*)?(?:function\b\s*)?(?:\*\s*)?(?:[\w$]+\b\s*)?\(/
   /** @type {RegExp} */
   #illegalFunctionHeadPattern = /^(?:async\b\s*)?\*\s*\(/
   /** @type {RegExp} */
@@ -2450,11 +2511,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns { boolean }
    */
   isFunctionParam(paramstr) {
-    if (paramstr.length == 0) {
+    if (paramstr.length === 0) {
       return true
     }
     const canCreateFunction =
-      security.isSandboxRequired() && security.importSandbox().Marshal.canCreateFunction
+      security.isSandboxRequired() &&
+      security.importSandbox().Marshal.canCreateFunction
     if (canCreateFunction) {
       return canCreateFunction(paramstr, "")
     }
@@ -2478,11 +2540,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    */
   isFunctionBody(code, type = /* (function(){return null})() */ null) {
     const canCreateFunction =
-      security.isSandboxRequired() && security.importSandbox().Marshal.canCreateFunction
+      security.isSandboxRequired() &&
+      security.importSandbox().Marshal.canCreateFunction
     if (canCreateFunction) {
       return canCreateFunction("", code, type)
     }
-    if (type == "any") {
+    if (type === "any") {
       return (
         ["async", "generator", "agenerator", null]
           // @ts-expect-error ignore // 突然发现ts-ignore也挺方便的喵
@@ -2587,7 +2650,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       let funcHead = functionHead[0]
       let idMatch
       while ((idMatch = get.#identifierPattern.exec(funcHead))) {
-        if (idMatch[0] != "async") {
+        if (idMatch[0] !== "async") {
           if (log) {
             console.warn("发现无法识别的远程代码:", str)
           }
@@ -2599,7 +2662,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       let funcHead = functionHead[0]
       let idMatch
       while ((idMatch = get.#identifierPattern.exec(funcHead))) {
-        if (idMatch[0] != "async") {
+        if (idMatch[0] !== "async") {
           break
         }
         funcHead = funcHead.slice(idMatch.index + idMatch[0].length)
@@ -2621,7 +2684,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         }
         return emptyFunction
       }
-      funcBody = "{" + str.slice(foundClose + neckMatch[0].length)
+      funcBody = `{${str.slice(foundClose + neckMatch[0].length)}`
     } else {
       // 将表达式函数体转换成块函数体
       funcBody = `{ return ${str.slice(foundClose + neckMatch[0].length)}; }`
@@ -2646,18 +2709,18 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     // 开始构造最终的函数
     let finalStr = ` (${verifiedParams}) ${funcBody}`
     if (funcType & 1) {
-      finalStr = "*" + finalStr
+      finalStr = `*${finalStr}`
     }
-    finalStr = "function" + finalStr
+    finalStr = `function${finalStr}`
     if (funcType & 2) {
-      finalStr = "async " + finalStr
+      finalStr = `async ${finalStr}`
     }
     return finalStr
   }
   funcInfoOL(func) {
-    if (typeof func == "function") {
+    if (typeof func === "function") {
       if (func._filter_args) {
-        return "_wtk_func:" + JSON.stringify(get.stringifiedResult(func._filter_args, 3))
+        return `_wtk_func:${JSON.stringify(get.stringifiedResult(func._filter_args, 3))}`
       }
       // 沙盒在封装函数时，为了保存源代码会另外存储函数的源代码
       /** @type {(func: Function) => string} */
@@ -2669,7 +2732,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       if (/\{\s*\[native code\]\s*\}/.test(str)) {
         return "_wtk_func:function () {}"
       }
-      return "_wtk_func:" + get.pureFunctionStr(str)
+      return `_wtk_func:${get.pureFunctionStr(str)}`
     }
     return ""
   }
@@ -2685,7 +2748,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     try {
       // js内置的函数
       if (/\{\s*\[native code\]\s*\}/.test(str)) {
-        return function () {}
+        return () => {}
       }
       if (security.isSandboxRequired()) {
         const loadStr = `return (${str});`
@@ -2701,7 +2764,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       }
     } catch (e) {
       console.error(`${e} in \n${str}`)
-      return function () {}
+      return () => {}
     }
     if (Array.isArray(func)) {
       func = get.filter.apply(this, get.parsedResult(func))
@@ -2709,18 +2772,18 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return func
   }
   eventInfoOL(item, level, noMore) {
-    return get.itemtype(item) == "event"
+    return get.itemtype(item) === "event"
       ? `_wtk_event:${JSON.stringify(
           Object.entries(item).reduce((stringifying, entry) => {
             const key = entry[0]
-            if (key == "_trigger") {
+            if (key === "_trigger") {
               if (noMore !== false) {
                 stringifying[key] = get.eventInfoOL(entry[1], null, false)
               }
             } else if (
               !lib.element.GameEvent.prototype[key] &&
-              key != "content" &&
-              get.itemtype(entry[1]) != "event"
+              key !== "content" &&
+              get.itemtype(entry[1]) !== "event"
             ) {
               stringifying[key] = get.stringifiedResult(entry[1], null, false)
             }
@@ -2737,7 +2800,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     try {
       Object.entries(JSON.parse(item.slice(14))).forEach((entry) => {
         const key = entry[0]
-        if (typeof evt[key] != "function") {
+        if (typeof evt[key] !== "function") {
           evt[key] = get.parsedResult(entry[1])
         }
       })
@@ -2791,12 +2854,11 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         vcard[key] = value
       })
       return vcard
-    } else {
-      const card = new lib.element.VCard(datas)
-      // @ts-expect-error ignore
-      lib.vcardOL[vid] = card
-      return card
     }
+    const card = new lib.element.VCard(datas)
+    // @ts-expect-error ignore
+    lib.vcardOL[vid] = card
+    return card
   }
   infoVCardsOL(infos) {
     return Array.from(infos || []).map(get.infoVCardOL)
@@ -2828,7 +2890,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     const info = {}
 
     for (const value of set) {
-      Array.prototype.push.call(info, get.stringifiedResult(value, level, nomore))
+      Array.prototype.push.call(
+        info,
+        get.stringifiedResult(value, level, nomore),
+      )
     }
 
     info[TYPE_KEY] = "set"
@@ -2838,7 +2903,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     const map = new Map()
 
     for (const index in item) {
-      if (!isFinite(Number(index))) {
+      if (!Number.isFinite(Number(index))) {
         break
       }
 
@@ -2857,7 +2922,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     const set = new Set()
 
     for (const index in item) {
-      if (!isFinite(Number(index))) {
+      if (!Number.isFinite(Number(index))) {
         break
       }
 
@@ -2870,9 +2935,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     if (!item) {
       return item
     }
-    if (typeof item == "function") {
+    if (typeof item === "function") {
       return get.funcInfoOL(item)
-    } else if (typeof item == "object") {
+    }
+    if (typeof item === "object") {
       switch (get.itemtype(item)) {
         case "card":
           return get.cardInfoOL(item)
@@ -2891,12 +2957,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             return ""
           }
           return get.eventInfoOL(item)
-        default:
-          if (typeof level != "number") {
+        default: {
+          if (typeof level !== "number") {
             level = 8
           }
           if (Array.isArray(item)) {
-            if (level == 0) {
+            if (level === 0) {
               return []
             }
             const result = []
@@ -2904,63 +2970,69 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
               result.push(get.stringifiedResult(item[i], level - 1, nomore))
             }
             return result
-          } else {
-            if (level == 0) {
-              return {}
-            }
-
-            const type = Object.prototype.toString.call(item).slice(8, -1)
-
-            switch (type) {
-              case "Map":
-                return get.mapInfoOL(item, level - 1, nomore)
-              case "Set":
-                return get.setInfoOL(item, level - 1, nomore)
-              case "Object": {
-                const result = {}
-                for (const i in item) {
-                  result[i] = get.stringifiedResult(item[i], level - 1, nomore)
-                }
-                return result
-              }
-              default:
-                return {}
-            }
           }
+          if (level === 0) {
+            return {}
+          }
+
+          const type = Object.prototype.toString.call(item).slice(8, -1)
+
+          switch (type) {
+            case "Map":
+              return get.mapInfoOL(item, level - 1, nomore)
+            case "Set":
+              return get.setInfoOL(item, level - 1, nomore)
+            case "Object": {
+              const result = {}
+              for (const i in item) {
+                result[i] = get.stringifiedResult(item[i], level - 1, nomore)
+              }
+              return result
+            }
+            default:
+              return {}
+          }
+        }
       }
-    } else if (item === Infinity) {
-      return "_wtk_infinity"
-    } else {
-      return item
     }
+    if (item === Infinity) {
+      return "_wtk_infinity"
+    }
+    return item
   }
   parsedResult(item) {
     if (!item) {
       return item
     }
-    if (typeof item == "string") {
+    if (typeof item === "string") {
       if (item.startsWith("_wtk_func:")) {
         return get.infoFuncOL(item)
-      } else if (item.startsWith("_wtk_card:")) {
-        return get.infoCardOL(item)
-      } else if (item.startsWith("_wtk_vcard:")) {
-        return get.infoVCardOL(item)
-      } else if (item.startsWith("_wtk_player:")) {
-        return get.infoPlayerOL(item)
-      } else if (item.startsWith("_wtk_event:")) {
-        return get.infoEventOL(item)
-      } else if (item == "_wtk_infinity") {
-        return Infinity
-      } else {
-        return item
       }
-    } else if (Array.isArray(item)) {
+      if (item.startsWith("_wtk_card:")) {
+        return get.infoCardOL(item)
+      }
+      if (item.startsWith("_wtk_vcard:")) {
+        return get.infoVCardOL(item)
+      }
+      if (item.startsWith("_wtk_player:")) {
+        return get.infoPlayerOL(item)
+      }
+      if (item.startsWith("_wtk_event:")) {
+        return get.infoEventOL(item)
+      }
+      if (item === "_wtk_infinity") {
+        return Infinity
+      }
+      return item
+    }
+    if (Array.isArray(item)) {
       const result = []
       for (let i = 0; i < item.length; i++) {
         result.push(get.parsedResult(item[i]))
       }
       return result
-    } else if (typeof item == "object") {
+    }
+    if (typeof item === "object") {
       if (TYPE_KEY in item) {
         switch (item[TYPE_KEY]) {
           case "map":
@@ -2974,24 +3046,23 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         result[i] = get.parsedResult(item[i])
       }
       return result
-    } else {
-      return item
     }
+    return item
   }
   verticalStr(str, sp) {
-    if (typeof str != "string") {
+    if (typeof str !== "string") {
       return ""
     }
     return Array.from(str)
-      .filter((value) => value != "`")
+      .filter((value) => value !== "`")
       .join("")
   }
   numStr(num, method) {
-    if (num == Infinity) {
-      if (method == "card") {
+    if (num === Infinity) {
+      if (method === "card") {
         return get.selectableCards().length + ui.selected.cards.length
       }
-      if (method == "target") {
+      if (method === "target") {
         return get.selectableTargets().length + ui.selected.targets.length
       }
       return "∞"
@@ -3000,12 +3071,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   }
   rawName(str, noab = false) {
     let str2 = lib.translate[str]
-    if (noab !== true && lib.translate[str + "_ab"]) {
-      str2 = lib.translate[str + "_ab"]
+    if (noab !== true && lib.translate[`${str}_ab`]) {
+      str2 = lib.translate[`${str}_ab`]
     }
     if (str2) {
-      if (lib.translate[str + "_prefix"]) {
-        let prefixList = lib.translate[str + "_prefix"].split("|")
+      if (lib.translate[`${str}_prefix`]) {
+        const prefixList = lib.translate[`${str}_prefix`].split("|")
         while (prefixList.length) {
           const prefix = prefixList.shift()
           if (str2.startsWith(prefix)) {
@@ -3029,8 +3100,8 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     let slimName = lib.translate[`${str}_ab`] || lib.translate[str]
     if (slimName) {
       if (lib.translate[`${str}_prefix`]) {
-        let prefixList = lib.translate[str + "_prefix"].split("|")
-        let setPrefix = []
+        const prefixList = lib.translate[`${str}_prefix`].split("|")
+        const setPrefix = []
         while (prefixList.length) {
           const prefix = prefixList.shift()
           if (slimName.startsWith(prefix)) {
@@ -3055,10 +3126,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    */
   prefixSpan(prefix, name) {
     const config = lib.config.buttoncharacter_prefix
-    if (config == "off") {
+    if (config === "off") {
       return ""
     }
-    if (config == "simple") {
+    if (config === "simple") {
       const span = document.createElement("span")
       span.innerHTML = prefix
       return span.outerHTML
@@ -3091,14 +3162,19 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   time() {
     if (lib.status.dateDelaying) {
       return (
-        lib.getUTC(lib.status.dateDelaying) - lib.getUTC(lib.status.date) - lib.status.dateDelayed
+        lib.getUTC(lib.status.dateDelaying) -
+        lib.getUTC(lib.status.date) -
+        lib.status.dateDelayed
       )
-    } else {
-      return lib.getUTC(new Date()) - lib.getUTC(lib.status.date) - lib.status.dateDelayed
     }
+    return (
+      lib.getUTC(new Date()) -
+      lib.getUTC(lib.status.date) -
+      lib.status.dateDelayed
+    )
   }
   utc() {
-    return new Date().getTime()
+    return Date.now()
   }
   evtDistance(e1, e2) {
     var dx = (e1.clientX - e2.clientX) / game.documentZoom
@@ -3106,7 +3182,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return Math.sqrt(dx * dx + dy * dy)
   }
   xyDistance(from, to) {
-    return Math.sqrt((from[0] - to[0]) * (from[0] - to[0]) + (from[1] - to[1]) * (from[1] - to[1]))
+    return Math.sqrt(
+      (from[0] - to[0]) * (from[0] - to[0]) +
+        (from[1] - to[1]) * (from[1] - to[1]),
+    )
   }
   /**
    * @overload
@@ -3158,11 +3237,11 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns { 'event' }
    */
   itemtype(obj) {
-    if (typeof obj == "string") {
+    if (typeof obj === "string") {
       if (obj.length <= 5) {
         let bool = true
         for (let i = 0; i < obj.length; i++) {
-          if (/h|e|j|s|x/.test(obj[i]) == false) {
+          if (/h|e|j|s|x/.test(obj[i]) === false) {
             bool = false
             break
           }
@@ -3191,20 +3270,21 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       if (
         obj.every(
           (p) =>
-            p instanceof lib.element.VCard || (get.is.object(p) && p.name && p.name in lib.card),
+            p instanceof lib.element.VCard ||
+            (get.is.object(p) && p.name && p.name in lib.card),
         )
       ) {
         return "vcards"
       }
-      if (obj.length == 2) {
-        if (typeof obj[0] == "number" && typeof obj[1] == "number") {
+      if (obj.length === 2) {
+        if (typeof obj[0] === "number" && typeof obj[1] === "number") {
           if (obj[0] <= obj[1] || obj[1] <= -1) {
             return "select"
           }
         }
       }
-      if (obj.length == 4) {
-        if (obj.every((p) => typeof p == "number")) {
+      if (obj.length === 4) {
+        if (obj.every((p) => typeof p === "number")) {
           return "divposition"
         }
       }
@@ -3245,7 +3325,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   equipNum(card) {
     const subtypes = get.subtypes(card)
     if (subtypes.length) {
-      return parseInt(subtypes[0].slice(5))
+      return parseInt(subtypes[0].slice(5), 10)
     }
     return 0
   }
@@ -3296,10 +3376,14 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     if (Object.prototype.toString.call(obj) === "[object HTMLTableElement]") {
       return "table"
     }
-    if (Object.prototype.toString.call(obj) === "[object HTMLTableRowElement]") {
+    if (
+      Object.prototype.toString.call(obj) === "[object HTMLTableRowElement]"
+    ) {
       return "tr"
     }
-    if (Object.prototype.toString.call(obj) === "[object HTMLTableCellElement]") {
+    if (
+      Object.prototype.toString.call(obj) === "[object HTMLTableCellElement]"
+    ) {
       return "td"
     }
     if (Object.prototype.toString.call(obj) === "[object HTMLBodyElement]") {
@@ -3318,10 +3402,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns { string }
    */
   type(obj, method, player) {
-    if (typeof obj == "string") {
+    if (typeof obj === "string") {
       obj = { name: obj }
     }
-    if (typeof obj != "object") {
+    if (typeof obj !== "object") {
       return
     }
     var name = get.name(obj, player)
@@ -3335,10 +3419,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           .split("_")
           .every((n) => lib.nature.has(n))
       ) {
-        return lib.card["sha"].type
+        return lib.card.sha.type
       }
     }
-    if (method == "trick" && lib.card[name].type == "delay") {
+    if (method === "trick" && lib.card[name].type === "delay") {
       return "trick"
     }
     return lib.card[name].type
@@ -3353,23 +3437,23 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns { string | undefined }
    */
   subtype(obj, player) {
-    if (typeof obj == "string") {
+    if (typeof obj === "string") {
       obj = { name: obj }
     }
-    if (typeof obj != "object") {
+    if (typeof obj !== "object") {
       return
     }
     const name = get.name(obj, player)
     if (!lib.card[name]) {
       return
     }
-    let subtype = lib.card[name].subtype
+    const subtype = lib.card[name].subtype
     return subtype
   }
   equiptype(card, player) {
     var subtype = get.subtype(card, player)
     if (subtype.startsWith("equip")) {
-      return parseInt(subtype[5])
+      return parseInt(subtype[5], 10)
     }
     return 0
   }
@@ -3380,7 +3464,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns { string | undefined }
    */
   name(card, player) {
-    if (get.itemtype(player) == "player" || (player !== false && get.position(card) == "h")) {
+    if (
+      get.itemtype(player) === "player" ||
+      (player !== false && get.position(card) === "h")
+    ) {
       var owner = player || get.owner(card)
       if (owner) {
         return game.checkMod(card, owner, card.name, "cardname", owner)
@@ -3399,30 +3486,30 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       return
     }
     if (Array.isArray(card)) {
-      if (card.length == 1) {
+      if (card.length === 1) {
         return get.suit(card[0], player)
       }
       return "none"
-    } else if (!("suit" in card) && Array.isArray(card.cards)) {
-      return get.suit(card.cards, player)
-    } else {
-      if (player !== false) {
-        const owner = player || get.owner(card)
-        if (owner) {
-          return game.checkMod(
-            card,
-            owner,
-            game.checkMod(card, card.suit, "suit", owner),
-            "cardsuit",
-            owner,
-          )
-        }
-      }
-      if (card.suit === "unsure" || lib.suits.includes(card.suit)) {
-        return card.suit
-      }
-      return "none"
     }
+    if (!("suit" in card) && Array.isArray(card.cards)) {
+      return get.suit(card.cards, player)
+    }
+    if (player !== false) {
+      const owner = player || get.owner(card)
+      if (owner) {
+        return game.checkMod(
+          card,
+          owner,
+          game.checkMod(card, card.suit, "suit", owner),
+          "cardsuit",
+          owner,
+        )
+      }
+    }
+    if (card.suit === "unsure" || lib.suits.includes(card.suit)) {
+      return card.suit
+    }
+    return "none"
   }
   /**
    * 返回牌的颜色
@@ -3441,24 +3528,28 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       const cards = card.slice(),
         color = get.color(cards.shift(), player)
       for (const anotherCard of cards) {
-        if (get.color(anotherCard, player) != color) {
+        if (get.color(anotherCard, player) !== color) {
           return "none"
         }
       }
       return color
-    } else if (card.color === "unsure" || Object.keys(lib.color).includes(card.color)) {
-      return card.color
-    } else if (Array.isArray(card.cards) && !lib.suit.includes(card.suit)) {
-      return get.color(card.cards, player)
-    } else {
-      const suit = get.suit(card, player)
-      for (const entry of Object.entries(lib.color)) {
-        if (entry[1].includes(suit)) {
-          return entry[0]
-        }
-      }
-      return "none"
     }
+    if (
+      card.color === "unsure" ||
+      Object.keys(lib.color).includes(card.color)
+    ) {
+      return card.color
+    }
+    if (Array.isArray(card.cards) && !lib.suit.includes(card.suit)) {
+      return get.color(card.cards, player)
+    }
+    const suit = get.suit(card, player)
+    for (const entry of Object.entries(lib.color)) {
+      if (entry[1].includes(suit)) {
+        return entry[0]
+      }
+    }
+    return "none"
   }
   /**
    * 返回牌的点数
@@ -3471,7 +3562,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       return
     }
     if (Array.isArray(card)) {
-      if (card.length == 1) {
+      if (card.length === 1) {
         return get.number(card[0], player)
       }
       return null
@@ -3482,11 +3573,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       number = card.number
       if (number === "unsure") {
         return number
-      } else if (typeof number != "number") {
+      }
+      if (typeof number !== "number") {
         number = null
       }
     } else {
-      if (card.cards && card.cards.length == 1) {
+      if (card.cards && card.cards.length === 1) {
         number = get.number(card.cards[0], false)
       }
     }
@@ -3505,14 +3597,20 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns {string}
    */
   nature(card, player) {
-    if (typeof card == "string") {
-      return card.split(lib.natureSeparator).sort(lib.sort.nature).join(lib.natureSeparator)
+    if (typeof card === "string") {
+      return card
+        .split(lib.natureSeparator)
+        .sort(lib.sort.nature)
+        .join(lib.natureSeparator)
     }
     if (Array.isArray(card)) {
       return card.sort(lib.sort.nature).join(lib.natureSeparator)
     }
     var nature = card.nature
-    if (get.itemtype(player) == "player" || (player !== false && get.position(card) == "h")) {
+    if (
+      get.itemtype(player) === "player" ||
+      (player !== false && get.position(card) === "h")
+    ) {
       var owner = get.owner(card)
       if (owner) {
         return game.checkMod(card, owner, nature, "cardnature", owner)
@@ -3530,14 +3628,14 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     if (!card) {
       return []
     }
-    if (get.itemtype(card) == "natures") {
+    if (get.itemtype(card) === "natures") {
       return card.split(lib.natureSeparator)
     }
-    if (get.itemtype(card) == "nature") {
+    if (get.itemtype(card) === "nature") {
       return [card]
     }
     const natures = get.nature(card, player)
-    if (typeof natures != "string") {
+    if (typeof natures !== "string") {
       return []
     }
     return natures.split(lib.natureSeparator)
@@ -3550,19 +3648,19 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    */
   canRespond(card, player) {
     let name
-    if (typeof card == "object") {
+    if (typeof card === "object") {
       name = get.name(card, player)
     } else {
       name = card
     }
-    if (typeof name != "string") {
+    if (typeof name !== "string") {
       return []
     }
     const filter = lib.respondMap[name]
     if (Array.isArray(filter)) {
       return filter
     }
-    if (typeof filter == "function") {
+    if (typeof filter === "function") {
       return [filter]
     }
     return []
@@ -3596,17 +3694,17 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       delete _status.waitingForCards
     }
     var list = []
-    if (typeof num != "number") {
+    if (typeof num !== "number") {
       num = 1
     }
     if (num <= 0) {
       return []
     }
     while (num--) {
-      if (ui.cardPile.hasChildNodes() == false) {
+      if (ui.cardPile.hasChildNodes() === false) {
         game.washCard()
       }
-      if (ui.cardPile.hasChildNodes() == false) {
+      if (ui.cardPile.hasChildNodes() === false) {
         game.over("平局")
         return []
       }
@@ -3624,13 +3722,13 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   }
   judge(card) {
     const cardInfo = card.viewAs ? lib.card[card.viewAs] : get.info(card)
-    return cardInfo && cardInfo.judge ? cardInfo.judge : () => 0
+    return cardInfo?.judge ? cardInfo.judge : () => 0
   }
   judge2(card) {
     return card.viewAs ? lib.card[card.viewAs].judge2 : get.info(card).judge2
   }
   distance(from, to, method) {
-    if (from == to) {
+    if (from === to) {
       return 0
     }
     if (!game.players.includes(from) && !game.dead.includes(from)) {
@@ -3641,14 +3739,14 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     }
     let n = 1
     if (game.chess) {
-      let fxy = from.getXY(),
+      const fxy = from.getXY(),
         txy = to.getXY()
       n = Math.abs(fxy[0] - txy[0]) + Math.abs(fxy[1] - txy[1])
-      if (method == "raw" || method == "pure" || method == "absolute") {
+      if (method === "raw" || method === "pure" || method === "absolute") {
         return n
       }
     } else if (to.isMin(true) || from.isMin(true)) {
-      if (method == "raw" || method == "pure" || method == "absolute") {
+      if (method === "raw" || method === "pure" || method === "absolute") {
         return n
       }
     } else {
@@ -3656,7 +3754,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         length = game.players.length
       const totalPopulation = game.players.length + game.dead.length + 1
       for (let iwhile = 0; iwhile < totalPopulation; iwhile++) {
-        if (player.nextSeat != to) {
+        if (player.nextSeat !== to) {
           player = player.nextSeat
           if (
             player.isAlive() &&
@@ -3679,7 +3777,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           length--
         }
       }
-      if (method == "absolute") {
+      if (method === "absolute") {
         return n
       }
       if (from.isDead()) {
@@ -3692,27 +3790,31 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         right = from.hasSkillTag("right_hand")
       if (left === right) {
         n = Math.min(n, length - n)
-      } else if (left == true) {
+      } else if (left === true) {
         n = length - n
       }
-      if (method == "raw" || method == "pure") {
+      if (method === "raw" || method === "pure") {
         return n
       }
     }
     n = game.checkMod(from, to, n, "globalFrom", from)
     n = game.checkMod(from, to, n, "globalTo", to)
-    const equips1 = from.getVCards("e", function (card) {
-        return !card.cards?.some((card) => {
-          return ui.selected.cards?.includes(card)
-        })
-      }),
-      equips2 = to.getVCards("e", function (card) {
-        return !card.cards?.some((card) => {
-          return ui.selected.cards?.includes(card)
-        })
-      })
+    const equips1 = from.getVCards(
+        "e",
+        (card) =>
+          !card.cards?.some((card) => {
+            return ui.selected.cards?.includes(card)
+          }),
+      ),
+      equips2 = to.getVCards(
+        "e",
+        (card) =>
+          !card.cards?.some((card) => {
+            return ui.selected.cards?.includes(card)
+          }),
+      )
     for (let i = 0; i < equips1.length; i++) {
-      let info = get.info(equips1[i]).distance
+      const info = get.info(equips1[i]).distance
       if (!info) {
         continue
       }
@@ -3721,7 +3823,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       }
     }
     for (let i = 0; i < equips2.length; i++) {
-      let info = get.info(equips2[i]).distance
+      const info = get.info(equips2[i]).distance
       if (!info) {
         continue
       }
@@ -3732,7 +3834,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         m += info.attackTo
       }
     }
-    if (method == "attack") {
+    if (method === "attack") {
       let m = n
       m = game.checkMod(from, to, m, "attackFrom", from)
       m = game.checkMod(from, to, m, "attackTo", to)
@@ -3747,7 +3849,8 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       // 	}
       // }
       // return n;
-    } else if (method == "unchecked") {
+    }
+    if (method === "unchecked") {
       return n
     }
     return Math.max(1, n)
@@ -3764,16 +3867,16 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns { any }
    */
   info(item, player) {
-    if (typeof item == "string" || typeof item == "symbol") {
+    if (typeof item === "string" || typeof item === "symbol") {
       const info = Reflect.get(lib.skill, item)
       if (!info) {
-        const str = typeof item == "string" ? item : `[${item.toString()}]`
+        const str = typeof item === "string" ? item : `[${item.toString()}]`
         console.warn(`孩子，你的技能${str}是不是忘写了什么？！`)
         return {}
       }
       return info
     }
-    if (typeof item == "object") {
+    if (typeof item === "object") {
       var name = item.name
       if (player !== false) {
         name = get.name(item, player)
@@ -3786,15 +3889,17 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns { Select }
    */
   select(select) {
-    if (typeof select == "function") {
-      let result = get.select(select())
-      if (typeof result == "number") {
+    if (typeof select === "function") {
+      const result = get.select(select())
+      if (typeof result === "number") {
         return [result, result]
       }
       return result
-    } else if (typeof select == "number") {
+    }
+    if (typeof select === "number") {
       return [select, select]
-    } else if (select && get.itemtype(select) == "select") {
+    }
+    if (select && get.itemtype(select) === "select") {
       return select
     }
     return [1, 1]
@@ -3803,7 +3908,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     if (_status.event.skill) {
       const info = get.info(_status.event.skill)
       let card = info.viewAs
-      if (typeof card == "function") {
+      if (typeof card === "function") {
         card = card(ui.selected.cards, _status.event.player)
       }
       if (card) {
@@ -3843,11 +3948,13 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    */
   players(sort, dead, out) {
     var players = game.players.slice(0)
-    if (sort != false) {
-      if (typeof sort == "function") {
+    if (sort !== false) {
+      if (typeof sort === "function") {
         players.sort(sort)
       } else {
-        players.sortBySeat(get.itemtype(sort) == "player" ? sort : _status.event.player)
+        players.sortBySeat(
+          get.itemtype(sort) === "player" ? sort : _status.event.player,
+        )
       }
     }
     if (dead) {
@@ -3869,9 +3976,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   nameList(player) {
     let type
     if (
-      typeof player == "undefined" ||
-      ((type = typeof player), type != "object") ||
-      ((type = get.itemtype(player)), type != "player")
+      typeof player === "undefined" ||
+      ((type = typeof player), type !== "object") ||
+      ((type = get.itemtype(player)), type !== "player")
     ) {
       throw new Error(`函数接受了一个不是Player的东西: ${type}: ${player}`)
     }
@@ -3884,19 +3991,19 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
 
   position(card, ordering) {
     //哪个大聪明在返回牌位置的函数写返回玩家位置的功能
-    if (get.itemtype(card) == "player") {
-      return parseInt(card.dataset.position)
+    if (get.itemtype(card) === "player") {
+      return parseInt(card.dataset.position, 10)
     }
     if (!card) {
       return null
     }
-    if (get.itemtype(card) == "vcard") {
+    if (get.itemtype(card) === "vcard") {
       if (card.cards) {
         return get.position(card.cards[0], ordering)
       }
       return null
     }
-    if (card.timeout && card.destiny && card.destiny.classList) {
+    if (card.timeout && card.destiny?.classList) {
       if (card.destiny.classList.contains("equips")) {
         return "e"
       }
@@ -3909,21 +4016,21 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       if (card.destiny.classList.contains("handcards")) {
         return card.classList.contains("glows") ? "s" : "h"
       }
-      if (card.destiny.id == "cardPile") {
+      if (card.destiny.id === "cardPile") {
         return "c"
       }
-      if (card.destiny.id == "discardPile") {
+      if (card.destiny.id === "discardPile") {
         return "d"
       }
-      if (card.destiny.id == "special") {
+      if (card.destiny.id === "special") {
         return "s"
       }
-      if (card.destiny.id == "ordering") {
+      if (card.destiny.id === "ordering") {
         return ordering ? "o" : "d"
       }
       return null
     }
-    if (!card.parentNode || !card.parentNode.classList) {
+    if (!card.parentNode?.classList) {
       return
     }
     if (card.parentNode.classList.contains("equips")) {
@@ -3938,16 +4045,16 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     if (card.parentNode.classList.contains("handcards")) {
       return card.classList.contains("glows") ? "s" : "h"
     }
-    if (card.parentNode.id == "cardPile") {
+    if (card.parentNode.id === "cardPile") {
       return "c"
     }
-    if (card.parentNode.id == "discardPile") {
+    if (card.parentNode.id === "discardPile") {
       return "d"
     }
-    if (card.parentNode.id == "special") {
+    if (card.parentNode.id === "special") {
       return "s"
     }
-    if (card.parentNode.id == "ordering") {
+    if (card.parentNode.id === "ordering") {
       return ordering ? "o" : "d"
     }
     return null
@@ -3967,10 +4074,15 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     const name = lib.translate[str]
     if (
       !player?.getSkills("invisible", null, false).some((skill) => {
-        if (!get.skillInfoTranslation(skill, player).length || lib.translate[skill] !== name) {
+        if (
+          !get.skillInfoTranslation(skill, player).length ||
+          lib.translate[skill] !== name
+        ) {
           return false
         }
-        return skill != str && get.sourceSkillFor(skill) != get.sourceSkillFor(str)
+        return (
+          skill !== str && get.sourceSkillFor(skill) !== get.sourceSkillFor(str)
+        )
       })
     ) {
       return get.translation(str)
@@ -3978,17 +4090,17 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     const info = get.info(str)
     if (info?.duplicatePrefix !== undefined) {
       const prefix = info.duplicatePrefix
-      if (typeof prefix == "function") {
+      if (typeof prefix === "function") {
         return `${prefix(player, str)}${name}`
       }
       return `${prefix}${name}`
     }
     const map = lib.duplicatePrefix
-    for (let key in map) {
+    for (const key in map) {
       if (str.startsWith(key) && lib.skill[str.slice(key.length)]) {
         return `${map[key]}${name}`
       }
-      let key2 = `${key}_`
+      const key2 = `${key}_`
       if (str.startsWith(key2)) {
         return `${map[key]}${name}`
       }
@@ -4003,7 +4115,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       if (player && lib.dynamicTranslate[name]) {
         return lib.dynamicTranslate[name](player, name)
       }
-      const str = lib.translate[name + "_info"]
+      const str = lib.translate[`${name}_info`]
       if (!str) {
         return ""
       }
@@ -4014,10 +4126,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         str = get.plainText(str)
       }
       return str
-    } else {
-      console.warn(`孩子，你${name}的翻译传的是什么？！`)
-      return ""
     }
+    console.warn(`孩子，你${name}的翻译传的是什么？！`)
+    return ""
     // return str.replace(/锁定技/g,'<span class="yellowtext">锁定技</span>').
     // 	replace(/限定技/g,'<span class="yellowtext">限定技</span>').
     // 	replace(/觉醒技/g,'<span class="greentext">觉醒技</span>').
@@ -4030,44 +4141,47 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns {string}
    */
   translation(str, arg) {
-    if (str && typeof str == "object" && (str.name || str._tempTranslate)) {
+    if (str && typeof str === "object" && (str.name || str._tempTranslate)) {
       if (str._tempTranslate) {
         return str._tempTranslate
       }
       var str2
-      if (arg == "viewAs" && str.viewAs) {
+      if (arg === "viewAs" && str.viewAs) {
         str2 = get.translation(str.viewAs)
       } else {
         str2 = get.translation(str.name)
       }
-      if (str2 == "杀") {
+      if (str2 === "杀") {
         str2 = ""
-        if (typeof str.nature == "string") {
-          let natures = str.nature.split(lib.natureSeparator).sort(lib.sort.nature)
-          for (let nature of natures) {
-            str2 += lib.translate["nature_" + nature] || lib.translate[nature] || ""
+        if (typeof str.nature === "string") {
+          const natures = str.nature
+            .split(lib.natureSeparator)
+            .sort(lib.sort.nature)
+          for (const nature of natures) {
+            str2 +=
+              lib.translate[`nature_${nature}`] || lib.translate[nature] || ""
           }
         }
         str2 += "杀"
       }
-      if (get.itemtype(str) == "card" || str.isCard) {
+      if (get.itemtype(str) === "card" || str.isCard) {
         if (_status.cardtag && str.cardid) {
           var tagstr = ""
           for (var i in _status.cardtag) {
             if (_status.cardtag[i].includes(str.cardid)) {
-              tagstr += lib.translate[i + "_tag"]
+              tagstr += lib.translate[`${i}_tag`]
             }
           }
           if (tagstr) {
-            str2 += "·" + tagstr
+            str2 += `·${tagstr}`
           }
         }
         if ((str.suit && str.number) || str.isCard) {
           var cardnum = get.strNumber(get.number(str, false), true) || ""
-          if (arg == "viewAs" && str.viewAs != str.name && str.viewAs) {
-            str2 += "（" + get.translation(str) + "）"
+          if (arg === "viewAs" && str.viewAs !== str.name && str.viewAs) {
+            str2 += `（${get.translation(str)}）`
           } else {
-            str2 += "【" + get.translation(get.suit(str, false)) + cardnum + "】"
+            str2 += `【${get.translation(get.suit(str, false))}${cardnum}】`
             // var len=str2.length-1;
             // str2=str2.slice(0,len)+'<span style="letter-spacing: -2px">'+str2[len]+'·</span>'+get.translation(str.suit)+str.number;
           }
@@ -4078,61 +4192,62 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     if (Array.isArray(str)) {
       var str2 = get.translation(str[0], arg)
       for (var i = 1; i < str.length; i++) {
-        str2 += "、" + get.translation(str[i], arg)
+        str2 += `、${get.translation(str[i], arg)}`
       }
       return str2
     }
-    if (get.itemtype(str) == "natures") {
-      let natures = str.split(lib.natureSeparator).sort(lib.sort.nature)
+    if (get.itemtype(str) === "natures") {
+      const natures = str.split(lib.natureSeparator).sort(lib.sort.nature)
       var str2 = ""
       for (var nature of natures) {
-        str2 += lib.translate["nature_" + nature] || lib.translate[nature] || ""
+        str2 += lib.translate[`nature_${nature}`] || lib.translate[nature] || ""
       }
       return str2
     }
-    if (arg == "skill") {
-      if (lib.translate[str + "_ab"]) {
-        return lib.translate[str + "_ab"]
+    if (arg === "skill") {
+      if (lib.translate[`${str}_ab`]) {
+        return lib.translate[`${str}_ab`]
       }
       if (lib.translate[str]) {
         return lib.translate[str].slice(0, 2)
       }
       return str
-    } else if (arg == "info") {
-      if (lib.translate[str + "_info"]) {
-        return lib.translate[str + "_info"]
+    }
+    if (arg === "info") {
+      if (lib.translate[`${str}_info`]) {
+        return lib.translate[`${str}_info`]
       }
       var str2 = str.slice(0, str.length - 1)
-      if (lib.translate[str2 + "_info"]) {
-        return lib.translate[str2 + "_info"]
+      if (lib.translate[`${str2}_info`]) {
+        return lib.translate[`${str2}_info`]
       }
       if (str.lastIndexOf("_") > 0) {
         str2 = str.slice(0, str.lastIndexOf("_"))
-        if (lib.translate[str2 + "_info"]) {
-          return lib.translate[str2 + "_info"]
+        if (lib.translate[`${str2}_info`]) {
+          return lib.translate[`${str2}_info`]
         }
       }
       str2 = str.slice(0, str.length - 2)
-      if (lib.translate[str2 + "_info"]) {
-        return lib.translate[str2 + "_info"]
+      if (lib.translate[`${str2}_info`]) {
+        return lib.translate[`${str2}_info`]
       }
-      if (lib.skill[str] && lib.skill[str].prompt) {
+      if (lib.skill[str]?.prompt) {
         return lib.skill[str].prompt
       }
     }
     if (lib.translate[str]) {
       return lib.translate[str]
     }
-    if (typeof str == "string") {
-      if (lib.translate["nature_" + str]) {
-        return lib.translate["nature_" + str]
+    if (typeof str === "string") {
+      if (lib.translate[`nature_${str}`]) {
+        return lib.translate[`nature_${str}`]
       }
       return str
     }
-    if (typeof str == "number" || typeof str == "boolean") {
+    if (typeof str === "number" || typeof str === "boolean") {
       return str.toString()
     }
-    if (str && str.toString) {
+    if (str?.toString) {
       return str.toString()
     }
     return ""
@@ -4174,7 +4289,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       return map
     }, {})[str]
     if (result === undefined && forced !== false) {
-      result = parseInt(str)
+      result = parseInt(str, 10)
     }
     return result
   }
@@ -4185,10 +4300,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns { string }
    */
   cnNumber(num, ordinal) {
-    if (isNaN(num)) {
+    if (Number.isNaN(num)) {
       return ""
     }
-    let numStr = "" + num
+    let numStr = `${num}`
     if (numStr === "Infinity") {
       return "∞"
     }
@@ -4246,10 +4361,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     let tempYi = ""
     for (let i = 0; i < numStr.length; i++) {
       const part = numStr[numStr.length - 1 - i]
-      let char = _transform(part)
+      const char = _transform(part)
       let unit = ""
       if (i % 2) {
-        ;[unit, tempYi] = ["万" + tempYi, ""]
+        ;[unit, tempYi] = [`万${tempYi}`, ""]
         if (char === "零") {
           unit = ""
         }
@@ -4290,7 +4405,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     for (var i = 0; i < buttons.length; i++) {
       if (
         buttons[i].classList.contains("selectable") &&
-        buttons[i].classList.contains("selected") == false
+        buttons[i].classList.contains("selected") === false
       ) {
         selectable.push(buttons[i])
       }
@@ -4314,7 +4429,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     for (var i = 0; i < cards.length; i++) {
       if (
         cards[i].classList.contains("selectable") &&
-        cards[i].classList.contains("selected") == false
+        cards[i].classList.contains("selected") === false
       ) {
         selectable.push(cards[i])
       }
@@ -4374,7 +4489,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           if (!Array.isArray(skills)) {
             skills = [skills]
           }
-          if (!skills.every((skill) => player.hasSkill(skill, null, null, false))) {
+          if (
+            !skills.every((skill) => player.hasSkill(skill, null, null, false))
+          ) {
             continue
           }
         }
@@ -4418,7 +4535,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       if (!info) {
         continue
       }
-      if (typeof func == "function" && !func(info, i)) {
+      if (typeof func === "function" && !func(info, i)) {
         continue
       }
       if (lib.filter.characterDisabled(i)) {
@@ -4457,7 +4574,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     for (var i = 0; i < players.length; i++) {
       if (
         players[i].classList.contains("selectable") &&
-        players[i].classList.contains("selected") == false
+        players[i].classList.contains("selected") === false
       ) {
         selectable.push(players[i])
       }
@@ -4469,90 +4586,90 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return selectable
   }
   filter(filter, i) {
-    if (typeof filter == "function") {
+    if (typeof filter === "function") {
       return filter
     }
-    if (i == undefined) {
+    if (i === undefined) {
       i = 0
     }
     var result = function () {
-      if (filter == arguments[i]) {
+      if (filter === arguments[i]) {
         return true
       }
       for (var j in filter) {
-        if (Object.prototype.hasOwnProperty.call(filter, j)) {
-          if (get.itemtype(arguments[i]) == "card") {
-            if (j == "name") {
+        if (Object.hasOwn(filter, j)) {
+          if (get.itemtype(arguments[i]) === "card") {
+            if (j === "name") {
               if (Array.isArray(filter[j])) {
-                if (filter[j].includes(get.name(arguments[i])) == false) {
+                if (filter[j].includes(get.name(arguments[i])) === false) {
                   return false
                 }
-              } else if (typeof filter[j] == "string") {
-                if (get.name(arguments[i]) != filter[j]) {
+              } else if (typeof filter[j] === "string") {
+                if (get.name(arguments[i]) !== filter[j]) {
                   return false
                 }
               }
-            } else if (j == "type") {
+            } else if (j === "type") {
               if (Array.isArray(filter[j])) {
-                if (filter[j].includes(get.type(arguments[i])) == false) {
+                if (filter[j].includes(get.type(arguments[i])) === false) {
                   return false
                 }
-              } else if (typeof filter[j] == "string") {
-                if (get.type(arguments[i]) != filter[j]) {
+              } else if (typeof filter[j] === "string") {
+                if (get.type(arguments[i]) !== filter[j]) {
                   return false
                 }
               }
-            } else if (j == "subtype") {
+            } else if (j === "subtype") {
               if (Array.isArray(filter[j])) {
-                if (filter[j].includes(get.subtype(arguments[i])) == false) {
+                if (filter[j].includes(get.subtype(arguments[i])) === false) {
                   return false
                 }
-              } else if (typeof filter[j] == "string") {
-                if (get.subtype(arguments[i]) != filter[j]) {
+              } else if (typeof filter[j] === "string") {
+                if (get.subtype(arguments[i]) !== filter[j]) {
                   return false
                 }
               }
-            } else if (j == "color") {
+            } else if (j === "color") {
               if (Array.isArray(filter[j])) {
-                if (filter[j].includes(get.color(arguments[i])) == false) {
+                if (filter[j].includes(get.color(arguments[i])) === false) {
                   return false
                 }
-              } else if (typeof filter[j] == "string") {
-                if (get.color(arguments[i]) != filter[j]) {
+              } else if (typeof filter[j] === "string") {
+                if (get.color(arguments[i]) !== filter[j]) {
                   return false
                 }
               }
-            } else if (j == "suit") {
+            } else if (j === "suit") {
               if (Array.isArray(filter[j])) {
-                if (filter[j].includes(get.suit(arguments[i])) == false) {
+                if (filter[j].includes(get.suit(arguments[i])) === false) {
                   return false
                 }
-              } else if (typeof filter[j] == "string") {
-                if (get.suit(arguments[i]) != filter[j]) {
+              } else if (typeof filter[j] === "string") {
+                if (get.suit(arguments[i]) !== filter[j]) {
                   return false
                 }
               }
-            } else if (j == "number") {
+            } else if (j === "number") {
               if (Array.isArray(filter[j])) {
-                if (filter[j].includes(get.number(arguments[i])) == false) {
+                if (filter[j].includes(get.number(arguments[i])) === false) {
                   return false
                 }
-              } else if (typeof filter[j] == "string") {
-                if (get.number(arguments[i]) != filter[j]) {
+              } else if (typeof filter[j] === "string") {
+                if (get.number(arguments[i]) !== filter[j]) {
                   return false
                 }
               }
             } else if (Array.isArray(filter[j])) {
-              if (filter[j].includes(arguments[i][j]) == false) {
+              if (filter[j].includes(arguments[i][j]) === false) {
                 return false
               }
-            } else if (typeof filter[j] == "string") {
-              if (arguments[i][j] != filter[j]) {
+            } else if (typeof filter[j] === "string") {
+              if (arguments[i][j] !== filter[j]) {
                 return false
               }
             }
           } else {
-            if (arguments[i][j] != filter[j]) {
+            if (arguments[i][j] !== filter[j]) {
               return false
             }
           }
@@ -4582,24 +4699,24 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    */
   cardCount(card, player) {
     var num
-    if (player == undefined) {
+    if (player === undefined) {
       player = _status.event.player
     }
-    if (card == true) {
+    if (card === true) {
       num = 0
       var stat = player.getStat("card")
       for (var i in stat) {
-        if (typeof stat[i] == "number") {
+        if (typeof stat[i] === "number") {
           num += stat[i]
         }
       }
       return num
     }
-    if (typeof card == "object") {
+    if (typeof card === "object") {
       card = card.name
     }
     num = player.getStat("card")[card]
-    if (num == undefined) {
+    if (num === undefined) {
       return 0
     }
     return num
@@ -4611,11 +4728,11 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns { number }
    */
   skillCount(skill, player) {
-    if (player == undefined) {
+    if (player === undefined) {
       player = _status.event.player
     }
     var num = player.getStat("skill")[skill]
-    if (num == undefined) {
+    if (num === undefined) {
       return 0
     }
     return num
@@ -4628,29 +4745,41 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    */
   owner(card, method) {
     return game.players.concat(game.dead).find((current) => {
-      if (current.judging[0] == card && method != "judge") {
+      if (current.judging[0] === card && method !== "judge") {
         return true
       }
       if (card.timeout && card.destiny) {
         const destiny = card.destiny
-        if (destiny == current.node.handcards1 || destiny == current.node.handcards2) {
+        if (
+          destiny === current.node.handcards1 ||
+          destiny === current.node.handcards2
+        ) {
           return !card.classList.contains("removing")
-        } else if (destiny == current.node.equips) {
+        }
+        if (destiny === current.node.equips) {
           return !card.classListContains("removing", "feichu", "emptyequip")
-        } else if (destiny == current.node.judges) {
+        }
+        if (destiny === current.node.judges) {
           return !card.classListContains("removing", "feichu")
-        } else if (destiny == current.node.expansions) {
+        }
+        if (destiny === current.node.expansions) {
           return !card.classListContains("removing")
         }
       }
-      let parent = card.parentNode
-      if (parent == current.node.handcards1 || parent == current.node.handcards2) {
+      const parent = card.parentNode
+      if (
+        parent === current.node.handcards1 ||
+        parent === current.node.handcards2
+      ) {
         return !card.classList.contains("removing")
-      } else if (parent == current.node.equips) {
+      }
+      if (parent === current.node.equips) {
         return !card.classListContains("removing", "feichu", "emptyequip")
-      } else if (parent == current.node.judges) {
+      }
+      if (parent === current.node.judges) {
         return !card.classListContains("removing", "feichu")
-      } else if (parent == current.node.expansions) {
+      }
+      if (parent === current.node.expansions) {
         return !card.classListContains("removing")
       }
       return false
@@ -4659,17 +4788,24 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     //	current.getCards("hejsx").includes(card) || (current.judging[0] == card && method != "judge"));
   }
   noSelected() {
-    return ui.selected.buttons.length + ui.selected.cards.length + ui.selected.targets.length == 0
+    return (
+      ui.selected.buttons.length +
+        ui.selected.cards.length +
+        ui.selected.targets.length ===
+      0
+    )
   }
   population(identity) {
-    return identity == undefined
+    return identity === undefined
       ? game.players.length + game.dead.length
-      : game.players.filter((current) => current.identity == identity).length
+      : game.players.filter((current) => current.identity === identity).length
   }
   totalPopulation(identity) {
-    return identity == undefined
+    return identity === undefined
       ? game.players.length + game.dead.length
-      : game.players.concat(game.dead).filter((current) => current.identity == identity).length
+      : game.players
+          .concat(game.dead)
+          .filter((current) => current.identity === identity).length
   }
   /**
    * @param { Card | VCard } item
@@ -4678,30 +4814,28 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   cardtag(item, tag) {
     return (
       (item.cardid &&
-        (get.itemtype(item) == "card" ||
+        (get.itemtype(item) === "card" ||
           !item.cards ||
           !item.cards.length ||
-          item.name == item.cards[0].name) &&
-        _status.cardtag &&
-        _status.cardtag[tag] &&
-        _status.cardtag[tag].includes(item.cardid)) ||
-      (item.cardtags && item.cardtags.includes(tag))
+          item.name === item.cards[0].name) &&
+        _status.cardtag?.[tag]?.includes(item.cardid)) ||
+      item.cardtags?.includes(tag)
     )
   }
   tag(item, tag, item2, bool) {
     var result
-    if (get.info(item, bool) && get.info(item, bool).ai && get.info(item, bool).ai.tag) {
+    if (get.info(item, bool)?.ai?.tag) {
       result = get.info(item, bool).ai.tag[tag]
     }
-    if (typeof result == "function") {
+    if (typeof result === "function") {
       return result(item, item2)
     }
     return result
   }
   sortCard(sort) {
     var func
-    if (sort == "type_sort") {
-      func = function (card) {
+    if (sort === "type_sort") {
+      func = (card) => {
         var type = get.type(card, null, false)
         var subtype = get.subtype(card, false)
         if (lib.cardType[subtype]) {
@@ -4725,25 +4859,23 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             return -4
         }
       }
-    } else if (sort == "suit_sort") {
-      func = function (card) {
-        if (get.suit(card) == "heart") {
+    } else if (sort === "suit_sort") {
+      func = (card) => {
+        if (get.suit(card) === "heart") {
           return 2
         }
-        if (get.suit(card) == "diamond") {
+        if (get.suit(card) === "diamond") {
           return 1
         }
-        if (get.suit(card) == "spade") {
+        if (get.suit(card) === "spade") {
           return -1
         }
-        if (get.suit(card) == "club") {
+        if (get.suit(card) === "club") {
           return -2
         }
       }
-    } else if (sort == "number_sort") {
-      func = function (card) {
-        return get.number(card) - 7 + 0.5
-      }
+    } else if (sort === "number_sort") {
+      func = (card) => get.number(card) - 7 + 0.5
     }
     return func
   }
@@ -4807,7 +4939,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             if (!value) {
               continue
             }
-            if ((!isArray && value !== filterVal) || (isArray && !filterVal.includes(value))) {
+            if (
+              (!isArray && value !== filterVal) ||
+              (isArray && !filterVal.includes(value))
+            ) {
               return false
             }
           }
@@ -4923,7 +5058,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       let index = judges.length
       while (index--) {
         const card = judges[index]
-        if (card.classList.contains("removing") || card.classList.contains("feichu")) {
+        if (
+          card.classList.contains("removing") ||
+          card.classList.contains("feichu")
+        ) {
           continue
         }
         yield card
@@ -4996,37 +5134,36 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     var skills = get.character(name, 3)
     var opacity
     for (var i = 0; i < skills.length; i++) {
-      if (lib.translate[skills[i]] && lib.translate[skills[i] + "_info"] && lib.skill[skills[i]]) {
-        if (learn && lib.skill[skills[i]].unique && (learn2 || !lib.skill[skills[i]].gainable)) {
+      if (
+        lib.translate[skills[i]] &&
+        lib.translate[`${skills[i]}_info`] &&
+        lib.skill[skills[i]]
+      ) {
+        if (
+          learn &&
+          lib.skill[skills[i]].unique &&
+          (learn2 || !lib.skill[skills[i]].gainable)
+        ) {
           opacity = "opacity:0.5"
         } else {
           opacity = ""
         }
         var skilltrans = get.translation(skills[i]).slice(0, 2)
-        str +=
-          '<div class="skill" style="' +
-          opacity +
-          '">【' +
-          skilltrans +
-          '】</div><div style="' +
-          opacity +
-          '">' +
-          get.skillInfoTranslation(skills[i], null, false) +
-          '</div><div style="display:block;height:10px"></div>'
+        str += `<div class="skill" style="${opacity}">【${skilltrans}】</div><div style="${opacity}">${get.skillInfoTranslation(skills[i], null, false)}</div><div style="display:block;height:10px"></div>`
       }
     }
     return str
   }
   intro(name) {
     var info = lib.character[name]
-    var str = "性别：" + get.translation(info[0]) + "<br/>"
-    str += "势力：" + get.translation(info[1]) + "<br/>"
-    str += "体力：" + get.translation(info[2]) + "<br/>"
+    var str = `性别：${get.translation(info[0])}<br/>`
+    str += `势力：${get.translation(info[1])}<br/>`
+    str += `体力：${get.translation(info[2])}<br/>`
     str += "技能："
     if (info[3].length) {
       str += get.translation(info[3][0])
       for (var i = 1; i < info[3].length; i++) {
-        str += "、" + get.translation(info[3][i])
+        str += `、${get.translation(info[3][i])}`
       }
     }
     return str
@@ -5035,19 +5172,19 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     switch (type) {
       case "mark": {
         if (content > 0) {
-          return "共有" + content + "个标记"
+          return `共有${content}个标记`
         }
         return false
       }
       case "turn": {
         if (content > 0) {
-          return "剩余" + content + "个回合"
+          return `剩余${content}个回合`
         }
         return false
       }
       case "time": {
         if (content > 0) {
-          return "剩余" + content + "次"
+          return `剩余${content}次`
         }
         return false
       }
@@ -5058,18 +5195,16 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         return "未发动"
       }
       case "info": {
-        return lib.translate[skill + "_info"]
+        return lib.translate[`${skill}_info`]
       }
       case "cardCount": {
         if (Array.isArray(content)) {
-          return "共有" + get.cnNumber(content.length) + "张牌"
+          return `共有${get.cnNumber(content.length)}张牌`
         }
         return false
       }
       case "expansion": {
-        content = player.getCards("x", function (card) {
-          return card.hasGaintag(skill)
-        })
+        content = player.getCards("x", (card) => card.hasGaintag(skill))
         if (dialog && content.length) {
           dialog.addAuto(content)
         } else {
@@ -5079,13 +5214,13 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       }
       case "card":
       case "cards": {
-        if (get.itemtype(content) == "card") {
+        if (get.itemtype(content) === "card") {
           content = [content]
         }
-        if (dialog && get.itemtype(content) == "cards") {
+        if (dialog && get.itemtype(content) === "cards") {
           dialog.addAuto(content)
         } else {
-          if (content && content.length) {
+          if (content?.length) {
             return get.translation(content)
           }
         }
@@ -5096,41 +5231,40 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       }
       case "player":
       case "players": {
-        if (get.itemtype(content) == "player") {
+        if (get.itemtype(content) === "player") {
           content = [content]
         }
-        if (dialog && get.itemtype(content) == "players") {
+        if (dialog && get.itemtype(content) === "players") {
           dialog.addAuto(content)
           return false
-        } else {
-          if (content && content.length) {
-            return get.translation(content)
-          }
-          return false
         }
+        if (content?.length) {
+          return get.translation(content)
+        }
+        return false
       }
       case "character":
       case "characters": {
-        if (typeof content == "string") {
+        if (typeof content === "string") {
           content = [content]
         }
         if (dialog && Array.isArray(content)) {
           dialog.addAuto([content, "character"])
           return false
-        } else {
-          if (content && content.length) {
-            return get.translation(content)
-          }
-          return false
         }
+        if (content?.length) {
+          return get.translation(content)
+        }
+        return false
       }
       default: {
-        if (typeof type == "string") {
+        if (typeof type === "string") {
           type = type.replace(/#/g, content)
           type = type.replace(/&/g, get.cnNumber(content))
           type = type.replace(/\$/g, get.translation(content))
           return type
-        } else if (typeof type == "function") {
+        }
+        if (typeof type === "function") {
           return type(content, player, skill)
         }
         return false
@@ -5148,7 +5282,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       return
     }
     let created = false
-    const createButtons = function (nameskin, avatarSetter) {
+    const createButtons = (nameskin, avatarSetter) => {
       const srcBase = get.skinPath(nameskin)
       if (!srcBase) {
         return
@@ -5166,14 +5300,19 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           const avatars = ui.create.div(".buttons.smallzoom.scrollbuttons")
           lib.setMousewheel(avatars)
           uiintro.add(avatars)
-          const originButton = ui.create.div(".button.character.pointerdiv", avatars, function () {
-            delete lib.config.skin[nameskin]
-            if (lib.characterSubstitute[nameskin]) {
-              for (const list of lib.characterSubstitute[nameskin]) delete lib.config.skin[list[0]]
-            }
-            avatarSetter("origin")
-            game.saveConfig("skin", lib.config.skin)
-          })
+          const originButton = ui.create.div(
+            ".button.character.pointerdiv",
+            avatars,
+            () => {
+              delete lib.config.skin[nameskin]
+              if (lib.characterSubstitute[nameskin]) {
+                for (const list of lib.characterSubstitute[nameskin])
+                  delete lib.config.skin[list[0]]
+              }
+              avatarSetter("origin")
+              game.saveConfig("skin", lib.config.skin)
+            },
+          )
           originButton.setBackground(nameskin, "character", "noskin")
           const originSkin = ui.create.caption(
             `<div class="text" data-nature=shenmm style="font-size: 12px">经典形象</div>`,
@@ -5184,18 +5323,25 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           files.forEach((file) => {
             const src = `${srcBase}${file}`,
               skinname = file
-            const button = ui.create.div(".button.character.pointerdiv", avatars, function () {
-              lib.config.skin[nameskin] = [skinname, src]
-              if (lib.characterSubstitute[nameskin]) {
-                for (const list of lib.characterSubstitute[nameskin]) {
-                  const sub = list[0],
-                    [fold, prefix] = skinname.split(".")
-                  lib.config.skin[sub] = [skinname, `${srcBase}${fold}/${sub}.${prefix}`]
+            const button = ui.create.div(
+              ".button.character.pointerdiv",
+              avatars,
+              () => {
+                lib.config.skin[nameskin] = [skinname, src]
+                if (lib.characterSubstitute[nameskin]) {
+                  for (const list of lib.characterSubstitute[nameskin]) {
+                    const sub = list[0],
+                      [fold, prefix] = skinname.split(".")
+                    lib.config.skin[sub] = [
+                      skinname,
+                      `${srcBase}${fold}/${sub}.${prefix}`,
+                    ]
+                  }
                 }
-              }
-              avatarSetter(src)
-              game.saveConfig("skin", lib.config.skin)
-            })
+                avatarSetter(src)
+                game.saveConfig("skin", lib.config.skin)
+              },
+            )
             button.setBackgroundImage(src)
             const skinCaption = ui.create.caption(
               `<div class="text" data-nature=shenmm style="font-size: 12px">${get.translation(skinname.slice(0, -4))}</div>`,
@@ -5208,7 +5354,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         () => {},
       )
     }
-    if (typeof node._customintro == "function") {
+    if (typeof node._customintro === "function") {
       if (node._customintro(uiintro, evt) === false) {
         return
       }
@@ -5218,14 +5364,16 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     } else if (Array.isArray(node._customintro)) {
       var caption = node._customintro[0]
       var content = node._customintro[1]
-      if (typeof caption == "function") {
+      if (typeof caption === "function") {
         caption = caption(node)
       }
-      if (typeof content == "function") {
+      if (typeof content === "function") {
         content = content(node)
       }
       uiintro.add(caption)
-      uiintro.add('<div class="text center" style="padding-bottom:5px">' + content + "</div>")
+      uiintro.add(
+        `<div class="text center" style="padding-bottom:5px">${content}</div>`,
+      )
     } else if (node.classList.contains("player") || node.linkplayer) {
       if (node.linkplayer) {
         node = node.link
@@ -5233,11 +5381,11 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       let capt = get.translation(node.name)
       const characterInfo = get.character(node.name),
         sex = node.sex || characterInfo[0]
-      if (sex && sex != "unknown" && lib.config.show_sex) {
-        capt += `&nbsp;&nbsp;${sex == "none" ? "无" : get.translation(sex)}`
+      if (sex && sex !== "unknown" && lib.config.show_sex) {
+        capt += `&nbsp;&nbsp;${sex === "none" ? "无" : get.translation(sex)}`
       }
       const group = node.group
-      if (group && group != "unknown" && lib.config.show_group) {
+      if (group && group !== "unknown" && lib.config.show_group) {
         capt += `&nbsp;&nbsp;${get.translation(group)}`
       }
       uiintro.add(capt)
@@ -5251,13 +5399,13 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       }
 
       if (lib.config.show_sortPack) {
-        for (let packname in lib.characterPack) {
+        for (const packname in lib.characterPack) {
           if (node.name in lib.characterPack[packname]) {
-            let pack = lib.translate[packname + "_character_config"],
+            let pack = lib.translate[`${packname}_character_config`],
               sort
             if (lib.characterSort[packname]) {
-              let sorted = lib.characterSort[packname]
-              for (let sortname in sorted) {
+              const sorted = lib.characterSort[packname]
+              for (const sortname in sorted) {
                 if (sorted[sortname].includes(node.name)) {
                   sort = `<span style = "font-size:small">${lib.translate[sortname]}</span>`
                   break
@@ -5267,7 +5415,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             const sortPack = document.createElement("div")
             sortPack.innerHTML = `${pack}${sort ? `<br>[${sort}]` : ""}`
             sortPack.appendChild(document.createElement("hr"))
-            sortPack.insertBefore(document.createElement("hr"), sortPack.firstChild)
+            sortPack.insertBefore(
+              document.createElement("hr"),
+              sortPack.firstChild,
+            )
             uiintro.add(sortPack)
             break
           }
@@ -5283,7 +5434,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         })
         if (initFilters.length) {
           const str = initFilters
-            .reduce((strx, stry) => strx + lib.InitFilter[stry] + "<br>", "")
+            .reduce((strx, stry) => `${strx + lib.InitFilter[stry]}<br>`, "")
             .slice(0, -4)
           uiintro.addText(str)
         }
@@ -5292,7 +5443,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       if (!node.noclick) {
         const allShown =
           node.isUnderControl() ||
-          (!game.observe && game.me && game.me.hasSkillTag("viewHandcard", null, node, true))
+          (!game.observe &&
+            game.me &&
+            game.me.hasSkillTag("viewHandcard", null, node, true))
         const shownHs = node.getShownCards()
         if (shownHs.length) {
           uiintro.add('<div class="text center">明置的手牌</div>')
@@ -5316,13 +5469,13 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
 
       var skills = node.getSkills(null, false, false).slice(0)
       var skills2 = game.filterSkills(skills, node)
-      if (node == game.me && node.hiddenSkills.length) {
+      if (node === game.me && node.hiddenSkills.length) {
         skills.addArray(node.hiddenSkills)
       }
       for (var i in node.disabledSkills) {
         if (
-          node.disabledSkills[i].length == 1 &&
-          node.disabledSkills[i][0] == i + "_awake" &&
+          node.disabledSkills[i].length === 1 &&
+          node.disabledSkills[i][0] === `${i}_awake` &&
           !node.hiddenSkills.includes(i)
         ) {
           skills.add(i)
@@ -5335,9 +5488,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         ) {
           continue
         }
-        if (lib.translate[skills[i] + "_info"]) {
-          if (lib.translate[skills[i] + "_ab"]) {
-            translation = lib.translate[skills[i] + "_ab"]
+        if (lib.translate[`${skills[i]}_info`]) {
+          if (lib.translate[`${skills[i]}_ab`]) {
+            translation = lib.translate[`${skills[i]}_ab`]
           } else {
             translation = get.translation(skills[i])
             if (!lib.skill[skills[i]].nobracket) {
@@ -5346,25 +5499,21 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           }
 
           if (node.forbiddenSkills[skills[i]]) {
-            var forbidstr =
-              '<div style="opacity:0.5"><div class="skill">' + translation + "</div><div>"
+            var forbidstr = `<div style="opacity:0.5"><div class="skill">${translation}</div><div>`
             if (node.forbiddenSkills[skills[i]].length) {
-              forbidstr += "（与" + get.translation(node.forbiddenSkills[skills[i]]) + "冲突）<br>"
+              forbidstr += `（与${get.translation(node.forbiddenSkills[skills[i]])}冲突）<br>`
             } else {
               forbidstr += "（双将禁用）<br>"
             }
-            forbidstr += get.skillInfoTranslation(skills[i], node, false) + "</div></div>"
+            forbidstr += `${get.skillInfoTranslation(skills[i], node, false)}</div></div>`
             uiintro.add(forbidstr)
           } else if (!skills2.includes(skills[i])) {
-            if (lib.skill[skills[i]].preHidden && get.mode() == "guozhan") {
+            if (lib.skill[skills[i]].preHidden && get.mode() === "guozhan") {
               uiintro.add(
-                '<div><div class="skill" style="opacity:0.5">' +
-                  translation +
-                  '</div><div><span style="opacity:0.5">' +
-                  get.skillInfoTranslation(skills[i], node, false) +
-                  '</span><br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">预亮技能</div></div></div>',
+                `<div><div class="skill" style="opacity:0.5">${translation}</div><div><span style="opacity:0.5">${get.skillInfoTranslation(skills[i], node, false)}</span><br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">预亮技能</div></div></div>`,
               )
-              var underlinenode = uiintro.content.lastChild.querySelector(".underlinenode")
+              var underlinenode =
+                uiintro.content.lastChild.querySelector(".underlinenode")
               if (_status.prehidden_skills.includes(skills[i])) {
                 underlinenode.classList.remove("on")
               }
@@ -5372,11 +5521,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
               underlinenode.listen(ui.click.hiddenskill)
             } else {
               uiintro.add(
-                '<div style="opacity:0.5"><div class="skill">' +
-                  translation +
-                  "</div><div>" +
-                  get.skillInfoTranslation(skills[i], node, false) +
-                  "</div></div>",
+                `<div style="opacity:0.5"><div class="skill">${translation}</div><div>${get.skillInfoTranslation(skills[i], node, false)}</div></div>`,
               )
             }
           } else if (
@@ -5384,25 +5529,29 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             !node.skills.includes(skills[i]) ||
             lib.skill[skills[i]].thundertext
           ) {
-            if (lib.skill[skills[i]].frequent || lib.skill[skills[i]].subfrequent) {
+            if (
+              lib.skill[skills[i]].frequent ||
+              lib.skill[skills[i]].subfrequent
+            ) {
               uiintro.add(
-                '<div><div class="skill thundertext thunderauto">' +
-                  translation +
-                  '</div><div class="thundertext thunderauto">' +
-                  get.skillInfoTranslation(skills[i], node, false) +
-                  '<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>',
+                `<div><div class="skill thundertext thunderauto">${translation}</div><div class="thundertext thunderauto">${get.skillInfoTranslation(skills[i], node, false)}<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>`,
               )
-              var underlinenode = uiintro.content.lastChild.querySelector(".underlinenode")
+              var underlinenode =
+                uiintro.content.lastChild.querySelector(".underlinenode")
               if (lib.skill[skills[i]].frequent) {
                 if (lib.config.autoskilllist.includes(skills[i])) {
                   underlinenode.classList.remove("on")
                 }
               }
               if (lib.skill[skills[i]].subfrequent) {
-                for (var j = 0; j < lib.skill[skills[i]].subfrequent.length; j++) {
+                for (
+                  var j = 0;
+                  j < lib.skill[skills[i]].subfrequent.length;
+                  j++
+                ) {
                   if (
                     lib.config.autoskilllist.includes(
-                      skills[i] + "_" + lib.skill[skills[i]].subfrequent[j],
+                      `${skills[i]}_${lib.skill[skills[i]].subfrequent[j]}`,
                     )
                   ) {
                     underlinenode.classList.remove("on")
@@ -5416,32 +5565,32 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
               underlinenode.listen(ui.click.autoskill2)
             } else {
               uiintro.add(
-                '<div><div class="skill thundertext thunderauto">' +
-                  translation +
-                  '</div><div class="thundertext thunderauto">' +
-                  get.skillInfoTranslation(skills[i], node, false) +
-                  "</div></div>",
+                `<div><div class="skill thundertext thunderauto">${translation}</div><div class="thundertext thunderauto">${get.skillInfoTranslation(skills[i], node, false)}</div></div>`,
               )
             }
-          } else if (lib.skill[skills[i]].frequent || lib.skill[skills[i]].subfrequent) {
+          } else if (
+            lib.skill[skills[i]].frequent ||
+            lib.skill[skills[i]].subfrequent
+          ) {
             uiintro.add(
-              '<div><div class="skill">' +
-                translation +
-                "</div><div>" +
-                get.skillInfoTranslation(skills[i], node, false) +
-                '<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>',
+              `<div><div class="skill">${translation}</div><div>${get.skillInfoTranslation(skills[i], node, false)}<br><div class="underlinenode on gray" style="position:relative;padding-left:0;padding-top:7px">自动发动</div></div></div>`,
             )
-            var underlinenode = uiintro.content.lastChild.querySelector(".underlinenode")
+            var underlinenode =
+              uiintro.content.lastChild.querySelector(".underlinenode")
             if (lib.skill[skills[i]].frequent) {
               if (lib.config.autoskilllist.includes(skills[i])) {
                 underlinenode.classList.remove("on")
               }
             }
             if (lib.skill[skills[i]].subfrequent) {
-              for (var j = 0; j < lib.skill[skills[i]].subfrequent.length; j++) {
+              for (
+                var j = 0;
+                j < lib.skill[skills[i]].subfrequent.length;
+                j++
+              ) {
                 if (
                   lib.config.autoskilllist.includes(
-                    skills[i] + "_" + lib.skill[skills[i]].subfrequent[j],
+                    `${skills[i]}_${lib.skill[skills[i]].subfrequent[j]}`,
                   )
                 ) {
                   underlinenode.classList.remove("on")
@@ -5453,19 +5602,20 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             }
             underlinenode.link = skills[i]
             underlinenode.listen(ui.click.autoskill2)
-          } else if (lib.skill[skills[i]].clickable && node.isIn() && node.isUnderControl(true)) {
+          } else if (
+            lib.skill[skills[i]].clickable &&
+            node.isIn() &&
+            node.isUnderControl(true)
+          ) {
             var intronode = uiintro
               .add(
-                '<div><div class="skill">' +
-                  translation +
-                  "</div><div>" +
-                  get.skillInfoTranslation(skills[i], node, false) +
-                  '<br><div class="menubutton skillbutton" style="position:relative;margin-top:5px">点击发动</div></div></div>',
+                `<div><div class="skill">${translation}</div><div>${get.skillInfoTranslation(skills[i], node, false)}<br><div class="menubutton skillbutton" style="position:relative;margin-top:5px">点击发动</div></div></div>`,
               )
               .querySelector(".skillbutton")
             if (
               !_status.gameStarted ||
-              (lib.skill[skills[i]].clickableFilter && !lib.skill[skills[i]].clickableFilter(node))
+              (lib.skill[skills[i]].clickableFilter &&
+                !lib.skill[skills[i]].clickableFilter(node))
             ) {
               intronode.classList.add("disabled")
               intronode.style.opacity = 0.5
@@ -5478,16 +5628,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             }
           } else {
             uiintro.add(
-              '<div><div class="skill">' +
-                translation +
-                "</div><div>" +
-                get.skillInfoTranslation(skills[i], node, false) +
-                "</div></div>",
+              `<div><div class="skill">${translation}</div><div>${get.skillInfoTranslation(skills[i], node, false)}</div></div>`,
             )
           }
-          if (lib.translate[skills[i] + "_append"]) {
+          if (lib.translate[`${skills[i]}_append`]) {
             uiintro._place_text = uiintro.add(
-              '<div class="text">' + lib.translate[skills[i] + "_append"] + "</div>",
+              `<div class="text">${lib.translate[`${skills[i]}_append`]}</div>`,
             )
           }
         }
@@ -5534,30 +5680,31 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         tr = document.createElement("tr")
         table.appendChild(tr)
         td = document.createElement("td")
-        if (node == game.me || !game.me || !game.me.isIn()) {
+        if (node === game.me || !game.me || !game.me.isIn()) {
           td.innerHTML = "-"
         } else {
           var dist1 = get.numStr(Math.max(1, game.me.distanceTo(node)))
           var dist2 = get.numStr(Math.max(1, node.distanceTo(game.me)))
-          if (dist1 == dist2) {
+          if (dist1 === dist2) {
             td.innerHTML = dist1
           } else {
-            td.innerHTML = dist1 + "/" + dist2
+            td.innerHTML = `${dist1}/${dist2}`
           }
         }
         tr.appendChild(td)
         td = document.createElement("td")
-        let handcardLimit = node.getHandcardLimit()
+        const handcardLimit = node.getHandcardLimit()
         td.innerHTML = `${node.countCards("h")}/${handcardLimit >= 114514 ? "∞" : handcardLimit}`
         tr.appendChild(td)
         td = document.createElement("td")
         td.innerHTML = node.phaseNumber
         tr.appendChild(td)
         td = document.createElement("td")
-        ;(function () {
+
+        ;(() => {
           let num = 0
           for (var j = 0; j < node.stat.length; j++) {
-            if (typeof node.stat[j].damage == "number") {
+            if (typeof node.stat[j].damage === "number") {
               num += node.stat[j].damage
             }
           }
@@ -5577,23 +5724,31 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         for (var i = 0; i < es.length; i++) {
           const special = [es[i]]
             .concat(es[i].cards || [])
-            .find((j) => j.name == es[i].name && lib.card[j.name]?.cardPrompt)
+            .find((j) => j.name === es[i].name && lib.card[j.name]?.cardPrompt)
           var str = special
             ? lib.card[special.name].cardPrompt(special, node)
-            : lib.translate[es[i].name + "_info"]
+            : lib.translate[`${es[i].name}_info`]
           uiintro.add(
-            '<div><div class="skill">' + es[i].outerHTML + "</div><div>" + str + "</div></div>",
+            `<div><div class="skill">${es[i].outerHTML}</div><div>${str}</div></div>`,
           )
-          uiintro.content.lastChild.querySelector(".skill>.card").style.transform = ""
+          uiintro.content.lastChild.querySelector(
+            ".skill>.card",
+          ).style.transform = ""
 
-          if (lib.translate[es[i].name + "_append"]) {
-            uiintro.add('<div class="text">' + lib.translate[es[i].name + "_append"] + "</div>")
+          if (lib.translate[`${es[i].name}_append`]) {
+            uiintro.add(
+              `<div class="text">${lib.translate[`${es[i].name}_append`]}</div>`,
+            )
           }
         }
         var js = node.getCards("j")
         for (var i = 0; i < js.length; i++) {
           const Vcard = js[i][js[i].cardSymbol]
-          if (js[i].viewAs && Vcard.cards.length == 1 && js[i].viewAs != Vcard.cards[0].name) {
+          if (
+            js[i].viewAs &&
+            Vcard.cards.length === 1 &&
+            js[i].viewAs !== Vcard.cards[0].name
+          ) {
             let html = Vcard.cards[0].outerHTML
             let cardInfo = lib.card[js[i].viewAs],
               showCardIntro = true
@@ -5614,7 +5769,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
               `<div><div class="skill">${js[i].outerHTML}</div><div>${lib.translate[js[i].name]}：${lib.card[js[i].name]?.cardPrompt?.(js[i], node) || lib.translate[`${js[i].name}_info`]}</div></div>`,
             )
           }
-          uiintro.content.lastChild.querySelector(".skill>.card").style.transform = ""
+          uiintro.content.lastChild.querySelector(
+            ".skill>.card",
+          ).style.transform = ""
         }
         if (get.is.phoneLayout()) {
           var markCoutainer = ui.create.div(".mark-container.marks")
@@ -5642,7 +5799,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           }
         }
       }
-      if (!game.observe && _status.gameStarted && game.me && node != game.me) {
+      if (!game.observe && _status.gameStarted && game.me && node !== game.me) {
         ui.throwEmotion = []
         uiintro.addText("发送交互表情")
         var click = function () {
@@ -5664,7 +5821,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           uiintro._close()
           _status.throwEmotionWait = true
           setTimeout(
-            function () {
+            () => {
               _status.throwEmotionWait = false
               if (ui.throwEmotion) {
                 for (var i of ui.throwEmotion) {
@@ -5672,7 +5829,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
                 }
               }
             },
-            emotion == "flower" || emotion == "egg" ? 500 : 5000,
+            emotion === "flower" || emotion === "egg" ? 500 : 5000,
           )
         }
         var td
@@ -5690,8 +5847,11 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           }
           td.link = listi[i]
           table.appendChild(td)
-          td.innerHTML = "<span>" + get.translation(listi[i]) + "</span>"
-          td.addEventListener(lib.config.touchscreen ? "touchend" : "click", click)
+          td.innerHTML = `<span>${get.translation(listi[i])}</span>`
+          td.addEventListener(
+            lib.config.touchscreen ? "touchend" : "click",
+            click,
+          )
         }
         uiintro.content.appendChild(table)
         table = document.createElement("div")
@@ -5711,17 +5871,20 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           }
           td.link = listi[i]
           table.appendChild(td)
-          td.innerHTML = "<span>" + get.translation(listi[i]) + "</span>"
-          td.addEventListener(lib.config.touchscreen ? "touchend" : "click", click)
+          td.innerHTML = `<span>${get.translation(listi[i])}</span>`
+          td.addEventListener(
+            lib.config.touchscreen ? "touchend" : "click",
+            click,
+          )
         }
         uiintro.content.appendChild(table)
       }
-      var modepack = lib.characterPack["mode_" + get.mode()]
+      var modepack = lib.characterPack[`mode_${get.mode()}`]
       if (
         lib.config.show_favourite &&
         lib.character[node.name] &&
         game.players.includes(node) &&
-        (!modepack || !modepack[node.name]) &&
+        !modepack?.[node.name] &&
         (!simple || get.is.phoneLayout())
       ) {
         var addFavourite = ui.create.div(".text.center.pointerdiv")
@@ -5737,12 +5900,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       }
       if (!simple || get.is.phoneLayout()) {
         if (!node.name.startsWith("unknown")) {
-          let viewInfo = ui.create.div(".text.center.pointerdiv")
+          const viewInfo = ui.create.div(".text.center.pointerdiv")
           viewInfo.link = node
           viewInfo.innerHTML = "查看资料"
           viewInfo.listen(function () {
-            let player = this.link
-            let audioName = player.skin.name || player.name1 || player.name
+            const player = this.link
+            const audioName = player.skin.name || player.name1 || player.name
             ui.click.charactercard(
               player.name1 || player.name,
               null,
@@ -5755,7 +5918,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           uiintro.add(viewInfo)
         }
       }
-      if (( lib.skin) && (!simple || get.is.phoneLayout())) {
+      if (lib.skin && (!simple || get.is.phoneLayout())) {
         ;[node.name1, node.name2].forEach((nameskin, index) => {
           if (nameskin) {
             createButtons(nameskin, (src) => {
@@ -5770,14 +5933,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     } else if (
       node.classList.contains("mark") &&
       node.info &&
-      node.parentNode &&
-      node.parentNode.parentNode &&
-      node.parentNode.parentNode.classList.contains("player")
+      node.parentNode?.parentNode?.classList.contains("player")
     ) {
       var info = node.info
       var player = node.parentNode.parentNode
       if (info.name) {
-        if (typeof info.name == "function") {
+        if (typeof info.name === "function") {
           var named = info.name(player.storage[node.skill], player)
           if (named) {
             uiintro.add(named)
@@ -5789,14 +5950,14 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         uiintro.add(get.translation(node.skill))
       }
       if (
-        typeof info.id == "string" &&
+        typeof info.id === "string" &&
         info.id.startsWith("subplayer") &&
         player.isUnderControl(true) &&
         player.storage[info.id] &&
         !_status.video
       ) {
         var storage = player.storage[info.id]
-        uiintro.addText("当前体力：" + storage.hp + "/" + storage.maxHp)
+        uiintro.addText(`当前体力：${storage.hp}/${storage.maxHp}`)
         if (storage.hs.length) {
           uiintro.addText("手牌区")
           uiintro.addSmall(storage.hs)
@@ -5806,8 +5967,14 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           uiintro.addSmall(storage.es)
         }
       }
-      if (typeof info.mark == "function") {
-        var stint = info.mark(uiintro, player.storage[node.skill], player, evt, node.skill)
+      if (typeof info.mark === "function") {
+        var stint = info.mark(
+          uiintro,
+          player.storage[node.skill],
+          player,
+          evt,
+          node.skill,
+        )
         if (stint instanceof Promise) {
           uiintro.hide()
           stint.then(() => {
@@ -5818,7 +5985,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           })
         } else if (stint) {
           var placetext = uiintro.add(
-            '<div class="text" style="display:inline">' + stint + "</div>",
+            `<div class="text" style="display:inline">${stint}</div>`,
           )
           if (!stint.startsWith('<div class="skill"')) {
             uiintro._place_text = placetext
@@ -5842,11 +6009,11 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           node.skill,
         )
         if (stint) {
-          if (stint[0] == "@") {
-            uiintro.add('<div class="caption">' + stint.slice(1) + "</div>")
+          if (stint[0] === "@") {
+            uiintro.add(`<div class="caption">${stint.slice(1)}</div>`)
           } else {
             var placetext = uiintro.add(
-              '<div class="text" style="display:inline">' + stint + "</div>",
+              `<div class="text" style="display:inline">${stint}</div>`,
             )
             if (!stint.startsWith('<div class="skill"')) {
               uiintro._place_text = placetext
@@ -5880,7 +6047,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             moded = true
             uiintro.add(item[0])
             uiintro._place_text = uiintro.add(
-              '<div class="text" style="display:inline">' + item[1] + "</div>",
+              `<div class="text" style="display:inline">${item[1]}</div>`,
             )
           }
         }
@@ -5897,8 +6064,8 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       if (
         ((cardPosition === "e" || cardPosition === "j") &&
           trueCard.viewAs &&
-          trueCard.viewAs != name) ||
-        (Vcard && (Vcard.cards.length != 1 || Vcard.cards[0].name != name))
+          trueCard.viewAs !== name) ||
+        (Vcard && (Vcard.cards.length !== 1 || Vcard.cards[0].name !== name))
       ) {
         uiintro.add(get.translation(trueCard.viewAs))
         var cardInfo = lib.card[trueCard.viewAs],
@@ -5944,23 +6111,23 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           modeorder.add(i)
         }
         var list = []
-        uiintro.contentContainer.listen(function (e) {
+        uiintro.contentContainer.listen((e) => {
           ui.click.touchpop()
           e.stopPropagation()
         })
         for (var i = 0; i < modeorder.length; i++) {
-          if (node._banning == "online") {
+          if (node._banning === "online") {
             if (!lib.mode[modeorder[i]].connect) {
               continue
             }
-          } else if (modeorder[i] == "connect" || modeorder[i] == "brawl") {
+          } else if (modeorder[i] === "connect" || modeorder[i] === "brawl") {
             continue
           }
           if (lib.config.all.mode.includes(modeorder[i])) {
             list.push(modeorder[i])
           }
         }
-        if (lib.card[name] && lib.card[name].type == "trick") {
+        if (lib.card[name] && lib.card[name].type === "trick") {
           list.push("zhinang_tricks")
         }
         var page = ui.create.div(".menu-buttons.configpopped", uiintro.content)
@@ -5968,21 +6135,23 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         for (var i = 0; i < list.length; i++) {
           var cfg = ui.create.div(
             ".config",
-            list[i] == "zhinang_tricks" ? "设为智囊" : lib.translate[list[i]] + "模式",
+            list[i] === "zhinang_tricks"
+              ? "设为智囊"
+              : `${lib.translate[list[i]]}模式`,
             page,
           )
           cfg.classList.add("toggle")
-          if (list[i] == "zhinang_tricks") {
-            cfg.bannedname = (node._banning == "offline" ? "" : "connect_") + "zhinang_tricks"
-          } else if (node._banning == "offline") {
-            cfg.bannedname = list[i] + "_bannedcards"
+          if (list[i] === "zhinang_tricks") {
+            cfg.bannedname = `${node._banning === "offline" ? "" : "connect_"}zhinang_tricks`
+          } else if (node._banning === "offline") {
+            cfg.bannedname = `${list[i]}_bannedcards`
           } else {
-            cfg.bannedname = "connect_" + list[i] + "_bannedcards"
+            cfg.bannedname = `connect_${list[i]}_bannedcards`
           }
           cfg.listen(clickBanned)
           ui.create.div(ui.create.div(cfg))
           var banned = lib.config[cfg.bannedname] || []
-          if (banned.includes(name) == (list[i] == "zhinang_tricks")) {
+          if (banned.includes(name) === (list[i] === "zhinang_tricks")) {
             cfg.classList.add("on")
             banall = true
           }
@@ -5992,10 +6161,11 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           banall ? "全部禁用" : "全部启用",
           uiintro.content,
           function () {
-            if (this.innerHTML == "全部禁用") {
+            if (this.innerHTML === "全部禁用") {
               for (var i = 0; i < page.childElementCount; i++) {
                 if (
-                  page.childNodes[i].bannedname.indexOf("zhinang_tricks") == -1 &&
+                  page.childNodes[i].bannedname.indexOf("zhinang_tricks") ===
+                    -1 &&
                   page.childNodes[i].bannedname &&
                   page.childNodes[i].classList.contains("on")
                 ) {
@@ -6006,7 +6176,8 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             } else {
               for (var i = 0; i < page.childElementCount; i++) {
                 if (
-                  page.childNodes[i].bannedname.indexOf("zhinang_tricks") == -1 &&
+                  page.childNodes[i].bannedname.indexOf("zhinang_tricks") ===
+                    -1 &&
                   page.childNodes[i].bannedname &&
                   !page.childNodes[i].classList.contains("on")
                 ) {
@@ -6019,34 +6190,29 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         ).style.marginTop = "-10px"
         ui.create.div(".placeholder.slim", uiintro.content)
       } else {
-        if (lib.translate[name + "_info"]) {
+        if (lib.translate[`${name}_info`]) {
           if (!uiintro.nosub) {
-            if (lib.card[name] && lib.card[name].derivation) {
-              if (typeof lib.card[name].derivation == "string") {
+            if (lib.card[name]?.derivation) {
+              if (typeof lib.card[name].derivation === "string") {
                 uiintro.add(
-                  '<div class="text center">来源：' +
-                    get.translation(lib.card[name].derivation) +
-                    "</div>",
+                  `<div class="text center">来源：${get.translation(lib.card[name].derivation)}</div>`,
                 )
               } else if (lib.card[name].derivationpack) {
                 uiintro.add(
-                  '<div class="text center">来源：' +
-                    get.translation(lib.card[name].derivationpack + "_card_config") +
-                    "包</div>",
+                  `<div class="text center">来源：${get.translation(`${lib.card[name].derivationpack}_card_config`)}包</div>`,
                 )
               }
             }
             let typeinfo = ""
-            if (lib.card[name] && lib.card[name].unique) {
-              typeinfo += "特殊" + get.translation(lib.card[name].type) + "牌"
+            if (lib.card[name]?.unique) {
+              typeinfo += `特殊${get.translation(lib.card[name].type)}牌`
             } else if (
-              lib.card[name] &&
-              lib.card[name].type &&
+              lib.card[name]?.type &&
               lib.translate[lib.card[name].type]
             ) {
-              typeinfo += get.translation(lib.card[name].type) + "牌"
+              typeinfo += `${get.translation(lib.card[name].type)}牌`
             }
-            let vcard = get
+            const vcard = get
               .owner(node)
               ?.getVCards(get.position(node))
               ?.find((card) => card.cards?.includes(node))
@@ -6059,26 +6225,32 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
                   .join("/")
             }
             if (typeinfo) {
-              uiintro.add('<div class="text center">' + typeinfo + "</div>")
+              uiintro.add(`<div class="text center">${typeinfo}</div>`)
             }
-            if (lib.card[name].unique && lib.card[name].type == "equip") {
+            if (lib.card[name].unique && lib.card[name].type === "equip") {
               if (lib.cardPile.guozhan && lib.cardPack.guozhan.includes(name)) {
-                uiintro.add('<div class="text center">专属装备</div>').style.marginTop = "-5px"
+                uiintro.add(
+                  '<div class="text center">专属装备</div>',
+                ).style.marginTop = "-5px"
               } else {
-                uiintro.add('<div class="text center">特殊装备</div>').style.marginTop = "-5px"
+                uiintro.add(
+                  '<div class="text center">特殊装备</div>',
+                ).style.marginTop = "-5px"
               }
             }
-            if (lib.card[name] && lib.card[name].addinfomenu) {
-              uiintro.add('<div class="text center">' + lib.card[name].addinfomenu + "</div>")
+            if (lib.card[name]?.addinfomenu) {
+              uiintro.add(
+                `<div class="text center">${lib.card[name].addinfomenu}</div>`,
+              )
             }
-            if (get.subtype(name, false) == "equip1") {
+            if (get.subtype(name, false) === "equip1") {
               var added = false
-              if (lib.card[name] && lib.card[name].distance) {
+              if (lib.card[name]?.distance) {
                 var dist = lib.card[name].distance
                 if (dist.attackFrom) {
                   added = true
                   uiintro.add(
-                    '<div class="text center">攻击范围：' + (-dist.attackFrom + 1) + "</div>",
+                    `<div class="text center">攻击范围：${-dist.attackFrom + 1}</div>`,
                   )
                 }
               }
@@ -6088,25 +6260,32 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             }
           }
           if (lib.card[name].cardPrompt) {
-            var str = lib.card[name].cardPrompt(node.link || node, get.owner(node)),
-              placetext = uiintro.add('<div class="text" style="display:inline">' + str + "</div>")
+            var str = lib.card[name].cardPrompt(
+                node.link || node,
+                get.owner(node),
+              ),
+              placetext = uiintro.add(
+                `<div class="text" style="display:inline">${str}</div>`,
+              )
             if (!str.startsWith('<div class="skill"')) {
               uiintro._place_text = placetext
             }
-          } else if (lib.translate[name + "_info"]) {
+          } else if (lib.translate[`${name}_info`]) {
             var placetext = uiintro.add(
-              '<div class="text" style="display:inline">' +
-                lib.translate[name + "_info"] +
-                "</div>",
+              `<div class="text" style="display:inline">${lib.translate[`${name}_info`]}</div>`,
             )
-            if (!lib.translate[name + "_info"].startsWith('<div class="skill"')) {
+            if (
+              !lib.translate[`${name}_info`].startsWith('<div class="skill"')
+            ) {
               uiintro._place_text = placetext
             }
           }
           if (get.is.yingbianConditional(node.link || node)) {
             const yingbianEffects = get.yingbianEffects(node.link || node)
             if (!yingbianEffects.length) {
-              const defaultYingbianEffect = get.defaultYingbianEffect(node.link || node)
+              const defaultYingbianEffect = get.defaultYingbianEffect(
+                node.link || node,
+              )
               if (lib.yingbian.prompt.has(defaultYingbianEffect)) {
                 yingbianEffects.push(defaultYingbianEffect)
               }
@@ -6117,11 +6296,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
               )
             }
           }
-          if (lib.translate[name + "_append"]) {
+          if (lib.translate[`${name}_append`]) {
             uiintro.add(
-              '<div class="text" style="display:inline">' +
-                lib.translate[name + "_append"] +
-                "</div>",
+              `<div class="text" style="display:inline">${lib.translate[`${name}_append`]}</div>`,
             )
           }
           if (uiintro.isNotCard) {
@@ -6133,7 +6310,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             }
           }
           if (node.gaintag?.length) {
-            let gaintag = node.gaintag
+            const gaintag = node.gaintag
               .map((tag) => {
                 let translate = get.translation(tag)
                 if (translate === tag && tag.startsWith("eternal_")) {
@@ -6147,7 +6324,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
               .filter((tag) => tag.length)
             if (gaintag?.length) {
               uiintro.add(" ")
-              uiintro.add(`<div class="text" style="display:inline">此牌标签：${gaintag}</div>`)
+              uiintro.add(
+                `<div class="text" style="display:inline">此牌标签：${gaintag}</div>`,
+              )
             }
           }
         }
@@ -6160,7 +6339,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       if (characterInfo) {
         const infoSex = characterInfo[0]
         if (infoSex && lib.config.show_sex) {
-          capt += `&nbsp;&nbsp;${infoSex == "none" ? "无" : lib.translate[infoSex]}`
+          capt += `&nbsp;&nbsp;${infoSex === "none" ? "无" : lib.translate[infoSex]}`
         }
         const infoGroup = characterInfo[1]
         if (infoGroup && lib.config.show_group) {
@@ -6183,13 +6362,13 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       }
 
       if (lib.config.show_sortPack) {
-        for (let packname in lib.characterPack) {
+        for (const packname in lib.characterPack) {
           if (node.link in lib.characterPack[packname]) {
-            let pack = lib.translate[packname + "_character_config"],
+            let pack = lib.translate[`${packname}_character_config`],
               sort
             if (lib.characterSort[packname]) {
-              let sorted = lib.characterSort[packname]
-              for (let sortname in sorted) {
+              const sorted = lib.characterSort[packname]
+              for (const sortname in sorted) {
                 if (sorted[sortname].includes(node.link)) {
                   sort = `<span style = "font-size:small">[${lib.translate[sortname]}]</span>`
                   break
@@ -6199,7 +6378,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             const sortPack = document.createElement("div")
             sortPack.innerHTML = `${pack}${sort ? `<br>${sort}` : ""}`
             sortPack.appendChild(document.createElement("hr"))
-            sortPack.insertBefore(document.createElement("hr"), sortPack.firstChild)
+            sortPack.insertBefore(
+              document.createElement("hr"),
+              sortPack.firstChild,
+            )
             uiintro.add(sortPack)
             break
           }
@@ -6215,7 +6397,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         })
         if (initFilters.length) {
           const str = initFilters
-            .reduce((strx, stry) => strx + lib.InitFilter[stry] + "<br>", "")
+            .reduce((strx, stry) => `${strx + lib.InitFilter[stry]}<br>`, "")
             .slice(0, -4)
           uiintro.addText(str)
         }
@@ -6240,19 +6422,19 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           modeorder.add(i)
         }
         var list = []
-        uiintro.contentContainer.listen(function (e) {
+        uiintro.contentContainer.listen((e) => {
           ui.click.touchpop()
           e.stopPropagation()
         })
         for (var i = 0; i < modeorder.length; i++) {
-          if (node._banning == "online") {
+          if (node._banning === "online") {
             if (!lib.mode[modeorder[i]].connect) {
               continue
             }
-            if (!lib.config["connect_" + modeorder[i] + "_banned"]) {
-              lib.config["connect_" + modeorder[i] + "_banned"] = []
+            if (!lib.config[`connect_${modeorder[i]}_banned`]) {
+              lib.config[`connect_${modeorder[i]}_banned`] = []
             }
-          } else if (modeorder[i] == "connect" || modeorder[i] == "brawl") {
+          } else if (modeorder[i] === "connect" || modeorder[i] === "brawl") {
             continue
           }
           if (lib.config.all.mode.includes(modeorder[i])) {
@@ -6262,12 +6444,16 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         var page = ui.create.div(".menu-buttons.configpopped", uiintro.content)
         var banall = false
         for (var i = 0; i < list.length; i++) {
-          var cfg = ui.create.div(".config", lib.translate[list[i]] + "模式", page)
+          var cfg = ui.create.div(
+            ".config",
+            `${lib.translate[list[i]]}模式`,
+            page,
+          )
           cfg.classList.add("toggle")
-          if (node._banning == "offline") {
-            cfg.bannedname = list[i] + "_banned"
+          if (node._banning === "offline") {
+            cfg.bannedname = `${list[i]}_banned`
           } else {
-            cfg.bannedname = "connect_" + list[i] + "_banned"
+            cfg.bannedname = `connect_${list[i]}_banned`
           }
           cfg.listen(clickBanned)
           ui.create.div(ui.create.div(cfg))
@@ -6277,7 +6463,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             banall = true
           }
         }
-        if (node._banning == "offline") {
+        if (node._banning === "offline") {
           var cfg = ui.create.div(".config", "随机选将可用", page)
           cfg.classList.add("toggle")
           cfg.listen(function () {
@@ -6299,16 +6485,22 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           banall ? "全部禁用" : "全部启用",
           uiintro.content,
           function () {
-            if (this.innerHTML == "全部禁用") {
+            if (this.innerHTML === "全部禁用") {
               for (var i = 0; i < page.childElementCount; i++) {
-                if (page.childNodes[i].bannedname && page.childNodes[i].classList.contains("on")) {
+                if (
+                  page.childNodes[i].bannedname &&
+                  page.childNodes[i].classList.contains("on")
+                ) {
                   clickBanned.call(page.childNodes[i])
                 }
               }
               this.innerHTML = "全部启用"
             } else {
               for (var i = 0; i < page.childElementCount; i++) {
-                if (page.childNodes[i].bannedname && !page.childNodes[i].classList.contains("on")) {
+                if (
+                  page.childNodes[i].bannedname &&
+                  !page.childNodes[i].classList.contains("on")
+                ) {
                   clickBanned.call(page.childNodes[i])
                 }
               }
@@ -6320,9 +6512,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       } else {
         var skills = get.character(character, 3)
         for (i = 0; i < skills.length; i++) {
-          if (lib.translate[skills[i] + "_info"]) {
-            if (lib.translate[skills[i] + "_ab"]) {
-              translation = lib.translate[skills[i] + "_ab"]
+          if (lib.translate[`${skills[i]}_info`]) {
+            if (lib.translate[`${skills[i]}_ab`]) {
+              translation = lib.translate[`${skills[i]}_ab`]
             } else {
               translation = get.translation(skills[i])
               if (!lib.skill[skills[i]].nobracket) {
@@ -6331,25 +6523,21 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             }
 
             uiintro.add(
-              '<div><div class="skill">' +
-                translation +
-                "</div><div>" +
-                get.skillInfoTranslation(skills[i], null, false) +
-                "</div></div>",
+              `<div><div class="skill">${translation}</div><div>${get.skillInfoTranslation(skills[i], null, false)}</div></div>`,
             )
 
-            if (lib.translate[skills[i] + "_append"]) {
+            if (lib.translate[`${skills[i]}_append`]) {
               uiintro._place_text = uiintro.add(
-                '<div class="text">' + lib.translate[skills[i] + "_append"] + "</div>",
+                `<div class="text">${lib.translate[`${skills[i]}_append`]}</div>`,
               )
             }
           }
         }
-        var modepack = lib.characterPack["mode_" + get.mode()]
+        var modepack = lib.characterPack[`mode_${get.mode()}`]
         if (
           lib.config.show_favourite &&
           lib.character[node.link] &&
-          (!modepack || !modepack[node.link]) &&
+          !modepack?.[node.link] &&
           (!simple || get.is.phoneLayout())
         ) {
           var addFavourite = ui.create.div(".text.center.pointerdiv")
@@ -6367,7 +6555,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           uiintro.add(ui.create.div(".placeholder.slim"))
         }
         if (!simple || get.is.phoneLayout()) {
-          let viewInfo = ui.create.div(".text.center.pointerdiv")
+          const viewInfo = ui.create.div(".text.center.pointerdiv")
           viewInfo.link = node.link
           viewInfo.innerHTML = "查看资料"
           viewInfo.style.marginBottom = "15px"
@@ -6376,7 +6564,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           })
           uiintro.add(viewInfo)
         }
-        if (( lib.skin) && (!simple || get.is.phoneLayout())) {
+        if (lib.skin && (!simple || get.is.phoneLayout())) {
           const nameskin = node.link
           if (nameskin) {
             createButtons(nameskin, (src) => {
@@ -6386,18 +6574,23 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           }
         }
       }
-    } else if (node.classList.contains("equips") && ui.arena.classList.contains("selecting")) {
-      ;(function () {
+    } else if (
+      node.classList.contains("equips") &&
+      ui.arena.classList.contains("selecting")
+    ) {
+      ;(() => {
         uiintro.add("选择装备")
         uiintro.addSmall(
           Array.from(node.childNodes).filter(
-            (node) => !node.classList.contains("emptyequip") && !node.classList.contains("feichu"),
+            (node) =>
+              !node.classList.contains("emptyequip") &&
+              !node.classList.contains("feichu"),
           ),
           true,
         )
         uiintro.clickintro = true
         ui.control.hide()
-        uiintro._onclose = function () {
+        uiintro._onclose = () => {
           ui.control.show()
         }
         var confirmbutton
@@ -6415,7 +6608,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             } else {
               this.classList.remove("selected")
             }
-            if (ui.confirm && ui.confirm.str && ui.confirm.str.includes("o")) {
+            if (ui.confirm?.str?.includes("o")) {
               confirmbutton.classList.remove("disabled")
             } else {
               confirmbutton.classList.add("disabled")
@@ -6427,8 +6620,8 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         confirmbutton = ui.create.div(
           ".menubutton.large.pointerdiv",
           "确定",
-          function () {
-            if (ui.confirm && ui.confirm.str && ui.confirm.str.includes("o")) {
+          () => {
+            if (ui.confirm?.str?.includes("o")) {
               uiintro._clickintro()
               ui.click.ok(ui.confirm.firstChild)
             }
@@ -6436,8 +6629,8 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           buttoncontainer,
         )
         confirmbutton.style.position = "relative"
-        setTimeout(function () {
-          if (ui.confirm && ui.confirm.str && ui.confirm.str.includes("o")) {
+        setTimeout(() => {
+          if (ui.confirm?.str?.includes("o")) {
             confirmbutton.classList.remove("disabled")
           } else {
             confirmbutton.classList.add("disabled")
@@ -6448,49 +6641,43 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       var career = node.dataset.career
       uiintro.add(get.translation(career))
       uiintro.add(
-        '<div class="text center" style="padding-bottom:5px">' +
-          lib.translate["_" + career + "_skill_info"] +
-          "</div>",
+        `<div class="text center" style="padding-bottom:5px">${lib.translate[`_${career}_skill_info`]}</div>`,
       )
     } else if (node.classList.contains("skillbar")) {
-      if (node == ui.friendBar) {
+      if (node === ui.friendBar) {
         uiintro.add("友方怒气值")
         uiintro.add(
-          '<div class="text center" style="padding-bottom:5px">' +
-            _status.friendRage +
-            "/100</div>",
+          `<div class="text center" style="padding-bottom:5px">${_status.friendRage}/100</div>`,
         )
-      } else if (node == ui.enemyBar) {
+      } else if (node === ui.enemyBar) {
         uiintro.add("敌方怒气值")
         uiintro.add(
-          '<div class="text center" style="padding-bottom:5px">' + _status.enemyRage + "/100</div>",
+          `<div class="text center" style="padding-bottom:5px">${_status.enemyRage}/100</div>`,
         )
       }
-    } else if (node.parentNode == ui.historybar) {
+    } else if (node.parentNode === ui.historybar) {
       if (node.dead) {
-        if (!node.source || node.source == node.player) {
-          uiintro.add('<div class="text center">' + get.translation(node.player) + "阵亡</div>")
+        if (!node.source || node.source === node.player) {
+          uiintro.add(
+            `<div class="text center">${get.translation(node.player)}阵亡</div>`,
+          )
           uiintro.addSmall([node.player])
         } else {
           uiintro.add(
-            '<div class="text center">' +
-              get.translation(node.player) +
-              "被" +
-              get.translation(node.source) +
-              "杀害</div>",
+            `<div class="text center">${get.translation(node.player)}被${get.translation(node.source)}杀害</div>`,
           )
           uiintro.addSmall([node.source])
         }
       }
       if (node.skill) {
-        uiintro.add('<div class="text center">' + get.translation(node.skill) + "</div>")
+        uiintro.add(
+          `<div class="text center">${get.translation(node.skill)}</div>`,
+        )
         uiintro._place_text = uiintro.add(
-          '<div class="text" style="display:inline">' +
-            get.translation(node.skill, "info") +
-            "</div>",
+          `<div class="text" style="display:inline">${get.translation(node.skill, "info")}</div>`,
         )
       }
-      if (node.targets && get.itemtype(node.targets) == "players") {
+      if (node.targets && get.itemtype(node.targets) === "players") {
         uiintro.add('<div class="text center">目标</div>')
         uiintro.addSmall(node.targets)
       }
@@ -6498,7 +6685,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         uiintro.add('<div class="text center">使用者</div>')
         uiintro.addSmall(node.players)
       }
-      if (node.cards && node.cards.length) {
+      if (node.cards?.length) {
         uiintro.add('<div class="text center">卡牌</div>')
         uiintro.addSmall(node.cards)
       }
@@ -6515,7 +6702,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       if (node.nodeTitle) {
         uiintro.add(node.nodeTitle)
       }
-      uiintro._place_text = uiintro.add('<div class="text">' + node.nodeContent + "</div>")
+      uiintro._place_text = uiintro.add(
+        `<div class="text">${node.nodeContent}</div>`,
+      )
     }
     if (lib.config.touchscreen) {
       lib.setScroll(uiintro.contentContainer)
@@ -6550,7 +6739,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     const uiintro = ui.create.dialog("hidden", "notouchscroll")
     uiintro.style.zIndex = "21"
     uiintro.setAttribute("id", "poptip")
-    if (typeof info == "string") {
+    if (typeof info === "string") {
       uiintro._place_text = uiintro.add(`<div class = "text">${info}</div>`)
     } else {
       info(uiintro, poptip)
@@ -6577,7 +6766,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         uiintro._onclose()
       }
     }
-    layer.addEventListener(lib.config.touchscreen ? "touchend" : "click", clicklayer)
+    layer.addEventListener(
+      lib.config.touchscreen ? "touchend" : "click",
+      clicklayer,
+    )
 
     const clickintro = function (e) {
       layer.remove()
@@ -6590,7 +6782,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       }
     }
     if (uiintro.clickintro) {
-      uiintro.listen(function () {
+      uiintro.listen(() => {
         _status.clicked = true
       })
       uiintro._clickintro = clicklayer
@@ -6602,7 +6794,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     }
     uiintro._close = clicklayer
 
-    const adjust = function () {
+    const adjust = () => {
       const margin = 8 //上下最小间距
       uiintro.style.maxHeight = "none"
       uiintro.style.overflowY = ""
@@ -6622,13 +6814,16 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         uiintro._poptipTranslate = 0
         return
       }
-      const desiredTop = Math.max(margin, Math.min(top, winH - margin - naturalHeight))
+      const desiredTop = Math.max(
+        margin,
+        Math.min(top, winH - margin - naturalHeight),
+      )
       const lift = top - desiredTop
       const baseTransform = uiintro._poptipOriginalTransform || ""
       uiintro._poptipTranslate = lift
-      uiintro.style.transform = baseTransform + ` translateY(${-lift}px)`
+      uiintro.style.transform = `${baseTransform} translateY(${-lift}px)`
       if (naturalHeight > allowedFull) {
-        uiintro.style.maxHeight = allowedFull + "px"
+        uiintro.style.maxHeight = `${allowedFull}px`
         uiintro.style.overflowY = "auto"
       } else {
         uiintro.style.maxHeight = "none"
@@ -6670,7 +6865,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return ["wei", "shu", "wu", "qun", "jin", "western", "key"]
   }
   selectGroup(name, type) {
-    if (get.itemtype(name) == "player") {
+    if (get.itemtype(name) === "player") {
       name = name.name || name.name1
     }
     const info = get.character(name)
@@ -6713,14 +6908,17 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   types() {
     var types = []
     for (var i in lib.card) {
-      if (lib.card[i].mode && lib.card[i].mode.includes(lib.config.mode) == false) {
+      if (
+        lib.card[i].mode &&
+        lib.card[i].mode.includes(lib.config.mode) === false
+      ) {
         continue
       }
-      if (lib.card[i].forbid && lib.card[i].forbid.includes(lib.config.mode)) {
+      if (lib.card[i].forbid?.includes(lib.config.mode)) {
         continue
       }
       if (lib.card[i].type) {
-        if (lib.card[i].type == "delay") {
+        if (lib.card[i].type === "delay") {
           types.add("trick")
         } else {
           types.add(lib.card[i].type)
@@ -6732,7 +6930,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   links(buttons) {
     var links = []
     for (var i = 0; i < buttons.length; i++) {
-      if (buttons[i].link != undefined) {
+      if (buttons[i].link !== undefined) {
         links.push(buttons[i].link)
       }
     }
@@ -6746,13 +6944,13 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     }
     for (var i = 0; i < skills.length; i++) {
       var info = get.info(skills[i])
-      if (info && info.ai && info.ai.threaten) {
-        if (typeof info.ai.threaten == "function" && player) {
+      if (info?.ai?.threaten) {
+        if (typeof info.ai.threaten === "function" && player) {
           var tmp = info.ai.threaten(player, target)
-          if (typeof tmp == "number") {
+          if (typeof tmp === "number") {
             threaten *= tmp
           }
-        } else if (typeof info.ai.threaten == "number") {
+        } else if (typeof info.ai.threaten === "number") {
           threaten *= info.ai.threaten
         }
       }
@@ -6783,7 +6981,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       num = 4 + Math.sqrt(num - 4)
     } else {
       if (player.isHealthy()) {
-        if (player.hp == 3) {
+        if (player.hp === 3) {
           num += 0.5
         } else if (player.hp < 3) {
           num++
@@ -6812,12 +7010,15 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     }
     from = from._trueMe || from
     arguments[0] = from
-    var att = CacheContext.requireCacheContext().get.rawAttitude.apply(this, arguments)
+    var att = CacheContext.requireCacheContext().get.rawAttitude.apply(
+      this,
+      arguments,
+    )
     if (from.isMad()) {
       att = -att
     }
     if (to.isMad() && att > 0) {
-      if (to.identity == "zhu") {
+      if (to.identity === "zhu") {
         att = 1
       } else {
         att = 0
@@ -6839,10 +7040,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return get.sgn(get.attitude.apply(this, arguments))
   }
   useful_raw(card, player) {
-    if (get.position(card) == "j") {
+    if (get.position(card) === "j") {
       return -1
     }
-    if (get.position(card) == "e") {
+    if (get.position(card) === "e") {
       return get.equipValue(card)
     }
     if (card._modUseful) {
@@ -6857,9 +7058,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         i = game
           .callFuncUseStepCache(
             "player.getCardsInUseful",
-            function (player, position, cardname) {
-              return player.getCards(position, cardname)
-            },
+            (player, position, cardname) => player.getCards(position, cardname),
             [player, "h", card.name],
           )
           .indexOf(card)
@@ -6872,17 +7071,17 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     }
     var aii = get.info(card).ai
     var useful
-    if (aii && aii.useful) {
+    if (aii?.useful) {
       useful = aii.useful
-    } else if (aii && aii.basic) {
+    } else if (aii?.basic) {
       useful = aii.basic.useful
     }
     var result
-    if (useful == undefined) {
+    if (useful === undefined) {
       result = -1
-    } else if (typeof useful == "function") {
+    } else if (typeof useful === "function") {
       result = useful(card, i)
-    } else if (typeof useful == "number") {
+    } else if (typeof useful === "number") {
       result = useful
     } else if (i < useful.length) {
       result = useful[i]
@@ -6894,7 +7093,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   }
   useful(card, player) {
     if (_status.event.useCache) {
-      return game.callFuncUseStepCache("get.useful_raw", get.useful_raw, [card, player])
+      return game.callFuncUseStepCache("get.useful_raw", get.useful_raw, [
+        card,
+        player,
+      ])
     }
     return get.useful_raw(card, player)
   }
@@ -6905,7 +7107,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return 10 - get.useful(card)
   }
   unuseful3(card) {
-    if (card.name == "du") {
+    if (card.name === "du") {
       return 20
     }
     return 10 - get.useful(card)
@@ -6927,25 +7129,23 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       return card._modValue(player, method)
     }
     var aii = get.info(card).ai
-    if (aii && aii.value) {
+    if (aii?.value) {
       value = aii.value
-    } else if (aii && aii.basic) {
+    } else if (aii?.basic) {
       value = aii.basic.value
     }
-    if (player == undefined || get.itemtype(player) != "player") {
+    if (player === undefined || get.itemtype(player) !== "player") {
       player = _status.event.player
     }
-    var geti = function () {
-      return player.getCardIndex("hs", card.name, card, 5)
-    }
-    if (typeof value == "function") {
+    var geti = () => player.getCardIndex("hs", card.name, card, 5)
+    if (typeof value === "function") {
       result = value(card, player, geti(), method)
     }
-    if (typeof value == "number") {
+    if (typeof value === "number") {
       result = value
     }
     if (Array.isArray(value)) {
-      if (method == "raw") {
+      if (method === "raw") {
         result = value[0]
       }
       var num = geti()
@@ -6974,10 +7174,14 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       if (!target.canEquip(card, true)) {
         return 0
       }
-      let current = target.getVEquip(card)
-      if (current && current != card) {
+      const current = target.getVEquip(card)
+      if (current && current !== card) {
         value2 = get.equipValue(current, target)
-        if (value2 > 0 && !target.needsToDiscard() && !get.tag(card, "valueswap")) {
+        if (
+          value2 > 0 &&
+          !target.needsToDiscard() &&
+          !get.tag(card, "valueswap")
+        ) {
           return 0
         }
       }
@@ -6987,25 +7191,27 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   equipValue(card, player) {
     player = player ?? get.owner(card) ?? get.player()
     if (get.itemtype(card) === "card") {
-      card = player.getVCards("e").find((vcard) => vcard.cards?.includes(card)) ?? card
+      card =
+        player.getVCards("e").find((vcard) => vcard.cards?.includes(card)) ??
+        card
     }
     var info = get.info(card, false)
     if (!info.ai) {
       return 0
     }
     var value = info.ai.equipValue
-    if (value == undefined) {
-      if (info.ai.basic && info.ai.basic.equipValue != undefined) {
+    if (value === undefined) {
+      if (info.ai.basic && info.ai.basic.equipValue !== undefined) {
         value = info.ai.basic.equipValue
       } else {
         return 0
       }
     }
-    if (typeof value == "number") {
+    if (typeof value === "number") {
       return value
     }
     //此处是否需要将实体牌改为虚拟牌呢？暂时不确定
-    if (typeof value == "function") {
+    if (typeof value === "function") {
       return value(card, player, null, "raw2")
     }
     return 0
@@ -7013,10 +7219,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
   equipValueNumber(card) {
     var info = get.info(card)
     if (info.ai) {
-      if (typeof info.ai.equipValue == "number") {
+      if (typeof info.ai.equipValue === "number") {
         return info.ai.equipValue
       }
-      if (info.ai.basic && typeof info.ai.basic.equipValue == "number") {
+      if (info.ai.basic && typeof info.ai.basic.equipValue === "number") {
         return info.ai.basic.equipValue
       }
     }
@@ -7036,10 +7242,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       return 1
     }
     var threaten = lib.skill[skill].ai.threaten
-    if (typeof threaten == "number") {
+    if (typeof threaten === "number") {
       return threaten
     }
-    if (typeof threaten == "function") {
+    if (typeof threaten === "function") {
       player = player || _status.event.player
       target = target || player
       return threaten(player, target)
@@ -7047,33 +7253,33 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return 1
   }
   cacheOrder(item) {
-    let cache = CacheContext.requireCacheContext()
+    const cache = CacheContext.requireCacheContext()
     return cache.get.order(item)
   }
   /**
    * @returns { number }
    */
   order(item, player = get.player() || game.me) {
-    let cache = CacheContext.requireCacheContext()
+    const cache = CacheContext.requireCacheContext()
     var info = get.info(item)
     if (!info) {
       return -1
     }
     var aii = info.ai
     var order
-    if (aii && aii.order) {
+    if (aii?.order) {
       order = aii.order
-    } else if (aii && aii.basic) {
+    } else if (aii?.basic) {
       order = aii.basic.order
     }
-    if (order == undefined) {
+    if (order === undefined) {
       return -1
     }
     var num = order
-    if (typeof order == "function") {
+    if (typeof order === "function") {
       num = order(item, player)
     }
-    if (typeof item == "object" && player) {
+    if (typeof item === "object" && player) {
       num = game.checkMod(player, item, num, "aiOrder", player)
     }
     return num
@@ -7084,7 +7290,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     if (info.ai) {
       result = get.copy(info.ai.result)
     }
-    if (typeof result == "function") {
+    if (typeof result === "function") {
       result = result(item)
     }
     if (!result) {
@@ -7102,32 +7308,32 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return result
   }
   cacheEffectUse(target, card, player, player2, isLink) {
-    let cache = CacheContext.requireCacheContext()
+    const cache = CacheContext.requireCacheContext()
     return cache.get.effect_use(target, card, player, player2, isLink)
   }
   effect_use(target, card, player, player2, isLink) {
-    let cache = CacheContext.requireCacheContext()
+    const cache = CacheContext.requireCacheContext()
     var event = _status.event
     var eventskill = null
-    if (player == undefined) {
+    if (player === undefined) {
       player = _status.event.player
     }
-    if (card && typeof card == "object" && "name" in card) {
+    if (card && typeof card === "object" && "name" in card) {
       card = get.autoViewAs(card)
     }
-    if (typeof card != "string" && (typeof card != "object" || !card.name)) {
+    if (typeof card !== "string" && (typeof card !== "object" || !card.name)) {
       var skillinfo = get.info(event.skill)
-      if (event.skill && skillinfo.viewAs == undefined) {
+      if (event.skill && skillinfo.viewAs === undefined) {
         card = _status.event.skill
       } else {
         card = get.card()
-        if (skillinfo && skillinfo.viewAs && card.name === skillinfo.viewAs.name) {
+        if (skillinfo?.viewAs && card.name === skillinfo.viewAs.name) {
           eventskill = event.skill
         }
       }
     }
     var info = get.info(card)
-    if (typeof card == "object" && info && info.changeTarget) {
+    if (typeof card === "object" && info && info.changeTarget) {
       var targets = [target]
       info.changeTarget(player, targets)
       var eff = 0
@@ -7139,17 +7345,17 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     var result = get.result(card, eventskill)
     var result1 = result.player_use || result.player,
       result2 = result.target_use || result.target
-    if (typeof result1 == "function") {
+    if (typeof result1 === "function") {
       result1 = result1(player, target, card, isLink)
     }
-    if (typeof result2 == "function") {
+    if (typeof result2 === "function") {
       result2 = result2(player, target, card, isLink)
     }
 
-    if (typeof result1 != "number") {
+    if (typeof result1 !== "number") {
       result1 = 0
     }
-    if (typeof result2 != "number") {
+    if (typeof result2 !== "number") {
       result2 = 0
     }
     var temp1,
@@ -7170,35 +7376,39 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       temp1 = info.ai
       if (
         temp1 &&
-        typeof temp1.effect == "object" &&
-        typeof temp1.effect.player_use == "function"
+        typeof temp1.effect === "object" &&
+        typeof temp1.effect.player_use === "function"
       ) {
-        temp1 = cache.delegate(temp1.effect).player_use(card, player, target, result1, isLink)
+        temp1 = cache
+          .delegate(temp1.effect)
+          .player_use(card, player, target, result1, isLink)
       } else if (
         temp1 &&
-        typeof temp1.effect == "object" &&
-        typeof temp1.effect.player == "function"
+        typeof temp1.effect === "object" &&
+        typeof temp1.effect.player === "function"
       ) {
-        temp1 = cache.delegate(temp1.effect).player(card, player, target, result1, isLink)
+        temp1 = cache
+          .delegate(temp1.effect)
+          .player(card, player, target, result1, isLink)
       } else {
         temp1 = undefined
       }
-      if (typeof temp1 == "object") {
-        if (temp1.length == 2 || temp1.length == 4) {
+      if (typeof temp1 === "object") {
+        if (temp1.length === 2 || temp1.length === 4) {
           result1 *= temp1[0]
           temp01 += temp1[1]
         }
-        if (temp1.length == 4) {
+        if (temp1.length === 4) {
           result2 *= temp1[2]
           temp02 += temp1[3]
         }
-      } else if (typeof temp1 == "number") {
+      } else if (typeof temp1 === "number") {
         result1 *= temp1
-      } else if (temp1 == "zeroplayer") {
+      } else if (temp1 === "zeroplayer") {
         zeroplayer = true
-      } else if (temp1 == "zerotarget") {
+      } else if (temp1 === "zerotarget") {
         zerotarget = true
-      } else if (temp1 == "zeroplayertarget") {
+      } else if (temp1 === "zeroplayertarget") {
         zeroplayer = true
         zerotarget = true
       }
@@ -7212,12 +7422,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           throw new Error(`${skills2[i]}不存在的技能`)
         }
         temp2 = info.ai
-        if (temp2 && temp2.threaten) {
+        if (temp2?.threaten) {
           temp3 = temp2.threaten
         } else {
           temp3 = undefined
         }
-        if (temp2 && typeof temp2.effect == "function") {
+        if (temp2 && typeof temp2.effect === "function") {
           if (
             !player.hasSkillTag("ignoreSkill", true, {
               card: card,
@@ -7226,14 +7436,16 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
               isLink: isLink,
             })
           ) {
-            temp2 = cache.delegate(temp2).effect(card, player, target, result2, isLink)
+            temp2 = cache
+              .delegate(temp2)
+              .effect(card, player, target, result2, isLink)
           } else {
             temp2 = undefined
           }
         } else if (
           temp2 &&
-          typeof temp2.effect == "object" &&
-          typeof temp2.effect.target_use == "function"
+          typeof temp2.effect === "object" &&
+          typeof temp2.effect.target_use === "function"
         ) {
           if (
             !player.hasSkillTag("ignoreSkill", true, {
@@ -7243,14 +7455,16 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
               isLink: isLink,
             })
           ) {
-            temp2 = cache.delegate(temp2.effect).target_use(card, player, target, result2, isLink)
+            temp2 = cache
+              .delegate(temp2.effect)
+              .target_use(card, player, target, result2, isLink)
           } else {
             temp2 = undefined
           }
         } else if (
           temp2 &&
-          typeof temp2.effect == "object" &&
-          typeof temp2.effect.target == "function"
+          typeof temp2.effect === "object" &&
+          typeof temp2.effect.target === "function"
         ) {
           if (
             !player.hasSkillTag("ignoreSkill", true, {
@@ -7260,74 +7474,76 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
               isLink: isLink,
             })
           ) {
-            temp2 = cache.delegate(temp2.effect).target(card, player, target, result2, isLink)
+            temp2 = cache
+              .delegate(temp2.effect)
+              .target(card, player, target, result2, isLink)
           } else {
             temp2 = undefined
           }
         } else {
           temp2 = undefined
         }
-        if (typeof temp2 == "object") {
-          if (temp2.length == 2 || temp2.length == 4) {
+        if (typeof temp2 === "object") {
+          if (temp2.length === 2 || temp2.length === 4) {
             result2 *= temp2[0]
             temp02 += temp2[1]
           }
-          if (temp2.length == 4) {
+          if (temp2.length === 4) {
             result1 *= temp2[2]
             temp01 += temp2[3]
           }
-        } else if (typeof temp2 == "number") {
+        } else if (typeof temp2 === "number") {
           result2 *= temp2
-        } else if (temp2 == "zeroplayer") {
+        } else if (temp2 === "zeroplayer") {
           zeroplayer = true
-        } else if (temp2 == "zerotarget") {
+        } else if (temp2 === "zerotarget") {
           zerotarget = true
-        } else if (temp2 == "zeroplayertarget") {
+        } else if (temp2 === "zeroplayertarget") {
           zeroplayer = true
           zerotarget = true
         }
-        if (typeof temp3 == "object") {
+        if (typeof temp3 === "object") {
           temp3 = temp3.target
         }
-        if (typeof temp3 == "function") {
+        if (typeof temp3 === "function") {
           temp3 = temp3(player, target)
         }
-        if (typeof temp3 == "number") {
+        if (typeof temp3 === "number") {
           threaten *= temp3
         }
       }
       result2 += temp02
       result1 += temp01
-      if (typeof card == "object" && !result.ignoreStatus) {
+      if (typeof card === "object" && !result.ignoreStatus) {
         if (cache.get.attitude(player, target) < 0) {
           result2 *= Math.sqrt(threaten)
         } else {
           result2 *= Math.sqrt(Math.sqrt(threaten))
         }
-        if (target.hp == 1) {
+        if (target.hp === 1) {
           result2 *= 2.5
         }
-        if (target.hp == 2) {
+        if (target.hp === 2) {
           result2 *= 1.8
         }
-        let countTargetCards = target.countCards("h")
-        if (countTargetCards == 0) {
+        const countTargetCards = target.countCards("h")
+        if (countTargetCards === 0) {
           if (get.tag(card, "respondSha") || get.tag(card, "respondShan")) {
             result2 *= 1.7
           } else {
             result2 *= 1.5
           }
-        } else if (countTargetCards == 1) {
+        } else if (countTargetCards === 1) {
           result2 *= 1.3
-        } else if (countTargetCards == 2) {
+        } else if (countTargetCards === 2) {
           result2 *= 1.1
         } else if (countTargetCards >= 3) {
           result2 *= 0.5
         }
 
-        if (target.hp == 4) {
+        if (target.hp === 4) {
           result2 *= 0.9
-        } else if (target.hp == 5) {
+        } else if (target.hp === 5) {
           result2 *= 0.8
         } else if (target.hp > 5) {
           result2 *= 0.6
@@ -7366,11 +7582,13 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     }
     if (!isLink && target && !zerotarget && get.tag(card, "natureDamage")) {
       var info = get.info(card)
-      if (!info || !info.ai || !info.ai.canLink) {
+      if (!info?.ai?.canLink) {
         if (target.isLinked()) {
-          game.players.forEach(function (current) {
-            if (current != target && current.isLinked()) {
-              final += cache.get.effect(current, card, player, player2, { source: target })
+          game.players.forEach((current) => {
+            if (current !== target && current.isLinked()) {
+              final += cache.get.effect(current, card, player, player2, {
+                source: target,
+              })
             }
           })
         }
@@ -7381,8 +7599,8 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             canLink = {}
           }
           canLink.source = target
-          game.players.forEach(function (current) {
-            if (current != target && current.isLinked()) {
+          game.players.forEach((current) => {
+            if (current !== target && current.isLinked()) {
               final += cache.get.effect(current, card, player, player2, canLink)
             }
           })
@@ -7392,26 +7610,26 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return final
   }
   cacheEffect(target, card, player, player2, isLink) {
-    let cache = CacheContext.requireCacheContext()
+    const cache = CacheContext.requireCacheContext()
     return cache.get.effect(target, card, player, player2, isLink)
   }
   effect(target, card, player, player2, isLink) {
-    let cache = CacheContext.requireCacheContext()
+    const cache = CacheContext.requireCacheContext()
     var event = _status.event
     var eventskill = null
-    if (player == undefined) {
+    if (player === undefined) {
       player = _status.event.player
     }
-    if (card && typeof card == "object" && "name" in card) {
+    if (card && typeof card === "object" && "name" in card) {
       card = get.autoViewAs(card)
     }
-    if (typeof card != "string" && (typeof card != "object" || !card.name)) {
+    if (typeof card !== "string" && (typeof card !== "object" || !card.name)) {
       var skillinfo = get.info(event.skill)
-      if (event.skill && skillinfo.viewAs == undefined) {
+      if (event.skill && skillinfo.viewAs === undefined) {
         card = _status.event.skill
       } else {
         card = get.card()
-        if (skillinfo && skillinfo.viewAs && card.name === skillinfo.viewAs.name) {
+        if (skillinfo?.viewAs && card.name === skillinfo.viewAs.name) {
           eventskill = event.skill
         }
       }
@@ -7419,17 +7637,17 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     var result = get.result(card, eventskill)
     var result1 = result.player,
       result2 = result.target
-    if (typeof result1 == "function") {
+    if (typeof result1 === "function") {
       result1 = result1(player, target, card, isLink)
     }
-    if (typeof result2 == "function") {
+    if (typeof result2 === "function") {
       result2 = result2(player, target, card, isLink)
     }
 
-    if (typeof result1 != "number") {
+    if (typeof result1 !== "number") {
       result1 = 0
     }
-    if (typeof result2 != "number") {
+    if (typeof result2 !== "number") {
       result2 = 0
     }
     var temp1,
@@ -7448,27 +7666,31 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         throw new Error(`${skills1[i]}不存在的技能`)
       }
       temp1 = info.ai
-      if (temp1 && typeof temp1.effect == "object" && typeof temp1.effect.player == "function") {
+      if (
+        temp1 &&
+        typeof temp1.effect === "object" &&
+        typeof temp1.effect.player === "function"
+      ) {
         temp1 = temp1.effect.player(card, player, target, result1, isLink)
       } else {
         temp1 = undefined
       }
-      if (typeof temp1 == "object") {
-        if (temp1.length == 2 || temp1.length == 4) {
+      if (typeof temp1 === "object") {
+        if (temp1.length === 2 || temp1.length === 4) {
           result1 *= temp1[0]
           temp01 += temp1[1]
         }
-        if (temp1.length == 4) {
+        if (temp1.length === 4) {
           result2 *= temp1[2]
           temp02 += temp1[3]
         }
-      } else if (typeof temp1 == "number") {
+      } else if (typeof temp1 === "number") {
         result1 *= temp1
-      } else if (temp1 == "zeroplayer") {
+      } else if (temp1 === "zeroplayer") {
         zeroplayer = true
-      } else if (temp1 == "zerotarget") {
+      } else if (temp1 === "zerotarget") {
         zerotarget = true
-      } else if (temp1 == "zeroplayertarget") {
+      } else if (temp1 === "zeroplayertarget") {
         zeroplayer = true
         zerotarget = true
       }
@@ -7490,7 +7712,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         } else {
           temp3 = undefined
         }
-        if (typeof temp2.effect == "object" && typeof temp2.effect.target == "function") {
+        if (
+          typeof temp2.effect === "object" &&
+          typeof temp2.effect.target === "function"
+        ) {
           if (
             !player.hasSkillTag("ignoreSkill", true, {
               card: card,
@@ -7499,77 +7724,85 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
               isLink: isLink,
             })
           ) {
-            temp2 = cache.delegate(temp2.effect).target(card, player, target, result2, isLink)
+            temp2 = cache
+              .delegate(temp2.effect)
+              .target(card, player, target, result2, isLink)
           } else {
             temp2 = undefined
           }
         } else {
           temp2 = undefined
         }
-        if (typeof temp2 == "object") {
-          if (temp2.length == 2 || temp2.length == 4) {
+        if (typeof temp2 === "object") {
+          if (temp2.length === 2 || temp2.length === 4) {
             result2 *= temp2[0]
             temp02 += temp2[1]
           }
-          if (temp2.length == 4) {
+          if (temp2.length === 4) {
             result1 *= temp2[2]
             temp01 += temp2[3]
           }
-        } else if (typeof temp2 == "number") {
+        } else if (typeof temp2 === "number") {
           result2 *= temp2
-        } else if (temp2 == "zeroplayer") {
+        } else if (temp2 === "zeroplayer") {
           zeroplayer = true
-        } else if (temp2 == "zerotarget") {
+        } else if (temp2 === "zerotarget") {
           zerotarget = true
-        } else if (temp2 == "zeroplayertarget") {
+        } else if (temp2 === "zeroplayertarget") {
           zeroplayer = true
           zerotarget = true
         }
-        if (typeof temp3 == "function" && temp3(player, target) != undefined) {
+        if (
+          typeof temp3 === "function" &&
+          temp3(player, target) !== undefined
+        ) {
           threaten *= temp3(player, target)
-        } else if (typeof temp3 == "object") {
-          if (typeof temp3.target == "number") {
+        } else if (typeof temp3 === "object") {
+          if (typeof temp3.target === "number") {
             threaten *= temp3
-          } else if (typeof temp3.target == "function" && temp3(player, target) != undefined) {
+          } else if (
+            typeof temp3.target === "function" &&
+            temp3(player, target) !== undefined
+          ) {
             threaten *= temp3(player, target)
           }
-        } else if (typeof temp3 == "number") {
+        } else if (typeof temp3 === "number") {
           threaten *= temp3
         }
       }
       result2 += temp02
       result1 += temp01
-      if (typeof card == "object" && !result.ignoreStatus) {
+      if (typeof card === "object" && !result.ignoreStatus) {
         if (cache.get.attitude(player, target) < 0) {
           result2 *= Math.sqrt(threaten)
         } else {
           result2 *= Math.sqrt(Math.sqrt(threaten))
         }
         // *** continue here ***
-        if (target.hp == 1) {
+        if (target.hp === 1) {
           result2 *= 3
         }
-        if (target.hp == 2) {
+        if (target.hp === 2) {
           result2 *= 1.8
         }
-        let targetCountCards = target.countCards("h")
-        if (targetCountCards == 0) {
+        const targetCountCards = target.countCards("h")
+        if (targetCountCards === 0) {
           if (get.tag(card, "respondSha") || get.tag(card, "respondShan")) {
             result2 *= 2.1
           } else {
             result2 *= 1.5
           }
         }
-        if (targetCountCards == 1) {
+        if (targetCountCards === 1) {
           result2 *= 1.3
-        } else if (targetCountCards == 2) {
+        } else if (targetCountCards === 2) {
           result2 *= 1.1
         } else if (targetCountCards > 3) {
           result2 *= 0.5
         }
-        if (target.hp == 4) {
+        if (target.hp === 4) {
           result2 *= 0.9
-        } else if (target.hp == 5) {
+        } else if (target.hp === 5) {
           result2 *= 0.8
         } else if (target.hp > 5) {
           result2 *= 0.6
@@ -7579,7 +7812,15 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       result2 += temp02
       result1 += temp01
       if (typeof card === "object" && !get.info(card)?.notarget) {
-        console.warn("计算get.effect(", target, card, player, player2, isLink, ")时缺少target参数")
+        console.warn(
+          "计算get.effect(",
+          target,
+          card,
+          player,
+          player2,
+          isLink,
+          ")时缺少target参数",
+        )
       }
     }
     if (zeroplayer) {
@@ -7600,11 +7841,13 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     }
     if (!isLink && target && !zerotarget && get.tag(card, "natureDamage")) {
       var info = get.info(card)
-      if (!info || !info.ai || !info.ai.canLink) {
+      if (!info?.ai?.canLink) {
         if (target.isLinked()) {
-          game.players.forEach(function (current) {
-            if (current != target && current.isLinked()) {
-              final += cache.get.effect(current, card, player, player2, { source: target })
+          game.players.forEach((current) => {
+            if (current !== target && current.isLinked()) {
+              final += cache.get.effect(current, card, player, player2, {
+                source: target,
+              })
             }
           })
         }
@@ -7615,8 +7858,8 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             canLink = {}
           }
           canLink.source = target
-          game.players.forEach(function (current) {
-            if (current != target && current.isLinked()) {
+          game.players.forEach((current) => {
+            if (current !== target && current.isLinked()) {
               final += cache.get.effect(current, card, player, player2, canLink)
             }
           })
@@ -7626,11 +7869,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     return final
   }
   damageEffect(target, player, viewer, nature) {
-    if (get.itemtype(nature) == "natures") {
+    if (get.itemtype(nature) === "natures") {
       var natures = get.natureList(nature)
       return (
-        natures.map((n) => get.damageEffect(target, player, viewer, n)).reduce((p, c) => p + c, 0) /
-        (natures.length || 1)
+        natures
+          .map((n) => get.damageEffect(target, player, viewer, n))
+          .reduce((p, c) => p + c, 0) / (natures.length || 1)
       )
     }
     if (!player) {
@@ -7640,11 +7884,11 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       viewer = target
     }
     var name = "damage"
-    if (nature == "fire") {
+    if (nature === "fire") {
       name = "firedamage"
-    } else if (nature == "thunder") {
+    } else if (nature === "thunder") {
       name = "thunderdamage"
-    } else if (nature == "ice") {
+    } else if (nature === "ice") {
       name = "icedamage"
     }
     var eff = get.effect(target, { name: name }, player, viewer)
@@ -7659,13 +7903,13 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns 返回的结果
    */
   dynamicVariable(source) {
-    if (typeof source == "function") {
+    if (typeof source === "function") {
       return source.call(null, ...Array.from(arguments).slice(1))
     }
     return source
   }
   recoverEffect(target, player, viewer) {
-    if (target.hp == target.maxHp) {
+    if (target.hp === target.maxHp) {
       return 0
     }
     if (!player) {
@@ -7680,7 +7924,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     const card = button.link
     const player = get.owner(card) || _status.event.player
     if (player.getCards("j").includes(card)) {
-      const vcard = get.autoViewAs({ name: card.viewAs || card.name, cards: [card] }, [card])
+      const vcard = get.autoViewAs(
+        { name: card.viewAs || card.name, cards: [card] },
+        [card],
+      )
       return get.effect(player, vcard, player, player)
     }
     if (player.getCards("e").includes(card)) {
@@ -7718,9 +7965,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     if ("zhuanhuanLimit" in info) {
       const { zhuanhuanLimit } = info
       if (typeof zhuanhuanLimit === "function") {
-        return parseInt(zhuanhuanLimit(skill, player))
+        return parseInt(zhuanhuanLimit(skill, player), 10)
       }
-      return parseInt(zhuanhuanLimit)
+      return parseInt(zhuanhuanLimit, 10)
     }
     return 2
   }
@@ -7786,12 +8033,18 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       return nameinfo.skinPath
     }
     const mode = get.mode()
-    if (lib.characterPack[`mode_${mode}`] && lib.characterPack[`mode_${mode}`][name]) {
+    if (
+      lib.characterPack[`mode_${mode}`] &&
+      lib.characterPack[`mode_${mode}`][name]
+    ) {
       if (mode === "guozhan") {
         if (name.startsWith("gz_shibing")) {
           name = name.slice(3, 11)
         } else {
-          if (lib.config.mode_config.guozhan.guozhanSkin && nameinfo && nameinfo.hasSkinInGuozhan) {
+          if (
+            lib.config.mode_config.guozhan.guozhanSkin &&
+            nameinfo?.hasSkinInGuozhan
+          ) {
             gzbool = true
           }
           name = name.slice(3)
@@ -7814,16 +8067,20 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           if (value.startsWith("img:")) {
             imgPrefixUrl = value.slice(4)
             break
-          } else if (value.startsWith("ext:")) {
+          }
+          if (value.startsWith("ext:")) {
             extimage = value
             break
-          } else if (value.startsWith("db:")) {
+          }
+          if (value.startsWith("db:")) {
             dbimage = value
             break
-          } else if (value.startsWith("mode:")) {
+          }
+          if (value.startsWith("mode:")) {
             modeimage = value.slice(5)
             break
-          } else if (value.startsWith("character:")) {
+          }
+          if (value.startsWith("character:")) {
             name = value.slice(10)
             break
           }
@@ -7872,8 +8129,11 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * console.assert(parsedPath == `${lib.assetURL}wtk/get/index.js`);
    */
   relativePath(url, addAssetURL = false) {
-    let base = lib.path.relative(decodeURI(rootURL.pathname), decodeURI(url.pathname))
-    if (addAssetURL && rootURL.protocol == "file:") {
+    let base = lib.path.relative(
+      decodeURI(rootURL.pathname),
+      decodeURI(url.pathname),
+    )
+    if (addAssetURL && rootURL.protocol === "file:") {
       base = `${lib.assetURL}${base}`
     }
     return base
@@ -7896,7 +8156,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    */
   dataUrlAsync(blob) {
     return new Promise((resolve, reject) => {
-      let fileReader = new FileReader()
+      const fileReader = new FileReader()
       fileReader.onload = resolve
       fileReader.onerror = reject
       fileReader.readAsDataURL(blob)
@@ -7921,13 +8181,13 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns {Promise<URL>}
    */
   async objectUrlAsync(dataUrl) {
-    let dataString = dataUrl instanceof URL ? dataUrl.href : dataUrl
+    const dataString = dataUrl instanceof URL ? dataUrl.href : dataUrl
     const objectURLMap = lib.objectURL
     if (objectURLMap.has(dataString)) {
       return new URL(objectURLMap.get(dataString))
     }
 
-    let blob = await this.blobFromUrl(dataUrl)
+    const blob = await this.blobFromUrl(dataUrl)
     const objectURL = URL.createObjectURL(blob)
     objectURLMap.set(dataString, objectURL)
     return new URL(objectURL)
@@ -7943,9 +8203,11 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    * @returns {Promise<Blob>}
    */
   blobFromUrl(url) {
-    let link = url instanceof URL ? url : new URL(url)
-    return link.protocol == "file:"
-      ? game.promises.readFile(get.relativePath(link)).then((buffer) => new Blob([buffer]))
+    const link = url instanceof URL ? url : new URL(url)
+    return link.protocol === "file:"
+      ? game.promises
+          .readFile(get.relativePath(link))
+          .then((buffer) => new Blob([buffer]))
       : fetch(link).then((response) => response.blob())
   }
 
@@ -7966,7 +8228,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     // 从主版本号遍历到修订版本号，只考虑当前版本号的长度
     for (let i = 0; i < current.length; ++i) {
       // 当前环境版本号当前位若是NaN，则记录后直接到下一位
-      if (isNaN(current[i])) {
+      if (Number.isNaN(current[i])) {
         flag = true
         continue
       }
@@ -7997,7 +8259,10 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
    */
   coreInfo() {
     // 如果存在process并且存在process.versions，则默认为node环境
-    if (typeof window.process != "undefined" && typeof window.process.versions == "object") {
+    if (
+      typeof window.process !== "undefined" &&
+      typeof window.process.versions === "object"
+    ) {
       // 如果存在versions.chrome，默认为electron的versions.chrome
       if (window.process.versions.chrome) {
         return parseVersion("chrome", window.process.versions.chrome)
@@ -8007,12 +8272,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     // Chrome/Chromium下的实验性特性，具体可参见
     // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userAgentData
     // @ts-expect-error ignore
-    if (typeof navigator.userAgentData != "undefined") {
+    if (typeof navigator.userAgentData !== "undefined") {
       // @ts-expect-error ignore
       const userAgentData = navigator.userAgentData
-      if (userAgentData.brands && userAgentData.brands.length) {
+      if (userAgentData.brands?.length) {
         const brand = userAgentData.brands.find(({ brand }) => {
-          let str = brand.toLowerCase()
+          const str = brand.toLowerCase()
           // 当前支持的浏览器中只有chrome支持userAgentData，故只判断chrome的情况
           return str.includes("chrome") || str.includes("chromium")
         })
@@ -8020,7 +8285,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         // 如果能通过userAgentData找到对应的浏览器信息，则直接返回
         // 反之则继续通过正则表达式匹配userAgent
         if (brand) {
-          return ["chrome", parseInt(brand.version), 0, 0]
+          return ["chrome", parseInt(brand.version, 10), 0, 0]
         }
       }
     }
@@ -8049,7 +8314,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     }
     // 不然则通过OS后面的版本号来获取内容
     else {
-      let safariRegex = /(?:iphone|ipad); cpu (?:iphone )?os (\d+(?:_\d+)+)/
+      const safariRegex = /(?:iphone|ipad); cpu (?:iphone )?os (\d+(?:_\d+)+)/
       result = userAgentLowerCase.match(safariRegex)
       if (result == null) {
         return ["other", NaN, NaN, NaN]
@@ -8067,7 +8332,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
      */
     function parseVersion(coreName, versions) {
       const [major, minor, patch] = versions.split(".")
-      const majorVersion = parseInt(major)
+      const majorVersion = parseInt(major, 10)
 
       // 如果major解析为NaN，则整体解析为NaN（此时不考虑minor和patch）
       if (Number.isNaN(majorVersion)) {
@@ -8075,7 +8340,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
       }
 
       // 反之则将不为NaN的minor和patch解析为0
-      return [coreName, majorVersion, parseInt(minor) || 0, parseInt(patch) || 0]
+      return [
+        coreName,
+        majorVersion,
+        parseInt(minor, 10) || 0,
+        parseInt(patch, 10) || 0,
+      ]
     }
   }
 }
@@ -8101,7 +8371,7 @@ export let get = new Get()
 /**
  * @param { InstanceType<typeof Get> } [instance]
  */
-export let setGet = (instance) => {
+export const setGet = (instance) => {
   get = instance || new Get()
   if (lib.config.dev) {
     window.get = get

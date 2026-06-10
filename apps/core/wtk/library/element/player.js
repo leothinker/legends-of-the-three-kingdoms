@@ -1,10 +1,10 @@
-import { _status, get, lib, game, ai, ui } from "wtk"
+import dedent from "dedent"
+import { _status, ai, game, get, lib, ui } from "wtk"
+import { AsyncFunction } from "@/util/index.js"
+import { security } from "@/util/sandbox.js"
 import { CacheContext } from "../cache/cacheContext.js"
 import { ChildNodesWatcher } from "../cache/childNodesWatcher.js"
-import { security } from "@/util/sandbox.js"
 import { ContentCompiler } from "./gameEvent.js"
-import { AsyncFunction } from "@/util/index.js"
-import dedent from "dedent"
 
 export class Player extends HTMLDivElement {
   /**
@@ -28,40 +28,42 @@ export class Player extends HTMLDivElement {
     return player
   }
   build(noclick) {
-    let player = this
-    player.buildNode()
-    player.buildProperty()
-    player.buildExtra()
-    player.buildEventListener(noclick)
+    this.buildNode()
+    this.buildProperty()
+    this.buildExtra()
+    this.buildEventListener(noclick)
     return this
   }
   buildNode() {
-    let player = this
     /** @type { Record<string, HTMLDivElement> } */
-    const node = (player.node = {
-      avatar: ui.create.div(".avatar", player, ui.click.avatar).hide(),
-      avatar2: ui.create.div(".avatar2", player, ui.click.avatar2).hide(),
-      turnedover: ui.create.div(".turned", "<div>翻面<div>", player),
-      framebg: ui.create.div(".framebg", player),
-      intro: ui.create.div(".intro", player),
-      identity: ui.create.div(".identity", player),
-      hp: ui.create.div(".hp", player),
-      name: ui.create.div(".name", player),
-      name2: ui.create.div(".name.name2", player),
-      nameol: ui.create.div(".nameol", player),
-      count: ui.create.div(".count", player).hide(),
-      equips: ui.create.div(".equips", player).hide(),
-      judges: ui.create.div(".judges", player),
-      marks: ui.create.div(".marks", player),
-      chain: ui.create.div(".chain", "<div></div>", player),
+    const node = (this.node = {
+      avatar: ui.create.div(".avatar", this, ui.click.avatar).hide(),
+      avatar2: ui.create.div(".avatar2", this, ui.click.avatar2).hide(),
+      turnedover: ui.create.div(".turned", "<div>翻面<div>", this),
+      framebg: ui.create.div(".framebg", this),
+      intro: ui.create.div(".intro", this),
+      identity: ui.create.div(".identity", this),
+      hp: ui.create.div(".hp", this),
+      name: ui.create.div(".name", this),
+      name2: ui.create.div(".name.name2", this),
+      nameol: ui.create.div(".nameol", this),
+      count: ui.create.div(".count", this).hide(),
+      equips: ui.create.div(".equips", this).hide(),
+      judges: ui.create.div(".judges", this),
+      marks: ui.create.div(".marks", this),
+      chain: ui.create.div(".chain", "<div></div>", this),
       handcards1: ui.create.div(".handcards"),
       handcards2: ui.create.div(".handcards"),
       expansions: ui.create.div(".expansions"),
     })
-    player.node.handcards1._childNodesWatcher = new ChildNodesWatcher(player.node.handcards1)
-    player.node.handcards2._childNodesWatcher = new ChildNodesWatcher(player.node.handcards2)
-    let observer = new MutationObserver((mutationsList) => {
-      for (let mutation of mutationsList) {
+    this.node.handcards1._childNodesWatcher = new ChildNodesWatcher(
+      this.node.handcards1,
+    )
+    this.node.handcards2._childNodesWatcher = new ChildNodesWatcher(
+      this.node.handcards2,
+    )
+    const observer = new MutationObserver((mutationsList) => {
+      for (const mutation of mutationsList) {
         if (mutation.type === "childList") {
           const addedNodes = Array.from(mutation.addedNodes)
           const removedNodes = Array.from(mutation.removedNodes)
@@ -71,7 +73,7 @@ export class Player extends HTMLDivElement {
             // @ts-expect-error ignore
             removedNodes.some((card) => !card.classList.contains("emptyequip"))
           ) {
-            player.$handleEquipChange()
+            this.$handleEquipChange()
           }
         }
       }
@@ -79,7 +81,7 @@ export class Player extends HTMLDivElement {
     const config = { childList: true }
     observer.observe(node.equips, config)
     node.expansions.style.display = "none"
-    const chainLength = game.layout == "default" ? 64 : 40
+    const chainLength = game.layout === "default" ? 64 : 40
     for (let repetition = 0; repetition < chainLength; repetition++) {
       ui.create.div(node.chain.firstChild, ".cardbg").style.transform =
         `translateX(${repetition * 5 - 5}px)`
@@ -87,9 +89,8 @@ export class Player extends HTMLDivElement {
     node.action = ui.create.div(".action", node.avatar)
   }
   buildExtra() {
-    let player = this
-    let node = player.node
-    node.link = player.mark(" ", {
+    const node = this.node
+    node.link = this.mark(" ", {
       mark: get.linkintro,
     })
     // @ts-expect-error ignore
@@ -99,7 +100,7 @@ export class Player extends HTMLDivElement {
     ui.create.div(node.identity)
   }
   buildProperty() {
-    let player = this
+    const player = this
     player.phaseNumber = 0
     player.skipList = []
     player.skills = []
@@ -157,7 +158,10 @@ export class Player extends HTMLDivElement {
             return Reflect.ownKeys(player.getStat("triggerSkill"))
           },
           getOwnPropertyDescriptor(_, prop) {
-            return Object.getOwnPropertyDescriptor(player.getStat("triggerSkill"), prop)
+            return Object.getOwnPropertyDescriptor(
+              player.getStat("triggerSkill"),
+              prop,
+            )
           },
         },
       ),
@@ -185,19 +189,21 @@ export class Player extends HTMLDivElement {
     }
   }
   buildEventListener(noclick) {
-    let player = this
-    let node = player.node
+    const node = this.node
     if (noclick) {
-      player.noclick = true
+      this.noclick = true
     } else {
-      player.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.target)
+      this.addEventListener(
+        lib.config.touchscreen ? "touchend" : "click",
+        ui.click.target,
+      )
       node.identity.addEventListener(
         lib.config.touchscreen ? "touchend" : "click",
         ui.click.identity,
       )
       if (lib.config.touchscreen) {
-        player.addEventListener("touchstart", ui.click.playertouchstart)
-        player.addEventListener("touchmove", ui.click.playertouchmove)
+        this.addEventListener("touchstart", ui.click.playertouchstart)
+        this.addEventListener("touchmove", ui.click.playertouchmove)
       }
     }
   }
@@ -416,24 +422,23 @@ export class Player extends HTMLDivElement {
    * @param {Function} [preserve] 视为装备的条件,用于八阵类视为装备
    */
   addExtraEquip(skill, equip, replace = false, preserve) {
-    const player = this
     if (replace) {
-      player.removeExtraEquip(skill)
+      this.removeExtraEquip(skill)
     }
     let list
-    if (typeof equip == "string") {
+    if (typeof equip === "string") {
       list = [[skill, equip, preserve]]
     } else {
       list = equip.map((card) => [skill, card, preserve])
     }
-    player.extraEquip.addArray(list)
-    player.$handleEquipChange()
+    this.extraEquip.addArray(list)
+    this.$handleEquipChange()
     game.broadcast(
       (player, list) => {
         player.extraEquip.addArray(list)
         player.$handleEquipChange()
       },
-      player,
+      this,
       list,
     )
   }
@@ -444,22 +449,23 @@ export class Player extends HTMLDivElement {
    * @param {Array<string>|string} equip 移除的装备
    */
   removeExtraEquip(skill, equip = "noequip") {
-    const player = this
     let equips
-    if (equip != "noequip") {
-      equip = typeof equip == "string" ? [equip] : equip
-      equips = player.extraEquip.filter((info) => info[0] != skill || !equip.includes(info[1]))
+    if (equip !== "noequip") {
+      equip = typeof equip === "string" ? [equip] : equip
+      equips = this.extraEquip.filter(
+        (info) => info[0] !== skill || !equip.includes(info[1]),
+      )
     } else {
-      equips = player.extraEquip.filter((info) => info[0] != skill)
+      equips = this.extraEquip.filter((info) => info[0] !== skill)
     }
-    player.extraEquip = equips
-    player.$handleEquipChange()
+    this.extraEquip = equips
+    this.$handleEquipChange()
     game.broadcast(
       (player, equips) => {
         player.extraEquip = equips
         player.$handleEquipChange()
       },
-      player,
+      this,
       equips,
     )
   }
@@ -481,9 +487,9 @@ export class Player extends HTMLDivElement {
     const cards1 = []
     const cards2 = !get.is.singleHandcard() ? [] : null
 
-    if (typeof sort == "function") {
+    if (typeof sort === "function") {
       hs.sort(sort)
-    } else if (get.itemtype(sort) == "cards") {
+    } else if (get.itemtype(sort) === "cards") {
       hs.sort((a, b) => sort.indexOf(a) - sort.indexOf(b))
     } else if (this.hasSkillTag("sortCardByNum")) {
       const getn = function (card) {
@@ -495,17 +501,17 @@ export class Player extends HTMLDivElement {
       }
       hs.sort((a, b) => getn(b) - getn(a))
     } else {
-      hs.sort(function (b, a) {
-        if (a.name != b.name) {
+      hs.sort((b, a) => {
+        if (a.name !== b.name) {
           return lib.sort.card(a.name, b.name)
-        } else if (a.suit != b.suit) {
-          return lib.suit.indexOf(a) - lib.suit.indexOf(b)
-        } else {
-          return a.number - b.number
         }
+        if (a.suit !== b.suit) {
+          return lib.suit.indexOf(a) - lib.suit.indexOf(b)
+        }
+        return a.number - b.number
       })
     }
-    if (this.getCards("h").every((card, index) => hs[index] == card)) {
+    if (this.getCards("h").every((card, index) => hs[index] === card)) {
       return false
     }
 
@@ -526,7 +532,7 @@ export class Player extends HTMLDivElement {
     }
     this.node.handcards1.style.visibility = "visible"
     this.node.handcards2.style.visibility = "visible"
-    if (this == game.me) {
+    if (this === game.me) {
       ui.updatehl()
     }
   }
@@ -552,65 +558,6 @@ export class Player extends HTMLDivElement {
     }
   }
   /**
-   * 是否拥有对应战法
-   * @param {string} id 战法的id
-   */
-  hasZhanfa(id) {
-    return this.getStorage("zhanfa").includes(id)
-  }
-  /**
-   * 获得对应战法
-   * @param {string} id 战法的id
-   */
-  addZhanfa(id) {
-    const skill = lib.zhanfa.getSkill(id)
-    if (!skill) {
-      console.warn(`不存在战法: ${id}`)
-      return
-    } else if (this.hasZhanfa(id)) {
-      return
-    }
-    game.log(this, "获得战法", `#g【${get.translation(id)}】`)
-    const card = game.createCard(id, "战法", "")
-    this.$draw(card, void 0, void 0, false)
-    this.addAdditionalSkill("zhanfa", skill, true)
-    this.markAuto("zhanfa", id)
-    const next = game.createEvent("addZhanfa", false, get.event())
-    next.player = this
-    next.zhanfaId = id
-    next.forceDie = true
-    next.includeOut = true
-    next.setContent(async (event, trigger, player) => {
-      await event.trigger(event.name)
-    })
-  }
-  /**
-   * 失去对应战法
-   * @param {string} id 战法的id
-   */
-  removeZhanfa(id) {
-    const skill = lib.zhanfa.getSkill(id)
-    if (!skill) {
-      console.warn(`不存在战法: ${id}`)
-      return
-    } else if (!this.hasZhanfa(id)) {
-      return
-    }
-    game.log(this, "失去战法", `#g【${get.translation(id)}】`)
-    const card = game.createCard(id, "战法", "")
-    this.$throw(card, 1000, void 0, void 0, false)
-    this.removeAdditionalSkill("zhanfa", skill)
-    this.unmarkAuto("zhanfa", id)
-    const next = game.createEvent("removeZhanfa", false, get.event())
-    next.player = this
-    next.zhanfaId = id
-    next.forceDie = true
-    next.includeOut = true
-    next.setContent(async (event, trigger, player) => {
-      await event.trigger(event.name)
-    })
-  }
-  /**
    * 获取一名角色的名字翻译
    * @param {boolean} forDialog 是否用于对话框显示，如【五谷丰登】/【惠民】之类多名角色选择卡牌的卡牌/技能的content中，方便知晓卡牌和角色的对应关系。默认为false。
    * @returns { string } 角色名字翻译，forDialog为true会返回HTML字符串，为对话框中的卡牌呈现类似卡牌动画信息的效果，否则根据player._tempTranslate、lib.translate[`${player.name}_ab`]、get.translation(player.name)的优先级返回纯文本。
@@ -628,14 +575,15 @@ export class Player extends HTMLDivElement {
     }
     if (!forDialog) {
       return playername
-    } else {
-      const SeatNum = this.getSeatNum()
-      const addSeat =
-        game.hasPlayer2((current) => current != this && current.getName() == playername, true) &&
-        typeof SeatNum == "number"
-      const border = get.groupnature(get.bordergroup(name))
-      return `<span style="font-weight:560"><span data-nature=${border}><span style="letter-spacing:0.1em">${!hasTempTranslate ? get.slimName(name) : playername}${addSeat ? `[${SeatNum}]` : ""}</span></span><br/><span style="color:#FFD700">`
     }
+    const SeatNum = this.getSeatNum()
+    const addSeat =
+      game.hasPlayer2(
+        (current) => current !== this && current.getName() === playername,
+        true,
+      ) && typeof SeatNum === "number"
+    const border = get.groupnature(get.bordergroup(name))
+    return `<span style="font-weight:560"><span data-nature=${border}><span style="letter-spacing:0.1em">${!hasTempTranslate ? get.slimName(name) : playername}${addSeat ? `[${SeatNum}]` : ""}</span></span><br/><span style="color:#FFD700">`
   }
   /**
    * 玩家（或某张牌）能否响应某个useCard事件的牌，目前仅支持本体部分常用的卡牌，需要添加新卡牌的可以到lib.respondMap按格式添加
@@ -646,22 +594,21 @@ export class Player extends HTMLDivElement {
    * @returns { boolean | undefined }
    */
   canRespond(event, card, type) {
-    const player = this
     if (!event.name?.startsWith("useCard")) {
       return
     }
-    const evt = event.name == "useCard" ? event : event.getParent()
-    if (!evt || !evt.card) {
+    const evt = event.name === "useCard" ? event : event.getParent()
+    if (!evt?.card) {
       return
     }
-    if (card && typeof card == "string") {
+    if (card && typeof card === "string") {
       card = { name: card }
     }
     if (typeof type !== "string") {
       type = type ? "all" : "use"
     }
     const keys = get.canRespond(evt.card)
-    if (get.type(evt?.card) == "trick") {
+    if (get.type(evt?.card) === "trick") {
       keys.addArray(get.canRespond("trick"))
     }
     if (get.tag(evt?.card, "damage")) {
@@ -670,15 +617,17 @@ export class Player extends HTMLDivElement {
     keys.addArray(get.canRespond("all"))
     if (card) {
       return keys.some((key) =>
-        typeof key == "function" ? key(card, player) : key == get.name(card, player),
+        typeof key === "function"
+          ? key(card, this)
+          : key === get.name(card, this),
       )
     }
     const evtx = get.event()
-    let evtNames =
+    const evtNames =
       typeof type !== "string" || type === "all"
         ? ["chooseToUse", "chooseToRespond"]
-        : ["chooseTo" + type.slice(0, 1).toUpperCase() + type.slice(1)]
-    const cards = player.getCards("hs", (card) => {
+        : [`chooseTo${type.slice(0, 1).toUpperCase()}${type.slice(1)}`]
+    const cards = this.getCards("hs", (card) => {
       if (type === "all") {
         return true
       }
@@ -688,17 +637,17 @@ export class Player extends HTMLDivElement {
           evty = evtx
         }
         if (type === "respond") {
-          return lib.filter.cardRespondable(card, player, evty)
+          return lib.filter.cardRespondable(card, this, evty)
         }
-        return lib.filter.cardEnabled(card, player, evty)
+        return lib.filter.cardEnabled(card, this, evty)
       })
     })
     return (
       keys.some((key) =>
-        typeof key == "function"
-          ? cards.some((card) => key(card, player))
-          : player.hasUsableCard(name, type),
-      ) && !evt.directHit.includes(player)
+        typeof key === "function"
+          ? cards.some((card) => key(card, this))
+          : this.hasUsableCard(name, type),
+      ) && !evt.directHit.includes(this)
     )
   }
   /**
@@ -711,8 +660,7 @@ export class Player extends HTMLDivElement {
    * @author Curpond
    */
   addTip(index, message, isTemp = false, css = {}) {
-    const player = this
-    if (player.getHiddenSkills(true, true).includes(index)) {
+    if (this.getHiddenSkills(true, true).includes(index)) {
       return
     }
     game.broadcastAll(
@@ -720,7 +668,10 @@ export class Player extends HTMLDivElement {
         player.node.tipContainer ??= ui.create.div(".tipContainer", player)
         player.tips ??= new Map()
         if (!player.tips.has(index)) {
-          player.tips.set(index, ui.create.div(".tip", player.node.tipContainer))
+          player.tips.set(
+            index,
+            ui.create.div(".tip", player.node.tipContainer),
+          )
         }
         player.tips.get(index).innerHTML = message
           .replace(/ /g, "&nbsp;")
@@ -728,30 +679,31 @@ export class Player extends HTMLDivElement {
           .replace(/\n/g, "<br>")
         player.tips.get(index).css(css)
 
-        let double = player.classList.contains("fullskin2") && lib.config.layout !== "long2"
+        const double =
+          player.classList.contains("fullskin2") &&
+          lib.config.layout !== "long2"
 
         const width = player.node.avatar.clientWidth
-        let w = width * (double ? 2 : 1)
+        const w = width * (double ? 2 : 1)
         player.style.setProperty("--w", `${w}px`)
 
         //检查tip的高度，使其不覆盖装备
         game.callHook("checkTipBottom", [player])
       },
-      player,
+      this,
       index,
       message,
       css,
     )
-    if (isTemp && !player.storage[`temp_tip_${index}`]) {
-      player.storage[`temp_tip_${index}`] = true
+    if (isTemp && !this.storage[`temp_tip_${index}`]) {
+      this.storage[`temp_tip_${index}`] = true
       let expire
       if (isTemp === true) {
         expire = { global: ["phaseAfter", "phaseBeforeStart"] }
-      } else if (typeof isTemp == "string" || Array.isArray(isTemp)) {
+      } else if (typeof isTemp === "string" || Array.isArray(isTemp)) {
         expire = { global: isTemp }
       }
-      player
-        .when(expire, false)
+      this.when(expire, false)
         .assign({
           firstDo: true,
           priority: Infinity,
@@ -771,7 +723,7 @@ export class Player extends HTMLDivElement {
   removeTip(index) {
     game.broadcastAll(
       (player, index) => {
-        if (index == undefined) {
+        if (index === undefined) {
           player.tips?.clear()
         } else {
           if (player.tips?.has(index)) {
@@ -795,14 +747,14 @@ export class Player extends HTMLDivElement {
    * @param { boolean } [limit]
    */
   changeFury(amount, limit) {
-    if (typeof this.storage.stratagem_fury != "number") {
+    if (typeof this.storage.stratagem_fury !== "number") {
       this.storage.stratagem_fury = 0
     }
     if (!amount) {
       return
     }
     const furyBefore = this.storage.stratagem_fury
-    if (limit === true && typeof _status.stratagemFuryMax == "number") {
+    if (limit === true && typeof _status.stratagemFuryMax === "number") {
       this.storage.stratagem_fury = Math.min(
         Math.max(furyBefore + amount, 0),
         _status.stratagemFuryMax,
@@ -841,15 +793,14 @@ export class Player extends HTMLDivElement {
     const player = this
     if (!_status.postReconnect.player_when) {
       _status.postReconnect.player_when = [
-        function (map) {
-          "use strict"
-          for (let i in map) {
+        (map) => {
+          for (const i in map) {
             lib.skill[i] = {
               charlotte: true,
               forced: true,
               popup: false,
             }
-            if (typeof map[i] == "string") {
+            if (typeof map[i] === "string") {
               lib.translate[i] = map[i]
             }
           }
@@ -858,17 +809,17 @@ export class Player extends HTMLDivElement {
       ]
     }
     let trigger
-    if (Array.isArray(triggerName) || typeof triggerName == "string") {
+    if (Array.isArray(triggerName) || typeof triggerName === "string") {
       trigger = { player: triggerName }
     } else if (get.is.object(triggerName)) {
       trigger = triggerName
     }
     if (!trigger) {
-      throw new Error("player.when传参数类型错误:" + triggerName)
+      throw new Error(`player.when传参数类型错误:${triggerName}`)
     }
     let skillName
     do {
-      skillName = "player_when_" + Math.random().toString(36).slice(-8)
+      skillName = `player_when_${Math.random().toString(36).slice(-8)}`
     } while (lib.skill[skillName] != null)
     const vars = {}
     //获取sourceSkill
@@ -890,7 +841,7 @@ export class Player extends HTMLDivElement {
     }
     const sourceSkill = get.sourceSkillFor(eventName)
     /** @type { Skill } */
-    let skill = {
+    const skill = {
       trigger: trigger,
       forced: true,
       charlotte: true,
@@ -899,11 +850,7 @@ export class Player extends HTMLDivElement {
       triggered: false,
       sourceSkill: sourceSkill,
       /** @type { Required<Skill>['filter'][] } */
-      filterFuns: [
-        function (event, player) {
-          return !lib.skill[skillName].triggered
-        },
-      ],
+      filterFuns: [(event, player) => !lib.skill[skillName].triggered],
       /** @type { Required<Skill>['content'][] } */
       contentFuns: [],
       // 外部变量
@@ -935,10 +882,14 @@ export class Player extends HTMLDivElement {
       let varstr = ""
       for (const key in vars) {
         if (warnVars.includes(key)) {
-          console.warn(`Variable '${key}' should not be referenced by vars objects`)
+          console.warn(
+            `Variable '${key}' should not be referenced by vars objects`,
+          )
         }
         if (errVars.includes(key)) {
-          throw new Error(`Variable '${key}' should not be referenced by vars objects`)
+          throw new Error(
+            `Variable '${key}' should not be referenced by vars objects`,
+          )
         }
         varstr += `var ${key}=lib.skill['${skillName}'].vars['${key}'];\n`
       }
@@ -983,7 +934,12 @@ export class Player extends HTMLDivElement {
         originals.push(compiled)
         contents.push(function (event, trigger, player) {
           // @ts-expect-error ignore
-          return compiled.apply(this, [{ lib, game, ui, get, ai, _status }, event, trigger, player])
+          return compiled.apply(this, [
+            { lib, game, ui, get, ai, _status },
+            event,
+            trigger,
+            player,
+          ])
         })
       }
       for (let i = 0; i < skill.contentFuns.length; i++) {
@@ -995,11 +951,16 @@ export class Player extends HTMLDivElement {
           const a = fun2
           //防止传入()=>xxx的情况
           const begin =
-            a.indexOf("{") == a.indexOf("}") && a.indexOf("{") == -1 && a.indexOf("=>") > -1
+            a.indexOf("{") === a.indexOf("}") &&
+            a.indexOf("{") === -1 &&
+            a.indexOf("=>") > -1
               ? a.indexOf("=>") + 2
               : a.indexOf("{") + 1
           const str2 = a
-            .slice(begin, a.lastIndexOf("}") != -1 ? a.lastIndexOf("}") : undefined)
+            .slice(
+              begin,
+              a.lastIndexOf("}") !== -1 ? a.lastIndexOf("}") : undefined,
+            )
             .trim()
           // 防止注入喵
           if (!get.isFunctionBody(str2)) {
@@ -1007,7 +968,8 @@ export class Player extends HTMLDivElement {
           }
           let recompiledScope
           if (security.isSandboxRequired()) {
-            recompiledScope = (code) => security.eval(`return (${code.toString()})`)
+            recompiledScope = (code) =>
+              security.eval(`return (${code.toString()})`)
           } else {
             recompiledScope = eval
           }
@@ -1025,7 +987,7 @@ export class Player extends HTMLDivElement {
       writable: true,
       value: skill,
     })
-    game.broadcast(function (skillName) {
+    game.broadcast((skillName) => {
       Object.defineProperty(lib.skill, skillName, {
         configurable: true,
         enumerable: false,
@@ -1049,7 +1011,7 @@ export class Player extends HTMLDivElement {
        * @param { Required<Skill>['filter'] } fun
        */
       filter(fun) {
-        if (lib.skill[skillName] != skill) {
+        if (lib.skill[skillName] !== skill) {
           throw new Error(`This skill has been destroyed`)
         }
         skill.filterFuns.push(fun)
@@ -1059,7 +1021,7 @@ export class Player extends HTMLDivElement {
        * @param { ContentFuncByAll } fun
        */
       then(fun) {
-        if (lib.skill[skillName] != skill) {
+        if (lib.skill[skillName] !== skill) {
           throw new Error(`This skill has been destroyed`)
         }
         if (fun instanceof AsyncFunction) {
@@ -1091,7 +1053,7 @@ export class Player extends HTMLDivElement {
        * @param { ContentFuncByAll } fun
        */
       step(fun) {
-        if (lib.skill[skillName] != skill) {
+        if (lib.skill[skillName] !== skill) {
           throw new Error(`This skill has been destroyed`)
         }
         skill.contentFuns.push(fun)
@@ -1102,10 +1064,10 @@ export class Player extends HTMLDivElement {
        * @param { string } str
        */
       popup(str) {
-        if (lib.skill[skillName] != skill) {
+        if (lib.skill[skillName] !== skill) {
           throw new Error(`This skill has been destroyed`)
         }
-        if (typeof str == "string") {
+        if (typeof str === "string") {
           skill.popup = str
         }
         return this
@@ -1114,13 +1076,14 @@ export class Player extends HTMLDivElement {
        * @param { string } translation
        */
       translation(translation) {
-        if (lib.skill[skillName] != skill) {
+        if (lib.skill[skillName] !== skill) {
           throw new Error(`This skill has been destroyed`)
         }
-        if (typeof translation == "string") {
+        if (typeof translation === "string") {
           _status.postReconnect.player_when[1][skillName] = translation
           game.broadcastAll(
-            (skillName, translation) => (lib.translate[skillName] = translation),
+            (skillName, translation) =>
+              (lib.translate[skillName] = translation),
             skillName,
             translation,
           )
@@ -1131,10 +1094,10 @@ export class Player extends HTMLDivElement {
        * @param { Record<string, any> } obj
        */
       assign(obj) {
-        if (lib.skill[skillName] != skill) {
+        if (lib.skill[skillName] !== skill) {
           throw new Error(`This skill has been destroyed`)
         }
-        if (typeof obj == "object" && obj !== null) {
+        if (typeof obj === "object" && obj !== null) {
           Object.assign(skill, obj)
           game.broadcast(
             (skillName, obj) => {
@@ -1151,7 +1114,7 @@ export class Player extends HTMLDivElement {
        * @param { Record<string, any> } arg
        */
       vars(arg) {
-        if (lib.skill[skillName] != skill) {
+        if (lib.skill[skillName] !== skill) {
           throw new Error(`This skill has been destroyed`)
         }
         if (!get.is.object(arg)) {
@@ -1166,7 +1129,7 @@ export class Player extends HTMLDivElement {
        * 如果instantlyAdd为false，则需要以此法获得技能
        **/
       finish() {
-        if (lib.skill[skillName] != skill) {
+        if (lib.skill[skillName] !== skill) {
           throw new Error(`This skill has been destroyed`)
         }
         player.addSkill(skillName)
@@ -1198,29 +1161,29 @@ export class Player extends HTMLDivElement {
     } else {
       for (const arg of args) {
         const type = get.itemtype(arg)
-        if (type == "cards") {
+        if (type === "cards") {
           next.cards = arg
-        } else if (type == "card") {
+        } else if (type === "card") {
           next.cards = [arg]
-        } else if (type == "player") {
+        } else if (type === "player") {
           next.source = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.log = arg
         }
       }
     }
 
-    if (get.itemtype(next.source) != "player") {
+    if (get.itemtype(next.source) !== "player") {
       next.source = _status.event.player
     }
-    if (get.itemtype(next.cards) != "cards") {
+    if (get.itemtype(next.cards) !== "cards") {
       next.cards = this.getCards("h")
     }
     if (!next.cards.length) {
       _status.event.next.remove(next)
       next.resolve()
     }
-    if (next.log == undefined) {
+    if (next.log === undefined) {
       next.log = true
     }
     next.setContent("connectCards")
@@ -1251,24 +1214,24 @@ export class Player extends HTMLDivElement {
     } else {
       for (const arg of args) {
         const type = get.itemtype(arg)
-        if (type == "cards") {
+        if (type === "cards") {
           next.cards = arg
-        } else if (type == "card") {
+        } else if (type === "card") {
           next.cards = [arg]
-        } else if (type == "player") {
+        } else if (type === "player") {
           next.source = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.log = arg
         }
       }
     }
-    if (get.itemtype(next.source) != "player") {
+    if (get.itemtype(next.source) !== "player") {
       next.source = _status.event.player
     }
-    if (get.itemtype(next.cards) != "cards") {
+    if (get.itemtype(next.cards) !== "cards") {
       next.cards = this.getConnectedCards()
     }
-    if (next.log == undefined) {
+    if (next.log === undefined) {
       next.log = true
     }
     if (!next.cards.length) {
@@ -1338,7 +1301,7 @@ export class Player extends HTMLDivElement {
     next.gaintag = []
     if (
       args.length === 1 &&
-      typeof params == "object" &&
+      typeof params === "object" &&
       params !== null &&
       get.itemtype(params) == null
     ) {
@@ -1346,11 +1309,11 @@ export class Player extends HTMLDivElement {
     } else {
       for (const arg of args) {
         const type = get.itemtype(arg)
-        if (type == "cards") {
+        if (type === "cards") {
           next.cards.addArray(arg)
-        } else if (type == "card") {
+        } else if (type === "card") {
           next.cards.add(arg)
-        } else if (typeof arg == "string" && arg.startsWith("visible_")) {
+        } else if (typeof arg === "string" && arg.startsWith("visible_")) {
           next.gaintag.add(arg)
         }
       }
@@ -1377,7 +1340,7 @@ export class Player extends HTMLDivElement {
     const args = [...arguments]
     if (
       args.length === 1 &&
-      typeof params == "object" &&
+      typeof params === "object" &&
       params !== null &&
       get.itemtype(params) == null
     ) {
@@ -1385,11 +1348,11 @@ export class Player extends HTMLDivElement {
     } else {
       for (const arg of args) {
         const type = get.itemtype(arg)
-        if (type == "cards") {
+        if (type === "cards") {
           next.cards.addArray(arg)
-        } else if (type == "card") {
+        } else if (type === "card") {
           next.cards.add(arg)
-        } else if (typeof arg == "string" && arg.startsWith("visible_")) {
+        } else if (typeof arg === "string" && arg.startsWith("visible_")) {
           next.gaintag.add(arg)
         }
       }
@@ -1553,13 +1516,13 @@ export class Player extends HTMLDivElement {
     const executeDelayCardEffect = game.createEvent("executeDelayCardEffect")
     executeDelayCardEffect.player = this
     executeDelayCardEffect.target = target || this
-    if (typeof card == "string") {
+    if (typeof card === "string") {
       const virtualCard = (executeDelayCardEffect.card = ui.create.card())
       virtualCard._destroy = true
       virtualCard.expired = true
       const info = lib.card[card]
-      virtualCard.init(["", "", card, info && info.cardnature])
-    } else if (get.itemtype(card) == "card") {
+      virtualCard.init(["", "", card, info?.cardnature])
+    } else if (get.itemtype(card) === "card") {
       executeDelayCardEffect.card = card
     } else {
       _status.event.next.remove(executeDelayCardEffect)
@@ -1639,14 +1602,18 @@ export class Player extends HTMLDivElement {
    * @param { Player } target
    */
   getGiftAIResultTarget(card, target) {
-    if (!card || !this.canGift(card, target, true) || target.refuseGifts(card, this)) {
+    if (
+      !card ||
+      !this.canGift(card, target, true) ||
+      target.refuseGifts(card, this)
+    ) {
       return 0
     }
-    if (get.type(card, null, target) == "equip") {
+    if (get.type(card, null, target) === "equip") {
       let eff = get.effect(target, card, target, target)
       const att = get.sgnAttitude(this, target)
       if (att < 0) {
-        if (eff == 0) {
+        if (eff === 0) {
           eff -= 0.1
         }
         if (target.canEquip(card)) {
@@ -1659,7 +1626,7 @@ export class Player extends HTMLDivElement {
       }
       return eff
     }
-    if (card.name == "du") {
+    if (card.name === "du") {
       // 保留毒/使用毒会有收益
       if (["usedu", "keepdu"].some((tag) => this.hasSkillTag(tag))) {
         return 0
@@ -1708,9 +1675,11 @@ export class Player extends HTMLDivElement {
       _status.event.next.remove(recast)
       recast.resolve()
     }
-    if (typeof recastingLose != "function") {
+    if (typeof recastingLose !== "function") {
       if (recastingLose === null) {
-        console.trace(`recast的recastingLose参数不应传入null,可以用void 0或undefined占位`)
+        console.trace(
+          `recast的recastingLose参数不应传入null,可以用void 0或undefined占位`,
+        )
       }
       recastingLose = (player, cards) => {
         const next = player.loseToDiscardpile(cards)
@@ -1720,9 +1689,11 @@ export class Player extends HTMLDivElement {
     }
     recast.recastingLose = recastingLose
     recast.recastingLosingEvents = []
-    if (typeof recastingGain != "function") {
+    if (typeof recastingGain !== "function") {
       if (recastingLose === null) {
-        console.trace(`recast的recastingGain参数不应传入null,可以用void 0或undefined占位`)
+        console.trace(
+          `recast的recastingGain参数不应传入null,可以用void 0或undefined占位`,
+        )
       }
       recastingGain = (player, cards) => {
         const next = player.draw(cards.length)
@@ -1756,9 +1727,9 @@ export class Player extends HTMLDivElement {
    * @returns { boolean }
    */
   hasDisabledSlot(type) {
-    if (type == "horse" || type == "equip3_4") {
-      return this.hasDisabledSlot(3) && ( this.hasDisabledSlot(4))
-    } 
+    if (type === "horse" || type === "equip3_4") {
+      return this.hasDisabledSlot(3) && this.hasDisabledSlot(4)
+    }
     return this.countDisabledSlot(type) > 0
   }
   /**
@@ -1770,22 +1741,21 @@ export class Player extends HTMLDivElement {
   countDisabledSlot(type) {
     const map = this.disabledSlots || {}
     let num
-    if (type == undefined) {
+    if (type === undefined) {
       num = 0
       for (let i = 1; i <= 5; i++) {
         num += this.countDisabledSlot(i)
       }
       return num
-    } else {
-      if (typeof type == "number") {
-        type = "equip" + type
-      }
-      num = map[type]
-      if (typeof num == "number" && num > 0) {
-        return num
-      }
-      return 0
     }
+    if (typeof type === "number") {
+      type = `equip${type}`
+    }
+    num = map[type]
+    if (typeof num === "number" && num > 0) {
+      return num
+    }
+    return 0
   }
   /**
    * 判断一名角色是否有某个装备栏空着
@@ -1793,8 +1763,8 @@ export class Player extends HTMLDivElement {
    * @returns { boolean }
    */
   hasEmptySlot(type) {
-    if (type == "horse" || type == "equip3_4") {
-      return this.hasEmptySlot(3) && ( this.hasEmptySlot(4))
+    if (type === "horse" || type === "equip3_4") {
+      return this.hasEmptySlot(3) && this.hasEmptySlot(4)
     }
     return this.countEmptySlot(type) > 0
   }
@@ -1806,16 +1776,16 @@ export class Player extends HTMLDivElement {
     if (!type) {
       return 0
     }
-    if (typeof type == "number") {
-      type = "equip" + type
-    } else if (type == "equip3_4") {
+    if (typeof type === "number") {
+      type = `equip${type}`
+    } else if (type === "equip3_4") {
       type = "equip3"
     }
     return Math.max(
       0,
       this.countEnabledSlot(type) -
         this.getVEquips(type).reduce((num, card) => {
-          let types = get.subtypes(card, false)
+          const types = get.subtypes(card, false)
           return num + get.numOf(types, type)
         }, 0),
     )
@@ -1839,16 +1809,16 @@ export class Player extends HTMLDivElement {
     if (!type) {
       return 0
     }
-    if (typeof type == "number") {
-      type = "equip" + type
-    } else if (type == "equip3_4") {
+    if (typeof type === "number") {
+      type = `equip${type}`
+    } else if (type === "equip3_4") {
       type = "equip3"
     }
     return Math.max(
       0,
       this.countEnabledSlot(type) -
         this.getVEquips(type).reduce((num, card) => {
-          let types = get.subtypes(card, false)
+          const types = get.subtypes(card, false)
           if (!lib.filter.canBeReplaced(card, this)) {
             num += get.numOf(types, type)
           }
@@ -1864,12 +1834,9 @@ export class Player extends HTMLDivElement {
    * @returns { boolean }
    */
   hasEnabledSlot(type) {
-    if (type == "horse" || type == "equip3_4") {
-      return this.hasEnabledSlot(3) && (this.hasEnabledSlot(4))
+    if (type === "horse" || type === "equip3_4") {
+      return this.hasEnabledSlot(3) && this.hasEnabledSlot(4)
     }
-    // else if(type=='equip3_4'){
-    // 	type='equip3';
-    // }
     return this.countEnabledSlot(type) > 0
   }
   /**
@@ -1887,18 +1854,17 @@ export class Player extends HTMLDivElement {
         num += this.countEnabledSlot(i)
       }
       return num
-    } else {
-      if (typeof type == "number") {
-        type = "equip" + type
-      }
-      let slots = 1
-      num = map[type]
-      if (typeof num == "number" && num > 0) {
-        slots += num
-      }
-      slots -= this.countDisabledSlot(type)
-      return slots
     }
+    if (typeof type === "number") {
+      type = `equip${type}`
+    }
+    let slots = 1
+    num = map[type]
+    if (typeof num === "number" && num > 0) {
+      slots += num
+    }
+    slots -= this.countDisabledSlot(type)
+    return slots
   }
   /**
    * 获取一名角色装备区内某种类型的装备牌
@@ -1925,20 +1891,21 @@ export class Player extends HTMLDivElement {
   getVEquips(subtype) {
     switch (typeof subtype) {
       case "string":
-        if (subtype == "equip3_4") {
+        if (subtype === "equip3_4") {
           const cards = []
           cards.addArray(this.getVEquips(3))
           cards.addArray(this.getVEquips(4))
           return cards
-        } else if (subtype.startsWith("equip") && parseInt(subtype.slice(5)) > 0) {
-          break
-        } else if (lib.card[subtype]) {
-          return this.getVCards("e", (card) => card.name == subtype)
-        } else {
-          return []
         }
+        if (subtype.startsWith("equip") && parseInt(subtype.slice(5), 10) > 0) {
+          break
+        }
+        if (lib.card[subtype]) {
+          return this.getVCards("e", (card) => card.name === subtype)
+        }
+        return []
       case "number":
-        subtype = "equip" + subtype
+        subtype = `equip${subtype}`
         break
       case "object":
         subtype = get.subtype(subtype, false)
@@ -1977,24 +1944,24 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.source = arg
         } else if (Array.isArray(arg)) {
           for (const slot of arg) {
-            if (typeof slot == "string") {
-              if (slot.startsWith("equip") && parseInt(slot.slice(5)) > 0) {
+            if (typeof slot === "string") {
+              if (slot.startsWith("equip") && parseInt(slot.slice(5), 10) > 0) {
                 next.slots.push(slot)
               }
-            } else if (typeof slot == "number") {
-              next.slots.push("equip" + slot)
+            } else if (typeof slot === "number") {
+              next.slots.push(`equip${slot}`)
             }
           }
-        } else if (typeof arg == "string") {
-          if (arg.startsWith("equip") && parseInt(arg.slice(5)) > 0) {
+        } else if (typeof arg === "string") {
+          if (arg.startsWith("equip") && parseInt(arg.slice(5), 10) > 0) {
             next.slots.push(arg)
           }
-        } else if (typeof arg == "number") {
-          next.slots.push("equip" + arg)
+        } else if (typeof arg === "number") {
+          next.slots.push(`equip${arg}`)
         }
       }
     }
@@ -2032,24 +1999,24 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.source = arg
         } else if (Array.isArray(arg)) {
           for (const slot of arg) {
-            if (typeof slot == "string") {
-              if (slot.startsWith("equip") && parseInt(slot.slice(5)) > 0) {
+            if (typeof slot === "string") {
+              if (slot.startsWith("equip") && parseInt(slot.slice(5), 10) > 0) {
                 next.slots.push(slot)
               }
-            } else if (typeof slot == "number") {
-              next.slots.push("equip" + slot)
+            } else if (typeof slot === "number") {
+              next.slots.push(`equip${slot}`)
             }
           }
-        } else if (typeof arg == "string") {
-          if (arg.startsWith("equip") && parseInt(arg.slice(5)) > 0) {
+        } else if (typeof arg === "string") {
+          if (arg.startsWith("equip") && parseInt(arg.slice(5), 10) > 0) {
             next.slots.push(arg)
           }
-        } else if (typeof arg == "number") {
-          next.slots.push("equip" + arg)
+        } else if (typeof arg === "number") {
+          next.slots.push(`equip${arg}`)
         }
       }
     }
@@ -2086,24 +2053,24 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.source = arg
         } else if (Array.isArray(arg)) {
           for (var slot of arg) {
-            if (typeof slot == "string") {
-              if (slot.startsWith("equip") && parseInt(slot.slice(5)) > 0) {
+            if (typeof slot === "string") {
+              if (slot.startsWith("equip") && parseInt(slot.slice(5), 10) > 0) {
                 next.slots.push(slot)
               }
-            } else if (typeof slot == "number") {
-              next.slots.push("equip" + slot)
+            } else if (typeof slot === "number") {
+              next.slots.push(`equip${slot}`)
             }
           }
-        } else if (typeof arg == "string") {
-          if (arg.startsWith("equip") && parseInt(arg.slice(5)) > 0) {
+        } else if (typeof arg === "string") {
+          if (arg.startsWith("equip") && parseInt(arg.slice(5), 10) > 0) {
             next.slots.push(arg)
           }
-        } else if (typeof arg == "number") {
-          next.slots.push("equip" + arg)
+        } else if (typeof arg === "number") {
+          next.slots.push(`equip${arg}`)
         }
       }
     }
@@ -2133,7 +2100,7 @@ export class Player extends HTMLDivElement {
     }
     game.addVideo("$syncExpand", this, get.copy(map))
     game.broadcast(
-      function (player, map) {
+      (player, map) => {
         player.expandedSlots = map
         player.$syncExpand(map)
       },
@@ -2154,7 +2121,7 @@ export class Player extends HTMLDivElement {
     }
     game.addVideo("$syncDisable", this, get.copy(map))
     game.broadcast(
-      function (player, map) {
+      (player, map) => {
         player.disabledSlots = map
         player.$syncDisable(map)
       },
@@ -2175,15 +2142,15 @@ export class Player extends HTMLDivElement {
       }
     }
     for (const index in map2) {
-      if (!index.startsWith("equip") || !(parseInt(index.slice(5)) > 0)) {
+      if (!index.startsWith("equip") || !(parseInt(index.slice(5), 10) > 0)) {
         continue
       }
       const num = map2[index]
       if (num > 0) {
         for (let i = 0; i < num; i++) {
           const card = game.createCard(
-            "feichu_" + index,
-            suits[index] || get.translation(index) + "栏",
+            `feichu_${index}`,
+            suits[index] || `${get.translation(index)}栏`,
             "",
           )
           card.fix()
@@ -2195,7 +2162,10 @@ export class Player extends HTMLDivElement {
           let equipped = false
           for (let j = 0; j < this.node.equips.childNodes.length; j++) {
             if (get.equipNum(this.node.equips.childNodes[j]) >= equipNum) {
-              this.node.equips.insertBefore(card, this.node.equips.childNodes[j])
+              this.node.equips.insertBefore(
+                card,
+                this.node.equips.childNodes[j],
+              )
               equipped = true
               break
             }
@@ -2209,7 +2179,7 @@ export class Player extends HTMLDivElement {
         }
       } else if (num < 0) {
         for (let i = 0; i > num; i--) {
-          const card = cards.find((card) => card.name == "feichu_" + index)
+          const card = cards.find((card) => card.name === `feichu_${index}`)
           if (card) {
             this.node.equips.removeChild(card)
             cards.remove(card)
@@ -2228,17 +2198,19 @@ export class Player extends HTMLDivElement {
     const ranges = get.subtypes(name),
       rangex = []
     rangex.push(...new Set(ranges))
-    if (get.itemtype(name) == "card") {
+    if (get.itemtype(name) === "card") {
       const owner = get.owner(name, "judge")
       if (owner && !lib.filter.canBeGained(name, this, owner)) {
         return false
       }
     }
-    for (let range of rangex) {
+    for (const range of rangex) {
       let num = this.countEquipableSlot(range)
-      let num2 = get.numOf(rangex, range)
+      const num2 = get.numOf(rangex, range)
       if (!replace) {
-        num -= this.getVEquips(range).filter((card) => lib.filter.canBeReplaced(card, this)).length
+        num -= this.getVEquips(range).filter((card) =>
+          lib.filter.canBeReplaced(card, this),
+        ).length
       }
       if (num < num2) {
         return false
@@ -2276,12 +2248,16 @@ export class Player extends HTMLDivElement {
     next._args = []
 
     const args = [...arguments]
-    if (args.length === 1 && typeof params === "object" && !Array.isArray(params)) {
+    if (
+      args.length === 1 &&
+      typeof params === "object" &&
+      !Array.isArray(params)
+    ) {
       next.list = params.list
       next._args = params.args
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "players") {
+        if (get.itemtype(arg) === "players") {
           next.list = arg.slice(0)
         } else {
           next._args.push(arg)
@@ -2308,13 +2284,13 @@ export class Player extends HTMLDivElement {
     }
     this.storage.cooperation.add(info)
     this.addTempSkill("cooperation", { player: "dieAfter" })
-    this.addTempSkill("cooperation_" + type, { player: "dieAfter" })
+    this.addTempSkill(`cooperation_${type}`, { player: "dieAfter" })
     game.log(
       this,
       "向",
       target,
       "发起了“协力”，合作类型是",
-      "#g" + get.translation("cooperation_" + type),
+      `#g${get.translation(`cooperation_${type}`)}`,
     )
   }
 
@@ -2336,11 +2312,11 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.target = arg
         } else if (Array.isArray(arg)) {
           next.cardlist = arg
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           next.reason = arg
         }
       }
@@ -2359,9 +2335,9 @@ export class Player extends HTMLDivElement {
   checkCooperationStatus(target, reason) {
     var storage = this.getStorage("cooperation")
     for (var info of storage) {
-      if (info.target == target && info.reason == reason) {
-        var skill = lib.skill["cooperation_" + info.type]
-        if (skill && skill.checkx && skill.checkx(info)) {
+      if (info.target === target && info.reason === reason) {
+        var skill = lib.skill[`cooperation_${info.type}`]
+        if (skill?.checkx?.(info)) {
           return true
         }
       }
@@ -2369,7 +2345,7 @@ export class Player extends HTMLDivElement {
     return false
   }
   removeCooperation(info) {
-    let storage = this.getStorage("cooperation")
+    const storage = this.getStorage("cooperation")
     if (!storage.includes(info)) {
       return
     }
@@ -2379,17 +2355,17 @@ export class Player extends HTMLDivElement {
     if (!storage.length) {
       this.removeSkill("cooperation")
     } else {
-      for (let i of storage) {
-        if (i.type == reason) {
+      for (const i of storage) {
+        if (i.type === reason) {
           unmark = false
           break
         }
       }
     }
     if (unmark) {
-      this.removeSkill("cooperation_" + reason)
+      this.removeSkill(`cooperation_${reason}`)
     } else {
-      this.markSkill("cooperation_" + reason)
+      this.markSkill(`cooperation_${reason}`)
     }
   }
   /**
@@ -2399,14 +2375,14 @@ export class Player extends HTMLDivElement {
   getClans(unseen) {
     const clans = []
     if (unseen || !this.isUnseen(0)) {
-      let info = lib.character[this.name1]
-      if (info && info.clans) {
+      const info = lib.character[this.name1]
+      if (info?.clans) {
         clans.addArray(info.clans)
       }
     }
     if (this.name2 && (unseen || !this.isUnseen(1))) {
-      let info = lib.character[this.name2]
-      if (info && info.clans) {
+      const info = lib.character[this.name2]
+      if (info?.clans) {
         clans.addArray(info.clans)
       }
     }
@@ -2424,27 +2400,27 @@ export class Player extends HTMLDivElement {
    * @param { string } skill
    */
   changeZhuanhuanji(skill) {
-    let info = get.info(skill),
+    const info = get.info(skill),
       zhuanhuan = info.zhuanhuanji
-    if (typeof zhuanhuan == "function") {
+    if (typeof zhuanhuan === "function") {
       zhuanhuan(this, skill)
-    } else if (zhuanhuan == "number") {
+    } else if (zhuanhuan === "number") {
       this.addMark(skill, 1, false)
     } else {
       this.storage[skill] = !this.storage[skill]
     }
     game.broadcastAll(
-      function (player, skill) {
+      (player, skill) => {
         player.$changeZhuanhuanji(skill)
       },
       this,
       skill,
     )
-    let player = this
+
     let evt = _status.event
     //转换技转换后
-    let next = game.createEvent("changeZhuanhuanji", false)
-    next.player = player
+    const next = game.createEvent("changeZhuanhuanji", false)
+    next.player = this
     next.forceDie = true
     next.includeOut = true
     next.skill = skill
@@ -2456,8 +2432,8 @@ export class Player extends HTMLDivElement {
     evt.after.push(next)
     next.setContent("emptyEvent")
     //转换技转换时
-    let next2 = game.createEvent("changeZhuanhuanjiBegin", false, get.event())
-    next2.player = player
+    const next2 = game.createEvent("changeZhuanhuanjiBegin", false, get.event())
+    next2.player = this
     next2.forceDie = true
     next2.includeOut = true
     next2.skill = skill
@@ -2476,14 +2452,14 @@ export class Player extends HTMLDivElement {
       }
       const zhuanhuanLimit = get.zhuanhuanItemNum(skill, this)
       // @ts-expect-error ignore
-      if (typeof mark.firstChild.reversed != "number") {
+      if (typeof mark.firstChild.reversed !== "number") {
         // @ts-expect-error ignore
         mark.firstChild.reversed = 0
       }
       // @ts-expect-error ignore
       mark.firstChild.reversed += 360 / zhuanhuanLimit
       // @ts-expect-error ignore
-      mark.firstChild.style.transform = "rotate(" + parseFloat(mark.firstChild.reversed) + "deg)"
+      mark.firstChild.style.transform = `rotate(${parseFloat(mark.firstChild.reversed)}deg)`
     }
   }
   /**
@@ -2493,7 +2469,7 @@ export class Player extends HTMLDivElement {
   setSeatNum(num) {
     _status.seatNumSettled = true
     game.broadcastAll(
-      function (player, num) {
+      (player, num) => {
         player.seatNum = num
       },
       this,
@@ -2505,7 +2481,7 @@ export class Player extends HTMLDivElement {
    * @returns { number }
    */
   getSeatNum() {
-    if (typeof this.seatNum == "number") {
+    if (typeof this.seatNum === "number") {
       return this.seatNum
     }
     return 0
@@ -2515,13 +2491,13 @@ export class Player extends HTMLDivElement {
    * @param { string } sex
    */
   hasSex(sex) {
-    if (this.sex == "unknown") {
+    if (this.sex === "unknown") {
       return false
     }
-    if (this.sex == "double") {
+    if (this.sex === "double") {
       return true
     }
-    return this.sex == sex
+    return this.sex === sex
   }
   /**
    * 是否和target同一性别
@@ -2530,13 +2506,13 @@ export class Player extends HTMLDivElement {
   sameSexAs(target) {
     const sex1 = this.sex,
       sex2 = target.sex
-    if (sex1 == "unknown" || sex2 == "unknown") {
+    if (sex1 === "unknown" || sex2 === "unknown") {
       return false
     }
-    if (sex1 == "double" || sex2 == "double") {
+    if (sex1 === "double" || sex2 === "double") {
       return true
     }
-    return sex1 == sex2
+    return sex1 === sex2
   }
   /**
    * 是否和target不同性别
@@ -2545,13 +2521,13 @@ export class Player extends HTMLDivElement {
   differentSexFrom(target) {
     var sex1 = this.sex,
       sex2 = target.sex
-    if (sex1 == "unknown" || sex2 == "unknown") {
+    if (sex1 === "unknown" || sex2 === "unknown") {
       return false
     }
-    if (sex1 == "double" || sex2 == "double") {
+    if (sex1 === "double" || sex2 === "double") {
       return true
     }
-    return sex1 != sex2
+    return sex1 !== sex2
   }
   /**
    * @param { string } skill
@@ -2588,9 +2564,9 @@ export class Player extends HTMLDivElement {
       toStorage: true,
       target: target || this,
     })
-    next.setContent(async function (event, trigger, player) {
+    next.setContent(async (event, trigger, player) => {
       await player.lose(event.cards, ui.special).set("getlx", false)
-      let cards = event.cards.slice()
+      const cards = event.cards.slice()
       cards.removeArray(player.getCards("hejsx"))
       if (cards.length) {
         event.target.directgains(cards, null, event.tag)
@@ -2604,12 +2580,12 @@ export class Player extends HTMLDivElement {
    * @param { string } tag
    */
   addGaintag(cards, tag) {
-    if (get.itemtype(cards) == "card") {
+    if (get.itemtype(cards) === "card") {
       cards = [cards]
     }
     game.addVideo("addGaintag", this, [get.cardsInfo(cards), tag])
     game.broadcastAll(
-      function (player, cards, tag) {
+      (player, cards, tag) => {
         var hs = player.getCards("hejsx")
         for (var i of cards) {
           if (hs.includes(i)) {
@@ -2628,13 +2604,13 @@ export class Player extends HTMLDivElement {
    * @param { Card | Card[] } [cards]
    */
   removeGaintag(tag, cards) {
-    if (get.itemtype(cards) == "card") {
+    if (get.itemtype(cards) === "card") {
       cards = [cards]
     }
     cards = cards || this.getCards("h")
     game.addVideo("removeGaintag", this, [tag, get.cardsInfo(cards)])
     game.broadcastAll(
-      function (player, tag, cards) {
+      (player, tag, cards) => {
         for (var i of cards) {
           i.removeGaintag(tag)
         }
@@ -2651,12 +2627,12 @@ export class Player extends HTMLDivElement {
     if (this.hasSkillTag("save", true, target, true)) {
       return true
     }
-    let name = {},
+    const name = {},
       hs = this.iterableGetCards("hs")
-    for (let i of hs) {
+    for (const i of hs) {
       name[get.name(i)] = true
     }
-    for (let i in lib.card) {
+    for (const i in lib.card) {
       if (lib.card[i].savable && (lib.inpile.includes(i) || name[i])) {
         if (
           lib.filter.cardSavable({ name: i }, this, target) &&
@@ -2674,15 +2650,22 @@ export class Player extends HTMLDivElement {
    */
   canSaveCard(card, target) {
     const mod2 = game.checkMod(card, this, "unchanged", "cardEnabled2", this)
-    if (mod2 != "unchanged") {
+    if (mod2 !== "unchanged") {
       return mod2
     }
-    const mod = game.checkMod(card, this, target, "unchanged", "cardSavable", this)
-    if (mod != "unchanged") {
+    const mod = game.checkMod(
+      card,
+      this,
+      target,
+      "unchanged",
+      "cardSavable",
+      this,
+    )
+    if (mod !== "unchanged") {
       return mod
     }
     let savable = get.info(card).savable
-    if (typeof savable == "function") {
+    if (typeof savable === "function") {
       savable = savable(card, this, target)
     }
     return savable
@@ -2698,7 +2681,7 @@ export class Player extends HTMLDivElement {
       rawPairs.push(this.name2)
     }
     for (let i = 0; i < rawPairs.length; i++) {
-      if (rawPairs[i] == from) {
+      if (rawPairs[i] === from) {
         rawPairs[i] = to
         break
       }
@@ -2711,12 +2694,18 @@ export class Player extends HTMLDivElement {
    */
   changeCharacter(newPairs, log = true) {
     if (!Array.isArray(newPairs)) {
-      console.warn(`警告：Player[${this.name}].changeCharacter填写了一个错误的参数:`, newPairs)
+      console.warn(
+        `警告：Player[${this.name}].changeCharacter填写了一个错误的参数:`,
+        newPairs,
+      )
       return
     }
-    for (let name of newPairs) {
+    for (const name of newPairs) {
       if (!lib.character[name]) {
-        console.warn(`警告：Player[${this.name}]试图将武将牌变更为不存在的武将:`, name)
+        console.warn(
+          `警告：Player[${this.name}]试图将武将牌变更为不存在的武将:`,
+          name,
+        )
         return
       }
     }
@@ -2734,10 +2723,10 @@ export class Player extends HTMLDivElement {
    */
   showCharacter(num, log) {
     var toShow = []
-    if ((num == 0 || num == 2) && this.isUnseen(0)) {
+    if ((num === 0 || num === 2) && this.isUnseen(0)) {
       toShow.add(this.name1)
     }
-    if ((num == 1 || num == 2) && this.isUnseen(1)) {
+    if ((num === 1 || num === 2) && this.isUnseen(1)) {
       toShow.add(this.name2)
     }
     if (!toShow.length) {
@@ -2766,10 +2755,10 @@ export class Player extends HTMLDivElement {
    * @param { false } [log]
    */
   $showCharacter(num, log) {
-    if (num == 0 && !this.isUnseen(0)) {
+    if (num === 0 && !this.isUnseen(0)) {
       return
     }
-    if (num == 1 && (!this.name2 || !this.isUnseen(1))) {
+    if (num === 1 && (!this.name2 || !this.isUnseen(1))) {
       return
     }
     if (!this.isUnseen(2)) {
@@ -2780,12 +2769,12 @@ export class Player extends HTMLDivElement {
     switch (num) {
       case 0:
         if (log !== false) {
-          game.log(this, "展示了主将", "#b" + this.name1)
+          game.log(this, "展示了主将", `#b${this.name1}`)
         }
         this.name = this.name1
         skills = lib.character[this.name][3] || []
         this.sex = lib.character[this.name][0]
-        if (this.group == "unknown") {
+        if (this.group === "unknown") {
           this.group = lib.character[this.name][1]
         }
         this.classList.remove("unseen")
@@ -2793,10 +2782,10 @@ export class Player extends HTMLDivElement {
         break
       case 1:
         if (log !== false) {
-          game.log(this, "展示了副将", "#b" + this.name2)
+          game.log(this, "展示了副将", `#b${this.name2}`)
         }
         skills = lib.character[this.name2][3] || []
-        if (this.sex == "unknown") {
+        if (this.sex === "unknown") {
           this.sex = lib.character[this.name2][0]
         }
         if (this.name.startsWith("unknown")) {
@@ -2805,12 +2794,18 @@ export class Player extends HTMLDivElement {
         this.classList.remove("unseen2")
         this.classList.remove("unseen2_show")
         break
-      case 2:
+      case 2: {
         if (log !== false) {
           if (this.name2) {
-            game.log(this, "展示了主将", "#b" + this.name1, "、副将", "#b" + this.name2)
+            game.log(
+              this,
+              "展示了主将",
+              `#b${this.name1}`,
+              "、副将",
+              `#b${this.name2}`,
+            )
           } else {
-            game.log(this, "展示了主将", "#b" + this.name1)
+            game.log(this, "展示了主将", `#b${this.name1}`)
           }
         }
         this.name = this.name1
@@ -2819,7 +2814,7 @@ export class Player extends HTMLDivElement {
           skills = skills.concat(lib.character[this.name2][3] || [])
         }
         this.sex = lib.character[this.name][0]
-        if (this.group == "unknown") {
+        if (this.group === "unknown") {
           this.group = lib.character[this.name][1]
         }
         this.classList.remove("unseen")
@@ -2827,6 +2822,7 @@ export class Player extends HTMLDivElement {
         this.classList.remove("unseen_show")
         this.classList.remove("unseen2_show")
         break
+      }
     }
     if (!this.isUnseen(2)) {
       delete this.storage.nohp
@@ -2836,7 +2832,7 @@ export class Player extends HTMLDivElement {
       this.update()
     }
     game.broadcast(
-      function (player, name, sex, num, group) {
+      (player, name, sex, num, group) => {
         player.group = group
         player.name = name
         player.sex = sex
@@ -2870,7 +2866,7 @@ export class Player extends HTMLDivElement {
     )
     skills = skills.filter((skill) => {
       var info = get.info(skill)
-      if (info && info.zhuSkill && !this.isZhu2()) {
+      if (info?.zhuSkill && !this.isZhu2()) {
         return false
       }
       return true
@@ -2905,22 +2901,18 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (typeof arg == "boolean") {
+        if (typeof arg === "boolean") {
           next.forced = arg
         } else if (arg === "allowChooseAll") {
           next.allowChooseAll = true
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           next.prompt = arg
         }
       }
     }
     next.setContent("chooseToMove")
-    next.filterOk = function () {
-      return true
-    }
-    next.filterMove = function () {
-      return true
-    }
+    next.filterOk = () => true
+    next.filterMove = () => true
     next._args = args
     return next
   }
@@ -2937,20 +2929,16 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (typeof arg == "boolean") {
+        if (typeof arg === "boolean") {
           next.forced = arg
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           next.prompt = arg
         }
       }
     }
     next.setContent("chooseToMove_new")
-    next.filterOk ??= function () {
-      return true
-    }
-    next.filterMove ??= function () {
-      return true
-    }
+    next.filterOk ??= () => true
+    next.filterMove ??= () => true
     next._args = Array.from(arguments)
     return next
   }
@@ -2968,20 +2956,16 @@ export class Player extends HTMLDivElement {
    */
   $throwEmotion(target, name, rotate) {
     game.addVideo("throwEmotion", this, [target.dataset.position, name])
-    var getLeft = function (player) {
-      if (player == game.me && !ui.fakeme && !ui.chess) {
+    var getLeft = (player) => {
+      if (player === game.me && !ui.fakeme && !ui.chess) {
         return player.getLeft() + player.node.avatar.offsetWidth / 2
       }
       return player.getLeft() + player.offsetWidth / 2
     }
-    var player = this
+
     var emotion = ui.create.div(
       "",
-      '<div style="text-align:center"> <img src="' +
-        lib.assetURL +
-        "image/emotion/throw_emotion/" +
-        name +
-        '1.png"> </div>',
+      `<div style="text-align:center"> <img src="${lib.assetURL}image/emotion/throw_emotion/${name}1.png"> </div>`,
       game.chess ? ui.chess : ui.window,
     )
     emotion.style.width = "60px"
@@ -2991,10 +2975,10 @@ export class Player extends HTMLDivElement {
     if (game.chess) {
       width += 60
     }
-    var left = getLeft(player) - width
-    var top = player.getTop() + player.offsetHeight / 3 - height
-    emotion.style.left = left + "px"
-    emotion.style.top = top + "px"
+    var left = getLeft(this) - width
+    var top = this.getTop() + this.offsetHeight / 3 - height
+    emotion.style.left = `${left}px`
+    emotion.style.top = `${top}px`
     var left2 = getLeft(target) - width
     var top2 = target.getTop() + target.offsetHeight / 3 - height
     if (["egg", "flower", "shoe"].includes(name) || rotate) {
@@ -3007,23 +2991,17 @@ export class Player extends HTMLDivElement {
       var top2 = target.getTop() + target.offsetHeight / 3 - height
     }
     emotion.style["z-index"] = 10
-    emotion.style.transform =
-      "translateY(" + (top2 - top) + "px) translateX(" + (left2 - left) + "px)"
+    emotion.style.transform = `translateY(${top2 - top}px) translateX(${left2 - left}px)`
     // @ts-expect-error ignore
     if (["egg", "flower", "shoe"].includes(name) || rotate) {
       emotion.firstElementChild.style.transform = "rotate(1440deg)"
     }
     if (lib.config.background_audio) {
-      game.playAudio("effect", "throw_" + name + get.rand(1, 2))
+      game.playAudio("effect", `throw_${name}${get.rand(1, 2)}`)
     }
-    setTimeout(function () {
-      emotion.innerHTML =
-        '<div style="text-align:center"> <img src="' +
-        lib.assetURL +
-        "image/emotion/throw_emotion/" +
-        name +
-        '2.png"> </div>'
-      setTimeout(function () {
+    setTimeout(() => {
+      emotion.innerHTML = `<div style="text-align:center"> <img src="${lib.assetURL}image/emotion/throw_emotion/${name}2.png"> </div>`
+      setTimeout(() => {
         emotion.delete()
       }, 1200)
     }, 600)
@@ -3033,7 +3011,7 @@ export class Player extends HTMLDivElement {
    */
   tryJudgeAnimate(bool) {
     game.broadcast(
-      function (player, bool) {
+      (player, bool) => {
         player.tryJudgeAnimate(bool)
       },
       this,
@@ -3054,11 +3032,10 @@ export class Player extends HTMLDivElement {
     game.callHook("checkSkillAnimate", [this, name, popname])
     if (
       !game.online &&
-      lib.config.skill_animation_type != "off" &&
-      lib.skill[name] &&
-      lib.skill[name].skillAnimation
+      lib.config.skill_animation_type !== "off" &&
+      lib.skill[name]?.skillAnimation
     ) {
-      if (lib.config.skill_animation_type == "default") {
+      if (lib.config.skill_animation_type === "default") {
         checkShow = checkShow || "main"
       } else {
         checkShow = false
@@ -3074,19 +3051,19 @@ export class Player extends HTMLDivElement {
       )
       return
     }
-    var player = this
+
     game.broadcast(
-      function (player, name, popname) {
+      (player, name, popname) => {
         player.trySkillAnimate(name, popname)
       },
-      player,
+      this,
       name,
       popname,
     )
     if (lib.animate.skill[name]) {
       lib.animate.skill[name].apply(this, arguments)
     } else {
-      if (popname != name) {
+      if (popname !== name) {
         this.popup(popname, "water", false)
       } else {
         this.popup(get.skillTranslation(name, this), "water", false)
@@ -3101,7 +3078,7 @@ export class Player extends HTMLDivElement {
    */
   tryCardAnimate(card, name, nature, popname) {
     game.broadcast(
-      function (player, card, name, nature, popname) {
+      (player, card, name, nature, popname) => {
         player.tryCardAnimate(card, name, nature, popname)
       },
       this,
@@ -3116,10 +3093,10 @@ export class Player extends HTMLDivElement {
       if (!lib.config.show_card_prompt) {
         return
       }
-      if (get.type(card) == "equip" && lib.config.hide_card_prompt_equip) {
+      if (get.type(card) === "equip" && lib.config.hide_card_prompt_equip) {
         return
       }
-      if (get.type(card) == "basic" && lib.config.hide_card_prompt_basic) {
+      if (get.type(card) === "basic" && lib.config.hide_card_prompt_basic) {
         return
       }
       if (popname) {
@@ -3135,18 +3112,17 @@ export class Player extends HTMLDivElement {
    * @returns { boolean | undefined }
    */
   hasUsableCard(name, type) {
-    const player = this
     if (typeof type !== "string") {
       type = type ? "limit" : "all"
     }
-    let event = get.event()
-    let evtNames =
+    const event = get.event()
+    const evtNames =
       typeof type !== "string" || type === "all"
         ? ["chooseToUse", "chooseToRespond"]
-        : ["chooseTo" + type.slice(0, 1).toUpperCase() + type.slice(1)]
+        : [`chooseTo${type.slice(0, 1).toUpperCase()}${type.slice(1)}`]
     if (
-      player.hasCard((i) => {
-        if (get.name(i, player) !== name) {
+      this.hasCard((i) => {
+        if (get.name(i, this) !== name) {
           return false
         }
         if (type === "all") {
@@ -3158,9 +3134,13 @@ export class Player extends HTMLDivElement {
             evt = event
           }
           if (type === "respond") {
-            return lib.filter.cardRespondable(i, player, evt)
+            return lib.filter.cardRespondable(i, this, evt)
           }
-          return lib.filter.cardEnabled(i, player, type === "limit" ? evt : "forceEnable")
+          return lib.filter.cardEnabled(
+            i,
+            this,
+            type === "limit" ? evt : "forceEnable",
+          )
         })
       }, "hs")
     ) {
@@ -3181,7 +3161,7 @@ export class Player extends HTMLDivElement {
       }
       return false
     }
-    const skills = player.getSkills("invisible").concat(lib.skill.global)
+    const skills = this.getSkills("invisible").concat(lib.skill.global)
     game.expandSkills(skills)
     for (let i = 0; i < skills.length; i++) {
       const skill = skills[i],
@@ -3190,23 +3170,28 @@ export class Player extends HTMLDivElement {
       if (info.usable !== undefined) {
         let num = info.usable
         if (typeof num === "function") {
-          num = info.usable(skill, player)
+          num = info.usable(skill, this)
         }
-        if (typeof num === "number" && get.skillCount(skill, player) >= num) {
+        if (typeof num === "number" && get.skillCount(skill, this) >= num) {
           continue
         }
       }
       if (
         info.round &&
-        info.round - (game.roundNumber - player.storage[skill + "_roundcount"]) > 0
+        info.round - (game.roundNumber - this.storage[`${skill}_roundcount`]) >
+          0
       ) {
         continue
       }
-      if (player.storage[`temp_ban_${skill}`]) {
+      if (this.storage[`temp_ban_${skill}`]) {
         continue
       }
-      if (info.viewAs && get.is.object(info.viewAs) && info.viewAs?.name === name) {
-        const goon = !info.viewAsFilter || info.viewAsFilter(player) !== false
+      if (
+        info.viewAs &&
+        get.is.object(info.viewAs) &&
+        info.viewAs?.name === name
+      ) {
+        const goon = info.viewAsFilter?.(this) !== false
         const bool =
           !info.filter ||
           (typeof info.filter === "function" &&
@@ -3220,24 +3205,34 @@ export class Player extends HTMLDivElement {
               }
               if (
                 evt.name === evtName &&
-                typeof evt.filterCard == "function" &&
-                !evt.filterCard(get.autoViewAs(info.viewAs, "unsure"), player, evt)
+                typeof evt.filterCard === "function" &&
+                !evt.filterCard(
+                  get.autoViewAs(info.viewAs, "unsure"),
+                  this,
+                  evt,
+                )
               ) {
                 return false
               }
               if (
                 evt.name === evtName &&
-                info["on" + evtName.slice(0, 1).toUpperCase() + evtName.slice(1)]
+                info[
+                  `on${evtName.slice(0, 1).toUpperCase()}${evtName.slice(1)}`
+                ]
               ) {
-                info["on" + evtName.slice(0, 1).toUpperCase() + evtName.slice(1)](evt)
+                info[
+                  `on${evtName.slice(0, 1).toUpperCase()}${evtName.slice(1)}`
+                ](evt)
               }
-              return evt.name === evtName ? info.filter(evt, player, evt.triggername) : true
+              return evt.name === evtName
+                ? info.filter(evt, this, evt.triggername)
+                : true
             }))
         if (goon && bool) {
           return true
         }
-      } else if (typeof hiddenCard == "function") {
-        const goon = hiddenCard(player, name)
+      } else if (typeof hiddenCard === "function") {
+        const goon = hiddenCard(this, name)
         const bool =
           !info.filter ||
           (info.enable &&
@@ -3252,11 +3247,17 @@ export class Player extends HTMLDivElement {
               }
               if (
                 evt.name === evtName &&
-                info["on" + evtName.slice(0, 1).toUpperCase() + evtName.slice(1)]
+                info[
+                  `on${evtName.slice(0, 1).toUpperCase()}${evtName.slice(1)}`
+                ]
               ) {
-                info["on" + evtName.slice(0, 1).toUpperCase() + evtName.slice(1)](evt)
+                info[
+                  `on${evtName.slice(0, 1).toUpperCase()}${evtName.slice(1)}`
+                ](evt)
               }
-              return evt.name === evtName ? info.filter(evt, player, evt.triggername) : true
+              return evt.name === evtName
+                ? info.filter(evt, this, evt.triggername)
+                : true
             }))
         if (goon && bool) {
           return true
@@ -3270,43 +3271,42 @@ export class Player extends HTMLDivElement {
    * @returns { boolean }
    */
   inRange(to) {
-    const from = this
-    if (from == to || from.hasSkill("undist") || to.hasSkill("undist")) {
+    if (this === to || this.hasSkill("undist") || to.hasSkill("undist")) {
       return false
     }
-    if (!game.players.includes(from) && !game.dead.includes(from)) {
+    if (!game.players.includes(this) && !game.dead.includes(this)) {
       return false
     }
     if (!game.players.includes(to) && !game.dead.includes(to)) {
       return false
     }
-    const mod1 = game.checkMod(from, to, "unchanged", "inRange", from)
-    if (mod1 != "unchanged") {
+    const mod1 = game.checkMod(this, to, "unchanged", "inRange", this)
+    if (mod1 !== "unchanged") {
       return mod1
     }
-    const mod2 = game.checkMod(from, to, "unchanged", "inRangeOf", to)
-    if (mod2 != "unchanged") {
+    const mod2 = game.checkMod(this, to, "unchanged", "inRangeOf", to)
+    if (mod2 !== "unchanged") {
       return mod2
     }
-    const range = from.getAttackRange()
+    const range = this.getAttackRange()
     if (range < 1) {
       return false
     }
-    let player = from,
+    let player = this,
       m,
       n = 1
     let fxy, txy
     if (game.chess) {
-      fxy = from.getXY()
+      fxy = this.getXY()
       txy = to.getXY()
       n = Math.abs(fxy[0] - txy[0]) + Math.abs(fxy[1] - txy[1])
-    } else if (to.isMin(true) || from.isMin(true)) {
+    } else if (to.isMin(true) || this.isMin(true)) {
       /* empty */
     } else {
       let length = game.players.length
-      let totalPopulation = game.players.length + game.dead.length + 1
+      const totalPopulation = game.players.length + game.dead.length + 1
       for (let iwhile = 0; iwhile < totalPopulation; iwhile++) {
-        if (player.nextSeat != to) {
+        if (player.nextSeat !== to) {
           player = player.nextSeat
           if (
             player.isAlive() &&
@@ -3329,35 +3329,39 @@ export class Player extends HTMLDivElement {
           length--
         }
       }
-      if (from.isDead()) {
+      if (this.isDead()) {
         length++
       }
       if (to.isDead()) {
         length++
       }
-      let left = from.hasSkillTag("left_hand")
-      let right = from.hasSkillTag("right_hand")
+      const left = this.hasSkillTag("left_hand")
+      const right = this.hasSkillTag("right_hand")
       if (left === right) {
         n = Math.min(n, length - n)
-      } else if (left == true) {
+      } else if (left === true) {
         n = length - n
       }
     }
-    n = game.checkMod(from, to, n, "globalFrom", from)
-    n = game.checkMod(from, to, n, "globalTo", to)
+    n = game.checkMod(this, to, n, "globalFrom", this)
+    n = game.checkMod(this, to, n, "globalTo", to)
     m = n
-    m = game.checkMod(from, to, m, "attackFrom", from)
-    m = game.checkMod(from, to, m, "attackTo", to)
-    const equips1 = from.getVCards("e", function (card) {
-        return !card.cards?.some((card) => {
-          return ui.selected.cards?.includes(card)
-        })
-      }),
-      equips2 = to.getVCards("e", function (card) {
-        return !card.cards?.some((card) => {
-          return ui.selected.cards?.includes(card)
-        })
-      })
+    m = game.checkMod(this, to, m, "attackFrom", this)
+    m = game.checkMod(this, to, m, "attackTo", to)
+    const equips1 = this.getVCards(
+        "e",
+        (card) =>
+          !card.cards?.some((card) => {
+            return ui.selected.cards?.includes(card)
+          }),
+      ),
+      equips2 = to.getVCards(
+        "e",
+        (card) =>
+          !card.cards?.some((card) => {
+            return ui.selected.cards?.includes(card)
+          }),
+      )
     for (let i = 0; i < equips1.length; i++) {
       const info = get.info(equips1[i]).distance
       if (!info) {
@@ -3410,7 +3414,7 @@ export class Player extends HTMLDivElement {
    * @returns { number }
    */
   getDamagedHp(raw) {
-    if (this.getHp(raw) == Infinity) {
+    if (this.getHp(raw) === Infinity) {
       return 0
     }
     return this.maxHp - this.getHp(raw)
@@ -3474,16 +3478,16 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.source = arg
-        } else if (get.itemtype(arg) == "select") {
+        } else if (get.itemtype(arg) === "select") {
           next.selectButton = arg
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.selectButton = [arg, arg]
         }
       }
     }
-    if (next.source == undefined) {
+    if (next.source === undefined) {
       next.source = this
     }
     next.player = this
@@ -3511,21 +3515,21 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.source = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.horse = arg
-        } else if (get.itemtype(arg) == "select") {
+        } else if (get.itemtype(arg) === "select") {
           next.selectButton = arg
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.selectButton = [arg, arg]
         }
       }
     }
-    if (next.horse == undefined) {
+    if (next.horse === undefined) {
       next.horse = false
     }
-    if (next.source == undefined) {
+    if (next.source === undefined) {
       next.source = this
     }
     next.player = this
@@ -3537,12 +3541,13 @@ export class Player extends HTMLDivElement {
    * @param { boolean } [notmeisok]
    */
   isPhaseUsing(notmeisok) {
-    if (!notmeisok && _status.currentPhase != this) {
+    if (!notmeisok && _status.currentPhase !== this) {
       return false
     }
     // @ts-expect-error ignore
     return (
-      _status.event.name == "phaseUse" || _status.event.getParent("phaseUse").name == "phaseUse"
+      _status.event.name === "phaseUse" ||
+      _status.event.getParent("phaseUse").name === "phaseUse"
     )
   }
   /**
@@ -3563,13 +3568,19 @@ export class Player extends HTMLDivElement {
    * @param { boolean} [bool] 忽略target的手牌不足以拼点
    */
   canCompare(target, goon, bool) {
-    if (this == target) {
+    if (this === target) {
       return false
     }
-    if ((!this.countCards("h") && goon !== true) || (!target.countCards("h") && bool !== true)) {
+    if (
+      (!this.countCards("h") && goon !== true) ||
+      (!target.countCards("h") && bool !== true)
+    ) {
       return false
     }
-    if (this.hasSkillTag("noCompareSource") || target.hasSkillTag("noCompareTarget")) {
+    if (
+      this.hasSkillTag("noCompareSource") ||
+      target.hasSkillTag("noCompareTarget")
+    ) {
       return false
     }
     return true
@@ -3595,7 +3606,7 @@ export class Player extends HTMLDivElement {
     this.storage._disableJudge = false
     for (let i = 0; i < this.node.judges.childNodes.length; i++) {
       // @ts-expect-error ignore
-      if (this.node.judges.childNodes[i].name == "disable_judge") {
+      if (this.node.judges.childNodes[i].name === "disable_judge") {
         this.node.judges.removeChild(this.node.judges.childNodes[i])
         break
       }
@@ -3618,10 +3629,10 @@ export class Player extends HTMLDivElement {
   //原有函数
   init(character, character2, skill, update) {
     let hidden = false
-    if (typeof character == "string" && !lib.character[character]) {
+    if (typeof character === "string" && !lib.character[character]) {
       lib.character[character] = get.character(character)
     }
-    if (typeof character2 == "string" && !lib.character[character2]) {
+    if (typeof character2 === "string" && !lib.character[character2]) {
       lib.character[character2] = get.character(character2)
     }
     if (!lib.character[character]) {
@@ -3632,7 +3643,7 @@ export class Player extends HTMLDivElement {
       character = character2
       character2 = tmp
     }
-    if (character2 == false) {
+    if (character2 === false) {
       skill = false
       character2 = null
     }
@@ -3663,7 +3674,10 @@ export class Player extends HTMLDivElement {
     this.node.name.dataset.nature = get.groupnature(this.group)
     lib.setIntro(this)
     this.node.name.innerHTML = get.slimName(character)
-    if (this.classList.contains("minskin") && this.node.name.querySelectorAll("br").length >= 4) {
+    if (
+      this.classList.contains("minskin") &&
+      this.node.name.querySelectorAll("br").length >= 4
+    ) {
       this.node.name.classList.add("long")
     }
     if (info.hasHiddenSkill && !this.noclick) {
@@ -3688,39 +3702,9 @@ export class Player extends HTMLDivElement {
       var maxHp2 = info2.maxHp
       var hujia2 = info2.hujia
       this.hujia += hujia2
-      var double_hp
-      if (_status.connectMode || (get.mode() == "single" && _status.mode == "changban")) {
-        double_hp = "pingjun"
-      } else {
-        double_hp = get.config("double_hp")
-      }
-      switch (double_hp) {
-        case "pingjun": {
-          this.maxHp = Math.floor((maxHp1 + maxHp2) / 2)
-          this.hp = Math.floor((hp1 + hp2) / 2)
-          this.singleHp = (maxHp1 + maxHp2) % 2 === 1
-          break
-        }
-        case "zuidazhi": {
-          this.maxHp = Math.max(maxHp1, maxHp2)
-          this.hp = Math.max(hp1, hp2)
-          break
-        }
-        case "zuixiaozhi": {
-          this.maxHp = Math.min(maxHp1, maxHp2)
-          this.hp = Math.min(hp1, hp2)
-          break
-        }
-        case "zonghe": {
-          this.maxHp = maxHp1 + maxHp2
-          this.hp = hp1 + hp2
-          break
-        }
-        default: {
-          this.maxHp = maxHp1 + maxHp2 - 3
-          this.hp = hp1 + hp2 - 3
-        }
-      }
+      this.maxHp = Math.floor((maxHp1 + maxHp2) / 2)
+      this.hp = Math.floor((hp1 + hp2) / 2)
+      this.singleHp = (maxHp1 + maxHp2) % 2 === 1
       if (info2.hasHiddenSkill && !this.noclick) {
         if (!this.hiddenSkills) {
           this.hiddenSkills = []
@@ -3741,10 +3725,10 @@ export class Player extends HTMLDivElement {
         this.node.hp.hide()
       }
     }
-    if (skill != false) {
+    if (skill !== false) {
       skills = skills.filter((skill) => {
         var info = get.info(skill)
-        if (info && info.zhuSkill && !this.isZhu2()) {
+        if (info?.zhuSkill && !this.isZhu2()) {
           return false
         }
         return true
@@ -3802,11 +3786,14 @@ export class Player extends HTMLDivElement {
     this.node.name.dataset.nature = get.groupnature(this.group)
     lib.setIntro(this)
     this.node.name.innerHTML = get.slimName(character)
-    if (this.classList.contains("minskin") && this.node.name.querySelectorAll("br").length >= 4) {
+    if (
+      this.classList.contains("minskin") &&
+      this.node.name.querySelectorAll("br").length >= 4
+    ) {
       this.node.name.classList.add("long")
     }
     if (info.hasHiddenSkill && !this.noclick) {
-      if (!_status.video && get.mode() != "guozhan") {
+      if (!_status.video && get.mode() !== "guozhan") {
         this.classList.add("unseen_show")
       }
       this.classList.add(_status.video ? "unseen_v" : "unseen")
@@ -3831,7 +3818,7 @@ export class Player extends HTMLDivElement {
 
       this.node.count.classList.add("p2")
       if (info2.hasHiddenSkill && !this.noclick) {
-        if (!_status.video && get.mode() != "guozhan") {
+        if (!_status.video && get.mode() !== "guozhan") {
           this.classList.add("unseen2_show")
         }
         this.classList.add(_status.video ? "unseen2_v" : "unseen2")
@@ -3857,46 +3844,59 @@ export class Player extends HTMLDivElement {
   changeSkin(map, character) {
     //TODO: 这一坨改不动了 谁爱改谁改
     if (!map || !character) {
-      console.warn("error: no sourceMap or character to changeSkin", get.translation(this))
+      console.warn(
+        "error: no sourceMap or character to changeSkin",
+        get.translation(this),
+      )
       return
     }
-    if (typeof map == "string") {
+    if (typeof map === "string") {
       map = { skill: map }
     }
     for (const i of ["name", "name1", "name2"]) {
-      if (i == "name" && get.mode() == "guozhan") {
+      if (i === "name" && get.mode() === "guozhan") {
         continue
       }
-      if (i == "name1" && this.name === this.name1 && get.mode() != "guozhan") {
+      if (
+        i === "name1" &&
+        this.name === this.name1 &&
+        get.mode() !== "guozhan"
+      ) {
         continue
       }
       const list = lib.characterSubstitute[this[i]]
       if (this[i] && list) {
-        const name = i == "name2" ? "name2" : "name"
+        const name = i === "name2" ? "name2" : "name"
         if (
           (() => {
-            if (typeof map == "function") {
+            if (typeof map === "function") {
               return map(this, name)
             }
-            if (typeof map.skill == "string" && get.character(this[i], 3).includes(map.skill)) {
-              return true
-            }
-            if (typeof map.characterName == "string" && this[i] == map.characterName) {
-              return true
-            }
             if (
-              typeof map.characterSkinName == "string" &&
-              this.skin[name] == map.characterSkinName
+              typeof map.skill === "string" &&
+              get.character(this[i], 3).includes(map.skill)
             ) {
               return true
             }
-            if (typeof map.source == "string" && name == map.source) {
+            if (
+              typeof map.characterName === "string" &&
+              this[i] === map.characterName
+            ) {
+              return true
+            }
+            if (
+              typeof map.characterSkinName === "string" &&
+              this.skin[name] === map.characterSkinName
+            ) {
+              return true
+            }
+            if (typeof map.source === "string" && name === map.source) {
               return true
             }
             return false
           })()
         ) {
-          if (this.skin[name] != character) {
+          if (this.skin[name] !== character) {
             const origin = this.skin[name]
             game.broadcastAll(
               (player, name, character, list, origin) => {
@@ -3910,15 +3910,24 @@ export class Player extends HTMLDivElement {
                     "",
                     0,
                     [],
-                    (list.find((i) => i[0] == character) || [character, []])[1],
+                    (list.find((i) => i[0] === character) || [
+                      character,
+                      [],
+                    ])[1],
                   ])
                 }
-                player.smoothAvatar(name == "name2")
-                const skinImg = !lib.config.skin[character] && lib.character[character]?.img
+                player.smoothAvatar(name === "name2")
+                const skinImg =
+                  !lib.config.skin[character] && lib.character[character]?.img
                 skinImg
-                  ? player.node["avatar" + name.slice(4)].setBackgroundImage(skinImg)
-                  : player.node["avatar" + name.slice(4)].setBackground(character, "character")
-                player.node["avatar" + name.slice(4)].show()
+                  ? player.node[`avatar${name.slice(4)}`].setBackgroundImage(
+                      skinImg,
+                    )
+                  : player.node[`avatar${name.slice(4)}`].setBackground(
+                      character,
+                      "character",
+                    )
+                player.node[`avatar${name.slice(4)}`].show()
                 if (goon) {
                   delete lib.character[character]
                 }
@@ -3934,7 +3943,7 @@ export class Player extends HTMLDivElement {
               to: character,
               name: name,
               list: list,
-              avatar2: name == "name2",
+              avatar2: name === "name2",
             })
           }
         }
@@ -3942,7 +3951,7 @@ export class Player extends HTMLDivElement {
     }
   }
   changeSkinByName(character, index) {
-    const name = index == 2 ? "name2" : "name"
+    const name = index === 2 ? "name2" : "name"
     const list = lib.characterSubstitute[this[name]]
     if (list && lib.characterSubstitute[this[name]]) {
       const origin = this.skin[name]
@@ -3958,12 +3967,15 @@ export class Player extends HTMLDivElement {
               "",
               0,
               [],
-              (list.find((i) => i[0] == character) || [character, []])[1],
+              (list.find((i) => i[0] === character) || [character, []])[1],
             ]
           }
-          player.smoothAvatar(name == "name2")
-          player.node["avatar" + name.slice(4)].setBackground(character, "character")
-          player.node["avatar" + name.slice(4)].show()
+          player.smoothAvatar(name === "name2")
+          player.node[`avatar${name.slice(4)}`].setBackground(
+            character,
+            "character",
+          )
+          player.node[`avatar${name.slice(4)}`].show()
           if (goon) {
             delete lib.character[character]
           }
@@ -3979,7 +3991,7 @@ export class Player extends HTMLDivElement {
         to: character,
         name: name,
         list: list,
-        avatar2: name == "name2",
+        avatar2: name === "name2",
       })
     }
   }
@@ -4005,13 +4017,13 @@ export class Player extends HTMLDivElement {
   initRoom(info, info2) {
     var str = ""
     this.serving = false
-    if (!info || info == "server") {
+    if (!info || info === "server") {
       this.roomempty = true
       str = "空房间"
       this.roomfull = false
       this.roomgaming = false
       this.version = null
-      if (info == "server") {
+      if (info === "server") {
         this.serving = true
       }
     } else {
@@ -4027,35 +4039,41 @@ export class Player extends HTMLDivElement {
         this.version = config.version
         if (config.gameStarted) {
           str += '<span class="firetext">游戏中</span>　'
-          if (config.observe && config.observeReady && this.version == lib.versionOL) {
+          if (
+            config.observe &&
+            config.observeReady &&
+            this.version === lib.versionOL
+          ) {
             this.classList.remove("exclude")
           } else {
             this.classList.add("exclude")
           }
         } else {
           str += '<span class="greentext">等待中</span>　'
-          if (this.version != lib.versionOL) {
+          if (this.version !== lib.versionOL) {
             this.classList.add("exclude")
           } else {
             this.classList.remove("exclude")
           }
         }
-        this.maxHp = parseInt(config.number)
+        this.maxHp = parseInt(config.number, 10)
         this.hp = Math.min(this.maxHp, info[3])
         if (this.hp < this.maxHp || config.gameStarted) {
-          str += "人数：" + this.hp + "/" + this.maxHp
+          str += `人数：${this.hp}/${this.maxHp}`
         } else {
-          str += '人数：<span class="firetext">' + this.hp + "/" + this.maxHp + "</span>"
+          str += `人数：<span class="firetext">${this.hp}/${this.maxHp}</span>`
         }
 
-        str += "　(" + info[0].slice(0, 12) + " 的房间)"
+        str += `　(${info[0].slice(0, 12)} 的房间)`
         if (
-          config.mode != "guozhan" &&
-          (config.mode != "doudizhu" || config.doudizhu_mode != "online")
+          config.mode !== "guozhan" &&
+          (config.mode !== "doudizhu" || config.doudizhu_mode !== "online")
         ) {
           str += "【"
           for (var i = 0; i < config.cardPack.length; i++) {
-            str += get.translation(config.cardPack[i] + "_card_config").slice(0, 2)
+            str += get
+              .translation(`${config.cardPack[i]}_card_config`)
+              .slice(0, 2)
             if (i < config.cardPack.length - 1) {
               str += "+"
             }
@@ -4063,7 +4081,7 @@ export class Player extends HTMLDivElement {
           str += "】"
         }
         this.config = config
-        if (this.hp == this.maxHp && !config.gameStarted) {
+        if (this.hp === this.maxHp && !config.gameStarted) {
           this.roomfull = true
         } else {
           this.roomfull = false
@@ -4083,7 +4101,6 @@ export class Player extends HTMLDivElement {
     return this
   }
   reinit2(newPairs) {
-    const player = this
     game.broadcast(
       (player, newPairs) => {
         player.reinit2(newPairs)
@@ -4096,60 +4113,62 @@ export class Player extends HTMLDivElement {
       rawPairs.push(this.name2)
     }
     //单将变单将 & 双将变双将
-    if (rawPairs.length == newPairs.length) {
+    if (rawPairs.length === newPairs.length) {
       for (let i = 0; i < Math.min(2, rawPairs.length); i++) {
-        let rawName = rawPairs[i],
+        const rawName = rawPairs[i],
           newName = newPairs[i]
-        if (rawName != newName && lib.character[rawName] && lib.character[newName]) {
-          player.reinit(rawName, newName, null, true)
+        if (
+          rawName !== newName &&
+          lib.character[rawName] &&
+          lib.character[newName]
+        ) {
+          this.reinit(rawName, newName, null, true)
         }
       }
     }
     //单将变双将
-    else if (rawPairs.length == 1 && newPairs.length == 2) {
-      player.name1 = newPairs[0]
-      player.name2 = newPairs[1]
-      player.$reinit12(newPairs)
+    else if (rawPairs.length === 1 && newPairs.length === 2) {
+      this.name1 = newPairs[0]
+      this.name2 = newPairs[1]
+      this.$reinit12(newPairs)
     }
     //双将变单将
-    else if (rawPairs.length == 2 && newPairs.length == 1) {
-      player.name1 = newPairs[0]
-      delete player.name2
-      player.$reinit21(newPairs)
+    else if (rawPairs.length === 2 && newPairs.length === 1) {
+      this.name1 = newPairs[0]
+      delete this.name2
+      this.$reinit21(newPairs)
     }
     //修改性别
-    if (!player.isUnseen(1)) {
-      player.name = player.name1
-      player.sex = get.character(player.name1, 0)
-    } else if (!player.isUnseen(2)) {
-      player.name = player.name2
-      player.sex = get.character(player.name2, 0)
+    if (!this.isUnseen(1)) {
+      this.name = this.name1
+      this.sex = get.character(this.name1, 0)
+    } else if (!this.isUnseen(2)) {
+      this.name = this.name2
+      this.sex = get.character(this.name2, 0)
     }
   }
   $reinit12(newPairs) {
-    const player = this
-    player.node.avatar.setBackground(newPairs[0], "character")
-    player.node.name.innerHTML = get.slimName(newPairs[0])
-    player.name2 = newPairs[1]
-    player.classList.add("fullskin2")
-    player.node.avatar2.classList.remove("hidden")
-    player.node.avatar2.setBackground(newPairs[1], "character")
-    player.node.name2.innerHTML = get.slimName(newPairs[1])
-    if (player == game.me && ui.fakeme) {
-      ui.fakeme.style.backgroundImage = player.node.avatar.style.backgroundImage
+    this.node.avatar.setBackground(newPairs[0], "character")
+    this.node.name.innerHTML = get.slimName(newPairs[0])
+    this.name2 = newPairs[1]
+    this.classList.add("fullskin2")
+    this.node.avatar2.classList.remove("hidden")
+    this.node.avatar2.setBackground(newPairs[1], "character")
+    this.node.name2.innerHTML = get.slimName(newPairs[1])
+    if (this === game.me && ui.fakeme) {
+      ui.fakeme.style.backgroundImage = this.node.avatar.style.backgroundImage
     }
   }
   $reinit21(newPairs) {
-    const player = this,
-      name = newPairs[0]
-    player.smoothAvatar(false)
-    player.node.avatar.setBackground(name, "character")
-    player.node.name.innerHTML = get.slimName(name)
-    player.classList.remove("fullskin2")
-    player.node.avatar2.classList.add("hidden")
-    player.node.name2.innerHTML = ""
-    if (player == game.me && ui.fakeme) {
-      ui.fakeme.style.backgroundImage = player.node.avatar.style.backgroundImage
+    const name = newPairs[0]
+    this.smoothAvatar(false)
+    this.node.avatar.setBackground(name, "character")
+    this.node.name.innerHTML = get.slimName(name)
+    this.classList.remove("fullskin2")
+    this.node.avatar2.classList.add("hidden")
+    this.node.name2.innerHTML = ""
+    if (this === game.me && ui.fakeme) {
+      ui.fakeme.style.backgroundImage = this.node.avatar.style.backgroundImage
     }
   }
   reinit(from, to, maxHp, online) {
@@ -4157,21 +4176,21 @@ export class Player extends HTMLDivElement {
     var info2 = lib.character[to]
     var smooth = true,
       replaced = null
-    if (maxHp == "nosmooth") {
+    if (maxHp === "nosmooth") {
       smooth = false
       maxHp = null
     }
-    if (this.name2 == from) {
+    if (this.name2 === from) {
       this.name2 = to
       this.skin.name2 = to
-    } else if (this.name == from || this.name1 == from) {
-      if (this.name1 == from) {
+    } else if (this.name === from || this.name1 === from) {
+      if (this.name1 === from) {
         this.name1 = to
         this.skin.name = to
       }
       if (!this.isUnseen(1)) {
         this.name = to
-        if (this.skin.name != to) {
+        if (this.skin.name !== to) {
           this.skin.name = to
         }
         this.sex = info2[0]
@@ -4185,7 +4204,7 @@ export class Player extends HTMLDivElement {
       }
       for (var i = 0; i < info2[3].length; i++) {
         var info = get.info(info2[3][i])
-        if (info && info.zhuSkill && !this.isZhu2()) {
+        if (info?.zhuSkill && !this.isZhu2()) {
           continue
         }
         this.addSkill(info2[3][i])
@@ -4193,7 +4212,7 @@ export class Player extends HTMLDivElement {
       if (Array.isArray(maxHp)) {
         this.maxHp = maxHp[1]
         this.hp = maxHp[0]
-        if (typeof maxHp[2] == "number") {
+        if (typeof maxHp[2] === "number") {
           this.hujia = maxHp[2]
         }
       } else {
@@ -4201,13 +4220,13 @@ export class Player extends HTMLDivElement {
         if (maxHp === false) {
           num = 0
         } else {
-          if (typeof maxHp != "number") {
+          if (typeof maxHp !== "number") {
             maxHp = get.infoMaxHp(info2[2])
           }
           num = maxHp - get.infoMaxHp(info1[2])
         }
-        if (typeof this.singleHp == "boolean") {
-          if (num % 2 != 0) {
+        if (typeof this.singleHp === "boolean") {
+          if (num % 2 !== 0) {
             if (this.singleHp) {
               this.maxHp += (num + 1) / 2
               this.singleHp = false
@@ -4226,7 +4245,7 @@ export class Player extends HTMLDivElement {
         }
       }
       game.broadcast(
-        function (player, from, to, skills) {
+        (player, from, to, skills) => {
           player.reinit(from, to, null, true)
           player.applySkills(skills)
         },
@@ -4240,31 +4259,31 @@ export class Player extends HTMLDivElement {
       from: from,
       to: to,
       hp: this.maxHp,
-      avatar2: this.name2 == to,
+      avatar2: this.name2 === to,
     })
     this.$reinit(from, to, maxHp, online)
     this.update()
   }
   $reinit(from, to, maxHp, online) {
     var smooth = true
-    if (maxHp == "nosmooth") {
+    if (maxHp === "nosmooth") {
       smooth = false
       maxHp = null
     }
-    if (this.name2 == to) {
+    if (this.name2 === to) {
       if (smooth) {
         this.smoothAvatar(true)
       }
       this.node.avatar2.setBackground(to, "character")
       this.node.name2.innerHTML = get.slimName(to)
-    } else if (this.name == to || this.name1 == to) {
+    } else if (this.name === to || this.name1 === to) {
       if (smooth) {
         this.smoothAvatar(false)
       }
       this.node.avatar.setBackground(to, "character")
       this.node.name.innerHTML = get.slimName(to)
 
-      if (this == game.me && ui.fakeme) {
+      if (this === game.me && ui.fakeme) {
         ui.fakeme.style.backgroundImage = this.node.avatar.style.backgroundImage
       }
     }
@@ -4316,10 +4335,10 @@ export class Player extends HTMLDivElement {
   $uninit() {
     this.$syncExpand()
     this.$syncDisable()
-    game.broadcastAll(function (player) {
+    game.broadcastAll((player) => {
       delete player.storage._disableJudge
       for (var i = 0; i < player.node.judges.childNodes.length; i++) {
-        if (player.node.judges.childNodes[i].name == "disable_judge") {
+        if (player.node.judges.childNodes[i].name === "disable_judge") {
           player.node.judges.removeChild(player.node.judges.childNodes[i])
           break
         }
@@ -4379,40 +4398,39 @@ export class Player extends HTMLDivElement {
     }
     ui.refresh(div)
     div.style.transition = "all 1s"
-    setTimeout(function () {
+    setTimeout(() => {
       div.classList.add("removing")
-      setTimeout(function () {
+      setTimeout(() => {
         div.remove()
       }, 2000)
     }, 100)
-    if (video != false) {
+    if (video !== false) {
       game.addVideo("smoothAvatar", this, vice)
     }
   }
   changeSeat(position, video) {
-    var player = this
     if (video !== false) {
-      game.addVideo("changeSeat", player, position)
+      game.addVideo("changeSeat", this, position)
     }
-    var rect1 = player.getBoundingClientRect()
-    player.style.transition = "all 0s"
-    ui.refresh(player)
-    player.dataset.position = position
-    var rect2 = player.getBoundingClientRect()
+    var rect1 = this.getBoundingClientRect()
+    this.style.transition = "all 0s"
+    ui.refresh(this)
+    this.dataset.position = position
+    var rect2 = this.getBoundingClientRect()
     var dx = rect1.left - rect2.left
     var dy = rect1.top - rect2.top
     if (
-      (game.chess || (player.dataset.position != 0 && position != 0)) &&
-      player.classList.contains("linked")
+      (game.chess || (this.dataset.position !== 0 && position !== 0)) &&
+      this.classList.contains("linked")
     ) {
-      player.style.transform = "rotate(-90deg) translate(" + -dy + "px," + dx + "px)"
+      this.style.transform = `rotate(-90deg) translate(${-dy}px,${dx}px)`
     } else {
-      player.style.transform = "translate(" + dx + "px," + dy + "px)"
+      this.style.transform = `translate(${dx}px,${dy}px)`
     }
-    setTimeout(function () {
-      player.style.transition = ""
-      ui.refresh(player)
-      player.style.transform = ""
+    setTimeout(() => {
+      this.style.transition = ""
+      ui.refresh(this)
+      this.style.transform = ""
     }, 100)
   }
   /**
@@ -4438,7 +4456,7 @@ export class Player extends HTMLDivElement {
   }
   throwEmotion(target, emotion, rotate) {
     game.broadcastAll(
-      function (player, target, emotion, rotate) {
+      (player, target, emotion, rotate) => {
         player.$throwEmotion(target, emotion, rotate)
       },
       this,
@@ -4451,12 +4469,12 @@ export class Player extends HTMLDivElement {
     var str = `<img src="##assetURL##image/emotion/${pack}/${id}" width="50" height="50">`
     this.say(str)
     game.broadcast(
-      function (id, str) {
+      (id, str) => {
         if (lib.playerOL[id]) {
           lib.playerOL[id].say(str)
         } else if (game.connectPlayers) {
           for (var i = 0; i < game.connectPlayers.length; i++) {
-            if (game.connectPlayers[i].playerid == id) {
+            if (game.connectPlayers[i].playerid === id) {
               game.connectPlayers[i].say(str)
               return
             }
@@ -4477,12 +4495,12 @@ export class Player extends HTMLDivElement {
     }
     this.say(str)
     game.broadcast(
-      function (id, str) {
+      (id, str) => {
         if (lib.playerOL[id]) {
           lib.playerOL[id].say(str)
         } else if (game.connectPlayers) {
           for (var i = 0; i < game.connectPlayers.length; i++) {
-            if (game.connectPlayers[i].playerid == id) {
+            if (game.connectPlayers[i].playerid === id) {
               game.connectPlayers[i].say(str)
               return
             }
@@ -4504,7 +4522,9 @@ export class Player extends HTMLDivElement {
     str = str.replace(/##assetURL##/g, lib.assetURL)
     var dialog = ui.create.dialog("hidden")
     dialog.classList.add("static")
-    dialog.add('<div class="text" style="word-break:break-all;display:inline">' + str + "</div>")
+    dialog.add(
+      `<div class="text" style="word-break:break-all;display:inline">${str}</div>`,
+    )
     dialog.classList.add("popped")
     ui.window.appendChild(dialog)
     var width = dialog.content.firstChild.firstChild.offsetWidth
@@ -4513,18 +4533,24 @@ export class Player extends HTMLDivElement {
     } else {
       dialog.content.firstChild.style.textAlign = "left"
     }
-    dialog.style.width = width + 16 + "px"
+    dialog.style.width = `${width + 16}px`
     var refnode
-    if (this.node && this.node.avatar && this.parentNode == ui.arena) {
+    if (this.node?.avatar && this.parentNode === ui.arena) {
       refnode = this.node.avatar
     }
     if (refnode) {
       lib.placePoppedDialog(dialog, {
         clientX:
-          (ui.arena.offsetLeft + this.getLeft() + refnode.offsetLeft + refnode.offsetWidth / 2) *
+          (ui.arena.offsetLeft +
+            this.getLeft() +
+            refnode.offsetLeft +
+            refnode.offsetWidth / 2) *
           game.documentZoom,
         clientY:
-          (ui.arena.offsetTop + this.getTop() + refnode.offsetTop + refnode.offsetHeight / 4) *
+          (ui.arena.offsetTop +
+            this.getTop() +
+            refnode.offsetTop +
+            refnode.offsetHeight / 4) *
           game.documentZoom,
       })
     } else {
@@ -4537,13 +4563,13 @@ export class Player extends HTMLDivElement {
       dialog.content.firstChild.style.padding = 0
     }
     setTimeout(
-      function () {
+      () => {
         dialog.delete()
       },
       lib.quickVoice.includes(str) ? 3800 : 2000,
     )
     var name = get.translation(this.name)
-    var info = [name ? name + "[" + this.nickname + "]" : this.nickname, str]
+    var info = [name ? `${name}[${this.nickname}]` : this.nickname, str]
     lib.chatHistory.push(info)
     if (_status.addChatEntry) {
       if (_status.addChatEntry._origin.parentNode) {
@@ -4553,12 +4579,16 @@ export class Player extends HTMLDivElement {
       }
     }
     if (lib.config.background_speak && lib.quickVoice.includes(str)) {
-      game.playAudio("voice", this.sex == "female" ? "female" : "male", lib.quickVoice.indexOf(str))
+      game.playAudio(
+        "voice",
+        this.sex === "female" ? "female" : "male",
+        lib.quickVoice.indexOf(str),
+      )
     }
   }
   showGiveup() {
     this._giveUp = true
-    if (this == game.me) {
+    if (this === game.me) {
       ui.create.giveup()
     } else if (this.isOnline2()) {
       this.send(ui.create.giveup)
@@ -4566,7 +4596,7 @@ export class Player extends HTMLDivElement {
   }
   applySkills(skills) {
     for (var i in skills) {
-      if (i == "global") {
+      if (i === "global") {
         lib.skill.global = skills[i]
       }
       //else if(i=='skillinfo'){
@@ -4577,7 +4607,7 @@ export class Player extends HTMLDivElement {
       //		lib.skill[j].chooseButton=skills[i][j];
       //	}
       //}
-      else if (i == "stat") {
+      else if (i === "stat") {
         this.stat = [skills.stat]
       } else if (lib.playerOL[i]) {
         for (var j in skills[i]) {
@@ -4601,7 +4631,7 @@ export class Player extends HTMLDivElement {
       equips: this.getCards("e"),
       extraEquip: this.extraEquip,
       equips_map: this.getCards("e").reduce((map, value) => {
-        let id = value.cardid
+        const id = value.cardid
         map[id] = {}
         if (value.isViewAsCard) {
           map[id].isViewAsCard = true
@@ -4622,7 +4652,7 @@ export class Player extends HTMLDivElement {
       }, {}),
       judges: this.getCards("j"),
       judges_map: this.getCards("j").reduce((map, value) => {
-        let id = value.cardid
+        const id = value.cardid
         map[id] = {}
         if (value.isViewAsCard) {
           map[id].isViewAsCard = true
@@ -4649,11 +4679,14 @@ export class Player extends HTMLDivElement {
       disabledSlots: this.disabledSlots,
       expandedSlots: this.expandedSlots,
       views: [],
-      position: parseInt(this.dataset.position),
+      position: parseInt(this.dataset.position, 10),
       hujia: this.hujia,
       side: this.side,
       identityShown: this.identityShown,
-      identityNode: [this.node.identity.innerHTML, this.node.identity.dataset.color],
+      identityNode: [
+        this.node.identity.innerHTML,
+        this.node.identity.dataset.color,
+      ],
       identity: this.identity,
       dead: this.isDead(),
       linked: this.isLinked(),
@@ -4684,16 +4717,16 @@ export class Player extends HTMLDivElement {
   }
   setAvatar(name, name2, video, fakeme) {
     var node
-    if (this.name2 == name) {
+    if (this.name2 === name) {
       node = this.node.avatar2
       this.smoothAvatar(true, video)
-    } else if (this.name == name) {
+    } else if (this.name === name) {
       node = this.node.avatar
       this.smoothAvatar(false, video)
     }
     if (node) {
       if (name === name2) {
-        var skinName = this.name2 != name ? this.skin?.name : this.skin?.name2
+        var skinName = this.name2 !== name ? this.skin?.name : this.skin?.name2
         if (!skinName || skinName === name2) {
           node.setBackground(name2, "character")
         } else {
@@ -4702,15 +4735,15 @@ export class Player extends HTMLDivElement {
       } else {
         node.setBackground(name2, "character")
       }
-      if (this == game.me && ui.fakeme && fakeme !== false) {
+      if (this === game.me && ui.fakeme && fakeme !== false) {
         ui.fakeme.style.backgroundImage = node.style.backgroundImage
       }
-      if (video != false) {
+      if (video !== false) {
         game.addVideo("setAvatar", this, [name, name2])
       }
     }
     game.broadcast(
-      function (player, name, name2) {
+      (player, name, name2) => {
         player.setAvatar(name, name2, false)
       },
       this,
@@ -4720,25 +4753,25 @@ export class Player extends HTMLDivElement {
   }
   setAvatarQueue(name, list) {
     var node
-    var player = this
-    if (player.name2 == name) {
-      node = player.node.avatar2
+
+    if (this.name2 === name) {
+      node = this.node.avatar2
     } else {
-      node = player.node.avatar
+      node = this.node.avatar
     }
     if (node._avatarqueue) {
       for (var i = 0; i < list.length; i++) {
         node._avatarqueue.push(list[i])
       }
     } else {
-      var func = function () {
+      var func = () => {
         if (node._avatarqueue.length) {
-          player.setAvatar(name, node._avatarqueue.shift(), false, false)
+          this.setAvatar(name, node._avatarqueue.shift(), false, false)
         } else {
           clearInterval(node._avatarqueueinterval)
           delete node._avatarqueue
           delete node._avatarqueueinterval
-          player.setAvatar(name, name, false, false)
+          this.setAvatar(name, name, false, false)
         }
       }
       node._avatarqueue = list.slice(0)
@@ -4767,21 +4800,24 @@ export class Player extends HTMLDivElement {
         }
       }
     }
-    if (lib.character[this.name2] && lib.character[this.name2].skills.includes(skill)) {
+    if (
+      lib.character[this.name2] &&
+      lib.character[this.name2].skills.includes(skill)
+    ) {
       this.setAvatarQueue(this.name2, [name])
     } else {
       this.setAvatarQueue(this.name, [name])
     }
   }
   update() {
-    if (_status.video && arguments.length == 0) {
+    if (_status.video && arguments.length === 0) {
       return
     }
     if (this.hp >= this.maxHp) {
       this.hp = this.maxHp
     }
     game.broadcast(
-      function (player, hp, maxHp, hujia) {
+      (player, hp, maxHp, hujia) => {
         player.hp = hp
         player.maxHp = maxHp
         player.hujia = hujia
@@ -4810,10 +4846,12 @@ export class Player extends HTMLDivElement {
     }
     if (!this.storage.nohp) {
       const hidden =
-        this.classList.contains("unseen_show") || this.classList.contains("unseen2_show")
+        this.classList.contains("unseen_show") ||
+        this.classList.contains("unseen2_show")
       const maxHp = hidden ? 1 : this.maxHp
-      if (maxHp == Infinity) {
-        hp.innerHTML = this.hp == Infinity ? "∞" : this.hp + "<br>/<br>" + "∞" + "<div></div>"
+      if (maxHp === Infinity) {
+        hp.innerHTML =
+          this.hp === Infinity ? "∞" : `${this.hp}<br>/<br>∞<div></div>`
         /*
 			} else if (game.layout == "default" && maxHp > 14) {
 				hp.innerHTML = this.hp + "/" + maxHp;
@@ -4821,8 +4859,8 @@ export class Player extends HTMLDivElement {
 			} else if (get.is.newLayout() && (maxHp > 9 || (maxHp > 5 && this.classList.contains("minskin")) || ((game.layout == "mobile" || game.layout == "long") && this.dataset.position == 0 && maxHp > 7))) {
 			 */
       } else if (maxHp > 5) {
-        hp.innerHTML = this.hp + "<br>/<br>" + maxHp + "<div></div>"
-        if (this.hp == 0) {
+        hp.innerHTML = `${this.hp}<br>/<br>${maxHp}<div></div>`
+        if (this.hp === 0) {
           hp.lastChild.classList.add("lost")
         }
         hp.classList.add("textstyle")
@@ -4859,7 +4897,7 @@ export class Player extends HTMLDivElement {
         hp.dataset.condition = "hidden"
       } else if (hp.classList.contains("room")) {
         hp.dataset.condition = "high"
-      } else if (this.hp == 0) {
+      } else if (this.hp === 0) {
         hp.dataset.condition = ""
       } else if (this.hp > Math.round(maxHp / 2) || this.hp === maxHp) {
         hp.dataset.condition = "high"
@@ -4869,7 +4907,7 @@ export class Player extends HTMLDivElement {
         hp.dataset.condition = "low"
       }
 
-      setTimeout(function () {
+      setTimeout(() => {
         hp.style.transition = ""
       })
     }
@@ -4898,7 +4936,12 @@ export class Player extends HTMLDivElement {
       }
     }
     if (!_status.video) {
-      game.addVideo("update", this, [this.countCards("h"), this.hp, this.maxHp, this.hujia])
+      game.addVideo("update", this, [
+        this.countCards("h"),
+        this.hp,
+        this.maxHp,
+        this.hujia,
+      ])
     }
     this.updateMarks()
     game.callHook("checkTipBottom", [this])
@@ -4910,7 +4953,7 @@ export class Player extends HTMLDivElement {
    * @param { boolean } [log]
    */
   clearMark(i, log) {
-    let num = this.countMark(i)
+    const num = this.countMark(i)
     if (num > 0) {
       this.removeMark(i, num, log)
     }
@@ -4922,10 +4965,10 @@ export class Player extends HTMLDivElement {
    * @param { boolean } [log]
    */
   removeMark(i, num, log) {
-    if (typeof num != "number" || !num) {
+    if (typeof num !== "number" || !num) {
       num = 1
     }
-    if (typeof this.storage[i] != "number" || !this.storage[i]) {
+    if (typeof this.storage[i] !== "number" || !this.storage[i]) {
       return
     }
     if (num > this.storage[i]) {
@@ -4935,17 +4978,17 @@ export class Player extends HTMLDivElement {
     if (log !== false) {
       var str = false
       var info = get.info(i)
-      if (info && info.intro && (info.intro.name || info.intro.name2)) {
+      if (info?.intro && (info.intro.name || info.intro.name2)) {
         str = info.intro.name2 || info.intro.name
       } else {
         str = lib.translate[i]
       }
       if (str) {
-        game.log(this, "移去了", get.cnNumber(num), "个", "#g【" + str + "】")
+        game.log(this, "移去了", get.cnNumber(num), "个", `#g【${str}】`)
       }
     }
     this.syncStorage(i)
-    this[this.storage[i] || (lib.skill[i] && lib.skill[i].mark) ? "markSkill" : "unmarkSkill"](i)
+    this[this.storage[i] || lib.skill[i]?.mark ? "markSkill" : "unmarkSkill"](i)
     const next = game.createEvent("removeMark", false, get.event())
     next.player = this
     next.num = num
@@ -4962,23 +5005,23 @@ export class Player extends HTMLDivElement {
    * @param { boolean } [log]
    */
   addMark(i, num, log) {
-    if (typeof num != "number" || !num) {
+    if (typeof num !== "number" || !num) {
       num = 1
     }
-    if (typeof this.storage[i] != "number") {
+    if (typeof this.storage[i] !== "number") {
       this.storage[i] = 0
     }
     this.storage[i] += num
     if (log !== false) {
       var str = false
       var info = get.info(i)
-      if (info && info.intro && (info.intro.name || info.intro.name2)) {
+      if (info?.intro && (info.intro.name || info.intro.name2)) {
         str = info.intro.name2 || info.intro.name
       } else {
         str = lib.translate[i]
       }
       if (str) {
-        game.log(this, "获得了", get.cnNumber(num), "个", "#g【" + str + "】")
+        game.log(this, "获得了", get.cnNumber(num), "个", `#g【${str}】`)
       }
     }
     this.syncStorage(i)
@@ -5012,10 +5055,10 @@ export class Player extends HTMLDivElement {
    * @returns { number }
    */
   countMark(i) {
-    if (this.storage[i] == undefined) {
+    if (this.storage[i] === undefined) {
       return 0
     }
-    if (typeof this.storage[i] == "number") {
+    if (typeof this.storage[i] === "number") {
       return this.storage[i]
     }
     if (Array.isArray(this.storage[i])) {
@@ -5033,7 +5076,10 @@ export class Player extends HTMLDivElement {
   }
   updateMark(i, storage) {
     if (!this.marks[i]) {
-      if (lib.skill[i] && lib.skill[i].intro && (this.storage[i] || lib.skill[i].intro.markcount)) {
+      if (
+        lib.skill[i]?.intro &&
+        (this.storage[i] || lib.skill[i].intro.markcount)
+      ) {
         this.markSkill(i)
         if (!this.marks[i]) {
           return this
@@ -5046,34 +5092,40 @@ export class Player extends HTMLDivElement {
       this.syncStorage(i)
     }
     if (
-      i == "ghujia" ||
-      ((!this.marks[i].querySelector(".image") || this.storage[i + "_markcount"]) &&
+      i === "ghujia" ||
+      ((!this.marks[i].querySelector(".image") ||
+        this.storage[`${i}_markcount`]) &&
         lib.skill[i] &&
         lib.skill[i].intro &&
         !lib.skill[i].intro.nocount &&
-        (this.storage[i] || this.storage[i + "_markcount"] || lib.skill[i].intro.markcount))
+        (this.storage[i] ||
+          this.storage[`${i}_markcount`] ||
+          lib.skill[i].intro.markcount))
     ) {
       this.marks[i].classList.add("overflowmark")
       var num = 0
-      if (typeof lib.skill[i].intro.markcount == "function") {
+      if (typeof lib.skill[i].intro.markcount === "function") {
         num = lib.skill[i].intro.markcount(this.storage[i], this, i)
-      } else if (lib.skill[i].intro.markcount == "expansion") {
+      } else if (lib.skill[i].intro.markcount === "expansion") {
         num = this.countCards("x", (card) => card.hasGaintag(i))
-      } else if (typeof this.storage[i + "_markcount"] == "number") {
-        num = this.storage[i + "_markcount"]
-      } else if (i == "ghujia") {
+      } else if (typeof this.storage[`${i}_markcount`] === "number") {
+        num = this.storage[`${i}_markcount`]
+      } else if (i === "ghujia") {
         num = this.hujia
-      } else if (typeof this.storage[i] == "number") {
+      } else if (typeof this.storage[i] === "number") {
         num = this.storage[i]
       } else if (Array.isArray(this.storage[i])) {
         num = this.storage[i].length
       }
       if (num) {
-        if (num == Infinity) {
+        if (num === Infinity) {
           num = "∞"
         }
         if (!this.marks[i].markcount) {
-          this.marks[i].markcount = ui.create.div(".markcount.menubutton", this.marks[i])
+          this.marks[i].markcount = ui.create.div(
+            ".markcount.menubutton",
+            this.marks[i],
+          )
         }
         this.marks[i].markcount.innerHTML = num
       } else if (this.marks[i].markcount) {
@@ -5085,16 +5137,16 @@ export class Player extends HTMLDivElement {
         this.marks[i].markcount.delete()
         delete this.marks[i].markcount
       }
-      if (lib.skill[i].mark == "auto") {
+      if (lib.skill[i].mark === "auto") {
         this.unmarkSkill(i)
       }
     }
     return this
   }
   updateMarks(connect) {
-    if (typeof connect == "string" && _status.connectMode && !game.online) {
+    if (typeof connect === "string" && _status.connectMode && !game.online) {
       game.broadcast(
-        function (player, storage, skill) {
+        (player, storage, skill) => {
           player.storage[skill] = storage
           player.updateMarks()
         },
@@ -5113,11 +5165,11 @@ export class Player extends HTMLDivElement {
    * @param { boolean } [log] false: 不进行广播
    */
   addCharge(num, log) {
-    if (typeof num != "number" || !num) {
+    if (typeof num !== "number" || !num) {
       num = 1
     }
-    let maxCharge = this.getMaxCharge()
-    if (maxCharge == Infinity) {
+    const maxCharge = this.getMaxCharge()
+    if (maxCharge === Infinity) {
       this.addMark("charge", num, log)
     } else {
       num = Math.min(num, maxCharge - this.countMark("charge"))
@@ -5132,7 +5184,7 @@ export class Player extends HTMLDivElement {
    * @param { boolean } [log] false: 不进行广播
    */
   removeCharge(num, log) {
-    if (typeof num != "number" || !num) {
+    if (typeof num !== "number" || !num) {
       num = 1
     }
     num = Math.min(num, this.countMark("charge"))
@@ -5147,7 +5199,7 @@ export class Player extends HTMLDivElement {
    */
   countCharge(max) {
     if (max) {
-      if (this.getMaxCharge() == Infinity) {
+      if (this.getMaxCharge() === Infinity) {
         return Infinity
       }
       return this.getMaxCharge() - this.countMark("charge")
@@ -5158,33 +5210,35 @@ export class Player extends HTMLDivElement {
    * 获取蓄力值上限
    */
   getMaxCharge() {
-    let skills = game.expandSkills(this.getSkills(null, null, false).concat(lib.skill.global))
+    const skills = game.expandSkills(
+      this.getSkills(null, null, false).concat(lib.skill.global),
+    )
     let max = 0
-    for (let skill of skills) {
-      let info = get.info(skill)
-      if (!info || typeof info.chargeSkill != "number") {
+    for (const skill of skills) {
+      const info = get.info(skill)
+      if (!info || typeof info.chargeSkill !== "number") {
         //|| !info.chargeSkill
         continue
       }
-      if (info.chargeSkill == Infinity) {
+      if (info.chargeSkill === Infinity) {
         return Infinity
       }
       max += info.chargeSkill
     }
     max = game.checkMod(this, max, "maxCharge", this)
-    return typeof max == "number" ? Math.max(0, max) : Infinity
+    return typeof max === "number" ? Math.max(0, max) : Infinity
   }
   line(target, config) {
-    if (get.itemtype(target) == "players") {
+    if (get.itemtype(target) === "players") {
       for (var i = 0; i < target.length; i++) {
         this.line(target[i], config)
       }
-    } else if (get.itemtype(target) == "player") {
-      if (target == this) {
+    } else if (get.itemtype(target) === "player") {
+      if (target === this) {
         return
       }
       game.broadcast(
-        function (player, target, config) {
+        (player, target, config) => {
           player.line(target, config)
         },
         this,
@@ -5208,8 +5262,8 @@ export class Player extends HTMLDivElement {
     this.line(targets[0], config)
     targets = targets.slice(0)
     for (var i = 1; i < targets.length; i++) {
-      ;(function (j) {
-        setTimeout(function () {
+      ;((j) => {
+        setTimeout(() => {
           targets[j - 1].line(targets[j], config)
         }, lib.config.duration * i)
       })(i)
@@ -5256,12 +5310,16 @@ export class Player extends HTMLDivElement {
       for (var i = 0; i < history.length; i++) {
         if (!card) {
           num++
-        } else if (typeof card == "string" && history[i].card && card == history[i].card.name) {
+        } else if (
+          typeof card === "string" &&
+          history[i].card &&
+          card === history[i].card.name
+        ) {
           num++
         } else if (
-          typeof card == "object" &&
+          typeof card === "object" &&
           history[i].card &&
-          card.name == history[i].card.name
+          card.name === history[i].card.name
         ) {
           num++
         }
@@ -5273,17 +5331,17 @@ export class Player extends HTMLDivElement {
     if (!card) {
       num = 0
       for (var i in stat) {
-        if (typeof stat[i] == "number") {
+        if (typeof stat[i] === "number") {
           num += stat[i]
         }
       }
       return num
     }
-    if (typeof card == "object") {
+    if (typeof card === "object") {
       card = card.name
     }
     num = stat[card]
-    if (typeof num != "number") {
+    if (typeof num !== "number") {
       return 0
     }
     return num
@@ -5299,12 +5357,12 @@ export class Player extends HTMLDivElement {
       prefix = "[player:"
     }
     if (this.playerid) {
-      return prefix + this.playerid + "]"
+      return `${prefix + this.playerid}]`
     }
     return (
       prefix +
       dedent`
-			${this.name}+${this.sex}+${this.group}+${this.hp}+${this.maxHp}+${this.hujia}+${"[" + this.skills.join(",") + "]"}+${this.name1}+${this.name2}]
+			${this.name}+${this.sex}+${this.group}+${this.hp}+${this.maxHp}+${this.hujia}+${`[${this.skills.join(",")}]`}+${this.name1}+${this.name2}]
 		`
     )
   }
@@ -5316,7 +5374,7 @@ export class Player extends HTMLDivElement {
   countSkill(skill) {
     const info = lib.skill[skill]
     if (!info) {
-      console.warn("“" + skill + "”为无效技能ID！")
+      console.warn(`“${skill}”为无效技能ID！`)
       return 0
     }
     if (
@@ -5371,10 +5429,9 @@ export class Player extends HTMLDivElement {
    * @returns { string[] }
    */
   getHiddenSkills(unowned, unique) {
-    const player = this
-    return player
-      .getStockSkills(unowned, unique, true)
-      .removeArray(player.getStockSkills(unowned, unique))
+    return this.getStockSkills(unowned, unique, true).removeArray(
+      this.getStockSkills(unowned, unique),
+    )
   }
   /**
    * @param { string } [arg1='h']
@@ -5382,7 +5439,7 @@ export class Player extends HTMLDivElement {
    * @returns { Iterable<Card> }
    */
   *iterableGetVCards(arg1, arg2) {
-    if (typeof arg1 != "string") {
+    if (typeof arg1 !== "string") {
       arg1 = "h"
     }
     const getCardName = (card) => {
@@ -5390,23 +5447,29 @@ export class Player extends HTMLDivElement {
     }
     let filter = (card) => true
     if (arg2) {
-      if (typeof arg2 == "string") {
-        filter = (card) => getCardName(card) == arg2
+      if (typeof arg2 === "string") {
+        filter = (card) => getCardName(card) === arg2
       } else if (Array.isArray(arg2)) {
         filter = (card) => arg2.includes(getCardName(card))
-      } else if (typeof arg2 == "object") {
+      } else if (typeof arg2 === "object") {
         filter = (card) => {
-          for (let j in arg2) {
+          for (const j in arg2) {
             var value
-            if (j == "type" || j == "subtype" || j == "color" || j == "suit" || j == "number") {
+            if (
+              j === "type" ||
+              j === "subtype" ||
+              j === "color" ||
+              j === "suit" ||
+              j === "number"
+            ) {
               value = get[j](card)
-            } else if (j == "name") {
+            } else if (j === "name") {
               value = getCardName(card)
             } else {
               value = card[j]
             }
             if (
-              (typeof arg2[j] == "string" && value != arg2[j]) ||
+              (typeof arg2[j] === "string" && value !== arg2[j]) ||
               (Array.isArray(arg2[j]) && !arg2[j].includes(value))
             ) {
               return false
@@ -5414,25 +5477,25 @@ export class Player extends HTMLDivElement {
           }
           return true
         }
-      } else if (typeof arg2 == "function") {
+      } else if (typeof arg2 === "function") {
         filter = arg2
       }
     }
     for (let i = 0; i < arg1.length; i++) {
-      if (arg1[i] == "h") {
-        for (let card of this.vcardsMap?.handcards ?? []) {
+      if (arg1[i] === "h") {
+        for (const card of this.vcardsMap?.handcards ?? []) {
           if (filter(card)) {
             yield card
           }
         }
-      } else if (arg1[i] == "e") {
-        for (let card of this.vcardsMap?.equips ?? []) {
+      } else if (arg1[i] === "e") {
+        for (const card of this.vcardsMap?.equips ?? []) {
           if (filter(card)) {
             yield card
           }
         }
-      } else if (arg1[i] == "j") {
-        for (let card of this.vcardsMap?.judges ?? []) {
+      } else if (arg1[i] === "j") {
+        for (const card of this.vcardsMap?.judges ?? []) {
           if (filter(card)) {
             yield card
           }
@@ -5454,7 +5517,7 @@ export class Player extends HTMLDivElement {
    */
   countVCards(arg1, arg2) {
     let count = 0
-    for (let item of this.iterableGetVCards(arg1, arg2)) {
+    for (const item of this.iterableGetVCards(arg1, arg2)) {
       count++
     }
     return count
@@ -5469,12 +5532,12 @@ export class Player extends HTMLDivElement {
    * @returns { Generator<Card> } 经过过滤后的牌的生成器
    */
   *iterableGetCards(position, filter) {
-    if (typeof position != "string") {
+    if (typeof position !== "string") {
       position = "h"
     }
     const judgesNode = this.node.judges
     const getCardName = (card) => {
-      if (card.parentNode == judgesNode) {
+      if (card.parentNode === judgesNode) {
         if (card.viewAs) {
           return card.viewAs
         }
@@ -5483,24 +5546,24 @@ export class Player extends HTMLDivElement {
     }
     let filterCard
     if (filter) {
-      if (typeof filter == "string") {
-        filterCard = (card) => getCardName(card) == filter
+      if (typeof filter === "string") {
+        filterCard = (card) => getCardName(card) === filter
       } else if (Array.isArray(filter)) {
         filterCard = (card) => filter.includes(getCardName(card))
-      } else if (typeof filter == "object") {
+      } else if (typeof filter === "object") {
         // 预计算过滤器条目，避免每张牌都重复判断 key 类型和 filterVal 类型
         const entries = []
         for (const key in filter) {
           let getter
           if (
-            key == "type" ||
-            key == "subtype" ||
-            key == "color" ||
-            key == "suit" ||
-            key == "number"
+            key === "type" ||
+            key === "subtype" ||
+            key === "color" ||
+            key === "suit" ||
+            key === "number"
           ) {
             getter = get[key]
-          } else if (key == "name") {
+          } else if (key === "name") {
             getter = getCardName
           } else {
             getter = null
@@ -5516,13 +5579,16 @@ export class Player extends HTMLDivElement {
         filterCard = (card) => {
           for (const { key, getter, filterVal, isArray } of entries) {
             const value = getter ? getter(card) : card[key]
-            if ((!isArray && value != filterVal) || (isArray && !filterVal.includes(value))) {
+            if (
+              (!isArray && value !== filterVal) ||
+              (isArray && !filterVal.includes(value))
+            ) {
               return false
             }
           }
           return true
         }
-      } else if (typeof filter == "function") {
+      } else if (typeof filter === "function") {
         filterCard = filter
       }
     }
@@ -5609,7 +5675,10 @@ export class Player extends HTMLDivElement {
           }
           judgeDone = true
           for (const card of get.iterableChildNodes(judgesNode)) {
-            if (card.classList.contains("removing") || card.classList.contains("feichu")) {
+            if (
+              card.classList.contains("removing") ||
+              card.classList.contains("feichu")
+            ) {
               continue
             }
             if (!useFilter || filterCard(card)) {
@@ -5673,7 +5742,9 @@ export class Player extends HTMLDivElement {
    * @returns { Card[] } 经过过滤后的牌的数组
    */
   getDiscardableCards(player, position, filter) {
-    return Array.from(this.iterableGetDiscardableCards(player, position, filter))
+    return Array.from(
+      this.iterableGetDiscardableCards(player, position, filter),
+    )
   }
   /**
    * 返回玩家的牌区中能被给定角色获得的牌，默认返回手牌区的牌
@@ -5727,9 +5798,9 @@ export class Player extends HTMLDivElement {
   }
   getCardIndex(arg1, name, card, max) {
     let count = 0
-    for (let item of this.iterableGetCards(arg1)) {
-      if (get.name(item) == name) {
-        if (card == item) {
+    for (const item of this.iterableGetCards(arg1)) {
+      if (get.name(item) === name) {
+        if (card === item) {
           return count
         }
         count++
@@ -5750,7 +5821,11 @@ export class Player extends HTMLDivElement {
    */
   countDiscardableCards(player, position, filter) {
     let count = 0
-    for (const _ of this.iterableGetDiscardableCards(player, position, filter)) {
+    for (const _ of this.iterableGetDiscardableCards(
+      player,
+      position,
+      filter,
+    )) {
       ++count
     }
     return count
@@ -5792,7 +5867,11 @@ export class Player extends HTMLDivElement {
    * @returns { boolean }
    */
   hasDiscardableCards(player, position, filter) {
-    for (const _ of this.iterableGetDiscardableCards(player, position, filter)) {
+    for (const _ of this.iterableGetDiscardableCards(
+      player,
+      position,
+      filter,
+    )) {
       return true
     }
     return false
@@ -5828,56 +5907,67 @@ export class Player extends HTMLDivElement {
   getModableSkills() {
     var skills = this.getSkills().concat(lib.skill.global)
     game.expandSkills(skills)
-    skills = skills.filter(function (skill) {
+    skills = skills.filter((skill) => {
       var info = get.info(skill)
-      return info && info.mod
+      return info?.mod
     })
     skills.sort((a, b) => get.priority(a) - get.priority(b))
     return skills
   }
   /**
-   * @param { string | boolean | null } [arg2]
-   * @param { boolean | null} [arg3]
-   * @param {boolean} [arg4]
+   * 返回玩家当前拥有的技能列表。
+   *
+   * @param { boolean | "e" | "invisible" | null } [skillMode=null] - 获取技能的范围；下面是skillMode的可选值：
+   * - `null`: 返回普通技能、非`hidden:`的额外技能、临时技能和装备技能。
+   * - `true`: 在`null`的基础上额外加入hiddenSkills，并允许`hidden:`的额外技能。
+   * - `false`: 在`null`的基础上额外加入invisibleSkills。
+   * - `"invisible"`: 同时包含`true`和`false`中的技能。
+   * - `"e"` - 在`includeEquipSkills`不为`false`时，直接返回装备技能；反之退化为`true`
+   * @param { boolean | null } [includeEquipSkills=true] - 是否包含装备技能；传入`false`时不读取装备技能。
+   * @param { boolean } [applySkillFilter=true] - 是否通过`game.filterSkills`过滤禁用或被屏蔽的技能，默认过滤。
    */
-  getSkills(arg2, arg3, arg4) {
-    var skills = this.skills.slice(0)
-    var es = []
-    var i, j
-    if (arg3 !== false) {
+  getSkills(skillMode, includeEquipSkills, applySkillFilter) {
+    let skills = this.skills.slice(0)
+    const es = []
+    if (includeEquipSkills !== false) {
       const VEquips = this.getVCards("e")
       es.addArray(get.skillsFromEquips(VEquips))
-      if (arg2 == "e") {
+      if (skillMode === "e") {
         return es
       }
     }
-    for (let i in this.additionalSkills) {
-      if (Array.isArray(this.additionalSkills[i]) && (arg2 || i.indexOf("hidden:") !== 0)) {
-        for (j = 0; j < this.additionalSkills[i].length; j++) {
-          if (this.additionalSkills[i][j]) {
-            skills.add(this.additionalSkills[i][j])
+    for (const source in this.additionalSkills) {
+      const additionalSkills = this.additionalSkills[source]
+      if (
+        Array.isArray(additionalSkills) &&
+        (skillMode || source.indexOf("hidden:") !== 0)
+      ) {
+        for (const skill of additionalSkills) {
+          if (!skill) {
+            continue
           }
+          skills.add(skill)
         }
-      } else if (this.additionalSkills[i] && typeof this.additionalSkills[i] == "string") {
-        skills.add(this.additionalSkills[i])
+      } else if (additionalSkills && typeof additionalSkills === "string") {
+        skills.add(additionalSkills)
       }
     }
-    for (let i in this.tempSkills) {
-      skills.add(i)
+    for (const skill in this.tempSkills) {
+      skills.add(skill)
     }
-    if (arg2) {
+    if (skillMode) {
       skills.addArray(this.hiddenSkills)
     }
-    if (arg2 === false || arg2 == "invisible") {
+    if (skillMode === false || skillMode === "invisible") {
       skills.addArray(this.invisibleSkills)
     }
-    if (arg3 !== false) {
+    if (includeEquipSkills !== false) {
       skills.addArray(es)
     }
-    for (let i in this.forbiddenSkills) {
-      skills.remove(i)
+    for (const skill in this.forbiddenSkills) {
+      skills.remove(skill)
     }
-    if (arg4 !== false) {
+    if (applySkillFilter !== false) {
       skills = game.filterSkills(skills, this, es)
     }
     return skills
@@ -5885,14 +5975,25 @@ export class Player extends HTMLDivElement {
   syncStorage(skill) {
     switch (get.itemtype(this.storage[skill])) {
       case "cards":
-        game.addVideo("storage", this, [skill, get.cardsInfo(this.storage[skill]), "cards"])
+        game.addVideo("storage", this, [
+          skill,
+          get.cardsInfo(this.storage[skill]),
+          "cards",
+        ])
         break
       case "card":
-        game.addVideo("storage", this, [skill, get.cardInfo(this.storage[skill]), "card"])
+        game.addVideo("storage", this, [
+          skill,
+          get.cardInfo(this.storage[skill]),
+          "card",
+        ])
         break
       default:
         try {
-          game.addVideo("storage", this, [skill, JSON.parse(JSON.stringify(this.storage[skill]))])
+          game.addVideo("storage", this, [
+            skill,
+            JSON.parse(JSON.stringify(this.storage[skill])),
+          ])
         } catch (e) {
           console.log(this.storage[skill])
         }
@@ -5900,7 +6001,7 @@ export class Player extends HTMLDivElement {
   }
   syncSkills() {
     game.broadcast(
-      function (player, skills) {
+      (player, skills) => {
         player.applySkills(skills)
       },
       this,
@@ -5911,14 +6012,14 @@ export class Player extends HTMLDivElement {
     time = time || 1000
     this.classList.add("playerfocus")
     ui.arena.classList.add("playerfocus")
-    var that = this
-    setTimeout(function () {
-      that.classList.remove("playerfocus")
+
+    setTimeout(() => {
+      this.classList.remove("playerfocus")
       ui.arena.classList.remove("playerfocus")
     }, time)
     game.addVideo("playerfocus", this, time)
     game.broadcast(
-      function (player, time) {
+      (player, time) => {
         player.playerfocus(time)
       },
       this,
@@ -5941,10 +6042,10 @@ export class Player extends HTMLDivElement {
   insertPhase(skill, insert) {
     var evt = _status.event.getParent("phase")
     var next
-    if (evt && evt.parent && evt.parent.next) {
+    if (evt?.parent?.next) {
       evt = evt.parent
       next = game.createEvent("phase", false, evt)
-    } else if (_status.event.parent && _status.event.parent.next) {
+    } else if (_status.event.parent?.next) {
       evt = _status.event.parent
       next = game.createEvent("phase", false, evt)
     } else {
@@ -5993,8 +6094,10 @@ export class Player extends HTMLDivElement {
     next.player = this
     next.num = 2
     if (
-      (get.config("first_less") || _status.connectMode || _status.first_less_forced) &&
-      game.phaseNumber == 1 &&
+      (get.config("first_less") ||
+        _status.connectMode ||
+        _status.first_less_forced) &&
+      game.phaseNumber === 1 &&
       _status.first_less
     ) {
       next.num--
@@ -6037,18 +6140,21 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (typeof arg == "number" || get.itemtype(arg) == "select") {
+        if (typeof arg === "number" || get.itemtype(arg) === "select") {
           next.selectTarget = arg
-        } else if ((typeof arg == "object" && arg) || typeof arg == "function") {
-          if (get.itemtype(arg) == "player" || next.filterCard) {
+        } else if (
+          (typeof arg === "object" && arg) ||
+          typeof arg === "function"
+        ) {
+          if (get.itemtype(arg) === "player" || next.filterCard) {
             next.filterTarget = arg
           } else {
             next.filterCard = arg
           }
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.forced = arg
-        } else if (typeof arg == "string") {
-          if (arg == "chooseonly") {
+        } else if (typeof arg === "string") {
+          if (arg === "chooseonly") {
             next.chooseonly = true
           } else {
             next.prompt = arg
@@ -6056,31 +6162,31 @@ export class Player extends HTMLDivElement {
         }
       }
     }
-    if (typeof next.filterCard == "object") {
+    if (typeof next.filterCard === "object") {
       next.filterCard = get.filter(next.filterCard)
     }
-    if (typeof next.filterTarget == "object") {
+    if (typeof next.filterTarget === "object") {
       next.filterTarget = get.filter(next.filterTarget, 2)
     }
-    if (next.filterCard == undefined) {
+    if (next.filterCard === undefined) {
       next.filterCard = lib.filter.filterCard
     }
-    if (next.selectCard == undefined) {
+    if (next.selectCard === undefined) {
       next.selectCard = [1, 1]
     }
-    if (next.filterTarget == undefined) {
+    if (next.filterTarget === undefined) {
       next.filterTarget = lib.filter.filterTarget
     }
-    if (next.selectTarget == undefined) {
+    if (next.selectTarget === undefined) {
       next.selectTarget = lib.filter.selectTarget
     }
-    if (next.position == undefined) {
+    if (next.position === undefined) {
       next.position = "hs"
     }
-    if (next.ai1 == undefined) {
+    if (next.ai1 === undefined) {
       next.ai1 = get.cacheOrder
     }
-    if (next.ai2 == undefined) {
+    if (next.ai2 === undefined) {
       next.ai2 = get.cacheEffectUse
     }
     next.setContent("chooseToUse")
@@ -6113,47 +6219,47 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (typeof arg == "number") {
+        if (typeof arg === "number") {
           next.selectCard = [arg, arg]
-        } else if (get.itemtype(arg) == "select") {
+        } else if (get.itemtype(arg) === "select") {
           next.selectCard = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.forced = arg
-        } else if (get.itemtype(arg) == "position") {
+        } else if (get.itemtype(arg) === "position") {
           next.position = arg
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           if (next.filterCard) {
             next.ai = arg
           } else {
             next.filterCard = arg
           }
-        } else if (typeof arg == "object" && arg) {
+        } else if (typeof arg === "object" && arg) {
           next.filterCard = get.filter(arg)
           filter = arg
-        } else if (arg == "nosource") {
+        } else if (arg === "nosource") {
           next.nosource = true
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           next.prompt = arg
         }
       }
     }
-    if (next.filterCard == undefined) {
+    if (next.filterCard === undefined) {
       next.filterCard = lib.filter.all
     }
-    if (next.selectCard == undefined) {
+    if (next.selectCard === undefined) {
       next.selectCard = [1, 1]
     }
-    if (next.source == undefined && !next.nosource) {
+    if (next.source === undefined && !next.nosource) {
       next.source = _status.event.player
     }
-    if (next.ai == undefined) {
+    if (next.ai === undefined) {
       next.ai = get.unuseful2
     }
-    if (next.prompt != false) {
-      if (typeof next.prompt == "string") {
+    if (next.prompt !== false) {
+      if (typeof next.prompt === "string") {
         //next.dialog=next.prompt;
       } else {
-        var str = "请打出" + get.cnNumber(next.selectCard[0]) + "张"
+        var str = `请打出${get.cnNumber(next.selectCard[0])}张`
         if (filter) {
           if (filter.name) {
             str += get.translation(filter.name)
@@ -6163,17 +6269,17 @@ export class Player extends HTMLDivElement {
         } else {
           str += "牌"
         }
-        if (_status.event.getParent().name == "useCard") {
+        if (_status.event.getParent().name === "useCard") {
           var cardname = _status.event.name
           if (lib.card[cardname] && lib.translate[cardname]) {
-            str += "响应" + lib.translate[cardname]
+            str += `响应${lib.translate[cardname]}`
           }
         }
         next.prompt = str
       }
     }
     next.position = "hs"
-    if (next.ai2 == undefined) {
+    if (next.ai2 === undefined) {
       next.ai2 = () => 1
     }
     next.setContent("chooseToRespond")
@@ -6189,7 +6295,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments]
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -6203,30 +6309,30 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.target = arg
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.selectCard = [arg, arg]
-        } else if (get.itemtype(arg) == "select") {
+        } else if (get.itemtype(arg) === "select") {
           next.selectCard = arg
-        } else if (get.itemtype(arg) == "dialog") {
+        } else if (get.itemtype(arg) === "dialog") {
           next.dialog = arg
           next.prompt = false
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.forced = arg
-        } else if (get.itemtype(arg) == "position") {
+        } else if (get.itemtype(arg) === "position") {
           next.position = arg
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           if (next.filterCard) {
             next.ai = arg
           } else {
             next.filterCard = arg
           }
-        } else if (typeof arg == "object" && arg) {
+        } else if (typeof arg === "object" && arg) {
           next.filterCard = get.filter(arg)
-        } else if (arg == "allowChooseAll") {
+        } else if (arg === "allowChooseAll") {
           next.allowChooseAll = true
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           get.evtprompt(next, arg)
         }
         if (arg === null) {
@@ -6234,19 +6340,19 @@ export class Player extends HTMLDivElement {
         }
       }
     }
-    if (next.isMine() == false && next.dialog) {
+    if (next.isMine() === false && next.dialog) {
       next.dialog.style.display = "none"
     }
-    if (next.filterCard == undefined) {
+    if (next.filterCard === undefined) {
       next.filterCard = lib.filter.all
     }
-    if (next.selectCard == undefined) {
+    if (next.selectCard === undefined) {
       next.selectCard = [1, 1]
     }
-    if (next.position == undefined) {
+    if (next.position === undefined) {
       next.position = "h"
     }
-    if (next.ai == undefined) {
+    if (next.ai === undefined) {
       next.ai = get.unuseful
     }
     next.setContent("chooseToGive")
@@ -6264,7 +6370,7 @@ export class Player extends HTMLDivElement {
     const args = [...arguments]
 
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -6278,29 +6384,29 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (typeof arg == "number") {
+        if (typeof arg === "number") {
           next.selectCard = [arg, arg]
-        } else if (get.itemtype(arg) == "select") {
+        } else if (get.itemtype(arg) === "select") {
           next.selectCard = arg
-        } else if (get.itemtype(arg) == "dialog") {
+        } else if (get.itemtype(arg) === "dialog") {
           next.dialog = arg
           next.prompt = false
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.forced = arg
-        } else if (get.itemtype(arg) == "position") {
+        } else if (get.itemtype(arg) === "position") {
           next.position = arg
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           if (next.filterCard) {
             next.ai = arg
           } else {
             next.filterCard = arg
           }
-        } else if (typeof arg == "object" && arg) {
+        } else if (typeof arg === "object" && arg) {
           next.filterCard = get.filter(arg)
-        } else if (typeof arg == "string") {
-          if (arg == "chooseonly") {
+        } else if (typeof arg === "string") {
+          if (arg === "chooseonly") {
             next.chooseonly = true
-          } else if (arg == "allowChooseAll") {
+          } else if (arg === "allowChooseAll") {
             next.allowChooseAll = true
           } else {
             get.evtprompt(next, arg)
@@ -6311,23 +6417,23 @@ export class Player extends HTMLDivElement {
         }
       }
     }
-    if (next.isMine() == false && next.dialog) {
+    if (next.isMine() === false && next.dialog) {
       next.dialog.style.display = "none"
     }
-    if (next.filterCard == undefined) {
+    if (next.filterCard === undefined) {
       next.filterCard = lib.filter.cardDiscardable
     }
-    if (next.selectCard == undefined) {
+    if (next.selectCard === undefined) {
       next.selectCard = [1, 1]
     }
-    if (next.ai == undefined) {
+    if (next.ai === undefined) {
       next.ai = get.unuseful
     }
     next.autochoose = function () {
       if (!this.forced) {
         return false
       }
-      if (typeof this.selectCard == "function") {
+      if (typeof this.selectCard === "function") {
         return false
       }
       if (this.complexCard || this.complexSelect || this.filterOk) {
@@ -6363,30 +6469,26 @@ export class Player extends HTMLDivElement {
       if (check) {
         next.ai = check
       } else {
-        next.ai = function (card) {
-          if (typeof card == "string" && lib.skill[card]) {
-            var ais =
-              lib.skill[card].check ||
-              function () {
-                return 0
-              }
+        next.ai = (card) => {
+          if (typeof card === "string" && lib.skill[card]) {
+            var ais = lib.skill[card].check || (() => 0)
             return ais()
           }
-          var addi = get.value(card) >= 8 && get.type(card) != "equip" ? -3 : 0
-          if (card.name == "du") {
+          var addi = get.value(card) >= 8 && get.type(card) !== "equip" ? -3 : 0
+          if (card.name === "du") {
             addi -= 3
           }
           var source = _status.event.source
           var player = _status.event.player
           var event = _status.event.getParent()
-          var getn = function (card) {
+          var getn = (card) => {
             //会赢吗？会赢的！
             if (player.hasSkillTag("forceWin", null, { card })) {
               return 13 * (event.small ? -1 : 1)
             }
             return get.number(card) * (event.small ? -1 : 1)
           }
-          if (source && source != player) {
+          if (source && source !== player) {
             if (get.attitude(player, source) > 1) {
               if (event.small) {
                 return getn(card) - get.value(card) / 3 + addi
@@ -6397,12 +6499,11 @@ export class Player extends HTMLDivElement {
               return -getn(card) - get.value(card) / 5 + addi
             }
             return getn(card) - get.value(card) / 5 + addi
-          } else {
-            if (event.small) {
-              return -getn(card) - get.value(card) / 5 + addi
-            }
-            return getn(card) - get.value(card) / 5 + addi
           }
+          if (event.small) {
+            return -getn(card) - get.value(card) / 5 + addi
+          }
+          return getn(card) - get.value(card) / 5 + addi
         }
       }
       next.setContent("chooseToCompareMultiple")
@@ -6411,40 +6512,35 @@ export class Player extends HTMLDivElement {
       if (check) {
         next.ai = check
       } else {
-        next.ai = function (card) {
-          if (typeof card == "string" && lib.skill[card]) {
-            var ais =
-              lib.skill[card].check ||
-              function () {
-                return 0
-              }
+        next.ai = (card) => {
+          if (typeof card === "string" && lib.skill[card]) {
+            var ais = lib.skill[card].check || (() => 0)
             return ais()
           }
           var player = get.owner(card)
-          var getn = function (card) {
+          var getn = (card) => {
             if (player.hasSkillTag("forceWin", null, { card })) {
               return 13
             }
             return get.number(card)
           }
           var event = _status.event.getParent()
-          var to = player == event.player ? event.target : event.player
-          var addi = get.value(card) >= 8 && get.type(card) != "equip" ? -6 : 0
+          var to = player === event.player ? event.target : event.player
+          var addi = get.value(card) >= 8 && get.type(card) !== "equip" ? -6 : 0
           var friend = get.attitude(player, to) > 0
-          if (card.name == "du") {
+          if (card.name === "du") {
             addi -= 5
           }
-          if (player == event.player) {
+          if (player === event.player) {
             if (event.small) {
               return -getn(card) - get.value(card) / (friend ? 4 : 5) + addi
             }
             return getn(card) - get.value(card) / (friend ? 4 : 5) + addi
-          } else {
-            if (friend == Boolean(event.small)) {
-              return getn(card) - get.value(card) / (friend ? 3 : 5) + addi
-            }
-            return -getn(card) - get.value(card) / (friend ? 3 : 5) + addi
           }
+          if (friend === Boolean(event.small)) {
+            return getn(card) - get.value(card) / (friend ? 3 : 5) + addi
+          }
+          return -getn(card) - get.value(card) / (friend ? 3 : 5) + addi
         }
       }
       next.setContent("chooseToCompare")
@@ -6466,7 +6562,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments].slice(1)
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -6474,9 +6570,9 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (typeof arg == "string") {
+        if (typeof arg === "string") {
           next.prompt = arg
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           next.func = arg
         }
       }
@@ -6499,7 +6595,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments].slice(1)
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -6507,9 +6603,9 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (typeof arg == "boolean") {
+        if (typeof arg === "boolean") {
           next.forced = arg
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           switch (arg) {
             case "use":
               next.use = true
@@ -6520,7 +6616,7 @@ export class Player extends HTMLDivElement {
             default:
               next.prompt = arg
           }
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.num = arg
         } else if (typeof arg === "function") {
           next.ai = arg
@@ -6542,7 +6638,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments]
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -6555,15 +6651,15 @@ export class Player extends HTMLDivElement {
       ai = params.ai
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "cards") {
+        if (get.itemtype(arg) === "cards") {
           cards = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           forced = arg
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           prompt = arg
-        } else if (get.itemtype(arg) == "select" || typeof arg == "number") {
+        } else if (get.itemtype(arg) === "select" || typeof arg === "number") {
           select = arg
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           if (ai) {
             filter = arg
           } else {
@@ -6572,7 +6668,7 @@ export class Player extends HTMLDivElement {
         }
       }
     }
-    if (prompt == undefined) {
+    if (prompt === undefined) {
       prompt = "请选择卡牌"
     }
     return this.chooseButton({
@@ -6599,7 +6695,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments]
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -6615,15 +6711,15 @@ export class Player extends HTMLDivElement {
       for (const arg of args) {
         if (Array.isArray(arg)) {
           list = arg
-        } else if (arg == "notype") {
+        } else if (arg === "notype") {
           notype = true
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           forced = arg
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           prompt = arg
-        } else if (get.itemtype(arg) == "select" || typeof arg == "number") {
+        } else if (get.itemtype(arg) === "select" || typeof arg === "number") {
           select = arg
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           if (ai) {
             filter = arg
           } else {
@@ -6639,7 +6735,7 @@ export class Player extends HTMLDivElement {
 
       return [get.subtype(item, false) || get.type(item), "", item]
     })
-    if (prompt == undefined) {
+    if (prompt === undefined) {
       prompt = "请选择卡牌"
     }
     return this.chooseButton({
@@ -6660,7 +6756,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments]
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -6674,31 +6770,31 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (typeof arg == "boolean") {
+        if (typeof arg === "boolean") {
           if (!next.forced) {
             next.forced = arg
           } else {
             next.complexSelect = arg
           }
-        } else if (get.itemtype(arg) == "dialog") {
+        } else if (get.itemtype(arg) === "dialog") {
           next.dialog = arg
           next.closeDialog = true
-        } else if (get.itemtype(arg) == "select") {
+        } else if (get.itemtype(arg) === "select") {
           next.selectButton = arg
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.selectButton = [arg, arg]
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           if (next.ai) {
             next.filterButton = arg
           } else {
             next.ai = arg
           }
-        } else if (arg == "complexSelect") {
+        } else if (arg === "complexSelect") {
           // 为直接添加complexSelect提供支持喵
           next.complexSelect = true
-        } else if (arg == "allowChooseAll") {
+        } else if (arg === "allowChooseAll") {
           next.allowChooseAll = true
-        } else if (arg == "direct") {
+        } else if (arg === "direct") {
           next.direct = true
         } else if (Array.isArray(arg)) {
           next.createDialog = arg
@@ -6706,22 +6802,20 @@ export class Player extends HTMLDivElement {
       }
     }
     next.player = this
-    if (typeof next.forced != "boolean") {
+    if (typeof next.forced !== "boolean") {
       next.forced = false
     }
-    if (next.isMine() == false && next.dialog) {
+    if (next.isMine() === false && next.dialog) {
       next.dialog.style.display = "none"
     }
-    if (next.filterButton == undefined) {
+    if (next.filterButton === undefined) {
       next.filterButton = lib.filter.filterButton
     }
-    if (next.selectButton == undefined) {
+    if (next.selectButton === undefined) {
       next.selectButton = [1, 1]
     }
-    if (next.ai == undefined) {
-      next.ai = function () {
-        return 1
-      }
+    if (next.ai === undefined) {
+      next.ai = () => 1
     }
     if (next.complexSelect !== false) {
       if (next.complexSelect === undefined && next.allowChooseAll === true) {
@@ -6751,24 +6845,40 @@ export class Player extends HTMLDivElement {
    * @returns {GameEvent}
    */
   chooseCardOL(params) {
-    var next = game.createEvent("chooseCardOL")
+    const next = game.createEvent("chooseCardOL")
     next._args = []
 
     const args = [...arguments]
-    if (args.length == 1 && get.is.object(params) && get.itemtype(params) == null) {
+    if (
+      args.length === 1 &&
+      params != null &&
+      get.is.object(params) &&
+      get.itemtype(params) == null
+    ) {
       next.list = params.list
-      next._args = params.args
+      if (params.args) {
+        next._args = params.args
+        next._args.add("glow_result")
+      } else {
+        /** @type {import("./Player/type.d").EventChooseCardParams} */
+        const newArgs = { ...params }
+        Reflect.deleteProperty(newArgs, "list")
+        if (newArgs.glow_result == null) {
+          newArgs.glow_result = true
+        }
+        next._args = [newArgs]
+      }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "players") {
+        if (get.itemtype(arg) === "players") {
           next.list = arg.slice(0)
         } else {
           next._args.push(arg)
         }
       }
+      next._args.add("glow_result")
     }
     next.setContent("chooseCardOL")
-    next._args.add("glow_result")
     return next
   }
   /**
@@ -6782,7 +6892,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments]
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -6797,45 +6907,45 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (typeof arg == "number") {
+        if (typeof arg === "number") {
           next.selectCard = [arg, arg]
-        } else if (get.itemtype(arg) == "select") {
+        } else if (get.itemtype(arg) === "select") {
           next.selectCard = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.forced = arg
-        } else if (get.itemtype(arg) == "position") {
+        } else if (get.itemtype(arg) === "position") {
           next.position = arg
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           if (next.filterCard) {
             next.ai = arg
           } else {
             next.filterCard = arg
           }
-        } else if (typeof arg == "object" && arg) {
+        } else if (typeof arg === "object" && arg) {
           next.filterCard = get.filter(arg)
-        } else if (arg == "glow_result") {
+        } else if (arg === "glow_result") {
           next.glow_result = true
-        } else if (arg == "allowChooseAll") {
+        } else if (arg === "allowChooseAll") {
           next.allowChooseAll = true
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           get.evtprompt(next, arg)
         }
       }
     }
-    if (next.filterCard == undefined) {
+    if (next.filterCard === undefined) {
       next.filterCard = lib.filter.all
     }
-    if (next.selectCard == undefined) {
+    if (next.selectCard === undefined) {
       next.selectCard = [1, 1]
     }
-    if (next.ai == undefined) {
+    if (next.ai === undefined) {
       next.ai = get.unuseful3
     }
     next.autochoose = function () {
       if (!this.forced) {
         return false
       }
-      if (typeof this.selectCard == "function") {
+      if (typeof this.selectCard === "function") {
         return false
       }
       if (this.complexCard || this.complexSelect || this.filterOk) {
@@ -6848,7 +6958,9 @@ export class Player extends HTMLDivElement {
       if (cards.some((card) => !this.filterCard(card, this.player, this))) {
         return false
       }
-      return get.select(this.selectCard)[0] >= this.player.countCards(this.position)
+      return (
+        get.select(this.selectCard)[0] >= this.player.countCards(this.position)
+      )
     }
     next.setContent("chooseCard")
     next._args = args
@@ -6880,32 +6992,32 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "cards") {
+        if (get.itemtype(arg) === "cards") {
           next.cards = arg.slice(0)
-        } else if (get.itemtype(arg) == "card") {
+        } else if (get.itemtype(arg) === "card") {
           next.card = arg
-        } else if (get.itemtype(arg) == "players") {
+        } else if (get.itemtype(arg) === "players") {
           next.targets = arg
-        } else if (get.itemtype(arg) == "player") {
+        } else if (get.itemtype(arg) === "player") {
           next.targets = [arg]
-        } else if (get.itemtype(arg) == "select") {
+        } else if (get.itemtype(arg) === "select") {
           next.selectTarget = arg
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.selectTarget = [arg, arg]
         } else if (get.is.object(arg) && arg.name) {
           next.card = arg
-        } else if (typeof arg == "string") {
-          if (arg == "nopopup") {
+        } else if (typeof arg === "string") {
+          if (arg === "nopopup") {
             next.nopopup = true
-          } else if (arg == "noanimate") {
+          } else if (arg === "noanimate") {
             next.animate = false
-          } else if (arg == "nothrow") {
+          } else if (arg === "nothrow") {
             next.throw = false
-          } else if (arg == "nodistance") {
+          } else if (arg === "nodistance") {
             next.nodistance = true
-          } else if (arg == "noTargetDelay") {
+          } else if (arg === "noTargetDelay") {
             next.noTargetDelay = true
-          } else if (arg == "nodelayx") {
+          } else if (arg === "nodelayx") {
             next.nodelayx = true
           } else if (lib.card[arg] && !next.card) {
             next.card = { name: arg, isCard: true }
@@ -6922,13 +7034,13 @@ export class Player extends HTMLDivElement {
     if (!next.targets) {
       next.targets = game.players.slice(0)
     }
-    if (next.cards == undefined) {
-      if (get.itemtype(next.card) == "card") {
+    if (next.cards === undefined) {
+      if (get.itemtype(next.card) === "card") {
         next.cards = [next.card]
       } else {
         next.cards = []
       }
-    } else if (next.card == undefined) {
+    } else if (next.card === undefined) {
       if (next.cards) {
         next.card = next.cards[0]
       }
@@ -6959,7 +7071,10 @@ export class Player extends HTMLDivElement {
       if (params.dialog != null) {
         next.prompt = false
       }
-      if (params.selectTarget != null && typeof params.selectTarget == "number") {
+      if (
+        params.selectTarget != null &&
+        typeof params.selectTarget === "number"
+      ) {
         next.selectTarget = [params.selectTarget, params.selectTarget]
       }
       if (params.prompt != null) {
@@ -6968,33 +7083,33 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (typeof arg == "number") {
+        if (typeof arg === "number") {
           next.selectTarget = [arg, arg]
-        } else if (get.itemtype(arg) == "select") {
+        } else if (get.itemtype(arg) === "select") {
           next.selectTarget = arg
-        } else if (get.itemtype(arg) == "dialog") {
+        } else if (get.itemtype(arg) === "dialog") {
           next.dialog = arg
           next.prompt = false
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.forced = arg
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           if (next.filterTarget) {
             next.ai = arg
           } else {
             next.filterTarget = arg
           }
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           get.evtprompt(next, arg)
         }
       }
     }
-    if (next.filterTarget == undefined) {
+    if (next.filterTarget === undefined) {
       next.filterTarget = lib.filter.all
     }
-    if (next.selectTarget == undefined) {
+    if (next.selectTarget === undefined) {
       next.selectTarget = [1, 1]
     }
-    if (next.ai == undefined) {
+    if (next.ai === undefined) {
       next.ai = get.attitude2
     }
     next.setContent("chooseTarget")
@@ -7011,28 +7126,28 @@ export class Player extends HTMLDivElement {
     next.player = this
 
     Object.assign(next, params)
-    if (typeof next.filterCard == "object") {
+    if (typeof next.filterCard === "object") {
       next.filterCard = get.filter(next.filterCard)
     }
-    if (typeof next.filterTarget == "object") {
+    if (typeof next.filterTarget === "object") {
       next.filterTarget = get.filter(next.filterTarget, 2)
     }
-    if (next.filterCard == undefined || next.filterCard === true) {
+    if (next.filterCard === undefined || next.filterCard === true) {
       next.filterCard = lib.filter.all
     }
-    if (next.selectCard == undefined) {
+    if (next.selectCard === undefined) {
       next.selectCard = 1
     }
-    if (next.filterTarget == undefined || next.filterTarget === true) {
+    if (next.filterTarget === undefined || next.filterTarget === true) {
       next.filterTarget = lib.filter.all
     }
-    if (next.selectTarget == undefined) {
+    if (next.selectTarget === undefined) {
       next.selectTarget = 1
     }
-    if (next.ai1 == undefined) {
+    if (next.ai1 === undefined) {
       next.ai1 = get.unuseful2
     }
-    if (next.ai2 == undefined) {
+    if (next.ai2 === undefined) {
       next.ai2 = get.attitude2
     }
     next.setContent("chooseCardTarget")
@@ -7047,33 +7162,31 @@ export class Player extends HTMLDivElement {
     const next = game.createEvent("chooseButtonTarget")
     next.player = this
     Object.assign(next, params)
-    if (typeof next.filterButton == "object") {
+    if (typeof next.filterButton === "object") {
       next.filterButton = get.filter(next.filterButton)
     }
-    if (typeof next.filterTarget == "object") {
+    if (typeof next.filterTarget === "object") {
       next.filterTarget = get.filter(next.filterTarget, 2)
     }
-    if (next.filterButton == undefined || next.filterButton === true) {
+    if (next.filterButton === undefined || next.filterButton === true) {
       next.filterButton = lib.filter.filterButton
     }
-    if (next.selectButton == undefined) {
+    if (next.selectButton === undefined) {
       next.selectButton = 1
     }
-    if (next.filterTarget == undefined || next.filterTarget === true) {
+    if (next.filterTarget === undefined || next.filterTarget === true) {
       next.filterTarget = lib.filter.all
     }
-    if (next.selectTarget == undefined) {
+    if (next.selectTarget === undefined) {
       next.selectTarget = 1
     }
-    if (next.ai1 == undefined) {
-      next.ai1 = function () {
-        return 1
-      }
+    if (next.ai1 === undefined) {
+      next.ai1 = () => 1
     }
-    if (next.ai2 == undefined) {
+    if (next.ai2 === undefined) {
       next.ai2 = get.attitude2
     }
-    if (next.canHidden == undefined) {
+    if (next.canHidden === undefined) {
       next.canHidden = true
     }
     next.setContent("chooseButtonTarget")
@@ -7100,12 +7213,12 @@ export class Player extends HTMLDivElement {
     }
 
     let list = []
-    let prompt = undefined
+    let prompt
     let forced = false
     let func = null
     const args = [...arguments]
     for (const arg of args) {
-      if (typeof arg == "string") {
+      if (typeof arg === "string") {
         if (!prompt) {
           prompt = arg
         } else {
@@ -7115,7 +7228,7 @@ export class Player extends HTMLDivElement {
         list = arg
       } else if (arg === true) {
         forced = true
-      } else if (typeof arg == "function") {
+      } else if (typeof arg === "function") {
         func = arg
       }
     }
@@ -7138,7 +7251,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments]
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -7146,27 +7259,27 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (typeof arg == "string") {
-          if (arg == "dialogcontrol") {
+        if (typeof arg === "string") {
+          if (arg === "dialogcontrol") {
             next.dialogcontrol = true
-          } else if (arg == "seperate") {
+          } else if (arg === "seperate") {
             next.seperate = true
           } else {
             next.controls.push(arg)
           }
         } else if (Array.isArray(arg)) {
           next.controls = next.controls.concat(arg)
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           next.ai = arg
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.choice = arg
-        } else if (get.itemtype(arg) == "dialog") {
+        } else if (get.itemtype(arg) === "dialog") {
           next.dialog = arg
         }
       }
     }
     next.player = this
-    if (next.choice == undefined) {
+    if (next.choice === undefined) {
       next.choice = 0
     }
     next.setContent("chooseControl")
@@ -7195,18 +7308,18 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (typeof arg == "boolean") {
+        if (typeof arg === "boolean") {
           next.choice = arg
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           next.ai = arg
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           get.evtprompt(next, arg)
-        } else if (get.itemtype(arg) == "dialog") {
+        } else if (get.itemtype(arg) === "dialog") {
           next.dialog = arg
         }
       }
     }
-    if (next.choice == undefined) {
+    if (next.choice === undefined) {
       next.choice = true
     }
     next.player = this
@@ -7225,7 +7338,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments]
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -7233,30 +7346,30 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (typeof arg == "number") {
-          if (typeof next.num1 == "number") {
+        if (typeof arg === "number") {
+          if (typeof next.num1 === "number") {
             next.num2 = arg
           } else {
             next.num1 = arg
           }
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.forced = arg
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           next.prompt = arg
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           next.ai = arg
-        } else if (get.itemtype(arg) == "player") {
+        } else if (get.itemtype(arg) === "player") {
           next.target = arg
         }
       }
     }
-    if (typeof next.num1 != "number") {
+    if (typeof next.num1 !== "number") {
       next.num1 = 1
     }
-    if (typeof next.num2 != "number") {
+    if (typeof next.num2 !== "number") {
       next.num2 = 1
     }
-    if (next.target == undefined) {
+    if (next.target === undefined) {
       next.target = this
     }
     next.setContent("chooseDrawRecover")
@@ -7286,15 +7399,15 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (typeof arg == "string") {
+        if (typeof arg === "string") {
           get.evtprompt(next, arg)
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.optionSum = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.forced = arg
-        } else if (typeof arg == "object" && Array.isArray(arg)) {
+        } else if (typeof arg === "object" && Array.isArray(arg)) {
           next.list.push(...arg)
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           if (!next.processAI) {
             next.processAI = arg
           } else {
@@ -7310,7 +7423,9 @@ export class Player extends HTMLDivElement {
     if (!next.filterSelect) {
       if (next.optionSum) {
         next.filterSelect = (num, index, event) =>
-          num + event.numbers.reduce((sum, num) => sum + num, 0) - (event.numbers[index] || 0) <=
+          num +
+            event.numbers.reduce((sum, num) => sum + num, 0) -
+            (event.numbers[index] || 0) <=
           event.optionSum
       } else {
         next.filterSelect = () => true
@@ -7356,54 +7471,52 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.target = arg
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.selectButton = [arg, arg]
-        } else if (get.itemtype(arg) == "select") {
+        } else if (get.itemtype(arg) === "select") {
           next.selectButton = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           if (!next.forced) {
             next.forced = arg
           } else {
             next.complexSelect = arg
           }
-        } else if (get.itemtype(arg) == "position") {
+        } else if (get.itemtype(arg) === "position") {
           next.position = arg
-        } else if (arg == "visible") {
+        } else if (arg === "visible") {
           next.visible = true
-        } else if (arg == "complexSelect") {
+        } else if (arg === "complexSelect") {
           // 为直接添加complexSelect提供支持喵
           next.complexSelect = true
-        } else if (arg == "allowChooseAll") {
+        } else if (arg === "allowChooseAll") {
           next.allowChooseAll = true
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           if (next.ai) {
             next.filterButton = arg
           } else {
             next.ai = arg
           }
-        } else if (typeof arg == "object" && arg) {
+        } else if (typeof arg === "object" && arg) {
           var filter = get.filter(arg)
-          next.filterButton = function (button) {
-            return filter(button.link)
-          }
-        } else if (typeof arg == "string") {
+          next.filterButton = (button) => filter(button.link)
+        } else if (typeof arg === "string") {
           next.prompt = arg
         }
       }
     }
-    if (next.filterButton == undefined) {
+    if (next.filterButton === undefined) {
       next.filterButton = lib.filter.all
     }
-    if (next.position == undefined) {
+    if (next.position === undefined) {
       next.position = "he"
     }
-    if (next.selectButton == undefined) {
+    if (next.selectButton === undefined) {
       next.selectButton = [1, 1]
     }
-    if (next.ai == undefined) {
-      next.ai = function (button) {
+    if (next.ai === undefined) {
+      next.ai = (button) => {
         var val = get.buttonValue(button)
         if (get.attitude(_status.event.player, get.owner(button.link)) > 0) {
           return -val
@@ -7447,54 +7560,52 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.target = arg
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.selectButton = [arg, arg]
-        } else if (get.itemtype(arg) == "select") {
+        } else if (get.itemtype(arg) === "select") {
           next.selectButton = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           if (!next.forced) {
             next.forced = arg
           } else {
             next.complexSelect = arg
           }
-        } else if (get.itemtype(arg) == "position") {
+        } else if (get.itemtype(arg) === "position") {
           next.position = arg
-        } else if (arg == "visible") {
+        } else if (arg === "visible") {
           next.visible = true
-        } else if (arg == "complexSelect") {
+        } else if (arg === "complexSelect") {
           // 为直接添加complexSelect提供支持喵
           next.complexSelect = true
-        } else if (arg == "allowChooseAll") {
+        } else if (arg === "allowChooseAll") {
           next.allowChooseAll = true
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           if (next.ai) {
             next.filterButton = arg
           } else {
             next.ai = arg
           }
-        } else if (typeof arg == "object" && arg) {
+        } else if (typeof arg === "object" && arg) {
           var filter = get.filter(arg)
-          next.filterButton = function (button) {
-            return filter(button.link)
-          }
-        } else if (typeof arg == "string") {
+          next.filterButton = (button) => filter(button.link)
+        } else if (typeof arg === "string") {
           next.prompt = arg
         }
       }
     }
-    if (next.filterButton == undefined) {
+    if (next.filterButton === undefined) {
       next.filterButton = lib.filter.all
     }
-    if (next.position == undefined) {
+    if (next.position === undefined) {
       next.position = "he"
     }
-    if (next.selectButton == undefined) {
+    if (next.selectButton === undefined) {
       next.selectButton = [1, 1]
     }
-    if (next.ai == undefined) {
-      next.ai = function (button) {
+    if (next.ai === undefined) {
+      next.ai = (button) => {
         var val = get.buttonValue(button)
         if (get.attitude(_status.event.player, get.owner(button.link)) > 0) {
           return -val
@@ -7538,56 +7649,54 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.target = arg
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.selectButton = [arg, arg]
-        } else if (get.itemtype(arg) == "select") {
+        } else if (get.itemtype(arg) === "select") {
           next.selectButton = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           if (!next.forced) {
             next.forced = arg
           } else {
             next.complexSelect = arg
           }
-        } else if (get.itemtype(arg) == "position") {
+        } else if (get.itemtype(arg) === "position") {
           next.position = arg
-        } else if (arg == "visible") {
+        } else if (arg === "visible") {
           next.visible = true
-        } else if (arg == "visibleMove") {
+        } else if (arg === "visibleMove") {
           next.visibleMove = true
-        } else if (arg == "complexSelect") {
+        } else if (arg === "complexSelect") {
           // 为直接添加complexSelect提供支持喵
           next.complexSelect = true
-        } else if (arg == "allowChooseAll") {
+        } else if (arg === "allowChooseAll") {
           next.allowChooseAll = true
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           if (next.ai) {
             next.filterButton = arg
           } else {
             next.ai = arg
           }
-        } else if (typeof arg == "object" && arg) {
+        } else if (typeof arg === "object" && arg) {
           var filter = get.filter(arg)
-          next.filterButton = function (button) {
-            return filter(button.link)
-          }
-        } else if (typeof arg == "string") {
+          next.filterButton = (button) => filter(button.link)
+        } else if (typeof arg === "string") {
           next.prompt = arg
         }
       }
     }
-    if (next.filterButton == undefined) {
+    if (next.filterButton === undefined) {
       next.filterButton = lib.filter.all
     }
-    if (next.position == undefined) {
+    if (next.position === undefined) {
       next.position = "he"
     }
-    if (next.selectButton == undefined) {
+    if (next.selectButton === undefined) {
       next.selectButton = [1, 1]
     }
-    if (next.ai == undefined) {
-      next.ai = function (button) {
+    if (next.ai === undefined) {
+      next.ai = (button) => {
         var val = get.buttonValue(button)
         if (get.attitude(_status.event.player, get.owner(button.link)) > 0) {
           return -val
@@ -7617,7 +7726,7 @@ export class Player extends HTMLDivElement {
     const cards = this.getCards("h")
 
     if (typeof str !== "string") {
-      str = get.translation(this) + "的手牌"
+      str = `${get.translation(this)}的手牌`
     }
     const next = this.showCards(cards, str)
     return next
@@ -7634,16 +7743,16 @@ export class Player extends HTMLDivElement {
     const next = game.createEvent("showCards")
     next.player = this
     next.str = str
-    if (typeof cards == "string") {
+    if (typeof cards === "string") {
       str = cards
       cards = next.str
       next.str = str
     }
-    if (get.itemtype(cards) == "card") {
-      // @ts-ignore
+    if (get.itemtype(cards) === "card") {
+      // @ts-expect-error
       next.cards = [cards]
-    } else if (get.itemtype(cards) == "cards") {
-      // @ts-ignore
+    } else if (get.itemtype(cards) === "cards") {
+      // @ts-expect-error
       next.cards = cards.slice(0)
     } else {
       _status.event.next.remove(next)
@@ -7656,10 +7765,9 @@ export class Player extends HTMLDivElement {
       next.isFlash = false
     }
     next.getShown = function (player) {
-      const event = this
-      if (get.itemtype(player) != "player") {
+      if (get.itemtype(player) !== "player") {
         return (
-          event.show_map?.get?.("others") || {
+          this.show_map?.get?.("others") || {
             cardPile: [],
             discardPile: [],
             ordering: [],
@@ -7669,7 +7777,7 @@ export class Player extends HTMLDivElement {
         )
       }
       return (
-        event.show_map?.get?.(player) || {
+        this.show_map?.get?.(player) || {
           hs: [],
           es: [],
           js: [],
@@ -7710,27 +7818,26 @@ export class Player extends HTMLDivElement {
   }
   //TODO: 给canMoveCard函数适配虚拟牌的移动
   canMoveCard(withatt, nojudge) {
-    const player = this
     const args = Array.from(arguments).slice(2)
     let sourceTargets, aimTargets, filterCard, canReplace
     args.forEach((arg) => {
-      if (get.itemtype(arg) == "players") {
+      if (get.itemtype(arg) === "players") {
         if (!sourceTargets) {
           sourceTargets = arg
         } else if (!aimTargets) {
           aimTargets = arg
         }
-      } else if (get.itemtype(arg) == "player") {
+      } else if (get.itemtype(arg) === "player") {
         if (!sourceTargets) {
           sourceTargets = [arg]
         } else if (!aimTargets) {
           aimTargets = [arg]
         }
-      } else if (typeof arg == "function") {
+      } else if (typeof arg === "function") {
         filterCard = arg
-      } else if (typeof arg == "object" && arg) {
+      } else if (typeof arg === "object" && arg) {
         filterCard = get.filter(arg)
-      } else if (arg == "canReplace") {
+      } else if (arg === "canReplace") {
         canReplace = true
       }
     })
@@ -7741,28 +7848,34 @@ export class Player extends HTMLDivElement {
       aimTargets = game.filterPlayer()
     }
     return sourceTargets.some((current) => {
-      const att = get.sgn(get.attitude(player, current))
-      if (!withatt || att != 0) {
+      const att = get.sgn(get.attitude(this, current))
+      if (!withatt || att !== 0) {
         var es = current.getVCards("e", filterCard)
         for (var i = 0; i < es.length; i++) {
           if (
             aimTargets.some((current2) => {
               if (withatt) {
-                if (get.sgn(get.value(es[i], current)) != -att) {
+                if (get.sgn(get.value(es[i], current)) !== -att) {
                   return false
                 }
-                var att2 = get.sgn(get.attitude(player, current2))
-                if (!canReplace || (att < 0 && current2.countEquipableSlot(get.subtype(es[i])))) {
+                var att2 = get.sgn(get.attitude(this, current2))
+                if (
+                  !canReplace ||
+                  (att < 0 && current2.countEquipableSlot(get.subtype(es[i])))
+                ) {
                   if (
-                    att == att2 ||
-                    att2 != get.sgn(get.effect(current2, es[i], player, current2))
+                    att === att2 ||
+                    att2 !==
+                      get.sgn(get.effect(current2, es[i], this, current2))
                   ) {
                     return false
                   }
                 }
               }
               return (
-                current != current2 && !current2.isMin() && current2.canEquip(es[i], canReplace)
+                current !== current2 &&
+                !current2.isMin() &&
+                current2.canEquip(es[i], canReplace)
               )
             })
           ) {
@@ -7774,17 +7887,17 @@ export class Player extends HTMLDivElement {
         var js = current.getVCards("j", filterCard)
         for (var i = 0; i < js.length; i++) {
           if (
-            game.hasPlayer(function (current2) {
+            game.hasPlayer((current2) => {
               if (!aimTargets.includes(current2)) {
                 return false
               }
               if (withatt) {
-                var att2 = get.attitude(player, current2)
+                var att2 = get.attitude(this, current2)
                 if (att2 >= 0) {
                   return false
                 }
               }
-              return current != current2 && current2.canAddJudge(js[i])
+              return current !== current2 && current2.canAddJudge(js[i])
             })
           ) {
             return true
@@ -7817,38 +7930,38 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (typeof arg == "boolean") {
+        if (typeof arg === "boolean") {
           next.forced = arg
-        } else if (get.itemtype(arg) == "players") {
+        } else if (get.itemtype(arg) === "players") {
           if (!next.sourceTargets) {
             next.sourceTargets = arg
           } else if (!next.aimTargets) {
             next.aimTargets = arg
           }
-        } else if (get.itemtype(arg) == "player") {
+        } else if (get.itemtype(arg) === "player") {
           if (!next.sourceTargets) {
             next.sourceTargets = [arg]
           } else if (!next.aimTargets) {
             next.aimTargets = [arg]
           }
-        } else if (typeof arg == "string") {
-          if (arg == "canReplace") {
+        } else if (typeof arg === "string") {
+          if (arg === "canReplace") {
             next.canReplace = true
           } else {
             get.evtprompt(next, arg)
           }
         } else if (Array.isArray(arg)) {
           for (var j = 0; j < arg.length; j++) {
-            if (typeof arg[j] != "string") {
+            if (typeof arg[j] !== "string") {
               break
             }
           }
-          if (j == arg.length) {
+          if (j === arg.length) {
             next.targetprompt = arg
           }
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           next.filter = arg
-        } else if (typeof arg == "object" && arg) {
+        } else if (typeof arg === "object" && arg) {
           next.filter = get.filter(arg)
         }
       }
@@ -7859,7 +7972,7 @@ export class Player extends HTMLDivElement {
     if (!next.aimTargets) {
       next.aimTargets = game.filterPlayer()
     }
-    if (next.filter == undefined) {
+    if (next.filter === undefined) {
       next.filter = lib.filter.all
     }
     next.setContent("moveCard")
@@ -7884,7 +7997,7 @@ export class Player extends HTMLDivElement {
       // }
     }
     if (event.logSkill) {
-      if (typeof event.logSkill == "string") {
+      if (typeof event.logSkill === "string") {
         this.logSkill(event.logSkill)
       } else if (Array.isArray(event.logSkill)) {
         this.logSkill.call(this, ...event.logSkill)
@@ -7892,7 +8005,12 @@ export class Player extends HTMLDivElement {
     }
     if (result.card || !result.skill) {
       result.used = result.card || result.cards[0]
-      const next = this.useCard(result.used, result.cards, result.targets, result.skill)
+      const next = this.useCard(
+        result.used,
+        result.cards,
+        result.targets,
+        result.skill,
+      )
       next.oncard = event.oncard
       next.respondTo = event.respondTo
       if (event.addCount === false) {
@@ -7904,7 +8022,8 @@ export class Player extends HTMLDivElement {
         }
       }
       return next
-    } else if (result.skill) {
+    }
+    if (result.skill) {
       result.used = result.skill
       const next = this.useSkill(result.skill, result.cards, result.targets)
       if (event.addSkillCount === false) {
@@ -7926,7 +8045,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments]
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -7934,36 +8053,36 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "cards") {
+        if (get.itemtype(arg) === "cards") {
           next.cards = arg.slice(0)
-        } else if (get.itemtype(arg) == "players") {
+        } else if (get.itemtype(arg) === "players") {
           next.targets = arg
-        } else if (get.itemtype(arg) == "player") {
+        } else if (get.itemtype(arg) === "player") {
           next.targets = [arg]
-        } else if (get.itemtype(arg) == "card") {
+        } else if (get.itemtype(arg) === "card") {
           next.card = arg
-        } else if (typeof arg == "object" && arg && arg.name) {
+        } else if (typeof arg === "object" && arg && arg.name) {
           next.card = arg
-        } else if (typeof arg == "string") {
-          if (arg == "noai") {
+        } else if (typeof arg === "string") {
+          if (arg === "noai") {
             next.noai = true
-          } else if (arg == "nowuxie") {
+          } else if (arg === "nowuxie") {
             next.nowuxie = true
           } else {
             next.skill = arg
           }
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.addCount = arg
         }
       }
     }
-    if (next.cards == undefined) {
-      if (get.itemtype(next.card) == "card") {
+    if (next.cards === undefined) {
+      if (get.itemtype(next.card) === "card") {
         next.cards = [next.card]
       } else {
         next.cards = []
       }
-    } else if (next.card == undefined) {
+    } else if (next.card === undefined) {
       if (next.cards) {
         next.card = next.cards[0]
       }
@@ -7978,7 +8097,11 @@ export class Player extends HTMLDivElement {
       cardnumber: null,
     }
     const keys = Object.keys(next.modSkill).flat()
-    if (event.name == "chooseToUse" && !next.skill && get.itemtype(card) == "card") {
+    if (
+      event.name === "chooseToUse" &&
+      !next.skill &&
+      get.itemtype(card) === "card"
+    ) {
       let skills = []
       if (typeof this.getModableSkills === "function") {
         skills = this.getModableSkills()
@@ -7987,25 +8110,33 @@ export class Player extends HTMLDivElement {
         game.expandSkills(skills)
         skills = skills.filter((i) => {
           const info = get.info(i)
-          return info && info.mod
+          return info?.mod
         })
         skills.sort((a, b) => get.priority(a) - get.priority(b))
       }
       for (const key of keys) {
         let preResult = "unchanged"
         for (const skill of skills) {
-          const mod = get.info(skill).mod[key == "cardsuit" ? "suit" : key]
+          const mod = get.info(skill).mod[key === "cardsuit" ? "suit" : key]
           if (mod) {
-            let arg = [card, this, get[key.slice(4)](card, false), preResult]
+            const arg = [card, this, get[key.slice(4)](card, false), preResult]
             let result = mod.call(game, ...arg)
-            if (key == "cardsuit") {
+            if (key === "cardsuit") {
               const mod2 = get.info(skill).mod[key]
               if (mod2) {
-                let arg2 = [card, this, get[key.slice(4)](card, false), result]
+                const arg2 = [
+                  card,
+                  this,
+                  get[key.slice(4)](card, false),
+                  result,
+                ]
                 result = mod2.call(game, ...arg2)
               }
             }
-            if (result !== undefined && typeof arg[arg.length - 1] !== "object") {
+            if (
+              result !== undefined &&
+              typeof arg[arg.length - 1] !== "object"
+            ) {
               arg[arg.length - 1] = result
             }
             if (arg[arg.length - 1] !== preResult) {
@@ -8036,7 +8167,10 @@ export class Player extends HTMLDivElement {
       }
     }
     for (var i = 0; i < next.targets.length; i++) {
-      if (get.attitude(this, next.targets[i]) >= -1 && get.attitude(this, next.targets[i]) < 0) {
+      if (
+        get.attitude(this, next.targets[i]) >= -1 &&
+        get.attitude(this, next.targets[i]) < 0
+      ) {
         if (!this.ai.tempIgnore) {
           this.ai.tempIgnore = []
         }
@@ -8044,7 +8178,7 @@ export class Player extends HTMLDivElement {
       }
     }
     if (
-      typeof this.logAi == "function" &&
+      typeof this.logAi === "function" &&
       !next.noai &&
       !get.info(next.card).noai &&
       !this.hasSkillTag(
@@ -8058,7 +8192,7 @@ export class Player extends HTMLDivElement {
       )
     ) {
       var postAi = get.info(next.card).postAi
-      if (postAi && postAi(next.targets)) {
+      if (postAi?.(next.targets)) {
         next.postAi = true
       } else {
         this.logAi(next.targets, next.card)
@@ -8081,7 +8215,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments]
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -8089,35 +8223,38 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "cards") {
+        if (get.itemtype(arg) === "cards") {
           next.cards = arg.slice(0)
-        } else if (get.itemtype(arg) == "players") {
+        } else if (get.itemtype(arg) === "players") {
           next.targets = arg
-        } else if (get.itemtype(arg) == "card") {
+        } else if (get.itemtype(arg) === "card") {
           next.card = arg
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           next.skill = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.addCount = arg
         }
       }
     }
-    if (next.cards == undefined) {
+    if (next.cards === undefined) {
       next.cards = []
     }
-    if (next.skill && get.info(next.skill) && get.info(next.skill).changeTarget) {
+    if (next.skill && get.info(next.skill)?.changeTarget) {
       get.info(next.skill).changeTarget(next.player, next.targets)
     }
     if (next.targets) {
       for (var i = 0; i < next.targets.length; i++) {
-        if (get.attitude(this, next.targets[i]) >= -1 && get.attitude(this, next.targets[i]) < 0) {
+        if (
+          get.attitude(this, next.targets[i]) >= -1 &&
+          get.attitude(this, next.targets[i]) < 0
+        ) {
           if (!this.ai.tempIgnore) {
             this.ai.tempIgnore = []
           }
           this.ai.tempIgnore.add(next.targets[i])
         }
       }
-      if (typeof this.logAi == "function") {
+      if (typeof this.logAi === "function") {
         this.logAi(next.targets, next.skill)
       }
     } else {
@@ -8138,18 +8275,22 @@ export class Player extends HTMLDivElement {
     if (Array.isArray(args)) {
       next = this.draw({ num: num2 })
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.source = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.animate = arg
-        } else if (arg == "nodelay") {
+        } else if (arg === "nodelay") {
           next.animate = false
           next.$draw = true
-        } else if (arg == "visible") {
+        } else if (arg === "visible") {
           next.visible = true
-        } else if (arg == "bottom") {
+        } else if (arg === "bottom") {
           next.bottom = true
-        } else if (typeof arg == "object" && arg && arg.drawDeck != undefined) {
+        } else if (
+          typeof arg === "object" &&
+          arg &&
+          arg.drawDeck !== undefined
+        ) {
           next.drawDeck = arg.drawDeck
         }
       }
@@ -8190,47 +8331,42 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.source = arg
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.num = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.animate = arg
-        } else if (arg == "nodelay") {
+        } else if (arg === "nodelay") {
           next.animate = false
           next.$draw = true
-        } else if (arg == "visible") {
+        } else if (arg === "visible") {
           next.visible = true
-        } else if (arg == "bottom") {
+        } else if (arg === "bottom") {
           next.bottom = true
-        } else if (typeof arg == "object" && arg && arg.drawDeck != undefined) {
+        } else if (
+          typeof arg === "object" &&
+          arg &&
+          arg.drawDeck !== undefined
+        ) {
           next.drawDeck = arg.drawDeck
         }
       }
     }
-    if (typeof next.num != "number") {
+    if (typeof next.num !== "number") {
       next.num = 1
     }
     if (next.num <= 0) {
       _status.event.next.remove(next)
       next.resolve()
     }
-    if (get.itemtype(next.source) != "player") {
+    if (get.itemtype(next.source) !== "player") {
       const source = event.player
       if (source) {
         next.source = source
       }
     }
     next.setContent("draw")
-    if (
-      lib.config.mode == "stone" &&
-      _status.mode == "deck" &&
-      next.drawDeck == undefined &&
-      !next.player.isMin() &&
-      next.num > 1
-    ) {
-      next.drawDeck = 1
-    }
     next.result = []
     next.gaintag ??= []
     return next
@@ -8266,7 +8402,7 @@ export class Player extends HTMLDivElement {
       for (const arg of args) {
         if (typeof arg === "number") {
           num = arg
-        } else if (get.itemtype(arg) == "player") {
+        } else if (get.itemtype(arg) === "player") {
           discarder = arg
         } else if (get.itemtype(arg) === "position") {
           position = arg
@@ -8285,7 +8421,9 @@ export class Player extends HTMLDivElement {
       cards = discardable.randomGets(num)
       if (cards.length < num) {
         cards.addArray(
-          this.getCards(position, (c) => !discardable.includes(c)).randomGets(num - cards.length),
+          this.getCards(position, (c) => !discardable.includes(c)).randomGets(
+            num - cards.length,
+          ),
         )
       }
     }
@@ -8321,13 +8459,13 @@ export class Player extends HTMLDivElement {
       line = params.line ?? line
     } else {
       for (const arg of args) {
-        if (typeof arg == "number") {
+        if (typeof arg === "number") {
           num = arg
-        } else if (get.itemtype(arg) == "position") {
+        } else if (get.itemtype(arg) === "position") {
           position = arg
-        } else if (get.itemtype(arg) == "player") {
+        } else if (get.itemtype(arg) === "player") {
           target = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           line = arg
         }
       }
@@ -8474,15 +8612,15 @@ export class Player extends HTMLDivElement {
       game.expandSkills(skills)
       skills = skills.filter((i) => {
         const info = get.info(i)
-        return info && info.mod
+        return info?.mod
       })
       skills.sort((a, b) => get.priority(a) - get.priority(b))
     }
-    for (let skill of skills) {
+    for (const skill of skills) {
       let mod = get.info(skill).mod.canBeDiscarded
       if (mod) {
         for (let i = 0; i < next.cards.length; i++) {
-          let arg = [next.cards[i], next.discarder, this, event, "unchanged"],
+          const arg = [next.cards[i], next.discarder, this, event, "unchanged"],
             result = mod.call(game, ...arg)
           if (result !== undefined && typeof arg[arg.length - 1] !== "object") {
             arg[arg.length - 1] = result
@@ -8496,7 +8634,7 @@ export class Player extends HTMLDivElement {
       mod = get.info(skill).mod.cardDiscardable
       if (mod) {
         for (let i = 0; i < next.cards.length; i++) {
-          let arg = [next.cards[i], this, event, "unchanged"],
+          const arg = [next.cards[i], this, event, "unchanged"],
             result = mod.call(game, ...arg)
           if (result !== undefined && typeof arg[arg.length - 1] !== "object") {
             arg[arg.length - 1] = result
@@ -8510,7 +8648,7 @@ export class Player extends HTMLDivElement {
     }
     next.setContent(async (event, trigger, player) => {
       if (event.skills.length && event.log) {
-        for (let i of event.skills) {
+        for (const i of event.skills) {
           if (typeof player[event.log] === "function") {
             player[event.log](i)
           }
@@ -8557,26 +8695,26 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.source = arg
-        } else if (get.itemtype(arg) == "cards") {
+        } else if (get.itemtype(arg) === "cards") {
           next.cards = arg.slice(0)
-        } else if (get.itemtype(arg) == "card") {
+        } else if (get.itemtype(arg) === "card") {
           next.cards = [arg]
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.animate = arg
         } else if (["div", "fragment"].includes(get.objtype(arg))) {
           next.position = arg
-        } else if (arg == "notBySelf") {
+        } else if (arg === "notBySelf") {
           next.notBySelf = true
-        } else if (arg == "insert") {
+        } else if (arg === "insert") {
           next.insert_card = true
-        } else if (arg == "blank") {
+        } else if (arg === "blank") {
           next.blank = true
         }
       }
     }
-    if (next.cards == undefined) {
+    if (next.cards === undefined) {
       _status.event.next.remove(next)
       next.resolve()
     }
@@ -8595,7 +8733,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments]
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -8603,32 +8741,32 @@ export class Player extends HTMLDivElement {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "cards") {
+        if (get.itemtype(arg) === "cards") {
           next.cards = arg.slice(0)
-        } else if (get.itemtype(arg) == "card") {
+        } else if (get.itemtype(arg) === "card") {
           next.card = arg
-        } else if (get.itemtype(arg) == "player") {
+        } else if (get.itemtype(arg) === "player") {
           next.source = arg
-        } else if (typeof arg == "object" && arg && arg.name) {
+        } else if (typeof arg === "object" && arg && arg.name) {
           next.card = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.animate = arg
-        } else if (arg == "highlight") {
+        } else if (arg === "highlight") {
           next.highlight = true
-        } else if (arg == "noOrdering") {
+        } else if (arg === "noOrdering") {
           next.noOrdering = true
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           next.skill = arg
         }
       }
     }
-    if (next.cards == undefined) {
-      if (get.itemtype(next.card) == "card") {
+    if (next.cards === undefined) {
+      if (get.itemtype(next.card) === "card") {
         next.cards = [next.card]
       } else {
         next.cards = []
       }
-    } else if (next.card == undefined) {
+    } else if (next.card === undefined) {
       if (next.cards) {
         next.card = next.cards[0]
       }
@@ -8643,7 +8781,11 @@ export class Player extends HTMLDivElement {
       cardnumber: null,
     }
     const keys = Object.keys(next.modSkill).flat()
-    if (event.name == "chooseToRespond" && !next.skill && get.itemtype(card) == "card") {
+    if (
+      event.name === "chooseToRespond" &&
+      !next.skill &&
+      get.itemtype(card) === "card"
+    ) {
       let skills = []
       if (typeof this.getModableSkills === "function") {
         skills = this.getModableSkills()
@@ -8652,25 +8794,33 @@ export class Player extends HTMLDivElement {
         game.expandSkills(skills)
         skills = skills.filter((i) => {
           const info = get.info(i)
-          return info && info.mod
+          return info?.mod
         })
         skills.sort((a, b) => get.priority(a) - get.priority(b))
       }
       for (const key of keys) {
         let preResult = "unchanged"
         for (const skill of skills) {
-          const mod = get.info(skill).mod[key == "cardsuit" ? "suit" : key]
+          const mod = get.info(skill).mod[key === "cardsuit" ? "suit" : key]
           if (mod) {
-            let arg = [card, this, get[key.slice(4)](card, false), preResult]
+            const arg = [card, this, get[key.slice(4)](card, false), preResult]
             let result = mod.call(game, ...arg)
-            if (key == "cardsuit") {
+            if (key === "cardsuit") {
               const mod2 = get.info(skill).mod[key]
               if (mod2) {
-                let arg2 = [card, this, get[key.slice(4)](card, false), result]
+                const arg2 = [
+                  card,
+                  this,
+                  get[key.slice(4)](card, false),
+                  result,
+                ]
                 result = mod2.call(game, ...arg2)
               }
             }
-            if (result !== undefined && typeof arg[arg.length - 1] !== "object") {
+            if (
+              result !== undefined &&
+              typeof arg[arg.length - 1] !== "object"
+            ) {
               arg[arg.length - 1] = result
             }
             if (arg[arg.length - 1] !== preResult) {
@@ -8712,7 +8862,9 @@ export class Player extends HTMLDivElement {
             return [card, card.cards ?? []]
           }
           return [
-            card.cardSymbol ? card[card.cardSymbol] : get.autoViewAs(card, void 0, false),
+            card.cardSymbol
+              ? card[card.cardSymbol]
+              : get.autoViewAs(card, void 0, false),
             [card],
           ]
         })(),
@@ -8735,11 +8887,14 @@ export class Player extends HTMLDivElement {
         gaintag.forEach((tag) => cards[i].addGaintag(tag))
       }
       var sort = lib.config.sort_card(cards[i])
-      this.node.expansions.insertBefore(cards[i], this.node.expansions.firstChild)
+      this.node.expansions.insertBefore(
+        cards[i],
+        this.node.expansions.firstChild,
+      )
     }
     if (broadcast !== false) {
       game.broadcast(
-        function (player, cards, gaintag, check) {
+        (player, cards, gaintag, check) => {
           player.$addToExpansion(cards, null, gaintag, check)
         },
         this,
@@ -8763,14 +8918,14 @@ export class Player extends HTMLDivElement {
     for (let i = 0; i < cards.length; i++) {
       cards[i].fix()
       if (gaintag) {
-        if (typeof gaintag == "string") {
+        if (typeof gaintag === "string") {
           gaintag = [gaintag]
         }
         //cards[i].addGaintag(gaintag);
         gaintag.forEach((tag) => cards[i].addGaintag(tag))
       }
       const sort = lib.config.sort_card(cards[i])
-      if (this == game.me) {
+      if (this === game.me) {
         cards[i].classList.add("drawinghidden")
       }
       if (get.is.singleHandcard() || sort > 0) {
@@ -8785,7 +8940,7 @@ export class Player extends HTMLDivElement {
       this.node.handcards2.prepend(...cards2)
     }
 
-    if (this == game.me || _status.video) {
+    if (this === game.me || _status.video) {
       ui.updatehl()
     }
     if (!_status.video) {
@@ -8794,7 +8949,7 @@ export class Player extends HTMLDivElement {
     }
     if (broadcast !== false) {
       game.broadcast(
-        function (player, cards) {
+        (player, cards) => {
           player.directgain(cards)
         },
         this,
@@ -8810,7 +8965,7 @@ export class Player extends HTMLDivElement {
         cards.splice(i--, 1)
       }
     }
-    var addLast = function (card, node) {
+    var addLast = (card, node) => {
       if (gaintag) {
         for (var i = 0; i < node.childNodes.length; i++) {
           var add = node.childNodes[node.childNodes.length - i - 1]
@@ -8829,14 +8984,14 @@ export class Player extends HTMLDivElement {
       cards[i].fix()
       cards[i].remove()
       if (gaintag) {
-        if (typeof gaintag == "string") {
+        if (typeof gaintag === "string") {
           gaintag = [gaintag]
         }
         //cards[i].addGaintag(gaintag);
         gaintag.forEach((tag) => cards[i].addGaintag(tag))
       }
       cards[i].classList.add("glows")
-      if (this == game.me) {
+      if (this === game.me) {
         cards[i].classList.add("drawinghidden")
       }
       if (get.is.singleHandcard()) {
@@ -8845,7 +9000,7 @@ export class Player extends HTMLDivElement {
         addLast(cards[i], this.node.handcards2)
       }
     }
-    if (this == game.me || _status.video) {
+    if (this === game.me || _status.video) {
       ui.updatehl()
     }
     if (!_status.video) {
@@ -8857,7 +9012,7 @@ export class Player extends HTMLDivElement {
     }
     if (broadcast !== false) {
       game.broadcast(
-        function (player, cards, gaintag) {
+        (player, cards, gaintag) => {
           player.directgains(cards, null, gaintag)
         },
         this,
@@ -8892,7 +9047,7 @@ export class Player extends HTMLDivElement {
 
     const args = [...arguments]
     if (
-      args.length == 1 &&
+      args.length === 1 &&
       params != null &&
       get.is.object(params) &&
       get.itemtype(params) == null
@@ -8910,32 +9065,34 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.source = arg
-        } else if (get.itemtype(arg) == "cards") {
+        } else if (get.itemtype(arg) === "cards") {
           next.cards = arg.slice(0)
-        } else if (get.itemtype(arg) == "card") {
+        } else if (get.itemtype(arg) === "card") {
           next.cards = [arg]
         } else if (arg === "log") {
           next.log = true
-        } else if (arg == "fromStorage") {
+        } else if (arg === "fromStorage") {
           next.fromStorage = true
         } else if (
-          typeof arg == "string" &&
-          [...lib.commonArea.keys()].some((area) => lib.commonArea.get(area)?.fromName == arg)
+          typeof arg === "string" &&
+          [...lib.commonArea.keys()].some(
+            (area) => lib.commonArea.get(area)?.fromName === arg,
+          )
         ) {
           next.fromStorage = true
           next[arg] = true
-        } else if (arg == "bySelf") {
+        } else if (arg === "bySelf") {
           next.bySelf = true
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           next.animate = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.delay = arg
         }
       }
     }
-    if (next.animate == "gain2" || next.animate == "draw2") {
+    if (next.animate === "gain2" || next.animate === "draw2") {
       if (!("log" in next)) {
         next.log = true
       }
@@ -8951,13 +9108,16 @@ export class Player extends HTMLDivElement {
       if (!key) {
         key = "cards"
       }
-      var cards = [],
-        event = this
-      game.checkGlobalHistory("cardMove", function (evt) {
-        if (evt.name != "lose" || evt.position != position || evt.getParent() != event) {
+      var cards = []
+      game.checkGlobalHistory("cardMove", (evt) => {
+        if (
+          evt.name !== "lose" ||
+          evt.position !== position ||
+          evt.getParent() !== this
+        ) {
           return
         }
-        if (player && player != evt.player) {
+        if (player && player !== evt.player) {
           return
         }
         cards.addArray(evt[key])
@@ -8965,7 +9125,6 @@ export class Player extends HTMLDivElement {
       return cards
     }
     next.getl = function (player) {
-      const that = this
       const map = {
         player: player,
         hs: [],
@@ -8978,8 +9137,8 @@ export class Player extends HTMLDivElement {
         gaintag_map: {},
         vcard_map: new Map(),
       }
-      player.checkAllHistory("lose", function (evt) {
-        if (evt.parent == that) {
+      player.checkAllHistory("lose", (evt) => {
+        if (evt.parent === this) {
           map.hs.addArray(evt.hs)
           map.es.addArray(evt.es)
           map.js.addArray(evt.js)
@@ -8987,7 +9146,7 @@ export class Player extends HTMLDivElement {
           map.xs.addArray(evt.xs)
           map.cards.addArray(evt.cards)
           map.cards2.addArray(evt.cards2)
-          for (let key in evt.gaintag_map) {
+          for (const key in evt.gaintag_map) {
             if (!map.gaintag_map[key]) {
               map.gaintag_map[key] = []
             }
@@ -9001,7 +9160,7 @@ export class Player extends HTMLDivElement {
       return map
     }
     next.getg = function (player) {
-      if (this.getlx === false || player != this.player || !this.cards) {
+      if (this.getlx === false || player !== this.player || !this.cards) {
         return []
       }
       return this.cards.slice(0)
@@ -9039,34 +9198,38 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.source = arg
-        } else if (get.itemtype(arg) == "cards") {
+        } else if (get.itemtype(arg) === "cards") {
           next.cards = arg.slice(0)
-        } else if (get.itemtype(arg) == "card") {
+        } else if (get.itemtype(arg) === "card") {
           next.cards = [arg]
         } else if (arg === "log") {
           next.log = true
-        } else if (arg == "fromStorage") {
+        } else if (arg === "fromStorage") {
           next.fromStorage = true
         } else if (
-          typeof arg == "string" &&
+          typeof arg === "string" &&
           Array.from(lib.commonArea.keys()).some(
-            (area) => lib.commonArea.get(area)?.fromName == arg,
+            (area) => lib.commonArea.get(area)?.fromName === arg,
           )
         ) {
           next.fromStorage = true
           next[arg] = true
-        } else if (arg == "bySelf") {
+        } else if (arg === "bySelf") {
           next.bySelf = true
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           next.animate = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.delay = arg
         }
       }
     }
-    if (next.animate == "gain2" || next.animate == "draw2" || next.animate == "give") {
+    if (
+      next.animate === "gain2" ||
+      next.animate === "draw2" ||
+      next.animate === "give"
+    ) {
       if (!("log" in next)) {
         next.log = true
       }
@@ -9082,13 +9245,16 @@ export class Player extends HTMLDivElement {
       if (!key) {
         key = "cards"
       }
-      var cards = [],
-        event = this
-      game.checkGlobalHistory("cardMove", function (evt) {
-        if (evt.name != "lose" || evt.position != position || evt.getParent() != event) {
+      var cards = []
+      game.checkGlobalHistory("cardMove", (evt) => {
+        if (
+          evt.name !== "lose" ||
+          evt.position !== position ||
+          evt.getParent() !== this
+        ) {
           return
         }
-        if (player && player != evt.player) {
+        if (player && player !== evt.player) {
           return
         }
         cards.addArray(evt[key])
@@ -9096,7 +9262,6 @@ export class Player extends HTMLDivElement {
       return cards
     }
     next.getl = function (player) {
-      const that = this
       const map = {
         player: player,
         hs: [],
@@ -9109,8 +9274,8 @@ export class Player extends HTMLDivElement {
         gaintag_map: {},
         vcard_map: new Map(),
       }
-      player.checkAllHistory("lose", function (evt) {
-        if (evt.parent == that) {
+      player.checkAllHistory("lose", (evt) => {
+        if (evt.parent === this) {
           map.hs.addArray(evt.hs)
           map.es.addArray(evt.es)
           map.js.addArray(evt.js)
@@ -9118,7 +9283,7 @@ export class Player extends HTMLDivElement {
           map.xs.addArray(evt.xs)
           map.cards.addArray(evt.cards)
           map.cards2.addArray(evt.cards2)
-          for (let key in evt.gaintag_map) {
+          for (const key in evt.gaintag_map) {
             if (!map.gaintag_map[key]) {
               map.gaintag_map[key] = []
             }
@@ -9131,9 +9296,7 @@ export class Player extends HTMLDivElement {
       })
       return map
     }
-    next.getg = function (player) {
-      return []
-    }
+    next.getg = (player) => []
     next.gaintag ??= []
     return next
   }
@@ -9180,25 +9343,27 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "player") {
+        if (get.itemtype(arg) === "player") {
           next.source = arg
-        } else if (get.itemtype(arg) == "cards") {
+        } else if (get.itemtype(arg) === "cards") {
           next.cards = arg.slice(0)
-        } else if (get.itemtype(arg) == "card") {
+        } else if (get.itemtype(arg) === "card") {
           next.cards = [arg]
         } else if (["div", "fragment"].includes(get.objtype(arg))) {
           next.position = arg
-        } else if (arg == "toStorage") {
+        } else if (arg === "toStorage") {
           next.toStorage = true
         } else if (
-          typeof arg == "string" &&
-          Array.from(lib.commonArea.keys()).some((area) => lib.commonArea.get(area)?.toName == arg)
+          typeof arg === "string" &&
+          Array.from(lib.commonArea.keys()).some(
+            (area) => lib.commonArea.get(area)?.toName === arg,
+          )
         ) {
           next.toStorage = true
           next[arg] = true
-        } else if (arg == "visible") {
+        } else if (arg === "visible") {
           next.visible = true
-        } else if (arg == "insert") {
+        } else if (arg === "insert") {
           next.insert_card = true
         }
       }
@@ -9211,11 +9376,11 @@ export class Player extends HTMLDivElement {
         }
       }
     }
-    if (!next.cards || !next.cards.length) {
+    if (!next.cards?.length) {
       _status.event.next.remove(next)
       next.resolve()
     } else {
-      if (next.position == undefined) {
+      if (next.position === undefined) {
         next.position = ui.discardPile
       }
       next.cards = next.cards.slice(0)
@@ -9230,8 +9395,8 @@ export class Player extends HTMLDivElement {
       }
       if (
         this.getlx === false ||
-        this.position != position ||
-        (player && this.player != player) ||
+        this.position !== position ||
+        (player && this.player !== player) ||
         !Array.isArray(this[key])
       ) {
         return []
@@ -9239,7 +9404,7 @@ export class Player extends HTMLDivElement {
       return this[key].slice(0)
     }
     next.getl = function (player) {
-      if (this.getlx !== false && this.player == player) {
+      if (this.getlx !== false && this.player === player) {
         return this
       }
       return {
@@ -9255,9 +9420,7 @@ export class Player extends HTMLDivElement {
         vcard_map: new Map(),
       }
     }
-    next.getg = function (player) {
-      return []
-    }
+    next.getg = (player) => []
     next.vcard_map = new Map()
     return next
   }
@@ -9278,7 +9441,7 @@ export class Player extends HTMLDivElement {
     const args = [...arguments]
     if (
       args.length === 1 &&
-      typeof params == "object" &&
+      typeof params === "object" &&
       params !== null &&
       get.itemtype(params) == null
     ) {
@@ -9296,30 +9459,30 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "cards") {
+        if (get.itemtype(arg) === "cards") {
           next.cards = arg.slice()
-        } else if (get.itemtype(arg) == "card") {
+        } else if (get.itemtype(arg) === "card") {
           next.card = arg
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.num = arg
-        } else if (get.itemtype(arg) == "player") {
+        } else if (get.itemtype(arg) === "player") {
           next.source = arg
-        } else if (arg && typeof arg == "object" && arg.name) {
+        } else if (arg && typeof arg === "object" && arg.name) {
           next.card = arg
-        } else if (arg == "nocard") {
+        } else if (arg === "nocard") {
           noCard = true
-        } else if (arg == "nosource") {
+        } else if (arg === "nosource") {
           noSource = true
-        } else if (arg == "notrigger") {
+        } else if (arg === "notrigger") {
           next._triggered = null
           next.notrigger = true
-        } else if (arg == "unreal") {
+        } else if (arg === "unreal") {
           next.unreal = true
-        } else if (arg == "nohujia") {
+        } else if (arg === "nohujia") {
           next.nohujia = true
-        } else if (get.itemtype(arg) == "nature" && arg != "stab") {
+        } else if (get.itemtype(arg) === "nature" && arg !== "stab") {
           next.nature = arg
-        } else if (get.itemtype(arg) == "natures") {
+        } else if (get.itemtype(arg) === "natures") {
           const natures = arg.split(lib.natureSeparator).remove("stab")
           if (natures.length) {
             next.nature = natures.join(lib.natureSeparator)
@@ -9339,7 +9502,7 @@ export class Player extends HTMLDivElement {
         next.source = source
       }
     }
-    if (typeof next.num != "number") {
+    if (typeof next.num !== "number") {
       next.num = (event.baseDamage || 1) + (event.extraDamage || 0)
     }
     next.original_num = next.num
@@ -9348,9 +9511,9 @@ export class Player extends HTMLDivElement {
       if (!nature) {
         return Boolean(this.nature && this.nature.length > 0)
       }
-      let natures = get.natureList(nature),
+      const natures = get.natureList(nature),
         naturesx = get.natureList(this.nature)
-      if (nature == "linked") {
+      if (nature === "linked") {
         return naturesx.some((n) => lib.linked.includes(n))
       }
       return get.is.sameNature(natures, naturesx)
@@ -9362,14 +9525,14 @@ export class Player extends HTMLDivElement {
     }
     next.setContent("damage")
     next.filterStop = function () {
-      if (this.source && this.source.isDead()) {
+      if (this.source?.isDead()) {
         delete this.source
       }
       var num = this.original_num
       for (var i of this.change_history) {
         num += i
       }
-      if (num != this.num) {
+      if (num !== this.num) {
         this.change_history.push(this.num - num)
       }
       if (this.num <= 0) {
@@ -9399,7 +9562,7 @@ export class Player extends HTMLDivElement {
     const event = _status.event
     if (
       args.length === 1 &&
-      typeof params == "object" &&
+      typeof params === "object" &&
       params !== null &&
       get.itemtype(params) == null
     ) {
@@ -9414,33 +9577,33 @@ export class Player extends HTMLDivElement {
       }
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "cards") {
+        if (get.itemtype(arg) === "cards") {
           next.cards = arg.slice(0)
-        } else if (get.itemtype(arg) == "card") {
+        } else if (get.itemtype(arg) === "card") {
           next.card = arg
-        } else if (get.itemtype(arg) == "player") {
+        } else if (get.itemtype(arg) === "player") {
           next.source = arg
-        } else if (typeof arg == "object" && arg && arg.name) {
+        } else if (typeof arg === "object" && arg && arg.name) {
           next.card = arg
-        } else if (typeof arg == "number") {
+        } else if (typeof arg === "number") {
           next.num = arg
-        } else if (arg == "nocard") {
+        } else if (arg === "nocard") {
           nocard = true
-        } else if (arg == "nosource") {
+        } else if (arg === "nosource") {
           nosource = true
         }
       }
     }
-    if (next.card == undefined && !nocard) {
+    if (next.card === undefined && !nocard) {
       next.card = event.card
     }
-    if (next.cards == undefined && !nocard) {
+    if (next.cards === undefined && !nocard) {
       next.cards = event.cards
     }
-    if (next.source == undefined && !nosource) {
+    if (next.source === undefined && !nosource) {
       next.source = event.customSource || event.player
     }
-    if (next.num == undefined) {
+    if (next.num === undefined) {
       next.num = (event.baseDamage || 1) + (event.extraDamage || 0)
     }
     next.filterStop = function () {
@@ -9466,7 +9629,7 @@ export class Player extends HTMLDivElement {
 
     // 我打算创了
     if (Array.isArray(args)) {
-      // @ts-ignore
+      // @ts-expect-error
       return this.recover(num2, ...args)
     }
 
@@ -9518,7 +9681,7 @@ export class Player extends HTMLDivElement {
     const args = [...arguments]
     if (
       args.length === 1 &&
-      typeof params == "object" &&
+      typeof params === "object" &&
       params !== null &&
       get.itemtype(params) == null
     ) {
@@ -9549,7 +9712,7 @@ export class Player extends HTMLDivElement {
     const args = [...arguments]
     if (
       args.length === 1 &&
-      typeof params == "object" &&
+      typeof params === "object" &&
       params !== null &&
       get.itemtype(params) == null
     ) {
@@ -9575,7 +9738,7 @@ export class Player extends HTMLDivElement {
   changeHp(num, popup) {
     const next = game.createEvent("changeHp")
     next.num = num
-    if (popup != undefined) {
+    if (popup !== undefined) {
       next.popup = popup
     }
     next.player = this
@@ -9592,16 +9755,16 @@ export class Player extends HTMLDivElement {
    */
   changeHujia(num, type, limit) {
     const next = game.createEvent("changeHujia")
-    if (typeof num != "number") {
+    if (typeof num !== "number") {
       num = 1
     }
     if (limit === true) {
       limit = 5
     }
-    if (typeof limit == "number" && this.hujia + num > parseInt(limit)) {
-      num = Math.max(0, parseInt(limit) - this.hujia)
+    if (typeof limit === "number" && this.hujia + num > parseInt(limit, 10)) {
+      num = Math.max(0, parseInt(limit, 10) - this.hujia)
     }
-    if (typeof type != "string") {
+    if (typeof type !== "string") {
       if (num > 0) {
         type = "gain"
       } else if (num < 0) {
@@ -9620,7 +9783,7 @@ export class Player extends HTMLDivElement {
     var list = [1, 2, 3, 4, 5, 6]
     var nodelay = false
     for (const arg of args) {
-      if (typeof arg == "number") {
+      if (typeof arg === "number") {
         list.remove(arg)
       } else if (arg === false) {
         nodelay = true
@@ -9670,13 +9833,13 @@ export class Player extends HTMLDivElement {
     var list = [1, 2, 3, 4, 5, 6]
     var nodelay = false
     for (const arg of args) {
-      if (typeof arg == "number") {
+      if (typeof arg === "number") {
         list.remove(arg)
       } else if (arg === false) {
         nodelay = true
       }
     }
-    if (this.countCards("he") == 0) {
+    if (this.countCards("he") === 0) {
       list.remove(1)
     }
     if (this.isLinked()) {
@@ -9685,7 +9848,7 @@ export class Player extends HTMLDivElement {
     if (this.hasSkill("fengyin")) {
       list.remove(5)
     }
-    if (this.hp == 1) {
+    if (this.hp === 1) {
       list.remove(3)
       if (list.length > 1) {
         list.remove(2)
@@ -9717,7 +9880,11 @@ export class Player extends HTMLDivElement {
         var list = []
         for (var i = 0; i < lib.inpile.length; i++) {
           var info = lib.card[lib.inpile[i]]
-          if (info.type == "delay" && !info.cancel && !this.hasJudge(lib.inpile[i])) {
+          if (
+            info.type === "delay" &&
+            !info.cancel &&
+            !this.hasJudge(lib.inpile[i])
+          ) {
             list.push(lib.inpile[i])
           }
         }
@@ -9748,7 +9915,7 @@ export class Player extends HTMLDivElement {
     var next = game.createEvent("dying")
     next.player = this
     next.reason = reason
-    if (reason && reason.source) {
+    if (reason?.source) {
       next.source = reason.source
     }
     next.setContent("dying")
@@ -9843,7 +10010,7 @@ export class Player extends HTMLDivElement {
     this.next = player
     game.players.add(this)
     game.dead.remove(this)
-    if (this == game.me) {
+    if (this === game.me) {
       if (ui.auto) {
         ui.auto.show()
       }
@@ -9918,7 +10085,11 @@ export class Player extends HTMLDivElement {
     this.addTempSkill("qianxing", { player: "phaseBeginStart" })
   }
   addExpose(num) {
-    if (typeof this.ai.shown == "number" && !this.identityShown && this.ai.shown < 1) {
+    if (
+      typeof this.ai.shown === "number" &&
+      !this.identityShown &&
+      this.ai.shown < 1
+    ) {
       this.ai.shown += num
       if (this.ai.shown > 0.95) {
         this.ai.shown = 0.95
@@ -9934,7 +10105,7 @@ export class Player extends HTMLDivElement {
     //if (get.is.object(next.card) && next.card.cards) next.card = next.card.cards[0];
     //next.cards = [next.card];
     //不接受VCard
-    let itemtype = get.itemtype(card)
+    const itemtype = get.itemtype(card)
     if (itemtype === "card") {
       next.cards = [card]
     } else {
@@ -9952,7 +10123,8 @@ export class Player extends HTMLDivElement {
     }
     //检查card合法性
     if (
-      (next.cards.length > 1 && next.cards.some((cardx) => cardx.isViewAsCard)) ||
+      (next.cards.length > 1 &&
+        next.cards.some((cardx) => cardx.isViewAsCard)) ||
       !next.card.name
     ) {
       //装备牌的实体牌数大于1时需要全部都为真实卡牌
@@ -9966,13 +10138,16 @@ export class Player extends HTMLDivElement {
       if (!key) {
         key = "cards"
       }
-      var cards = [],
-        event = this
-      game.checkGlobalHistory("cardMove", function (evt) {
-        if (evt.name != "lose" || evt.position != position || evt.getParent() != event) {
+      var cards = []
+      game.checkGlobalHistory("cardMove", (evt) => {
+        if (
+          evt.name !== "lose" ||
+          evt.position !== position ||
+          evt.getParent() !== this
+        ) {
           return
         }
-        if (player && player != evt.player) {
+        if (player && player !== evt.player) {
           return
         }
         cards.addArray(evt[key])
@@ -9980,7 +10155,6 @@ export class Player extends HTMLDivElement {
       return cards
     }
     next.getl = function (player) {
-      const that = this
       const map = {
         player: player,
         hs: [],
@@ -9993,8 +10167,8 @@ export class Player extends HTMLDivElement {
         gaintag_map: {},
         vcard_map: new Map(),
       }
-      player.checkAllHistory("lose", function (evt) {
-        if (evt.parent == that) {
+      player.checkAllHistory("lose", (evt) => {
+        if (evt.parent === this) {
           map.hs.addArray(evt.hs)
           map.es.addArray(evt.es)
           map.js.addArray(evt.js)
@@ -10002,7 +10176,7 @@ export class Player extends HTMLDivElement {
           map.xs.addArray(evt.xs)
           map.cards.addArray(evt.cards)
           map.cards2.addArray(evt.cards2)
-          for (let key in evt.gaintag_map) {
+          for (const key in evt.gaintag_map) {
             if (!map.gaintag_map[key]) {
               map.gaintag_map[key] = []
             }
@@ -10015,9 +10189,7 @@ export class Player extends HTMLDivElement {
       })
       return map
     }
-    next.getg = function (player) {
-      return []
-    }
+    next.getg = (player) => []
     return next
   }
   /**
@@ -10028,7 +10200,7 @@ export class Player extends HTMLDivElement {
    */
   addJudge(card, cards) {
     var next = game.createEvent("addJudge")
-    if (get.itemtype(card) == "card") {
+    if (get.itemtype(card) === "card") {
       next.card = card
       if (card.isViewAsCard) {
         next.cards = card[card.cardSymbol].cards
@@ -10037,10 +10209,10 @@ export class Player extends HTMLDivElement {
       }
     } else {
       next.cards = cards
-      if (get.itemtype(next.cards) == "card") {
+      if (get.itemtype(next.cards) === "card") {
         next.cards = [next.cards]
       }
-      if (typeof card == "string") {
+      if (typeof card === "string") {
         card = { name: card }
       }
       next.card = get.autoViewAs(card, next.cards)
@@ -10054,13 +10226,16 @@ export class Player extends HTMLDivElement {
       if (!key) {
         key = "cards"
       }
-      var cards = [],
-        event = this
-      game.checkGlobalHistory("cardMove", function (evt) {
-        if (evt.name != "lose" || evt.position != position || evt.getParent() != event) {
+      var cards = []
+      game.checkGlobalHistory("cardMove", (evt) => {
+        if (
+          evt.name !== "lose" ||
+          evt.position !== position ||
+          evt.getParent() !== this
+        ) {
           return
         }
-        if (player && player != evt.player) {
+        if (player && player !== evt.player) {
           return
         }
         cards.addArray(evt[key])
@@ -10068,7 +10243,6 @@ export class Player extends HTMLDivElement {
       return cards
     }
     next.getl = function (player) {
-      const that = this
       const map = {
         player: player,
         hs: [],
@@ -10081,8 +10255,8 @@ export class Player extends HTMLDivElement {
         gaintag_map: {},
         vcard_map: new Map(),
       }
-      player.checkAllHistory("lose", function (evt) {
-        if (evt.parent == that) {
+      player.checkAllHistory("lose", (evt) => {
+        if (evt.parent === this) {
           map.hs.addArray(evt.hs)
           map.es.addArray(evt.es)
           map.js.addArray(evt.js)
@@ -10090,7 +10264,7 @@ export class Player extends HTMLDivElement {
           map.xs.addArray(evt.xs)
           map.cards.addArray(evt.cards)
           map.cards2.addArray(evt.cards2)
-          for (let key in evt.gaintag_map) {
+          for (const key in evt.gaintag_map) {
             if (!map.gaintag_map[key]) {
               map.gaintag_map[key] = []
             }
@@ -10103,9 +10277,7 @@ export class Player extends HTMLDivElement {
       })
       return map
     }
-    next.getg = function (player) {
-      return []
-    }
+    next.getg = (player) => []
     return next
   }
   /**
@@ -10120,7 +10292,7 @@ export class Player extends HTMLDivElement {
       return false
     }
     let name
-    if (typeof card == "string") {
+    if (typeof card === "string") {
       name = card
     } else {
       name = card.viewAs || card.name
@@ -10146,13 +10318,13 @@ export class Player extends HTMLDivElement {
   addJudgeNext(card, unlimited) {
     if (!card.expired) {
       const name = card.viewAs || card.name
-      const cards = get.itemtype(card) == "card" ? [card] : (card.cards ?? [])
+      const cards = get.itemtype(card) === "card" ? [card] : (card.cards ?? [])
       //if (get.itemtype(cards) != "cards") return;
       if (
         !unlimited &&
         cards.some((card) => {
           const position = get.position(card, true)
-          return position != "j" && position != "o"
+          return position !== "j" && position !== "o"
         })
       ) {
         game.log(card, "已被移出处理区，无法置入判定区")
@@ -10167,7 +10339,7 @@ export class Player extends HTMLDivElement {
         if (lib.filter.judge(card, target, target)) {
           break
         }
-        if (target == this) {
+        if (target === this) {
           target = null
         }
       } while (target)
@@ -10188,36 +10360,34 @@ export class Player extends HTMLDivElement {
     const args = [...arguments]
     if (
       args.length === 1 &&
-      typeof params == "object" &&
+      typeof params === "object" &&
       params !== null &&
       get.itemtype(params) == null
     ) {
       Object.assign(next, params)
     } else {
       for (const arg of args) {
-        if (get.itemtype(arg) == "card" || get.is.object(arg)) {
+        if (get.itemtype(arg) === "card" || get.is.object(arg)) {
           next.card = arg
-        } else if (typeof arg == "string") {
+        } else if (typeof arg === "string") {
           next.skill = arg
-        } else if (typeof arg == "function") {
+        } else if (typeof arg === "function") {
           next.judge = arg
-        } else if (typeof arg == "boolean") {
+        } else if (typeof arg === "boolean") {
           next.clearArena = arg
         } else if (["div", "fragment"].includes(get.objtype(arg))) {
           next.position = arg
         }
       }
     }
-    if (next.card && next.judge == undefined) {
+    if (next.card && next.judge === undefined) {
       next.judge = get.judge(next.card)
       next.judge2 ??= get.judge2(next.card)
     }
-    if (next.judge == undefined) {
-      next.judge = function () {
-        return 0
-      }
+    if (next.judge === undefined) {
+      next.judge = () => 0
     }
-    if (next.position == undefined) {
+    if (next.position === undefined) {
       next.position = ui.discardPile
     }
     if (next.card) {
@@ -10246,7 +10416,7 @@ export class Player extends HTMLDivElement {
     next.player = this
     next.includeOut = true
     next.setContent("turnOver")
-    if (typeof bool == "boolean") {
+    if (typeof bool === "boolean") {
       if (bool) {
         if (this.isTurnedOver()) {
           _status.event.next.remove(next)
@@ -10262,9 +10432,9 @@ export class Player extends HTMLDivElement {
     return next
   }
   out(skill) {
-    if (typeof skill == "number") {
+    if (typeof skill === "number") {
       this.outCount += skill
-    } else if (typeof skill == "string") {
+    } else if (typeof skill === "string") {
       if (!this.outSkills) {
         this.outSkills = []
       }
@@ -10282,14 +10452,14 @@ export class Player extends HTMLDivElement {
   }
   in(skill) {
     if (this.isOut()) {
-      if (typeof skill == "string") {
+      if (typeof skill === "string") {
         if (this.outSkills) {
           this.outSkills.remove(skill)
           if (!this.outSkills.length) {
             delete this.outSkills
           }
         }
-      } else if (typeof skill == "number") {
+      } else if (typeof skill === "number") {
         this.outCount -= skill
       } else {
         if (skill === true) {
@@ -10313,7 +10483,7 @@ export class Player extends HTMLDivElement {
     var next = game.createEvent("link")
     next.player = this
     next.setContent("link")
-    if (typeof bool == "boolean") {
+    if (typeof bool === "boolean") {
       if (bool) {
         if (this.isLinked()) {
           _status.event.next.remove(next)
@@ -10333,7 +10503,7 @@ export class Player extends HTMLDivElement {
   }
   wait(callback) {
     if (lib.node) {
-      if (typeof callback == "function") {
+      if (typeof callback === "function") {
         callback._wtk_waiting = true
         lib.node.torespond[this.playerid] = callback
       } else {
@@ -10341,19 +10511,24 @@ export class Player extends HTMLDivElement {
       }
       clearTimeout(lib.node.torespondtimeout[this.playerid])
       if (this.ws && !this.ws.closed) {
-        var player = this
-        var time = parseInt(lib.configOL.choose_timeout) * 1000
-        if (_status.event._global_timer || _status.event.getParent().skillHidden) {
+        var time = parseInt(lib.configOL.choose_timeout, 10) * 1000
+        if (
+          _status.event._global_timer ||
+          _status.event.getParent().skillHidden
+        ) {
           for (var i = 0; i < game.players.length; i++) {
             game.players[i].showTimer(time)
           }
-          player._hide_all_timer = true
-        } else if (!_status.event._global_waiting && _status.noclearcountdown !== "direct") {
-          player.showTimer(time)
+          this._hide_all_timer = true
+        } else if (
+          !_status.event._global_waiting &&
+          _status.noclearcountdown !== "direct"
+        ) {
+          this.showTimer(time)
         }
-        lib.node.torespondtimeout[this.playerid] = setTimeout(function () {
-          player.unwait("ai")
-          player.ws.ws.close()
+        lib.node.torespondtimeout[this.playerid] = setTimeout(() => {
+          this.unwait("ai")
+          this.ws.ws.close()
         }, time + 5000)
       }
     }
@@ -10366,8 +10541,8 @@ export class Player extends HTMLDivElement {
       }
     } else if (
       !get.event()._global_waiting &&
-      (_status.noclearcountdown !== "direct" || (result && result.bool)) &&
-      !(result && result._noHidingTimer)
+      (_status.noclearcountdown !== "direct" || result?.bool) &&
+      !result?._noHidingTimer
     ) {
       this.hideTimer()
     }
@@ -10379,7 +10554,7 @@ export class Player extends HTMLDivElement {
     var noresume = false
     var proceed = null
     if (
-      typeof lib.node.torespond[this.playerid] == "function" &&
+      typeof lib.node.torespond[this.playerid] === "function" &&
       lib.node.torespond[this.playerid]._wtk_waiting
     ) {
       proceed = lib.node.torespond[this.playerid](result, this)
@@ -10389,16 +10564,17 @@ export class Player extends HTMLDivElement {
     }
     lib.node.torespond[this.playerid] = result
     for (var i in lib.node.torespond) {
-      if (lib.node.torespond[i] == "_wtk_waiting") {
+      if (lib.node.torespond[i] === "_wtk_waiting") {
         return
-      } else if (lib.node.torespond[i] && lib.node.torespond[i]._wtk_waiting) {
+      }
+      if (lib.node.torespond[i]?._wtk_waiting) {
         return
       }
     }
     _status.event.result = result
     _status.event.resultOL = lib.node.torespond
     lib.node.torespond = {}
-    if (typeof proceed == "function") {
+    if (typeof proceed === "function") {
       proceed()
     } else if (_status.paused && !noresume) {
       game.resume()
@@ -10416,12 +10592,12 @@ export class Player extends HTMLDivElement {
     }
     var proceed
     if (
-      typeof lib.node.torespond[this.playerid] == "function" &&
+      typeof lib.node.torespond[this.playerid] === "function" &&
       lib.node.torespond[this.playerid]._wtk_waiting
     ) {
       proceed = lib.node.torespond[this.playerid](result, this)
     }
-    if (typeof proceed == "function") {
+    if (typeof proceed === "function") {
       proceed()
     }
   }
@@ -10433,7 +10609,7 @@ export class Player extends HTMLDivElement {
    * @param { * } [args]
    */
   logSkill(name, targets, nature, logv, args) {
-    if (get.itemtype(targets) == "player") {
+    if (get.itemtype(targets) === "player") {
       targets = [targets]
     }
     var nopop = false
@@ -10447,7 +10623,7 @@ export class Player extends HTMLDivElement {
       this.trySkillAnimate(name, popname, checkShow)
       if (Array.isArray(targets) && targets.length) {
         var str
-        if (targets[0] == this) {
+        if (targets[0] === this) {
           str = "#b自己"
           if (targets.length > 1) {
             str += "、"
@@ -10456,12 +10632,18 @@ export class Player extends HTMLDivElement {
         } else {
           str = targets
         }
-        game.log(this, "对", str, "发动了", "【" + get.skillTranslation(name, this) + "】")
+        game.log(
+          this,
+          "对",
+          str,
+          "发动了",
+          `【${get.skillTranslation(name, this)}】`,
+        )
       } else {
-        game.log(this, "发动了", "【" + get.skillTranslation(name, this) + "】")
+        game.log(this, "发动了", `【${get.skillTranslation(name, this)}】`)
       }
     }
-    if (nature != false) {
+    if (nature !== false) {
       if (nature === undefined) {
         nature = "green"
       }
@@ -10471,14 +10653,14 @@ export class Player extends HTMLDivElement {
     if (
       info &&
       info.ai &&
-      info.ai.expose != undefined &&
+      info.ai.expose !== undefined &&
       this.logAi &&
-      (!targets || targets.length != 1 || targets[0] != this)
+      (targets?.length !== 1 || targets[0] !== this)
     ) {
       this.logAi(lib.skill[name].ai.expose)
     }
-    if (info && info.round) {
-      var roundname = name + "_roundcount"
+    if (info?.round) {
+      var roundname = `${name}_roundcount`
       this.storage[roundname] = game.roundNumber
       this.syncStorage(roundname)
       this.markSkill(roundname)
@@ -10493,9 +10675,8 @@ export class Player extends HTMLDivElement {
       game.logv(this, name, targets)
     }
     if (info) {
-      var player = this
-      var players = player.getSkills(false, false, false)
-      var equips = player.getSkills("e")
+      var players = this.getSkills(false, false, false)
+      var equips = this.getSkills("e")
       var global = lib.skill.global.slice(0)
       var logInfo = {
         skill: name,
@@ -10548,7 +10729,7 @@ export class Player extends HTMLDivElement {
       }
       var next = game.createEvent("logSkill", false),
         evt = _status.event
-      next.player = player
+      next.player = this
       next.forceDie = true
       next.includeOut = true
       evt.next.remove(next)
@@ -10556,7 +10737,7 @@ export class Player extends HTMLDivElement {
         evt = evt.getParent()
       }
       for (var i in logInfo) {
-        if (i == "event") {
+        if (i === "event") {
           next.log_event = logInfo[i]
         } else {
           next[i] = logInfo[i]
@@ -10564,15 +10745,15 @@ export class Player extends HTMLDivElement {
       }
       evt.after.push(next)
       next.setContent("emptyEvent")
-      player.getHistory("useSkill").push(logInfo)
+      this.getHistory("useSkill").push(logInfo)
       //尽可能别往这写插入结算
       //不能用来终止技能发动！！！
       var next2 = game.createEvent("logSkillBegin", false, get.event())
-      next2.player = player
+      next2.player = this
       next2.forceDie = true
       next2.includeOut = true
       for (var i in logInfo) {
-        if (i == "event") {
+        if (i === "event") {
           next2.log_event = logInfo[i]
         } else {
           next2[i] = logInfo[i]
@@ -10583,7 +10764,7 @@ export class Player extends HTMLDivElement {
     if (this._hookTrigger) {
       for (var i = 0; i < this._hookTrigger.length; i++) {
         var info = lib.skill[this._hookTrigger[i]].hookTrigger
-        if (info && info.log) {
+        if (info?.log) {
           info.log(this, name, targets)
         }
       }
@@ -10622,15 +10803,16 @@ export class Player extends HTMLDivElement {
     }
     node.dataset.position = this.dataset.position
     if (
-      this.dataset.position == 0 ||
-      parseInt(this.dataset.position) == parseInt(ui.arena.dataset.number) / 2 ||
-      typeof name2 == "number" ||
+      this.dataset.position === 0 ||
+      parseInt(this.dataset.position, 10) ===
+        parseInt(ui.arena.dataset.number, 10) / 2 ||
+      typeof name2 === "number" ||
       this.classList.contains("minskin")
     ) {
       node.innerHTML = name2
     } else {
       for (var i = 0; i < name2.length; i++) {
-        node.innerHTML += name2[i] + "<br/>"
+        node.innerHTML += `${name2[i]}<br/>`
       }
     }
     if (className) {
@@ -10660,15 +10842,16 @@ export class Player extends HTMLDivElement {
     game.addVideo("popup", this, [name, className])
     node.dataset.position = this.dataset.position
     if (
-      this.dataset.position == 0 ||
-      parseInt(this.dataset.position) == parseInt(ui.arena.dataset.number) / 2 ||
-      typeof name2 == "number" ||
+      this.dataset.position === 0 ||
+      parseInt(this.dataset.position, 10) ===
+        parseInt(ui.arena.dataset.number, 10) / 2 ||
+      typeof name2 === "number" ||
       this.classList.contains("minskin")
     ) {
       node.innerHTML = name2
     } else {
       for (var i = 0; i < name2.length; i++) {
-        node.innerHTML += name2[i] + "<br/>"
+        node.innerHTML += `${name2[i]}<br/>`
       }
     }
     if (className) {
@@ -10678,9 +10861,8 @@ export class Player extends HTMLDivElement {
     if (this.popups.length > 1) {
       node.hide()
     } else {
-      var that = this
-      setTimeout(function () {
-        that._popup()
+      setTimeout(() => {
+        this._popup()
       }, 1000)
     }
     return node
@@ -10690,27 +10872,27 @@ export class Player extends HTMLDivElement {
       this.popups.shift().delete()
       if (this.popups.length) {
         this.popups[0].show()
-        var that = this
-        setTimeout(function () {
-          that._popup()
+
+        setTimeout(() => {
+          this._popup()
         }, 1000)
       }
     }
   }
   showTimer(time) {
     if (!time && lib.configOL) {
-      time = parseInt(lib.configOL.choose_timeout) * 1000
+      time = parseInt(lib.configOL.choose_timeout, 10) * 1000
     }
     if (_status.connectMode && !game.online) {
       game.broadcast(
-        function (player, time) {
+        (player, time) => {
           player.showTimer(time)
         },
         this,
         time,
       )
     }
-    if (this == game.me) {
+    if (this === game.me) {
       return
     }
     if (this.node.timer) {
@@ -10721,12 +10903,12 @@ export class Player extends HTMLDivElement {
     ui.create.div(this.node.timer)
     var bar = ui.create.div(this.node.timer)
     ui.refresh(bar)
-    bar.style.transitionDuration = time / 1000 + "s"
+    bar.style.transitionDuration = `${time / 1000}s`
     bar.style.transform = "scale(0,1)"
   }
   hideTimer() {
     if (_status.connectMode && !game.online && this.playerid) {
-      game.broadcast(function (player) {
+      game.broadcast((player) => {
         player.hideTimer()
       }, this)
     }
@@ -10741,7 +10923,7 @@ export class Player extends HTMLDivElement {
    * @param { * } [info] 向storage数组中添加对应元素/元素数组
    */
   markAuto(name, info) {
-    if (typeof info != "undefined") {
+    if (typeof info !== "undefined") {
       if (!Array.isArray(this.storage[name])) {
         this.storage[name] = []
       }
@@ -10755,7 +10937,7 @@ export class Player extends HTMLDivElement {
       var storage = this.storage[name]
       if (Array.isArray(storage)) {
         this[storage.length > 0 ? "markSkill" : "unmarkSkill"](name)
-      } else if (typeof storage == "number") {
+      } else if (typeof storage === "number") {
         this[storage > 0 ? "markSkill" : "unmarkSkill"](name)
       } else if (storage) {
         this.markSkill(name)
@@ -10827,7 +11009,7 @@ export class Player extends HTMLDivElement {
     if (!(name in this.storage)) {
       return false
     }
-    if (typeof value == "undefined") {
+    if (typeof value === "undefined") {
       return true
     }
     const storage = this.storage[name]
@@ -10863,7 +11045,9 @@ export class Player extends HTMLDivElement {
     return values.every((item) => storage.includes(item))
   }
   initStorage(name, value, mark) {
-    return this.hasStorage(name) ? this.getStorage(name) : this.setStorage(name, value, mark)
+    return this.hasStorage(name)
+      ? this.getStorage(name)
+      : this.setStorage(name, value, mark)
   }
   updateStorage(name, operation, mark) {
     return this.setStorage(name, operation(this.getStorage(name)), mark)
@@ -10909,7 +11093,7 @@ export class Player extends HTMLDivElement {
       }
       player.updateMarks()
     }
-    if (event.player == game.me) {
+    if (event.player === game.me) {
       func(skill, target)
     } else if (event.isOnline()) {
       this.send(func, skill, target)
@@ -10920,12 +11104,12 @@ export class Player extends HTMLDivElement {
       this.syncStorage(name)
       info = null
     }
-    if (get.itemtype(card) == "card") {
+    if (get.itemtype(card) === "card") {
       game.addVideo("markSkill", this, [name, get.cardInfo(card)])
     } else {
       game.addVideo("markSkill", this, [name])
     }
-    const func = function (storage, player, name, info, card) {
+    const func = (storage, player, name, info, card) => {
       player.storage[name] = storage
       if (!info) {
         if (player.marks[name]) {
@@ -10960,7 +11144,7 @@ export class Player extends HTMLDivElement {
     game.addVideo("unmarkSkill", this, name)
     if (!nobroadcast) {
       game.broadcast(
-        function (player, name) {
+        (player, name) => {
           if (player.marks[name]) {
             player.marks[name].delete()
             player.marks[name].style.transform += " scale(0.2)"
@@ -10979,14 +11163,14 @@ export class Player extends HTMLDivElement {
       ui.updatem(this)
       var info = lib.skill[name]
       if (!game.online && info && info.intro && info.intro.onunmark) {
-        if (info.intro.onunmark == "throw") {
-          if (get.itemtype(this.storage[name]) == "cards") {
+        if (info.intro.onunmark === "throw") {
+          if (get.itemtype(this.storage[name]) === "cards") {
             this.$throw(this.storage[name], 1000)
             game.cardsDiscard(this.storage[name])
             game.log(this.storage[name], "进入了弃牌堆")
             this.storage[name].length = 0
           }
-        } else if (typeof info.intro.onunmark == "function") {
+        } else if (typeof info.intro.onunmark === "function") {
           info.intro.onunmark(this.storage[name], this, name)
         } else {
           delete this.storage[name]
@@ -10996,12 +11180,12 @@ export class Player extends HTMLDivElement {
     return this
   }
   markSkillCharacter(id, target, name, content, nobroadcast) {
-    if (typeof target == "object") {
+    if (typeof target === "object") {
       target = target.name
     }
-    const func = function (player, target, name, content, id) {
+    const func = (player, target, name, content, id) => {
       if (player.marks[id]) {
-        player.marks[id].name = name + "_charactermark"
+        player.marks[id].name = `${name}_charactermark`
         player.marks[id]._name = target
         player.marks[id].info = {
           name: name,
@@ -11037,21 +11221,24 @@ export class Player extends HTMLDivElement {
     return this
   }
   markCharacter(name, info, learn, learn2) {
-    if (typeof name == "object") {
+    if (typeof name === "object") {
       name = name.name
     }
     var node
     if (name.startsWith("unknown")) {
       node = ui.create.div(".card.mark.drawinghidden")
-      ui.create.div(".background.skillmark", node).innerHTML = get.translation(name)[0]
+      ui.create.div(".background.skillmark", node).innerHTML =
+        get.translation(name)[0]
     } else {
       if (!get.character(name)) {
         return
       }
-      node = ui.create.div(".card.mark.drawinghidden").setBackground(name, "character")
+      node = ui.create
+        .div(".card.mark.drawinghidden")
+        .setBackground(name, "character")
     }
     this.node.marks.insertBefore(node, this.node.marks.childNodes[1])
-    node.name = name + "_charactermark"
+    node.name = `${name}_charactermark`
     if (!info) {
       info = {}
     }
@@ -11062,7 +11249,10 @@ export class Player extends HTMLDivElement {
       info.content = get.skillintro(name, learn, learn2)
     }
     node.info = info
-    node.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.card)
+    node.addEventListener(
+      lib.config.touchscreen ? "touchend" : "click",
+      ui.click.card,
+    )
     if (!lib.config.touchscreen) {
       if (lib.config.hover_all) {
         lib.setHover(node, ui.click.hoverplayer)
@@ -11075,85 +11265,90 @@ export class Player extends HTMLDivElement {
     return node
   }
   mark(name, info, skill) {
-    if (get.itemtype(name) == "cards") {
+    if (get.itemtype(name) === "cards") {
       var marks = []
       for (var i = 0; i < name.length; i++) {
         marks.push(this.mark(name[i], info))
       }
       return marks
-    } else {
-      var node
-      if (get.itemtype(name) == "card") {
-        node = name.copy("mark")
-        node.classList.add("drawinghidden")
-        this.node.marks.insertBefore(node, this.node.marks.childNodes[1])
-        node.suit = name.suit
-        node.number = name.number
-        // if(name.name&&lib.card[name.name]&&lib.card[name.name].markimage){
-        // 	node.node.image.style.left=lib.card[name.name].markimage;
-        // }
-
-        if (name.classList.contains("fullborder")) {
-          node.classList.add("fakejudge")
-          node.classList.add("fakemark")
-          ;(node.querySelector(".background") || ui.create.div(".background", node)).innerHTML =
-            lib.translate[name.name + "_bg"] || get.translation(name.name)[0]
-        }
-
-        name = name.name
-      } else {
-        node = ui.create.div(".card.mark.drawinghidden")
-        this.node.marks.insertBefore(node, this.node.marks.childNodes[1])
-        if (lib.skill[name] && lib.skill[name].markimage) {
-          node.setBackgroundImage(lib.skill[name].markimage)
-          node.style["box-shadow"] = "none"
-          node.style["background-size"] = "contain"
-        } else if (lib.skill[name] && lib.skill[name].markimage2) {
-          let img = ui.create.div(".background.skillmark", node)
-          img.setBackgroundImage(lib.skill[name].markimage2)
-          img.style["background-size"] = "contain"
-        } else {
-          var str = lib.translate[name + "_bg"]
-          if (!str || str[0] == "+" || str[0] == "-") {
-            str = get.translation(name)[0]
-          }
-          ui.create.div(".background.skillmark", node).innerHTML = str
-        }
-      }
-      node.name = name
-      node.skill = skill || name
-      if (typeof info == "object") {
-        node.info = info
-      } else if (typeof info == "string") {
-        node.markidentifer = info
-      }
-      node.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.card)
-      if (!lib.config.touchscreen) {
-        if (lib.config.hover_all) {
-          lib.setHover(node, ui.click.hoverplayer)
-        }
-        if (lib.config.right_info) {
-          node.oncontextmenu = ui.click.rightplayer
-        }
-      }
-      this.updateMarks()
-      ui.updatem(this)
-      return node
     }
+    var node
+    if (get.itemtype(name) === "card") {
+      node = name.copy("mark")
+      node.classList.add("drawinghidden")
+      this.node.marks.insertBefore(node, this.node.marks.childNodes[1])
+      node.suit = name.suit
+      node.number = name.number
+      // if(name.name&&lib.card[name.name]&&lib.card[name.name].markimage){
+      // 	node.node.image.style.left=lib.card[name.name].markimage;
+      // }
+
+      if (name.classList.contains("fullborder")) {
+        node.classList.add("fakejudge")
+        node.classList.add("fakemark")
+        ;(
+          node.querySelector(".background") ||
+          ui.create.div(".background", node)
+        ).innerHTML =
+          lib.translate[`${name.name}_bg`] || get.translation(name.name)[0]
+      }
+
+      name = name.name
+    } else {
+      node = ui.create.div(".card.mark.drawinghidden")
+      this.node.marks.insertBefore(node, this.node.marks.childNodes[1])
+      if (lib.skill[name]?.markimage) {
+        node.setBackgroundImage(lib.skill[name].markimage)
+        node.style["box-shadow"] = "none"
+        node.style["background-size"] = "contain"
+      } else if (lib.skill[name]?.markimage2) {
+        const img = ui.create.div(".background.skillmark", node)
+        img.setBackgroundImage(lib.skill[name].markimage2)
+        img.style["background-size"] = "contain"
+      } else {
+        var str = lib.translate[`${name}_bg`]
+        if (!str || str[0] === "+" || str[0] === "-") {
+          str = get.translation(name)[0]
+        }
+        ui.create.div(".background.skillmark", node).innerHTML = str
+      }
+    }
+    node.name = name
+    node.skill = skill || name
+    if (typeof info === "object") {
+      node.info = info
+    } else if (typeof info === "string") {
+      node.markidentifer = info
+    }
+    node.addEventListener(
+      lib.config.touchscreen ? "touchend" : "click",
+      ui.click.card,
+    )
+    if (!lib.config.touchscreen) {
+      if (lib.config.hover_all) {
+        lib.setHover(node, ui.click.hoverplayer)
+      }
+      if (lib.config.right_info) {
+        node.oncontextmenu = ui.click.rightplayer
+      }
+    }
+    this.updateMarks()
+    ui.updatem(this)
+    return node
   }
   unmark(name, info) {
     game.addVideo("unmarkname", this, name)
-    if (get.itemtype(name) == "card") {
+    if (get.itemtype(name) === "card") {
       this.unmark(name.name, info)
-    } else if (get.itemtype(name) == "cards") {
+    } else if (get.itemtype(name) === "cards") {
       for (var i = 0; i < name.length; i++) {
         this.unmark(name[i].name, info)
       }
     } else {
       for (var i = 0; i < this.node.marks.childNodes.length; i++) {
         if (
-          this.node.marks.childNodes[i].name == name &&
-          (!info || this.node.marks.childNodes[i].markidentifer == info)
+          this.node.marks.childNodes[i].name === name &&
+          (!info || this.node.marks.childNodes[i].markidentifer === info)
         ) {
           this.node.marks.childNodes[i].delete()
           this.node.marks.childNodes[i].style.transform += " scale(0.2)"
@@ -11186,7 +11381,7 @@ export class Player extends HTMLDivElement {
    * @returns { boolean }
    */
   canUse(card, target, distance, includecard) {
-    if (typeof card == "string") {
+    if (typeof card === "string") {
       card = { name: card, isCard: true }
     }
     var info = get.info(card)
@@ -11211,7 +11406,13 @@ export class Player extends HTMLDivElement {
     if (distance !== false && !lib.filter.targetInRange(card, this, target)) {
       return false
     }
-    return lib.filter[includecard ? "targetEnabledx" : "targetEnabled"](card, this, target) ?? false
+    return (
+      lib.filter[includecard ? "targetEnabledx" : "targetEnabled"](
+        card,
+        this,
+        target,
+      ) ?? false
+    )
   }
   /**
    * 场上是否存在能对其使用card的目标
@@ -11221,10 +11422,10 @@ export class Player extends HTMLDivElement {
    * @returns { boolean }
    */
   hasUseTarget(card, distance, includecard) {
-    var player = this
-    return game.hasPlayer2(function (current) {
-      return player.canUse(card, current, distance, includecard)
-    }, true)
+    return game.hasPlayer2(
+      (current) => this.canUse(card, current, distance, includecard),
+      true,
+    )
   }
   /**
    * 场上是否存在收益为正的目标
@@ -11234,10 +11435,10 @@ export class Player extends HTMLDivElement {
    * @returns { boolean }
    */
   hasValueTarget(card, distance, includecard) {
-    if (typeof card == "string") {
+    if (typeof card === "string") {
       card = { name: card, isCard: true }
     }
-    var player = this
+
     var targets = game.filterPlayer2(null, null, true)
     var value = []
     var min = 0
@@ -11247,44 +11448,42 @@ export class Player extends HTMLDivElement {
     }
     var range
     var select = get.copy(info.selectTarget)
-    if (select == undefined) {
-      if (info.filterTarget == undefined) {
+    if (select === undefined) {
+      if (info.filterTarget === undefined) {
         return true
       }
       range = [1, 1]
-    } else if (typeof select == "number") {
+    } else if (typeof select === "number") {
       range = [select, select]
-    } else if (get.itemtype(select) == "select") {
+    } else if (get.itemtype(select) === "select") {
       range = select
-    } else if (typeof select == "function") {
-      range = select(card, player)
-      if (typeof range == "number") {
+    } else if (typeof select === "function") {
+      range = select(card, this)
+      if (typeof range === "number") {
         range = [range, range]
       }
     }
     if (info.singleCard) {
       range = [1, 1]
     }
-    game.checkMod(card, player, range, "selectTarget", player)
+    game.checkMod(card, this, range, "selectTarget", this)
     if (!range) {
       return false
     }
 
-    let cache = CacheContext.requireCacheContext()
+    const cache = CacheContext.requireCacheContext()
     for (var i = 0; i < targets.length; i++) {
-      if (player.canUse(card, targets[i], distance, includecard)) {
-        var eff = cache.get.effect(targets[i], card, player, player)
-        if (range[1] == 1 && eff > 0) {
+      if (this.canUse(card, targets[i], distance, includecard)) {
+        var eff = cache.get.effect(targets[i], card, this, this)
+        if (range[1] === 1 && eff > 0) {
           return true
         }
         value.push(eff)
       }
     }
-    value.sort(function (a, b) {
-      return b - a
-    })
+    value.sort((a, b) => b - a)
     for (var i = 0; i < value.length; i++) {
-      if (i == range[1] || (range[1] != -1 && value[i] <= 0)) {
+      if (i === range[1] || (range[1] !== -1 && value[i] <= 0)) {
         break
       }
       min += value[i]
@@ -11299,10 +11498,10 @@ export class Player extends HTMLDivElement {
    * @returns { number } 无可选或正收益目标返回0
    */
   getUseValue(card, distance, includecard) {
-    if (typeof card == "string") {
+    if (typeof card === "string") {
       card = { name: card, isCard: true }
     }
-    var player = this
+
     var targets = game.filterPlayer2(null, null, true)
     var value = []
     var min = 0
@@ -11312,41 +11511,39 @@ export class Player extends HTMLDivElement {
     }
     var range
     var select = get.copy(info.selectTarget)
-    if (select == undefined) {
-      if (info.filterTarget == undefined) {
+    if (select === undefined) {
+      if (info.filterTarget === undefined) {
         return 1
       }
       range = [1, 1]
-    } else if (typeof select == "number") {
+    } else if (typeof select === "number") {
       range = [select, select]
-    } else if (get.itemtype(select) == "select") {
+    } else if (get.itemtype(select) === "select") {
       range = select
-    } else if (typeof select == "function") {
-      range = select(card, player)
-      if (typeof range == "number") {
+    } else if (typeof select === "function") {
+      range = select(card, this)
+      if (typeof range === "number") {
         range = [range, range]
       }
     }
     if (info.singleCard) {
       range = [1, 1]
     }
-    game.checkMod(card, player, range, "selectTarget", player)
+    game.checkMod(card, this, range, "selectTarget", this)
     if (!range) {
       return 0
     }
 
-    let cache = CacheContext.requireCacheContext()
+    const cache = CacheContext.requireCacheContext()
     for (var i = 0; i < targets.length; i++) {
-      if (player.canUse(card, targets[i], distance, includecard)) {
-        var eff = cache.get.effect(targets[i], card, player, player)
+      if (this.canUse(card, targets[i], distance, includecard)) {
+        var eff = cache.get.effect(targets[i], card, this, this)
         value.push(eff)
       }
     }
-    value.sort(function (a, b) {
-      return b - a
-    })
+    value.sort((a, b) => b - a)
     for (var i = 0; i < value.length; i++) {
-      if (i == range[1] || (range[1] != -1 && value[i] <= 0)) {
+      if (i === range[1] || (range[1] !== -1 && value[i] <= 0)) {
         break
       }
       min += value[i]
@@ -11358,8 +11555,8 @@ export class Player extends HTMLDivElement {
    * @param { { hs?: Card[], es?: Card[], skills?: string[], hp?: number, maxHp?: number, hujia?: number, sex?: Sex, group?: string, skill?: string, source?: string  } } cfg
    */
   addSubPlayer(cfg) {
-    var skill = "subplayer_" + cfg.name + "_" + get.id()
-    game.log(this, "获得了随从", "#g" + get.translation(cfg.name))
+    var skill = `subplayer_${cfg.name}_${get.id()}`
+    game.log(this, "获得了随从", `#g${get.translation(cfg.name)}`)
     cfg.hs = cfg.hs || []
     cfg.es = cfg.es || []
     cfg.skills = cfg.skills || []
@@ -11386,7 +11583,7 @@ export class Player extends HTMLDivElement {
       : ["", "_prefix", "_ab"].map((str) => lib.translate[cfg.name + str])
     game.broadcastAll(
       //TODO: 这里直接修改trashBin部分，后续需要修改为新写法
-      function (player, skill, list, cfg) {
+      (player, skill, list, cfg) => {
         lib.skill[skill] = {
           intro: {
             content: cfg.intro || "",
@@ -11400,16 +11597,18 @@ export class Player extends HTMLDivElement {
         lib.character[skill] = [
           cfg.sex,
           cfg.group,
-          parseFloat(cfg.hp) + "/" + parseFloat(cfg.maxHp) + "/" + parseFloat(cfg.hujia),
+          `${parseFloat(cfg.hp)}/${parseFloat(cfg.maxHp)}/${parseFloat(cfg.hujia)}`,
           cfg.skills,
-          ["tempname:" + cfg.name].concat(lib.character[cfg.name].trashBin || []),
+          [`tempname:${cfg.name}`].concat(
+            lib.character[cfg.name].trashBin || [],
+          ),
         ]
         if (Array.isArray(cfg.image)) {
           cfg.image.forEach((image) => lib.character[skill][4].push(image))
-        } else if (typeof cfg.image == "string") {
+        } else if (typeof cfg.image === "string") {
           lib.character[skill].trashBin.push(cfg.image)
         } else {
-          lib.character[skill].trashBin.push("character:" + cfg.name)
+          lib.character[skill].trashBin.push(`character:${cfg.name}`)
         }
         for (let i = 0; i < list.length; i++) {
           if (!list[i]) {
@@ -11435,7 +11634,7 @@ export class Player extends HTMLDivElement {
     return skill
   }
   removeSubPlayer(name) {
-    if (this.hasSkill("subplayer") && this.name == name) {
+    if (this.hasSkill("subplayer") && this.name === name) {
       this.exitSubPlayer(true)
     } else {
       if (this.storage[name].onremove) {
@@ -11443,7 +11642,7 @@ export class Player extends HTMLDivElement {
       }
       this.removeSkill(name)
       delete this.storage[name]
-      game.log(this, "牺牲了随从", "#g" + name)
+      game.log(this, "牺牲了随从", `#g${name}`)
       _status.event.trigger("removeSubPlayer")
     }
   }
@@ -11484,17 +11683,17 @@ export class Player extends HTMLDivElement {
     for (var i = 0; i < skills.length; i++) {
       var name = skills[i]
       var info = lib.skill[name]
-      if (tag && info.subplayer != tag) {
+      if (tag && info.subplayer !== tag) {
         continue
       }
-      if (info.ai && info.ai.subplayer && this.storage[name] && this.storage[name].name) {
+      if (info.ai?.subplayer && this.storage[name]?.name) {
         list.push(name)
       }
     }
     return list
   }
   addSkillTrigger(skills, hidden, triggeronly) {
-    if (typeof skills == "string") {
+    if (typeof skills === "string") {
       skills = [skills]
     }
     game.expandSkills(skills)
@@ -11526,7 +11725,7 @@ export class Player extends HTMLDivElement {
       }
       if (info.trigger && this.playerid) {
         const setTrigger = (role, evt) => {
-          const name = this.playerid + "_" + role + "_" + evt
+          const name = `${this.playerid}_${role}_${evt}`
           if (!lib.hook[name]) {
             lib.hook[name] = []
           }
@@ -11544,7 +11743,9 @@ export class Player extends HTMLDivElement {
             names
               .reduce((list, i) => {
                 if (evt.startsWith(i)) {
-                  return list.addArray(map[i].map((j) => j + evt.slice(i.length)))
+                  return list.addArray(
+                    map[i].map((j) => j + evt.slice(i.length)),
+                  )
                 }
                 return list
               }, [])
@@ -11559,7 +11760,7 @@ export class Player extends HTMLDivElement {
         }
         this._hookTrigger.add(skill)
       }
-      if (_status.event && _status.event.addTrigger) {
+      if (_status.event?.addTrigger) {
         _status.event.addTrigger(skill, this)
       }
       _status.event.clearStepCache()
@@ -11581,7 +11782,7 @@ export class Player extends HTMLDivElement {
         if (popup) {
           this.popup(i)
         }
-        return "#g【" + get.translation(i) + "】"
+        return `#g【${get.translation(i)}】`
       }),
     )
   }
@@ -11600,7 +11801,7 @@ export class Player extends HTMLDivElement {
         if (popup) {
           this.popup(i)
         }
-        return "#g【" + get.translation(i) + "】"
+        return `#g【${get.translation(i)}】`
       }),
     )
   }
@@ -11637,11 +11838,11 @@ export class Player extends HTMLDivElement {
       }
     } else {
       var info = lib.skill[skill]
-      if (info && info.fixed && arguments[1] !== true) {
+      if (info?.fixed && arguments[1] !== true) {
         return skill
       }
       game.broadcastAll(
-        function (player, skill) {
+        (player, skill) => {
           player.invisibleSkills.remove(skill)
         },
         this,
@@ -11667,7 +11868,9 @@ export class Player extends HTMLDivElement {
   }
   changeSkills(addSkill = [], removeSkill = [], popup = true) {
     if (!Array.isArray(addSkill) || !Array.isArray(removeSkill)) {
-      console.warn(`警告：Player[${this.name}].changeSkills的参数错误，应当为数组形式。`)
+      console.warn(
+        `警告：Player[${this.name}].changeSkills的参数错误，应当为数组形式。`,
+      )
       return
     }
     const next = game.createEvent("changeSkills", false)
@@ -11698,7 +11901,7 @@ export class Player extends HTMLDivElement {
         this.skills.add(skill)
         if (!nobroadcast) {
           game.broadcast(
-            function (player, skill) {
+            (player, skill) => {
               player.skills.add(skill)
             },
             this,
@@ -11715,35 +11918,47 @@ export class Player extends HTMLDivElement {
         info.init2(this, skill)
       }
       if (info.mark) {
-        if (info.mark == "card" && get.itemtype(this.storage[skill]) == "card") {
+        if (
+          info.mark === "card" &&
+          get.itemtype(this.storage[skill]) === "card"
+        ) {
           this.markSkill(skill, null, this.storage[skill], nobroadcast)
-        } else if (info.mark == "card" && get.itemtype(this.storage[skill]) == "cards") {
+        } else if (
+          info.mark === "card" &&
+          get.itemtype(this.storage[skill]) === "cards"
+        ) {
           this.markSkill(skill, null, this.storage[skill][0], nobroadcast)
-        } else if (info.mark == "image") {
+        } else if (info.mark === "image") {
           this.markSkill(
             skill,
             null,
             ui.create.card(null, "noclick").init([null, null, skill]),
             nobroadcast,
           )
-        } else if (info.mark == "character") {
+        } else if (info.mark === "character") {
           var intro = info.intro.content
-          if (typeof intro == "function") {
+          if (typeof intro === "function") {
             intro = intro(this.storage[skill], this, skill)
-          } else if (typeof intro == "string") {
+          } else if (typeof intro === "string") {
             intro = intro.replace(/#/g, this.storage[skill])
             intro = intro.replace(/&/g, get.cnNumber(this.storage[skill]))
             intro = intro.replace(/\$/g, get.translation(this.storage[skill]))
           }
           var caption
-          if (typeof info.intro.name == "function") {
+          if (typeof info.intro.name === "function") {
             caption = info.intro.name(this.storage[skill], this, skill)
-          } else if (typeof info.intro.name == "string") {
+          } else if (typeof info.intro.name === "string") {
             caption = info.name
           } else {
             caption = get.translation(skill)
           }
-          this.markSkillCharacter(skill, this.storage[skill], caption, intro, nobroadcast)
+          this.markSkillCharacter(
+            skill,
+            this.storage[skill],
+            caption,
+            intro,
+            nobroadcast,
+          )
         } else {
           this.markSkill(skill, null, null, nobroadcast)
         }
@@ -11756,7 +11971,7 @@ export class Player extends HTMLDivElement {
     return skill
   }
   addAdditionalSkills(skill, skillsToAdd, keep) {
-    if (typeof skillsToAdd == "string") {
+    if (typeof skillsToAdd === "string") {
       skillsToAdd = [skillsToAdd]
     }
     if (!Array.isArray(skillsToAdd)) {
@@ -11773,7 +11988,7 @@ export class Player extends HTMLDivElement {
     //创建对应的addSkills的事件
     return this.changeSkills(skillsToAdd, skillsToRemove).set(
       "$handle",
-      function (player, skillsToAdd, skillsToRemove) {
+      (player, skillsToAdd, skillsToRemove) => {
         //先失去先前获得的衍生技能
         if (skillsToRemove.length > 0) {
           player.removeSkillLog(skillsToRemove, get.event().popup)
@@ -11787,7 +12002,7 @@ export class Player extends HTMLDivElement {
               if (get.event().popup) {
                 player.popup(i)
               }
-              return "#g【" + get.translation(i) + "】"
+              return `#g【${get.translation(i)}】`
             }),
           )
           if (!Array.isArray(player.additionalSkills[skill])) {
@@ -11811,7 +12026,7 @@ export class Player extends HTMLDivElement {
     )
   }
   addAdditionalSkill(skill, skillsToAdd, keep) {
-    if (typeof skillsToAdd == "string") {
+    if (typeof skillsToAdd === "string") {
       skillsToAdd = [skillsToAdd]
     }
     if (!Array.isArray(skillsToAdd)) {
@@ -11868,33 +12083,31 @@ export class Player extends HTMLDivElement {
     )
   }
   getRemovableAdditionalSkills(skill, target) {
-    const player = this,
-      removableSkills = []
+    const removableSkills = []
     if (this.additionalSkills[skill]) {
       const additionalSkills = this.additionalSkills[skill]
-      const hasAnotherSKill = function (skillkey, skill) {
-        return (
-          player.skills.includes(skill) ||
-          player.tempSkills[skill] ||
-          Object.keys(player.additionalSkills).some((key) => {
-            if (key === skillkey) {
-              return false
-            }
-            if (Array.isArray(player.additionalSkills[key])) {
-              return player.additionalSkills[key].includes(skill)
-            }
-            return player.additionalSkills[key] == skill
-          })
-        )
-      }
-      if (Array.isArray(additionalSkills) && typeof target == "string") {
+      const hasAnotherSKill = (skillkey, skill) =>
+        this.skills.includes(skill) ||
+        this.tempSkills[skill] ||
+        Object.keys(this.additionalSkills).some((key) => {
+          if (key === skillkey) {
+            return false
+          }
+          if (Array.isArray(this.additionalSkills[key])) {
+            return this.additionalSkills[key].includes(skill)
+          }
+          return this.additionalSkills[key] === skill
+        })
+      if (Array.isArray(additionalSkills) && typeof target === "string") {
         if (additionalSkills.includes(target)) {
           removableSkills.push(target)
         }
       } else {
         if (Array.isArray(additionalSkills)) {
           removableSkills.addArray(
-            additionalSkills.filter((target) => !hasAnotherSKill(skill, target)),
+            additionalSkills.filter(
+              (target) => !hasAnotherSKill(skill, target),
+            ),
           )
         }
       }
@@ -11902,26 +12115,25 @@ export class Player extends HTMLDivElement {
     return removableSkills
   }
   removeAdditionalSkill(skill, target) {
-    const player = this,
-      skills = this.getRemovableAdditionalSkills(skill, target)
+    const skills = this.getRemovableAdditionalSkills(skill, target)
     if (skills.length) {
-      player.removeSkill(skills)
+      this.removeSkill(skills)
     }
-    player.$removeAdditionalSkills(skill, target)
+    this.$removeAdditionalSkills(skill, target)
     _status.event.clearStepCache()
     return this
   }
   removeAdditionalSkills(skill, target) {
-    const player = this,
-      skills = this.getRemovableAdditionalSkills(skill, target)
-    return player
-      .changeSkills([], skills)
-      .set("$handle", function (player, addSkills, removeSkills) {
+    const skills = this.getRemovableAdditionalSkills(skill, target)
+    return this.changeSkills([], skills).set(
+      "$handle",
+      (player, addSkills, removeSkills) => {
         if (removeSkills.length > 0) {
           player.removeSkillLog(removeSkills, get.event().popup)
         }
         player.$removeAdditionalSkills(skill, target)
-      })
+      },
+    )
   }
   /**
    * 中流（×）批量重置技能
@@ -11929,11 +12141,10 @@ export class Player extends HTMLDivElement {
    * @returns { string [] } 返回被重置的技能
    */
   refreshSkill(skills) {
-    const player = this
     if (!skills) {
-      skills = game.expandSkills(player.getStockSkills(true, true))
+      skills = game.expandSkills(this.getStockSkills(true, true))
     }
-    if (typeof skills == "string") {
+    if (typeof skills === "string") {
       skills = [skills]
     }
     if (!Array.isArray(skills) || !skills?.length) {
@@ -11945,36 +12156,36 @@ export class Player extends HTMLDivElement {
       const info = get.info(skill)
       if (info.usable !== undefined) {
         if (
-          typeof player.getStat("triggerSkill")[skill] == "number" &&
-          player.getStat("triggerSkill")[skill] >= 1
+          typeof this.getStat("triggerSkill")[skill] === "number" &&
+          this.getStat("triggerSkill")[skill] >= 1
         ) {
-          delete player.getStat("triggerSkill")[skill]
+          delete this.getStat("triggerSkill")[skill]
           resetSkills.add(skill)
         }
         if (
-          typeof player.getStat("skill")[skill] == "number" &&
-          player.getStat("skill")[skill] >= 1
+          typeof this.getStat("skill")[skill] === "number" &&
+          this.getStat("skill")[skill] >= 1
         ) {
-          delete player.getStat("skill")[skill]
+          delete this.getStat("skill")[skill]
           resetSkills.add(skill)
         }
       }
-      if (info.round && player.storage[skill + "_roundcount"]) {
-        delete player.storage[skill + "_roundcount"]
-        player.unmarkSkill(skill + "_roundcount")
+      if (info.round && this.storage[`${skill}_roundcount`]) {
+        delete this.storage[`${skill}_roundcount`]
+        this.unmarkSkill(`${skill}_roundcount`)
         resetSkills.add(skill)
       }
-      if (player.storage[`temp_ban_${skill}`]) {
-        delete player.storage[`temp_ban_${skill}`]
+      if (this.storage[`temp_ban_${skill}`]) {
+        delete this.storage[`temp_ban_${skill}`]
         resetSkills.add(skill)
       }
-      if (player.awakenedSkills.includes(skill)) {
-        player.restoreSkill(skill)
+      if (this.awakenedSkills.includes(skill)) {
+        this.restoreSkill(skill)
         resetSkills.add(skill)
       }
       for (const suffix of suffixs) {
-        if (player.hasSkill(skill + "_" + suffix)) {
-          player.removeSkill(skill + "_" + suffix)
+        if (this.hasSkill(`${skill}_${suffix}`)) {
+          this.removeSkill(`${skill}_${suffix}`)
           resetSkills.add(skill)
         }
       }
@@ -11982,9 +12193,9 @@ export class Player extends HTMLDivElement {
     if (resetSkills.length) {
       let str = ""
       for (const i of resetSkills) {
-        str += "【" + get.translation(i) + "】、"
+        str += `【${get.translation(i)}】、`
       }
-      game.log(player, "重置了技能", "#g" + str.slice(0, -1))
+      game.log(this, "重置了技能", `#g${str.slice(0, -1)}`)
     }
     return resetSkills
   }
@@ -11992,7 +12203,7 @@ export class Player extends HTMLDivElement {
     if (!nounmark) {
       this.unmarkSkill(skill)
     }
-    this.disableSkill(skill + "_awake", skill)
+    this.disableSkill(`${skill}_awake`, skill)
     this.awakenedSkills.add(skill)
     if (this.storage[skill] === undefined || this.storage[skill] === false) {
       this.storage[skill] = true
@@ -12005,7 +12216,7 @@ export class Player extends HTMLDivElement {
       this.storage[skill] = false
     }
     this.awakenedSkills.remove(skill)
-    this.enableSkill(skill + "_awake", skill)
+    this.enableSkill(`${skill}_awake`, skill)
     if (!nomark && this.hasSkill(skill, null, null, false)) {
       this.markSkill(skill)
     }
@@ -12013,26 +12224,26 @@ export class Player extends HTMLDivElement {
     return this
   }
   disableSkill(skill, skills) {
-    if (typeof skills == "string") {
+    if (typeof skills === "string") {
       if (!this.disabledSkills[skills]) {
         this.disabledSkills[skills] = []
         var info = get.info(skills)
         if (info.ondisable && info.onremove) {
-          if (typeof info.onremove == "function") {
+          if (typeof info.onremove === "function") {
             info.onremove(this, skill)
-          } else if (typeof info.onremove == "string") {
-            if (info.onremove == "storage") {
+          } else if (typeof info.onremove === "string") {
+            if (info.onremove === "storage") {
               delete this.storage[skill]
             } else {
               var cards = this.storage[skill]
-              if (get.itemtype(cards) == "card") {
+              if (get.itemtype(cards) === "card") {
                 cards = [cards]
               }
-              if (get.itemtype(cards) == "cards") {
-                if (this.onremove == "discard") {
+              if (get.itemtype(cards) === "cards") {
+                if (this.onremove === "discard") {
                   this.$throw(cards)
                 }
-                if (this.onremove == "discard" || this.onremove == "lose") {
+                if (this.onremove === "discard" || this.onremove === "lose") {
                   game.cardsDiscard(cards)
                   delete this.storage[skill]
                 }
@@ -12050,7 +12261,7 @@ export class Player extends HTMLDivElement {
       this.disabledSkills[skills] ??= []
       this.disabledSkills[skills].add(skill)
       var group = lib.skill[skills].group
-      if (typeof group == "string" || Array.isArray(group)) {
+      if (typeof group === "string" || Array.isArray(group)) {
         this.disableSkill(skill, group)
       }
     } else if (Array.isArray(skills)) {
@@ -12064,7 +12275,7 @@ export class Player extends HTMLDivElement {
   enableSkill(skill) {
     for (var i in this.disabledSkills) {
       this.disabledSkills[i].remove(skill)
-      if (this.disabledSkills[i].length == 0) {
+      if (this.disabledSkills[i].length === 0) {
         delete this.disabledSkills[i]
       }
     }
@@ -12103,55 +12314,56 @@ export class Player extends HTMLDivElement {
     return this
   }
   removeVirtualJudge(VCard) {
-    const player = this
-    game.addVideo("removeVirtualJudge", player, get.vcardInfo(VCard))
+    game.addVideo("removeVirtualJudge", this, get.vcardInfo(VCard))
     game.broadcast(
       (VCard, player) => {
         const cards = player.vcardsMap?.judges
-        if (cards && cards.includes(VCard)) {
+        if (cards?.includes(VCard)) {
           cards.remove(VCard)
         }
       },
       VCard,
-      player,
+      this,
     )
-    const cards = player.vcardsMap?.judges
-    if (cards && cards.includes(VCard)) {
+    const cards = this.vcardsMap?.judges
+    if (cards?.includes(VCard)) {
       cards.remove(VCard)
     }
-    if (VCard.storage.equipEnable && VCard.cards?.some((card) => get.type(card) == "equip")) {
-      const es = player.getVCards("e"),
+    if (
+      VCard.storage.equipEnable &&
+      VCard.cards?.some((card) => get.type(card) === "equip")
+    ) {
+      const es = this.getVCards("e"),
         equips = VCard.cards
       if (equips.length) {
-        let keepSkills = Object.values(player.additionalSkills)
+        const keepSkills = Object.values(this.additionalSkills)
             .flat()
             .concat(get.skillsFromEquips(es)),
           skills = get.skillsFromEquips(equips).removeArray(keepSkills)
         if (skills.length) {
-          player.removeSkill(skills)
+          this.removeSkill(skills)
         }
       }
     }
   }
   removeVirtualEquip(VCard) {
-    const player = this
-    game.addVideo("removeVirtualEquip", player, get.vcardInfo(VCard))
+    game.addVideo("removeVirtualEquip", this, get.vcardInfo(VCard))
     game.broadcast(
       (VCard, player) => {
         const cards = player.vcardsMap?.equips
-        if (cards && cards.includes(VCard)) {
+        if (cards?.includes(VCard)) {
           cards.remove(VCard)
         }
       },
       VCard,
-      player,
+      this,
     )
-    const cards = player.vcardsMap?.equips
-    if (cards && cards.includes(VCard)) {
-      player.removeEquipTrigger(VCard, true)
+    const cards = this.vcardsMap?.equips
+    if (cards?.includes(VCard)) {
+      this.removeEquipTrigger(VCard, true)
       cards.remove(VCard)
     }
-    player.$handleEquipChange()
+    this.$handleEquipChange()
   }
   removeEquipTrigger(card, hasMove) {
     if (_status.video) {
@@ -12164,7 +12376,7 @@ export class Player extends HTMLDivElement {
       VEquips.remove(card)
       skills.addArray(get.skillsFromEquips(VEquips))
       const cards = this.vcardsMap?.equips
-      if (cards && cards.includes(card) && hasMove !== true) {
+      if (cards?.includes(card) && hasMove !== true) {
         cards.remove(card)
       }
       if (info.skills) {
@@ -12175,8 +12387,8 @@ export class Player extends HTMLDivElement {
           this.removeSkillTrigger(info.skills[j])
         }
       }
-      if (info.clearLose && typeof info.onLose == "function") {
-        var next = game.createEvent("lose_" + card.name)
+      if (info.clearLose && typeof info.onLose === "function") {
+        var next = game.createEvent(`lose_${card.name}`)
         next.setContent(info.onLose)
         next.player = this
         next.card = card
@@ -12191,7 +12403,7 @@ export class Player extends HTMLDivElement {
     return this
   }
   removeSkillTrigger(skills, triggeronly) {
-    if (typeof skills == "string") {
+    if (typeof skills === "string") {
       skills = [skills]
     }
     game.expandSkills(skills)
@@ -12221,12 +12433,12 @@ export class Player extends HTMLDivElement {
       }
       if (info.trigger && this.playerid) {
         const removeTrigger = (role, evt) => {
-          const name = this.playerid + "_" + role + "_" + evt
+          const name = `${this.playerid}_${role}_${evt}`
           if (!lib.hook[name]) {
             return
           }
           lib.hook[name].remove(skill)
-          if (lib.hook[name].length == 0) {
+          if (lib.hook[name].length === 0) {
             delete lib.hook[name]
           }
         }
@@ -12241,7 +12453,9 @@ export class Player extends HTMLDivElement {
             names
               .reduce((list, i) => {
                 if (evt.startsWith(i)) {
-                  return list.addArray(map[i].map((j) => j + evt.slice(i.length)))
+                  return list.addArray(
+                    map[i].map((j) => j + evt.slice(i.length)),
+                  )
                 }
                 return list
               }, [])
@@ -12256,7 +12470,7 @@ export class Player extends HTMLDivElement {
           delete this._hookTrigger
         }
       }
-      if (_status.event && _status.event.removeTrigger) {
+      if (_status.event?.removeTrigger) {
         _status.event.removeTrigger(skill, this)
       }
       _status.event.clearStepCache()
@@ -12276,64 +12490,63 @@ export class Player extends HTMLDivElement {
       if (skill === "counttrigger") {
         this.stat[this.stat.length - 1].triggerSkill = {}
         return
-      } else {
-        var info = lib.skill[skill]
-        if (info?.fixed && arguments[1] !== true) {
-          return skill
-        }
-        this.unmarkSkill(skill)
-        game.broadcastAll(
-          function (player, skill) {
-            player.skills.remove(skill)
-            player.hiddenSkills.remove(skill)
-            player.invisibleSkills.remove(skill)
-            delete player.tempSkills[skill]
-            for (var i in player.additionalSkills) {
-              player.additionalSkills[i].remove(skill)
-            }
-          },
-          this,
-          skill,
-        )
-        this.checkConflict(skill)
-        if (info) {
-          if (info.onremove) {
-            if (typeof info.onremove == "function") {
-              info.onremove(this, skill)
-            } else if (typeof info.onremove == "string") {
-              if (info.onremove == "storage") {
-                delete this.storage[skill]
-              } else {
-                var cards = this.storage[skill]
-                if (get.itemtype(cards) == "card") {
-                  cards = [cards]
-                }
-                if (get.itemtype(cards) == "cards") {
-                  if (this.onremove == "discard") {
-                    this.$throw(cards)
-                  }
-                  if (this.onremove == "discard" || this.onremove == "lose") {
-                    game.cardsDiscard(cards)
-                    delete this.storage[skill]
-                  }
-                }
-              }
-            } else if (Array.isArray(info.onremove)) {
-              for (var i = 0; i < info.onremove.length; i++) {
-                delete this.storage[info.onremove[i]]
-              }
-            } else if (info.onremove === true) {
-              delete this.storage[skill]
-            }
-          }
-          this.removeSkillTrigger(skill)
-          if (!info.keepSkill) {
-            this.removeAdditionalSkills(skill)
-          }
-        }
-        this.enableSkill(skill + "_awake")
-        game.callHook("removeSkillCheck", [skill, this])
       }
+      var info = lib.skill[skill]
+      if (info?.fixed && arguments[1] !== true) {
+        return skill
+      }
+      this.unmarkSkill(skill)
+      game.broadcastAll(
+        (player, skill) => {
+          player.skills.remove(skill)
+          player.hiddenSkills.remove(skill)
+          player.invisibleSkills.remove(skill)
+          delete player.tempSkills[skill]
+          for (var i in player.additionalSkills) {
+            player.additionalSkills[i].remove(skill)
+          }
+        },
+        this,
+        skill,
+      )
+      this.checkConflict(skill)
+      if (info) {
+        if (info.onremove) {
+          if (typeof info.onremove === "function") {
+            info.onremove(this, skill)
+          } else if (typeof info.onremove === "string") {
+            if (info.onremove === "storage") {
+              delete this.storage[skill]
+            } else {
+              var cards = this.storage[skill]
+              if (get.itemtype(cards) === "card") {
+                cards = [cards]
+              }
+              if (get.itemtype(cards) === "cards") {
+                if (this.onremove === "discard") {
+                  this.$throw(cards)
+                }
+                if (this.onremove === "discard" || this.onremove === "lose") {
+                  game.cardsDiscard(cards)
+                  delete this.storage[skill]
+                }
+              }
+            }
+          } else if (Array.isArray(info.onremove)) {
+            for (var i = 0; i < info.onremove.length; i++) {
+              delete this.storage[info.onremove[i]]
+            }
+          } else if (info.onremove === true) {
+            delete this.storage[skill]
+          }
+        }
+        this.removeSkillTrigger(skill)
+        if (!info.keepSkill) {
+          this.removeAdditionalSkills(skill)
+        }
+      }
+      this.enableSkill(`${skill}_awake`)
+      game.callHook("removeSkillCheck", [skill, this])
     }
     return skill
   }
@@ -12345,7 +12558,7 @@ export class Player extends HTMLDivElement {
    */
   addTempSkills(skillsToAdd, expire) {
     //请注意，该方法的底层实现并非tempSkill，而是additionalSkills和player.when！
-    if (typeof skillsToAdd == "string") {
+    if (typeof skillsToAdd === "string") {
       skillsToAdd = [skillsToAdd]
     }
     if (!Array.isArray(skillsToAdd) || !skillsToAdd.length) {
@@ -12357,12 +12570,12 @@ export class Player extends HTMLDivElement {
     //确定技能要被移除的时机
     if (!expire) {
       expire = { global: ["phaseAfter", "phaseBeforeStart"] }
-    } else if (typeof expire == "string" || Array.isArray(expire)) {
+    } else if (typeof expire === "string" || Array.isArray(expire)) {
       expire = { global: expire }
     }
     return this.changeSkills(skillsToAdd, []).set(
       "$handle",
-      function (player, addSkills, removeSkills) {
+      (player, addSkills, removeSkills) => {
         if (addSkills.length) {
           game.log(
             player,
@@ -12371,13 +12584,13 @@ export class Player extends HTMLDivElement {
               if (get.event().popup) {
                 player.popup(i)
               }
-              return "#g【" + get.translation(i) + "】"
+              return `#g【${get.translation(i)}】`
             }),
           )
           let skillName
           //生成该TempSkills对应的ID
           do {
-            skillName = "player_tempSkills_" + Math.random().toString(36).slice(-8)
+            skillName = `player_tempSkills_${Math.random().toString(36).slice(-8)}`
           } while (player.additionalSkills[skillName] != null)
           player.addAdditionalSkill(skillName, skillsToAdd)
           player
@@ -12407,20 +12620,20 @@ export class Player extends HTMLDivElement {
         this.addTempSkill(skill[i], expire, checkConflict)
       }
     } else {
-      if (this.hasSkill(skill) && this.tempSkills[skill] == undefined) {
+      if (this.hasSkill(skill) && this.tempSkills[skill] === undefined) {
         return
       }
       this.addSkill(skill, checkConflict, false, true)
 
       if (!expire) {
         expire = { global: ["phaseAfter", "phaseBeforeStart"] }
-      } else if (typeof expire == "string" || Array.isArray(expire)) {
+      } else if (typeof expire === "string" || Array.isArray(expire)) {
         expire = { global: expire }
       }
       this.tempSkills[skill] = expire
       const map = lib.relatedTrigger,
         names = Object.keys(map)
-      if (get.objtype(expire) == "object") {
+      if (get.objtype(expire) === "object") {
         const roles = ["player", "source", "target", "global"]
         for (const i of roles) {
           let triggers = expire[i]
@@ -12460,13 +12673,18 @@ export class Player extends HTMLDivElement {
       this.setStorage(`temp_ban_${skill}`, true)
 
       if (log !== false && this.hasSkill(skill)) {
-        game.log(this, "的技能", `#g【${get.translation(skill)}】`, "暂时失效了")
+        game.log(
+          this,
+          "的技能",
+          `#g【${get.translation(skill)}】`,
+          "暂时失效了",
+        )
       }
 
       if (expire !== "forever") {
         if (!expire) {
           expire = { global: ["phaseAfter", "phaseBeforeStart"] }
-        } else if (typeof expire == "string" || Array.isArray(expire)) {
+        } else if (typeof expire === "string" || Array.isArray(expire)) {
           expire = { global: expire }
         }
         this.when(expire, false)
@@ -12490,13 +12708,16 @@ export class Player extends HTMLDivElement {
     return this.hasStorage(`temp_ban_${skill}`)
   }
   attitudeTo(target) {
-    if (typeof get.attitude == "function") {
+    if (typeof get.attitude === "function") {
       return get.attitude(this, target)
     }
     return 0
   }
   clearSkills(all, ...skills) {
-    if (!all) return this.removeSkills(this.getSkills(null, false, false).removeArray(skills))
+    if (!all)
+      return this.removeSkills(
+        this.getSkills(null, false, false).removeArray(skills),
+      )
     var list = this.skills.filter((skill) => {
       return !lib.skill[skill]?.superCharlotte && !skills.includes(skill)
     })
@@ -12525,10 +12746,10 @@ export class Player extends HTMLDivElement {
     } else {
       this.forbiddenSkills = {}
       var forbid = []
-      var getName = function (arr) {
+      var getName = (arr) => {
         var str = ""
         for (var i = 0; i < arr.length; i++) {
-          str += arr[i] + "+"
+          str += `${arr[i]}+`
         }
         return str.slice(0, str.length - 1)
       }
@@ -12544,14 +12765,15 @@ export class Player extends HTMLDivElement {
               break
             }
           }
-          if (j == forbidlist[i].length) {
+          if (j === forbidlist[i].length) {
             forbid.push(forbidlist[i])
           }
         }
       }
       for (var i = 0; i < forbid.length; i++) {
         if (forbid[i][1] || this.name2) {
-          this.forbiddenSkills[forbid[i][0]] = this.forbiddenSkills[forbid[i][0]] || []
+          this.forbiddenSkills[forbid[i][0]] =
+            this.forbiddenSkills[forbid[i][0]] || []
           if (forbid[i][1]) {
             this.forbiddenSkills[forbid[i][0]].add(forbid[i][1])
           }
@@ -12725,9 +12947,8 @@ export class Player extends HTMLDivElement {
     }
     if (!filter) {
       return this.actionHistory[this.actionHistory.length - 1][key]
-    } else {
-      return this.iterHistory(key, filter, last).toArray()
     }
+    return this.iterHistory(key, filter, last).toArray()
   }
   /**
    * 遍历当前回合内该玩家指定类型的历史事件
@@ -12921,7 +13142,9 @@ export class Player extends HTMLDivElement {
     }
 
     if (last != null) {
-      if (!this.actionHistory.some((histories) => histories[key].includes(last))) {
+      if (
+        !this.actionHistory.some((histories) => histories[key].includes(last))
+      ) {
         return
       }
     }
@@ -13015,7 +13238,7 @@ export class Player extends HTMLDivElement {
     return false
   }
   getLastUsed(num) {
-    if (typeof num != "number") {
+    if (typeof num !== "number") {
       num = 0
     }
     var history = this.getHistory("useCard")
@@ -13068,47 +13291,46 @@ export class Player extends HTMLDivElement {
     return stat[key]
   }
   queue(time) {
-    if (time == false) {
+    if (time === false) {
       clearTimeout(this.queueTimeout)
       this.queueCount = 0
       return
     }
-    if (time == undefined) {
+    if (time === undefined) {
       time = 500
     }
-    var player = this
-    player.queueCount++
-    this.queueTimeout = setTimeout(function () {
-      player.queueCount--
-      if (player.queueCount == 0) {
-        player.style.transform = ""
-        player.node.avatar.style.transform = ""
-        player.node.avatar2.style.transform = ""
+
+    this.queueCount++
+    this.queueTimeout = setTimeout(() => {
+      this.queueCount--
+      if (this.queueCount === 0) {
+        this.style.transform = ""
+        this.node.avatar.style.transform = ""
+        this.node.avatar2.style.transform = ""
         if (game.chess) {
-          ui.placeChess(player, player.dataset.position)
+          ui.placeChess(this, this.dataset.position)
         }
-        if (player == game.me) {
+        if (this === game.me) {
           ui.me.removeAttribute("style")
         }
       }
     }, time)
   }
   getCardUsable(card, pure) {
-    var player = this
-    if (typeof card == "string") {
+    if (typeof card === "string") {
       card = { name: card }
     }
     card = get.autoViewAs(card)
     var num = get.info(card).usable
-    if (typeof num == "function") {
-      num = num(card, player)
+    if (typeof num === "function") {
+      num = num(card, this)
     }
-    num = game.checkMod(card, player, num, "cardUsable", player)
-    if (typeof num != "number") {
+    num = game.checkMod(card, this, num, "cardUsable", this)
+    if (typeof num !== "number") {
       return Infinity
     }
-    if (!pure && _status.currentPhase == player) {
-      return num - player.countUsed(card)
+    if (!pure && _status.currentPhase === this) {
+      return num - this.countUsed(card)
     }
     return num
   }
@@ -13118,32 +13340,33 @@ export class Player extends HTMLDivElement {
    * @returns { number }
    */
   getAttackRange(raw) {
-    const player = this
     let range = 0
     if (raw) {
-      range = game.checkMod(player, player, range, "globalFrom", player)
-      range = game.checkMod(player, player, range, "attackFrom", player)
-      const equips = player.getVCards("e", function (card) {
-        return !card.cards?.some((card) => {
-          return ui.selected.cards?.includes(card)
-        })
-      })
+      range = game.checkMod(this, this, range, "globalFrom", this)
+      range = game.checkMod(this, this, range, "attackFrom", this)
+      const equips = this.getVCards(
+        "e",
+        (card) =>
+          !card.cards?.some((card) => {
+            return ui.selected.cards?.includes(card)
+          }),
+      )
       equips.forEach((card) => {
         const info = get.info(card, false).distance
-        if (info && info.globalFrom) {
+        if (info?.globalFrom) {
           range += info.globalFrom
         }
       })
-      return player.getEquipRange() - range
+      return this.getEquipRange() - range
     }
-    let base = game.checkMod(player, "unchanged", "attackRangeBase", player)
-    if (base != "unchanged") {
+    const base = game.checkMod(this, "unchanged", "attackRangeBase", this)
+    if (base !== "unchanged") {
       range = base
     } else {
-      range = player.getEquipRange()
+      range = this.getEquipRange()
     }
-    range = game.checkMod(player, range, "attackRange", player)
-    range = game.checkMod(player, range, "attackRangeFinal", player)
+    range = game.checkMod(this, range, "attackRange", this)
+    range = game.checkMod(this, range, "attackRangeFinal", this)
     return range
   }
   /**
@@ -13152,46 +13375,47 @@ export class Player extends HTMLDivElement {
    * @returns { number }
    */
   getEquipRange(cards) {
-    const player = this
     if (!cards) {
-      cards = player.getVCards("e", function (card) {
-        return !card.cards?.some((card) => {
-          return ui.selected.cards?.includes(card)
-        })
-      })
+      cards = this.getVCards(
+        "e",
+        (card) =>
+          !card.cards?.some((card) => {
+            return ui.selected.cards?.includes(card)
+          }),
+      )
     }
     const range = cards.reduce((range, card) => {
       let newRange = false
       const info = get.info(card, false)
       if (info.distance) {
         //如果存在attackRange 则通过attackRange动态获取攻击范围
-        if (typeof info.distance.attackRange == "function") {
-          newRange = info.distance.attackRange(card, player)
+        if (typeof info.distance.attackRange === "function") {
+          newRange = info.distance.attackRange(card, this)
         }
         //否则采用祖宗之法
-        else if (typeof info.distance.attackFrom == "number") {
+        else if (typeof info.distance.attackFrom === "number") {
           newRange = 1 - info.distance.attackFrom
         }
       }
-      let isN1 = typeof range == "number"
-      let isN2 = typeof newRange == "number"
+      const isN1 = typeof range === "number"
+      const isN2 = typeof newRange === "number"
       if (isN1 && isN2) {
         return Math.max(range, newRange)
-      } else {
-        return isN1 ? range : newRange
       }
+      return isN1 ? range : newRange
     }, false)
-    return typeof range == "number" ? range : 1
+    return typeof range === "number" ? range : 1
   }
   getGlobalFrom() {
-    var player = this
     var range = 0
-    range = game.checkMod(player, player, range, "globalFrom", player)
-    var equips = player.getVCards("e", function (card) {
-      return !card.cards?.some((card) => {
-        return ui.selected.cards?.includes(card)
-      })
-    })
+    range = game.checkMod(this, this, range, "globalFrom", this)
+    var equips = this.getVCards(
+      "e",
+      (card) =>
+        !card.cards?.some((card) => {
+          return ui.selected.cards?.includes(card)
+        }),
+    )
     for (var i = 0; i < equips.length; i++) {
       var info = get.info(equips[i]).distance
       if (!info) {
@@ -13204,14 +13428,15 @@ export class Player extends HTMLDivElement {
     return -range
   }
   getGlobalTo() {
-    var player = this
     var range = 0
-    range = game.checkMod(player, player, range, "globalTo", player)
-    var equips = player.getVCards("e", function (card) {
-      return !card.cards?.some((card) => {
-        return ui.selected.cards?.includes(card)
-      })
-    })
+    range = game.checkMod(this, this, range, "globalTo", this)
+    var equips = this.getVCards(
+      "e",
+      (card) =>
+        !card.cards?.some((card) => {
+          return ui.selected.cards?.includes(card)
+        }),
+    )
     for (var i = 0; i < equips.length; i++) {
       var info = get.info(equips[i]).distance
       if (!info) {
@@ -13235,17 +13460,16 @@ export class Player extends HTMLDivElement {
     return Math.max(0, num)
   }
   getEnemies(func, includeDie) {
-    var player = this
     var targets
     var mode = get.mode()
-    let method = includeDie ? "filterPlayer2" : "filterPlayer"
-    if (mode == "identity") {
-      if (_status.mode == "purple") {
-        switch (player.identity) {
+    const method = includeDie ? "filterPlayer2" : "filterPlayer"
+    if (mode === "identity") {
+      if (_status.mode === "purple") {
+        switch (this.identity) {
           case "bZhu":
           case "bZhong":
           case "rNei":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
@@ -13255,7 +13479,7 @@ export class Player extends HTMLDivElement {
           case "rZhu":
           case "rZhong":
           case "bNei":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
@@ -13264,7 +13488,7 @@ export class Player extends HTMLDivElement {
             break
           case "rYe":
           case "bYe":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
@@ -13274,96 +13498,97 @@ export class Player extends HTMLDivElement {
         }
       } else {
         var num = get.population("fan")
-        switch (player.identity) {
+        switch (this.identity) {
           case "zhu":
           case "zhong":
           case "mingzhong":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
               if (num >= 3) {
-                return target.identity == "fan"
+                return target.identity === "fan"
               }
-              return target.identity == "nei" || target.identity == "fan"
+              return target.identity === "nei" || target.identity === "fan"
             })
             break
           case "nei":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
               if (num >= 3) {
-                return target.identity == "fan"
+                return target.identity === "fan"
               }
-              if (game.players.length == 2) {
-                return target != player
+              if (game.players.length === 2) {
+                return target !== this
               }
               return (
-                target.identity == "zhong" ||
-                target.identity == "mingzhong" ||
-                target.identity == "fan"
+                target.identity === "zhong" ||
+                target.identity === "mingzhong" ||
+                target.identity === "fan"
               )
             })
             break
           case "fan":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
-              return target.identity != "fan"
+              return target.identity !== "fan"
             })
             break
           case "commoner":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
               if (num >= 3) {
-                return target.identity != "fan"
+                return target.identity !== "fan"
               }
-              return target.identity == "fan"
+              return target.identity === "fan"
             })
             break
         }
       }
-    } else if (mode == "guozhan") {
-      if (player.identity == "ye") {
-        targets = game[method](function (target) {
+    } else if (mode === "guozhan") {
+      if (this.identity === "ye") {
+        targets = game[method]((target) => {
           if (func && !func(target)) {
             return false
           }
           return true
         })
       } else {
-        var group = lib.character[player.name1][1]
-        targets = game[method](function (target) {
+        var group = lib.character[this.name1][1]
+        targets = game[method]((target) => {
           if (func && !func(target)) {
             return false
           }
-          return target.identity == "ye" || lib.character[target.name1][1] != group
+          return (
+            target.identity === "ye" || lib.character[target.name1][1] !== group
+          )
         })
       }
-    } else if (mode == "doudizhu") {
-      targets = game[method](function (target) {
+    } else if (mode === "doudizhu") {
+      targets = game[method]((target) => {
         if (func && !func(target)) {
           return false
         }
-        return target.identity != player.identity
+        return target.identity !== this.identity
       })
     } else {
-      targets = game[method](function (target) {
+      targets = game[method]((target) => {
         if (func && !func(target)) {
           return false
         }
-        return target.side != player.side
+        return target.side !== this.side
       })
     }
-    targets.remove(player)
+    targets.remove(this)
     return targets
   }
   getFriends(func, includeDie) {
-    var player = this
     var targets = []
     var mode = get.mode()
     var self = false
@@ -13371,14 +13596,14 @@ export class Player extends HTMLDivElement {
       func = null
       self = true
     }
-    let method = includeDie ? "filterPlayer2" : "filterPlayer"
-    if (mode == "identity") {
-      if (_status.mode == "purple") {
-        switch (player.identity) {
+    const method = includeDie ? "filterPlayer2" : "filterPlayer"
+    if (mode === "identity") {
+      if (_status.mode === "purple") {
+        switch (this.identity) {
           case "rZhu":
           case "rZhong":
           case "bNei":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
@@ -13388,7 +13613,7 @@ export class Player extends HTMLDivElement {
           case "bZhu":
           case "bZhong":
           case "rNei":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
@@ -13397,7 +13622,7 @@ export class Player extends HTMLDivElement {
             break
           case "rYe":
           case "bYe":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
@@ -13406,11 +13631,11 @@ export class Player extends HTMLDivElement {
             break
         }
       } else {
-        switch (player.identity) {
+        switch (this.identity) {
           case "zhu":
           case "zhong":
           case "mingzhong":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
@@ -13421,15 +13646,15 @@ export class Player extends HTMLDivElement {
             targets = []
             break
           case "fan":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
-              return target.identity == "fan"
+              return target.identity === "fan"
             })
             break
           case "commoner":
-            targets = game[method](function (target) {
+            targets = game[method]((target) => {
               if (func && !func(target)) {
                 return false
               }
@@ -13438,37 +13663,39 @@ export class Player extends HTMLDivElement {
             break
         }
       }
-    } else if (mode == "guozhan") {
-      if (player.identity == "ye") {
+    } else if (mode === "guozhan") {
+      if (this.identity === "ye") {
         targets = []
       } else {
-        var group = lib.character[player.name1][1]
-        targets = game[method](function (target) {
+        var group = lib.character[this.name1][1]
+        targets = game[method]((target) => {
           if (func && !func(target)) {
             return false
           }
-          return target.identity != "ye" && lib.character[target.name1][1] == group
+          return (
+            target.identity !== "ye" && lib.character[target.name1][1] === group
+          )
         })
       }
-    } else if (mode == "doudizhu") {
-      targets = game[method](function (target) {
+    } else if (mode === "doudizhu") {
+      targets = game[method]((target) => {
         if (func && !func(target)) {
           return false
         }
-        return target.identity == player.identity
+        return target.identity === this.identity
       })
     } else {
-      targets = game[method](function (target) {
+      targets = game[method]((target) => {
         if (func && !func(target)) {
           return false
         }
-        return target.side == player.side
+        return target.side === this.side
       })
     }
     if (self) {
-      targets.add(player)
+      targets.add(this)
     } else {
-      targets.remove(player)
+      targets.remove(this)
     }
     return targets
   }
@@ -13476,8 +13703,8 @@ export class Player extends HTMLDivElement {
     return !this.isFriendOf.call(this, ...arguments)
   }
   isFriendOf(player) {
-    if (get.mode() == "guozhan") {
-      if (this == player) {
+    if (get.mode() === "guozhan") {
+      if (this === player) {
         return true
       }
       if (
@@ -13486,21 +13713,21 @@ export class Player extends HTMLDivElement {
       ) {
         return true
       }
-      if (this.identity == "unknown" || this.identity == "ye") {
+      if (this.identity === "unknown" || this.identity === "ye") {
         return false
       }
-      if (player.identity == "unknown" || player.identity == "ye") {
+      if (player.identity === "unknown" || player.identity === "ye") {
         return false
       }
-      return this.identity == player.identity
+      return this.identity === player.identity
     }
-    if (get.mode() == "doudizhu") {
-      return this.identity == player.identity
+    if (get.mode() === "doudizhu") {
+      return this.identity === player.identity
     }
-    if (this.side != undefined && typeof player.side == "boolean") {
-      return this.side == player.side
+    if (this.side !== undefined && typeof player.side === "boolean") {
+      return this.side === player.side
     }
-    return this == player
+    return this === player
   }
   isFriendsOf(player, includeDie) {
     return player.getFriends(true, includeDie).includes(this)
@@ -13509,7 +13736,7 @@ export class Player extends HTMLDivElement {
     return player.getEnemies(null, includeDie).includes(this)
   }
   isAlive() {
-    return this.classList.contains("dead") == false
+    return this.classList.contains("dead") === false
   }
   isDead() {
     return this.classList.contains("dead")
@@ -13541,7 +13768,7 @@ export class Player extends HTMLDivElement {
       filter = lib.filter.all
     }
     return game.filterPlayer(filter).every((value) => {
-      if (value.isOut() || value == this) {
+      if (value.isOut() || value === this) {
         return true
       }
       return only ? value.maxHp < this.maxHp : value.maxHp <= this.maxHp
@@ -13558,7 +13785,7 @@ export class Player extends HTMLDivElement {
       filter = lib.filter.all
     }
     return game.filterPlayer(filter).every((value) => {
-      if (value.isOut() || value == this) {
+      if (value.isOut() || value === this) {
         return true
       }
       return only ? value.maxHp > this.maxHp : value.maxHp >= this.maxHp
@@ -13576,10 +13803,12 @@ export class Player extends HTMLDivElement {
       filter = lib.filter.all
     }
     return game.filterPlayer(filter).every((value) => {
-      if (value.isOut() || value == this) {
+      if (value.isOut() || value === this) {
         return true
       }
-      return only ? value.getHp(raw) < this.getHp(raw) : value.getHp(raw) <= this.getHp(raw)
+      return only
+        ? value.getHp(raw) < this.getHp(raw)
+        : value.getHp(raw) <= this.getHp(raw)
     })
   }
   /**
@@ -13594,10 +13823,12 @@ export class Player extends HTMLDivElement {
       filter = lib.filter.all
     }
     return game.filterPlayer(filter).every((value) => {
-      if (value.isOut() || value == this) {
+      if (value.isOut() || value === this) {
         return true
       }
-      return only ? value.getHp(raw) > this.getHp(raw) : value.getHp(raw) >= this.getHp(raw)
+      return only
+        ? value.getHp(raw) > this.getHp(raw)
+        : value.getHp(raw) >= this.getHp(raw)
     })
   }
   /**
@@ -13612,10 +13843,12 @@ export class Player extends HTMLDivElement {
     }
     const numberOfCards = this.countCards("he")
     return game.filterPlayer(filter).every((value) => {
-      if (value.isOut() || value == this) {
+      if (value.isOut() || value === this) {
         return true
       }
-      return only ? value.countCards("he") < numberOfCards : value.countCards("he") <= numberOfCards
+      return only
+        ? value.countCards("he") < numberOfCards
+        : value.countCards("he") <= numberOfCards
     })
   }
   /**
@@ -13630,10 +13863,12 @@ export class Player extends HTMLDivElement {
     }
     const numberOfCards = this.countCards("he")
     return game.filterPlayer(filter).every((value) => {
-      if (value.isOut() || value == this) {
+      if (value.isOut() || value === this) {
         return true
       }
-      return only ? value.countCards("he") > numberOfCards : value.countCards("he") >= numberOfCards
+      return only
+        ? value.countCards("he") > numberOfCards
+        : value.countCards("he") >= numberOfCards
     })
   }
   /**
@@ -13648,7 +13883,7 @@ export class Player extends HTMLDivElement {
     }
     const numberOfHandCards = this.countCards("h")
     return game.filterPlayer(filter).every((value) => {
-      if (value.isOut() || value == this) {
+      if (value.isOut() || value === this) {
         return true
       }
       return only
@@ -13668,7 +13903,7 @@ export class Player extends HTMLDivElement {
     }
     const numberOfHandCards = this.countCards("h")
     return game.filterPlayer(filter).every((value) => {
-      if (value.isOut() || value == this) {
+      if (value.isOut() || value === this) {
         return true
       }
       return only
@@ -13688,7 +13923,7 @@ export class Player extends HTMLDivElement {
     }
     const numberOfEquipAreaCards = this.countCards("e")
     return game.filterPlayer(filter).every((value) => {
-      if (value.isOut() || value == this) {
+      if (value.isOut() || value === this) {
         return true
       }
       return only
@@ -13708,7 +13943,7 @@ export class Player extends HTMLDivElement {
     }
     const numberOfEquipAreaCards = this.countCards("e")
     return game.filterPlayer(filter).every((value) => {
-      if (value.isOut() || value == this) {
+      if (value.isOut() || value === this) {
         return true
       }
       return only
@@ -13741,7 +13976,7 @@ export class Player extends HTMLDivElement {
     return this.classList.contains("out")
   }
   isMin(distance) {
-    if (distance && lib.config.mode != "stone") {
+    if (distance) {
       return false
     }
     if (this.forcemin) {
@@ -13751,8 +13986,8 @@ export class Player extends HTMLDivElement {
   }
   isIn() {
     return (
-      this.classList.contains("dead") == false &&
-      this.classList.contains("out") == false &&
+      this.classList.contains("dead") === false &&
+      this.classList.contains("out") === false &&
       !this.removed
     )
   }
@@ -13763,10 +13998,14 @@ export class Player extends HTMLDivElement {
       case 1:
         return this.classList.contains("unseen2")
       case 2:
-        return this.classList.contains("unseen") || this.classList.contains("unseen2")
+        return (
+          this.classList.contains("unseen") ||
+          this.classList.contains("unseen2")
+        )
       default:
         return (
-          this.classList.contains("unseen") && (!this.name2 || this.classList.contains("unseen2"))
+          this.classList.contains("unseen") &&
+          (!this.name2 || this.classList.contains("unseen2"))
         )
     }
   }
@@ -13782,46 +14021,54 @@ export class Player extends HTMLDivElement {
       }
       return false
     }
-    if (that === me || this == me?._trueMe) {
+    if (that === me || this === me?._trueMe) {
       return true
     }
     if (_status.connectMode) {
       return false
     }
-    if (lib.config.mode == "versus") {
-      if (_status.mode == "three") {
-        return this.side == me.side
+    if (lib.config.mode === "versus") {
+      if (_status.mode === "three") {
+        return this.side === me.side
       }
-      if (_status.mode == "standard") {
-        return lib.storage.single_control && this.side == me.side
+      if (_status.mode === "standard") {
+        return lib.storage.single_control && this.side === me.side
       }
-      if (_status.mode == "four") {
-        return get.config("four_phaseswap") && this.side == me.side
+      if (_status.mode === "four") {
+        return get.config("four_phaseswap") && this.side === me.side
       }
-      if (_status.mode == "two") {
-        return get.config("two_phaseswap") && this.side == me.side
+      if (_status.mode === "two") {
+        return get.config("two_phaseswap") && this.side === me.side
       }
       return false
-    } else if (lib.config.mode == "boss") {
+    }
+    if (lib.config.mode === "boss") {
       if (me.side) {
         return false
       }
-      return this.side == me.side && get.config("single_control")
-    } else if (game.chess) {
-      if (lib.config.mode == "chess") {
-        if (_status.mode == "combat" && !get.config("single_control")) {
+      return this.side === me.side && get.config("single_control")
+    }
+    if (game.chess) {
+      if (lib.config.mode === "chess") {
+        if (_status.mode === "combat" && !get.config("single_control")) {
           return false
         }
       }
-      return this.side == me.side
+      return this.side === me.side
     }
     return false
   }
   isMine() {
-    return this == game.me && !_status.auto && !this.isMad() && !game.notMe
+    return this === game.me && !_status.auto && !this.isMad() && !game.notMe
   }
   isOnline() {
-    if (this.ws && lib.node && !this.ws.closed && this.ws.inited && !this.isAuto) {
+    if (
+      this.ws &&
+      lib.node &&
+      !this.ws.closed &&
+      this.ws.inited &&
+      !this.isAuto
+    ) {
       return true
     }
     return false
@@ -13839,13 +14086,14 @@ export class Player extends HTMLDivElement {
     return false
   }
   isMajor() {
-    if (get.mode() == "guozhan") {
-      if (this.identity == "unknown") {
+    if (get.mode() === "guozhan") {
+      if (this.identity === "unknown") {
         return false
       }
-      var list = game.filterPlayer(function (current) {
-        return current.identity != "unknown" && current.hasSkillTag("forceMajor")
-      })
+      var list = game.filterPlayer(
+        (current) =>
+          current.identity !== "unknown" && current.hasSkillTag("forceMajor"),
+      )
       if (list.length) {
         for (var i of list) {
           if (i.isFriendOf(this)) {
@@ -13859,7 +14107,7 @@ export class Player extends HTMLDivElement {
         pmap = _status.connectMode ? lib.playerOL : game.playerMap,
         player
       for (var i of game.players) {
-        if (i.identity == "unknown") {
+        if (i.identity === "unknown") {
           continue
         }
         var added = false
@@ -13867,7 +14115,7 @@ export class Player extends HTMLDivElement {
           if (i.isFriendOf(pmap[j])) {
             added = true
             map[j].push(i)
-            if (i == this) {
+            if (i === this) {
               player = j
             }
             break
@@ -13876,7 +14124,7 @@ export class Player extends HTMLDivElement {
         if (!added) {
           map[i.playerid] = [i]
           sides.push(i.playerid)
-          if (i == this) {
+          if (i === this) {
             player = i.playerid
           }
         }
@@ -13890,32 +14138,29 @@ export class Player extends HTMLDivElement {
         }
       }
       return true
-    } else {
-      var list = game.filterPlayer(function (current) {
-        return current.hasSkillTag("forceMajor")
-      })
-      if (list.length) {
-        for (var i of list) {
-          if (i.group == this.group) {
-            return true
-          }
+    }
+    var list = game.filterPlayer((current) => current.hasSkillTag("forceMajor"))
+    if (list.length) {
+      for (var i of list) {
+        if (i.group === this.group) {
+          return true
         }
+      }
+      return false
+    }
+    var map = {}
+    for (var i of game.players) {
+      if (!map[i.group]) {
+        map[i.group] = []
+      }
+      map[i.group].push(i)
+    }
+    for (var i in map) {
+      if (map[i].length > map[this.group].length) {
         return false
       }
-      var map = {}
-      for (var i of game.players) {
-        if (!map[i.group]) {
-          map[i.group] = []
-        }
-        map[i.group].push(i)
-      }
-      for (var i in map) {
-        if (map[i].length > map[this.group].length) {
-          return false
-        }
-      }
-      return true
     }
+    return true
   }
   isNotMajor() {
     for (var i = 0; i < game.players.length; i++) {
@@ -13926,16 +14171,11 @@ export class Player extends HTMLDivElement {
     return false
   }
   isMinor(nomajor) {
-    if (get.mode() == "guozhan") {
-      if (this.identity == "unknown" || (!nomajor && this.isMajor())) {
+    if (get.mode() === "guozhan") {
+      if (this.identity === "unknown" || (!nomajor && this.isMajor())) {
         return false
       }
-      if (
-        !nomajor &&
-        !game.hasPlayer(function (current) {
-          return current.isMajor()
-        })
-      ) {
+      if (!nomajor && !game.hasPlayer((current) => current.isMajor())) {
         return false
       }
       var map = {},
@@ -13943,7 +14183,7 @@ export class Player extends HTMLDivElement {
         pmap = _status.connectMode ? lib.playerOL : game.playerMap,
         player
       for (var i of game.players) {
-        if (i.identity == "unknown") {
+        if (i.identity === "unknown") {
           continue
         }
         var added = false
@@ -13951,7 +14191,7 @@ export class Player extends HTMLDivElement {
           if (i.isFriendOf(pmap[j])) {
             added = true
             map[j].push(i)
-            if (i == this) {
+            if (i === this) {
               player = j
             }
             break
@@ -13960,7 +14200,7 @@ export class Player extends HTMLDivElement {
         if (!added) {
           map[i.playerid] = [i]
           sides.push(i.playerid)
-          if (i == this) {
+          if (i === this) {
             player = i.playerid
           }
         }
@@ -13971,68 +14211,63 @@ export class Player extends HTMLDivElement {
         }
       }
       return true
-    } else {
-      if (!nomajor && this.isMajor()) {
-        return false
-      }
-      if (
-        !nomajor &&
-        !game.hasPlayer(function (current) {
-          return current.isMajor()
-        })
-      ) {
-        return false
-      }
-      var map = {}
-      for (var i of game.players) {
-        if (!map[i.group]) {
-          map[i.group] = []
-        }
-        map[i.group].push(i)
-      }
-      for (var i in map) {
-        if (map[i].length < map[this.group].length) {
-          return false
-        }
-      }
-      return true
     }
+    if (!nomajor && this.isMajor()) {
+      return false
+    }
+    if (!nomajor && !game.hasPlayer((current) => current.isMajor())) {
+      return false
+    }
+    var map = {}
+    for (var i of game.players) {
+      if (!map[i.group]) {
+        map[i.group] = []
+      }
+      map[i.group].push(i)
+    }
+    for (var i in map) {
+      if (map[i].length < map[this.group].length) {
+        return false
+      }
+    }
+    return true
   }
   siege(player) {
-    if (this.identity == "unknown" || this.hasSkill("undist")) {
+    if (this.identity === "unknown" || this.hasSkill("undist")) {
       return false
     }
     if (!player) {
       var next = this.getNext()
-      if (next && next.sieged()) {
+      if (next?.sieged()) {
         return true
       }
       var previous = this.getPrevious()
-      if (previous && previous.sieged()) {
+      if (previous?.sieged()) {
         return true
       }
       return false
-    } else {
-      return player.sieged() && (player.getNext() == this || player.getPrevious() == this)
     }
+    return (
+      player.sieged() &&
+      (player.getNext() === this || player.getPrevious() === this)
+    )
   }
   sieged(player) {
-    if (this.identity == "unknown") {
+    if (this.identity === "unknown") {
       return false
     }
     if (player) {
       return player.siege(this)
-    } else {
-      var next = this.getNext()
-      var previous = this.getPrevious()
-      if (next && previous && next != previous) {
-        if (next.identity == "unknown" || next.isFriendOf(this)) {
-          return false
-        }
-        return next.isFriendOf(previous)
-      }
-      return false
     }
+    var next = this.getNext()
+    var previous = this.getPrevious()
+    if (next && previous && next !== previous) {
+      if (next.identity === "unknown" || next.isFriendOf(this)) {
+        return false
+      }
+      return next.isFriendOf(previous)
+    }
+    return false
   }
   inline(...args) {
     if (["unknown", "ye"].includes(this.identity) || this.hasSkill("undist")) {
@@ -14044,7 +14279,7 @@ export class Player extends HTMLDivElement {
     for (var i = 0; next || previous; i++) {
       if (next) {
         next = next.getNext()
-        if (!next.isFriendOf(this) || next == this) {
+        if (!next.isFriendOf(this) || next === this) {
           next = null
         } else {
           list.add(next)
@@ -14052,7 +14287,7 @@ export class Player extends HTMLDivElement {
       }
       if (previous) {
         previous = previous.getPrevious()
-        if (!previous.isFriendOf(this) || previous == this) {
+        if (!previous.isFriendOf(this) || previous === this) {
           previous = null
         } else {
           list.add(previous)
@@ -14063,7 +14298,7 @@ export class Player extends HTMLDivElement {
       return false
     }
     for (const arg of args) {
-      if (!list.includes(arg) && arg != this) {
+      if (!list.includes(arg) && arg !== this) {
         return false
       }
     }
@@ -14072,18 +14307,20 @@ export class Player extends HTMLDivElement {
   checkShow(skill, showonly) {
     var sourceSkill = get.info(skill)
     var noshow = false
-    if (sourceSkill && sourceSkill.sourceSkill) {
+    if (sourceSkill?.sourceSkill) {
       skill = sourceSkill.sourceSkill
     }
     if (lib.skill.global.includes(skill)) {
       return false
     }
-    if (get.mode() != "guozhan" || game.expandSkills(this.getSkills()).includes(skill)) {
+    if (
+      get.mode() !== "guozhan" ||
+      game.expandSkills(this.getSkills()).includes(skill)
+    ) {
       if (showonly) {
         return false
-      } else {
-        noshow = true
       }
+      noshow = true
     }
     var unseen0 = this.isUnseen(0)
     var name1 = this.name1 || this.name
@@ -14165,34 +14402,40 @@ export class Player extends HTMLDivElement {
    * @returns { boolean }
    */
   hasStockSkill(skill, arg1, arg2, arg3) {
-    return game.expandSkills(this.getStockSkills(arg1, arg2, arg3)).includes(skill)
+    return game
+      .expandSkills(this.getStockSkills(arg1, arg2, arg3))
+      .includes(skill)
   }
   isZhu2() {
-    var player = this,
-      mode = get.mode()
+    var mode = get.mode()
     if (!this.isZhu) {
       return false
     }
-    if (mode == "identity") {
-      if (_status.mode == "stratagem" && !this.identityShown) {
+    if (mode === "identity") {
+      if (_status.mode === "stratagem" && !this.identityShown) {
         return false
       }
       return true
     }
-    if (mode == "versus" && (_status.mode == "four" || _status.mode == "guandu")) {
+    if (
+      mode === "versus" &&
+      (_status.mode === "four" || _status.mode === "guandu")
+    ) {
       return true
     }
     return false
   }
   isInitFilter(tag) {
-    const player = this
-    for (const name of [player.name, player.name1, player.name2]) {
+    for (const name of [this.name, this.name1, this.name2]) {
       if (name && lib.character[name]) {
         const filter = lib.character[name].initFilters
         if (!filter.includes(tag)) {
           continue
         }
-        if (lib.characterInitFilter[name] && lib.characterInitFilter[name](tag) === false) {
+        if (
+          lib.characterInitFilter[name] &&
+          lib.characterInitFilter[name](tag) === false
+        ) {
           continue
         }
         return true
@@ -14211,13 +14454,16 @@ export class Player extends HTMLDivElement {
     }
     if (player) {
       var mode = get.mode()
-      if (mode == "identity" && _status.mode == "purple") {
-        if (this.identity.slice(0, 1) != player.identity.slice(0, 1)) {
+      if (mode === "identity" && _status.mode === "purple") {
+        if (this.identity.slice(0, 1) !== player.identity.slice(0, 1)) {
           return false
         }
       }
-      if (mode == "versus" && (_status.mode == "four" || _status.mode == "guandu")) {
-        if (this.side != player.side) {
+      if (
+        mode === "versus" &&
+        (_status.mode === "four" || _status.mode === "guandu")
+      ) {
+        if (this.side !== player.side) {
           return false
         }
       }
@@ -14229,7 +14475,7 @@ export class Player extends HTMLDivElement {
     game.expandSkills(skills)
     for (var i = 0; i < skills.length; i++) {
       var info = lib.skill[skills[i]]
-      if (info && info.ai) {
+      if (info?.ai) {
         if (
           info.ai.skillTagFilter &&
           info.ai[tag] &&
@@ -14237,8 +14483,8 @@ export class Player extends HTMLDivElement {
         ) {
           continue
         }
-        if (typeof info.ai[tag] == "string") {
-          if (info.ai[tag] == arg) {
+        if (typeof info.ai[tag] === "string") {
+          if (info.ai[tag] === arg) {
             return true
           }
         } else if (info.ai[tag]) {
@@ -14262,7 +14508,7 @@ export class Player extends HTMLDivElement {
     game.expandSkills(skills)
     for (var i = 0; i < skills.length; i++) {
       var info = lib.skill[skills[i]]
-      if (info && info.ai) {
+      if (info?.ai) {
         if (info.ai.skillTagFilter && info.ai[tag]) {
           if (info.ai.skillTagFilter(this, tag, arg) === false) {
             continue
@@ -14276,11 +14522,15 @@ export class Player extends HTMLDivElement {
             )
           }
           return true
-        } else if (typeof info.ai[tag] !== "undefined") {
+        }
+        if (typeof info.ai[tag] !== "undefined") {
           if (typeof arg !== typeof info.ai[tag]) {
-            console.warn(`lib.skill.${skills[i]}.ai.${tag}类型不符\nhasSkillTag：`, arg)
+            console.warn(
+              `lib.skill.${skills[i]}.ai.${tag}类型不符\nhasSkillTag：`,
+              arg,
+            )
           }
-          if (info.ai[tag] == arg) {
+          if (info.ai[tag] === arg) {
             // 全凭"=="大人的包容
             return true
           }
@@ -14316,7 +14566,7 @@ export class Player extends HTMLDivElement {
       if (game.players[i].isOut()) {
         continue
       }
-      if (game.players[i] != this && get.attitude(game.players[i], this) > 0) {
+      if (game.players[i] !== this && get.attitude(game.players[i], this) > 0) {
         return true
       }
     }
@@ -14329,12 +14579,12 @@ export class Player extends HTMLDivElement {
    */
   hasUnknown(num) {
     var mode = get.mode()
-    if (typeof num != "number") {
+    if (typeof num !== "number") {
       num = 0
     }
-    if (mode == "identity" || mode == "guozhan") {
+    if (mode === "identity" || mode === "guozhan") {
       for (var i = 0; i < game.players.length; i++) {
-        if (game.players[i].ai.shown == 0 && game.players[i] != this) {
+        if (game.players[i].ai.shown === 0 && game.players[i] !== this) {
           num--
           if (num <= 0) {
             return true
@@ -14346,8 +14596,8 @@ export class Player extends HTMLDivElement {
   }
   isUnknown(player) {
     var mode = get.mode()
-    if (mode == "identity" || mode == "guozhan") {
-      if (this.ai.shown == 0 && this != player) {
+    if (mode === "identity" || mode === "guozhan") {
+      if (this.ai.shown === 0 && this !== player) {
         return true
       }
     }
@@ -14365,16 +14615,23 @@ export class Player extends HTMLDivElement {
         continue
       }
       if (ifo.hiddenWuxie && info) {
-        if (typeof ifo.hiddenWuxie == "function" && ifo.hiddenWuxie(this, info)) {
+        if (
+          typeof ifo.hiddenWuxie === "function" &&
+          ifo.hiddenWuxie(this, info)
+        ) {
           return true
         }
-      } else if (ifo.viewAs && typeof ifo.viewAs != "function" && ifo.viewAs.name == "wuxie") {
+      } else if (
+        ifo.viewAs &&
+        typeof ifo.viewAs !== "function" &&
+        ifo.viewAs.name === "wuxie"
+      ) {
         if (!ifo.viewAsFilter || ifo.viewAsFilter(this)) {
           return true
         }
       } else {
         var hiddenCard = ifo.hiddenCard
-        if (typeof hiddenCard == "function" && hiddenCard(this, "wuxie")) {
+        if (typeof hiddenCard === "function" && hiddenCard(this, "wuxie")) {
           return true
         }
       }
@@ -14455,7 +14712,7 @@ export class Player extends HTMLDivElement {
     } else if (get.itemtype(ignore) === "card") {
       selected.add(ignore)
     }
-    if (this === viewer || get.itemtype(viewer) == "player") {
+    if (this === viewer || get.itemtype(viewer) === "player") {
       cards = this.getKnownCards(viewer)
     } else {
       cards = this.getShownCards()
@@ -14464,8 +14721,8 @@ export class Player extends HTMLDivElement {
       if (selected.includes(card)) {
         return false
       }
-      let name = get.name(card, this)
-      if (name == "sha" || name == "hufu" || name == "yuchanqian") {
+      const name = get.name(card, this)
+      if (name === "sha" || name === "hufu" || name === "yuchanqian") {
         if (type === "use") {
           return lib.filter.cardEnabled(card, this)
         }
@@ -14479,11 +14736,14 @@ export class Player extends HTMLDivElement {
     if (count && rvt !== "count") {
       return rvt === "odds" ? 1 : true
     }
-    let hs = this.getCards("hs").filter((i) => !cards.includes(i) && !selected.includes(i)).length
+    const hs = this.getCards("hs").filter(
+      (i) => !cards.includes(i) && !selected.includes(i),
+    ).length
     if (!hs) {
       if (rvt === "count") {
         return count
-      } else if (rvt === "odds") {
+      }
+      if (rvt === "odds") {
         return 0
       }
       return false
@@ -14495,14 +14755,14 @@ export class Player extends HTMLDivElement {
       return count + hs / 4.8
     }
     if (hs > 9 || this.isPhaseUsing()) {
-      count += Math.pow(2 + hs, 2) / 40
+      count += (2 + hs) ** 2 / 40
     } else {
       count += -1.5 * Math.log(1 - hs / 10)
     }
     if (rvt === "odds") {
       return Math.min(1, count)
     }
-    return count > _status.event.getRand("mayHaveSha" + hs + this.playerid)
+    return count > _status.event.getRand(`mayHaveSha${hs}${this.playerid}`)
   }
   /**
    * 以viewer视角猜测Player手里的闪
@@ -14540,7 +14800,7 @@ export class Player extends HTMLDivElement {
         ignore = this.getCards("h", (i) => i.hasGaintag("sha_notshan"))
       }
     }
-    if (this === viewer || get.itemtype(viewer) == "player") {
+    if (this === viewer || get.itemtype(viewer) === "player") {
       cards = this.getKnownCards(viewer)
     } else {
       cards = this.getShownCards()
@@ -14549,7 +14809,7 @@ export class Player extends HTMLDivElement {
       if (selected.includes(card)) {
         return false
       }
-      let name = get.name(card, this)
+      const name = get.name(card, this)
       if (name === "shan" || name === "hufu") {
         if (type === "use") {
           return lib.filter.cardEnabled(card, this, "forceEnable")
@@ -14564,11 +14824,14 @@ export class Player extends HTMLDivElement {
     if (count && rvt !== "count") {
       return rvt === "odds" ? 1 : true
     }
-    let hs = this.getCards("hs").filter((i) => !cards.includes(i) && !selected.includes(i)).length
+    const hs = this.getCards("hs").filter(
+      (i) => !cards.includes(i) && !selected.includes(i),
+    ).length
     if (!hs) {
       if (rvt === "count") {
         return count
-      } else if (rvt === "odds") {
+      }
+      if (rvt === "odds") {
         return 0
       }
       return false
@@ -14587,7 +14850,7 @@ export class Player extends HTMLDivElement {
     if (rvt === "odds") {
       return Math.min(1, count)
     }
-    return count > _status.event.getRand("mayHaveShan" + hs + this.playerid)
+    return count > _status.event.getRand(`mayHaveShan${hs}${this.playerid}`)
   }
   /**
    * 返回玩家是否有某(种牌名的)牌
@@ -14603,8 +14866,8 @@ export class Player extends HTMLDivElement {
     return false
   }
   hasVCard(name, position) {
-    if (typeof name == "function") {
-      for (let card of this.iterableGetVCards(position, name)) {
+    if (typeof name === "function") {
+      for (const card of this.iterableGetVCards(position, name)) {
         return true
       }
     } else {
@@ -14616,20 +14879,24 @@ export class Player extends HTMLDivElement {
   }
   getVEquip(name) {
     var es = this.getVCards("e")
-    if (typeof name == "object" && get.info(name)) {
+    if (typeof name === "object" && get.info(name)) {
       name = get.info(name).subtype
       if (name) {
-        name = parseInt(name[5])
+        name = parseInt(name[5], 10)
       }
-    } else if (typeof name == "string" && name.startsWith("equip") && name.length == 6) {
-      name = parseInt(name[5])
+    } else if (
+      typeof name === "string" &&
+      name.startsWith("equip") &&
+      name.length === 6
+    ) {
+      name = parseInt(name[5], 10)
     }
     if (!name) {
       return null
     }
     for (var i = 0; i < es.length; i++) {
       if (typeof name === "number") {
-        if (get.info(es[i]).subtype === "equip" + name) {
+        if (get.info(es[i]).subtype === `equip${name}`) {
           return es[i]
         }
       } else {
@@ -14646,20 +14913,24 @@ export class Player extends HTMLDivElement {
   }
   getEquip(name) {
     var es = this.getCards("e")
-    if (typeof name == "object" && get.info(name)) {
+    if (typeof name === "object" && get.info(name)) {
       name = get.info(name).subtype
       if (name) {
-        name = parseInt(name[5])
+        name = parseInt(name[5], 10)
       }
-    } else if (typeof name == "string" && name.startsWith("equip") && name.length == 6) {
-      name = parseInt(name[5])
+    } else if (
+      typeof name === "string" &&
+      name.startsWith("equip") &&
+      name.length === 6
+    ) {
+      name = parseInt(name[5], 10)
     }
     if (!name) {
       return null
     }
     for (var i = 0; i < es.length; i++) {
       if (typeof name === "number") {
-        if (get.info(es[i]).subtype === "equip" + name) {
+        if (get.info(es[i]).subtype === `equip${name}`) {
           return es[i]
         }
       } else {
@@ -14682,7 +14953,7 @@ export class Player extends HTMLDivElement {
   getVJudge(name) {
     var judges = this.getVCards("j")
     for (var i = 0; i < judges.length; i++) {
-      if (judges[i].name == name) {
+      if (judges[i].name === name) {
         return judges[i]
       }
     }
@@ -14697,7 +14968,7 @@ export class Player extends HTMLDivElement {
   getJudge(name) {
     var judges = this.getCards("j")
     for (var i = 0; i < judges.length; i++) {
-      if ((judges[i].viewAs || judges[i].name) == name) {
+      if ((judges[i].viewAs || judges[i].name) === name) {
         return judges[i]
       }
     }
@@ -14716,7 +14987,7 @@ export class Player extends HTMLDivElement {
     }
     if (init !== false && init !== "nobroadcast") {
       game.broadcast(
-        function (player, num, init, config, cardsetion) {
+        (player, num, init, config, cardsetion) => {
           player.$draw(num, init, config, cardsetion)
         },
         this,
@@ -14727,10 +14998,10 @@ export class Player extends HTMLDivElement {
       )
     }
     var cards, node
-    if (get.itemtype(num) == "cards") {
+    if (get.itemtype(num) === "cards") {
       cards = num
       num = cards.length
-    } else if (get.itemtype(num) == "card") {
+    } else if (get.itemtype(num) === "card") {
       cards = [num]
       num = 1
     }
@@ -14782,7 +15053,10 @@ export class Player extends HTMLDivElement {
         dx = -10
         if (rect.top <= 80) {
           dy = -10
-        } else if (rect.top + rect.height + 80 >= ui.chessContainer.offsetHeight) {
+        } else if (
+          rect.top + rect.height + 80 >=
+          ui.chessContainer.offsetHeight
+        ) {
           dy = 10
         } else {
           dy = 0
@@ -14791,7 +15065,10 @@ export class Player extends HTMLDivElement {
         dx = 10
         if (rect.top <= 80) {
           dy = -10
-        } else if (rect.top + rect.height + 80 >= ui.chessContainer.offsetHeight) {
+        } else if (
+          rect.top + rect.height + 80 >=
+          ui.chessContainer.offsetHeight
+        ) {
           dy = 10
         } else {
           dy = 0
@@ -14799,7 +15076,10 @@ export class Player extends HTMLDivElement {
       } else if (rect.top <= 80) {
         dx = 0
         dy = -10
-      } else if (rect.top + rect.height + 80 >= ui.chessContainer.offsetHeight) {
+      } else if (
+        rect.top + rect.height + 80 >=
+        ui.chessContainer.offsetHeight
+      ) {
         dx = 0
         dy = 10
       } else {
@@ -14811,8 +15091,8 @@ export class Player extends HTMLDivElement {
       dx *= coeff
       dy *= coeff
 
-      node.style.left = this.getLeft() + this.offsetWidth / 2 - 52 - dx + "px"
-      node.style.top = this.getTop() + this.offsetHeight / 2 - 52 - dy + "px"
+      node.style.left = `${this.getLeft() + this.offsetWidth / 2 - 52 - dx}px`
+      node.style.top = `${this.getTop() + this.offsetHeight / 2 - 52 - dy}px`
       this.parentNode.appendChild(node)
     } else {
       this.parentNode.appendChild(node)
@@ -14831,7 +15111,7 @@ export class Player extends HTMLDivElement {
     }
     node.style.transitionDuration = "0.8s"
     ui.refresh(node)
-    if (typeof num == "number" && init !== false) {
+    if (typeof num === "number" && init !== false) {
       config = {
         total: num,
         current: 1,
@@ -14861,36 +15141,36 @@ export class Player extends HTMLDivElement {
     }
     if (
       node.style.transform &&
-      node.style.transform != "none" &&
-      node.style.transform.indexOf("translate") == -1
+      node.style.transform !== "none" &&
+      node.style.transform.indexOf("translate") === -1
     ) {
-      node.style.transform += " translate(" + dx + "px," + dy + "px)"
+      node.style.transform += ` translate(${dx}px,${dy}px)`
     } else {
-      node.style.transform = "translate(" + dx + "px," + dy + "px)"
+      node.style.transform = `translate(${dx}px,${dy}px)`
     }
     node.show()
 
-    node.listenTransition(function () {
+    node.listenTransition(() => {
       node.style.transitionDuration = "0.5s"
       ui.refresh(node)
       node.delete()
     })
-    var that = this
+
     if (num && num > 1) {
       if (config && config.total > 1) {
-        setTimeout(function () {
+        setTimeout(() => {
           if (cards) {
-            that.$draw(cards, false, config, cardsetion)
+            this.$draw(cards, false, config, cardsetion)
           } else {
-            that.$draw(num - 1, false, config, cardsetion)
+            this.$draw(num - 1, false, config, cardsetion)
           }
         }, 50)
       } else {
-        setTimeout(function () {
+        setTimeout(() => {
           if (cards) {
-            that.$draw(cards, false, config, cardsetion)
+            this.$draw(cards, false, config, cardsetion)
           } else {
-            that.$draw(num - 1, false, config, cardsetion)
+            this.$draw(num - 1, false, config, cardsetion)
           }
         }, 200)
       }
@@ -14901,14 +15181,14 @@ export class Player extends HTMLDivElement {
       var cardsetions = {},
         cardsetion_targets = [this]
       cardsetion_targets.addArray(targets)
-      for (let target of cardsetion_targets) {
-        let id = target.playerid,
+      for (const target of cardsetion_targets) {
+        const id = target.playerid,
           cardsetion = get.cardsetion(target)
         cardsetions[id] = cardsetion
       }
     }
     game.broadcast(
-      function (player, card1, targets, cards, cardsetions) {
+      (player, card1, targets, cards, cardsetions) => {
         player.$compareMultiple(card1, targets, cards, cardsetions)
       },
       this,
@@ -14922,15 +15202,15 @@ export class Player extends HTMLDivElement {
       get.targetsInfo(targets),
       get.cardsInfo(cards),
     ])
-    var player = this
-    var node1 = player.$throwxy2(
+
+    var node1 = this.$throwxy2(
       card1,
       "calc(50% - 52px)",
       "calc(50% + 10px)",
       "perspective(600px) rotateY(180deg)",
       true,
     )
-    if (lib.config.cardback_style != "default") {
+    if (lib.config.cardback_style !== "default") {
       node1.style.transitionProperty = "none"
       ui.refresh(node1)
       node1.classList.add("infohidden")
@@ -14942,7 +15222,11 @@ export class Player extends HTMLDivElement {
 
     node1.style.transform = "perspective(600px) rotateY(180deg) translateX(0)"
     if (cardsetions) {
-      var next = ui.create.div(".cardsetion", cardsetions[player.playerid] || "", node1)
+      var next = ui.create.div(
+        ".cardsetion",
+        cardsetions[this.playerid] || "",
+        node1,
+      )
       next.style.setProperty("display", "block", "important")
       if (node1.node) {
         if (node1.node.cardsetion) {
@@ -14952,16 +15236,18 @@ export class Player extends HTMLDivElement {
         node1.node.cardsetion = next
       }
     }
-    var onEnd01 = function () {
+    var onEnd01 = () => {
       //node1.removeEventListener('webkitTransitionEnd',onEnd01);
-      setTimeout(function () {
+      setTimeout(() => {
         node1.style.transition = "all ease-in 0.3s"
-        node1.style.transform = "perspective(600px) rotateY(270deg) translateX(52px)"
-        var onEnd = function () {
+        node1.style.transform =
+          "perspective(600px) rotateY(270deg) translateX(52px)"
+        var onEnd = () => {
           node1.classList.remove("infohidden")
           node1.style.transition = "all 0s"
           ui.refresh(node1)
-          node1.style.transform = "perspective(600px) rotateY(-90deg) translateX(52px)"
+          node1.style.transform =
+            "perspective(600px) rotateY(-90deg) translateX(52px)"
           ui.refresh(node1)
           node1.style.transition = ""
           ui.refresh(node1)
@@ -14973,16 +15259,16 @@ export class Player extends HTMLDivElement {
     }
     node1.listenTransition(onEnd01)
 
-    setTimeout(function () {
+    setTimeout(() => {
       var left0 = -targets.length * 52 - (targets.length - 1) * 8
       for (var i = 0; i < targets.length; i++) {
-        ;(function (target, card2, i) {
+        ;((target, card2, i) => {
           var left = left0 + i * 120
           var node2
           if (left < 0) {
             node2 = target.$throwxy2(
               card2,
-              "calc(50% - " + -left + "px)",
+              `calc(50% - ${-left}px)`,
               "calc(50% - 114px)",
               "perspective(600px) rotateY(180deg)",
               true,
@@ -14990,14 +15276,18 @@ export class Player extends HTMLDivElement {
           } else {
             node2 = target.$throwxy2(
               card2,
-              "calc(50% + " + left + "px)",
+              `calc(50% + ${left}px)`,
               "calc(50% - 114px)",
               "perspective(600px) rotateY(180deg)",
               true,
             )
           }
           if (cardsetions) {
-            var next = ui.create.div(".cardsetion", cardsetions[target.playerid] || "", node2)
+            var next = ui.create.div(
+              ".cardsetion",
+              cardsetions[target.playerid] || "",
+              node2,
+            )
             next.style.setProperty("display", "block", "important")
             if (node2.node) {
               if (node2.node.cardsetion) {
@@ -15007,7 +15297,7 @@ export class Player extends HTMLDivElement {
               node2.node.cardsetion = next
             }
           }
-          if (lib.config.cardback_style != "default") {
+          if (lib.config.cardback_style !== "default") {
             node2.style.transitionProperty = "none"
             ui.refresh(node2)
             node2.classList.add("infohidden")
@@ -15016,17 +15306,20 @@ export class Player extends HTMLDivElement {
           } else {
             node2.classList.add("infohidden")
           }
-          node2.style.transform = "perspective(600px) rotateY(180deg) translateX(0)"
-          var onEnd02 = function () {
+          node2.style.transform =
+            "perspective(600px) rotateY(180deg) translateX(0)"
+          var onEnd02 = () => {
             //node2.removeEventListener('webkitTransitionEnd',onEnd02);
-            setTimeout(function () {
+            setTimeout(() => {
               node2.style.transition = "all ease-in 0.3s"
-              node2.style.transform = "perspective(600px) rotateY(270deg) translateX(52px)"
-              var onEnd = function () {
+              node2.style.transform =
+                "perspective(600px) rotateY(270deg) translateX(52px)"
+              var onEnd = () => {
                 node2.classList.remove("infohidden")
                 node2.style.transition = "all 0s"
                 ui.refresh(node2)
-                node2.style.transform = "perspective(600px) rotateY(-90deg) translateX(52px)"
+                node2.style.transform =
+                  "perspective(600px) rotateY(-90deg) translateX(52px)"
                 ui.refresh(node2)
                 node2.style.transition = ""
                 ui.refresh(node2)
@@ -15045,14 +15338,14 @@ export class Player extends HTMLDivElement {
     if (!cardsetions && lib.config.card_animation_info) {
       var cardsetions = {},
         cardsetion_targets = [this, target]
-      for (let targetx of cardsetion_targets) {
-        let id = targetx.playerid,
+      for (const targetx of cardsetion_targets) {
+        const id = targetx.playerid,
           cardsetion = get.cardsetion(targetx)
         cardsetions[id] = cardsetion
       }
     }
     game.broadcast(
-      function (player, target, card1, card2, cardsetions) {
+      (player, target, card1, card2, cardsetions) => {
         player.$compare(card1, target, card2, cardsetions)
       },
       this,
@@ -15066,15 +15359,15 @@ export class Player extends HTMLDivElement {
       target.dataset.position,
       get.cardInfo(card2),
     ])
-    var player = this
-    var node1 = player.$throwxy2(
+
+    var node1 = this.$throwxy2(
       card1,
       "calc(50% - 114px)",
       "calc(50% - 52px)",
       "perspective(600px) rotateY(180deg)",
       true,
     )
-    if (lib.config.cardback_style != "default") {
+    if (lib.config.cardback_style !== "default") {
       node1.style.transitionProperty = "none"
       ui.refresh(node1)
       node1.classList.add("infohidden")
@@ -15084,7 +15377,11 @@ export class Player extends HTMLDivElement {
       node1.classList.add("infohidden")
     }
     if (cardsetions) {
-      var next = ui.create.div(".cardsetion", cardsetions[player.playerid] || "", node1)
+      var next = ui.create.div(
+        ".cardsetion",
+        cardsetions[this.playerid] || "",
+        node1,
+      )
       next.style.setProperty("display", "block", "important")
       if (node1.node) {
         if (node1.node.cardsetion) {
@@ -15095,16 +15392,18 @@ export class Player extends HTMLDivElement {
       }
     }
     node1.style.transform = "perspective(600px) rotateY(180deg) translateX(0)"
-    var onEnd01 = function () {
+    var onEnd01 = () => {
       //node1.removeEventListener('webkitTransitionEnd',onEnd01);
-      setTimeout(function () {
+      setTimeout(() => {
         node1.style.transition = "all ease-in 0.3s"
-        node1.style.transform = "perspective(600px) rotateY(270deg) translateX(52px)"
-        var onEnd = function () {
+        node1.style.transform =
+          "perspective(600px) rotateY(270deg) translateX(52px)"
+        var onEnd = () => {
           node1.classList.remove("infohidden")
           node1.style.transition = "all 0s"
           ui.refresh(node1)
-          node1.style.transform = "perspective(600px) rotateY(-90deg) translateX(52px)"
+          node1.style.transform =
+            "perspective(600px) rotateY(-90deg) translateX(52px)"
           ui.refresh(node1)
           node1.style.transition = ""
           ui.refresh(node1)
@@ -15115,7 +15414,7 @@ export class Player extends HTMLDivElement {
       }, 300)
     }
     node1.listenTransition(onEnd01)
-    setTimeout(function () {
+    setTimeout(() => {
       var node2 = target.$throwxy2(
         card2,
         "calc(50% + 10px)",
@@ -15123,7 +15422,7 @@ export class Player extends HTMLDivElement {
         "perspective(600px) rotateY(180deg)",
         true,
       )
-      if (lib.config.cardback_style != "default") {
+      if (lib.config.cardback_style !== "default") {
         node2.style.transitionProperty = "none"
         ui.refresh(node2)
         node2.classList.add("infohidden")
@@ -15133,7 +15432,11 @@ export class Player extends HTMLDivElement {
         node2.classList.add("infohidden")
       }
       if (cardsetions) {
-        var next = ui.create.div(".cardsetion", cardsetions[target.playerid] || "", node2)
+        var next = ui.create.div(
+          ".cardsetion",
+          cardsetions[target.playerid] || "",
+          node2,
+        )
         next.style.setProperty("display", "block", "important")
         if (node2.node) {
           if (node2.node.cardsetion) {
@@ -15144,16 +15447,18 @@ export class Player extends HTMLDivElement {
         }
       }
       node2.style.transform = "perspective(600px) rotateY(180deg) translateX(0)"
-      var onEnd02 = function () {
+      var onEnd02 = () => {
         //node2.removeEventListener('webkitTransitionEnd',onEnd02);
-        setTimeout(function () {
+        setTimeout(() => {
           node2.style.transition = "all ease-in 0.3s"
-          node2.style.transform = "perspective(600px) rotateY(270deg) translateX(52px)"
-          var onEnd = function () {
+          node2.style.transform =
+            "perspective(600px) rotateY(270deg) translateX(52px)"
+          var onEnd = () => {
             node2.classList.remove("infohidden")
             node2.style.transition = "all 0s"
             ui.refresh(node2)
-            node2.style.transform = "perspective(600px) rotateY(-90deg) translateX(52px)"
+            node2.style.transform =
+              "perspective(600px) rotateY(-90deg) translateX(52px)"
             ui.refresh(node2)
             node2.style.transition = ""
             ui.refresh(node2)
@@ -15176,7 +15481,7 @@ export class Player extends HTMLDivElement {
         if (!id) id = get.event().id
       }
     }
-    if (typeof card == "number") {
+    if (typeof card === "number") {
       var tmp = card
       card = []
       while (tmp--) {
@@ -15203,7 +15508,7 @@ export class Player extends HTMLDivElement {
     if (init !== false) {
       if (init !== "nobroadcast") {
         game.broadcast(
-          function (player, card, time, init, nosource, cardsetion, id) {
+          (player, card, time, init, nosource, cardsetion, id) => {
             player.$throw(card, time, init, nosource, cardsetion, id)
           },
           this,
@@ -15215,8 +15520,8 @@ export class Player extends HTMLDivElement {
           id,
         )
       }
-      if (get.itemtype(card) != "cards") {
-        if (get.itemtype(card) == "card") {
+      if (get.itemtype(card) !== "cards") {
+        if (get.itemtype(card) === "card") {
           card = [card]
         } else {
           return
@@ -15227,7 +15532,7 @@ export class Player extends HTMLDivElement {
     if (game.chess) {
       this.chessFocus()
     }
-    if (get.itemtype(card) == "cards") {
+    if (get.itemtype(card) === "cards") {
       //////////////////////////////////////更改部分开始喵///////////////////////////////////////
       const nodes = []
 
@@ -15258,17 +15563,17 @@ export class Player extends HTMLDivElement {
         ["useCard", "respond"].includes(curEvent.name) &&
         curEvent.lose_map[this.playerid] === card
       ) {
-        const isCard = curEvent.card?.isCard && curEvent.cards?.length == 1
+        const isCard = curEvent.card?.isCard && curEvent.cards?.length === 1
         const isCard2 =
-          curEvent.cards.length == 1 &&
+          curEvent.cards.length === 1 &&
           ["name", "suit", "number", "nature"].every((key) => {
-            let card = curEvent.cards[0]
-            if (key == "nature") {
-              if (card.nature == void 0 && curEvent.card.nature === false) {
+            const card = curEvent.cards[0]
+            if (key === "nature") {
+              if (card.nature === void 0 && curEvent.card.nature === false) {
                 return true
               }
             }
-            return card[key] == curEvent.card[key]
+            return card[key] === curEvent.card[key]
           })
         // 是否允许显示转化牌的详情并且是转化牌哦
         if (
@@ -15282,9 +15587,11 @@ export class Player extends HTMLDivElement {
           // 如果以后改了（应该不至于改喵）这里也要同步更改喵
           async function makeViewAsCard(event, lastCardid) {
             const vcard = event.card
-            const throwns = Array.from(ui.arena.querySelectorAll(".card.thrown")).reverse()
+            const throwns = Array.from(
+              ui.arena.querySelectorAll(".card.thrown"),
+            ).reverse()
             const lastCard = throwns.find((c) => {
-              return c._cardid == lastCardid
+              return c._cardid === lastCardid
             })
             if (!lastCard) return
             const curCards = event.cards
@@ -15352,15 +15659,15 @@ export class Player extends HTMLDivElement {
                 vcardStr = "视为"
               }
             }
-            if (typeof vcardSkill != "string" || !lib.translate[vcardSkill]) {
+            if (typeof vcardSkill !== "string" || !lib.translate[vcardSkill]) {
               vcardSkill = ""
             }
-            let suit = get.suit(vcard, false),
+            const suit = get.suit(vcard, false),
               color = get.color(vcard, false),
-              color2 = color == "red" ? "red" : "black"
+              color2 = color === "red" ? "red" : "black"
             const initData = [
               suit,
-              isFinite(number) && number != null
+              Number.isFinite(number) && number != null
                 ? String(number)
                 : `<span style="color:${color2}">${vcardStr}</span>`,
               get.name(vcard, false),
@@ -15400,8 +15707,8 @@ export class Player extends HTMLDivElement {
 
             lastCard.addEventListener(
               lib.config.touchscreen ? "touchend" : "click",
-              function (e) {
-                lastCard._customintro = function (uiintro, evt) {
+              (e) => {
+                lastCard._customintro = (uiintro, evt) => {
                   delete lastCard._customintro
 
                   const newUiintro = get.nodeintro(lastCard, false, evt)
@@ -15410,10 +15717,7 @@ export class Player extends HTMLDivElement {
                     return false
                   }
                   newUiintro.add(
-                    '<div class="text center">由' +
-                      get.translation(vcardSkill) +
-                      vcardStr +
-                      "</div>",
+                    `<div class="text center">由${get.translation(vcardSkill)}${vcardStr}</div>`,
                   )
                   newUiintro.add(curCards)
 
@@ -15422,13 +15726,16 @@ export class Player extends HTMLDivElement {
                   newUiintro.content.insertBefore(buttons, first.nextSibling)
 
                   // 偷天换日喵！没办法哦，谁叫这个函数不可以直接返回uiintro喵
-                  uiintro.contentContainer.insertBefore(newUiintro.content, uiintro.content)
+                  uiintro.contentContainer.insertBefore(
+                    newUiintro.content,
+                    uiintro.content,
+                  )
                   uiintro.contentContainer.removeChild(uiintro.content)
                   uiintro.content = newUiintro.content
                   newUiintro.close()
                 }
 
-                if (e.changedTouches && e.changedTouches[0]) {
+                if (e.changedTouches?.[0]) {
                   e = e.changedTouches[0]
                 }
 
@@ -15441,13 +15748,13 @@ export class Player extends HTMLDivElement {
           let lastNode = nodes[nodes.length - 1]
           if (get.event().lose_map) {
             const id = this.playerid
-            let ids = []
-            for (let key in get.event().lose_map) {
-              if (key != "noowner" && get.event().lose_map[key].length > 0) {
+            const ids = []
+            for (const key in get.event().lose_map) {
+              if (key !== "noowner" && get.event().lose_map[key].length > 0) {
                 ids.add(key)
               }
             }
-            if (ids.indexOf(id) == -1 || ids.indexOf(id) != ids.length - 1) {
+            if (ids.indexOf(id) === -1 || ids.indexOf(id) !== ids.length - 1) {
               lastNode = {
                 _cardid: -1,
               }
@@ -15455,45 +15762,47 @@ export class Player extends HTMLDivElement {
           }
           // 如果本次的抛出动画没有被广播那我们的广播就没有意义哦
           // 不过一般都会广播的吧喵？
-          if (init !== "nobroadcast") game.broadcastAll(makeViewAsCard, curEvent, lastNode?._cardid)
+          if (init !== "nobroadcast")
+            game.broadcastAll(makeViewAsCard, curEvent, lastNode?._cardid)
           else makeViewAsCard(curEvent, lastNode._cardid)
         }
       }
 
       return nodes[nodes.length - 1] // 不用管这个是不是存在，因为原来的代码也不一定存在喵 _(:з」∠)_
       //////////////////////////////////////更改部分结束喵///////////////////////////////////////
-    } else {
-      var node
-      if (card == void 0 || card.length == 0) return
-      var cardx = card.copy("thrown")
-      if (id) cardx.node.throw_id = id
-      node = this.$throwordered(cardx, nosource, cardsetion)
-      if (time != void 0) {
-        node.fixed = true
-        setTimeout(function () {
-          node.delete()
-        }, time)
-      }
-      lib.listenEnd(node)
-      return node
     }
+    var node
+    if (card === void 0 || card.length === 0) return
+    var cardx = card.copy("thrown")
+    if (id) cardx.node.throw_id = id
+    node = this.$throwordered(cardx, nosource, cardsetion)
+    if (time !== void 0) {
+      node.fixed = true
+      setTimeout(() => {
+        node.delete()
+      }, time)
+    }
+    lib.listenEnd(node)
+    return node
   }
   $throwordered() {
     const $throwordered2 = this.$throwordered2.apply(this, arguments)
     if (lib.config.card_animation_info) {
-      let node = arguments[0]
-      let eventInfo = arguments[2],
-        player = this
+      const node = arguments[0]
+      let eventInfo = arguments[2]
       if (eventInfo !== false) {
-        eventInfo = get.cardsetion(player)
+        eventInfo = get.cardsetion(this)
       }
       if (eventInfo?.length) {
         game.broadcastAll(
-          function (node, eventInfo, id) {
+          (node, eventInfo, id) => {
             if (!node?.node) {
               node = [...ui.arena.childNodes].find((c) => {
-                if (c.classList.contains("thrown") && c.classList.contains("card")) {
-                  if (c._cardid == id && !c.selectedt) {
+                if (
+                  c.classList.contains("thrown") &&
+                  c.classList.contains("card")
+                ) {
+                  if (c._cardid === id && !c.selectedt) {
                     c.selectedt = true
                     return true
                   }
@@ -15504,7 +15813,7 @@ export class Player extends HTMLDivElement {
               return
             }
             node.classList.add("infoflip")
-            let next = ui.create.div(".cardsetion", eventInfo, node)
+            const next = ui.create.div(".cardsetion", eventInfo, node)
             next.style.setProperty("display", "block", "important")
             if (node.node) {
               if (node.node.cardsetion) {
@@ -15519,7 +15828,7 @@ export class Player extends HTMLDivElement {
           node._cardid,
         )
         node.classList.add("infoflip")
-        let next = ui.create.div(".cardsetion", eventInfo, node)
+        const next = ui.create.div(".cardsetion", eventInfo, node)
         next.style.setProperty("display", "block", "important")
         if (node.node) {
           if (node.node.cardsetion) {
@@ -15543,7 +15852,10 @@ export class Player extends HTMLDivElement {
     node.hide()
     node.style.transitionProperty = "left,top,opacity,transform"
     for (var i = 0; i < ui.thrown.length; i++) {
-      if (ui.thrown[i].parentNode != ui.arena || ui.thrown[i].classList.contains("removing")) {
+      if (
+        ui.thrown[i].parentNode !== ui.arena ||
+        ui.thrown[i].classList.contains("removing")
+      ) {
         ui.thrown.splice(i--, 1)
       }
     }
@@ -15562,7 +15874,12 @@ export class Player extends HTMLDivElement {
           tops = ["calc(50% - 196px)", "calc(50% - 82px)", "calc(50% + 32px)"]
           break
         default:
-          tops = ["calc(50% - 253px)", "calc(50% - 139px)", "calc(50% - 25px)", "calc(50% + 89px)"]
+          tops = [
+            "calc(50% - 253px)",
+            "calc(50% - 139px)",
+            "calc(50% - 25px)",
+            "calc(50% + 89px)",
+          ]
       }
     } else {
       switch (Math.floor((ui.thrown.length - 1) / 4)) {
@@ -15576,7 +15893,12 @@ export class Player extends HTMLDivElement {
           tops = ["calc(50% - 166px)", "calc(50% - 52px)", "calc(50% + 62px)"]
           break
         default:
-          tops = ["calc(50% - 223px)", "calc(50% - 109px)", "calc(50% + 5px)", "calc(50% + 119px)"]
+          tops = [
+            "calc(50% - 223px)",
+            "calc(50% - 109px)",
+            "calc(50% + 5px)",
+            "calc(50% + 119px)",
+          ]
       }
     }
     while (uithrowns.length) {
@@ -15619,10 +15941,12 @@ export class Player extends HTMLDivElement {
       node.style.transform = "scale(0)"
       node.classList.add("center")
     } else {
-      var parseCalc = function (str) {
+      var parseCalc = (str) => {
         var per = str.slice(str.indexOf("calc(") + 5, str.indexOf("%"))
-        var add = str.slice(str.indexOf("%") + 1, str.indexOf("px")).replace(/\s/g, "")
-        return [parseInt(per), parseInt(add)]
+        var add = str
+          .slice(str.indexOf("%") + 1, str.indexOf("px"))
+          .replace(/\s/g, "")
+        return [parseInt(per, 10), parseInt(add, 10)]
       }
       var nx = parseCalc(node.style.left)
       var ny = parseCalc(node.style.top)
@@ -15645,12 +15969,12 @@ export class Player extends HTMLDivElement {
       }
       if (
         node.style.transform &&
-        node.style.transform != "none" &&
-        node.style.transform.indexOf("translate") == -1
+        node.style.transform !== "none" &&
+        node.style.transform.indexOf("translate") === -1
       ) {
-        node.style.transform += " translate(" + dx + "px," + dy + "px)"
+        node.style.transform += ` translate(${dx}px,${dy}px)`
       } else {
-        node.style.transform = "translate(" + dx + "px," + dy + "px)"
+        node.style.transform = `translate(${dx}px,${dy}px)`
       }
     }
     ui.arena.appendChild(node)
@@ -15687,18 +16011,21 @@ export class Player extends HTMLDivElement {
       }
       if (
         node.style.transform &&
-        node.style.transform != "none" &&
-        node.style.transform.indexOf("translate") == -1
+        node.style.transform !== "none" &&
+        node.style.transform.indexOf("translate") === -1
       ) {
-        node.style.transform += " translate(" + dx + "px," + dy + "px)"
+        node.style.transform += ` translate(${dx}px,${dy}px)`
       } else {
-        node.style.transform = "translate(" + dx + "px," + dy + "px)"
+        node.style.transform = `translate(${dx}px,${dy}px)`
       }
     }
     ui.arena.appendChild(node)
     ui.refresh(node)
     for (var i = 0; i < ui.thrown.length; i++) {
-      if (ui.thrown[i].parentNode != ui.arena || ui.thrown[i].classList.contains("removing")) {
+      if (
+        ui.thrown[i].parentNode !== ui.arena ||
+        ui.thrown[i].classList.contains("removing")
+      ) {
         ui.thrown.splice(i--, 1)
       }
     }
@@ -15706,7 +16033,9 @@ export class Player extends HTMLDivElement {
     if (
       !node.subThrow &&
       node.node?.throw_id &&
-      ui.thrown.some((n) => n != node && n.node?.throw_id == node.node?.throw_id)
+      ui.thrown.some(
+        (n) => n !== node && n.node?.throw_id === node.node?.throw_id,
+      )
     ) {
       node.subThrow = true
     }
@@ -15721,7 +16050,8 @@ export class Player extends HTMLDivElement {
     var limitWidth = Math.min(maxWidth, pw)
     var margin =
       totalWidth > limitWidth
-        ? (limitWidth - cardWidth) / (cards.filter((i) => !i.subThrow).length - 1)
+        ? (limitWidth - cardWidth) /
+          (cards.filter((i) => !i.subThrow).length - 1)
         : cardWidth + cardGap
     var actualWidth = Math.min(totalWidth, limitWidth)
     var offsetX = -actualWidth / 2 + cardWidth / 2
@@ -15732,10 +16062,12 @@ export class Player extends HTMLDivElement {
     for (var j = 0; j < cards.length; j++) {
       var x = Math.round(offsetX + j * margin)
       x -= dlcX
-      let id = cards[j]?.node?.throw_id
-      const node_Stacking = cards.filter((n) => n.subThrow && n.node.throw_id == id).slice(0)
+      const id = cards[j]?.node?.throw_id
+      const node_Stacking = cards
+        .filter((n) => n.subThrow && n.node.throw_id === id)
+        .slice(0)
       const index = node_Stacking.indexOf(cards[j])
-      if (index != -1) {
+      if (index !== -1) {
         let xx = 80
         if (node_Stacking.length > 2) {
           xx += 10
@@ -15747,20 +16079,22 @@ export class Player extends HTMLDivElement {
         dlcX += xx
         x -= xx
       }
-      cards[j].style.transform = "translate(" + x + "px, -30px)"
+      cards[j].style.transform = `translate(${x}px, -30px)`
       if (cards[j].node && j < cards.length - 1 && infoOffset > 0) {
         var actualInfoOffset = infoOffset
         if (infoOffset > 40) {
-          actualInfoOffset = 90 - (cards[j].node.info ? cards[j].node.info.offsetWidth : 20)
+          actualInfoOffset =
+            90 - (cards[j].node.info ? cards[j].node.info.offsetWidth : 20)
           if (cards[j].node.info) {
             var infoSpan = cards[j].node.info.querySelector("span")
             if (infoSpan) infoSpan.style.display = "none"
             cards[j].node.info.style.transform =
-              "translateX(-" + actualInfoOffset + "px) translateY(-3px)"
+              `translateX(-${actualInfoOffset}px) translateY(-3px)`
           }
           if (cards[j].node.name) {
             if (cards[j].node.name.classList.contains("long")) {
-              cards[j].node.name.style.transform = "translateY(16px) scale(0.85)"
+              cards[j].node.name.style.transform =
+                "translateY(16px) scale(0.85)"
               cards[j].node.name.style.transformOrigin = "top left"
             } else {
               cards[j].node.name.style.transform = "translateY(16px)"
@@ -15770,7 +16104,8 @@ export class Player extends HTMLDivElement {
           if (cards[j].node.info) {
             var infoSpan = cards[j].node.info.querySelector("span")
             if (infoSpan) infoSpan.style.display = ""
-            cards[j].node.info.style.transform = "translateX(-" + actualInfoOffset + "px)"
+            cards[j].node.info.style.transform =
+              `translateX(-${actualInfoOffset}px)`
           }
           if (cards[j].node.name) {
             cards[j].node.name.style.transform = ""
@@ -15817,10 +16152,12 @@ export class Player extends HTMLDivElement {
     node.hide()
     // node.style.transitionProperty='left,top,opacity,transform';
 
-    var parseCalc = function (str) {
+    var parseCalc = (str) => {
       var per = str.slice(str.indexOf("calc(") + 5, str.indexOf("%"))
-      var add = str.slice(str.indexOf("%") + 1, str.indexOf("px")).replace(/\s/g, "")
-      return [parseInt(per), parseInt(add)]
+      var add = str
+        .slice(str.indexOf("%") + 1, str.indexOf("px"))
+        .replace(/\s/g, "")
+      return [parseInt(per, 10), parseInt(add, 10)]
     }
     var nx = parseCalc(node.style.left)
     var ny = parseCalc(node.style.top)
@@ -15835,9 +16172,9 @@ export class Player extends HTMLDivElement {
       dy = -dy
     }
     if (trans) {
-      node.style.transform = trans + " translate(" + dx + "px," + dy + "px)"
+      node.style.transform = `${trans} translate(${dx}px,${dy}px)`
     } else {
-      node.style.transform = "translate(" + dx + "px," + dy + "px)"
+      node.style.transform = `translate(${dx}px,${dy}px)`
     }
 
     ui.arena.appendChild(node)
@@ -15848,7 +16185,7 @@ export class Player extends HTMLDivElement {
     return node
   }
   throwDice(num) {
-    if (typeof num != "number") {
+    if (typeof num !== "number") {
       num = get.rand(6) + 1
       _status.event.num = num
     }
@@ -15858,7 +16195,7 @@ export class Player extends HTMLDivElement {
     if (!game.online) {
       game.pause()
     }
-    game.broadcastAll(function (num) {
+    game.broadcastAll((num) => {
       var diceContainer = ui.create.div(".fullsize.dice-container", ui.window)
       ui.window.classList.add("dicepaused")
       var dice = ui.create.div(".dice")
@@ -15916,27 +16253,26 @@ export class Player extends HTMLDivElement {
         6: [255, 0, 135],
       }
       dice.roll = function (deg) {
-        if (typeof deg == "number") {
+        if (typeof deg === "number") {
           dice.current[0] += deg
           deg = dice.current
         }
         deg = deg.slice(0)
         dice.current = deg
-        this.style.transform =
-          "rotateX(" + deg[0] + "deg) rotateY(" + deg[1] + "deg) rotateZ(" + deg[2] + "deg)"
+        this.style.transform = `rotateX(${deg[0]}deg) rotateY(${deg[1]}deg) rotateZ(${deg[2]}deg)`
       }
       dice.roll(map[num])
       diceContainer.appendChild(dice)
       ui.refresh(dice)
       dice.roll(1025)
 
-      dice.addEventListener("webkitTransitionEnd", function () {
+      dice.addEventListener("webkitTransitionEnd", () => {
         if (!dice.over) {
           dice.style.transition = "transform 0.8s ease"
           dice.roll(-20)
           dice.over = true
         } else if (!dice.resumed) {
-          setTimeout(function () {
+          setTimeout(() => {
             diceContainer.delete()
             ui.window.classList.remove("dicepaused")
           }, 300)
@@ -15949,11 +16285,14 @@ export class Player extends HTMLDivElement {
     }, num)
   }
   $giveAuto(card, player) {
-    if (Array.isArray(card) && card.length == 0) {
+    if (Array.isArray(card) && card.length === 0) {
       return
     }
     var args = Array.from(arguments)
-    if (_status.connectMode || (!this.isUnderControl(true) && !player.isUnderControl(true))) {
+    if (
+      _status.connectMode ||
+      (!this.isUnderControl(true) && !player.isUnderControl(true))
+    ) {
       if (Array.isArray(card)) {
         card = card.length
       } else {
@@ -15965,8 +16304,8 @@ export class Player extends HTMLDivElement {
   }
   $give(card, player, log, init, cardsetion) {
     if (!cardsetion && cardsetion !== false && lib.config.card_animation_info) {
-      let evt = get.cardsetion(null, true)
-      if (evt && evt.player == player) {
+      const evt = get.cardsetion(null, true)
+      if (evt && evt.player === player) {
         cardsetion = get.cardsetion(player)
       } else {
         cardsetion = get.cardsetion(this)
@@ -15974,7 +16313,7 @@ export class Player extends HTMLDivElement {
     }
     if (init !== false) {
       game.broadcast(
-        function (source, card, player, init, cardsetion) {
+        (source, card, player, init, cardsetion) => {
           source.$give(card, player, false, init, cardsetion)
         },
         this,
@@ -15983,19 +16322,22 @@ export class Player extends HTMLDivElement {
         init,
         cardsetion,
       )
-      if (typeof card == "number" && card >= 0) {
+      if (typeof card === "number" && card >= 0) {
         game.addVideo("give", this, [card, player.dataset.position])
       } else {
-        if (get.itemtype(card) == "card") {
+        if (get.itemtype(card) === "card") {
           card = [card]
         }
-        if (get.itemtype(card) == "cards") {
-          game.addVideo("giveCard", this, [get.cardsInfo(card), player.dataset.position])
+        if (get.itemtype(card) === "cards") {
+          game.addVideo("giveCard", this, [
+            get.cardsInfo(card),
+            player.dataset.position,
+          ])
         }
       }
     }
-    if (get.itemtype(card) == "cards") {
-      if (log != false && !_status.video) {
+    if (get.itemtype(card) === "cards") {
+      if (log !== false && !_status.video) {
         game.log(player, "从", this, "获得了", card)
       }
       if (this.$givemod) {
@@ -16005,9 +16347,9 @@ export class Player extends HTMLDivElement {
           this.$give(card[i], player, false, false, cardsetion)
         }
       }
-    } else if (typeof card == "number" && card >= 0) {
-      if (log != false && !_status.video) {
-        game.log(player, "从", this, "获得了" + get.cnNumber(card) + "张牌")
+    } else if (typeof card === "number" && card >= 0) {
+      if (log !== false && !_status.video) {
+        game.log(player, "从", this, `获得了${get.cnNumber(card)}张牌`)
       }
       if (this.$givemod) {
         this.$givemod(card, player)
@@ -16017,8 +16359,8 @@ export class Player extends HTMLDivElement {
         }
       }
     } else {
-      if (log != false && !_status.video) {
-        if (get.itemtype(card) == "card" && log != false) {
+      if (log !== false && !_status.video) {
+        if (get.itemtype(card) === "card" && log !== false) {
           game.log(player, "从", this, "获得了", card)
         } else {
           game.log(player, "从", this, "获得了一张牌")
@@ -16028,7 +16370,7 @@ export class Player extends HTMLDivElement {
         this.$givemod(card, player)
       } else {
         var node
-        if (get.itemtype(card) == "card") {
+        if (get.itemtype(card) === "card") {
           node = card.copy("card", "thrown", false)
           if (cardsetion) {
             var next = ui.create.div(".cardsetion", cardsetion, node)
@@ -16045,7 +16387,7 @@ export class Player extends HTMLDivElement {
           if (cardsetion) {
             node.classList.add("infoflip")
             node.classList.add("infohidden")
-            let next = ui.create.div(".cardsetion", cardsetion, node)
+            const next = ui.create.div(".cardsetion", cardsetion, node)
             next.style.setProperty("display", "block", "important")
             if (node.node) {
               if (node.node.cardsetion) {
@@ -16071,17 +16413,19 @@ export class Player extends HTMLDivElement {
         // node.style.left='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*100+'px)';
         // node.style.top='calc(50% - 52px '+((Math.random()-0.5<0)?'+':'-')+' '+Math.random()*80+'px)';
 
-        node.listenTransition(function () {
-          var dx = player.getLeft() + player.offsetWidth / 2 - 52 - node.offsetLeft
-          var dy = player.getTop() + player.offsetHeight / 2 - 52 - node.offsetTop
+        node.listenTransition(() => {
+          var dx =
+            player.getLeft() + player.offsetWidth / 2 - 52 - node.offsetLeft
+          var dy =
+            player.getTop() + player.offsetHeight / 2 - 52 - node.offsetTop
           if (
             node.style.transform &&
-            node.style.transform != "none" &&
-            node.style.transform.indexOf("translate") == -1
+            node.style.transform !== "none" &&
+            node.style.transform.indexOf("translate") === -1
           ) {
-            node.style.transform += " translate(" + dx + "px," + dy + "px)"
+            node.style.transform += ` translate(${dx}px,${dy}px)`
           } else {
-            node.style.transform = "translate(" + dx + "px," + dy + "px)"
+            node.style.transform = `translate(${dx}px,${dy}px)`
           }
 
           node.delete()
@@ -16104,50 +16448,51 @@ export class Player extends HTMLDivElement {
     }
   }
   $handleEquipChange() {
-    const player = this
-    const cards = Array.from(player.node.equips.childNodes)
+    const cards = Array.from(this.node.equips.childNodes)
     const cardsResume = cards.slice(0)
     const extraEquip = []
-    player.extraEquip.forEach((info) => {
-      if (player.hiddenSkills.includes(info[0])) {
+    this.extraEquip.forEach((info) => {
+      if (this.hiddenSkills.includes(info[0])) {
         return
       }
       const extra = `${get.translation(info[0])} ${get.translation(info[1])}`
       const subtype = get.subtype(info[1])
-      let preserve = info[2] && !info[2](player)
+      const preserve = info[2] && !info[2](this)
       if (!preserve && !extraEquip.map((info) => info[1]).includes(info[1])) {
         extraEquip.add([info, extra, subtype])
       }
     })
     cards.forEach((card) => {
-      let num = get.equipNum(card)
+      const num = get.equipNum(card)
       let remove = false
-      if (card.name.indexOf("empty_equip") == 0) {
-        if (!player.hasEmptySlot(num) || player.getEquips(num).length) {
+      if (card.name.indexOf("empty_equip") === 0) {
+        if (!this.hasEmptySlot(num) || this.getEquips(num).length) {
           remove = true
         }
         if (remove) {
-          player.node.equips.removeChild(card)
+          this.node.equips.removeChild(card)
           cardsResume.remove(card)
         }
       }
       if (card.extraEquip && !remove) {
         const info = card.extraEquip,
           disable = card.classList.contains("feichu")
-        const extra = extraEquip.find((infox) => infox.every((item) => info.includes(item)))
+        const extra = extraEquip.find((infox) =>
+          infox.every((item) => info.includes(item)),
+        )
         if (!extra) {
           if (disable) {
-            card.node.name2.innerHTML = get.translation("equip" + num) + " 已废除"
+            card.node.name2.innerHTML = `${get.translation(`equip${num}`)} 已废除`
             delete card.extraEquip
           } else {
-            player.node.equips.removeChild(card)
+            this.node.equips.removeChild(card)
             cardsResume.remove(card)
           }
         } else {
           extraEquip.remove(extra)
         }
       } else if (card.classList.contains("feichu")) {
-        let extra = extraEquip.find((info) => info[2].includes("equip" + num))
+        const extra = extraEquip.find((info) => info[2].includes(`equip${num}`))
         if (extra) {
           card.node.name2.innerHTML = extra[1]
           card.extraEquip = extra[0]
@@ -16157,15 +16502,15 @@ export class Player extends HTMLDivElement {
     })
     for (let i = 1; i <= 5; i++) {
       let add = false
-      add = player.hasEmptySlot(i) && !player.getEquips(i).length
+      add = this.hasEmptySlot(i) && !this.getEquips(i).length
       if (
         add &&
         !cardsResume.some((card) => {
-          let num = get.equipNum(card)
-          return num == i
+          const num = get.equipNum(card)
+          return num === i
         })
       ) {
-        const card = game.createCard("empty_equip" + i, "", "")
+        const card = game.createCard(`empty_equip${i}`, "", "")
         card.fix()
         //console.log('add '+card.name);
         card.style.transform = ""
@@ -16175,15 +16520,15 @@ export class Player extends HTMLDivElement {
         delete card._transform
         const equipNum = get.equipNum(card)
         let equipped = false
-        for (let j = 0; j < player.node.equips.childNodes.length; j++) {
-          if (get.equipNum(player.node.equips.childNodes[j]) >= equipNum) {
-            player.node.equips.insertBefore(card, player.node.equips.childNodes[j])
+        for (let j = 0; j < this.node.equips.childNodes.length; j++) {
+          if (get.equipNum(this.node.equips.childNodes[j]) >= equipNum) {
+            this.node.equips.insertBefore(card, this.node.equips.childNodes[j])
             equipped = true
             break
           }
         }
         if (!equipped) {
-          player.node.equips.appendChild(card)
+          this.node.equips.appendChild(card)
           if (_status.discarded) {
             _status.discarded.remove(card)
           }
@@ -16191,8 +16536,8 @@ export class Player extends HTMLDivElement {
       }
     }
     extraEquip.forEach((info) => {
-      if (player.hasEmptySlot(info[2])) {
-        const card = game.createCard("empty_" + info[2], "", "")
+      if (this.hasEmptySlot(info[2])) {
+        const card = game.createCard(`empty_${info[2]}`, "", "")
         card.fix()
         //console.log('add '+card.name);
         card.style.transform = ""
@@ -16203,10 +16548,10 @@ export class Player extends HTMLDivElement {
         delete card._transform
         const equipNum = get.equipNum(card)
         let equipped = false
-        for (let j = 0; j < player.node.equips.childNodes.length; j++) {
-          const node = player.node.equips.childNodes[j]
+        for (let j = 0; j < this.node.equips.childNodes.length; j++) {
+          const node = this.node.equips.childNodes[j]
           if (
-            get.equipNum(node) == info[2].at(-1) &&
+            get.equipNum(node) === info[2].at(-1) &&
             info &&
             node.classList.contains("emptyequip") &&
             !node.extraEquip
@@ -16218,13 +16563,13 @@ export class Player extends HTMLDivElement {
             break
           }
           if (get.equipNum(node) >= equipNum) {
-            player.node.equips.insertBefore(card, node)
+            this.node.equips.insertBefore(card, node)
             equipped = true
             break
           }
         }
         if (!equipped) {
-          player.node.equips.appendChild(card)
+          this.node.equips.appendChild(card)
           if (_status.discarded) {
             _status.discarded.remove(card)
           }
@@ -16234,37 +16579,42 @@ export class Player extends HTMLDivElement {
   }
   addVirtualJudge(card, cards) {
     let cardx
-    if (get.itemtype(card) == "card" && card.isViewAsCard) {
+    if (get.itemtype(card) === "card" && card.isViewAsCard) {
       cardx = card[card.cardSymbol]
     } else {
       cardx = card
     }
     cardx.initID()
-    const player = this
+
     game.broadcast(
       (player, card, cards) => {
         player.addVirtualJudge(card, cards)
       },
-      player,
+      this,
       card,
       cards,
     )
-    game.addVideo("addVirtualJudge", player, [get.vcardInfo(cardx), get.cardsInfo(cards)])
-    player.vcardsMap?.judges.push(cardx)
+    game.addVideo("addVirtualJudge", this, [
+      get.vcardInfo(cardx),
+      get.cardsInfo(cards),
+    ])
+    this.vcardsMap?.judges.push(cardx)
     if (_status.discarded) {
       _status.discarded.removeArray(cards)
     }
-    player.$addVirtualJudge(card, cards)
+    this.$addVirtualJudge(card, cards)
     //game.addVideo("addVirtualJudge", ???);
     if (
       cardx.storage.equipEnable &&
-      (cardx.cards || cards).some((card) => get.type(card) == "equip")
+      (cardx.cards || cards).some((card) => get.type(card) === "equip")
     ) {
-      const equips = (cardx.cards || cards).filter((card) => get.type(card) == "equip")
+      const equips = (cardx.cards || cards).filter(
+        (card) => get.type(card) === "equip",
+      )
       if (equips.length) {
-        let skills = get.skillsFromEquips(equips)
+        const skills = get.skillsFromEquips(equips)
         if (skills.length) {
-          player.addSkill(skills)
+          this.addSkill(skills)
         }
       }
       game.addGlobalSkill("equipEnableSkill")
@@ -16274,19 +16624,19 @@ export class Player extends HTMLDivElement {
     if (game.online) {
       return
     }
-    const player = this,
-      card = VCard
-    const isViewAsCard = cards.length !== 1 || cards[0].name !== VCard.name || !card.isCard,
+    const card = VCard
+    const isViewAsCard =
+        cards.length !== 1 || cards[0].name !== VCard.name || !card.isCard,
       info = get.info(VCard, false)
     let cardx
-    if (get.itemtype(card) == "card" && card.isViewAsCard) {
+    if (get.itemtype(card) === "card" && card.isViewAsCard) {
       cardx = card
     } else {
       cardx = isViewAsCard
         ? game.createCard(
             card.name,
-            cards.length == 1 ? get.suit(cards[0]) : "none",
-            cards.length == 1 ? get.number(cards[0]) : 0,
+            cards.length === 1 ? get.suit(cards[0]) : "none",
+            cards.length === 1 ? get.number(cards[0]) : 0,
           )
         : cards[0]
     }
@@ -16304,17 +16654,17 @@ export class Player extends HTMLDivElement {
         if (isViewAsCard && !cardx.isViewAsCard) {
           cardx.isViewAsCard = true
           cardx.destroyLog = false
-          for (let i of cards) {
+          for (const i of cards) {
             i.goto(ui.special)
             i.destiny = player.node.judges
           }
           if (cardx.destroyed) {
             cardx._destroyed_Virtua = cardx.destroyed
           }
-          cardx.destroyed = function (card, id, player, event) {
+          cardx.destroyed = (card, id, player, event) => {
             if (card._destroyed_Virtua) {
-              if (typeof card._destroyed_Virtua == "function") {
-                let bool = card._destroyed_Virtua(card, id, player, event)
+              if (typeof card._destroyed_Virtua === "function") {
+                const bool = card._destroyed_Virtua(card, id, player, event)
                 if (bool === true) {
                   return true
                 }
@@ -16326,19 +16676,21 @@ export class Player extends HTMLDivElement {
                   }
                 }
                 return true
-              } else if (typeof card._destroyed_Virtua == "string") {
-                return card._destroyed_Virtua == id
+              } else if (typeof card._destroyed_Virtua === "string") {
+                return card._destroyed_Virtua === id
               } else if (card._destroyed_Virtua === true) {
                 return true
               }
             }
             if (
-              id == "ordering" &&
-              ["phaseJudge", "executeDelayCardEffect"].includes(event.getParent().name)
+              id === "ordering" &&
+              ["phaseJudge", "executeDelayCardEffect"].includes(
+                event.getParent().name,
+              )
             ) {
               return false
             }
-            if (id != "judge") {
+            if (id !== "judge") {
               return true
             }
           }
@@ -16362,7 +16714,8 @@ export class Player extends HTMLDivElement {
               cardx.style.backgroundImage = ""
             }
             cardx.node.background.innerHTML =
-              lib.translate[cardx.viewAs + "_bg"] || get.translation(cardx.viewAs)[0]
+              lib.translate[`${cardx.viewAs}_bg`] ||
+              get.translation(cardx.viewAs)[0]
           }
         } else {
           delete cardx.viewAs
@@ -16372,7 +16725,7 @@ export class Player extends HTMLDivElement {
         player.node.judges.insertBefore(cardx, player.node.judges.firstChild)
         ui.updatej(player)
       },
-      player,
+      this,
       cardx,
       isViewAsCard,
       VCard,
@@ -16381,28 +16734,31 @@ export class Player extends HTMLDivElement {
   }
   addVirtualEquip(card, cards) {
     let cardx
-    if (get.itemtype(card) == "card" && card.isViewAsCard) {
+    if (get.itemtype(card) === "card" && card.isViewAsCard) {
       cardx = card[card.cardSymbol]
     } else {
       cardx = card
     }
     cardx.initID()
-    const player = this
+
     game.broadcast(
       (player, card, cards) => {
         player.addVirtualEquip(card, cards)
       },
-      player,
+      this,
       card,
       cards,
     )
-    game.addVideo("addVirtualEquip", player, [get.vcardInfo(cardx), get.cardsInfo(cards)])
-    player.vcardsMap?.equips.push(cardx)
-    player.vcardsMap?.equips.sort((a, b) => {
+    game.addVideo("addVirtualEquip", this, [
+      get.vcardInfo(cardx),
+      get.cardsInfo(cards),
+    ])
+    this.vcardsMap?.equips.push(cardx)
+    this.vcardsMap?.equips.sort((a, b) => {
       return get.equipNum(a) - get.equipNum(b)
     })
-    player.$addVirtualEquip(card, cards)
-    player.addEquipTrigger(card)
+    this.$addVirtualEquip(card, cards)
+    this.addEquipTrigger(card)
     /*var info = get.info(card, false);
 			if (info.skills) {
 				for (var i = 0; i < info.skills.length; i++) {
@@ -16414,8 +16770,9 @@ export class Player extends HTMLDivElement {
     if (game.online) {
       return
     }
-    const player = this
-    const isViewAsCard = cards.length !== 1 || cards[0].name !== card.name || !card.isCard,
+
+    const isViewAsCard =
+        cards.length !== 1 || cards[0].name !== card.name || !card.isCard,
       info = get.info(card, false)
     let cardShownName = get.translation(card.name)
     if (info.subtype === "equip3") {
@@ -16424,14 +16781,14 @@ export class Player extends HTMLDivElement {
       cardShownName += "-"
     }
     let cardx
-    if (get.itemtype(card) == "card" && card.isViewAsCard) {
+    if (get.itemtype(card) === "card" && card.isViewAsCard) {
       cardx = card
     } else {
       cardx = isViewAsCard
         ? game.createCard(
             card.name,
-            cards.length == 1 ? get.suit(cards[0]) : "none",
-            cards.length == 1 ? get.number(cards[0]) : 0,
+            cards.length === 1 ? get.suit(cards[0]) : "none",
+            cards.length === 1 ? get.number(cards[0]) : 0,
           )
         : cards[0]
     }
@@ -16452,17 +16809,17 @@ export class Player extends HTMLDivElement {
         if (isViewAsCard && !cardx.isViewAsCard) {
           cardx.isViewAsCard = true
           cardx.destroyLog = false
-          for (let i of cards) {
+          for (const i of cards) {
             i.goto(ui.special)
             i.destiny = player.node.equips
           }
           if (cardx.destroyed) {
             cardx._destroyed_Virtua = cardx.destroyed
           }
-          cardx.destroyed = function (card, id, player, event) {
+          cardx.destroyed = (card, id, player, event) => {
             if (card._destroyed_Virtua) {
-              if (typeof card._destroyed_Virtua == "function") {
-                let bool = card._destroyed_Virtua(card, id, player, event)
+              if (typeof card._destroyed_Virtua === "function") {
+                const bool = card._destroyed_Virtua(card, id, player, event)
                 if (bool === true) {
                   return true
                 }
@@ -16474,13 +16831,13 @@ export class Player extends HTMLDivElement {
                   }
                 }
                 return true
-              } else if (typeof card._destroyed_Virtua == "string") {
-                return card._destroyed_Virtua == id
+              } else if (typeof card._destroyed_Virtua === "string") {
+                return card._destroyed_Virtua === id
               } else if (card._destroyed_Virtua === true) {
                 return true
               }
             }
-            if (id != "equip") {
+            if (id !== "equip") {
               return true
             }
           }
@@ -16503,7 +16860,10 @@ export class Player extends HTMLDivElement {
           for (let i = 0; i < player.node.equips.childNodes.length; i++) {
             if (get.equipNum(player.node.equips.childNodes[i]) >= equipNum) {
               equipped = true
-              player.node.equips.insertBefore(cardx, player.node.equips.childNodes[i])
+              player.node.equips.insertBefore(
+                cardx,
+                player.node.equips.childNodes[i],
+              )
               break
             }
           }
@@ -16515,7 +16875,7 @@ export class Player extends HTMLDivElement {
           }
         }
       },
-      player,
+      this,
       cardx,
       isViewAsCard,
       card,
@@ -16525,7 +16885,7 @@ export class Player extends HTMLDivElement {
   }
   $equip(card) {
     game.broadcast(
-      function (player, card) {
+      (player, card) => {
         player.$equip(card)
       },
       this,
@@ -16535,18 +16895,18 @@ export class Player extends HTMLDivElement {
     card.style.transform = ""
     card.classList.remove("drawinghidden")
     delete card._transform
-    var player = this
+
     var equipNum = get.equipNum(card)
     var equipped = false
-    for (var i = 0; i < player.node.equips.childNodes.length; i++) {
-      if (get.equipNum(player.node.equips.childNodes[i]) >= equipNum) {
-        player.node.equips.insertBefore(card, player.node.equips.childNodes[i])
+    for (var i = 0; i < this.node.equips.childNodes.length; i++) {
+      if (get.equipNum(this.node.equips.childNodes[i]) >= equipNum) {
+        this.node.equips.insertBefore(card, this.node.equips.childNodes[i])
         equipped = true
         break
       }
     }
     if (!equipped) {
-      player.node.equips.appendChild(card)
+      this.node.equips.appendChild(card)
       if (_status.discarded) {
         _status.discarded.remove(card)
       }
@@ -16554,10 +16914,10 @@ export class Player extends HTMLDivElement {
     var info = get.info(card)
     if (info.skills) {
       for (var i = 0; i < info.skills.length; i++) {
-        player.addSkillTrigger(info.skills[i])
+        this.addSkillTrigger(info.skills[i])
       }
     }
-    return player
+    return this
   }
   $gain(card, log, init, cardsetion) {
     if (!cardsetion && cardsetion !== false && lib.config.card_animation_info) {
@@ -16565,7 +16925,7 @@ export class Player extends HTMLDivElement {
     }
     if (init !== false) {
       game.broadcast(
-        function (player, card, init, cardsetion) {
+        (player, card, init, cardsetion) => {
           player.$gain(card, false, init, cardsetion)
         },
         this,
@@ -16573,21 +16933,21 @@ export class Player extends HTMLDivElement {
         init,
         cardsetion,
       )
-      if (typeof card == "number" && card >= 0) {
+      if (typeof card === "number" && card >= 0) {
         game.addVideo("gain", this, card)
       } else {
-        if (get.itemtype(card) == "card") {
+        if (get.itemtype(card) === "card") {
           card = [card]
         }
-        if (get.itemtype(card) == "cards") {
+        if (get.itemtype(card) === "cards") {
           game.addVideo("gainCard", this, get.cardsInfo(card))
         } else {
           game.addVideo("gain", this, 1)
         }
       }
     }
-    if (get.itemtype(card) == "cards") {
-      if (log != false && !_status.video) {
+    if (get.itemtype(card) === "cards") {
+      if (log !== false && !_status.video) {
         game.log(this, "获得了", card)
       }
       if (this.$gainmod) {
@@ -16597,9 +16957,9 @@ export class Player extends HTMLDivElement {
           this.$gain(card[i], false, false)
         }
       }
-    } else if (typeof card == "number" && card > 1) {
-      if (log != false && !_status.video) {
-        game.log(this, "获得了" + get.cnNumber(card) + "张牌")
+    } else if (typeof card === "number" && card > 1) {
+      if (log !== false && !_status.video) {
+        game.log(this, `获得了${get.cnNumber(card)}张牌`)
       }
       if (this.$gainmod) {
         this.$gainmod(card)
@@ -16609,14 +16969,14 @@ export class Player extends HTMLDivElement {
         }
       }
     } else {
-      if (get.itemtype(card) == "card" && log != false && !_status.video) {
+      if (get.itemtype(card) === "card" && log !== false && !_status.video) {
         game.log(this, "获得了", card)
       }
       if (this.$gainmod) {
         this.$gainmod(card)
       } else {
         var node
-        if (get.itemtype(card) == "card") {
+        if (get.itemtype(card) === "card") {
           node = card.copy("thrown", false)
         } else {
           node = ui.create.div(".card.thrown")
@@ -16635,18 +16995,8 @@ export class Player extends HTMLDivElement {
           }
         }
         node.fixed = true
-        node.style.left =
-          "calc(50% - 52px " +
-          (Math.random() - 0.5 < 0 ? "+" : "-") +
-          " " +
-          Math.random() * 100 +
-          "px)"
-        node.style.top =
-          "calc(50% - 52px " +
-          (Math.random() - 0.5 < 0 ? "+" : "-") +
-          " " +
-          Math.random() * 100 +
-          "px)"
+        node.style.left = `calc(50% - 52px ${Math.random() - 0.5 < 0 ? "+" : "-"} ${Math.random() * 100}px)`
+        node.style.top = `calc(50% - 52px ${Math.random() - 0.5 < 0 ? "+" : "-"} ${Math.random() * 100}px)`
         node.style.transform = "scale(0)"
         node.hide()
         ui.arena.appendChild(node)
@@ -16655,9 +17005,9 @@ export class Player extends HTMLDivElement {
         node.style.transform = ""
 
         lib.listenEnd(node)
-        var player = this
-        setTimeout(function () {
-          node.moveDelete(player)
+
+        setTimeout(() => {
+          node.moveDelete(this)
         }, 700)
       }
     }
@@ -16670,16 +17020,16 @@ export class Player extends HTMLDivElement {
       game.log(this, "获得了", cards)
     }
     game.broadcast(
-      function (player, cards, cardsetion) {
+      (player, cards, cardsetion) => {
         player.$gain2(cards, null, cardsetion)
       },
       this,
       cards,
       cardsetion,
     )
-    if (get.itemtype(cards) == "card") {
+    if (get.itemtype(cards) === "card") {
       cards = [cards]
-    } else if (get.itemtype(cards) != "cards") {
+    } else if (get.itemtype(cards) !== "cards") {
       return
     }
     var list = [],
@@ -16687,7 +17037,8 @@ export class Player extends HTMLDivElement {
     for (var i = 0; i < cards.length; i++) {
       if (
         cards[i].clone &&
-        (cards[i].clone.parentNode == this.parentNode || cards[i].clone.parentNode == ui.arena) &&
+        (cards[i].clone.parentNode === this.parentNode ||
+          cards[i].clone.parentNode === ui.arena) &&
         parseFloat(getComputedStyle(cards[i].clone).opacity) > 0.3
       ) {
         var next = ui.create.div(".cardsetion", cardsetion, cards[i].clone)
@@ -16714,7 +17065,7 @@ export class Player extends HTMLDivElement {
     }
   }
   $skill(name, type, color, avatar) {
-    if (typeof type != "string") {
+    if (typeof type !== "string") {
       type = "legend"
     }
     if (!avatar) {
@@ -16722,31 +17073,31 @@ export class Player extends HTMLDivElement {
       game.delay(2)
     } else {
       game.addVideo("playerfocus2")
-      game.broadcastAll(function () {
+      game.broadcastAll(() => {
         ui.arena.classList.add("playerfocus")
-        setTimeout(function () {
+        setTimeout(() => {
           ui.arena.classList.remove("playerfocus")
         }, 1800)
       })
       game.delay(3)
     }
-    var that = this
+
     setTimeout(
-      function () {
+      () => {
         game.broadcastAll(
-          function (that, type, name, color, avatar) {
+          (that, type, name, color, avatar) => {
             if (lib.config.animation && !lib.config.low_performance) {
               if (game.chess) {
-                that["$" + type + "2"](1200)
+                that[`$${type}2`](1200)
               } else {
-                that["$" + type](1200)
+                that[`$${type}`](1200)
               }
             }
             if (name) {
               that.$fullscreenpop(name, color, avatar)
             }
           },
-          that,
+          this,
           type,
           name,
           color,
@@ -16767,7 +17118,12 @@ export class Player extends HTMLDivElement {
       left = this.getLeft()
       top = this.getTop()
     }
-    game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 20, 700, "fire")
+    game.animate.flame(
+      left + this.offsetWidth / 2,
+      top + this.offsetHeight - 20,
+      700,
+      "fire",
+    )
   }
   $thunder() {
     game.addVideo("flame", this, "thunder")
@@ -16780,28 +17136,48 @@ export class Player extends HTMLDivElement {
       left = this.getLeft()
       top = this.getTop()
     }
-    game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, 700, "thunder")
+    game.animate.flame(
+      left + this.offsetWidth / 2,
+      top + this.offsetHeight - 30,
+      700,
+      "thunder",
+    )
   }
   $rare2() {
     game.addVideo("flame", this, "rare2")
     var rect = this.getBoundingClientRect()
     var left = rect.left
     var top = rect.top + 15
-    game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, 700, "rare")
+    game.animate.flame(
+      left + this.offsetWidth / 2,
+      top + this.offsetHeight - 30,
+      700,
+      "rare",
+    )
   }
   $epic2() {
     game.addVideo("flame", this, "epic2")
     var rect = this.getBoundingClientRect()
     var left = rect.left
     var top = rect.top + 15
-    game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, 700, "epic")
+    game.animate.flame(
+      left + this.offsetWidth / 2,
+      top + this.offsetHeight - 30,
+      700,
+      "epic",
+    )
   }
   $legend2() {
     game.addVideo("flame", this, "legend2")
     var rect = this.getBoundingClientRect()
     var left = rect.left
     var top = rect.top + 15
-    game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, 700, "legend")
+    game.animate.flame(
+      left + this.offsetWidth / 2,
+      top + this.offsetHeight - 30,
+      700,
+      "legend",
+    )
   }
   $rare(time) {
     time = time || 700
@@ -16817,7 +17193,12 @@ export class Player extends HTMLDivElement {
     if (this.classList.contains("minskin")) {
       top += 15
     }
-    game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, time, "rare")
+    game.animate.flame(
+      left + this.offsetWidth / 2,
+      top + this.offsetHeight - 30,
+      time,
+      "rare",
+    )
   }
   $epic(time) {
     time = time || 700
@@ -16833,7 +17214,12 @@ export class Player extends HTMLDivElement {
     if (this.classList.contains("minskin")) {
       top += 15
     }
-    game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, time, "epic")
+    game.animate.flame(
+      left + this.offsetWidth / 2,
+      top + this.offsetHeight - 30,
+      time,
+      "epic",
+    )
   }
   $legend(time) {
     time = time || 700
@@ -16849,10 +17235,15 @@ export class Player extends HTMLDivElement {
     if (this.classList.contains("minskin")) {
       top += 15
     }
-    game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, time, "legend")
+    game.animate.flame(
+      left + this.offsetWidth / 2,
+      top + this.offsetHeight - 30,
+      time,
+      "legend",
+    )
   }
   $coin() {
-    game.broadcast(function (player) {
+    game.broadcast((player) => {
       if (!lib.config.low_performance) {
         player.$coin()
       }
@@ -16864,10 +17255,15 @@ export class Player extends HTMLDivElement {
       top += 15
     }
     top -= 25
-    game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, 700, "coin")
+    game.animate.flame(
+      left + this.offsetWidth / 2,
+      top + this.offsetHeight - 30,
+      700,
+      "coin",
+    )
   }
   $dust() {
-    game.broadcast(function (player) {
+    game.broadcast((player) => {
       if (!lib.config.low_performance) {
         player.$dust()
       }
@@ -16879,7 +17275,12 @@ export class Player extends HTMLDivElement {
       top += 15
     }
     top -= 25
-    game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, 700, "dust")
+    game.animate.flame(
+      left + this.offsetWidth / 2,
+      top + this.offsetHeight - 30,
+      700,
+      "dust",
+    )
   }
   $recover() {
     game.addVideo("flame", this, "recover")
@@ -16892,7 +17293,12 @@ export class Player extends HTMLDivElement {
       left = this.getLeft()
       top = this.getTop()
     }
-    game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, 700, "recover")
+    game.animate.flame(
+      left + this.offsetWidth / 2,
+      top + this.offsetHeight - 30,
+      700,
+      "recover",
+    )
   }
   /**
    * @param {*} str
@@ -16903,7 +17309,7 @@ export class Player extends HTMLDivElement {
   $fullscreenpop(str, nature, avatar, broadcast) {
     if (broadcast !== false) {
       game.broadcast(
-        function (player, str, nature, avatar) {
+        (player, str, nature, avatar) => {
           player.$fullscreenpop(str, nature, avatar)
         },
         this,
@@ -16915,7 +17321,7 @@ export class Player extends HTMLDivElement {
     game.addVideo("fullscreenpop", this, [str, nature, avatar])
     var node = ui.create.div(".damage")
     if (avatar && this.node) {
-      if (avatar == "vice") {
+      if (avatar === "vice") {
         if (lib.character[this.name2]) {
           avatar = this.node.avatar2
         }
@@ -16936,14 +17342,15 @@ export class Player extends HTMLDivElement {
       // ui.create.div('',str.split('').join('<br>'),ui.create.div('.text.textbg',node));
       ui.create.div(
         "",
-        "<div>" + str.split("").join("</div><br><div>") + "</div>",
+        `<div>${str.split("").join("</div><br><div>")}</div>`,
         ui.create.div(".text", node),
       )
-      node.firstChild.firstChild.style.backgroundImage = avatar.style.backgroundImage
+      node.firstChild.firstChild.style.backgroundImage =
+        avatar.style.backgroundImage
       node.dataset.nature = nature || "unknown"
       var num = 0
       var nodes = node.lastChild.firstChild.querySelectorAll("div")
-      var interval = setInterval(function () {
+      var interval = setInterval(() => {
         if (num < nodes.length) {
           nodes[num].classList.add("flashtext")
           num++
@@ -16961,7 +17368,7 @@ export class Player extends HTMLDivElement {
       var rect2 = this.getBoundingClientRect()
       var dx = Math.round(2 * rect2.left + rect2.width - rect1.width)
       var dy = Math.round(2 * rect2.top + rect2.height - rect1.height)
-      node.style.transform = "scale(0.5) translate(" + dx + "px," + dy + "px)"
+      node.style.transform = `scale(0.5) translate(${dx}px,${dy}px)`
     }
     ui.window.appendChild(node)
     ui.refresh(node)
@@ -16972,7 +17379,7 @@ export class Player extends HTMLDivElement {
       node.classList.add("damageadded")
     }
     setTimeout(
-      function () {
+      () => {
         node.delete()
         node.style.transform = "scale(1.5)"
       },
@@ -16987,11 +17394,11 @@ export class Player extends HTMLDivElement {
    * @param { boolean } [nobroadcast]
    */
   $damagepop(num, nature = "soil", font, nobroadcast) {
-    if (typeof num == "number" || typeof num == "string") {
+    if (typeof num === "number" || typeof num === "string") {
       game.addVideo("damagepop", this, [num, nature, font])
       if (nobroadcast !== false) {
         game.broadcast(
-          function (player, num, nature, font) {
+          (player, num, nature, font) => {
             player.$damagepop(num, nature, font)
           },
           this,
@@ -17004,19 +17411,19 @@ export class Player extends HTMLDivElement {
       if (font) {
         node.classList.add("normal-font")
       }
-      if (typeof num == "number" && num > 0) {
-        if (num == Infinity) {
+      if (typeof num === "number" && num > 0) {
+        if (num === Infinity) {
           num = "+∞"
         } else {
-          num = "+" + num
+          num = `+${num}`
         }
-      } else if (num == -Infinity) {
+      } else if (num === -Infinity) {
         num = "-∞"
       }
       node.innerHTML = num
       this.damagepopups.push(node)
       node.dataset.nature = nature || "soil"
-      if (this.damagepopups.length == 1) {
+      if (this.damagepopups.length === 1) {
         this.$damagepop()
       }
     } else if (this.damagepopups.length) {
@@ -17024,41 +17431,40 @@ export class Player extends HTMLDivElement {
       this.appendChild(node)
       ui.refresh(node)
       node.classList.add("damageadded")
-      node.listenTransition(function () {
-        setTimeout(function () {
+      node.listenTransition(() => {
+        setTimeout(() => {
           node.delete()
         }, 200)
       })
-      // setTimeout(function(){
-      // 	node.delete();
-      // },500);
-      var that = this
-      setTimeout(function () {
-        that.damagepopups.shift()
-        that.$damagepop()
+
+      setTimeout(() => {
+        this.damagepopups.shift()
+        this.$damagepop()
       }, 500)
     }
   }
   $damage(source) {
-    if (get.itemtype(source) == "player") {
+    if (get.itemtype(source) === "player") {
       game.addVideo("damage", this, source.dataset.position)
     } else {
       game.addVideo("damage", this)
     }
     game.broadcast(
-      function (player, source) {
+      (player, source) => {
         player.$damage(source)
       },
       this,
       source,
     )
-    if (source && source != this && lib.config.damage_shake) {
+    if (source && source !== this && lib.config.damage_shake) {
       var left, top
-      if (source.getTop() == this.getTop()) {
+      if (source.getTop() === this.getTop()) {
         left = 20
         top = 0
       } else {
-        var ratio = (source.getLeft() - this.getLeft()) / (source.getTop() - this.getTop())
+        var ratio =
+          (source.getLeft() - this.getLeft()) /
+          (source.getTop() - this.getTop())
         left = Math.abs((20 * ratio) / Math.sqrt(1 + ratio * ratio))
         top = Math.abs(20 / Math.sqrt(1 + ratio * ratio))
       }
@@ -17070,64 +17476,50 @@ export class Player extends HTMLDivElement {
       }
       if (get.is.mobileMe(this)) {
         if (this.classList.contains("linked")) {
-          this.node.avatar.style.transform =
-            "translate(" + left + "px," + top + "px) rotate(-90deg)"
-          this.node.avatar2.style.transform =
-            "translate(" + left + "px," + top + "px) rotate(-90deg)"
+          this.node.avatar.style.transform = `translate(${left}px,${top}px) rotate(-90deg)`
+          this.node.avatar2.style.transform = `translate(${left}px,${top}px) rotate(-90deg)`
         } else {
-          this.node.avatar.style.transform = "translate(" + left + "px," + top + "px)"
-          this.node.avatar2.style.transform = "translate(" + left + "px," + top + "px)"
+          this.node.avatar.style.transform = `translate(${left}px,${top}px)`
+          this.node.avatar2.style.transform = `translate(${left}px,${top}px)`
         }
       } else if (this.classList.contains("linked") && get.is.newLayout()) {
-        this.style.transform = "translate(" + left + "px," + top + "px) rotate(-90deg)"
+        this.style.transform = `translate(${left}px,${top}px) rotate(-90deg)`
       } else if (this._chesstransform) {
-        this.style.transform =
-          "translate(" +
-          (left + this._chesstransform[0]) +
-          "px," +
-          (top + this._chesstransform[1]) +
-          "px)"
+        this.style.transform = `translate(${left + this._chesstransform[0]}px,${top + this._chesstransform[1]}px)`
       } else {
-        this.style.transform = "translate(" + left + "px," + top + "px)"
+        this.style.transform = `translate(${left}px,${top}px)`
       }
     } else {
       var zoom1 = 0.9,
         zoom2 = 0.95
-      if (arguments[1] == "phase") {
+      if (arguments[1] === "phase") {
         zoom1 = 1.05
         zoom2 = 1.05
       }
       if (get.is.mobileMe(this)) {
         if (this.classList.contains("linked")) {
-          this.node.avatar.style.transform = "scale(" + zoom1 + ") rotate(-90deg)"
-          this.node.avatar2.style.transform = "scale(" + zoom1 + ") rotate(-90deg)"
+          this.node.avatar.style.transform = `scale(${zoom1}) rotate(-90deg)`
+          this.node.avatar2.style.transform = `scale(${zoom1}) rotate(-90deg)`
         } else {
-          this.node.avatar.style.transform = "scale(" + zoom1 + ")"
-          this.node.avatar2.style.transform = "scale(" + zoom1 + ")"
+          this.node.avatar.style.transform = `scale(${zoom1})`
+          this.node.avatar2.style.transform = `scale(${zoom1})`
         }
       } else if (this.classList.contains("linked") && get.is.newLayout()) {
-        this.style.transform = "scale(" + zoom2 + ") rotate(-90deg)"
+        this.style.transform = `scale(${zoom2}) rotate(-90deg)`
       } else if (game.chess && this._chesstransform) {
-        this.style.transform =
-          "translate(" +
-          this._chesstransform[0] +
-          "px," +
-          this._chesstransform[1] +
-          "px) scale(" +
-          zoom2 +
-          ")"
+        this.style.transform = `translate(${this._chesstransform[0]}px,${this._chesstransform[1]}px) scale(${zoom2})`
       } else {
-        this.style.transform = "scale(" + zoom2 + ")"
+        this.style.transform = `scale(${zoom2})`
       }
     }
     this.queue()
   }
   $die() {
     game.addVideo("die", this)
-    game.broadcast(function (player) {
+    game.broadcast((player) => {
       player.$die()
     }, this)
-    if (lib.config.die_move != "off") {
+    if (lib.config.die_move !== "off") {
       this.$dieflip(lib.config.die_move)
     }
     if (this.$dieAfter) {
@@ -17154,13 +17546,13 @@ export class Player extends HTMLDivElement {
       left += this._chesstransform[0]
       top += this._chesstransform[1]
     }
-    var transform =
-      "translate(" + left + "px," + top + "px) " + "rotate(" + (Math.random() * 20 - 10) + "deg) "
-    if (type == "flip") {
-      if (game.layout == "long" || game.layout == "long2") {
+    var transform = `translate(${left}px,${top}px) rotate(${Math.random() * 20 - 10}deg) `
+    if (type === "flip") {
+      if (game.layout === "long" || game.layout === "long2") {
         transform += "rotateY(180deg)"
       } else {
-        transform += Math.random() - 0.5 < 0 ? "rotateX(180deg)" : "rotateY(180deg)"
+        transform +=
+          Math.random() - 0.5 < 0 ? "rotateX(180deg)" : "rotateY(180deg)"
       }
     }
     if (get.is.mobileMe(this)) {
@@ -17176,15 +17568,18 @@ export class Player extends HTMLDivElement {
   }
   $phaseJudge(card) {
     game.addVideo("phaseJudge", this, get.cardInfo(card))
-    const player = this
+
     if (card[card.cardSymbol]?.cards?.length) {
       const cards = card[card.cardSymbol].cards
-      const clone = player.$throw(cards)
-      if (lib.config.low_performance && cards[0] && cards[0].clone) {
+      const clone = this.$throw(cards)
+      if (lib.config.low_performance && cards[0]?.clone) {
         const waitingForTransition = get.time()
         _status.waitingForTransition = waitingForTransition
-        cards[0].clone.listenTransition(function () {
-          if (_status.waitingForTransition == waitingForTransition && _status.paused) {
+        cards[0].clone.listenTransition(() => {
+          if (
+            _status.waitingForTransition === waitingForTransition &&
+            _status.paused
+          ) {
             game.resume()
           }
         })
@@ -17194,12 +17589,15 @@ export class Player extends HTMLDivElement {
       }
     } else {
       const VCard = game.createCard(card.name, "虚拟", "")
-      const clone = player.$throw(VCard)
-      if (lib.config.low_performance && VCard && VCard.clone) {
+      const clone = this.$throw(VCard)
+      if (lib.config.low_performance && VCard?.clone) {
         const waitingForTransition = get.time()
         _status.waitingForTransition = waitingForTransition
-        VCard.clone.listenTransition(function () {
-          if (_status.waitingForTransition == waitingForTransition && _status.paused) {
+        VCard.clone.listenTransition(() => {
+          if (
+            _status.waitingForTransition === waitingForTransition &&
+            _status.paused
+          ) {
             game.resume()
           }
         })

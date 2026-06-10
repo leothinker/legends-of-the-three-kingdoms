@@ -24,7 +24,6 @@ import { defaultHooks } from "./hooks/index.js"
 import { LibInit } from "./init/index.js"
 import { PoptipManager } from "./poptip.js"
 import skills from "./skill.js"
-import { ZhanfaManager } from "./zhanfa.js"
 
 export class Library {
   configprefix = "wtk_0.9_"
@@ -171,7 +170,7 @@ export class Library {
         const srcBase = `${lib.assetURL}image/emotion/${name}/`
         game.getFileList(
           srcBase,
-          (_folders, files) => {
+          (folders, files) => {
             if (!files.length) {
               return
             }
@@ -186,7 +185,7 @@ export class Library {
       const srcBase = `${lib.assetURL}image/emotion/`
       game.getFileList(
         srcBase,
-        (folders, _files) => {
+        (folders, files) => {
           if (!folders.length) {
             return
           }
@@ -551,7 +550,7 @@ export class Library {
                   game.resume()
                 }
               },
-              async (event, _trigger, player) => {
+              async (event, trigger, player) => {
                 var type = get.type2(event.card)
                 event.list = game
                   .filterPlayer(
@@ -691,7 +690,7 @@ export class Library {
                   game.pause()
                 }
               },
-              async (_event) => {
+              async (event) => {
                 game.players.forEach((value) => value.hideTimer())
               },
               async (event, trigger, player) => {
@@ -740,19 +739,19 @@ export class Library {
     effect: new Map([
       [
         "add",
-        (_event, trigger, _player) => {
+        (event, trigger, player) => {
           trigger.yingbian_addTarget = true
         },
       ],
       [
         "remove",
-        (_event, trigger, _player) => {
+        (event, trigger, player) => {
           trigger.yingbian_removeTarget = true
         },
       ],
       [
         "damage",
-        (event, trigger, _player) => {
+        (event, trigger, player) => {
           if (typeof trigger.baseDamage !== "number") {
             trigger.baseDamage = 1
           }
@@ -762,13 +761,13 @@ export class Library {
       ],
       [
         "draw",
-        (_event, _trigger, player) => {
+        (event, trigger, player) => {
           player.draw()
         },
       ],
       [
         "gain",
-        (_event, trigger, player) => {
+        (event, trigger, player) => {
           const cardx = trigger.respondTo
           if (cardx?.[1]?.cards?.filterInD("od").length) {
             player.gain(cardx[1].cards.filterInD("od"), "gain2")
@@ -777,14 +776,14 @@ export class Library {
       ],
       [
         "hit",
-        (event, trigger, _player) => {
+        (event, trigger, player) => {
           trigger.directHit.addArray(game.players).addArray(game.dead)
           game.log(event.card, "不可被响应")
         },
       ],
       [
         "all",
-        (event, _trigger, _player) => {
+        (event, trigger, player) => {
           event.card.yingbian_all = true
           game.log(event.card, "执行所有选项")
         },
@@ -863,7 +862,7 @@ export class Library {
           event.player
             .when("useCard")
             .filter((evt) => evt === event)
-            .step(async (_event, trigger, _player) => {
+            .step(async (event, trigger, player) => {
               const evt = trigger.getParent(2)
               if (!evt.shanRequired) {
                 evt.shanRequired = 0
@@ -889,7 +888,7 @@ export class Library {
                 evt.getParent(2) === event &&
                 event.targets.includes(evt.player),
             )
-            .step(async (_event, trigger) => {
+            .step(async (event, trigger) => {
               trigger.num++
             })
         },
@@ -990,7 +989,7 @@ export class Library {
         /** #player.gain/.addToExpansion中的参数名，表示来源区域 */
         fromName: "fromRenku",
         /** 处理添加到相应区域中的卡牌，由于仁库需要处理溢出，所以采用事件的content*/
-        async addHandeler(event, _trigger, _player) {
+        async addHandeler(event, trigger, player) {
           const { cards } = event
           _status.renku.addArray(
             cards.filter(
@@ -1009,7 +1008,7 @@ export class Library {
           game.updateRenku()
         },
         /** 处理从相应区域中移出的卡牌*/
-        async removeHandeler(event, _trigger, _player) {
+        async removeHandeler(event, trigger, player) {
           _status.renku.removeArray(event.cards)
           game.updateRenku()
         },
@@ -2027,7 +2026,7 @@ export class Library {
           name: "游戏背景",
           init: "default",
           item: {},
-          visualMenu: (node, link, name, _config) => {
+          visualMenu: (node, link, name, config) => {
             node.className = "button character"
             node.style.backgroundImage = ""
             node.style.backgroundSize = ""
@@ -2134,7 +2133,7 @@ export class Library {
             // new:'新版',
             default: "默认",
           },
-          visualMenu: (node, link, _name, _config) => {
+          visualMenu: (node, link, name, config) => {
             node.className = "button card fullskin"
             node.style.backgroundSize = "100% 100%"
             switch (link) {
@@ -2197,7 +2196,7 @@ export class Library {
             ol: "手杀",
             default: "默认",
           },
-          visualMenu(node, link, _name, _config) {
+          visualMenu(node, link, name, config) {
             node.style.backgroundSize = "100% 100%"
             switch (link) {
               case "default":
@@ -2299,7 +2298,7 @@ export class Library {
             xinglass: "双鱼",
             xinround: "OL",
           },
-          visualMenu: (node, link, _name, _config) => {
+          visualMenu: (node, link, name, config) => {
             node.className = "button hpbutton dashedmenubutton"
             node.innerHTML = ""
             for (var i = 1; i <= 4; i++) {
@@ -2351,7 +2350,7 @@ export class Library {
             simple: "简约",
             default: "默认",
           },
-          visualMenu: (node, link, _name, _config) => {
+          visualMenu: (node, link, name, config) => {
             node.className = "button character"
             node.style.backgroundSize = ""
             node.style.height = "108px"
@@ -2442,7 +2441,7 @@ export class Library {
             auto: "自动",
             default: "默认",
           },
-          visualMenu: (node, link, _name, _config) => {
+          visualMenu: (node, link, name, config) => {
             node.className = "button character"
             node.style.backgroundSize = ""
             node.style.height = "108px"
@@ -2572,7 +2571,7 @@ export class Library {
             simple: "简约",
             default: "默认",
           },
-          visualMenu: (node, link, _name, _config) => {
+          visualMenu: (node, link, name, config) => {
             node.className = "button character"
             node.style.backgroundSize = "auto"
             switch (link) {
@@ -2631,7 +2630,7 @@ export class Library {
             simple: "简约",
             default: "默认",
           },
-          visualMenu: (node, link, _name, _config) => {
+          visualMenu: (node, link, name, config) => {
             node.className = "button character controlbutton"
             node.style.backgroundSize = ""
             switch (link) {
@@ -3230,7 +3229,7 @@ export class Library {
             game.saveConfig("suits_font", bool)
           },
         },
-        update: (_config, map) => {
+        update: (config, map) => {
           if (lib.config.custom_button) {
             map.custom_button_system_top.show()
             map.custom_button_system_bottom.show()
@@ -3291,7 +3290,7 @@ export class Library {
     view: {
       name: "显示",
       config: {
-        update: (_config, map) => {
+        update: (config, map) => {
           if (
             lib.config.mode === "versus" ||
             lib.config.mode === "chess" ||
@@ -4124,7 +4123,7 @@ export class Library {
     audio: {
       name: "音效",
       config: {
-        update: (_config, map) => {
+        update: (config, map) => {
           if (
             lib.config.background_music === "music_custom" &&
             (lib.device || lib.node)
@@ -4229,7 +4228,7 @@ export class Library {
     skill: {
       name: "技能",
       config: {
-        update: (_config, map) => {
+        update: (config, map) => {
           for (var i in map) {
             if (map[i]._link.config.type === "autoskill") {
               if (!lib.config.autoskilllist.includes(i)) {
@@ -4391,7 +4390,7 @@ export class Library {
           },
           clear: true,
         },
-        update: (_config, map) => {
+        update: (config, map) => {
           if (lib.device || lib.node) {
             map.redownload_game.show()
           } else {
@@ -4426,9 +4425,7 @@ export class Library {
             map.connect_enable_year_limit.show()
             map.connect_zhong_card.show()
             map.connect_special_identity.hide()
-            map.connect_double_character.show()
           } else if (config.connect_identity_mode === "stratagem") {
-            map.connect_double_character.show()
             map.connect_player_number.show()
             map.connect_choice_zhu.show()
             map.connect_limit_zhu.hide()
@@ -4458,9 +4455,7 @@ export class Library {
             map.connect_enable_year_limit.hide()
             map.connect_zhong_card.hide()
             map.connect_special_identity.hide()
-            map.connect_double_character.hide()
           } else {
-            map.connect_double_character.show()
             map.connect_player_number.show()
             map.connect_choice_zhu.show()
             map.connect_limit_zhu.show()
@@ -4665,12 +4660,6 @@ export class Library {
             game.saveConfig("connect_choice_commoner", num, "identity")
           },
         },
-        connect_double_character: {
-          name: "双将模式",
-          init: false,
-          frequent: true,
-          restart: true,
-        },
         connect_change_card: {
           name: "启用手气卡",
           init: false,
@@ -4754,14 +4743,8 @@ export class Library {
             map.choose_group.show()
             map.change_choice.show()
             map.auto_mark_identity.show()
-            map.double_character.show()
             map.free_choose.show()
             map.change_identity.show()
-            if (config.double_character) {
-              map.double_hp.show()
-            } else {
-              map.double_hp.hide()
-            }
             map.continue_game.show()
           } else if (config.identity_mode === "stratagem") {
             map.continue_game.show()
@@ -4803,12 +4786,6 @@ export class Library {
             map.free_choose.show()
             map.change_identity.show()
             map.special_identity.hide()
-            map.double_character.show()
-            if (config.double_character) {
-              map.double_hp.show()
-            } else {
-              map.double_hp.hide()
-            }
           } else if (config.identity_mode === "purple") {
             map.player_number.hide()
             map.enhance_zhu.hide()
@@ -4828,8 +4805,6 @@ export class Library {
             map.ban_identity3.hide()
             map.zhong_card.hide()
             map.special_identity.hide()
-            map.double_character.hide()
-            map.double_hp.hide()
             map.choose_group.hide()
             map.auto_mark_identity.hide()
             map.change_choice.hide()
@@ -4883,12 +4858,6 @@ export class Library {
               map.special_identity.show()
             } else {
               map.special_identity.hide()
-            }
-            map.double_character.show()
-            if (config.double_character) {
-              map.double_hp.show()
-            } else {
-              map.double_hp.hide()
             }
           }
         },
@@ -4949,12 +4918,6 @@ export class Library {
           init: true,
           unfrequent: true,
         },
-        double_character: {
-          name: "双将模式",
-          init: false,
-          frequent: true,
-          restart: true,
-        },
         special_identity: {
           name: "特殊身份",
           init: false,
@@ -4966,18 +4929,6 @@ export class Library {
           name: "明忠卡牌替换",
           init: true,
           frequent: true,
-          restart: true,
-        },
-        double_hp: {
-          name: "双将体力上限",
-          init: "pingjun",
-          item: {
-            hejiansan: "和减三",
-            pingjun: "平均值",
-            zuidazhi: "最大值",
-            zuixiaozhi: "最小值",
-            zonghe: "相加",
-          },
           restart: true,
         },
         auto_identity: {
@@ -5647,18 +5598,6 @@ export class Library {
           intro:
             "若开启此选项，晋势力武将将使用OL【文德武备】版本；否则使用线下【紫气东来】【受命于天】版本。",
         },
-        double_hp: {
-          name: "双将体力上限",
-          init: "pingjun",
-          item: {
-            hejiansan: "和减三",
-            pingjun: "平均值",
-            zuidazhi: "最大值",
-            zuixiaozhi: "最小值",
-            zonghe: "相加",
-          },
-          restart: true,
-        },
         free_choose: {
           name: "自由选将",
           init: true,
@@ -5958,11 +5897,6 @@ export class Library {
           } else {
             map.free_choose.hide()
           }
-          if (config.versus_mode === "jiange") {
-            map.double_character_jiange.show()
-          } else {
-            map.double_character_jiange.hide()
-          }
           if (config.versus_mode === "two") {
             map.replace_handcard_two.show()
             map.olfeiyang_four.show()
@@ -6166,11 +6100,6 @@ export class Library {
               delete ui.cheat
             }
           },
-          frequent: true,
-        },
-        double_character_jiange: {
-          name: "双将模式",
-          init: false,
           frequent: true,
         },
         replace_handcard_two: {
@@ -6543,7 +6472,6 @@ export class Library {
             map.connect_change_card.show()
           }
           if (config.connect_doudizhu_mode !== "normal") {
-            map.connect_double_character.hide()
             if (config.connect_doudizhu_mode !== "kaihei") {
               map.connect_choice_zhu.hide()
               map.connect_choice_fan.hide()
@@ -6555,7 +6483,6 @@ export class Library {
             map.connect_enhance_nongmin.hide()
             map.connect_feiyang_version.hide()
           } else {
-            map.connect_double_character.show()
             map.connect_choice_zhu.show()
             map.connect_choice_fan.show()
             map.connect_enhance_dizhu.show()
@@ -6575,12 +6502,6 @@ export class Library {
           },
           restart: true,
           frequent: true,
-        },
-        connect_double_character: {
-          name: "双将模式",
-          init: false,
-          frequent: true,
-          restart: true,
         },
         connect_choice_zhu: {
           name: "地主候选武将数",
@@ -6675,7 +6596,6 @@ export class Library {
               map.choice_zhu.hide()
               map.choice_fan.hide()
             }
-            map.double_character.hide()
             map.free_choose.hide()
             map.change_identity.hide()
             map.change_choice.hide()
@@ -6686,7 +6606,6 @@ export class Library {
             map.enhance_nongmin.hide()
             map.feiyang_version.hide()
           } else {
-            map.double_character.show()
             map.choice_zhu.show()
             map.choice_fan.show()
             map.free_choose.show()
@@ -6698,11 +6617,6 @@ export class Library {
             map.enhance_dizhu.show()
             map.enhance_nongmin.show()
             map.feiyang_version.show()
-          }
-          if (config.double_character && config.doudizhu_mode === "normal") {
-            map.double_hp.show()
-          } else {
-            map.double_hp.hide()
           }
         },
         doudizhu_mode: {
@@ -6717,24 +6631,6 @@ export class Library {
           },
           restart: true,
           frequent: true,
-        },
-        double_character: {
-          name: "双将模式",
-          init: false,
-          frequent: true,
-          restart: true,
-        },
-        double_hp: {
-          name: "双将体力上限",
-          init: "pingjun",
-          item: {
-            hejiansan: "和减三",
-            pingjun: "平均值",
-            zuidazhi: "最大值",
-            zuixiaozhi: "最小值",
-            zonghe: "相加",
-          },
-          restart: true,
         },
         choice_zhu: {
           name: "地主候选武将数",
@@ -7017,28 +6913,6 @@ export class Library {
           init: false,
           frequent: true,
         },
-        connect_double_character: {
-          name: "启用双将",
-          init: "single",
-          item: {
-            single: "不启用",
-            double: "启用双将",
-            singble: "单双任选",
-          },
-          restart: true,
-        },
-        connect_double_hp: {
-          name: "双将体力上限",
-          init: "pingjun",
-          item: {
-            hejiansan: "和减三",
-            pingjun: "平均值",
-            zuidazhi: "最大值",
-            zuixiaozhi: "最小值",
-            zonghe: "相加",
-          },
-          restart: true,
-        },
         update: (config, map) => {
           if (config.connect_single_mode !== "normal") {
             map.connect_enable_jin.hide()
@@ -7049,19 +6923,6 @@ export class Library {
             map.connect_change_card.hide()
           } else {
             map.connect_change_card.show()
-          }
-          if (config.connect_single_mode !== "dianjiang") {
-            map.connect_double_character.hide()
-            map.connect_double_hp.hide()
-          } else {
-            map.connect_double_character.show()
-            if (
-              ["double", "singble"].includes(config.connect_double_character)
-            ) {
-              map.connect_double_hp.show()
-            } else {
-              map.connect_double_hp.hide()
-            }
           }
         },
       },
@@ -7094,28 +6955,6 @@ export class Library {
             twice: "两次",
             unlimited: "无限",
           },
-        },
-        double_character: {
-          name: "启用双将",
-          init: "single",
-          item: {
-            single: "不启用",
-            double: "启用双将",
-            singble: "单双任选",
-          },
-          restart: true,
-        },
-        double_hp: {
-          name: "双将体力上限",
-          init: "pingjun",
-          item: {
-            hejiansan: "和减三",
-            pingjun: "平均值",
-            zuidazhi: "最大值",
-            zuixiaozhi: "最小值",
-            zonghe: "相加",
-          },
-          restart: true,
         },
         single_control: {
           name: "单人控制",
@@ -7155,17 +6994,9 @@ export class Library {
             map.change_card.show()
           }
           if (config.single_mode !== "dianjiang") {
-            map.double_character.hide()
-            map.double_hp.hide()
             map.single_control.hide()
           } else {
-            map.double_character.show()
             map.single_control.show()
-            if (["double", "singble"].includes(config.double_character)) {
-              map.double_hp.show()
-            } else {
-              map.double_hp.hide()
-            }
           }
           if (
             config.single_mode === "wuxianhuoli" ||
@@ -7876,7 +7707,7 @@ export class Library {
         "ow_yuanshi",
         "zuoci",
       ]
-      const _vintage = [
+      const vintage = [
         "tianjian",
         "shuiyun",
         "zhuyue",
@@ -8038,7 +7869,7 @@ export class Library {
      * @param  {...Player | string} args 玩家或卡牌名
      * @returns { void }
      */
-    e(..._args) {
+    e(...args) {
       /**
        * @type { Card[] }
        */
@@ -8331,55 +8162,6 @@ export class Library {
       ) {
         ui.dialog.buttons[i].link = args[i]
       }
-    },
-    /**
-     * 炉石模式可用，使用'spell_yexinglanghun'卡牌
-     * @param { boolean } [me] 决定是自己还是对手使用'spell_yexinglanghun'卡牌
-     */
-    uy(me) {
-      if (me) {
-        game.me.useCard({ name: "spell_yexinglanghun" }, game.me)
-      } else {
-        // player.getEnemy是炉石模式的函数
-        const enemy = game.me.getEnemy()
-        enemy.useCard({ name: "spell_yexinglanghun" }, enemy)
-      }
-    },
-    /**
-     * 炉石模式可用，使用`spell_${name}`卡牌
-     * @param { string } [name]
-     * @param { boolean } [act]
-     */
-    gs(name = "yexinglanghun", act) {
-      const card = game.createCard(`spell_${name}`)
-      game.me.node.handcards1.appendChild(card)
-      if (!act) {
-        game.me.actused = -99
-      }
-      ui.updatehl()
-      delete _status.event._buttonChoice
-      delete _status.event._cardChoice
-      delete _status.event._targetChoice
-      delete _status.event._skillChoice
-      setTimeout(game.check, 300)
-    },
-    /**
-     * 炉石模式可用，获得`stone_${name}_stonecharacter`卡牌
-     * @param { string } [name]
-     * @param { boolean } [act]
-     */
-    gc(name = "falifulong", act) {
-      var card = game.createCard(`stone_${name}_stonecharacter`)
-      game.me.node.handcards1.appendChild(card)
-      if (!act) {
-        game.me.actused = -99
-      }
-      ui.updatehl()
-      delete _status.event._buttonChoice
-      delete _status.event._cardChoice
-      delete _status.event._targetChoice
-      delete _status.event._skillChoice
-      setTimeout(game.check, 300)
     },
     /**
      * 进入/关闭快速自动测试模式(游戏速度最快)，只有游戏记录界面
@@ -8705,7 +8487,7 @@ export class Library {
      * @param { number } [num]
      * @param { Player } [target]
      */
-    d(num = 1, _target) {
+    d(num = 1, target) {
       const cards = get.cards(num)
       for (let i = 0; i < num; i++) {
         const card = cards[i]
@@ -9073,11 +8855,6 @@ export class Library {
       stratagem_fury: "怒气",
       _stratagem_add_buff: "强化",
       danqi_hufu: "虎符",
-      zhanfa: "战法",
-      zf_common: "普通",
-      zf_rare: "稀有",
-      zf_epic: "史诗",
-      zf_legend: "传说",
       assigned_tag: "已分配",
 
       phaseZhunbei: "准备阶段",
@@ -9098,50 +8875,7 @@ export class Library {
         "游戏开始时，你可以查看一名角色的身份是否为反贼（对所有玩家可见）。",
       visible_sxrm_connect_tag: "连接牌",
     },
-    {
-      // get(target, prop, receiver) {
-      // 	return Reflect.get(target, prop, receiver);
-      // },
-      // set(target, prop, newValue) {
-      // 	if (typeof prop == "string" && typeof newValue == "string") {
-      // 		const list = newValue.split("&");
-      // 		if (list.length > 1) {
-      // 			const newList = list.slice();
-      // 			for (let i = 0; i < list.length; i++) {
-      // 				const str = list[i];
-      // 				const listx = str.split("=");
-      // 				if (listx.length == 2) {
-      // 					if (listx[0] == "poptip") {
-      // 						newList[i] = get.poptip(listx[1]);
-      // 					}
-      // 				}
-      // 			}
-      // 			newValue = newList.join("");
-      // 		}
-      // 	}
-      // 	return Reflect.set(target, prop, newValue);
-      // },
-      // defineProperty(target, prop, descriptor) {
-      // 	const newValue = descriptor.value;
-      // 	if (typeof prop == "string" && typeof newValue == "string") {
-      // 		const list = newValue.split("&");
-      // 		if (list.length > 1) {
-      // 			const newList = list.slice();
-      // 			for (let i = 0; i < list.length; i++) {
-      // 				const str = list[i];
-      // 				const listx = str.split("=");
-      // 				if (listx.length == 2) {
-      // 					if (listx[0] == "poptip") {
-      // 						newList[i] = get.poptip(listx[1]);
-      // 					}
-      // 				}
-      // 			}
-      // 			descriptor.value = newList.join("");
-      // 		}
-      // 	}
-      // 	return Reflect.defineProperty(target, prop, descriptor);
-      // },
-    },
+    {},
   )
 
   experimental = experimental
@@ -9198,7 +8932,7 @@ export class Library {
         }
         lib.message.client[message.shift()].apply(null, message)
       },
-      onerror: function (_e) {
+      onerror: function (e) {
         if (this._nocallback) {
           return
         }
@@ -9503,7 +9237,7 @@ export class Library {
     },
     //装备栏 END
     buttonIncluded: (button) => !_status.event.excludeButton?.includes(button),
-    filterButton: (_button) => true,
+    filterButton: (button) => true,
     cardSavable: (card, player, target) => {
       if (get.itemtype(card) === "card") {
         var mod2 = game.checkMod(
@@ -9768,7 +9502,7 @@ export class Library {
       }
       return true
     },
-    characterDisabled: function (i, _libCharacter) {
+    characterDisabled: function (i, libCharacter) {
       const args = Array.from(arguments).slice(2)
       if (!lib.character[i]) {
         return true
@@ -9791,17 +9525,6 @@ export class Library {
         var double_character = false
         if (lib.configOL.mode === "guozhan") {
           double_character = true
-        } else if (
-          lib.configOL.double_character &&
-          (lib.configOL.mode === "identity" || lib.configOL.mode === "stone")
-        ) {
-          double_character = true
-        } else if (
-          lib.configOL.double_character_jiange &&
-          lib.configOL.mode === "versus" &&
-          _status.mode === "jiange"
-        ) {
-          double_character = true
         }
         if (double_character && lib.config.forbiddouble.includes(i)) {
           return true
@@ -9812,17 +9535,6 @@ export class Library {
         }
         var double_character = false
         if (get.mode() === "guozhan") {
-          double_character = true
-        } else if (
-          get.config("double_character") &&
-          lib.config.mode === "identity"
-        ) {
-          double_character = true
-        } else if (
-          get.config("double_character_jiange") &&
-          lib.config.mode === "versus" &&
-          _status.mode === "jiange"
-        ) {
           double_character = true
         }
         if (double_character && lib.config.forbiddouble.includes(i)) {
@@ -10443,11 +10155,11 @@ export class Library {
     filterTarget2: (card, player, target) =>
       lib.filter.targetEnabled2(card, player, target) &&
       lib.filter.targetInRange(card, player, target),
-    notMe: (_card, player, target) => player !== target,
-    isMe: (_card, player, target) => player === target,
-    attackFrom: (_card, player, target) =>
+    notMe: (card, player, target) => player !== target,
+    isMe: (card, player, target) => player === target,
+    attackFrom: (card, player, target) =>
       get.distance(player, target, "attack") <= 1,
-    globalFrom: (_card, player, target) => get.distance(player, target) <= 1,
+    globalFrom: (card, player, target) => get.distance(player, target) <= 1,
     selectCard: () => [1, 1],
     selectTarget: (card, player) => {
       if (!card) {
@@ -10833,11 +10545,6 @@ export class Library {
   )
   perfectPair = {}
   cardPile = {}
-
-  #zhanfa = new ZhanfaManager(this)
-  get zhanfa() {
-    return this.#zhanfa
-  }
 
   message = {
     server: {
@@ -11295,7 +11002,7 @@ export class Library {
           for (var i = 0; i < arguments.length; i++) {
             items.push(this.sandbox.exec(`return ${arguments[i]}`))
           }
-        } catch (_e) {
+        } catch (e) {
           this.send("log", ["err"])
           return
         }
@@ -11366,7 +11073,7 @@ export class Library {
         }
         game.ws.close()
       },
-      createroom: (index, _config, _mode) => {
+      createroom: (index, config, mode) => {
         game.online = false
         game.onlineroom = true
         game.roomId = index
@@ -11648,7 +11355,7 @@ export class Library {
         }
         lib.message.client.updateclients(clients, true)
       },
-      updateclients: (clients, _bool) => {
+      updateclients: (clients, bool) => {
         if (clients && ui.connectClients) {
           ui.connectClients.info = clients
           ui.connectClientsCount.innerHTML = clients.length
@@ -11941,13 +11648,13 @@ export class Library {
           state = get.parsedResult(state)
           ui.arena.setNumber(state.number)
           _status.mode = state.mode
-          for (const [_key, value] of lib.commonArea) {
+          for (const [key, value] of lib.commonArea) {
             _status[value.areaStatusName] = state[value.areaStatusName]
           }
           lib.inpile = state.inpile
           lib.inpile_nature = state.inpile_nature
           var pos = state.players[observe || game.onlineID].position
-          for (var _i in state.players) {
+          for (var i in state.players) {
             var info = state.players[i]
             var player = ui.create.player(ui.arena).addTempClass("start")
             player.dataset.position =

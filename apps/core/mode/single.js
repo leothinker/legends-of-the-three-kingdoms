@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
 export const type = "mode"
 /**
  * @type { () => importModeConfig }
@@ -589,8 +589,10 @@ export default () => {
     ),
     startBefore() {},
     onreinit() {
-      _status.mode = _status.connectMode ? lib.configOL.single_mode : get.config("single_mode")
-      if (_status.mode != "normal") {
+      _status.mode = _status.connectMode
+        ? lib.configOL.single_mode
+        : get.config("single_mode")
+      if (_status.mode !== "normal") {
         return
       }
       for (var i in lib.characterSingle) {
@@ -602,16 +604,20 @@ export default () => {
     },
     start() {
       "step 0"
-      _status.mode = _status.connectMode ? lib.configOL.single_mode : get.config("single_mode")
-      var playback = localStorage.getItem(lib.configprefix + "playback")
+      _status.mode = _status.connectMode
+        ? lib.configOL.single_mode
+        : get.config("single_mode")
+      var playback = localStorage.getItem(`${lib.configprefix}playback`)
       if (playback) {
         ui.create.me()
         ui.arena.style.display = "none"
         ui.system.style.display = "none"
         _status.playback = playback
-        localStorage.removeItem(lib.configprefix + "playback")
-        var store = lib.db.transaction(["video"], "readwrite").objectStore("video")
-        store.get(parseInt(playback)).onsuccess = function (e) {
+        localStorage.removeItem(`${lib.configprefix}playback`)
+        var store = lib.db
+          .transaction(["video"], "readwrite")
+          .objectStore("video")
+        store.get(parseInt(playback, 10)).onsuccess = (e) => {
           if (e.target.result) {
             game.playVideoContent(e.target.result.video)
           } else {
@@ -625,16 +631,16 @@ export default () => {
       }
       ;("step 1")
       if (_status.connectMode) {
-        game.waitForPlayer(function () {
+        game.waitForPlayer(() => {
           lib.configOL.number = 2
         })
       }
       ;("step 2")
-      if (_status.mode == "normal") {
+      if (_status.mode === "normal") {
         lib.card.list = lib.singlePile.slice(0)
         game.fixedPile = true
         game.broadcastAll(
-          function (singleTranslate, characterSingle, jin) {
+          (singleTranslate, characterSingle, jin) => {
             _status.mode = "normal"
             for (var j in singleTranslate) {
               lib.translate[j] = singleTranslate[j]
@@ -650,9 +656,11 @@ export default () => {
           },
           lib.singleTranslate,
           lib.characterSingle,
-          _status.connectMode ? lib.configOL.enable_jin : get.config("enable_jin"),
+          _status.connectMode
+            ? lib.configOL.enable_jin
+            : get.config("enable_jin"),
         )
-      } else if (_status.mode == "changban") {
+      } else if (_status.mode === "changban") {
         _status.characterlist = []
         for (var i = 0; i < lib.changbanCharacter.length; i++) {
           var name = lib.changbanCharacter[i]
@@ -660,7 +668,7 @@ export default () => {
             _status.characterlist.push(name)
           }
         }
-        game.broadcastAll(function () {
+        game.broadcastAll(() => {
           _status.mode = "changban"
           lib.translate.bingliang_info =
             "目标角色判定阶段进行判定：若判定结果不为梅花，则跳过该角色的摸牌阶段。"
@@ -669,15 +677,15 @@ export default () => {
         for (var i = 0; i < lib.card.list.length; i++) {
           var card = lib.card.list[i]
           if (
-            card[2] == "muniu" ||
-            card[2] == "shandian" ||
-            (card[2] == "tengjia" && card[0] == "club") ||
-            (card[2] == "wuxie" && card[0] == "diamond" && card[1] == 12)
+            card[2] === "muniu" ||
+            card[2] === "shandian" ||
+            (card[2] === "tengjia" && card[0] === "club") ||
+            (card[2] === "wuxie" && card[0] === "diamond" && card[1] === 12)
           ) {
             lib.card.list.splice(i--, 1)
           }
         }
-      } else if (_status.mode == "wuxianhuoli") {
+      } else if (_status.mode === "wuxianhuoli") {
         var list = []
         lib.card.list = lib.singlePile_wuxianhuoli.slice(0)
         game.fixedPile = true
@@ -686,12 +694,15 @@ export default () => {
         } else {
           var list = []
           for (var i in lib.character) {
-            if (!lib.filter.characterDisabled2(i) && !lib.filter.characterDisabled(i)) {
+            if (
+              !lib.filter.characterDisabled2(i) &&
+              !lib.filter.characterDisabled(i)
+            ) {
               list.push(i)
             }
           }
         }
-        game.countPlayer2(function (current) {
+        game.countPlayer2((current) => {
           list.remove(current.name)
           list.remove(current.name1)
           list.remove(current.name2)
@@ -706,7 +717,7 @@ export default () => {
         for (var i = 0; i < game.players.length; i++) {
           game.players[i].getId()
         }
-        if (_status.brawl && _status.brawl.chooseCharacterBefore) {
+        if (_status.brawl?.chooseCharacterBefore) {
           _status.brawl.chooseCharacterBefore()
         }
         game.chooseCharacter()
@@ -732,22 +743,22 @@ export default () => {
       _status.videoInited = true
       game.addVideo("init", null, info)
 
-      game.gameDraw(game.zhu, function (player) {
-        if (_status.mode == "dianjiang") {
+      game.gameDraw(game.zhu, (player) => {
+        if (_status.mode === "dianjiang") {
           return 4
         }
-        if (_status.mode == "wuxianhuoli") {
+        if (_status.mode === "wuxianhuoli") {
           return 4
         }
-        if (_status.mode == "normal") {
+        if (_status.mode === "normal") {
           if (player.hasSkill("cuorui")) {
             player.logSkill("cuorui")
             return 2 + _status.characterChoice[player.identity].length
           }
-          return player == game.zhu ? 3 : 4
+          return player === game.zhu ? 3 : 4
         }
-        if (_status.mode == "changban") {
-          return player == game.fan ? 5 : 4
+        if (_status.mode === "changban") {
+          return player === game.fan ? 5 : 4
         }
         return player.maxHp
       })
@@ -760,8 +771,8 @@ export default () => {
     },
     game: {
       canReplaceViewpoint: () => true,
-      addRecord: function (bool) {
-        if (typeof bool == "boolean") {
+      addRecord(bool) {
+        if (typeof bool === "boolean") {
           var mode = _status.mode
           var data = lib.config.gameRecord.single.data
           if (!get.is.object(data[mode])) {
@@ -780,17 +791,10 @@ export default () => {
           var list = ["zhu", "fan"]
           var str = ""
           for (var j in data) {
-            str += get.translation(j + 2) + "：<br>"
+            str += `${get.translation(j + 2)}：<br>`
             for (var i = 0; i < list.length; i++) {
               if (data[j][list[i]]) {
-                str +=
-                  lib.translate[list[i] + "2"] +
-                  "：" +
-                  data[j][list[i]][0] +
-                  "胜" +
-                  " " +
-                  data[j][list[i]][1] +
-                  "负<br>"
+                str += `${lib.translate[`${list[i]}2`]}：${data[j][list[i]][0]}胜 ${data[j][list[i]][1]}负<br>`
               }
             }
           }
@@ -798,7 +802,7 @@ export default () => {
           game.saveConfig("gameRecord", lib.config.gameRecord)
         }
       },
-      getState: function () {
+      getState() {
         var state = {}
         for (var i in lib.playerOL) {
           var player = lib.playerOL[i]
@@ -806,7 +810,7 @@ export default () => {
         }
         return state
       },
-      updateState: function (state) {
+      updateState(state) {
         for (var i in state) {
           var player = lib.playerOL[i]
           if (player) {
@@ -814,48 +818,48 @@ export default () => {
           }
         }
       },
-      getRoomInfo: function (uiintro) {
-        if (lib.configOL.single_mode == "normal") {
+      getRoomInfo(uiintro) {
+        if (lib.configOL.single_mode === "normal") {
           uiintro.add(
-            '<div class="text chat">晋势力武将：' + (lib.configOL.enable_jin ? "开启" : "关闭"),
+            `<div class="text chat">晋势力武将：${lib.configOL.enable_jin ? "开启" : "关闭"}`,
           )
         }
         if (lib.configOL.bannedcards.length) {
           uiintro.add(
-            '<div class="text chat">禁用卡牌：' + get.translation(lib.configOL.bannedcards),
+            `<div class="text chat">禁用卡牌：${get.translation(lib.configOL.bannedcards)}`,
           )
         }
         uiintro.style.paddingBottom = "8px"
       },
-      getVideoName: function () {
+      getVideoName() {
         var str = get.translation(game.me.name)
         if (game.me.name2) {
-          str += "/" + get.translation(game.me.name2)
+          str += `/${get.translation(game.me.name2)}`
         }
         var name = [
           str,
-          get.translation(_status.mode + 2) + " - " + lib.translate[game.me.identity + "2"],
+          `${get.translation(_status.mode + 2)} - ${lib.translate[`${game.me.identity}2`]}`,
         ]
         return name
       },
-      showIdentity: function () {},
-      checkResult: function () {
+      showIdentity() {},
+      checkResult() {
         game.over((game.me._trueMe || game.me).isAlive())
       },
-      checkOnlineResult: function (player) {
+      checkOnlineResult(player) {
         return player.isAlive()
       },
-      chooseCharacterDianjiang: function () {
+      chooseCharacterDianjiang() {
         var next = game.createEvent("chooseCharacter")
         next.showConfig = true
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           ui.arena.classList.add("choose-character")
           lib.init.onfree()
           ;("step 1")
           game.me.chooseControl("先手", "后手").prompt = "请选择自己的行动顺序"
           ;("step 2")
-          var map = result.control == "先手" ? ["zhu", "fan"] : ["fan", "zhu"]
+          var map = result.control === "先手" ? ["zhu", "fan"] : ["fan", "zhu"]
           game.me.identity = map[0]
           game.me.next.identity = map[1]
           game.me.showIdentity()
@@ -871,34 +875,19 @@ export default () => {
             list.push(i)
           }
           _status.characterlist = list
-          var filter = function (name) {
-            return !_status.characterlist.includes(name)
-          }
+          var filter = (name) => !_status.characterlist.includes(name)
           var dialog = ui.create.characterDialog("heightset", filter).open()
           dialog.videoId = event.videoId
 
           game.me
             .chooseButton(true)
-            .set("ai", function (button) {
-              return Math.random()
-            })
-            .set(
-              "selectButton",
-              (function (choice) {
-                if (choice == "singble") {
-                  return [1, 2]
-                }
-                if (choice == "double") {
-                  return 2
-                }
-                return 1
-              })(get.config("double_character")),
-            )
+            .set("ai", (button) => Math.random())
+            .set("selectButton", 1)
             .set("dialog", event.videoId)
           ;("step 4")
           game.addRecentCharacter(result.links[0])
           _status.characterlist.removeArray(result.links)
-          if (result.links.length == 2) {
+          if (result.links.length === 2) {
             game.me.init(result.links[0], result.links[1])
             game.addRecentCharacter(result.links[1])
           } else {
@@ -906,36 +895,24 @@ export default () => {
           }
           game.me
             .chooseButton(true)
-            .set("ai", function (button) {
-              return Math.random()
-            })
-            .set(
-              "selectButton",
-              (function (choice) {
-                if (choice == "singble") {
-                  return [1, 2]
-                }
-                if (choice == "double") {
-                  return 2
-                }
-                return 1
-              })(get.config("double_character")),
-            )
+            .set("ai", (button) => Math.random())
+            .set("selectButton", 1)
             .set("dialog", event.videoId)
           ;("step 5")
           game.broadcastAll("closeDialog", event.videoId)
           game.addRecentCharacter(result.links[0])
           _status.characterlist.removeArray(result.links)
-          if (result.links.length == 2) {
+          if (result.links.length === 2) {
             game.me.next.init(result.links[0], result.links[1])
             game.addRecentCharacter(result.links[1])
           } else {
             game.me.next.init(result.links[0])
           }
-          setTimeout(function () {
+          setTimeout(() => {
             ui.arena.classList.remove("choose-character")
           }, 500)
           if (get.config("single_control")) {
+            game.checkResult = () => game.over(true)
             game.addGlobalSkill("autoswap")
             game.me.next._trueMe = game.me
           }
@@ -944,7 +921,7 @@ export default () => {
       chooseCharacterWuxianhuoli() {
         const next = game.createEvent("chooseCharacter")
         next.showConfig = true
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           ui.arena.classList.add("choose-character")
           lib.init.onfree()
@@ -952,7 +929,7 @@ export default () => {
           game.players[num].identity = "zhu"
           game.players[1 - num].identity = "fan"
           game.broadcastAll(
-            function (p, t) {
+            (p, t) => {
               p.enemy = t
               t.enemy = p
             },
@@ -976,7 +953,7 @@ export default () => {
             fan: _status.characterlist.randomRemove(6),
           }
           // 创建自由选将功能
-          const createCharacterDialog = function () {
+          const createCharacterDialog = () => {
             if (get.config("free_choose")) {
               event.dialogxx = ui.create.characterDialog("heightset")
             } else {
@@ -988,9 +965,9 @@ export default () => {
           } else {
             createCharacterDialog()
           }
-          ui.create.cheat2 = function () {
+          ui.create.cheat2 = () => {
             ui.cheat2 = ui.create.control("自由选将", function () {
-              if (this.dialog == _status.event.dialog) {
+              if (this.dialog === _status.event.dialog) {
                 if (game.changeCoin) {
                   game.changeCoin(10)
                 }
@@ -1020,7 +997,10 @@ export default () => {
           if (!ui.cheat2 && get.config("free_choose")) {
             ui.create.cheat2()
           }
-          const dialog = ["请选择出场武将", '<div class="text center">本局游戏Buff</div>']
+          const dialog = [
+            "请选择出场武将",
+            '<div class="text center">本局游戏Buff</div>',
+          ]
           game.globalBuff.forEach((buff, ind) => {
             dialog.add(
               `<div class="text">「${ind === 0 ? "固定" : "随机"}」 ${get.translation(buff)}：${get.skillInfoTranslation(buff, null, false)}</div>`,
@@ -1036,7 +1016,8 @@ export default () => {
           game.me.init(result.links[0])
           game.addRecentCharacter(result.links[0])
           _status.characterChoice[game.me.identity].removeArray(result.links)
-          var list = _status.characterChoice[game.me.enemy.identity].randomRemove(1)
+          var list =
+            _status.characterChoice[game.me.enemy.identity].randomRemove(1)
           game.me.enemy.init(list[0])
           ;[game.me, game.me.enemy].forEach((current) => {
             if (
@@ -1084,7 +1065,9 @@ export default () => {
                     uiintro.add(`<div class="text center">全场角色造成${_status.wuxianhuoliLevel === 0 ? 3 : 5}点伤害(当前${_status.wuxianhuoliProgress}点)</div>\
 										<div class="text center">奖励：获得一个技能，摸两张牌</div>`)
                   } else {
-                    uiintro.add(`<div class="text center">所有任务已完成，无后续任务</div>`)
+                    uiintro.add(
+                      `<div class="text center">所有任务已完成，无后续任务</div>`,
+                    )
                   }
                   uiintro.add(
                     `<div class="text center" style="font-size:18px"><b>全局Buff</b></div>`,
@@ -1092,9 +1075,7 @@ export default () => {
                   uiintro.add(
                     `<div class="text">${game.globalBuff
                       .map((buff, ind) => {
-                        return (
-                          get.translation(buff) + "：" + get.skillInfoTranslation(buff, null, false)
-                        )
+                        return `${get.translation(buff)}：${get.skillInfoTranslation(buff, null, false)}`
                       })
                       .join("<br>")}</div>`,
                   )
@@ -1111,7 +1092,9 @@ export default () => {
             showTasks()
             var dialog = ui.create.dialog("hidden", "forcebutton")
             dialog.add(`任务一`)
-            dialog.addText(`任务：全场角色共计造成3点伤害<br>奖励：获得一个技能，摸两张牌`)
+            dialog.addText(
+              `任务：全场角色共计造成3点伤害<br>奖励：获得一个技能，摸两张牌`,
+            )
             dialog.add(`任务二<div class="text center" style="font-size:10px">(完成任务一后解锁)</div>\
 							<div class="text center">任务：全场角色共计造成5点伤害<br>奖励：获得一个技能，摸两张牌</div>`)
             dialog.open()
@@ -1122,31 +1105,33 @@ export default () => {
           game.broadcastAll(func)
           game.delay(0, 3000)
           ;("step 3")
-          _status.characterlist.addArray(Object.values(_status.characterChoice).flat())
-          setTimeout(function () {
+          _status.characterlist.addArray(
+            Object.values(_status.characterChoice).flat(),
+          )
+          setTimeout(() => {
             ui.arena.classList.remove("choose-character")
           }, 500)
         })
       },
-      chooseCharacter: function () {
-        if (_status.mode == "dianjiang") {
+      chooseCharacter() {
+        if (_status.mode === "dianjiang") {
           game.chooseCharacterDianjiang()
           return
         }
-        if (_status.mode == "wuxianhuoli") {
+        if (_status.mode === "wuxianhuoli") {
           game.chooseCharacterWuxianhuoli()
           return
         }
         var next = game.createEvent("chooseCharacter")
         next.showConfig = true
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           ui.arena.classList.add("choose-character")
           var num = [0, 1].randomGet()
           game.players[num].identity = "zhu"
           game.players[1 - num].identity = "fan"
           game.broadcastAll(
-            function (p, t) {
+            (p, t) => {
               p.enemy = t
               t.enemy = p
             },
@@ -1164,11 +1149,13 @@ export default () => {
           }
           event.videoIdx = lib.status.videoId++
           game.broadcastAll(
-            function (id, list) {
-              var dialog = ui.create.dialog("选择武将", [list.all, "character"], "起始武将", [
-                list[game.me.identity],
-                "character",
-              ])
+            (id, list) => {
+              var dialog = ui.create.dialog(
+                "选择武将",
+                [list.all, "character"],
+                "起始武将",
+                [list[game.me.identity], "character"],
+              )
               dialog.videoId = id
             },
             event.videoIdx,
@@ -1176,28 +1163,25 @@ export default () => {
           )
           ;("step 2")
           var next = game.fan.chooseButton(true, 1)
-          next.filterButton = function (button) {
-            return _status.event.canChoose.includes(button.link)
-          }
+          next.filterButton = (button) =>
+            _status.event.canChoose.includes(button.link)
           next.set("onfree", true)
           next.dialog = event.videoIdx
           next.canChoose = _status.characterChoice.all
-          next.ai = function () {
-            return Math.random()
-          }
+          next.ai = () => Math.random()
           ;("step 3")
           _status.characterChoice.fan.addArray(result.links)
           _status.characterChoice.all.removeArray(result.links)
           game.broadcastAll(
-            function (link, choosing, first, id) {
+            (link, choosing, first, id) => {
               var dialog = get.idDialog(id)
               if (dialog) {
-                if (choosing == game.me) {
+                if (choosing === game.me) {
                   choosing = "你"
                 } else {
                   choosing = "对手"
                 }
-                dialog.content.firstChild.innerHTML = choosing + "选择了" + get.translation(link)
+                dialog.content.firstChild.innerHTML = `${choosing}选择了${get.translation(link)}`
                 for (var i = 0; i < dialog.buttons.length; i++) {
                   if (link.includes(dialog.buttons[i].link)) {
                     if (first) {
@@ -1215,27 +1199,24 @@ export default () => {
             event.videoIdx,
           )
           var next = game.zhu.chooseButton(true, 2)
-          next.filterButton = function (button) {
-            return _status.event.canChoose.includes(button.link)
-          }
+          next.filterButton = (button) =>
+            _status.event.canChoose.includes(button.link)
           next.dialog = event.videoIdx
           next.canChoose = _status.characterChoice.all
-          next.ai = function () {
-            return Math.random()
-          }
+          next.ai = () => Math.random()
           ;("step 4")
           _status.characterChoice.zhu.addArray(result.links)
           _status.characterChoice.all.removeArray(result.links)
           game.broadcastAll(
-            function (link, choosing, first, id) {
+            (link, choosing, first, id) => {
               var dialog = get.idDialog(id)
               if (dialog) {
-                if (choosing == game.me) {
+                if (choosing === game.me) {
                   choosing = "你"
                 } else {
                   choosing = "对手"
                 }
-                dialog.content.firstChild.innerHTML = choosing + "选择了" + get.translation(link)
+                dialog.content.firstChild.innerHTML = `${choosing}选择了${get.translation(link)}`
                 for (var i = 0; i < dialog.buttons.length; i++) {
                   if (link.includes(dialog.buttons[i].link)) {
                     if (first) {
@@ -1253,27 +1234,24 @@ export default () => {
             event.videoIdx,
           )
           var next = game.fan.chooseButton(true, 2)
-          next.filterButton = function (button) {
-            return _status.event.canChoose.includes(button.link)
-          }
+          next.filterButton = (button) =>
+            _status.event.canChoose.includes(button.link)
           next.dialog = event.videoIdx
           next.canChoose = _status.characterChoice.all
-          next.ai = function () {
-            return Math.random()
-          }
+          next.ai = () => Math.random()
           ;("step 5")
           _status.characterChoice.fan.addArray(result.links)
           _status.characterChoice.all.removeArray(result.links)
           game.broadcastAll(
-            function (link, choosing, first, id) {
+            (link, choosing, first, id) => {
               var dialog = get.idDialog(id)
               if (dialog) {
-                if (choosing == game.me) {
+                if (choosing === game.me) {
                   choosing = "你"
                 } else {
                   choosing = "对手"
                 }
-                dialog.content.firstChild.innerHTML = choosing + "选择了" + get.translation(link)
+                dialog.content.firstChild.innerHTML = `${choosing}选择了${get.translation(link)}`
                 for (var i = 0; i < dialog.buttons.length; i++) {
                   if (link.includes(dialog.buttons[i].link)) {
                     if (first) {
@@ -1291,27 +1269,24 @@ export default () => {
             event.videoIdx,
           )
           var next = game.zhu.chooseButton(true)
-          next.filterButton = function (button) {
-            return _status.event.canChoose.includes(button.link)
-          }
+          next.filterButton = (button) =>
+            _status.event.canChoose.includes(button.link)
           next.dialog = event.videoIdx
           next.canChoose = _status.characterChoice.all
-          next.ai = function () {
-            return Math.random()
-          }
+          next.ai = () => Math.random()
           ;("step 6")
           _status.characterChoice.zhu.addArray(result.links)
           _status.characterChoice.all.removeArray(result.links)
           game.broadcastAll(
-            function (link, choosing, first, id) {
+            (link, choosing, first, id) => {
               var dialog = get.idDialog(id)
               if (dialog) {
-                if (choosing == game.me) {
+                if (choosing === game.me) {
                   choosing = "你"
                 } else {
                   choosing = "对手"
                 }
-                dialog.content.firstChild.innerHTML = choosing + "选择了" + get.translation(link)
+                dialog.content.firstChild.innerHTML = `${choosing}选择了${get.translation(link)}`
                 for (var i = 0; i < dialog.buttons.length; i++) {
                   if (link.includes(dialog.buttons[i].link)) {
                     if (first) {
@@ -1333,26 +1308,32 @@ export default () => {
           ;("step 8")
           game.me.chooseButton(
             true,
-            ["请选择出场武将", [_status.characterChoice[game.me.identity], "character"]],
-            _status.mode == "changban" ? 2 : 1,
+            [
+              "请选择出场武将",
+              [_status.characterChoice[game.me.identity], "character"],
+            ],
+            _status.mode === "changban" ? 2 : 1,
           )
           ;("step 9")
-          game.me.init(result.links[0], _status.mode == "changban" ? result.links[1] : null)
-          _status.characterChoice[game.me.identity].removeArray(result.links)
-          var list = _status.characterChoice[game.me.enemy.identity].randomRemove(
-            _status.mode == "changban" ? 2 : 1,
+          game.me.init(
+            result.links[0],
+            _status.mode === "changban" ? result.links[1] : null,
           )
+          _status.characterChoice[game.me.identity].removeArray(result.links)
+          var list = _status.characterChoice[
+            game.me.enemy.identity
+          ].randomRemove(_status.mode === "changban" ? 2 : 1)
           game.me.enemy.init(list[0], list[1])
           ;("step 10")
-          setTimeout(function () {
+          setTimeout(() => {
             ui.arena.classList.remove("choose-character")
           }, 500)
         })
       },
-      chooseCharacterDianjiangOL: function () {
+      chooseCharacterDianjiangOL() {
         var next = game.createEvent("chooseCharacter")
         next.showConfig = true
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           var map = Math.random() < 0.5 ? ["zhu", "fan"] : ["fan", "zhu"]
           game.me.identity = map[0]
@@ -1379,11 +1360,9 @@ export default () => {
             list.push(i)
           }
           game.broadcastAll(
-            function (list, id) {
+            (list, id) => {
               _status.characterlist = list
-              var filter = function (name) {
-                return !_status.characterlist.includes(name)
-              }
+              var filter = (name) => !_status.characterlist.includes(name)
               var dialog = ui.create.characterDialog("heightset", filter).open()
               dialog.videoId = id
               ui.arena.classList.add("choose-character")
@@ -1393,33 +1372,20 @@ export default () => {
           )
           game.zhu
             .chooseButton(true)
-            .set("ai", function (button) {
-              return Math.random()
-            })
-            .set(
-              "selectButton",
-              (function (choice) {
-                if (choice == "singble") {
-                  return [1, 2]
-                }
-                if (choice == "double") {
-                  return 2
-                }
-                return 1
-              })(lib.configOL.double_character),
-            )
+            .set("ai", (button) => Math.random())
+            .set("selectButton", 1)
             .set("dialog", event.videoId)
           ;("step 2")
           game.broadcastAll(
-            function (player, character, id) {
-              if (player == game.me) {
+            (player, character, id) => {
+              if (player === game.me) {
                 game.addRecentCharacter(character[0])
               }
               if (character.length !== 2) {
                 player.init(character[0])
               } else {
                 player.init(character[0], character[1])
-                if (player == game.me) {
+                if (player === game.me) {
                   game.addRecentCharacter(character[1])
                 }
               }
@@ -1430,43 +1396,30 @@ export default () => {
           )
           game.fan
             .chooseButton(true)
-            .set("ai", function (button) {
-              return Math.random()
-            })
-            .set(
-              "selectButton",
-              (function (choice) {
-                if (choice == "singble") {
-                  return [1, 2]
-                }
-                if (choice == "double") {
-                  return 2
-                }
-                return 1
-              })(lib.configOL.double_character),
-            )
+            .set("ai", (button) => Math.random())
+            .set("selectButton", 1)
             .set("dialog", event.videoId)
           ;("step 3")
           game.broadcastAll("closeDialog", event.videoId)
           game.broadcastAll(
-            function (player, character, id) {
+            (player, character, id) => {
               var dialog = get.idDialog(id)
               if (dialog) {
                 dialog.close()
               }
-              if (player == game.me) {
+              if (player === game.me) {
                 game.addRecentCharacter(character[0])
               }
               if (character.length !== 2) {
                 player.init(character[0])
               } else {
                 player.init(character[0], character[1])
-                if (player == game.me) {
+                if (player === game.me) {
                   game.addRecentCharacter(character[1])
                 }
               }
               _status.characterlist.removeArray(character)
-              setTimeout(function () {
+              setTimeout(() => {
                 ui.arena.classList.remove("choose-character")
               }, 500)
             },
@@ -1479,14 +1432,14 @@ export default () => {
       chooseCharacterWuxianhuoliOL() {
         var next = game.createEvent("chooseCharacter")
         next.showConfig = true
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           ui.arena.classList.add("choose-character")
           var num = [0, 1].randomGet()
           game.players[num].identity = "zhu"
           game.players[1 - num].identity = "fan"
           game.broadcastAll(
-            function (p, t) {
+            (p, t) => {
               p.enemy = t
               t.enemy = p
             },
@@ -1518,7 +1471,7 @@ export default () => {
             fan: _status.characterlist.randomRemove(6),
           }
           // 创建自由选将功能
-          const createCharacterDialog = function () {
+          const createCharacterDialog = () => {
             if (get.config("free_choose")) {
               event.dialogxx = ui.create.characterDialog("heightset")
             } else {
@@ -1530,9 +1483,9 @@ export default () => {
           } else {
             createCharacterDialog()
           }
-          ui.create.cheat2 = function () {
+          ui.create.cheat2 = () => {
             ui.cheat2 = ui.create.control("自由选将", function () {
-              if (this.dialog == _status.event.dialog) {
+              if (this.dialog === _status.event.dialog) {
                 if (game.changeCoin) {
                   game.changeCoin(10)
                 }
@@ -1563,7 +1516,10 @@ export default () => {
             ui.create.cheat2()
           }
           const list = ["zhu", "fan"].map((identity) => {
-            const dialog = ["请选择出场武将", '<div class="text center">本局游戏Buff</div>']
+            const dialog = [
+              "请选择出场武将",
+              '<div class="text center">本局游戏Buff</div>',
+            ]
             game.globalBuff.forEach((buff, ind) => {
               dialog.add(
                 `<div class="text">「${ind === 0 ? "固定" : "随机"}」 ${get.translation(buff)}：${get.skillInfoTranslation(buff, null, false)}</div>`,
@@ -1572,10 +1528,10 @@ export default () => {
             dialog.add([_status.characterChoice[identity], "character"])
             return [game[identity], true, dialog]
           })
-          game.me.chooseButtonOL(list, function (player, result) {
-            if (game.online || player == game.me) {
+          game.me.chooseButtonOL(list, (player, result) => {
+            if (game.online || player === game.me) {
               player.init(result.links[0])
-              if (player == game.me) {
+              if (player === game.me) {
                 game.addRecentCharacter(result.links[0])
               }
               player.hp = 10
@@ -1591,8 +1547,9 @@ export default () => {
           }
           for (var i in result) {
             var current = lib.playerOL[i]
-            if (result[i] == "ai") {
-              result[i] = _status.characterChoice[current.identity].randomGets(1)
+            if (result[i] === "ai") {
+              result[i] =
+                _status.characterChoice[current.identity].randomGets(1)
             } else {
               result[i] = result[i].links
             }
@@ -1601,7 +1558,8 @@ export default () => {
               current.init(result[i][0])
               if (
                 current.storage.nohp ||
-                (lib.character[current.name1].hasHiddenSkill && !current.noclick)
+                (lib.character[current.name1].hasHiddenSkill &&
+                  !current.noclick)
               ) {
                 current.storage.rawHp = 1
                 current.storage.rawMaxHp = 1
@@ -1612,14 +1570,15 @@ export default () => {
               current.update()
             }
           }
-          game.broadcast(function (result) {
+          game.broadcast((result) => {
             for (var i in result) {
               const current = lib.playerOL[i]
               if (!current.name) {
                 current.init(result[i][0])
                 if (
                   current.storage.nohp ||
-                  (lib.character[current.name1].hasHiddenSkill && !current.noclick)
+                  (lib.character[current.name1].hasHiddenSkill &&
+                    !current.noclick)
                 ) {
                   current.storage.rawHp = 1
                   current.storage.rawMaxHp = 1
@@ -1630,7 +1589,7 @@ export default () => {
                 current.update()
               }
             }
-            setTimeout(function () {
+            setTimeout(() => {
               ui.arena.classList.remove("choose-character")
             }, 500)
           }, result)
@@ -1669,7 +1628,9 @@ export default () => {
                     uiintro.add(`<div class="text center">全场角色造成${_status.wuxianhuoliLevel === 0 ? 3 : 5}点伤害(当前${_status.wuxianhuoliProgress}点)</div>\
 										<div class="text center">奖励：获得一个技能，摸两张牌</div>`)
                   } else {
-                    uiintro.add(`<div class="text center">所有任务已完成，无后续任务</div>`)
+                    uiintro.add(
+                      `<div class="text center">所有任务已完成，无后续任务</div>`,
+                    )
                   }
                   uiintro.add(
                     `<div class="text center" style="font-size:18px"><b>全局Buff</b></div>`,
@@ -1677,9 +1638,7 @@ export default () => {
                   uiintro.add(
                     `<div class="text">${game.globalBuff
                       .map((buff, ind) => {
-                        return (
-                          get.translation(buff) + "：" + get.skillInfoTranslation(buff, null, false)
-                        )
+                        return `${get.translation(buff)}：${get.skillInfoTranslation(buff, null, false)}`
                       })
                       .join("<br>")}</div>`,
                   )
@@ -1699,7 +1658,9 @@ export default () => {
             }
             const dialog = ui.create.dialog("hidden", "forcebutton")
             dialog.add(`任务一`)
-            dialog.addText(`任务：全场角色共计造成3点伤害<br>奖励：获得一个技能，摸两张牌`)
+            dialog.addText(
+              `任务：全场角色共计造成3点伤害<br>奖励：获得一个技能，摸两张牌`,
+            )
             dialog.add(`任务二<div class="text center" style="font-size:10px">(完成任务一后解锁)</div>\
 							<div class="text center">任务：全场角色共计造成5点伤害<br>奖励：获得一个技能，摸两张牌</div>`)
             dialog.open()
@@ -1710,30 +1671,32 @@ export default () => {
           game.broadcastAll(func)
           game.delay(0, 3000)
           ;("step 3")
-          _status.characterlist.addArray(Object.values(_status.characterChoice).flat())
-          setTimeout(function () {
+          _status.characterlist.addArray(
+            Object.values(_status.characterChoice).flat(),
+          )
+          setTimeout(() => {
             ui.arena.classList.remove("choose-character")
           }, 500)
         })
       },
-      chooseCharacterOL: function () {
-        if (_status.mode == "dianjiang") {
+      chooseCharacterOL() {
+        if (_status.mode === "dianjiang") {
           game.chooseCharacterDianjiangOL()
           return
         }
-        if (_status.mode == "wuxianhuoli") {
+        if (_status.mode === "wuxianhuoli") {
           game.chooseCharacterWuxianhuoliOL()
           return
         }
         var next = game.createEvent("chooseCharacter")
-        next.setContent(function () {
+        next.setContent(() => {
           "step 0"
           ui.arena.classList.add("choose-character")
           var num = [0, 1].randomGet()
           game.players[num].identity = "zhu"
           game.players[1 - num].identity = "fan"
           game.broadcastAll(
-            function (p, t) {
+            (p, t) => {
               p.enemy = t
               t.enemy = p
             },
@@ -1751,9 +1714,9 @@ export default () => {
           }
           event.videoIdx = lib.status.videoId++
           game.broadcastAll(
-            function (id, list) {
+            (id, list) => {
               var dialog = ui.create.dialog(
-                game.me.identity == "fan" ? "选择武将" : "请等待对手选择武将",
+                game.me.identity === "fan" ? "选择武将" : "请等待对手选择武将",
                 [list.all, "character"],
                 "起始武将",
                 [list[game.me.identity], "character"],
@@ -1765,27 +1728,25 @@ export default () => {
           )
           ;("step 2")
           var next = game.fan.chooseButton(true, 1)
-          next.set("filterButton", function (button) {
-            return _status.event.canChoose.includes(button.link)
-          })
+          next.set("filterButton", (button) =>
+            _status.event.canChoose.includes(button.link),
+          )
           next.set("dialog", event.videoIdx)
           next.set("canChoose", _status.characterChoice.all)
-          next.ai = function () {
-            return Math.random()
-          }
+          next.ai = () => Math.random()
           ;("step 3")
           _status.characterChoice.fan.addArray(result.links)
           _status.characterChoice.all.removeArray(result.links)
           game.broadcastAll(
-            function (link, choosing, first, id) {
+            (link, choosing, first, id) => {
               var dialog = get.idDialog(id)
               if (dialog) {
-                if (choosing == game.me) {
+                if (choosing === game.me) {
                   choosing = "你"
                 } else {
                   choosing = "对手"
                 }
-                dialog.content.firstChild.innerHTML = choosing + "选择了" + get.translation(link)
+                dialog.content.firstChild.innerHTML = `${choosing}选择了${get.translation(link)}`
                 for (var i = 0; i < dialog.buttons.length; i++) {
                   if (link.includes(dialog.buttons[i].link)) {
                     if (first) {
@@ -1803,27 +1764,25 @@ export default () => {
             event.videoIdx,
           )
           var next = game.zhu.chooseButton(true, 2)
-          next.set("filterButton", function (button) {
-            return _status.event.canChoose.includes(button.link)
-          })
+          next.set("filterButton", (button) =>
+            _status.event.canChoose.includes(button.link),
+          )
           next.set("dialog", event.videoIdx)
           next.set("canChoose", _status.characterChoice.all)
-          next.ai = function () {
-            return Math.random()
-          }
+          next.ai = () => Math.random()
           ;("step 4")
           _status.characterChoice.zhu.addArray(result.links)
           _status.characterChoice.all.removeArray(result.links)
           game.broadcastAll(
-            function (link, choosing, first, id) {
+            (link, choosing, first, id) => {
               var dialog = get.idDialog(id)
               if (dialog) {
-                if (choosing == game.me) {
+                if (choosing === game.me) {
                   choosing = "你"
                 } else {
                   choosing = "对手"
                 }
-                dialog.content.firstChild.innerHTML = choosing + "选择了" + get.translation(link)
+                dialog.content.firstChild.innerHTML = `${choosing}选择了${get.translation(link)}`
                 for (var i = 0; i < dialog.buttons.length; i++) {
                   if (link.includes(dialog.buttons[i].link)) {
                     if (first) {
@@ -1841,27 +1800,25 @@ export default () => {
             event.videoIdx,
           )
           var next = game.fan.chooseButton(true, 2)
-          next.set("filterButton", function (button) {
-            return _status.event.canChoose.includes(button.link)
-          })
+          next.set("filterButton", (button) =>
+            _status.event.canChoose.includes(button.link),
+          )
           next.set("dialog", event.videoIdx)
           next.set("canChoose", _status.characterChoice.all)
-          next.ai = function () {
-            return Math.random()
-          }
+          next.ai = () => Math.random()
           ;("step 5")
           _status.characterChoice.fan.addArray(result.links)
           _status.characterChoice.all.removeArray(result.links)
           game.broadcastAll(
-            function (link, choosing, first, id) {
+            (link, choosing, first, id) => {
               var dialog = get.idDialog(id)
               if (dialog) {
-                if (choosing == game.me) {
+                if (choosing === game.me) {
                   choosing = "你"
                 } else {
                   choosing = "对手"
                 }
-                dialog.content.firstChild.innerHTML = choosing + "选择了" + get.translation(link)
+                dialog.content.firstChild.innerHTML = `${choosing}选择了${get.translation(link)}`
                 for (var i = 0; i < dialog.buttons.length; i++) {
                   if (link.includes(dialog.buttons[i].link)) {
                     if (first) {
@@ -1879,27 +1836,25 @@ export default () => {
             event.videoIdx,
           )
           var next = game.zhu.chooseButton(true)
-          next.set("filterButton", function (button) {
-            return _status.event.canChoose.includes(button.link)
-          })
+          next.set("filterButton", (button) =>
+            _status.event.canChoose.includes(button.link),
+          )
           next.set("dialog", event.videoIdx)
           next.set("canChoose", _status.characterChoice.all)
-          next.ai = function () {
-            return Math.random()
-          }
+          next.ai = () => Math.random()
           ;("step 6")
           _status.characterChoice.zhu.addArray(result.links)
           _status.characterChoice.all.removeArray(result.links)
           game.broadcastAll(
-            function (link, choosing, first, id) {
+            (link, choosing, first, id) => {
               var dialog = get.idDialog(id)
               if (dialog) {
-                if (choosing == game.me) {
+                if (choosing === game.me) {
                   choosing = "你"
                 } else {
                   choosing = "对手"
                 }
-                dialog.content.firstChild.innerHTML = choosing + "选择了" + get.translation(link)
+                dialog.content.firstChild.innerHTML = `${choosing}选择了${get.translation(link)}`
                 for (var i = 0; i < dialog.buttons.length; i++) {
                   if (link.includes(dialog.buttons[i].link)) {
                     if (first) {
@@ -1919,22 +1874,32 @@ export default () => {
           ;("step 7")
           game.broadcastAll("closeDialog", event.videoIdx)
           ;("step 8")
-          var num = _status.mode == "changban" ? 2 : 1
+          var num = _status.mode === "changban" ? 2 : 1
           var list = [
-            [game.zhu, num, true, ["选择出场角色", [_status.characterChoice.zhu, "character"]]],
-            [game.fan, num, true, ["选择出场角色", [_status.characterChoice.fan, "character"]]],
+            [
+              game.zhu,
+              num,
+              true,
+              ["选择出场角色", [_status.characterChoice.zhu, "character"]],
+            ],
+            [
+              game.fan,
+              num,
+              true,
+              ["选择出场角色", [_status.characterChoice.fan, "character"]],
+            ],
           ]
-          game.me.chooseButtonOL(list, function (player, result) {
-            if (game.online || player == game.me) {
+          game.me.chooseButtonOL(list, (player, result) => {
+            if (game.online || player === game.me) {
               player.init(result.links[0], result.links[1])
             }
           })
           ;("step 9")
           for (var i in result) {
             var current = lib.playerOL[i]
-            if (result[i] == "ai") {
+            if (result[i] === "ai") {
               result[i] = _status.characterChoice[current.identity].randomGets(
-                _status.mode == "changban" ? 2 : 1,
+                _status.mode === "changban" ? 2 : 1,
               )
             } else {
               result[i] = result[i].links
@@ -1944,17 +1909,17 @@ export default () => {
               current.init(result[i][0], result[i][1])
             }
           }
-          game.broadcast(function (result) {
+          game.broadcast((result) => {
             for (var i in result) {
               if (!lib.playerOL[i].name) {
                 lib.playerOL[i].init(result[i][0], result[i][1])
               }
             }
-            setTimeout(function () {
+            setTimeout(() => {
               ui.arena.classList.remove("choose-character")
             }, 500)
           }, result)
-          setTimeout(function () {
+          setTimeout(() => {
             ui.arena.classList.remove("choose-character")
           }, 500)
         })
@@ -1962,26 +1927,36 @@ export default () => {
     },
     element: {
       player: {
-        dieAfter: function () {
-          if (_status.mode != "normal" || _status.characterChoice[this.identity].length <= 3) {
+        dieAfter() {
+          if (
+            _status.mode !== "normal" ||
+            _status.characterChoice[this.identity].length <= 3
+          ) {
             game.checkResult()
           }
         },
-        dieAfter2: function () {
-          if (_status.mode != "normal") {
+        dieAfter2() {
+          if (_status.mode !== "normal") {
             return
           }
-          var next = game.createEvent("replacePlayerSingle", false, _status.event.getParent())
+          var next = game.createEvent(
+            "replacePlayerSingle",
+            false,
+            _status.event.getParent(),
+          )
           next.player = this
           next.forceDie = true
-          next.setContent(function () {
+          next.setContent(() => {
             "step 0"
             game.delay()
             ;("step 1")
             player
               .chooseButton(true, [
                 "请选择一名出场武将",
-                [_status.characterChoice[player.identity].slice(0), "character"],
+                [
+                  _status.characterChoice[player.identity].slice(0),
+                  "character",
+                ],
               ])
               .set("forceDie", true)
             ;("step 2")
@@ -1990,7 +1965,7 @@ export default () => {
             var color = source.node.identity.dataset.color
 
             game.broadcastAll(
-              function (source, name, color) {
+              (source, name, color) => {
                 source.revive(null, false)
                 source.uninit()
                 source.init(name)
@@ -2002,14 +1977,14 @@ export default () => {
             )
             game.log(source, "出场")
 
-            var num = _status.mode == "normal" ? 4 : source.maxHp
+            var num = _status.mode === "normal" ? 4 : source.maxHp
             if (player.hasSkill("cuorui")) {
               player.logSkill("cuorui")
               num = 2 + _status.characterChoice[player.identity].length
             }
             source.draw(num)
             var evt = event.getParent("dying")
-            if (evt && evt.parent) {
+            if (evt?.parent) {
               evt.parent.untrigger(false, source)
             }
             game.addVideo("reinit", source, [name, color])
@@ -2017,18 +1992,18 @@ export default () => {
             _status.characterChoice[player.identity].remove(name)
           })
         },
-        logAi: function (targets, card) {},
-        showIdentity: function () {
+        logAi(targets, card) {},
+        showIdentity() {
           game.broadcastAll(
-            function (player, identity) {
+            (player, identity) => {
               player.identity = identity
               game[identity] = player
-              player.side = identity == "zhu"
+              player.side = identity === "zhu"
               player.node.identity.classList.remove("guessing")
               player.identityShown = true
               player.ai.shown = 1
               player.setIdentity()
-              if (player.identity == "zhu") {
+              if (player.identity === "zhu") {
                 player.isZhu = true
               }
               if (_status.clickingidentity) {
@@ -2051,7 +2026,7 @@ export default () => {
           return 0
         }
         from = from._trueMe || from
-        let att = from.identity == to.identity ? 10 : -10
+        let att = from.identity === to.identity ? 10 : -10
         if (!_status.tempnofake) {
           _status.tempnofake = true
           if (from.ai.modAttitudeFrom) {
@@ -2070,10 +2045,10 @@ export default () => {
         audio: 2,
         trigger: { target: "useCardToTargeted" },
         frequent: true,
-        filter: function (event, player) {
-          return event.card.name == "sha"
+        filter(event, player) {
+          return event.card.name === "sha"
         },
-        content: function () {
+        content() {
           player.draw()
         },
       },
@@ -2089,10 +2064,10 @@ export default () => {
         enable: "phaseUse",
         skillAnimation: true,
         animationColor: "water",
-        filterTarget: function (card, player, target) {
-          return target != player && player.canCompare(target)
+        filterTarget(card, player, target) {
+          return target !== player && player.canCompare(target)
         },
-        content: function () {
+        content() {
           "step 0"
           player.awakenSkill(event.name)
           player.chooseToCompare(target)
@@ -2106,11 +2081,12 @@ export default () => {
         ai: {
           order: 1,
           result: {
-            target: function (player, target) {
+            target(player, target) {
               if (
-                player.countCards("h", function (card) {
-                  return get.value(card) <= 5 && get.number(card) >= 12
-                }) &&
+                player.countCards(
+                  "h",
+                  (card) => get.value(card) <= 5 && get.number(card) >= 12,
+                ) &&
                 get.effect(target, { name: "juedou" }, player, player) > 0
               ) {
                 return -1
@@ -2127,7 +2103,7 @@ export default () => {
           global: "gameDrawAfter",
         },
         direct: true,
-        content: function () {
+        content() {
           player.chooseUseTarget(
             "shuiyanqijunx",
             get.prompt("huwei"),
@@ -2140,7 +2116,7 @@ export default () => {
         audioname: ["re_huangzhong"],
         trigger: { player: "useCardToPlayered" },
         filter(event, player) {
-          if (event.card.name != "sha" || !player.enemy) {
+          if (event.card.name !== "sha" || !player.enemy) {
             return false
           }
           return player.enemy.countCards("h") >= player.hp
@@ -2155,7 +2131,10 @@ export default () => {
         ai: {
           directHit_ai: true,
           skillTagFilter(player, tag, arg) {
-            if (get.attitude(player, arg.target) > 0 || arg.card.name != "sha") {
+            if (
+              get.attitude(player, arg.target) > 0 ||
+              arg.card.name !== "sha"
+            ) {
               return false
             }
             return player.enemy && player.enemy.countCards("h") >= player.hp
@@ -2166,16 +2145,14 @@ export default () => {
         audio: "kuanggu",
         trigger: { source: "damageSource" },
         frequent: true,
-        filter: function (event, player) {
+        filter(event, player) {
           return player.isDamaged()
         },
-        content: function () {
+        content() {
           "step 0"
-          player.judge(function (result) {
-            return get.color(result) == "black" ? 2 : -2
-          })
+          player.judge((result) => (get.color(result) === "black" ? 2 : -2))
           ;("step 1")
-          if (result.bool == true) {
+          if (result.bool === true) {
             player.recover()
           }
         },
@@ -2186,13 +2163,13 @@ export default () => {
       cangji: {
         audio: 2,
         trigger: { player: "die" },
-        filter: function (event, player) {
+        filter(event, player) {
           return player.countCards("e") > 0
         },
         forceDie: true,
         skillAnimation: true,
         animationColor: "orange",
-        content: function () {
+        content() {
           var cards = player.getCards("e")
           player.cangji_yozuru = cards
           player.lose(cards, ui.special)
@@ -2207,7 +2184,7 @@ export default () => {
             forced: true,
             popup: false,
             //onremove:true,
-            content: function () {
+            content() {
               var cards = player.cangji_yozuru.slice(0)
               for (var i = 0; i < cards.length; i++) {
                 player.equip(cards[i])
@@ -2222,21 +2199,22 @@ export default () => {
         audio: 2,
         trigger: { target: "useCardToTargeted" },
         direct: true,
-        filter: function (event, player) {
+        filter(event, player) {
           return (
-            event.player != player &&
+            event.player !== player &&
             event.player.isPhaseUsing() &&
-            (event.card.name == "sha" || get.type(event.card) == "trick")
+            (event.card.name === "sha" || get.type(event.card) === "trick")
           )
         },
-        content: function () {
+        content() {
           if (!player.hasSkill("sgrenwang_one")) {
             player.addTempSkill("sgrenwang_one", "phaseUseEnd")
           } else if (trigger.player.countDiscardableCards(player, "he")) {
-            player.discardPlayerCard(trigger.player, "he", get.prompt("sgrenwang")).logSkill = [
-              "sgrenwang",
+            player.discardPlayerCard(
               trigger.player,
-            ]
+              "he",
+              get.prompt("sgrenwang"),
+            ).logSkill = ["sgrenwang", trigger.player]
           }
         },
       },
@@ -2245,22 +2223,25 @@ export default () => {
         group: "sgduanliang_gdm",
         audio: "duanliang1",
         enable: "chooseToUse",
-        filterCard: function (card) {
-          if (get.type(card) != "basic" && get.type(card) != "equip") {
+        filterCard(card) {
+          if (get.type(card) !== "basic" && get.type(card) !== "equip") {
             return false
           }
-          return get.color(card) == "black"
+          return get.color(card) === "black"
         },
-        filter: function (event, player) {
+        filter(event, player) {
           return (
             player.hasSkill("sgduanliang_sss") &&
-            player.countCards("he", { type: ["basic", "equip"], color: "black" })
+            player.countCards("he", {
+              type: ["basic", "equip"],
+              color: "black",
+            })
           )
         },
         position: "he",
         viewAs: { name: "bingliang" },
         prompt: "将一黑色的基本牌或装备牌当兵粮寸断使用",
-        check: function (card) {
+        check(card) {
           return 6 - get.value(card)
         },
         ai: {
@@ -2272,8 +2253,8 @@ export default () => {
             forced: true,
             silent: true,
             popup: false,
-            content: function () {
-              if (trigger.target != player) {
+            content() {
+              if (trigger.target !== player) {
                 player.addTempSkill("sgduanliang_sss")
               }
             },
@@ -2286,27 +2267,31 @@ export default () => {
         enable: ["chooseToRespond", "chooseToUse"],
         filterCard: true,
         viewAs: { name: "shan" },
-        viewAsFilter: function (player) {
+        viewAsFilter(player) {
           if (!player.countCards("e")) {
             return false
           }
         },
         prompt: "将一张装备区中的牌当闪使用或打出",
         position: "e",
-        check: function () {
+        check() {
           return 1
         },
         ai: {
           order: 0.5,
           respondShan: true,
-          skillTagFilter: function (player) {
+          skillTagFilter(player) {
             if (!player.countCards("e")) {
               return false
             }
           },
           effect: {
-            target: function (card, player, target, current) {
-              if (target.countCards("e") && get.tag(card, "respondShan") && current < 0) {
+            target(card, player, target, current) {
+              if (
+                target.countCards("e") &&
+                get.tag(card, "respondShan") &&
+                current < 0
+              ) {
                 return 0.6
               }
             },
@@ -2317,8 +2302,8 @@ export default () => {
         audio: 2,
         trigger: { player: "enterGame" },
         forced: true,
-        filter: function (event, player) {
-          return event.getParent("phase").player == player.enemy
+        filter(event, player) {
+          return event.getParent("phase").player === player.enemy
         },
         async content(event, trigger, player) {
           const evt = event.getParent("phase", true)
@@ -2361,7 +2346,7 @@ export default () => {
           reverseEquip: true,
           effect: {
             target(card, player, target, current) {
-              if (get.type(card) == "equip" && !get.cardtag(card, "gifts")) {
+              if (get.type(card) === "equip" && !get.cardtag(card, "gifts")) {
                 return [1, 3]
               }
             },
@@ -2371,26 +2356,32 @@ export default () => {
       yinli: {
         audio: 2,
         trigger: { global: "loseEnd" },
-        filter: function (event, player) {
+        filter(event, player) {
           if (
-            event.player == player ||
-            event.player != _status.currentPhase ||
-            event.getParent().name == "useCard"
+            event.player === player ||
+            event.player !== _status.currentPhase ||
+            event.getParent().name === "useCard"
           ) {
             return false
           }
           for (var i = 0; i < event.cards.length; i++) {
-            if (get.type(event.cards[i]) == "equip" && get.position(event.cards[i]) == "d") {
+            if (
+              get.type(event.cards[i]) === "equip" &&
+              get.position(event.cards[i]) === "d"
+            ) {
               return true
             }
           }
           return false
         },
         frequent: true,
-        content: function () {
+        content() {
           var list = []
           for (var i = 0; i < trigger.cards.length; i++) {
-            if (get.type(trigger.cards[i]) == "equip" && get.position(trigger.cards[i]) == "d") {
+            if (
+              get.type(trigger.cards[i]) === "equip" &&
+              get.position(trigger.cards[i]) === "d"
+            ) {
               list.push(trigger.cards[i])
             }
           }
@@ -2402,7 +2393,7 @@ export default () => {
       shenju: {
         audio: 2,
         mod: {
-          maxHandcard: function (player, num) {
+          maxHandcard: (player, num) => {
             if (player.enemy) {
               return num + player.enemy.getHp()
             }
@@ -2416,7 +2407,11 @@ export default () => {
         // audio: "chulao",
         enable: "phaseUse",
         filter(event, player) {
-          return player.countCards("he") > 0 && player.enemy && player.enemy.countCards("he") > 0
+          return (
+            player.countCards("he") > 0 &&
+            player.enemy &&
+            player.enemy.countCards("he") > 0
+          )
         },
         filterTarget(card, player, target) {
           return target === player.enemy && target.countCards("he") > 0
@@ -2424,7 +2419,7 @@ export default () => {
         filterCard: true,
         position: "he",
         check(card) {
-          if (get.suit(card) == "spade") {
+          if (get.suit(card) === "spade") {
             return 8 - get.value(card)
           }
           return 5 - get.value(card)
@@ -2473,12 +2468,12 @@ export default () => {
         trigger: { global: "gameDrawAfter" },
         silent: true,
         popup: false,
-        filter: function (event, player) {
-          return _status.mode == "changban" && player.maxHp <= 3
+        filter(event, player) {
+          return _status.mode === "changban" && player.maxHp <= 3
         },
-        content: function () {
+        content() {
           "step 0"
-          player.chooseBool("是否更换手牌？").ai = function () {
+          player.chooseBool("是否更换手牌？").ai = () => {
             var hs = player.getCards("h")
             return get.value(hs, "raw") < 6 * hs
           }
@@ -2513,7 +2508,7 @@ export default () => {
         },
         mod: {
           cardUsable(card, player, num) {
-            if (card.name == "sha") {
+            if (card.name === "sha") {
               return num + 1
             }
           },
@@ -2532,7 +2527,7 @@ export default () => {
       wuxianhuoli_xushidaifa: {
         trigger: { source: "damageBegin1" },
         filter(event, player) {
-          if (!event.card || event.card.name !== "sha") {
+          if (event.card?.name !== "sha") {
             return false
           }
           return (
@@ -2629,13 +2624,15 @@ export default () => {
                   ? ui.create.div(".touchinfo.left", ui.window)
                   : ui.create.div(ui.gameinfo)
               }
-              ui.wuxianhuoliProgress.innerHTML =
-                "任务进度(" + num + "/" + (level === 0 ? 3 : 5) + ")"
+              ui.wuxianhuoliProgress.innerHTML = `任务进度(${num}/${level === 0 ? 3 : 5})`
             },
             _status.wuxianhuoliProgress,
             _status.wuxianhuoliLevel,
           )
-          if (_status.wuxianhuoliProgress < (_status.wuxianhuoliLevel === 0 ? 3 : 5)) {
+          if (
+            _status.wuxianhuoliProgress <
+            (_status.wuxianhuoliLevel === 0 ? 3 : 5)
+          ) {
             return
           }
           game.broadcastAll(() => {
@@ -2644,7 +2641,7 @@ export default () => {
           })
           let next
           const send = (skills, refreshable, stop = false) => {
-            let next = game.createEvent("wuxianhuoli_reward", false)
+            const next = game.createEvent("wuxianhuoli_reward", false)
             next.setContent(lib.skill.wuxianhuoli_task.contentx)
             next.set("skills", skills)
             next.set("refreshable", refreshable)
@@ -2658,7 +2655,10 @@ export default () => {
             if (!result) {
               result = {}
             }
-            if (!result.control && (typeof result.index !== "number" || result.index < 0)) {
+            if (
+              !result.control &&
+              (typeof result.index !== "number" || result.index < 0)
+            ) {
               result.index = 0
             }
             results.push([player, result])
@@ -2681,7 +2681,7 @@ export default () => {
               withol = true
               current.send(send, skills, refreshable)
               current.wait(sendback)
-            } else if (current == game.me) {
+            } else if (current === game.me) {
               withme = true
               next = send(skills, refreshable, true)
               if (_status.connectMode) {
@@ -2701,9 +2701,9 @@ export default () => {
             }
             if (ai_targets.length) {
               ai_targets.randomSort()
-              setTimeout(function () {
+              setTimeout(() => {
                 event.interval = setInterval(
-                  function () {
+                  () => {
                     const current = ai_targets.shift()
                     if (players.includes(current)) {
                       sendback({ index: 0 }, current)
@@ -2728,7 +2728,10 @@ export default () => {
               if (!result) {
                 result = {}
               }
-              if (!result.control && (typeof result.index !== "number" || result.index < 0)) {
+              if (
+                !result.control &&
+                (typeof result.index !== "number" || result.index < 0)
+              ) {
                 result.index = 0
               }
               results.push([game.me, result])
@@ -2795,8 +2798,7 @@ export default () => {
                   ? ui.create.div(".touchinfo.left", ui.window)
                   : ui.create.div(ui.gameinfo)
               }
-              ui.wuxianhuoliProgress.innerHTML =
-                "任务进度(" + num + "/" + (level === 0 ? 3 : 5) + ")"
+              ui.wuxianhuoliProgress.innerHTML = `任务进度(${num}/${level === 0 ? 3 : 5})`
             },
             _status.wuxianhuoliProgress,
             _status.wuxianhuoliLevel,
@@ -2804,21 +2806,21 @@ export default () => {
           await game.delay()
         },
         getSkills(num = 6) {
-          let allList = _status.characterlist.slice(0)
-          let list = []
-          let skills = []
-          let map = []
-          let entries = []
+          const allList = _status.characterlist.slice(0)
+          const list = []
+          const skills = []
+          const map = []
+          const entries = []
           allList.randomSort()
           for (let i = 0; i < allList.length; i++) {
-            let name = allList[i]
-            let skills2 = lib.character[name][3].slice()
+            const name = allList[i]
+            const skills2 = lib.character[name][3].slice()
             skills2.randomSort()
             outer: for (let j = 0; j < skills2.length; j++) {
-              let list2 = [skills2[j]]
+              const list2 = [skills2[j]]
               game.expandSkills(list2)
               for (let k = 0; k < list2.length; k++) {
-                let info = lib.skill[list2[k]]
+                const info = lib.skill[list2[k]]
                 if (
                   !info ||
                   info.silent ||
@@ -2861,7 +2863,9 @@ export default () => {
               game.resume()
             },
           ]
-          event.control = ui.create.control(controls.concat(["刷新(0/1)", "stayleft"]))
+          event.control = ui.create.control(
+            controls.concat(["刷新(0/1)", "stayleft"]),
+          )
           if (!event.refreshable) {
             event.control.classList.add("disabled")
             event.control.firstChild.innerText = "刷新(1/1)"
@@ -2869,22 +2873,16 @@ export default () => {
           let refreshed = false,
             result
           while (true) {
-            const skills = event.skills.slice(3 * refreshed, 3 * (refreshed + 1))
+            const skills = event.skills.slice(
+              3 * refreshed,
+              3 * (refreshed + 1),
+            )
             const next = game.me
               .chooseControl(skills)
               .set(
                 "choiceList",
                 skills.map((skill) => {
-                  return (
-                    '<div class="skill">【' +
-                    get.translation(
-                      lib.translate[skill + "_ab"] || get.translation(skill).slice(0, 2),
-                    ) +
-                    "】</div>" +
-                    "<div>" +
-                    get.skillInfoTranslation(skill, game.me, false) +
-                    "</div>"
-                  )
+                  return `<div class="skill">【${get.translation(lib.translate[`${skill}_ab`] || get.translation(skill).slice(0, 2))}】</div><div>${get.skillInfoTranslation(skill, game.me, false)}</div>`
                 }),
               )
               .set("displayIndex", false)
@@ -2918,7 +2916,8 @@ export default () => {
         "出牌阶段，对一名其他角色使用。目标角色选择一项：1、弃置装备区里的所有牌；2、受到你造成的1点伤害。",
       guohe_info:
         "出牌阶段，对有牌的一名其他角色使用。你选择一项：①弃置其装备区里的一张牌。②观看其手牌并弃置其中的一张。",
-      shunshou_info: "出牌阶段，对距离为1且有牌的一名其他角色使用。你获得其的一张牌。",
+      shunshou_info:
+        "出牌阶段，对距离为1且有牌的一名其他角色使用。你获得其的一张牌。",
     },
     translate: {
       zhu: "先",
@@ -2931,15 +2930,19 @@ export default () => {
       wuxianhuoli2: "无限火力",
 
       wuxianhuoli_weisuoyuwei: "为所欲为",
-      wuxianhuoli_weisuoyuwei_info: "①准备阶段，你摸一张牌。②你使用【杀】的次数上限+1。",
+      wuxianhuoli_weisuoyuwei_info:
+        "①准备阶段，你摸一张牌。②你使用【杀】的次数上限+1。",
       wuxianhuoli_duoduoyishan: "多多益善",
       wuxianhuoli_duoduoyishan_info: "一名角色的回合结束时，你摸一张牌。",
       wuxianhuoli_xushidaifa: "蓄势待发",
-      wuxianhuoli_xushidaifa_info: "当你于一回合首次造成渠道为【杀】的伤害时，此伤害+1。",
+      wuxianhuoli_xushidaifa_info:
+        "当你于一回合首次造成渠道为【杀】的伤害时，此伤害+1。",
       wuxianhuoli_liuanhuaming: "柳暗花明",
-      wuxianhuoli_liuanhuaming_info: "每回合限两次。当你于回合外失去牌后，你摸一张牌。",
+      wuxianhuoli_liuanhuaming_info:
+        "每回合限两次。当你于回合外失去牌后，你摸一张牌。",
       wuxianhuoli_mianmianjudao: "面面俱到",
-      wuxianhuoli_mianmianjudao_info: "准备阶段，你从牌堆或弃牌堆中获得基本牌和锦囊牌各一张。",
+      wuxianhuoli_mianmianjudao_info:
+        "准备阶段，你从牌堆或弃牌堆中获得基本牌和锦囊牌各一张。",
 
       wanrong: "婉容",
       wanrong_info: "当你成为【杀】的目标后，你可以摸一张牌。",
@@ -2960,7 +2963,8 @@ export default () => {
       sgliegong_info:
         "当你使用【杀】指定目标后，若对手的手牌数大于等于你的体力值，你可令此【杀】不可被【闪】响应。",
       sgkuanggu: "狂骨",
-      sgkuanggu_info: "当你造成伤害后，若你已受伤，你可以进行判定：若结果为黑色，你回复1点体力。",
+      sgkuanggu_info:
+        "当你造成伤害后，若你已受伤，你可以进行判定：若结果为黑色，你回复1点体力。",
       suzi: "肃资",
       "#suzi1": "来来来！清点缴获！哈哈哈！",
       "#suzi2": "抢夺资材，快，快，快！",
@@ -2984,7 +2988,8 @@ export default () => {
       "#pianyi1": "呵呵，不能动了吧~",
       "#pianyi2": "将军，看呆了么~",
       sgxiaoji: "枭姬",
-      sgxiaoji_info: "当你失去一张装备区内的牌后，你可以摸两张牌或回复1点体力。",
+      sgxiaoji_info:
+        "当你失去一张装备区内的牌后，你可以摸两张牌或回复1点体力。",
       "#sgxiaoji1": "你可要看好了！",
       "#sgxiaoji2": "谁说女子不如男！",
       yinli: "姻礼",
@@ -2994,7 +2999,8 @@ export default () => {
       "#shenju1": "谨慎为妙。",
       "#shenju2": "时机未到。",
       puji: "普济",
-      puji_info: "出牌阶段限一次，你可弃置你与对手各一张牌，然后被弃置黑桃牌的角色各摸一张牌。",
+      puji_info:
+        "出牌阶段限一次，你可弃置你与对手各一张牌，然后被弃置黑桃牌的角色各摸一张牌。",
     },
     help: {
       血战长坂:

@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
 export const type = "mode"
 /**
  * @type { () => importModeConfig }
@@ -36,14 +36,14 @@ export default () => {
       lib.setScroll(packnode)
       var clickCapt = function () {
         var active = this.parentNode.querySelector(".active")
-        if (this.link == "stage") {
+        if (this.link === "stage") {
           if (get.is.empty(lib.storage.scene)) {
             alert("请创建至少1个场景")
             return
           }
         }
         if (active) {
-          if (active == this) {
+          if (active === this) {
             return
           }
           for (var i = 0; i < active.nodes.length; i++) {
@@ -60,9 +60,9 @@ export default () => {
           dialog.content.appendChild(this.nodes[i])
         }
         var showcase = this.nodes[this.nodes.length - 1]
-        showcase.style.height = dialog.content.offsetHeight - showcase.offsetTop + "px"
-        if (typeof showcase.action == "function") {
-          if (showcase.action(showcase._showcased ? false : true) !== false) {
+        showcase.style.height = `${dialog.content.offsetHeight - showcase.offsetTop}px`
+        if (typeof showcase.action === "function") {
+          if (showcase.action(!showcase._showcased) !== false) {
             showcase._showcased = true
           }
         }
@@ -73,14 +73,19 @@ export default () => {
         }
         game.save("currentBrawl", this.link)
       }
-      var createNode = function (name) {
+      var createNode = (name) => {
         var info = lib.brawl[name]
-        var node = ui.create.div(".dialogbutton.menubutton.large", info.name, packnode, clickCapt)
+        var node = ui.create.div(
+          ".dialogbutton.menubutton.large",
+          info.name,
+          packnode,
+          clickCapt,
+        )
         node.style.transition = "all 0s"
         var caption = info.name
         var modeinfo = ""
         if (info.mode) {
-          modeinfo = get.translation(info.mode) + "模式"
+          modeinfo = `${get.translation(info.mode)}模式`
         }
         if (info.submode) {
           if (modeinfo) {
@@ -92,15 +97,15 @@ export default () => {
         if (Array.isArray(info.intro)) {
           intro = '<ul style="text-align:left;margin-top:0;width:450px">'
           if (modeinfo) {
-            intro += "<li>" + modeinfo
+            intro += `<li>${modeinfo}`
           }
           for (var i = 0; i < info.intro.length; i++) {
-            intro += "<li>" + info.intro[i]
+            intro += `<li>${info.intro[i]}`
           }
         } else {
           intro = ""
           if (modeinfo) {
-            intro += "（" + modeinfo + "）"
+            intro += `（${modeinfo}）`
           }
           intro += info.intro
         }
@@ -123,7 +128,7 @@ export default () => {
         }
         node.link = name
         node._nostart = info.nostart
-        if (lib.storage.currentBrawl == name) {
+        if (lib.storage.currentBrawl === name) {
           clickCapt.call(node)
         }
         return node
@@ -138,7 +143,7 @@ export default () => {
             }
           }
           var info
-          if (active.link.indexOf("stage_") == 0) {
+          if (active.link.indexOf("stage_") === 0) {
             var level
             if (Array.isArray(arguments[0])) {
               level = { index: arguments[0][1] }
@@ -149,24 +154,32 @@ export default () => {
               var stagesave = lib.storage.stage
               var stage = stagesave[active.link.slice(6)]
               game.save("lastStage", level.index)
-              if (stage.mode == "loopTest") {
+              if (stage.mode === "loopTest") {
                 //console.log('关卡 lastStage: ', level.index, stage);
                 var SSS = localStorage.getItem("SSS")
                 if (!SSS) {
                   SSS = 1
                 }
-                var NNN = ui.create.system("LV" + (level.index + 1) + "/" + SSS, null, true)
+                var NNN = ui.create.system(
+                  `LV${level.index + 1}/${SSS}`,
+                  null,
+                  true,
+                )
               }
-              lib.onover.push(function (bool) {
+              lib.onover.push((bool) => {
                 _status.createControl = ui.controls[0]
                 //lib.storage.stage[stage.name] = stage;
                 //console.log('关卡 场景对局结果: ', bool, level.index + 1, stage.scenes.length);
-                if (stage.mode == "loopTest") {
+                if (stage.mode === "loopTest") {
                   //console.log('关卡 自动进入下一Scene场景', level.index, stage.scenes);
                   game.delay(1, 1500)
                   //next_level.click();
                   if (level.index + 1 < stage.scenes.length) {
-                    game.save("directStage", [stage.name, level.index + 1], "brawl")
+                    game.save(
+                      "directStage",
+                      [stage.name, level.index + 1],
+                      "brawl",
+                    )
                   } else {
                     game.save("directStage", [stage.name, 0], "brawl")
                     var SSS = localStorage.getItem("SSS")
@@ -178,38 +191,53 @@ export default () => {
                     //当前通关数
                     localStorage.setItem("SSS", SSS)
                   }
-                  localStorage.setItem(lib.configprefix + "directstart", true)
+                  localStorage.setItem(`${lib.configprefix}directstart`, true)
                   game.reload()
                 }
 
                 if (bool && level.index + 1 < stage.scenes.length) {
-                  ui.create.control("下一关", function () {
-                    game.save("directStage", [stage.name, level.index + 1], "brawl")
-                    localStorage.setItem(lib.configprefix + "directstart", true)
+                  ui.create.control("下一关", () => {
+                    game.save(
+                      "directStage",
+                      [stage.name, level.index + 1],
+                      "brawl",
+                    )
+                    localStorage.setItem(`${lib.configprefix}directstart`, true)
                     game.reload()
                   })
                   if (level.index + 1 > stage.level) {
                     stage.level = level.index + 1
                     game.save("stage", stagesave, "brawl")
                   }
-                  if (stage.mode != "sequal") {
+                  if (stage.mode !== "sequal") {
                     game.save("lastStage", level.index + 1, "brawl")
                   }
                 } else {
-                  ui.create.control("重新开始", function () {
-                    if (stage.mode == "sequal" && bool && level.index == stage.scenes.length - 1) {
+                  ui.create.control("重新开始", () => {
+                    if (
+                      stage.mode === "sequal" &&
+                      bool &&
+                      level.index === stage.scenes.length - 1
+                    ) {
                       game.save("directStage", [stage.name, 0], "brawl")
                     } else {
-                      game.save("directStage", [stage.name, level.index], "brawl")
+                      game.save(
+                        "directStage",
+                        [stage.name, level.index],
+                        "brawl",
+                      )
                     }
-                    localStorage.setItem(lib.configprefix + "directstart", true)
+                    localStorage.setItem(`${lib.configprefix}directstart`, true)
                     game.reload()
                   })
-                  if (stage.mode == "sequal" && level.index == stage.scenes.length - 1) {
+                  if (
+                    stage.mode === "sequal" &&
+                    level.index === stage.scenes.length - 1
+                  ) {
                     stage.level = 0
                     game.save("stage", stagesave, "brawl")
                   }
-                  if (stage.mode != "sequal") {
+                  if (stage.mode !== "sequal") {
                     game.save("lastStage", level.index, "brawl")
                   }
                 }
@@ -238,20 +266,20 @@ export default () => {
           ui.brawlinfo = ui.create.system("乱斗", null, true)
           lib.setPopped(
             ui.brawlinfo,
-            function () {
+            () => {
               var uiintro = ui.create.dialog("hidden")
               uiintro.add(info.name)
               var intro
               if (Array.isArray(info.intro)) {
                 intro = '<ul style="text-align:left;margin-top:0;width:450px">'
                 for (var i = 0; i < info.intro.length; i++) {
-                  intro += "<li>" + info.intro[i]
+                  intro += `<li>${info.intro[i]}`
                 }
                 intro += "</ul>"
               } else {
                 intro = info.intro
               }
-              uiintro.add('<div class="text center">' + intro + "</div>")
+              uiintro.add(`<div class="text center">${intro}</div>`)
               var ul = uiintro.querySelector("ul")
               if (ul) {
                 ul.style.width = "180px"
@@ -267,13 +295,18 @@ export default () => {
           if (info.init) {
             info.init()
           }
-          if (stage && stage.mode == "loopTest") {
+          if (stage && stage.mode === "loopTest") {
             //console.log("关卡开局就托管：brawl", info, stage);
             ui.click.auto()
           }
         }
       }
-      var start = ui.create.div(".menubutton.round.highlight", "斗", dialog.content, clickStart)
+      var start = ui.create.div(
+        ".menubutton.round.highlight",
+        "斗",
+        dialog.content,
+        clickStart,
+      )
       start.style.position = "absolute"
       start.style.left = "auto"
       start.style.right = "10px"
@@ -287,7 +320,7 @@ export default () => {
       start.style.fontSize = "72px"
       start.style.zIndex = 3
       start.style.transition = "all 0s"
-      game.addScene = function (name, clear) {
+      game.addScene = (name, clear) => {
         var scene = lib.storage.scene[name]
         var brawl = {
           name: name,
@@ -300,15 +333,15 @@ export default () => {
           brawl.content.noGameDraw = true
         }
         brawl.content.scene = scene
-        lib.brawl["scene_" + name] = brawl
-        var node = createNode("scene_" + name)
+        lib.brawl[`scene_${name}`] = brawl
+        var node = createNode(`scene_${name}`)
         if (clear) {
           game.addSceneClear()
           clickCapt.call(node)
           _status.sceneChanged = true
         }
       }
-      game.addStage = function (name, clear) {
+      game.addStage = (name, clear) => {
         var stage = lib.storage.stage[name]
         var brawl = {
           name: name,
@@ -319,22 +352,22 @@ export default () => {
           brawl[i] = get.copy(lib.brawl.stage.template[i])
         }
         brawl.content.stage = stage
-        lib.brawl["stage_" + name] = brawl
-        var node = createNode("stage_" + name)
+        lib.brawl[`stage_${name}`] = brawl
+        var node = createNode(`stage_${name}`)
         if (clear) {
           game.addStageClear()
           clickCapt.call(node)
         }
       }
-      game.removeScene = function (name) {
+      game.removeScene = (name) => {
         delete lib.storage.scene[name]
         game.save("scene", lib.storage.scene)
         _status.sceneChanged = true
         for (var i = 0; i < packnode.childElementCount; i++) {
-          if (packnode.childNodes[i].link == "scene_" + name) {
+          if (packnode.childNodes[i].link === `scene_${name}`) {
             if (packnode.childNodes[i].classList.contains("active")) {
               for (var j = 0; j < packnode.childElementCount; j++) {
-                if (packnode.childNodes[j].link == "scene") {
+                if (packnode.childNodes[j].link === "scene") {
                   clickCapt.call(packnode.childNodes[j])
                 }
               }
@@ -344,19 +377,19 @@ export default () => {
           }
         }
       }
-      game.removeStage = function (name) {
+      game.removeStage = (name) => {
         delete lib.storage.stage[name]
         game.save("stage", lib.storage.stage)
         for (var i = 0; i < packnode.childElementCount; i++) {
-          if (packnode.childNodes[i].link == "stage_" + name) {
+          if (packnode.childNodes[i].link === `stage_${name}`) {
             if (packnode.childNodes[i].classList.contains("active")) {
               for (var j = 0; j < packnode.childElementCount; j++) {
                 if (get.is.empty(lib.storage.scene)) {
-                  if (packnode.childNodes[j].link == "scene") {
+                  if (packnode.childNodes[j].link === "scene") {
                     clickCapt.call(packnode.childNodes[j])
                   }
                 } else {
-                  if (packnode.childNodes[j].link == "stage") {
+                  if (packnode.childNodes[j].link === "stage") {
                     clickCapt.call(packnode.childNodes[j])
                   }
                 }
@@ -372,14 +405,14 @@ export default () => {
         if (get.config(i) === false) {
           continue
         }
-        if (i == "scene") {
+        if (i === "scene") {
           sceneNode = createNode(i)
         } else {
           createNode(i)
         }
       }
       if (sceneNode) {
-        game.switchScene = function () {
+        game.switchScene = () => {
           clickCapt.call(sceneNode)
         }
       }
@@ -418,12 +451,12 @@ export default () => {
           }
           var lx = this.offsetWidth / 2 - 120
           var ly = Math.min(lx, this.offsetHeight / 2 - 60)
-          var setPos = function (node) {
+          var setPos = (node) => {
             var i = node.index
             var deg = (Math.PI / 4) * i
             var dx = Math.round(lx * Math.cos(deg))
             var dy = Math.round(ly * Math.sin(deg))
-            node.style.transform = "translate(" + dx + "px," + dy + "px)"
+            node.style.transform = `translate(${dx}px,${dy}px)`
           }
           var characterz = [
             "guyong",
@@ -453,7 +486,7 @@ export default () => {
             this.appendChild(node)
           }
           var nodes = this.nodes
-          this.showcaseinterval = setInterval(function () {
+          this.showcaseinterval = setInterval(() => {
             for (var i = 0; i < nodes.length; i++) {
               nodes[i].index++
               if (nodes[i].index > 7) {
@@ -463,10 +496,10 @@ export default () => {
             }
           }, 1000)
         },
-        init: function () {},
+        init: () => {},
         content: {
           submode: "normal",
-          chooseCharacterBefore: function () {
+          chooseCharacterBefore: () => {
             game.identityVideoName = "幻化之战"
             var skills = []
             var banned = [
@@ -569,7 +602,7 @@ export default () => {
               if (lib.filter.characterDisabled(name)) {
                 continue
               }
-              if (name.indexOf("old_") == 0) {
+              if (name.indexOf("old_") === 0) {
                 continue
               }
               var skillsx = lib.character[name][3].slice(0)
@@ -587,7 +620,7 @@ export default () => {
                   list.splice(j--, 1)
                   continue
                 }
-                if (typeof info.derivation == "string") {
+                if (typeof info.derivation === "string") {
                   list.push(info.derivation)
                 } else if (Array.isArray(info.derivation)) {
                   list.addArray(info.derivation)
@@ -607,7 +640,7 @@ export default () => {
                   info.hiddenSkill ||
                   info.dutySkill ||
                   info.groupSkill ||
-                  (info.ai && info.ai.combo)
+                  info.ai?.combo
                 ) {
                   continue
                 }
@@ -624,10 +657,9 @@ export default () => {
                     fullskin: true,
                     recastable: true,
                     type: "trick",
-                    filterTarget: function (card, player, target) {
-                      return target.skillH.length > 0
-                    },
-                    content: function () {
+                    filterTarget: (card, player, target) =>
+                      target.skillH.length > 0,
+                    content: () => {
                       target.removeSkillH(target.skillH.randomGet())
                       var skills = lib.huanhuazhizhan.skills
                       skills.randomSort()
@@ -641,9 +673,7 @@ export default () => {
                     ai: {
                       order: 10,
                       result: {
-                        target: function () {
-                          return 0.5 - Math.random()
-                        },
+                        target: () => 0.5 - Math.random(),
                       },
                     },
                   },
@@ -651,10 +681,9 @@ export default () => {
                     enable: true,
                     fullskin: true,
                     type: "trick",
-                    filterTarget: function (card, player, target) {
-                      return target.skillH.length > 0
-                    },
-                    content: function () {
+                    filterTarget: (card, player, target) =>
+                      target.skillH.length > 0,
+                    content: () => {
                       target.removeSkillH(target.skillH.randomGet())
                     },
                     ai: {
@@ -694,10 +723,8 @@ export default () => {
                     trigger: { source: "damage" },
                     forced: true,
                     popup: false,
-                    filter: function (event, player) {
-                      return event.player == player._toKill
-                    },
-                    content: function () {
+                    filter: (event, player) => event.player === player._toKill,
+                    content: () => {
                       game.log(player, "对击杀目标造成了伤害")
                       player.changeLingli(trigger.num)
                     },
@@ -714,13 +741,9 @@ export default () => {
                       player: "phaseBeginStart",
                     },
                     prompt: "是否消耗2点灵力获得一个技能？",
-                    filter: function (event, player) {
-                      return player.storage._lingli > 1
-                    },
-                    check: function (event, player) {
-                      return player.skillH.length < 3
-                    },
-                    content: function () {
+                    filter: (event, player) => player.storage._lingli > 1,
+                    check: (event, player) => player.skillH.length < 3,
+                    content: () => {
                       "step 0"
                       player.changeLingli(-2)
                       ;("step 1")
@@ -732,7 +755,7 @@ export default () => {
                         if (!player.skillH.includes(skills[i])) {
                           list.push(skills[i])
                         }
-                        if (list.length == 3) {
+                        if (list.length === 3) {
                           break
                         }
                       }
@@ -744,20 +767,24 @@ export default () => {
                         list.push("刷新")
                       }
                       event.list = list
-                      var dialog = game.getSkillDialog(event.list, "选择获得一个技能")
-                      player.chooseControl(event.list).set("ai", function () {
-                        return 0
-                      }).dialog = dialog
+                      var dialog = game.getSkillDialog(
+                        event.list,
+                        "选择获得一个技能",
+                      )
+                      player
+                        .chooseControl(event.list)
+                        .set("ai", () => 0).dialog = dialog
                       ;("step 2")
-                      if (result.control == "刷新") {
+                      if (result.control === "刷新") {
                         player.changeLingli(-1)
                         event.goto(1)
                         return
                       }
                       event.skill = result.control
-                      if (player.skillH.length == 3) {
+                      if (player.skillH.length === 3) {
                         event.lose = true
-                        player.chooseControl(player.skillH).prompt = "选择失去1个已有技能"
+                        player.chooseControl(player.skillH).prompt =
+                          "选择失去1个已有技能"
                       }
                       ;("step 3")
                       if (event.lose) {
@@ -770,19 +797,16 @@ export default () => {
                     trigger: { global: "roundStart" },
                     forced: true,
                     popup: false,
-                    filter: function (event, player) {
-                      return _status._aozhan != true && game.roundNumber > 1
-                    },
-                    content: function () {
+                    filter: (event, player) =>
+                      _status._aozhan !== true && game.roundNumber > 1,
+                    content: () => {
                       player.changeLingli(1)
                     },
                   },
                   _lingli_draw: {
                     enable: "phaseUse",
-                    filter: function (event, player) {
-                      return player.storage._lingli > 0
-                    },
-                    content: function () {
+                    filter: (event, player) => player.storage._lingli > 0,
+                    content: () => {
                       player.changeLingli(-1)
                       player.draw()
                     },
@@ -790,9 +814,12 @@ export default () => {
                     ai: {
                       order: 10,
                       result: {
-                        player: function (player) {
-                          return player.storage._lingli - 2 * (3 - player.skillH.length) > 0 ? 1 : 0
-                        },
+                        player: (player) =>
+                          player.storage._lingli -
+                            2 * (3 - player.skillH.length) >
+                          0
+                            ? 1
+                            : 0,
                       },
                     },
                   },
@@ -800,10 +827,10 @@ export default () => {
                     trigger: { target: "useCardToTargeted" },
                     forced: true,
                     popup: false,
-                    filter: function (event, player) {
-                      return event.card.name == "tao" && player == event.player._toSave
-                    },
-                    content: function () {
+                    filter: (event, player) =>
+                      event.card.name === "tao" &&
+                      player === event.player._toSave,
+                    content: () => {
                       game.log(trigger.player, "帮助了保护目标")
                       trigger.player.changeLingli(1)
                     },
@@ -813,20 +840,19 @@ export default () => {
                     forced: true,
                     forceDie: true,
                     popup: false,
-                    filter: function (event, player) {
-                      return (
-                        (_status._aozhan && !player.getStat("damage") && player.isAlive()) ||
-                        event._lastDead != undefined
-                      )
-                    },
-                    content: function () {
+                    filter: (event, player) =>
+                      (_status._aozhan &&
+                        !player.getStat("damage") &&
+                        player.isAlive()) ||
+                      event._lastDead !== undefined,
+                    content: () => {
                       "step 0"
                       if (_status._aozhan && !player.getStat("damage")) {
                         player.loseHp()
                         player.changeLingli(1)
                         game.log(player, "本回合内未造成伤害，触发死战模式惩罚")
                       }
-                      if (trigger._lastDead == undefined) {
+                      if (trigger._lastDead === undefined) {
                         event.goto(2)
                       }
                       ;("step 1")
@@ -834,7 +860,7 @@ export default () => {
                       event.type = type
                       trigger._lastDead.playerfocus(1200)
                       player.$fullscreenpop(
-                        "乾坤八卦·" + ["离", "坎", "乾", "震", "兑", "艮", "巽", "坤"][type - 1],
+                        `乾坤八卦·${["离", "坎", "乾", "震", "兑", "艮", "巽", "坤"][type - 1]}`,
                         get.groupnature(trigger._lastDead.group, "raw"),
                       )
                       game.delay(1.5)
@@ -842,13 +868,13 @@ export default () => {
                       var type = event.type
                       switch (type) {
                         case 1: {
-                          game.countPlayer(function (current) {
+                          game.countPlayer((current) => {
                             current.loseHp()
                           })
                           break
                         }
                         case 2: {
-                          game.countPlayer(function (current) {
+                          game.countPlayer((current) => {
                             current.draw(2, "nodelay")
                           })
                           break
@@ -859,7 +885,7 @@ export default () => {
                           break
                         }
                         case 4: {
-                          game.countPlayer(function (current) {
+                          game.countPlayer((current) => {
                             var he = current.getCards("he")
                             if (he.length) {
                               current.discard(he.randomGet()).delay = false
@@ -868,17 +894,19 @@ export default () => {
                           break
                         }
                         case 5: {
-                          game.countPlayer(function (current) {
+                          game.countPlayer((current) => {
                             current.changeLingli(1)
                           })
                           break
                         }
                         case 6: {
                           var cards = []
-                          game.countPlayer(function (current) {
-                            var card = get.cardPile(function (card) {
-                              return !cards.includes(card) && get.type(card) == "equip"
-                            })
+                          game.countPlayer((current) => {
+                            var card = get.cardPile(
+                              (card) =>
+                                !cards.includes(card) &&
+                                get.type(card) === "equip",
+                            )
                             if (card) {
                               cards.push(card)
                               current.$gain(card, "gain2")
@@ -888,7 +916,7 @@ export default () => {
                           break
                         }
                         case 7: {
-                          game.countPlayer(function (current) {
+                          game.countPlayer((current) => {
                             if (current.skillH.length < 3) {
                               var skills = lib.huanhuazhizhan.skills
                               skills.randomSort()
@@ -921,7 +949,7 @@ export default () => {
                       }
                       ;("step 3")
                       if (game.playerx().length <= 4 && !_status._aozhan) {
-                        game.countPlayer2(function (current) {
+                        game.countPlayer2((current) => {
                           delete current._toKill
                           delete current._toSave
                         })
@@ -930,7 +958,8 @@ export default () => {
                         game.playBackgroundMusic()
                         trigger._lastDead.$fullscreenpop(
                           "死战模式",
-                          get.groupnature(trigger._lastDead.group, "raw") || "fire",
+                          get.groupnature(trigger._lastDead.group, "raw") ||
+                            "fire",
                         )
                       } else {
                         game.randomMission()
@@ -939,15 +968,9 @@ export default () => {
                   },
                   hhzz_noCard: {
                     mod: {
-                      cardEnabled: function () {
-                        return false
-                      },
-                      cardSavable: function () {
-                        return false
-                      },
-                      cardRespondable: function () {
-                        return false
-                      },
+                      cardEnabled: () => false,
+                      cardSavable: () => false,
+                      cardRespondable: () => false,
                     },
                   },
                   hhzz_huilei: {
@@ -956,10 +979,8 @@ export default () => {
                     forceDie: true,
                     skillAnimation: true,
                     logTarget: "source",
-                    filter: function (event, player) {
-                      return event.source != undefined
-                    },
-                    content: function () {
+                    filter: (event, player) => event.source !== undefined,
+                    content: () => {
                       var source = trigger.source
                       var cards = source.getCards("he")
                       if (cards.length) {
@@ -968,7 +989,7 @@ export default () => {
                     },
                     ai: {
                       effect: {
-                        target: function (card, player, target) {
+                        target: (card, player, target) => {
                           if (get.tag(card, "damage")) {
                             return [-5, 0]
                           }
@@ -982,10 +1003,8 @@ export default () => {
                     forceDie: true,
                     skillAnimation: true,
                     logTarget: "source",
-                    filter: function (event, player) {
-                      return event.source != undefined
-                    },
-                    content: function () {
+                    filter: (event, player) => event.source !== undefined,
+                    content: () => {
                       var source = trigger.source
                       var cards = source.getCards("he")
                       if (cards.length) {
@@ -998,7 +1017,7 @@ export default () => {
                     },
                     ai: {
                       effect: {
-                        target: function (card, player, target) {
+                        target: (card, player, target) => {
                           if (get.tag(card, "damage")) {
                             return [-5, 0]
                           }
@@ -1009,15 +1028,13 @@ export default () => {
                   hhzz_zhencang: {
                     trigger: { player: "die" },
                     forced: true,
-                    filter: function (event, player) {
-                      return event.source != undefined
-                    },
+                    filter: (event, player) => event.source !== undefined,
                     forceDie: true,
                     logTarget: "source",
-                    content: function () {
+                    content: () => {
                       var source = trigger.source
                       source.draw()
-                      if (source.skillH.length == 3) {
+                      if (source.skillH.length === 3) {
                         source.removeSkillH(source.skillH.randomGet())
                       }
                       var skills = lib.huanhuazhizhan.skills
@@ -1035,13 +1052,11 @@ export default () => {
                     forced: true,
                     forceDie: true,
                     logTarget: "source",
-                    filter: function (event, player) {
-                      return event.source != undefined
-                    },
-                    content: function () {
+                    filter: (event, player) => event.source !== undefined,
+                    content: () => {
                       var source = trigger.source
                       source.draw(3)
-                      if (source.skillH.length == 3) {
+                      if (source.skillH.length === 3) {
                         source.removeSkillH(source.skillH.randomGet())
                       }
                       var skills = lib.huanhuazhizhan.skills
@@ -1058,10 +1073,9 @@ export default () => {
                     trigger: { player: "damage" },
                     forced: true,
                     logTarget: "source",
-                    filter: function (event, player) {
-                      return event.source != undefined && player.countCards("he") > 0
-                    },
-                    content: function () {
+                    filter: (event, player) =>
+                      event.source !== undefined && player.countCards("he") > 0,
+                    content: () => {
                       var cards = player.getCards("he")
                       cards.randomSort()
                       cards = cards.slice(0, trigger.num)
@@ -1069,7 +1083,7 @@ export default () => {
                     },
                     ai: {
                       effect: {
-                        target: function (card, player, target) {
+                        target: (card, player, target) => {
                           if (get.tag(card, "damage")) {
                             return [15, 0]
                           }
@@ -1088,7 +1102,8 @@ export default () => {
                   hhzz_huizhen: "汇珍",
                   hhzz_jubao: "聚宝",
                   hhzz_huilei_info: "锁定技，杀死你的角色弃置所有的牌。",
-                  hhzz_youlian_info: "锁定技，杀死你的角色弃置所有牌并随机失去一个技能。",
+                  hhzz_youlian_info:
+                    "锁定技，杀死你的角色弃置所有牌并随机失去一个技能。",
                   hhzz_zhencang_info:
                     "锁定技，杀死你的角色摸一张牌并随机获得一个技能(已满则先随机移除一个)。",
                   hhzz_huizhen_info:
@@ -1103,42 +1118,41 @@ export default () => {
                   hhzz_fudichouxin: "釜底抽薪",
                   hhzz_toulianghuanzhu_info:
                     "出牌阶段，对一名角色使用，随机更换其一个技能。可重铸。",
-                  hhzz_fudichouxin_info: "出牌阶段，对一名角色使用，随机弃置其一个技能。",
+                  hhzz_fudichouxin_info:
+                    "出牌阶段，对一名角色使用，随机弃置其一个技能。",
                   nei: " ",
                   nei2: " ",
                   刷新_info: "消耗1点灵力值，刷新上述技能。",
                 },
               },
               get: {
-                rawAttitude: function (from, to) {
-                  if (from == to || to == from._toSave) {
+                rawAttitude: (from, to) => {
+                  if (from === to || to === from._toSave) {
                     return 10
                   }
-                  if (to == from._toKill) {
+                  if (to === from._toKill) {
                     return -30
                   }
                   return -10
                 },
               },
               eltc: {
-                gameDraw: function () {
+                gameDraw: () => {
                   var end = player
                   var numx
-                  var num = function (player) {
-                    return player._hSeat > 5 ? 5 : 4
-                  }
+                  var num = (player) => (player._hSeat > 5 ? 5 : 4)
                   do {
-                    if (typeof num == "function") {
+                    if (typeof num === "function") {
                       numx = num(player)
                     }
                     if (player._hSeat > 6) {
                       player.changeLingli(1)
                     }
-                    let cards = get.cards(numx)
+                    const cards = get.cards(numx)
                     player.directgain(cards)
                     player._start_cards = cards
                     player = player.next
-                  } while (player != end)
+                  } while (player !== end)
                 },
               },
               eltp: {
@@ -1148,7 +1162,11 @@ export default () => {
                 },
                 removeSkillH: function (skill) {
                   this.skillH.remove(skill)
-                  game.log(this, "失去了技能", "#g【" + get.translation(skill) + "】")
+                  game.log(
+                    this,
+                    "失去了技能",
+                    `#g【${get.translation(skill)}】`,
+                  )
                   this.removeSkill(skill)
                 },
                 dieAfter: function () {
@@ -1156,34 +1174,29 @@ export default () => {
                   if (evt) {
                     evt._lastDead = this
                   }
-                  if (game.playerx().length == 1) {
+                  if (game.playerx().length === 1) {
                     game.over(game.me.isAlive())
                   }
                 },
-                $dieAfter: function () {},
-                hasUnknown: function () {
-                  return false
-                },
-                isUnknown: function () {
-                  return false
-                },
+                $dieAfter: () => {},
+                hasUnknown: () => false,
+                isUnknown: () => false,
                 getEnemies: function () {
                   var list = game.playerx()
                   list.remove(this)
                   return list
                 },
                 dieAfter2: function (source) {
-                  if (source && this.name.indexOf("hhzz_") != 0) {
-                    if (source._toKill == this) {
+                  if (source && this.name.indexOf("hhzz_") !== 0) {
+                    if (source._toKill === this) {
                       game.log(source, "击杀目标成功")
                     }
-                    source.draw(this == source._toKill ? 2 : 1)
-                    source.changeLingli(this == source._toKill ? 3 : 2)
+                    source.draw(this === source._toKill ? 2 : 1)
+                    source.changeLingli(this === source._toKill ? 3 : 2)
                   }
                   if (!_status._aozhan) {
-                    var that = this
-                    game.countPlayer(function (current) {
-                      if (current._toSave == that) {
+                    game.countPlayer((current) => {
+                      if (current._toSave === this) {
                         game.log(current, "保护失败")
                         var cards = current.getCards("he")
                         if (cards.length) {
@@ -1193,12 +1206,12 @@ export default () => {
                     })
                   }
                 },
-                logAi: function () {},
+                logAi: () => {},
                 changeLingli: function (num) {
-                  if (typeof num != "number") {
+                  if (typeof num !== "number") {
                     num = 1
                   }
-                  if (typeof this.storage._lingli != "number") {
+                  if (typeof this.storage._lingli !== "number") {
                     this.storage._lingli = 0
                   }
                   if (num > 0) {
@@ -1206,35 +1219,42 @@ export default () => {
                     if (num < 1) {
                       return
                     }
-                    game.log(this, "获得了", "#y" + get.cnNumber(num) + "点", "灵力")
+                    game.log(this, "获得了", `#y${get.cnNumber(num)}点`, "灵力")
                   } else {
                     if (-num > this.storage._lingli) {
                       num = -this.storage._lingli
                     }
-                    if (num == 0) {
+                    if (num === 0) {
                       return
                     }
-                    game.log(this, "失去了", "#y" + get.cnNumber(-num) + "点", "灵力")
+                    game.log(
+                      this,
+                      "失去了",
+                      `#y${get.cnNumber(-num)}点`,
+                      "灵力",
+                    )
                   }
                   this.storage._lingli += num
                   this.markSkill("_lingli")
                 },
               },
               game: {
-                playerx: function () {
-                  return game.filterPlayer(function (current) {
-                    if (current.name.indexOf("hhzz_") == 0) {
+                playerx: () =>
+                  game.filterPlayer((current) => {
+                    if (current.name.indexOf("hhzz_") === 0) {
                       return
                     }
                     return true
-                  })
-                },
-                randomMission: function () {
+                  }),
+                randomMission: () => {
                   if (_status._aozhan) {
                     return
                   }
                   if (!ui.huanhuazhizhan) {
-                    ui.huanhuazhizhan = ui.create.div(".touchinfo.left", ui.window)
+                    ui.huanhuazhizhan = ui.create.div(
+                      ".touchinfo.left",
+                      ui.window,
+                    )
                     if (ui.time3) {
                       ui.time3.style.display = "none"
                     }
@@ -1253,7 +1273,7 @@ export default () => {
                     "，保护" +
                     get.translation(game.me._toSave)
                 },
-                getSkillDialog: function (skills, prompt) {
+                getSkillDialog: (skills, prompt) => {
                   var dialog = ui.create.dialog("hidden", "forcebutton")
                   if (prompt) {
                     dialog.addText(prompt)
@@ -1263,17 +1283,17 @@ export default () => {
                       '<div class="popup pointerdiv" style="width:80%;display:inline-block"><div class="skill">【' +
                         get.translation(skills[i]) +
                         "】</div><div>" +
-                        lib.translate[skills[i] + "_info"] +
+                        lib.translate[`${skills[i]}_info`] +
                         "</div></div>",
                     )
                   }
                   dialog.addText(" <br> ")
                   return dialog
                 },
-                chooseCharacter: function () {
+                chooseCharacter: () => {
                   var next = game.createEvent("chooseCharacter")
                   next.showConfig = true
-                  next.setContent(function () {
+                  next.setContent(() => {
                     "step 0"
                     game.zhu = game.players.randomGet()
                     var i = 1
@@ -1282,19 +1302,22 @@ export default () => {
                       current.skillH = []
                       current._hSeat = i
                       current.identity = "nei"
-                      current.setNickname(get.cnNumber(i, true) + "号位")
+                      current.setNickname(`${get.cnNumber(i, true)}号位`)
                       for (var ii in lib.huanhuazhizhan.eltp) {
                         current[ii] = lib.huanhuazhizhan.eltp[ii]
                       }
                       current = current.next
                       i++
-                      if (current == game.zhu) {
+                      if (current === game.zhu) {
                         break
                       }
                     }
                     ui.arena.classList.add("choose-character")
                     game.me.chooseButton(
-                      ["请选择角色形象", [_status.characterlist.randomRemove(5), "character"]],
+                      [
+                        "请选择角色形象",
+                        [_status.characterlist.randomRemove(5), "character"],
+                      ],
                       true,
                     ).onfree = true
                     ;("step 1")
@@ -1317,10 +1340,12 @@ export default () => {
                       game.addGlobalSkill(list[i])
                     }
                     game.me.addSkillH(result.control)
-                    game.countPlayer(function (current) {
+                    game.countPlayer((current) => {
                       if (!current.name) {
                         current.init(_status.characterlist.randomRemove(1)[0])
-                        current.addSkillH(["xiandeng", "shulv", "xisheng"].randomGet())
+                        current.addSkillH(
+                          ["xiandeng", "shulv", "xisheng"].randomGet(),
+                        )
                       }
                       current.storage._lingli = 0
                       current.markSkill("_lingli")
@@ -1337,12 +1362,14 @@ export default () => {
                     for (var i = 0; i < list.length; i++) {
                       ui.cardPile.insertBefore(
                         list[i],
-                        ui.cardPile.childNodes[get.rand(ui.cardPile.childElementCount)],
+                        ui.cardPile.childNodes[
+                          get.rand(ui.cardPile.childElementCount)
+                        ],
                       )
                     }
                     game.updateRoundNumber()
                     ;("step 4")
-                    setTimeout(function () {
+                    setTimeout(() => {
                       ui.arena.classList.remove("choose-character")
                     }, 500)
                     _status.videoInited = true
@@ -1416,7 +1443,8 @@ export default () => {
                         hhzz_huizhen: "汇珍",
                         hhzz_jubao: "聚宝",
                         hhzz_huilei_info: "锁定技，杀死你的角色弃置所有的牌。",
-                        hhzz_youlian_info: "锁定技，杀死你的角色弃置所有牌并随机失去一个技能。",
+                        hhzz_youlian_info:
+                          "锁定技，杀死你的角色弃置所有牌并随机失去一个技能。",
                         hhzz_zhencang_info:
                           "锁定技，杀死你的角色摸一张牌并随机获得一个技能(已满则先随机移除一个)。",
                         hhzz_huizhen_info:
@@ -1433,14 +1461,15 @@ export default () => {
                         hhzz_fudichouxin: "釜底抽薪",
                         hhzz_toulianghuanzhu_info:
                           "出牌阶段，对一名角色使用，随机更换其一个技能。可重铸。",
-                        hhzz_fudichouxin_info: "出牌阶段，对一名角色使用，随机弃置其一个技能。",
+                        hhzz_fudichouxin_info:
+                          "出牌阶段，对一名角色使用，随机弃置其一个技能。",
                       },
                     })
                   })
                 },
               },
             }
-            var func = function (pack) {
+            var func = (pack) => {
               for (var i in pack.pack) {
                 for (var j in pack.pack[i]) {
                   lib[i][j] = pack.pack[i][j]
@@ -1473,10 +1502,9 @@ export default () => {
           "玩家持有“副将”的所有技能",
         ],
         showcase: function (init) {
-          const node = this
           let player
           const initPlayer = (name) => {
-            let player = ui.create.player(null, true)
+            const player = ui.create.player(null, true)
             player.node.avatar.style.backgroundSize = "cover"
             player.node.avatar.setBackground(name, "character")
             player.node.avatar.show()
@@ -1490,30 +1518,35 @@ export default () => {
             player.style.left = "calc(50% - 75px)"
             player.style.top = "20px"
             player.nowName = "pot_yuji"
-            node.appendChild(player)
-            node.playernode = player
+            this.appendChild(player)
+            this.playernode = player
           } else {
-            player = node.playernode
+            player = this.playernode
           }
           let num = 0,
             num2 = 0,
-            nameList = ["pot_yuji", "ol_nanhualaoxian", "pot_yuji_shadow", "re_zuoci"],
+            nameList = [
+              "pot_yuji",
+              "ol_nanhualaoxian",
+              "pot_yuji_shadow",
+              "re_zuoci",
+            ],
             names = game.initCharacterList()
-          this.showcaseinterval = setInterval(function () {
+          this.showcaseinterval = setInterval(() => {
             let dx, dy
-            if (num2 % 5 == 0) {
+            if (num2 % 5 === 0) {
               player.classList.add("zoomin3")
               player.hide()
               player.style.transitionDuration = "0.7s"
-              setTimeout(function () {
+              setTimeout(() => {
                 player.style.transitionProperty = "none"
                 player.classList.remove("zoomin3")
                 player.classList.add("zoomout2")
-                setTimeout(function () {
+                setTimeout(() => {
                   player.style.transitionProperty = ""
                   player.classList.remove("zoomout2")
                   num++
-                  let nowName = nameList[num % 4]
+                  const nowName = nameList[num % 4]
                   player.node.avatar.setBackground(nowName, "character")
                   player.show()
                 }, 500)
@@ -1541,22 +1574,20 @@ export default () => {
                     dy = 0
                     break
                 }
-                let card = initPlayer(names.randomGet())
+                const card = initPlayer(names.randomGet())
                 card.style.left = "calc(50% - 52px)"
                 card.style.top = "68px"
                 card.style.position = "absolute"
                 card.style.margin = 0
                 card.style.zIndex = 2
                 card.style.opacity = 0
-                node.appendChild(card)
+                this.appendChild(card)
                 ui.refresh(card)
                 card.style.opacity = 1
-                card.style.transform = "translate(" + dx + "px," + dy + "px)"
+                card.style.transform = `translate(${dx}px,${dy}px)`
                 setTimeout(
-                  (function (card) {
-                    return function () {
-                      card.delete()
-                    }
+                  ((card) => () => {
+                    card.delete()
                   })(card),
                   700,
                 )
@@ -1565,7 +1596,7 @@ export default () => {
             num2++
           }, 700)
         },
-        init: function () {
+        init: () => {
           game.identityVideoName = "三国杀·幻"
           var pack = {
             pack: {
@@ -1684,7 +1715,9 @@ export default () => {
                     order: 6,
                     result: {
                       player(player, target) {
-                        return get.damageEffect(player) + (player.hp > 1 ? 2 : 1)
+                        return (
+                          get.damageEffect(player) + (player.hp > 1 ? 2 : 1)
+                        )
                       },
                     },
                   },
@@ -1695,13 +1728,15 @@ export default () => {
                   filterTarget(card, player, target) {
                     return (
                       player !== target &&
-                      target.getStockSkills("千早爱音", "长崎素世").filter((skill) => {
-                        if (player.hasSkill(skill, null, null, false)) {
-                          return false
-                        }
-                        const info = get.info(skill)
-                        return info && !info.charlotte
-                      }).length
+                      target
+                        .getStockSkills("千早爱音", "长崎素世")
+                        .filter((skill) => {
+                          if (player.hasSkill(skill, null, null, false)) {
+                            return false
+                          }
+                          const info = get.info(skill)
+                          return info && !info.charlotte
+                        }).length
                     )
                   },
                   async content(event, trigger, player) {
@@ -1783,24 +1818,24 @@ export default () => {
                   },
                   filter(event, player) {
                     const cards = player.getExpansions("hhsg_qianhuan")
-                    if (event.name == "damage") {
+                    if (event.name === "damage") {
                       return player.countCards("he", (card) => {
                         return cards.every((cardx) => {
-                          return get.suit(cardx) != get.suit(card)
+                          return get.suit(cardx) !== get.suit(card)
                         })
                       })
                     }
                     if (!["basic", "trick"].includes(get.type(event.card))) {
                       return false
                     }
-                    if (event.targets?.length != 1) {
+                    if (event.targets?.length !== 1) {
                       return false
                     }
                     return cards.length
                   },
                   async cost(event, trigger, player) {
                     const cards = player.getExpansions(event.skill)
-                    if (trigger.name == "damage") {
+                    if (trigger.name === "damage") {
                       event.result = await player
                         .chooseCard(
                           get.prompt(event.skill),
@@ -1828,7 +1863,15 @@ export default () => {
                           }
                           return 0
                         })
-                        .set("eff", get.effect(player, trigger.card, trigger.player, player))
+                        .set(
+                          "eff",
+                          get.effect(
+                            player,
+                            trigger.card,
+                            trigger.player,
+                            player,
+                          ),
+                        )
                         .forResult()
                       if (result.bool) {
                         event.result = {
@@ -1844,7 +1887,7 @@ export default () => {
                       if (player.isUnderControl(true)) {
                         dialog.addAuto(cards)
                       } else {
-                        return "共有" + get.cnNumber(cards.length) + "张牌"
+                        return `共有${get.cnNumber(cards.length)}张牌`
                       }
                     },
                     markcount: "expansion",
@@ -1856,8 +1899,12 @@ export default () => {
                     }
                   },
                   async content(event, trigger, player) {
-                    if (trigger.name == "damage") {
-                      const next = player.addToExpansion(event.cards, "giveAuto", player)
+                    if (trigger.name === "damage") {
+                      const next = player.addToExpansion(
+                        event.cards,
+                        "giveAuto",
+                        player,
+                      )
                       next.gaintag.add(event.name)
                       await next
                     } else {
@@ -1918,7 +1965,7 @@ export default () => {
                     global: "chooseToGainViceBegin",
                   },
                   filter(event, player) {
-                    return event.player != player && !event.fromJinghe
+                    return event.player !== player && !event.fromJinghe
                   },
                   logTarget: "player",
                   async content(event, trigger, player) {
@@ -1932,7 +1979,10 @@ export default () => {
                       const gains = list.randomGets(2)
                       const result = await player
                         .chooseButton(
-                          ["###经合###选择作为副将的武将牌", [gains, "character"]],
+                          [
+                            "###经合###选择作为副将的武将牌",
+                            [gains, "character"],
+                          ],
                           true,
                         )
                         .forResult()
@@ -1940,7 +1990,7 @@ export default () => {
                         return
                       }
                       await player.gainNewVice(result.links)
-                      let num = player.viceCharacters.length - 3
+                      const num = player.viceCharacters.length - 3
                       if (num > 0) {
                         await player.chooseToRemoveVice(num)
                       }
@@ -1954,7 +2004,8 @@ export default () => {
                 hhsg_tianshu_info:
                   "出牌阶段限一次，若你的体力值大于1，你可以对自己造成1点伤害，然后摸两张牌。",
                 hhsg_sadou: "撒豆成兵",
-                hhsg_sadou_info: "出牌阶段，对你使用。你随机获得一张未加入游戏的武将牌作为副将。",
+                hhsg_sadou_info:
+                  "出牌阶段，对你使用。你随机获得一张未加入游戏的武将牌作为副将。",
                 hhsg_tianshu_skill: "天书残卷",
                 hhsg_tianshu_skill_info:
                   "出牌阶段限一次，若你的体力值大于1，你可以对自己造成1点伤害，然后摸两张牌。",
@@ -1976,7 +2027,8 @@ export default () => {
                 hhsg_nanhualaoxian: "幻南华老仙",
                 hhsg_nanhualaoxian_prefix: "幻",
                 hhsg_jidao: "祭祷",
-                hhsg_jidao_info: "主将技，一名角色移除武将牌时，你可以摸一张牌。",
+                hhsg_jidao_info:
+                  "主将技，一名角色移除武将牌时，你可以摸一张牌。",
                 hhsg_feisheng: "飞升",
                 hhsg_feisheng_info:
                   "副将技，此武将牌被移除时，你可以选择一项：1.恢复1点体力；2.摸两张牌。",
@@ -1987,7 +2039,9 @@ export default () => {
             },
             get: {
               viceCharacterList() {
-                let list = (_status.characterlist ?? game.initCharacterList()).slice(0)
+                const list = (
+                  _status.characterlist ?? game.initCharacterList()
+                ).slice(0)
                 game.filterPlayer2().forEach((current) => {
                   list.removeArray(get.nameList(current))
                   list.removeArray(get.viceCharacter(current))
@@ -2011,7 +2065,10 @@ export default () => {
                 }
                 const result = await player
                   .chooseButton(
-                    [`选择移除${get.cnNumber(num)}名副将`, [player.viceCharacters, "character"]],
+                    [
+                      `选择移除${get.cnNumber(num)}名副将`,
+                      [player.viceCharacters, "character"],
+                    ],
                     num,
                     true,
                   )
@@ -2037,7 +2094,7 @@ export default () => {
                 }
                 const gains = list.randomGets(event.num)
                 await player.gainNewVice(gains)
-                let num = player.viceCharacters.length - 3
+                const num = player.viceCharacters.length - 3
                 if (num > 0) {
                   await player.chooseToRemoveVice(num)
                 }
@@ -2058,7 +2115,9 @@ export default () => {
                 }
                 if (
                   get.viceCharacter(this).some((name) => {
-                    return game.expandSkills(get.character(name, 3).slice(0)).includes(skill)
+                    return game
+                      .expandSkills(get.character(name, 3).slice(0))
+                      .includes(skill)
                   })
                 ) {
                   return true
@@ -2074,7 +2133,9 @@ export default () => {
                 }
                 if (
                   get.nameList(this).some((name) => {
-                    return game.expandSkills(get.character(name, 3).slice(0)).includes(skill)
+                    return game
+                      .expandSkills(get.character(name, 3).slice(0))
+                      .includes(skill)
                   })
                 ) {
                   return true
@@ -2102,17 +2163,17 @@ export default () => {
                 if (!Array.isArray(vices)) {
                   vices = [vices]
                 }
-                const player = this
-                player.viceCharacters ??= []
-                player.viceCharacters.addArray(vices)
+
+                this.viceCharacters ??= []
+                this.viceCharacters.addArray(vices)
                 game.broadcastAll(
-                  function (player, list) {
+                  (player, list) => {
                     const cards = []
                     for (let i = 0; i < list.length; i++) {
-                      const cardname = "huashen_card_" + list[i]
+                      const cardname = `huashen_card_${list[i]}`
                       lib.card[cardname] = {
                         fullimage: true,
-                        image: "character/" + list[i],
+                        image: `character/${list[i]}`,
                       }
                       lib.translate[cardname] = get.rawName2(list[i])
                       const card = game.createCard(cardname, "", "")
@@ -2121,11 +2182,16 @@ export default () => {
                     }
                     player.$draw(cards, "nobroadcast")
                   },
-                  player,
+                  this,
                   vices,
                 )
-                game.log(player, "获得了", "#g副将", `#y${get.translation(vices)}`)
-                vices.forEach((name) => player.flashAvatar(null, name))
+                game.log(
+                  this,
+                  "获得了",
+                  "#g副将",
+                  `#y${get.translation(vices)}`,
+                )
+                vices.forEach((name) => this.flashAvatar(null, name))
                 const next = game.createEvent("gainVice")
                 next.player = this
                 next.vices = vices
@@ -2146,17 +2212,17 @@ export default () => {
                 if (!Array.isArray(vices)) {
                   vices = [vices]
                 }
-                const player = this
-                player.viceCharacters ??= []
-                player.viceCharacters.removeArray(vices)
+
+                this.viceCharacters ??= []
+                this.viceCharacters.removeArray(vices)
                 game.broadcastAll(
-                  function (player, list) {
+                  (player, list) => {
                     const cards = []
                     for (let i = 0; i < list.length; i++) {
-                      const cardname = "huashen_card_" + list[i]
+                      const cardname = `huashen_card_${list[i]}`
                       lib.card[cardname] = {
                         fullimage: true,
-                        image: "character/" + list[i],
+                        image: `character/${list[i]}`,
                       }
                       lib.translate[cardname] = get.rawName2(list[i])
                       const card = game.createCard(cardname, "", "")
@@ -2165,10 +2231,15 @@ export default () => {
                     }
                     player.$throw(cards, 1000, "nobroadcast")
                   },
-                  player,
+                  this,
                   vices,
                 )
-                game.log(player, "移去了", "#g副将", `#y${get.translation(vices)}`)
+                game.log(
+                  this,
+                  "移去了",
+                  "#g副将",
+                  `#y${get.translation(vices)}`,
+                )
                 const next = game.createEvent("removeVice")
                 next.player = this
                 next.vices = vices
@@ -2188,7 +2259,7 @@ export default () => {
             },
             game: {},
           }
-          var func = function (pack) {
+          var func = (pack) => {
             for (var i in pack.pack) {
               for (var j in pack.pack[i]) {
                 lib[i][j] = pack.pack[i][j]
@@ -2211,9 +2282,9 @@ export default () => {
           func(pack)
         },
         content: {
-          cardPile: function (list) {
+          cardPile: (list) => {
             for (let i = 0; i < list.length; i++) {
-              if (list[i][2] == "muniu") {
+              if (list[i][2] === "muniu") {
                 list[i][2] = "hhsg_tianshu"
               }
               if (
@@ -2232,40 +2303,39 @@ export default () => {
         mode: "identity",
         intro: "牌堆中额外添加10%的毒",
         showcase: function (init) {
-          var node = this
-          var func = function () {
+          var func = () => {
             var card = game.createCard("du", "noclick")
-            node.nodes.push(card)
+            this.nodes.push(card)
             card.style.position = "absolute"
             var rand1 = Math.round(Math.random() * 100)
             var rand2 = Math.round(Math.random() * 100)
             var rand3 = Math.round(Math.random() * 40) - 20
-            card.style.left = "calc(" + rand1 + "% - " + rand1 + "px)"
-            card.style.top = "calc(" + rand2 + "% - " + rand2 + "px)"
-            card.style.transform = "scale(0.8) rotate(" + rand3 + "deg)"
+            card.style.left = `calc(${rand1}% - ${rand1}px)`
+            card.style.top = `calc(${rand2}% - ${rand2}px)`
+            card.style.transform = `scale(0.8) rotate(${rand3}deg)`
             card.style.opacity = 0
-            node.appendChild(card)
+            this.appendChild(card)
             ui.refresh(card)
             card.style.opacity = 1
-            card.style.transform = "scale(1) rotate(" + rand3 + "deg)"
-            if (node.nodes.length > 7) {
-              setTimeout(function () {
-                while (node.nodes.length > 5) {
-                  node.nodes.shift().delete()
+            card.style.transform = `scale(1) rotate(${rand3}deg)`
+            if (this.nodes.length > 7) {
+              setTimeout(() => {
+                while (this.nodes.length > 5) {
+                  this.nodes.shift().delete()
                 }
               }, 500)
             }
           }
           if (init) {
-            node.nodes = []
+            this.nodes = []
             for (var i = 0; i < 5; i++) {
               func()
             }
           }
-          node.showcaseinterval = setInterval(func, 1000)
+          this.showcaseinterval = setInterval(func, 1000)
         },
         content: {
-          cardPile: function (list) {
+          cardPile: (list) => {
             game.identityVideoName = "毒战三国杀"
             lib.config.bannedcards.remove("du")
             if (game.bannedcards) {
@@ -2288,7 +2358,6 @@ export default () => {
         mode: "identity",
         intro: "牌堆中所有普通锦囊牌数量翻倍；移除拥有集智技能的角色",
         showcase: function (init) {
-          var node = this
           var player1, player2
           if (init) {
             player1 = ui.create.player(null, true).init("huangyueying")
@@ -2320,7 +2389,7 @@ export default () => {
             player2 = this.player2
           }
 
-          var createCard = function (wuxie) {
+          var createCard = (wuxie) => {
             var card
             if (wuxie) {
               card = game.createCard("wuxie", "noclick")
@@ -2335,7 +2404,7 @@ export default () => {
             return card
           }
 
-          var func = function () {
+          var func = () => {
             game.linexy(
               [
                 player1.getLeft() + player1.offsetWidth / 2,
@@ -2343,22 +2412,22 @@ export default () => {
                 player2.getLeft() + player2.offsetWidth / 2,
                 player2.getTop() + player2.offsetHeight / 2,
               ],
-              node,
+              this,
             )
             var card = createCard(true)
             card.style.left = "43px"
             card.style.top = "58px"
-            node.appendChild(card)
+            this.appendChild(card)
             ui.refresh(card)
             card.style.opacity = 1
             card.style.transform = "scale(0.9) translate(137px,152px)"
-            setTimeout(function () {
+            setTimeout(() => {
               card.delete()
             }, 1000)
             player1.node.count.innerHTML = "1"
 
-            setTimeout(function () {
-              if (!node.showcaseinterval) {
+            setTimeout(() => {
+              if (!this.showcaseinterval) {
                 return
               }
               player1.node.count.innerHTML = "2"
@@ -2366,17 +2435,17 @@ export default () => {
               card.style.left = "43px"
               card.style.top = "58px"
               card.style.transform = "scale(0.9) translate(137px,152px)"
-              node.appendChild(card)
+              this.appendChild(card)
               ui.refresh(card)
               card.style.opacity = 1
               card.style.transform = "scale(0.9)"
-              setTimeout(function () {
+              setTimeout(() => {
                 card.delete()
               }, 1000)
             }, 300)
 
-            setTimeout(function () {
-              if (!node.showcaseinterval) {
+            setTimeout(() => {
+              if (!this.showcaseinterval) {
                 return
               }
               player2.node.count.innerHTML = "1"
@@ -2387,22 +2456,22 @@ export default () => {
                   player1.getLeft() + player1.offsetWidth / 2,
                   player1.getTop() + player1.offsetHeight / 2,
                 ],
-                node,
+                this,
               )
               var card = createCard(true)
               card.style.left = "auto"
               card.style.right = "43px"
               card.style.top = "58px"
-              node.appendChild(card)
+              this.appendChild(card)
               ui.refresh(card)
               card.style.opacity = 1
               card.style.transform = "scale(0.9) translate(-137px,152px)"
-              setTimeout(function () {
+              setTimeout(() => {
                 card.delete()
               }, 700)
 
-              setTimeout(function () {
-                if (!node.showcaseinterval) {
+              setTimeout(() => {
+                if (!this.showcaseinterval) {
                   return
                 }
                 player2.node.count.innerHTML = "2"
@@ -2411,20 +2480,20 @@ export default () => {
                 card.style.right = "43px"
                 card.style.top = "58px"
                 card.style.transform = "scale(0.9) translate(-137px,152px)"
-                node.appendChild(card)
+                this.appendChild(card)
                 ui.refresh(card)
                 card.style.opacity = 1
                 card.style.transform = "scale(0.9)"
-                setTimeout(function () {
+                setTimeout(() => {
                   card.delete()
                 }, 700)
               }, 300)
             }, 1000)
           }
-          node.showcaseinterval = setInterval(func, 2200)
+          this.showcaseinterval = setInterval(func, 2200)
           func()
         },
-        init: function () {
+        init: () => {
           for (const i in lib.character) {
             const { skills } = get.character(i),
               checked = []
@@ -2433,7 +2502,7 @@ export default () => {
                 return false
               }
               checked.add(skill)
-              if (lib.translate[skill] == "集智") {
+              if (lib.translate[skill] === "集智") {
                 return true
               }
               let { derivation } = get.info(skill)
@@ -2451,12 +2520,12 @@ export default () => {
           }
         },
         content: {
-          cardPile: function (list) {
+          cardPile: (list) => {
             game.identityVideoName = "导师月英"
             var list2 = []
             for (var i = 0; i < list.length; i++) {
               list2.push(list[i])
-              if (get.type(list[i][2]) == "trick") {
+              if (get.type(list[i][2]) === "trick") {
                 list2.push(list[i])
               }
             }
@@ -2474,38 +2543,39 @@ export default () => {
           "受到杀造成的伤害后战神印记将移到伤害来源的武将牌上",
         ],
         showcase: function (init) {
-          var node = this
           var player
           if (init) {
             player = ui.create.player(null, true)
             player.node.avatar.style.backgroundSize = "cover"
-            player.node.avatar.setBackgroundImage("image/mode/boss/character/boss_lvbu2.jpg")
+            player.node.avatar.setBackgroundImage(
+              "image/mode/boss/character/boss_lvbu2.jpg",
+            )
             player.node.avatar.show()
             player.style.left = "calc(50% - 75px)"
             player.style.top = "20px"
             player.node.count.remove()
             player.node.hp.remove()
             player.style.transition = "all 0.5s"
-            node.appendChild(player)
-            node.playernode = player
+            this.appendChild(player)
+            this.playernode = player
           } else {
-            player = node.playernode
+            player = this.playernode
           }
           var num = 0
           var num2 = 0
-          this.showcaseinterval = setInterval(function () {
+          this.showcaseinterval = setInterval(() => {
             var dx, dy
-            if (num2 % 5 == 0) {
+            if (num2 % 5 === 0) {
               // player.addTempClass('target');
               // player.addTempClass('zoomin');
               player.classList.add("zoomin3")
               player.hide()
               player.style.transitionDuration = "0.7s"
-              setTimeout(function () {
+              setTimeout(() => {
                 player.style.transitionProperty = "none"
                 player.classList.remove("zoomin3")
                 player.classList.add("zoomout2")
-                setTimeout(function () {
+                setTimeout(() => {
                   player.style.transitionProperty = ""
                   player.classList.remove("zoomout2")
                   player.show()
@@ -2541,15 +2611,13 @@ export default () => {
                 card.style.margin = 0
                 card.style.zIndex = 2
                 card.style.opacity = 0
-                node.appendChild(card)
+                this.appendChild(card)
                 ui.refresh(card)
                 card.style.opacity = 1
-                card.style.transform = "translate(" + dx + "px," + dy + "px)"
+                card.style.transform = `translate(${dx}px,${dy}px)`
                 setTimeout(
-                  (function (card) {
-                    return function () {
-                      card.delete()
-                    }
+                  ((card) => () => {
+                    card.delete()
                   })(card),
                   700,
                 )
@@ -2561,7 +2629,7 @@ export default () => {
             }
           }, 700)
         },
-        init: function () {
+        init: () => {
           game.identityVideoName = "唯我独尊"
           lib.skill.weiwoduzun = {
             mark: true,
@@ -2573,20 +2641,17 @@ export default () => {
               damage: {
                 trigger: { source: "damageBegin" },
                 forced: true,
-                filter: function (event) {
-                  return event.card && event.card.name == "sha" && event.notLink()
-                },
-                content: function () {
+                filter: (event) =>
+                  event.card && event.card.name === "sha" && event.notLink(),
+                content: () => {
                   trigger.num++
                 },
               },
               lose: {
                 trigger: { player: "damageEnd" },
                 forced: true,
-                filter: function (event) {
-                  return event.source && event.source.isAlive()
-                },
-                content: function () {
+                filter: (event) => event.source?.isAlive(),
+                content: () => {
                   player.removeSkill("weiwoduzun")
                   trigger.source.addSkill("weiwoduzun")
                 },
@@ -2597,10 +2662,10 @@ export default () => {
           lib.translate.weiwoduzun_bg = "尊"
         },
         content: {
-          cardPile: function (list) {
+          cardPile: (list) => {
             var num = 0
             for (var i = 0; i < list.length; i++) {
-              if (list[i][2] == "sha") {
+              if (list[i][2] === "sha") {
                 num++
               }
             }
@@ -2626,8 +2691,8 @@ export default () => {
             }
             return list
           },
-          gameStart: function () {
-            if (_status.mode == "zhong") {
+          gameStart: () => {
+            if (_status.mode === "zhong") {
               game.zhong.addSkill("weiwoduzun")
             } else {
               game.zhu.addSkill("weiwoduzun")
@@ -2641,8 +2706,7 @@ export default () => {
         submode: "2v2",
         intro: "姓氏相同的武将组合一队",
         showcase: function (init) {
-          var node = this
-          var getList = function () {
+          var getList = () => {
             var list = [
               ["guanyu", "guanping", "guansuo", "guanyinping"],
               ["caocao", "caopi", "caozhi", "caorui"],
@@ -2658,56 +2722,56 @@ export default () => {
             for (var i = 0; i < list.length; i++) {
               list2 = list2.concat(list[i])
             }
-            node.list = list2
+            this.list = list2
           }
-          var func = function () {
-            if (!node.list.length) {
+          var func = () => {
+            if (!this.list.length) {
               getList()
             }
             var card = ui.create.player(null, true)
-            card.init(node.list.shift())
+            card.init(this.list.shift())
             card.node.marks.remove()
             card.node.count.remove()
             card.node.hp.remove()
-            node.nodes.push(card)
+            this.nodes.push(card)
             card.style.position = "absolute"
             var rand1 = Math.round(Math.random() * 100)
             var rand2 = Math.round(Math.random() * 100)
             var rand3 = Math.round(Math.random() * 40) - 20
-            card.style.left = "calc(" + rand1 + "% - " + rand1 * 1.5 + "px)"
-            card.style.top = "calc(" + rand2 + "% - " + rand2 * 1.8 + "px)"
-            card.style.transform = "scale(1.2) rotate(" + rand3 + "deg)"
+            card.style.left = `calc(${rand1}% - ${rand1 * 1.5}px)`
+            card.style.top = `calc(${rand2}% - ${rand2 * 1.8}px)`
+            card.style.transform = `scale(1.2) rotate(${rand3}deg)`
             card.style.opacity = 0
             ui.refresh(card)
-            node.appendChild(card)
+            this.appendChild(card)
             ui.refresh(card)
-            card.style.transform = "scale(0.9) rotate(" + rand3 + "deg)"
+            card.style.transform = `scale(0.9) rotate(${rand3}deg)`
             card.style.opacity = 1
-            if (node.nodes.length > 4) {
-              setTimeout(function () {
-                while (node.nodes.length > 3) {
-                  node.nodes.shift().delete()
+            if (this.nodes.length > 4) {
+              setTimeout(() => {
+                while (this.nodes.length > 3) {
+                  this.nodes.shift().delete()
                 }
               }, 500)
             }
           }
-          node.list = []
+          this.list = []
           if (init) {
-            node.nodes = []
+            this.nodes = []
             for (var i = 0; i < 3; i++) {
               func()
             }
           }
-          node.showcaseinterval = setInterval(func, 1000)
+          this.showcaseinterval = setInterval(func, 1000)
         },
-        init: function () {
+        init: () => {
           var map = {}
           var map3 = []
           for (var i in lib.character) {
             if (lib.filter.characterDisabled(i)) {
               continue
             }
-            if (lib.character[i][1] == "key") {
+            if (lib.character[i][1] === "key") {
               continue
             }
             var list = get.characterSurname(i)
@@ -2735,10 +2799,10 @@ export default () => {
         content: {
           submode: "two",
           chooseCharacterFixed: true,
-          chooseCharacter: function (list, player) {
+          chooseCharacter: (list, player) => {
             game.versusVideoName = "同姓之争"
             _status.noReplaceCharacter = true
-            if (player.side == game.me.side) {
+            if (player.side === game.me.side) {
               if (_status.brawl.mylist) {
                 return _status.brawl.mylist.randomGets(2)
               }
@@ -2749,7 +2813,7 @@ export default () => {
             }
             var surname = _status.brawl.map3.randomRemove()
             var list = _status.brawl.map[surname]
-            if (player == game.me) {
+            if (player === game.me) {
               _status.brawl.mylist = list
             } else {
               _status.brawl.enemylist = list
@@ -2766,12 +2830,10 @@ export default () => {
           "其余玩家从曹休、文聘、曹洪、张郃、夏侯渊、徐晃、许褚这些武将中随机选中一个",
           "游戏开始时将麒麟弓和爪黄飞电各置于每名角色的装备区内，大宛马洗入牌堆，移除其他的武器牌和坐骑牌",
         ],
-        init: function () {
+        init: () => {
           game.saveConfig("player_number", "8", "identity")
-          game.saveConfig("double_character", false, "identity")
         },
         showcase: function (init) {
-          var node = this
           var list = [
             "re_caoxiu",
             "re_wenpin",
@@ -2783,48 +2845,48 @@ export default () => {
           ]
           list.randomSort()
           list.push("re_caocao")
-          var func = function () {
+          var func = () => {
             var card = ui.create.player(null, true)
             card.init(list.shift())
             card.node.marks.remove()
             card.node.count.remove()
             card.node.hp.remove()
-            node.nodes.push(card)
+            this.nodes.push(card)
             card.style.position = "absolute"
             card.style.zIndex = 2
             card.style.transition = "all 2s"
             var rand1 = Math.round(Math.random() * 100)
             var rand2 = Math.round(Math.random() * 100)
             var rand3 = Math.round(Math.random() * 40) - 20
-            card.style.left = "calc(" + rand1 + "% - " + rand1 * 1.5 + "px)"
-            card.style.top = "calc(" + rand2 + "% - " + rand2 * 1.8 + "px)"
-            card.style.transform = "scale(0.8) rotate(" + rand3 + "deg)"
-            node.appendChild(card)
+            card.style.left = `calc(${rand1}% - ${rand1 * 1.5}px)`
+            card.style.top = `calc(${rand2}% - ${rand2 * 1.8}px)`
+            card.style.transform = `scale(0.8) rotate(${rand3}deg)`
+            this.appendChild(card)
             ui.refresh(card)
           }
 
           var list2 = ["qilin", "dayuan", "zhuahuang"]
-          var func2 = function () {
+          var func2 = () => {
             var card = game.createCard(list2.shift(), "noclick")
-            node.nodes.push(card)
+            this.nodes.push(card)
             card.style.position = "absolute"
             card.style.zIndex = 2
             card.style.transition = "all 2s"
             var rand1 = Math.round(Math.random() * 100)
             var rand2 = Math.round(Math.random() * 100)
             var rand3 = Math.round(Math.random() * 40) - 20
-            card.style.left = "calc(" + rand1 + "% - " + rand1 + "px)"
-            card.style.top = "calc(" + rand2 + "% - " + rand2 + "px)"
-            card.style.transform = "rotate(" + rand3 + "deg)"
-            node.appendChild(card)
+            card.style.left = `calc(${rand1}% - ${rand1}px)`
+            card.style.top = `calc(${rand2}% - ${rand2}px)`
+            card.style.transform = `rotate(${rand3}deg)`
+            this.appendChild(card)
             ui.refresh(card)
           }
 
           if (init) {
-            node.nodes = []
+            this.nodes = []
           } else {
-            while (node.nodes.length) {
-              node.nodes.shift().remove()
+            while (this.nodes.length) {
+              this.nodes.shift().remove()
             }
           }
           for (var i = 0; i < 5; i++) {
@@ -2834,23 +2896,23 @@ export default () => {
             func2()
             func()
           }
-          var func3 = function () {
-            for (var i = 0; i < node.nodes.length; i++) {
-              var card = node.nodes[i]
+          var func3 = () => {
+            for (var i = 0; i < this.nodes.length; i++) {
+              var card = this.nodes[i]
               if (card.classList.contains("player")) {
                 var rand1 = Math.round(Math.random() * 100)
                 var rand2 = Math.round(Math.random() * 100)
                 var rand3 = Math.round(Math.random() * 40) - 20
-                card.style.left = "calc(" + rand1 + "% - " + rand1 * 1.5 + "px)"
-                card.style.top = "calc(" + rand2 + "% - " + rand2 * 1.8 + "px)"
-                card.style.transform = "scale(0.8) rotate(" + rand3 + "deg)"
+                card.style.left = `calc(${rand1}% - ${rand1 * 1.5}px)`
+                card.style.top = `calc(${rand2}% - ${rand2 * 1.8}px)`
+                card.style.transform = `scale(0.8) rotate(${rand3}deg)`
               } else {
                 var rand1 = Math.round(Math.random() * 100)
                 var rand2 = Math.round(Math.random() * 100)
                 var rand3 = Math.round(Math.random() * 40) - 20
-                card.style.left = "calc(" + rand1 + "% - " + rand1 + "px)"
-                card.style.top = "calc(" + rand2 + "% - " + rand2 + "px)"
-                card.style.transform = "rotate(" + rand3 + "deg)"
+                card.style.left = `calc(${rand1}% - ${rand1}px)`
+                card.style.top = `calc(${rand2}% - ${rand2}px)`
+                card.style.transform = `rotate(${rand3}deg)`
               }
             }
           }
@@ -2858,10 +2920,14 @@ export default () => {
           // node.showcaseinterval=setInterval(func3,5000);
         },
         content: {
-          cardPile: function (list) {
+          cardPile: (list) => {
             for (var i = 0; i < list.length; i++) {
               var subtype = get.subtype(list[i][2])
-              if (subtype == "equip1" || subtype == "equip3" || subtype == "equip4") {
+              if (
+                subtype === "equip1" ||
+                subtype === "equip3" ||
+                subtype === "equip4"
+              ) {
                 list.splice(i--, 1)
               }
             }
@@ -2874,7 +2940,7 @@ export default () => {
             }
             return list
           },
-          gameStart: function () {
+          gameStart: () => {
             game.identityVideoName = "铜雀夺袍"
             for (var i = 0; i < game.players.length; i++) {
               game.players[i].$equip(game.createCard("qilin"))
@@ -2892,23 +2958,21 @@ export default () => {
             "re_xuzhu",
           ],
           chooseCharacterFixed: true,
-          chooseCharacterAi: function (player) {
-            if (player == game.zhu) {
+          chooseCharacterAi: (player) => {
+            if (player === game.zhu) {
               player.init("re_caocao")
             } else {
               _status.brawl.list.remove(game.me.name)
               player.init(_status.brawl.list.randomRemove())
             }
           },
-          chooseCharacter: function () {
+          chooseCharacter: () => {
             _status.noReplaceCharacter = true
-            if (game.me == game.zhu) {
+            if (game.me === game.zhu) {
               return ["re_caocao"]
-            } else {
-              _status.brawl.list.randomSort()
-              return _status.brawl.list
-              // return _status.brawl.list.randomGets(1);
             }
+            _status.brawl.list.randomSort()
+            return _status.brawl.list
           },
         },
       },
@@ -2932,12 +2996,12 @@ export default () => {
           }
           var lx = this.offsetWidth / 2 - 120
           var ly = Math.min(lx, this.offsetHeight / 2 - 60)
-          var setPos = function (node) {
+          var setPos = (node) => {
             var i = node.index
             var deg = (Math.PI / 4) * i
             var dx = Math.round(lx * Math.cos(deg))
             var dy = Math.round(ly * Math.sin(deg))
-            node.style.transform = "translate(" + dx + "px," + dy + "px)"
+            node.style.transform = `translate(${dx}px,${dy}px)`
           }
           for (var i = 0; i < 8; i++) {
             var node = ui.create.player(null, true)
@@ -2957,7 +3021,7 @@ export default () => {
             this.appendChild(node)
           }
           var nodes = this.nodes
-          this.showcaseinterval = setInterval(function () {
+          this.showcaseinterval = setInterval(() => {
             for (var i = 0; i < nodes.length; i++) {
               nodes[i].index++
               if (nodes[i].index > 7) {
@@ -2968,14 +3032,10 @@ export default () => {
           }, 1000)
         },
         content: {
-          gameStart: function () {
+          gameStart: () => {
             game.identityVideoName = "同将模式"
-            var target = _status.mode == "zhong" ? game.zhong : game.zhu
-            if (get.config("double_character")) {
-              target.init(game.me.name1, game.me.name2)
-            } else {
-              target.init(game.me.name1)
-            }
+            var target = _status.mode === "zhong" ? game.zhong : game.zhu
+            target.init(game.me.name1)
             target.hp++
             target.maxHp++
             target.update()
@@ -2983,7 +3043,7 @@ export default () => {
               var list = lib.group.slice(0)
               list.remove("shen")
               game.players.forEach((i) => {
-                if (i.group == "shen" && i != game.me) {
+                if (i.group === "shen" && i !== game.me) {
                   var group = list.randomGet()
                   i.group = group
                   i.node.name.dataset.nature = get.groupnature(group)
@@ -2992,30 +3052,23 @@ export default () => {
               })
             }
           },
-          chooseCharacterAi: function (player, list, list2, back) {
-            if (player == game.zhu) {
+          chooseCharacterAi: (player, list, list2, back) => {
+            if (player === game.zhu) {
               return
-            } else {
-              if (get.config("double_character")) {
-                player.init(game.me.name1, game.me.name2)
-              } else {
-                player.init(game.me.name1)
-              }
             }
+            player.init(game.me.name1)
           },
-          chooseCharacter: function (list, list2, num) {
-            if (game.me != game.zhu) {
+          chooseCharacter: (list, list2, num) => {
+            if (game.me !== game.zhu) {
               return list.slice(0, list2)
-            } else {
-              if (_status.event.zhongmode) {
-                return list.slice(0, 6)
-              } else {
-                return list.concat(list2.slice(0, num))
-              }
             }
+            if (_status.event.zhongmode) {
+              return list.slice(0, 6)
+            }
+            return list.concat(list2.slice(0, num))
           },
-          chooseCharacterBefore: function () {
-            if (_status.mode == "purple") {
+          chooseCharacterBefore: () => {
+            if (_status.mode === "purple") {
               _status.mode = "normal"
             }
           },
@@ -3027,8 +3080,7 @@ export default () => {
         submode: "2v2",
         intro: "势力相同的武将组合一队，获得专属势力技能",
         showcase: function (init) {
-          var node = this
-          var getList = function () {
+          var getList = () => {
             var list = [
               ["liubei", "guanyu", "zhangfei"],
               ["caocao", "guojia", "xunyu"],
@@ -3044,53 +3096,53 @@ export default () => {
             for (var i = 0; i < list.length; i++) {
               list2 = list2.concat(list[i])
             }
-            node.list = list2
+            this.list = list2
           }
-          var func = function () {
-            if (!node.list.length) {
+          var func = () => {
+            if (!this.list.length) {
               getList()
             }
             var card = ui.create.player(null, true)
-            card.init(node.list.shift())
+            card.init(this.list.shift())
             card.node.marks.remove()
             card.node.count.remove()
             card.node.hp.remove()
-            node.nodes.push(card)
+            this.nodes.push(card)
             card.style.position = "absolute"
             var rand1 = Math.round(Math.random() * 100)
             var rand2 = Math.round(Math.random() * 100)
             var rand3 = Math.round(Math.random() * 40) - 20
-            card.style.left = "calc(" + rand1 + "% - " + rand1 * 1.5 + "px)"
-            card.style.top = "calc(" + rand2 + "% - " + rand2 * 1.8 + "px)"
-            card.style.transform = "scale(1.2) rotate(" + rand3 + "deg)"
+            card.style.left = `calc(${rand1}% - ${rand1 * 1.5}px)`
+            card.style.top = `calc(${rand2}% - ${rand2 * 1.8}px)`
+            card.style.transform = `scale(1.2) rotate(${rand3}deg)`
             card.style.opacity = 0
             ui.refresh(card)
-            node.appendChild(card)
+            this.appendChild(card)
             ui.refresh(card)
-            card.style.transform = "scale(0.9) rotate(" + rand3 + "deg)"
+            card.style.transform = `scale(0.9) rotate(${rand3}deg)`
             card.style.opacity = 1
-            if (node.nodes.length > 4) {
-              setTimeout(function () {
-                while (node.nodes.length > 3) {
-                  node.nodes.shift().delete()
+            if (this.nodes.length > 4) {
+              setTimeout(() => {
+                while (this.nodes.length > 3) {
+                  this.nodes.shift().delete()
                 }
               }, 500)
             }
           }
-          node.list = []
+          this.list = []
           if (init) {
-            node.nodes = []
+            this.nodes = []
             for (var i = 0; i < 3; i++) {
               func()
             }
           }
-          node.showcaseinterval = setInterval(func, 1000)
+          this.showcaseinterval = setInterval(func, 1000)
         },
-        init: function () {},
+        init: () => {},
         content: {
           submode: "two",
           chooseCharacterFixed: true,
-          chooseCharacterBefore: function () {
+          chooseCharacterBefore: () => {
             _status.noReplaceCharacter = true
             game.versusVideoName = "家族之争"
             var map = {
@@ -3117,7 +3169,7 @@ export default () => {
               }
             }
             for (var i in map) {
-              if (map[i].length < 8 || (i == "key" && !_status.keyVerified)) {
+              if (map[i].length < 8 || (i === "key" && !_status.keyVerified)) {
                 delete map[i]
               } else {
                 map3.push(i)
@@ -3132,31 +3184,25 @@ export default () => {
                 popup: "魏业",
                 prompt2:
                   "回合开始时，你可以弃置一张牌并指定一名敌方角色，该角色须弃置一张牌，否则你摸一张牌。",
-                filter: function (event, player) {
-                  return player.group == "wei" && player.countCards("he") > 0
-                },
-                content: function () {
+                filter: (event, player) =>
+                  player.group === "wei" && player.countCards("he") > 0,
+                content: () => {
                   "step 0"
                   player.chooseCardTarget({
                     prompt: get.prompt2(event.name),
                     filterCard: lib.filter.cardDiscardable,
-                    filterTarget: function (card, player, target) {
-                      return player.side != target.side
-                    },
+                    filterTarget: (card, player, target) =>
+                      player.side !== target.side,
                     position: "he",
-                    ai1: function (card) {
-                      return 6 - get.value(card)
-                    },
-                    ai2: function (target) {
-                      return 1 / (1 + target.countCards("he"))
-                    },
+                    ai1: (card) => 6 - get.value(card),
+                    ai2: (target) => 1 / (1 + target.countCards("he")),
                   })
                   ;("step 1")
                   if (result.bool) {
                     player.logSkill(event.name, result.targets)
                     player.discard(result.cards)
                     result.targets[0].chooseToDiscard(
-                      "弃置一张牌，或令" + get.translation(player) + "摸一张牌",
+                      `弃置一张牌，或令${get.translation(player)}摸一张牌`,
                       "he",
                     ).ai = lib.skill.zhiheng.check
                   } else {
@@ -3173,25 +3219,24 @@ export default () => {
                 prompt2:
                   "你使用【杀】上限+1；出牌阶段结束时，若你于此阶段使用【杀】次数不少于2，摸一张牌。",
                 mod: {
-                  cardUsable: function (card, player, num) {
-                    if (card.name == "sha" && player.group == "shu") {
+                  cardUsable: (card, player, num) => {
+                    if (card.name === "sha" && player.group === "shu") {
                       return num + 1
                     }
                   },
                 },
                 trigger: { player: "phaseUseEnd" },
                 forced: true,
-                filter: function (event, player) {
-                  return (
-                    player.group == "shu" &&
-                    player.getHistory("useCard", function (evt) {
-                      return (
-                        evt.card && evt.card.name == "sha" && evt.getParent("phaseUse") == event
-                      )
-                    }).length > 1
-                  )
-                },
-                content: function () {
+                filter: (event, player) =>
+                  player.group === "shu" &&
+                  player.getHistory(
+                    "useCard",
+                    (evt) =>
+                      evt.card &&
+                      evt.card.name === "sha" &&
+                      evt.getParent("phaseUse") === event,
+                  ).length > 1,
+                content: () => {
                   player.draw()
                 },
               },
@@ -3199,11 +3244,11 @@ export default () => {
                 trigger: { player: "phaseEnd" },
                 forced: true,
                 popup: "吴耀",
-                prompt2: "回合结束时，若你的手牌数不等于你的体力值，则你摸一张牌。",
-                filter: function (event, player) {
-                  return player.group == "wu" && player.countCards("h") != player.hp
-                },
-                content: function () {
+                prompt2:
+                  "回合结束时，若你的手牌数不等于你的体力值，则你摸一张牌。",
+                filter: (event, player) =>
+                  player.group === "wu" && player.countCards("h") !== player.hp,
+                content: () => {
                   player.draw()
                 },
               },
@@ -3213,13 +3258,11 @@ export default () => {
                   "锁定技，弃牌阶段开始时，若你的手牌数比体力值多2或更多，你本回合手牌上限+1；若你已损失体力值大于1，你手牌上限+1",
                 trigger: { player: "phaseDiscardBegin" },
                 forced: true,
-                filter: function (event, player) {
-                  return (
-                    player.group == "qun" &&
-                    (player.isDamaged() || player.countCards("h") - player.hp > 1)
-                  )
-                },
-                content: function () {
+                filter: (event, player) =>
+                  player.group === "qun" &&
+                  (player.isDamaged() ||
+                    player.countCards("h") - player.hp > 1),
+                content: () => {
                   var num = 0
                   if (player.isDamaged()) {
                     num++
@@ -3236,13 +3279,16 @@ export default () => {
                 popup: "晋势",
                 prompt2:
                   "摸牌阶段结束时，你可以展示你于此阶段内因摸牌而得到的牌。若这些牌的花色均不同，则你摸一张牌。",
-                filter: function (event, player) {
+                filter: (event, player) => {
                   var hs = player.getCards("h")
                   return (
-                    player.group == "jin" &&
+                    player.group === "jin" &&
                     hs.length > 0 &&
-                    player.getHistory("gain", function (evt) {
-                      if (evt.getParent().name != "draw" || evt.getParent("phaseDraw") != event) {
+                    player.getHistory("gain", (evt) => {
+                      if (
+                        evt.getParent().name !== "draw" ||
+                        evt.getParent("phaseDraw") !== event
+                      ) {
                         return false
                       }
                       for (var i of evt.cards) {
@@ -3254,12 +3300,15 @@ export default () => {
                     }).length > 0
                   )
                 },
-                check: function (event, player) {
+                check: (event, player) => {
                   var hs = player.getCards("h"),
                     cards = [],
                     suits = []
-                  player.getHistory("gain", function (evt) {
-                    if (evt.getParent().name != "draw" || evt.getParent("phaseDraw") != event) {
+                  player.getHistory("gain", (evt) => {
+                    if (
+                      evt.getParent().name !== "draw" ||
+                      evt.getParent("phaseDraw") !== event
+                    ) {
                       return false
                     }
                     for (var i of evt.cards) {
@@ -3269,14 +3318,17 @@ export default () => {
                       }
                     }
                   })
-                  return cards.length == suits.length
+                  return cards.length === suits.length
                 },
-                content: function () {
+                content: () => {
                   var hs = player.getCards("h"),
                     cards = [],
                     suits = []
-                  player.getHistory("gain", function (evt) {
-                    if (evt.getParent().name != "draw" || evt.getParent("phaseDraw") != trigger) {
+                  player.getHistory("gain", (evt) => {
+                    if (
+                      evt.getParent().name !== "draw" ||
+                      evt.getParent("phaseDraw") !== trigger
+                    ) {
                       return false
                     }
                     for (var i of evt.cards) {
@@ -3286,8 +3338,11 @@ export default () => {
                       }
                     }
                   })
-                  player.showCards(cards, get.translation(player) + "发动了【晋势】")
-                  if (cards.length == suits.length) {
+                  player.showCards(
+                    cards,
+                    `${get.translation(player)}发动了【晋势】`,
+                  )
+                  if (cards.length === suits.length) {
                     player.draw()
                   }
                 },
@@ -3296,19 +3351,17 @@ export default () => {
                 enable: "phaseUse",
                 usable: 1,
                 popup: "键魂",
-                filter: function (event, player) {
-                  return player.group == "key"
-                },
+                filter: (event, player) => player.group === "key",
                 prompt2:
                   "出牌阶段限一次，你可以摸一张牌并获得1点护甲。若如此做，你于当前回合结束时失去1点体力。",
-                content: function () {
+                content: () => {
                   "step 0"
                   player.draw()
                   ;("step 1")
                   player.changeHujia(1)
                   ;("step 2")
                   var evt = event.getParent("phase")
-                  if (evt && evt.after) {
+                  if (evt?.after) {
                     var next = player.loseHp()
                     event.next.remove(next)
                     evt.after.push(next)
@@ -3317,9 +3370,7 @@ export default () => {
                 ai: {
                   order: 10,
                   result: {
-                    player: function (player) {
-                      return player.hp - 1
-                    },
+                    player: (player) => player.hp - 1,
                   },
                 },
               },
@@ -3327,9 +3378,8 @@ export default () => {
                 noGlobal: true,
                 onremove: true,
                 mod: {
-                  maxHandcard: function (player, num) {
-                    return num + player.countMark("qunxin_temp")
-                  },
+                  maxHandcard: (player, num) =>
+                    num + player.countMark("qunxin_temp"),
                 },
               },
               _jiazu_awaken_wei: {
@@ -3339,10 +3389,9 @@ export default () => {
                 },
                 trigger: { player: "damageEnd" },
                 forced: true,
-                filter: function (event, player) {
-                  return player._jiazuAwaken && player.group == "wei"
-                },
-                content: function () {
+                filter: (event, player) =>
+                  player._jiazuAwaken && player.group === "wei",
+                content: () => {
                   player.draw()
                 },
               },
@@ -3353,15 +3402,12 @@ export default () => {
                 },
                 trigger: { source: "damageEnd" },
                 forced: true,
-                filter: function (event, player) {
-                  return (
-                    player._jiazuAwaken &&
-                    player.group == "shu" &&
-                    event.card &&
-                    event.card.name == "sha"
-                  )
-                },
-                content: function () {
+                filter: (event, player) =>
+                  player._jiazuAwaken &&
+                  player.group === "shu" &&
+                  event.card &&
+                  event.card.name === "sha",
+                content: () => {
                   player.draw()
                 },
               },
@@ -3372,39 +3418,39 @@ export default () => {
                 },
                 trigger: { player: "useCard" },
                 forced: true,
-                filter: function (event, player) {
-                  return (
-                    player._jiazuAwaken && player.group == "wu" && get.type(event.card) == "equip"
-                  )
-                },
-                content: function () {
+                filter: (event, player) =>
+                  player._jiazuAwaken &&
+                  player.group === "wu" &&
+                  get.type(event.card) === "equip",
+                content: () => {
                   player.draw()
                 },
               },
               _jiazu_awaken_qun: {
                 popup: "邺城",
                 intro: {
-                  content: "锁定技，当你使用锦囊牌指定其他角色为目标后，你摸一张牌。",
+                  content:
+                    "锁定技，当你使用锦囊牌指定其他角色为目标后，你摸一张牌。",
                 },
                 trigger: { player: "useCardToPlayered" },
                 forced: true,
-                filter: function (event, player) {
+                filter: (event, player) => {
                   if (
                     !player._jiazuAwaken ||
-                    player.group != "qun" ||
+                    player.group !== "qun" ||
                     !event.isFirstTarget ||
-                    get.type(event.card, "trick") != "trick"
+                    get.type(event.card, "trick") !== "trick"
                   ) {
                     return false
                   }
                   for (var i = 0; i < event.targets.length; i++) {
-                    if (event.targets[i] != player) {
+                    if (event.targets[i] !== player) {
                       return true
                     }
                   }
                   return false
                 },
-                content: function () {
+                content: () => {
                   player.draw()
                 },
               },
@@ -3415,22 +3461,22 @@ export default () => {
                 },
                 trigger: { player: ["loseHpEnd", "recoverEnd"] },
                 forced: true,
-                filter: function (event, player) {
-                  return player._jiazuAwaken && player.group == "key"
-                },
-                content: function () {
+                filter: (event, player) =>
+                  player._jiazuAwaken && player.group === "key",
+                content: () => {
                   player.draw()
                 },
               },
               _jiazu_awaken_jin: {
                 popup: "洛阳",
                 intro: {
-                  content: "锁定技，结束阶段，若你手牌中的花色数小于3，则你摸一张牌。",
+                  content:
+                    "锁定技，结束阶段，若你手牌中的花色数小于3，则你摸一张牌。",
                 },
                 trigger: { player: "phaseJieshuBegin" },
                 forced: true,
-                filter: function (event, player) {
-                  if (!player._jiazuAwaken || player.group != "jin") {
+                filter: (event, player) => {
+                  if (!player._jiazuAwaken || player.group !== "jin") {
                     return false
                   }
                   var hs = player.getCards("h"),
@@ -3446,19 +3492,18 @@ export default () => {
                   }
                   return true
                 },
-                content: function () {
+                content: () => {
                   player.draw()
                 },
               },
               _jiazu_awaken: {
                 trigger: { global: "die" },
                 forced: true,
-                filter: function (event, player) {
-                  return !player._jiazuAwaken && event.player.side == player.side
-                },
-                content: function () {
+                filter: (event, player) =>
+                  !player._jiazuAwaken && event.player.side === player.side,
+                content: () => {
                   player._jiazuAwaken = true
-                  var name = "_jiazu_awaken_" + player.group
+                  var name = `_jiazu_awaken_${player.group}`
                   if (lib.skill[name]) {
                     player.markSkill(name)
                   }
@@ -3473,8 +3518,8 @@ export default () => {
                 translate[i] = skill[i].popup
               }
               if (skill[i].prompt2) {
-                lib.translate[i + "_info"] = skill[i].prompt2
-                translate[i + "_info"] = skill[i].prompt2
+                lib.translate[`${i}_info`] = skill[i].prompt2
+                translate[`${i}_info`] = skill[i].prompt2
               }
               if (!skill[i].noGlobal) {
                 game.addGlobalSkill(i)
@@ -3494,7 +3539,8 @@ export default () => {
                 },
                 _jiazu_wu: {
                   popup: "吴耀",
-                  prompt2: "回合结束时，若你的手牌数不等于你的体力值，则你摸一张牌。",
+                  prompt2:
+                    "回合结束时，若你的手牌数不等于你的体力值，则你摸一张牌。",
                 },
                 _jiazu_qun: {
                   popup: "群心",
@@ -3532,13 +3578,15 @@ export default () => {
                 _jiazu_awaken_qun: {
                   popup: "邺城",
                   intro: {
-                    content: "锁定技，当你使用锦囊牌指定其他角色为目标后，你摸一张牌。",
+                    content:
+                      "锁定技，当你使用锦囊牌指定其他角色为目标后，你摸一张牌。",
                   },
                 },
                 _jiazu_awaken_jin: {
                   popup: "洛阳",
                   intro: {
-                    content: "锁定技，结束阶段，若你手牌中的花色数小于3，则你摸一张牌。",
+                    content:
+                      "锁定技，结束阶段，若你手牌中的花色数小于3，则你摸一张牌。",
                   },
                 },
                 _jiazu_awaken_key: {
@@ -3552,24 +3600,28 @@ export default () => {
               translate: translate,
             })
           },
-          chooseCharacter: function (list, player) {
-            if (player.side == game.me.side) {
+          chooseCharacter: (list, player) => {
+            if (player.side === game.me.side) {
               if (_status.brawl.mylist) {
-                return _status.brawl.mylist.randomGets(player == game.me ? 5 : 3)
+                return _status.brawl.mylist.randomGets(
+                  player === game.me ? 5 : 3,
+                )
               }
             } else {
               if (_status.brawl.enemylist) {
-                return _status.brawl.enemylist.randomGets(player == game.me ? 5 : 3)
+                return _status.brawl.enemylist.randomGets(
+                  player === game.me ? 5 : 3,
+                )
               }
             }
             var surname = _status.brawl.map3.randomRemove()
             var list = _status.brawl.map[surname]
-            if (player == game.me) {
+            if (player === game.me) {
               _status.brawl.mylist = list
             } else {
               _status.brawl.enemylist = list
             }
-            return list.randomRemove(player == game.me ? 5 : 3)
+            return list.randomRemove(player === game.me ? 5 : 3)
           },
         },
       },
@@ -3578,7 +3630,6 @@ export default () => {
         mode: "versus",
         submode: "2v2",
         showcase: function (init) {
-          var node = this
           var player1, player2
           if (init) {
             player1 = ui.create.player(null, true)
@@ -3610,33 +3661,33 @@ export default () => {
             player1 = this.player1
             player2 = this.player2
           }
-          var func = function () {
-            setTimeout(function () {
+          var func = () => {
+            setTimeout(() => {
               player1.smoothAvatar()
               player2.smoothAvatar()
               player1.node.avatar.setBackground("re_lvmeng", "character")
               player2.node.avatar.setBackground("re_guanyu", "character")
             }, 1500)
-            setTimeout(function () {
+            setTimeout(() => {
               player1.smoothAvatar()
               player2.smoothAvatar()
               player1.node.avatar.setBackground("sp_lvmeng", "character")
               player2.node.avatar.setBackground("jsp_guanyu", "character")
             }, 3000)
-            setTimeout(function () {
+            setTimeout(() => {
               player1.smoothAvatar()
               player2.smoothAvatar()
               player1.node.avatar.setBackground("shen_lvmeng", "character")
               player2.node.avatar.setBackground("shen_guanyu", "character")
             }, 4500)
-            setTimeout(function () {
+            setTimeout(() => {
               player1.smoothAvatar()
               player2.smoothAvatar()
               player1.node.avatar.setBackground("lvmeng", "character")
               player2.node.avatar.setBackground("guanyu", "character")
             }, 6000)
           }
-          node.showcaseinterval = setInterval(func, 6000)
+          this.showcaseinterval = setInterval(func, 6000)
           func()
         },
         intro: [
@@ -3646,17 +3697,15 @@ export default () => {
         ],
         content: {
           submode: "two",
-          chooseCharacterBefore: function () {
+          chooseCharacterBefore: () => {
             game.versusVideoName = "白衣渡江"
-            ;((lib.skill._changeCharacter = {
+            ;(lib.skill._changeCharacter = {
               trigger: { player: ["phaseBefore", "phaseAfter"] },
               forced: true,
               silent: true,
               popup: false,
-              filter: function (event, player) {
-                return player._backupCharacter != undefined
-              },
-              content: function () {
+              filter: (event, player) => player._backupCharacter !== undefined,
+              content: () => {
                 "step 0"
                 player
                   .chooseControl("确定", "取消")
@@ -3664,22 +3713,29 @@ export default () => {
                     "是否替换自己的武将牌？",
                     [[player._backupCharacter], "character"],
                   ])
-                  .set("ai", function () {
-                    return Math.random() < 0.15 ? "确定" : "取消"
-                  })
+                  .set("ai", () => (Math.random() < 0.15 ? "确定" : "取消"))
                 ;("step 1")
-                if (result.control == "确定") {
-                  game.log(player, "将", player.name, "替换为了", player._backupCharacter)
+                if (result.control === "确定") {
+                  game.log(
+                    player,
+                    "将",
+                    player.name,
+                    "替换为了",
+                    player._backupCharacter,
+                  )
                   player.reinit(player.name, player._backupCharacter)
-                  player.changeGroup(lib.character[player._backupCharacter][1], false)
+                  player.changeGroup(
+                    lib.character[player._backupCharacter][1],
+                    false,
+                  )
                   delete player._backupCharacter
                 }
               },
             }),
-              game.addGlobalSkill("_changeCharacter"))
-            game.chooseCharacterTwo = function () {
+              game.addGlobalSkill("_changeCharacter")
+            game.chooseCharacterTwo = () => {
               var next = game.createEvent("chooseCharacter")
-              next.setContent(function () {
+              next.setContent(() => {
                 "step 0"
                 ui.arena.classList.add("choose-character")
                 var bool = Math.random() < 0.5
@@ -3692,24 +3748,25 @@ export default () => {
                 ref.previous.side = !bool2
 
                 var firstChoose = game.players.randomGet()
-                if (firstChoose.next.side == firstChoose.side) {
+                if (firstChoose.next.side === firstChoose.side) {
                   firstChoose = firstChoose.next
                 }
                 _status.firstAct = firstChoose
                 for (var i = 0; i < 4; i++) {
                   firstChoose.node.name.innerHTML = get.verticalStr(
-                    get.cnNumber(i + 1, true) + "号位",
+                    `${get.cnNumber(i + 1, true)}号位`,
                   )
                   firstChoose = firstChoose.next
                 }
 
                 for (var i = 0; i < game.players.length; i++) {
-                  if (game.players[i].side == game.me.side) {
+                  if (game.players[i].side === game.me.side) {
                     game.players[i].node.identity.firstChild.innerHTML = "友"
                   } else {
                     game.players[i].node.identity.firstChild.innerHTML = "敌"
                   }
-                  game.players[i].node.identity.dataset.color = game.players[i].side + "zhu"
+                  game.players[i].node.identity.dataset.color =
+                    `${game.players[i].side}zhu`
                 }
                 var list = []
                 for (i in lib.character) {
@@ -3719,37 +3776,46 @@ export default () => {
                 }
                 var choose = []
                 _status.characterlist = list
-                event.filterChoice = function (name1, name2) {
+                event.filterChoice = (name1, name2) => {
                   var info1 = lib.character[name1]
                   var info2 = lib.character[name2]
                   if (!info1 || !info2) {
                     return
                   }
                   var num = 0
-                  if (info1[0] == info2[0]) {
+                  if (info1[0] === info2[0]) {
                     num++
                   }
-                  if (get.infoMaxHp(info1[2]) == get.infoMaxHp(info2[2])) {
+                  if (get.infoMaxHp(info1[2]) === get.infoMaxHp(info2[2])) {
                     num++
                   }
-                  if (info1[3].length == info2[3].length) {
+                  if (info1[3].length === info2[3].length) {
                     num++
                   }
                   return num > 1
                 }
                 var list2 = list.randomGets(8)
-                var next = game.me.chooseButton(2, true, ["请选择您的武将牌", [list2, "character"]])
+                var next = game.me.chooseButton(2, true, [
+                  "请选择您的武将牌",
+                  [list2, "character"],
+                ])
                 next.set("onfree", true)
-                next.set("filterButton", function (button) {
+                next.set("filterButton", (button) => {
                   if (!ui.selected.buttons.length) {
                     for (var i = 0; i < list2.length; i++) {
-                      if (list2[i] != button.link && event.filterChoice(button.link, list2[i])) {
+                      if (
+                        list2[i] !== button.link &&
+                        event.filterChoice(button.link, list2[i])
+                      ) {
                         return true
                       }
                     }
                     return false
                   }
-                  return event.filterChoice(button.link, ui.selected.buttons[0].link)
+                  return event.filterChoice(
+                    button.link,
+                    ui.selected.buttons[0].link,
+                  )
                 })
                 ;("step 1")
                 game.me.init(result.links[0])
@@ -3757,7 +3823,7 @@ export default () => {
                 _status.characterlist.removeArray(result.links)
                 var list = _status.characterlist
                 for (var i = 0; i < game.players.length; i++) {
-                  if (game.players[i] != game.me) {
+                  if (game.players[i] !== game.me) {
                     list.randomSort()
                     var bool = false
                     for (var k = 0; k < list.length; k++) {
@@ -3775,7 +3841,7 @@ export default () => {
                     }
                   }
                 }
-                setTimeout(function () {
+                setTimeout(() => {
                   ui.arena.classList.remove("choose-character")
                 }, 500)
                 if (get.config("two_phaseswap")) {
@@ -3794,7 +3860,6 @@ export default () => {
         name: "千里单骑",
         mode: "identity",
         showcase: function (init) {
-          var node = this
           var player1
           if (init) {
             player1 = ui.create.player(null, true).init("jsp_guanyu")
@@ -3809,7 +3874,7 @@ export default () => {
           } else {
             player1 = this.player1
           }
-          var func = function () {
+          var func = () => {
             var player2 = ui.create.player(null, true).init("caiyang")
             player2.node.marks.remove()
             player2.node.hp.remove()
@@ -3819,11 +3884,11 @@ export default () => {
             player2.node.count.remove()
             player2.style.transform = "scale(0.7)"
             player2.style.opacity = 0
-            node.appendChild(player2)
+            this.appendChild(player2)
             ui.refresh(player2)
             player2.style.opacity = 1
             player2.style.transform = "scale(0.9)"
-            setTimeout(function () {
+            setTimeout(() => {
               if (!player2) {
                 return
               }
@@ -3834,23 +3899,23 @@ export default () => {
                   player2.getLeft() + player2.offsetWidth / 2,
                   player2.getTop() + player2.offsetHeight / 2,
                 ],
-                node,
+                this,
               )
-              setTimeout(function () {
+              setTimeout(() => {
                 var popup = ui.create.div(".damage")
                 popup.innerHTML = "-1"
                 popup.dataset.nature = "soil"
                 player2.appendChild(popup)
                 ui.refresh(popup)
                 popup.classList.add("damageadded")
-                popup.listenTransition(function () {
-                  setTimeout(function () {
+                popup.listenTransition(() => {
+                  setTimeout(() => {
                     popup.delete()
                   }, 300)
                 })
               }, 250)
             }, 600)
-            setTimeout(function () {
+            setTimeout(() => {
               if (!player2) {
                 return
               }
@@ -3859,7 +3924,7 @@ export default () => {
               player2.delete()
             }, 1200)
           }
-          node.showcaseinterval = setInterval(func, 2600)
+          this.showcaseinterval = setInterval(func, 2600)
           func()
         },
         intro: [
@@ -3870,12 +3935,12 @@ export default () => {
               "关，是否能够突破这一记录呢？"
             : "你能否过五关斩六将，击败古城战神蔡阳呢？",
         ],
-        init: function () {
+        init: () => {
           if (!_status.qianlidanji) {
             _status.qianlidanji = {
               completeNumber: 0,
               used: ["pujing", "huban", "caiyang"],
-              addFellow: function (name) {
+              addFellow: (name) => {
                 game.fan.dataset.position = 2
                 ui.arena.setNumber(3)
                 game.fellow = game.addFellow(1, name)
@@ -3886,7 +3951,10 @@ export default () => {
                 game.fellow.node.identity.classList.remove("guessing")
                 _status.event.getParent("phaseLoop").player = game.fellow
                 game.fellow.actionHistory ??= []
-                while (game.fellow.actionHistory.length < game.zhu.actionHistory.length) {
+                while (
+                  game.fellow.actionHistory.length <
+                  game.zhu.actionHistory.length
+                ) {
                   game.fellow.actionHistory.push({
                     useCard: [],
                     respond: [],
@@ -3904,23 +3972,25 @@ export default () => {
               completeReward: [
                 [
                   "回复1点体力并摸一张牌",
-                  function () {
+                  () => {
                     game.zhu.recover()
                     game.zhu.draw()
                   },
                 ],
                 [
                   "摸三张牌",
-                  function () {
+                  () => {
                     game.zhu.draw(3)
                   },
                 ],
                 [
                   "将一张防具牌置入装备区并摸一张牌",
-                  function () {
-                    var card = get.cardPile(function (card) {
-                      return get.subtype(card) == "equip2" && !get.cardtag(card, "gifts")
-                    })
+                  () => {
+                    var card = get.cardPile(
+                      (card) =>
+                        get.subtype(card) === "equip2" &&
+                        !get.cardtag(card, "gifts"),
+                    )
                     if (card) {
                       game.zhu.equip(card)
                     }
@@ -3929,10 +3999,12 @@ export default () => {
                 ],
                 [
                   "将一张武器牌置入装备区并摸一张牌",
-                  function () {
-                    var card = get.cardPile(function (card) {
-                      return get.subtype(card) == "equip1" && !get.cardtag(card, "gifts")
-                    })
+                  () => {
+                    var card = get.cardPile(
+                      (card) =>
+                        get.subtype(card) === "equip1" &&
+                        !get.cardtag(card, "gifts"),
+                    )
                     if (card) {
                       game.zhu.equip(card)
                     }
@@ -3941,37 +4013,41 @@ export default () => {
                 ],
                 [
                   "回复2点体力并弃置一张牌",
-                  function () {
+                  () => {
                     game.zhu.recover(2)
                     game.zhu.chooseToDiscard("he", true)
                   },
                 ],
                 [
                   "摸五张牌，然后弃置三张牌",
-                  function () {
+                  () => {
                     game.zhu.draw(5)
                     game.zhu.chooseToDiscard(3, "he", true)
                   },
                 ],
                 [
                   "摸五张牌，然后对手摸两张牌",
-                  function () {
+                  () => {
                     game.zhu.draw(5)
                     game.fan.draw(2)
                   },
                 ],
                 [
                   "将一张武器牌和一张防具牌置入装备区",
-                  function () {
-                    var card = get.cardPile(function (card) {
-                      return get.subtype(card) == "equip1" && !get.cardtag(card, "gifts")
-                    })
+                  () => {
+                    var card = get.cardPile(
+                      (card) =>
+                        get.subtype(card) === "equip1" &&
+                        !get.cardtag(card, "gifts"),
+                    )
                     if (card) {
                       game.zhu.equip(card)
                     }
-                    var card2 = get.cardPile(function (card) {
-                      return get.subtype(card) == "equip2" && !get.cardtag(card, "gifts")
-                    })
+                    var card2 = get.cardPile(
+                      (card) =>
+                        get.subtype(card) === "equip2" &&
+                        !get.cardtag(card, "gifts"),
+                    )
                     if (card2) {
                       game.zhu.equip(card2)
                     }
@@ -3979,16 +4055,20 @@ export default () => {
                 ],
                 [
                   "将一张武器牌和一张防御坐骑牌置入装备区",
-                  function () {
-                    var card = get.cardPile(function (card) {
-                      return get.subtype(card) == "equip1" && !get.cardtag(card, "gifts")
-                    })
+                  () => {
+                    var card = get.cardPile(
+                      (card) =>
+                        get.subtype(card) === "equip1" &&
+                        !get.cardtag(card, "gifts"),
+                    )
                     if (card) {
                       game.zhu.equip(card)
                     }
-                    var card2 = get.cardPile(function (card) {
-                      return get.subtype(card) == "equip3" && !get.cardtag(card, "gifts")
-                    })
+                    var card2 = get.cardPile(
+                      (card) =>
+                        get.subtype(card) === "equip3" &&
+                        !get.cardtag(card, "gifts"),
+                    )
                     if (card2) {
                       game.zhu.equip(card2)
                     }
@@ -3996,7 +4076,7 @@ export default () => {
                 ],
                 [
                   "弃置所有手牌并于下一关获得【涅槃】(标)",
-                  function () {
+                  () => {
                     var hs = game.zhu.getCards("h")
                     if (hs.length) {
                       game.zhu.discard(hs)
@@ -4008,12 +4088,14 @@ export default () => {
                 ],
                 [
                   "获得两张锦囊牌",
-                  function () {
+                  () => {
                     var list = []
                     while (list.length < 2) {
-                      var card = get.cardPile(function (card) {
-                        return !list.includes(card) && get.type(card, "trick") == "trick"
-                      })
+                      var card = get.cardPile(
+                        (card) =>
+                          !list.includes(card) &&
+                          get.type(card, "trick") === "trick",
+                      )
                       if (!card) {
                         break
                       }
@@ -4026,7 +4108,7 @@ export default () => {
                 ],
                 [
                   "将体力回复至体力上限，然后弃置一张牌",
-                  function () {
+                  () => {
                     var num = game.zhu.maxHp - game.zhu.hp
                     if (num) {
                       game.zhu.recover(num)
@@ -4036,33 +4118,34 @@ export default () => {
                 ],
                 [
                   "弃置两张牌，在下一关的第一个回合后进行一个额外的回合",
-                  function () {
+                  () => {
                     game.zhu.chooseToDiscard(2, true, "he")
                     game.zhu.addSkill("qianlidanji_phase")
                   },
                 ],
                 [
                   "摸一张牌，然后将对手翻面",
-                  function () {
+                  () => {
                     game.zhu.draw()
                     game.fan.turnOver(true)
                   },
                 ],
                 [
                   "摸一张牌，然后令对手受到1点伤害",
-                  function () {
+                  () => {
                     game.zhu.draw()
                     game.fan.damage(game.zhu)
                   },
                 ],
                 [
                   "获得五张基本牌",
-                  function () {
+                  () => {
                     var list = []
                     while (list.length < 5) {
-                      var card = get.cardPile(function (card) {
-                        return !list.includes(card) && get.type(card) == "basic"
-                      })
+                      var card = get.cardPile(
+                        (card) =>
+                          !list.includes(card) && get.type(card) === "basic",
+                      )
                       if (!card) {
                         break
                       }
@@ -4075,14 +4158,14 @@ export default () => {
                 ],
                 [
                   "失去1点体力，然后摸五张牌",
-                  function () {
+                  () => {
                     game.zhu.loseHp()
                     game.zhu.draw(5)
                   },
                 ],
                 [
                   "失去体力至1点，然后摸七张牌",
-                  function () {
+                  () => {
                     var num = game.zhu.hp - 1
                     if (num) {
                       game.zhu.loseHp(num)
@@ -4092,29 +4175,31 @@ export default () => {
                 ],
                 [
                   "弃置一张牌，然后令对手受到2点伤害",
-                  function () {
+                  () => {
                     game.zhu.chooseToDiscard("he", true)
                     game.fan.damage(game.zhu, 2)
                   },
                 ],
                 [
                   "在下一关中召唤普净一同战斗",
-                  function () {
+                  () => {
                     _status.qianlidanji.addFellow("pujing")
                   },
                 ],
                 [
                   "在下一关中召唤胡班一同战斗",
-                  function () {
+                  () => {
                     _status.qianlidanji.addFellow("huban")
                   },
                 ],
                 [
                   "将一张宝物牌置入装备区并摸一张牌",
-                  function () {
-                    var card = get.cardPile(function (card) {
-                      return get.subtype(card) == "equip5" && !get.cardtag(card, "gifts")
-                    })
+                  () => {
+                    var card = get.cardPile(
+                      (card) =>
+                        get.subtype(card) === "equip5" &&
+                        !get.cardtag(card, "gifts"),
+                    )
                     if (card) {
                       game.zhu.equip(card)
                     }
@@ -4123,24 +4208,20 @@ export default () => {
                 ],
                 [
                   "摸五张牌，然后将自己翻面",
-                  function () {
+                  () => {
                     game.zhu.draw(5)
                     game.zhu.turnOver(true)
                   },
                 ],
                 [
                   "获得一张【酒】和一张【杀】",
-                  function () {
+                  () => {
                     var list = []
-                    var card = get.cardPile(function (card) {
-                      return card.name == "sha"
-                    })
+                    var card = get.cardPile((card) => card.name === "sha")
                     if (card) {
                       list.push(card)
                     }
-                    var card = get.cardPile(function (card) {
-                      return card.name == "jiu"
-                    })
+                    var card = get.cardPile((card) => card.name === "jiu")
                     if (card) {
                       list.push(card)
                     }
@@ -4150,7 +4231,7 @@ export default () => {
                   },
                 ],
               ],
-              replace_character: function () {
+              replace_character: () => {
                 "step 0"
                 if (game.zhu._oldniepan) {
                   game.zhu.removeSkill("oldniepan")
@@ -4159,13 +4240,18 @@ export default () => {
                 _status.qianlidanji.completeNumber++
                 if (
                   !lib.config.qianlidanji_level ||
-                  lib.config.qianlidanji_level < _status.qianlidanji.completeNumber
+                  lib.config.qianlidanji_level <
+                    _status.qianlidanji.completeNumber
                 ) {
-                  lib.config.qianlidanji_level = _status.qianlidanji.completeNumber
-                  game.saveConfig("qianlidanji_level", lib.config.qianlidanji_level)
+                  lib.config.qianlidanji_level =
+                    _status.qianlidanji.completeNumber
+                  game.saveConfig(
+                    "qianlidanji_level",
+                    lib.config.qianlidanji_level,
+                  )
                 }
-                if (game.fellow && game.fellow.isAlive()) {
-                  if (ui.land && ui.land.player == game.fellow) {
+                if (game.fellow?.isAlive()) {
+                  if (ui.land && ui.land.player === game.fellow) {
                     game.addVideo("destroyLand")
                     ui.land.destroy()
                   }
@@ -4207,7 +4293,7 @@ export default () => {
                   game.zhu.nextSeat = game.fan
                   game.fan.nextSeat = game.zhu
                 }
-                if (_status.qianlidanji.completeNumber != 5) {
+                if (_status.qianlidanji.completeNumber !== 5) {
                   var list = _status.qianlidanji.completeReward.randomGets(3)
                   var list2 = []
                   for (var i = 0; i < list.length; i++) {
@@ -4216,7 +4302,7 @@ export default () => {
                   }
                   if (_status.qianlidanji.completeNumber >= 6) {
                     list.push("我不想再打了，直接在这里结束吧！")
-                    list2.push(function () {
+                    list2.push(() => {
                       game.over(true)
                     })
                   }
@@ -4226,23 +4312,26 @@ export default () => {
                     .set("choiceList", list)
                     .set(
                       "prompt",
-                      "请选择一项奖励（当前已通过" + _status.qianlidanji.completeNumber + "关）",
+                      `请选择一项奖励（当前已通过${_status.qianlidanji.completeNumber}关）`,
                     )
                 }
                 ;("step 2")
-                if (_status.qianlidanji.completeNumber != 5) {
-                  if (result.index == 3) {
+                if (_status.qianlidanji.completeNumber !== 5) {
+                  if (result.index === 3) {
                     game.over(true)
                     return
                   }
                   event.reward = event.list[result.index]
                 }
                 _status.characterlist.removeArray(_status.qianlidanji.used)
-                if (_status.qianlidanji.completeNumber == 5) {
+                if (_status.qianlidanji.completeNumber === 5) {
                   event._result = { links: ["caiyang"] }
                 } else {
                   game.zhu.chooseButton(
-                    ["选择下一关出战的对手", [_status.characterlist.randomGets(3), "character"]],
+                    [
+                      "选择下一关出战的对手",
+                      [_status.characterlist.randomGets(3), "character"],
+                    ],
                     true,
                   )
                 }
@@ -4295,7 +4384,7 @@ export default () => {
                 if (evt) {
                   game.resetSkills()
                   let evtx = _status.event
-                  while (evtx != evt) {
+                  while (evtx !== evt) {
                     evtx.finish()
                     evtx.untrigger(true)
                     evtx = evtx.getParent()
@@ -4311,13 +4400,17 @@ export default () => {
         },
         content: {
           submode: "normal",
-          chooseCharacterBefore: function () {
+          chooseCharacterBefore: () => {
             game.identityVideoName = "千里单骑"
-            game.saveConfig("player_number", _status.qianlidanji.player_number, "identity")
-            game.chooseCharacter = function () {
+            game.saveConfig(
+              "player_number",
+              _status.qianlidanji.player_number,
+              "identity",
+            )
+            game.chooseCharacter = () => {
               var next = game.createEvent("chooseCharacter")
               next.showConfig = true
-              next.setContent(function () {
+              next.setContent(() => {
                 "step 0"
                 ui.arena.classList.add("choose-character")
                 game.me.identity = "zhu"
@@ -4354,10 +4447,13 @@ export default () => {
                 dialog.setCaption("选择角色")
                 game.me.chooseButton(dialog, true).set("onfree", true)
 
-                ui.create.cheat = function () {
+                ui.create.cheat = () => {
                   _status.createControl = ui.cheat2
-                  ui.cheat = ui.create.control("更换", function () {
-                    if (ui.cheat2 && ui.cheat2.dialog == _status.event.dialog) {
+                  ui.cheat = ui.create.control("更换", () => {
+                    if (
+                      ui.cheat2 &&
+                      ui.cheat2.dialog === _status.event.dialog
+                    ) {
                       return
                     }
                     if (game.changeCoin) {
@@ -4369,7 +4465,11 @@ export default () => {
 
                     var buttons = ui.create.div(".buttons")
                     var node = _status.event.dialog.buttons[0].parentNode
-                    _status.event.dialog.buttons = ui.create.buttons(list, "character", buttons)
+                    _status.event.dialog.buttons = ui.create.buttons(
+                      list,
+                      "character",
+                      buttons,
+                    )
                     _status.event.dialog.content.insertBefore(buttons, node)
                     buttons.addTempClass("start")
                     node.remove()
@@ -4379,7 +4479,7 @@ export default () => {
                   delete _status.createControl
                 }
                 if (lib.onfree) {
-                  lib.onfree.push(function () {
+                  lib.onfree.push(() => {
                     event.dialogxx = ui.create.characterDialog("heightset")
                     if (ui.cheat2) {
                       ui.cheat2.addTempClass("controlpressdownx", 500)
@@ -4390,9 +4490,9 @@ export default () => {
                   event.dialogxx = ui.create.characterDialog("heightset")
                 }
 
-                ui.create.cheat2 = function () {
+                ui.create.cheat2 = () => {
                   ui.cheat2 = ui.create.control("自由选将", function () {
-                    if (this.dialog == _status.event.dialog) {
+                    if (this.dialog === _status.event.dialog) {
                       if (game.changeCoin) {
                         game.changeCoin(10)
                       }
@@ -4426,7 +4526,7 @@ export default () => {
                     ui.cheat2.classList.add("disabled")
                   }
                 }
-                if (!_status.brawl || !_status.brawl.chooseCharacterFixed) {
+                if (!_status.brawl?.chooseCharacterFixed) {
                   if (!ui.cheat && get.config("change_choice")) {
                     ui.create.cheat()
                   }
@@ -4459,7 +4559,10 @@ export default () => {
                   game.zhu.update()
                 }
                 game.zhu.chooseButton(
-                  ["请选择对手的登场武将", [_status.characterlist.randomGets(3), "character"]],
+                  [
+                    "请选择对手的登场武将",
+                    [_status.characterlist.randomGets(3), "character"],
+                  ],
                   true,
                 )
                 ;("step 3")
@@ -4469,7 +4572,7 @@ export default () => {
                 if (event.draw) {
                   game.zhu.directgain(get.cards(event.draw))
                 }
-                setTimeout(function () {
+                setTimeout(() => {
                   ui.arena.classList.remove("choose-character")
                 }, 500)
 
@@ -4502,7 +4605,7 @@ export default () => {
                       forced: true,
                       silent: true,
                       firstDo: true,
-                      content: function () {
+                      content: () => {
                         player.removeSkill("qianlidanji_phase")
                         player.insertPhase()
                       },
@@ -4516,15 +4619,17 @@ export default () => {
                 }
                 delete pack.skill
                 game.addVideo("arrangeLib", null, pack)
-                game.addOverDialog = function (dialog) {
-                  dialog.addText("共计通过" + _status.qianlidanji.completeNumber + "关")
+                game.addOverDialog = (dialog) => {
+                  dialog.addText(
+                    `共计通过${_status.qianlidanji.completeNumber}关`,
+                  )
                 }
                 lib.element.player.dieAfter2 = function () {
-                  if (this == game.fellow) {
+                  if (this === game.fellow) {
                     return
                   }
                   _status.characterlist.removeArray(_status.qianlidanji.used)
-                  if (game.zhu == this || !_status.characterlist.length) {
+                  if (game.zhu === this || !_status.characterlist.length) {
                     var bool = false
                     if (_status.qianlidanji.completeNumber > 5) {
                       bool = true
@@ -4537,7 +4642,7 @@ export default () => {
                 }
                 lib.element.player.dieAfter = function (source) {
                   _status.characterlist.removeArray(_status.qianlidanji.used)
-                  let next = game.createEvent("dieAfter", false)
+                  const next = game.createEvent("dieAfter", false)
                   next.player = this
                   next.forceDie = true
                   next.source = source
@@ -4557,7 +4662,6 @@ export default () => {
         mode: "versus",
         submode: "2v2",
         showcase: function (init) {
-          var node = this
           var player1, player2
           var list = [
             ["re_sp_zhugeliang", "yujin_yujin", "re_zhangliao", "re_lusu"],
@@ -4570,7 +4674,9 @@ export default () => {
             ["re_guanyu", "caoren", "re_lvmeng", "guanping"],
           ].randomGet()
           if (_status.keyVerified) {
-            list = [["caozhen", "key_hisako", "key_iwasawa", "sp_key_kanade"]].randomGet()
+            list = [
+              ["caozhen", "key_hisako", "key_iwasawa", "sp_key_kanade"],
+            ].randomGet()
           }
           if (init) {
             player1 = ui.create.player(null, true)
@@ -4629,12 +4735,17 @@ export default () => {
         intro: ["双方使用特定的武将，搭配特定的技能，还原特定的经典场景"],
         content: {
           submode: "two",
-          chooseCharacterBefore: function () {
+          chooseCharacterBefore: () => {
             var list = [
               {
                 name: "草船借箭",
                 place: [true, false, false, true],
-                character: ["re_sp_zhugeliang", "yujin_yujin", "re_zhangliao", "re_lusu"],
+                character: [
+                  "re_sp_zhugeliang",
+                  "yujin_yujin",
+                  "re_zhangliao",
+                  "re_lusu",
+                ],
                 lib: {
                   character: {
                     re_sp_zhugeliang: {
@@ -4675,7 +4786,12 @@ export default () => {
               {
                 name: "定军山之战",
                 place: [true, false, false, true],
-                character: ["re_huangzhong", "re_xiahouyuan", "zhanghe", "xin_fazheng"],
+                character: [
+                  "re_huangzhong",
+                  "re_xiahouyuan",
+                  "zhanghe",
+                  "xin_fazheng",
+                ],
                 lib: {
                   character: {
                     re_huangzhong: {
@@ -4715,7 +4831,12 @@ export default () => {
               {
                 name: "官渡追击战",
                 place: [false, true, true, false],
-                character: ["re_caocao", "re_yuanshao", "guotufengji", "re_guojia"],
+                character: [
+                  "re_caocao",
+                  "re_yuanshao",
+                  "guotufengji",
+                  "re_guojia",
+                ],
                 lib: {
                   character: {
                     re_caocao: {
@@ -4796,7 +4917,12 @@ export default () => {
               {
                 name: "舌战群儒",
                 place: [false, true, false, true],
-                character: ["re_zhangzhang", "re_sp_zhugeliang", "guyong", "re_lusu"],
+                character: [
+                  "re_zhangzhang",
+                  "re_sp_zhugeliang",
+                  "guyong",
+                  "re_lusu",
+                ],
                 lib: {
                   character: {
                     re_sp_zhugeliang: {
@@ -4837,7 +4963,12 @@ export default () => {
               {
                 name: "武圣战双雄",
                 place: [true, false, false, true],
-                character: ["yj_jushou", "re_caocao", "jsp_guanyu", "re_yanwen"],
+                character: [
+                  "yj_jushou",
+                  "re_caocao",
+                  "jsp_guanyu",
+                  "re_yanwen",
+                ],
                 lib: {
                   character: {
                     yj_jushou: {
@@ -4877,7 +5008,12 @@ export default () => {
               {
                 name: "合肥之战",
                 place: [true, false, false, true],
-                character: ["re_lingtong", "re_lidian", "re_zhangliao", "re_ganning"],
+                character: [
+                  "re_lingtong",
+                  "re_lidian",
+                  "re_zhangliao",
+                  "re_ganning",
+                ],
                 lib: {
                   character: {
                     re_lingtong: {
@@ -5004,7 +5140,12 @@ export default () => {
                 {
                   name: "My Song",
                   place: [false, true, true, false],
-                  character: ["caozhen", "key_hisako", "key_iwasawa", "sp_key_kanade"],
+                  character: [
+                    "caozhen",
+                    "key_hisako",
+                    "key_iwasawa",
+                    "sp_key_kanade",
+                  ],
                   lib: {
                     character: {
                       caozhen: {
@@ -5029,7 +5170,11 @@ export default () => {
                         sex: "female",
                         group: "key",
                         hp: "-999/3",
-                        skills: ["iwasawa_yinhang", "iwasawa_mysong", "hisako_zhuanyun"],
+                        skills: [
+                          "iwasawa_yinhang",
+                          "iwasawa_mysong",
+                          "hisako_zhuanyun",
+                        ],
                       },
                       sp_key_kanade: {
                         sex: "female",
@@ -5049,7 +5194,12 @@ export default () => {
                 {
                   name: "Day Game",
                   place: [false, true, true, false],
-                  character: ["key_yuzuru", "sp_key_kanade", "key_ayato", "key_hinata"],
+                  character: [
+                    "key_yuzuru",
+                    "sp_key_kanade",
+                    "key_ayato",
+                    "key_hinata",
+                  ],
                   lib: {
                     character: {
                       key_yuzuru: {
@@ -5088,14 +5238,17 @@ export default () => {
               ]
             }
             game.liangjunduilei = list
-            game.chooseCharacterTwo = function () {
+            game.chooseCharacterTwo = () => {
               var next = game.createEvent("chooseCharacter")
-              next.setContent(function () {
+              next.setContent(() => {
                 "step 0"
                 ui.arena.classList.add("choose-character")
                 var list = game.liangjunduilei
                 var id = lib.status.videoId++
-                var choiceList = ui.create.dialog("请选择要游玩的剧情", "forcebutton")
+                var choiceList = ui.create.dialog(
+                  "请选择要游玩的剧情",
+                  "forcebutton",
+                )
                 choiceList.videoId = id
                 choiceList.add([
                   list.map((item, i) => {
@@ -5115,7 +5268,7 @@ export default () => {
                 } else {
                   ui.duileiInfo = ui.create.div(ui.gameinfo)
                 }
-                ui.duileiInfo.innerHTML = "当前剧情：" + pack.name
+                ui.duileiInfo.innerHTML = `当前剧情：${pack.name}`
                 for (var i in pack.lib) {
                   for (var j in pack.lib[i]) {
                     lib[i][j] = pack.lib[i][j]
@@ -5130,15 +5283,16 @@ export default () => {
                 }
 
                 for (var i = 0; i < game.players.length; i++) {
-                  if (game.players[i].side == game.me.side) {
+                  if (game.players[i].side === game.me.side) {
                     game.players[i].node.identity.firstChild.innerHTML = "友"
                   } else {
                     game.players[i].node.identity.firstChild.innerHTML = "敌"
                   }
-                  game.players[i].node.identity.dataset.color = game.players[i].side + "zhu"
+                  game.players[i].node.identity.dataset.color =
+                    `${game.players[i].side}zhu`
                 }
                 game.addVideo("arrangeLib", null, pack.lib)
-                setTimeout(function () {
+                setTimeout(() => {
                   ui.arena.classList.remove("choose-character")
                 }, 500)
                 if (get.config("two_phaseswap")) {
@@ -5162,15 +5316,14 @@ export default () => {
         fullshow: true,
         template: {
           mode: "identity",
-          init: function () {
-            game.saveConfig("double_character", false, "identity")
+          init: () => {
             _status.brawl.playerNumber = _status.brawl.scene.players.length
           },
           showcase: function (init) {
             if (init) {
               var name = lib.brawl[this.link].name
               var scene = lib.storage.scene[name]
-              ui.create.node("button", "编辑场景", this, function () {
+              ui.create.node("button", "编辑场景", this, () => {
                 _status.sceneToLoad = scene
                 game.switchScene()
               })
@@ -5178,8 +5331,8 @@ export default () => {
                 "button",
                 "删除场景",
                 this,
-                function () {
-                  if (confirm("确定删除" + name + "？")) {
+                () => {
+                  if (confirm(`确定删除${name}？`)) {
                     game.removeScene(name)
                   }
                 },
@@ -5192,7 +5345,7 @@ export default () => {
             noAddSetting: true,
             identityShown: true,
             orderedPile: true,
-            cardPile: function (list) {
+            cardPile: (list) => {
               list.randomSort()
               var scene = _status.brawl.scene
               var inpile = []
@@ -5201,25 +5354,25 @@ export default () => {
                   if (lib.config.bannedcards.includes(list[i][2])) {
                     continue
                   }
-                  if (game.bannedcards && game.bannedcards.includes(list[i][2])) {
+                  if (game.bannedcards?.includes(list[i][2])) {
                     continue
                   }
                   inpile.add(list[i][2])
                 }
               }
-              var parseInfo = function (info) {
+              var parseInfo = (info) => {
                 var info2 = []
-                if (info[1] == "random") {
+                if (info[1] === "random") {
                   info2.push(["club", "spade", "heart", "diamond"].randomGet())
                 } else {
                   info2.push(info[1])
                 }
-                if (info[2] == "random") {
+                if (info[2] === "random") {
                   info2.push(Math.ceil(Math.random() * 13))
                 } else {
                   info2.push(info[2])
                 }
-                if (info[0] == "random") {
+                if (info[0] === "random") {
                   info2.push(inpile.randomGet())
                 } else {
                   info2.push(info[0])
@@ -5236,11 +5389,13 @@ export default () => {
                 list.push(parseInfo(scene.cardPileBottom[i]))
               }
               for (var i = 0; i < scene.discardPile.length; i++) {
-                ui.create.card(ui.discardPile).init(parseInfo(scene.discardPile[i]))
+                ui.create
+                  .card(ui.discardPile)
+                  .init(parseInfo(scene.discardPile[i]))
               }
               return list
             },
-            gameStart: function () {
+            gameStart: () => {
               for (var i = 0; i < game.players.length; i++) {
                 game.players[i].node.marks.show()
                 game.players[i].node.name.show()
@@ -5261,7 +5416,7 @@ export default () => {
                 game.players[i].update()
               }
               var scene = _status.brawl.scene
-              var over = function (str) {
+              var over = (str) => {
                 switch (str) {
                   case "win":
                     game.over(true)
@@ -5276,7 +5431,7 @@ export default () => {
               }
               if (scene.turns) {
                 var turns = scene.turns[0]
-                lib.onphase.push(function () {
+                lib.onphase.push(() => {
                   turns--
                   if (turns < 0) {
                     over(scene.turns[1])
@@ -5285,7 +5440,7 @@ export default () => {
               }
               if (scene.washes) {
                 var washes = scene.washes[0]
-                lib.onwash.push(function () {
+                lib.onwash.push(() => {
                   washes--
                   if (washes <= 0) {
                     over(scene.washes[1])
@@ -5293,7 +5448,7 @@ export default () => {
                 })
               }
             },
-            chooseCharacterBefore: function () {
+            chooseCharacterBefore: () => {
               var scene = _status.brawl.scene
               var playercontrol = []
               var maxpos = 0
@@ -5326,30 +5481,28 @@ export default () => {
               } else {
                 game.me.brawlinfo = scene.players.randomGet()
               }
-              var getpos = function (info) {
+              var getpos = (info) => {
                 var dp = info.position - game.me.brawlinfo.position
                 if (dp < 0) {
                   dp += maxpos
                 }
                 return dp
               }
-              scene.players.sort(function (a, b) {
-                return getpos(a) - getpos(b)
-              })
+              scene.players.sort((a, b) => getpos(a) - getpos(b))
               var target = game.me
-              var createCard = function (info) {
+              var createCard = (info) => {
                 var info2 = []
-                if (info[1] == "random") {
+                if (info[1] === "random") {
                   info2.push(["club", "spade", "heart", "diamond"].randomGet())
                 } else {
                   info2.push(info[1])
                 }
-                if (info[2] == "random") {
+                if (info[2] === "random") {
                   info2.push(Math.ceil(Math.random() * 13))
                 } else {
                   info2.push(info[2])
                 }
-                if (info[0] == "random") {
+                if (info[0] === "random") {
                   info2.push(lib.inpile.randomGet())
                 } else {
                   info2.push(info[0])
@@ -5361,13 +5514,13 @@ export default () => {
                 var info = scene.players[i]
                 target.brawlinfo = info
                 target.identity = info.identity
-                if (target.identity == "zhu") {
+                if (target.identity === "zhu") {
                   target.isZhu = true
                 }
                 target.setIdentity(info.identity)
                 target.node.marks.hide()
-                if (info.name2 != "none" && info.name2 != "random") {
-                  if (info.name == "random") {
+                if (info.name2 !== "none" && info.name2 !== "random") {
+                  if (info.name === "random") {
                     target.init(info.name2, info.name2)
                     target.node.name.hide()
                     target.node.avatar.hide()
@@ -5375,8 +5528,8 @@ export default () => {
                     target.init(info.name, info.name2)
                   }
                 } else {
-                  if (info.name != "random") {
-                    if (info.name2 == "random") {
+                  if (info.name !== "random") {
+                    if (info.name2 === "random") {
                       target.init(info.name, info.name)
                       target.node.name2.hide()
                       target.node.avatar2.hide()
@@ -5386,7 +5539,9 @@ export default () => {
                   }
                 }
                 if (info.linked) {
-                  target.classList.add("linked" + (get.is.linked2(target) ? "2" : ""))
+                  target.classList.add(
+                    `linked${get.is.linked2(target) ? "2" : ""}`,
+                  )
                 }
                 if (info.turnedover) {
                   target.classList.add("turnedover")
@@ -5402,54 +5557,58 @@ export default () => {
                   target.directgain(hs)
                 }
                 for (var j = 0; j < info.equips.length; j++) {
-                  let card = createCard(info.equips[j])
-                  target.addVirtualEquip(get.autoViewAs(card, void 0, false), [card])
+                  const card = createCard(info.equips[j])
+                  target.addVirtualEquip(get.autoViewAs(card, void 0, false), [
+                    card,
+                  ])
                 }
                 for (var j = 0; j < info.judges.length; j++) {
-                  let card = createCard(info.judges[j])
-                  target.addVirtualJudge(get.autoViewAs(card, void 0, false), [card])
+                  const card = createCard(info.judges[j])
+                  target.addVirtualJudge(get.autoViewAs(card, void 0, false), [
+                    card,
+                  ])
                 }
                 target = target.next
               }
             },
-            chooseCharacterAi: function (player, list, list2) {
-              let info = player.brawlinfo
+            chooseCharacterAi: (player, list, list2) => {
+              const info = player.brawlinfo
               list = list
                 .slice()
                 .map((name) => [name, ...(lib.characterReplace?.[name] ?? [])]) //这么写是防止有人给lib.characterReplace[name]弄成空数组或者不放name进去
                 .unique()
                 .flat()
-              if (info.name2 != "none") {
-                if (info.name == "random" && info.name2 == "random") {
+              if (info.name2 !== "none") {
+                if (info.name === "random" && info.name2 === "random") {
                   player.init(list.randomRemove(), list.randomRemove())
-                } else if (info.name == "random") {
+                } else if (info.name === "random") {
                   player.init(list.randomGet(), info.name2)
-                } else if (info.name2 == "random") {
+                } else if (info.name2 === "random") {
                   player.init(info.name, list.randomGet())
                 }
               } else {
-                if (info.name == "random") {
+                if (info.name === "random") {
                   player.init(list.randomGet())
                 }
               }
             },
-            chooseCharacter: function (list) {
+            chooseCharacter: (list) => {
               var info = game.me.brawlinfo
               var event = _status.event
-              if (info.name2 == "none") {
-                if (info.name != "random") {
+              if (info.name2 === "none") {
+                if (info.name !== "random") {
                   event.chosen = [info.name]
                 }
               } else {
-                if (info.name2 == "random" && info.name == "random") {
+                if (info.name2 === "random" && info.name === "random") {
                   _status.brawl.doubleCharacter = true
-                } else if (info.name == "random") {
+                } else if (info.name === "random") {
                   game.me.init(info.name2, info.name2)
                   game.me.node.avatar.hide()
                   game.me.node.name.hide()
                   _status.brawl.chooseCharacterStr = "选择主将"
                   event.modchosen = [info.name, info.name2]
-                } else if (info.name2 == "random") {
+                } else if (info.name2 === "random") {
                   game.me.init(info.name, info.name)
                   game.me.node.avatar2.hide()
                   game.me.node.name2.hide()
@@ -5459,7 +5618,7 @@ export default () => {
                   event.chosen = [info.name, info.name2]
                 }
               }
-              if (game.me.identity == "zhu") {
+              if (game.me.identity === "zhu") {
                 return false
               }
               return "nozhu"
@@ -5474,7 +5633,7 @@ export default () => {
             lib.translate.fan = lib.translate.fan || "反"
 
             this.style.transition = "all 0s"
-            this.style.height = this.offsetHeight - 10 + "px"
+            this.style.height = `${this.offsetHeight - 10}px`
             this.style.overflow = "scroll"
             lib.setScroll(this)
             var style = { marginLeft: "3px", marginRight: "3px" }
@@ -5487,11 +5646,19 @@ export default () => {
               padding: 0,
               width: "100%",
             }
-            var style3 = { marginLeft: "4px", marginRight: "4px", position: "relative" }
+            var style3 = {
+              marginLeft: "4px",
+              marginRight: "4px",
+              position: "relative",
+            }
 
-            var scenename = ui.create.node("input", ui.create.div(style2, "", "场景名称：", this), {
-              width: "120px",
-            })
+            var scenename = ui.create.node(
+              "input",
+              ui.create.div(style2, "", "场景名称：", this),
+              {
+                width: "120px",
+              },
+            )
             scenename.type = "text"
             scenename.style.marginTop = "20px"
             var sceneintro = ui.create.node(
@@ -5507,7 +5674,7 @@ export default () => {
               "button",
               "添加角色",
               line1,
-              function () {
+              () => {
                 // line1.style.display='none';
                 resetStatus()
                 editPile.disabled = true
@@ -5541,7 +5708,7 @@ export default () => {
               "button",
               "场景选项",
               line1,
-              function () {
+              () => {
                 resetCharacter()
                 // editCode.disabled=true;
                 saveButton.disabled = true
@@ -5577,7 +5744,7 @@ export default () => {
               "button",
               "保存场景",
               line1,
-              function () {
+              () => {
                 if (!scenename.value) {
                   alert("请填写场景名称")
                   return
@@ -5598,7 +5765,7 @@ export default () => {
                   return
                 }
                 if (lib.storage.scene[scenename.value]) {
-                  if (_status.currentScene != scenename.value) {
+                  if (_status.currentScene !== scenename.value) {
                     if (!confirm("场景名与现有场景重复，是否覆盖？")) {
                       return
                     }
@@ -5620,11 +5787,14 @@ export default () => {
                 if (gameDraw.checked) {
                   scene.gameDraw = true
                 }
-                if (turnsresult.value != "none") {
-                  scene.turns = [parseInt(turns.value), turnsresult.value]
+                if (turnsresult.value !== "none") {
+                  scene.turns = [parseInt(turns.value, 10), turnsresult.value]
                 }
-                if (washesresult.value != "none") {
-                  scene.washes = [parseInt(washes.value), washesresult.value]
+                if (washesresult.value !== "none") {
+                  scene.washes = [
+                    parseInt(washes.value, 10),
+                    washesresult.value,
+                  ]
                 }
                 lib.storage.scene[scene.name] = scene
                 game.save("scene", lib.storage.scene)
@@ -5672,7 +5842,9 @@ export default () => {
             ui.create.node("span", "体力：", line2_t)
             var hp = ui.create.node("input", line2_t, { width: "40px" })
             hp.type = "text"
-            ui.create.node("span", "体力上限：", line2_t, { marginLeft: "10px" })
+            ui.create.node("span", "体力上限：", line2_t, {
+              marginLeft: "10px",
+            })
             var maxHp = ui.create.node("input", line2_t, { width: "40px" })
             maxHp.type = "text"
             ui.create.node("span", "横置 ", line2_t, { marginLeft: "20px" })
@@ -5690,18 +5862,18 @@ export default () => {
               list.push([i, lib.translate[i]])
             }
 
-            list.sort(function (a, b) {
+            list.sort((a, b) => {
               a = a[0]
               b = b[0]
               var aa = a,
                 bb = b
-              if (aa.indexOf("_") != -1) {
+              if (aa.indexOf("_") !== -1) {
                 aa = aa.slice(aa.lastIndexOf("_") + 1)
               }
-              if (bb.indexOf("_") != -1) {
+              if (bb.indexOf("_") !== -1) {
                 bb = bb.slice(bb.lastIndexOf("_") + 1)
               }
-              if (aa != bb) {
+              if (aa !== bb) {
                 return aa > bb ? 1 : -1
               }
               return a > b ? 1 : -1
@@ -5734,10 +5906,14 @@ export default () => {
               if (!lib.cardPack[lib.config.cards[i]]) {
                 continue
               }
-              for (var j = 0; j < lib.cardPack[lib.config.cards[i]].length; j++) {
+              for (
+                var j = 0;
+                j < lib.cardPack[lib.config.cards[i]].length;
+                j++
+              ) {
                 var cname = lib.cardPack[lib.config.cards[i]][j]
                 pileaddlist.push([cname, get.translation(cname)])
-                if (cname == "sha") {
+                if (cname === "sha") {
                   pileaddlist.push(["huosha", "火杀"])
                   pileaddlist.push(["leisha", "雷杀"])
                   pileaddlist.push(["icesha", "冰杀"])
@@ -5775,7 +5951,22 @@ export default () => {
             cardpileaddsuit.style.marginRight = "3px"
             cardpileaddsuit.style.width = "85px"
             var cardpileaddnumber = ui.create.selectlist(
-              [["random", "随机点数"], 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+              [
+                ["random", "随机点数"],
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+              ],
               null,
               line3,
             )
@@ -5783,20 +5974,20 @@ export default () => {
             cardpileaddnumber.style.marginRight = "3px"
             cardpileaddnumber.style.width = "85px"
 
-            var fakecard = function (info, position, capt) {
+            var fakecard = (info, position, capt) => {
               var name = info[0],
                 suit = info[1],
                 number = info[2]
               var card = ui.create.card(null, "noclick", true)
               card.style.zoom = 0.6
-              number = parseInt(cardpileaddnumber.value)
+              number = parseInt(cardpileaddnumber.value, 10)
               var name2 = name
               var suit2 = suit
               var number2 = number
-              if (name2 == "random") {
+              if (name2 === "random") {
                 name2 = "sha"
               }
-              if (suit2 == "random") {
+              if (suit2 === "random") {
                 suit2 = "?"
               }
               if (!number2) {
@@ -5805,7 +5996,7 @@ export default () => {
               }
               card.init([suit2, number2, name2])
               card.info = info
-              if (name == "random") {
+              if (name === "random") {
                 card.node.name.innerHTML = get.verticalStr("随机卡牌")
               }
               if (position && capt) {
@@ -5819,44 +6010,56 @@ export default () => {
               }
               return card
             }
-            var cc_h = ui.create.node("button", "加入手牌区", line5, function () {
+            var cc_h = ui.create.node("button", "加入手牌区", line5, () => {
               fakecard(
-                [cardpileaddname.value, cardpileaddsuit.value, cardpileaddnumber.value],
+                [
+                  cardpileaddname.value,
+                  cardpileaddsuit.value,
+                  cardpileaddnumber.value,
+                ],
                 line6_h,
                 capt_h,
               )
               capt_h.style.display = "block"
             })
-            var cc_e = ui.create.node("button", "加入装备区", line5, function () {
-              if (get.type(cardpileaddname.value) != "equip") {
+            var cc_e = ui.create.node("button", "加入装备区", line5, () => {
+              if (get.type(cardpileaddname.value) !== "equip") {
                 return
               }
               var subtype = get.subtype(cardpileaddname.value)
               for (var i = 0; i < line6_e.childElementCount; i++) {
-                if (get.subtype(line6_e.childNodes[i].name) == subtype) {
+                if (get.subtype(line6_e.childNodes[i].name) === subtype) {
                   line6_e.childNodes[i].remove()
                   break
                 }
               }
               fakecard(
-                [cardpileaddname.value, cardpileaddsuit.value, cardpileaddnumber.value],
+                [
+                  cardpileaddname.value,
+                  cardpileaddsuit.value,
+                  cardpileaddnumber.value,
+                ],
                 line6_e,
                 capt_e,
               )
               capt_e.style.display = "block"
             })
-            var cc_j = ui.create.node("button", "加入判定区", line5, function () {
-              if (get.type(cardpileaddname.value) != "delay") {
+            var cc_j = ui.create.node("button", "加入判定区", line5, () => {
+              if (get.type(cardpileaddname.value) !== "delay") {
                 return
               }
               for (var i = 0; i < line6_j.childElementCount; i++) {
-                if (line6_j.childNodes[i].name == cardpileaddname.value) {
+                if (line6_j.childNodes[i].name === cardpileaddname.value) {
                   line6_j.childNodes[i].remove()
                   break
                 }
               }
               fakecard(
-                [cardpileaddname.value, cardpileaddsuit.value, cardpileaddnumber.value],
+                [
+                  cardpileaddname.value,
+                  cardpileaddsuit.value,
+                  cardpileaddnumber.value,
+                ],
                 line6_j,
                 capt_j,
               )
@@ -5885,25 +6088,37 @@ export default () => {
 
             var line10 = ui.create.div(style2, this)
             line10.style.display = "none"
-            var ac_h = ui.create.node("button", "加入牌堆顶", line10, function () {
+            var ac_h = ui.create.node("button", "加入牌堆顶", line10, () => {
               fakecard(
-                [cardpileaddname.value, cardpileaddsuit.value, cardpileaddnumber.value],
+                [
+                  cardpileaddname.value,
+                  cardpileaddsuit.value,
+                  cardpileaddnumber.value,
+                ],
                 line6_t,
                 capt_t,
               )
               capt_t.style.display = "block"
             })
-            var ac_e = ui.create.node("button", "加入牌堆底", line10, function () {
+            var ac_e = ui.create.node("button", "加入牌堆底", line10, () => {
               fakecard(
-                [cardpileaddname.value, cardpileaddsuit.value, cardpileaddnumber.value],
+                [
+                  cardpileaddname.value,
+                  cardpileaddsuit.value,
+                  cardpileaddnumber.value,
+                ],
                 line6_b,
                 capt_b,
               )
               capt_b.style.display = "block"
             })
-            var ac_j = ui.create.node("button", "加入弃牌堆", line10, function () {
+            var ac_j = ui.create.node("button", "加入弃牌堆", line10, () => {
               fakecard(
-                [cardpileaddname.value, cardpileaddsuit.value, cardpileaddnumber.value],
+                [
+                  cardpileaddname.value,
+                  cardpileaddsuit.value,
+                  cardpileaddnumber.value,
+                ],
                 line6_d,
                 capt_d,
               )
@@ -5919,7 +6134,12 @@ export default () => {
             ac_j.style.marginRight = "3px"
             ac_j.style.width = "85px"
 
-            var line11 = ui.create.div(style2, this, "", "<span>替换牌堆</span>")
+            var line11 = ui.create.div(
+              style2,
+              this,
+              "",
+              "<span>替换牌堆</span>",
+            )
             line11.style.display = "none"
             var replacepile = ui.create.node("input", line11)
             replacepile.type = "checkbox"
@@ -5943,7 +6163,7 @@ export default () => {
             var line4 = ui.create.div(style2, this)
             line4.style.display = "none"
             line4.style.marginTop = "20px"
-            var resetCharacter = function () {
+            var resetCharacter = () => {
               // line1.style.display='block';
               editPile.disabled = false
               // editCode.disabled=false;
@@ -5980,9 +6200,9 @@ export default () => {
               turnedover.checked = false
               playercontrol.checked = false
             }
-            var createCharacter = function (info) {
+            var createCharacter = (info) => {
               var player = ui.create.player(null, true)
-              player._customintro = function (uiintro) {
+              player._customintro = (uiintro) => {
                 if (info.handcards.length) {
                   uiintro.addText("手牌", true)
                   var hs = ui.create.div(".buttons")
@@ -5997,21 +6217,21 @@ export default () => {
               player.info = info
               var name = info.name,
                 name3 = info.name2
-              if (name == "random") {
+              if (name === "random") {
                 name = "re_caocao"
               }
-              if (name3 != "none") {
-                if (name3 == "random") {
+              if (name3 !== "none") {
+                if (name3 === "random") {
                   name3 = "liubei"
                 }
                 player.init(name, name3)
-                if (info.name2 == "random") {
+                if (info.name2 === "random") {
                   player.node.name2.innerHTML = get.verticalStr("自选副将")
                 }
               } else {
                 player.init(name)
               }
-              if (info.name == "random") {
+              if (info.name === "random") {
                 player.node.name.innerHTML = get.verticalStr("自选主将")
               }
               if (info.maxHp) {
@@ -6024,19 +6244,23 @@ export default () => {
                 player.node.handcards1.appendChild(ui.create.card())
               }
               for (var i = 0; i < info.equips.length; i++) {
-                let card = fakecard(info.equips[i])
-                player.addVirtualEquip(get.autoViewAs(card, void 0, false), [card])
+                const card = fakecard(info.equips[i])
+                player.addVirtualEquip(get.autoViewAs(card, void 0, false), [
+                  card,
+                ])
               }
               for (var i = 0; i < info.judges.length; i++) {
-                let card = fakecard(info.judges[i])
-                player.addVirtualJudge(get.autoViewAs(card, void 0, false), [card])
+                const card = fakecard(info.judges[i])
+                player.addVirtualJudge(get.autoViewAs(card, void 0, false), [
+                  card,
+                ])
               }
               player.setIdentity(info.identity)
               var pos = info.position
-              if (pos == 0) {
+              if (pos === 0) {
                 pos = "随机位置"
               } else {
-                pos = get.cnNumber(pos, true) + "号位"
+                pos = `${get.cnNumber(pos, true)}号位`
               }
               if (info.linked && info.turnedover) {
                 pos += "<br>横置 - 翻面"
@@ -6066,14 +6290,14 @@ export default () => {
 
               return player
             }
-            ui.create.div(".menubutton.large", "确定", line4, style3, function () {
+            ui.create.div(".menubutton.large", "确定", line4, style3, () => {
               var info = {
                 name: name1.value,
                 name2: name2.value,
                 identity: identity.value,
-                position: parseInt(position.value),
-                hp: parseInt(hp.value),
-                maxHp: parseInt(maxHp.value),
+                position: parseInt(position.value, 10),
+                hp: parseInt(hp.value, 10),
+                maxHp: parseInt(maxHp.value, 10),
                 linked: linked.checked,
                 turnedover: turnedover.checked,
                 playercontrol: playercontrol.checked,
@@ -6082,11 +6306,17 @@ export default () => {
                 judges: [],
               }
               for (var i = 0; i < line7.childElementCount; i++) {
-                if (info.identity == "zhu" && line7.childNodes[i].info.identity == "zhu") {
+                if (
+                  info.identity === "zhu" &&
+                  line7.childNodes[i].info.identity === "zhu"
+                ) {
                   alert("不能有两个主公")
                   return
                 }
-                if (info.position != 0 && info.position == line7.childNodes[i].info.position) {
+                if (
+                  info.position !== 0 &&
+                  info.position === line7.childNodes[i].info.position
+                ) {
                   alert("座位与现在角色相同")
                   return
                 }
@@ -6103,7 +6333,13 @@ export default () => {
               createCharacter(info)
               resetCharacter()
             })
-            ui.create.div(".menubutton.large", "取消", line4, style3, resetCharacter)
+            ui.create.div(
+              ".menubutton.large",
+              "取消",
+              line4,
+              style3,
+              resetCharacter,
+            )
             var line7 = ui.create.div(style2, this)
             line7.style.marginTop = "12px"
 
@@ -6137,7 +6373,7 @@ export default () => {
             var line9 = ui.create.div(style2, this)
             line9.style.display = "none"
             line9.style.marginTop = "20px"
-            var resetStatus = function (all) {
+            var resetStatus = (all) => {
               // editCode.disabled=false;
               saveButton.disabled = false
               // exportButton.disabled=false;
@@ -6174,9 +6410,15 @@ export default () => {
               }
             }
 
-            ui.create.div(".menubutton.large", "确定", line9, style3, resetStatus)
+            ui.create.div(
+              ".menubutton.large",
+              "确定",
+              line9,
+              style3,
+              resetStatus,
+            )
 
-            game.addSceneClear = function () {
+            game.addSceneClear = () => {
               resetCharacter()
               resetStatus(true)
               scenename.value = ""
@@ -6184,7 +6426,7 @@ export default () => {
               line7.innerHTML = ""
               delete _status.currentScene
             }
-            game.loadScene = function (scene) {
+            game.loadScene = (scene) => {
               resetCharacter()
               resetStatus(true)
               scenename.value = scene.name
@@ -6250,24 +6492,28 @@ export default () => {
                 padding: 0,
                 width: "100%",
               }
-              var style3 = { marginLeft: "4px", marginRight: "4px", position: "relative" }
+              var style3 = {
+                marginLeft: "4px",
+                marginRight: "4px",
+                position: "relative",
+              }
               var line1 = ui.create.div(style2, this)
               var line2 = ui.create.div(style2, this)
               line2.style.lineHeight = "50px"
               line2.style.overflow = "scroll"
               lib.setScroll(line2)
               var container = this.parentNode.parentNode
-              setTimeout(function () {
+              setTimeout(() => {
                 var rect1 = container.getBoundingClientRect()
                 var rect2 = line2.getBoundingClientRect()
-                line2.style.height = rect1.height - (rect2.top - rect1.top) + "px"
+                line2.style.height = `${rect1.height - (rect2.top - rect1.top)}px`
               }, 1000)
               ui.create.node(
                 "button",
                 "删除关卡",
                 line1,
-                function () {
-                  if (confirm("确定删除" + name + "？")) {
+                () => {
+                  if (confirm(`确定删除${name}？`)) {
                     game.removeStage(name)
                   }
                 },
@@ -6279,7 +6525,9 @@ export default () => {
                   return
                 }
                 if (!this.classList.contains("active")) {
-                  var active = this.parentNode.querySelector(".menubutton.large.active")
+                  var active = this.parentNode.querySelector(
+                    ".menubutton.large.active",
+                  )
                   if (active) {
                     active.classList.remove("active")
                   }
@@ -6295,23 +6543,26 @@ export default () => {
                   clickNode,
                 )
                 node.index = i
-                if (stage.mode == "sequal") {
-                  if (i == stage.level) {
+                if (stage.mode === "sequal") {
+                  if (i === stage.level) {
                     node.classList.add("active")
                     noactive = false
                   } else {
                     node.classList.add("unselectable")
                   }
-                } else if (stage.mode == "normal") {
+                } else if (stage.mode === "normal") {
                   if (i > stage.level) {
                     node.classList.add("unselectable")
                   }
                 }
-                if (lib.storage.lastStage == i && !node.classList.contains("unselectable")) {
+                if (
+                  lib.storage.lastStage === i &&
+                  !node.classList.contains("unselectable")
+                ) {
                   node.classList.add("active")
                   noactive = false
                 } else if (
-                  lib.storage.lastStage == undefined &&
+                  lib.storage.lastStage === undefined &&
                   noactive &&
                   !node.classList.contains("unselectable")
                 ) {
@@ -6330,7 +6581,7 @@ export default () => {
           }
           if (init) {
             this.style.transition = "all 0s"
-            this.style.height = this.offsetHeight - 10 + "px"
+            this.style.height = `${this.offsetHeight - 10}px`
             // this.style.overflow='scroll';
             // lib.setScroll(this);
             var style2 = {
@@ -6342,11 +6593,19 @@ export default () => {
               padding: 0,
               width: "100%",
             }
-            var style3 = { marginLeft: "4px", marginRight: "4px", position: "relative" }
+            var style3 = {
+              marginLeft: "4px",
+              marginRight: "4px",
+              position: "relative",
+            }
 
-            var scenename = ui.create.node("input", ui.create.div(style2, "", "关卡名称：", this), {
-              width: "120px",
-            })
+            var scenename = ui.create.node(
+              "input",
+              ui.create.div(style2, "", "关卡名称：", this),
+              {
+                width: "120px",
+              },
+            )
             scenename.type = "text"
             scenename.style.marginTop = "20px"
             var sceneintro = ui.create.node(
@@ -6364,10 +6623,10 @@ export default () => {
             line2.style.overflow = "scroll"
             lib.setScroll(line2)
             var container = this.parentNode.parentNode
-            setTimeout(function () {
+            setTimeout(() => {
               var rect1 = container.getBoundingClientRect()
               var rect2 = line2.getBoundingClientRect()
-              line2.style.height = rect1.height - (rect2.top - rect1.top) + "px"
+              line2.style.height = `${rect1.height - (rect2.top - rect1.top)}px`
             }, 1000)
             var scenes = []
             for (var i in lib.storage.scene) {
@@ -6384,21 +6643,26 @@ export default () => {
               }
             }
             var e2 = function () {
-              var that = this
-              this.movetimeout = setTimeout(function () {
-                e1.call(that)
+              this.movetimeout = setTimeout(() => {
+                e1.call(this)
               }, 500)
             }
             var e3 = function () {
               clearTimeout(this.movetimeout)
               delete this.movetimeout
             }
-            var e4 = function (value) {
-              var node = ui.create.div(".menubutton.large", value, line2, style3, function () {
-                if (confirm("是否移除" + this.innerHTML + "？")) {
-                  this.remove()
-                }
-              })
+            var e4 = (value) => {
+              var node = ui.create.div(
+                ".menubutton.large",
+                value,
+                line2,
+                style3,
+                function () {
+                  if (confirm(`是否移除${this.innerHTML}？`)) {
+                    this.remove()
+                  }
+                },
+              )
               if (lib.config.touchscreen) {
                 node.ontouchstart = e2
                 node.ontouchend = e3
@@ -6414,7 +6678,7 @@ export default () => {
               "button",
               "添加场景",
               line1,
-              function () {
+              () => {
                 e4(scenelist.value)
               },
               { marginLeft: "6px", marginRight: "12px" },
@@ -6433,7 +6697,7 @@ export default () => {
               "button",
               "保存关卡",
               line1,
-              function () {
+              () => {
                 if (!scenename.value) {
                   alert("请填写关卡名称")
                   return
@@ -6450,7 +6714,9 @@ export default () => {
                   level: 0,
                 }
                 for (var i = 0; i < line2.childElementCount; i++) {
-                  stage.scenes.push(lib.storage.scene[line2.childNodes[i].innerHTML])
+                  stage.scenes.push(
+                    lib.storage.scene[line2.childNodes[i].innerHTML],
+                  )
                 }
                 if (lib.storage.stage[scenename.value]) {
                   if (!confirm("关卡名与现有关卡重复，是否覆盖？")) {
@@ -6464,7 +6730,7 @@ export default () => {
               },
               { marginLeft: "6px" },
             )
-            game.addStageClear = function () {
+            game.addStageClear = () => {
               scenelist.value = scenes[0][0]
               sceneconfig.value = "normal"
               scenename.value = ""

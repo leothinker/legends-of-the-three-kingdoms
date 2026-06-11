@@ -1,10 +1,14 @@
 // 喵喵！step写法的content全在这里处理喵！
 import { _status, ai, game, get, lib, ui } from "wtk"
-import { AsyncFunction, GeneratorFunction, AsyncGeneratorFunction } from "@/util/index.js"
-import { security, CodeSnippet, ErrorManager } from "@/util/sandbox.js"
-import { EventContent } from "./IContentCompiler.ts"
-import ContentCompilerBase from "./ContentCompilerBase.ts"
+import {
+  AsyncFunction,
+  AsyncGeneratorFunction,
+  GeneratorFunction,
+} from "@/util/index.js"
+import { CodeSnippet, ErrorManager, security } from "@/util/sandbox.js"
 import ContentCompiler from "./ContentCompiler.ts"
+import ContentCompilerBase from "./ContentCompilerBase.ts"
+import type { EventContent } from "./IContentCompiler.ts"
 
 type GeneralFunction = (...args: any[]) => any
 
@@ -21,7 +25,7 @@ export default class StepCompiler extends ContentCompilerBase {
   }
 
   compile(content: EventContent) {
-    if (typeof content != "function") {
+    if (typeof content !== "function") {
       throw new Error("StepCompiler只能接受函数")
     }
 
@@ -53,7 +57,9 @@ class StepParser {
    * 但是因为默认沙盒还是可以额外操作东西，
    * 故而对不同的运行域做了区分
    */
-  functionConstructor: new (...args: string[]) => GeneralFunction
+  functionConstructor: new (
+    ...args: string[]
+  ) => GeneralFunction
   str: string
   stepHead: string = ""
   //func中要写步骤的话，必须要写step 0
@@ -125,15 +131,21 @@ class StepParser {
     this.originals.push(compiled)
     this.contents.push(function (event, trigger, player) {
       // @ts-expect-error ignore
-      return compiled.apply(this, [{ _status, ai, game, get, lib, ui }, event, trigger, player])
+      return compiled.apply(this, [
+        { _status, ai, game, get, lib, ui },
+        event,
+        trigger,
+        player,
+      ])
     })
   }
 
   formatFunction(func: GeneralFunction) {
     // 沙盒在封装函数时，为了保存源代码会另外存储函数的源代码
-    const decompileFunction: (func: GeneralFunction) => string = security.isSandboxRequired()
-      ? security.importSandbox().Marshal.decompileFunction
-      : Function.prototype.call.bind(Function.prototype.toString)
+    const decompileFunction: (func: GeneralFunction) => string =
+      security.isSandboxRequired()
+        ? security.importSandbox().Marshal.decompileFunction
+        : Function.prototype.call.bind(Function.prototype.toString)
 
     //移除所有注释
     const code = decompileFunction(func)

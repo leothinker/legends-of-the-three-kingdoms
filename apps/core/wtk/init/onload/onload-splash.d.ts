@@ -26,7 +26,10 @@ export interface OnloadSplash {
    * @param resolve - 回调函数，用于通知启动页加载完成。参数为要启动模式
    * @returns 可为同步，亦可为异步
    */
-  init(node: HTMLDivElement, resolve: (mode: string) => void): void | Promise<void>
+  init(
+    node: HTMLDivElement,
+    resolve: (mode: string) => void,
+  ): void | Promise<void>
 
   /**
    * 选择模式后，进行必要的清理工作
@@ -36,7 +39,9 @@ export interface OnloadSplash {
    * @param node - 渲染启动页的 HTML div 元素
    * @returns 可为同步，亦可为异步
    */
-  dispose(node: HTMLDivElement): void | Promise<void> | boolean | Promise<boolean>
+  dispose(
+    node: HTMLDivElement,
+  ): void | Promise<void> | boolean | Promise<boolean>
 
   /**
    * 预览启动页

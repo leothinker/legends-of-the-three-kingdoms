@@ -1,5 +1,5 @@
-import { game, _status } from "wtk"
-import { IContentCompiler, EventContent } from "./IContentCompiler.js"
+import { _status, game } from "wtk"
+import type { EventContent, IContentCompiler } from "./IContentCompiler.js"
 
 type HandlerOption = { state?: "begin" | "end" }
 
@@ -19,7 +19,8 @@ export default abstract class ContentCompilerBase implements IContentCompiler {
    * @param event 事件
    */
   beforeExecute(event: GameEvent) {
-    const handlerType = event.getDefaultHandlerType() as `on${Capitalize<string>}`
+    const handlerType =
+      event.getDefaultHandlerType() as `on${Capitalize<string>}`
     const option: HandlerOption = { state: "begin" }
     event.callHandler(handlerType, event, option)
     event.updateStep()
@@ -44,14 +45,18 @@ export default abstract class ContentCompilerBase implements IContentCompiler {
       return false
     }
     if (player.isDead() && !event.forceDie) {
-      game.broadcastAll(function () {
+      game.broadcastAll(() => {
         while (_status.dieClose.length) {
           _status.dieClose.shift().close()
         }
       })
       event._oncancel?.()
     } else if (player.isOut() && !event.includeOut) {
-      if (event.name == "phase" && player == _status.roundStart && !event.skill) {
+      if (
+        event.name === "phase" &&
+        player === _status.roundStart &&
+        !event.skill
+      ) {
         _status.roundSkipped = true
       }
     } else if (player.removed) {
@@ -74,7 +79,8 @@ export default abstract class ContentCompilerBase implements IContentCompiler {
   afterExecute(event: GameEvent) {
     event.clearStepCache(null)
 
-    const handlerType = event.getDefaultHandlerType() as `on${Capitalize<string>}`
+    const handlerType =
+      event.getDefaultHandlerType() as `on${Capitalize<string>}`
     const option: HandlerOption = { state: "end" }
     event.callHandler(handlerType, event, option)
     event.updateStep()

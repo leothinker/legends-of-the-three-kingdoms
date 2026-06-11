@@ -1,11 +1,11 @@
-import { lib, game, get, _status, ai, ui } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
+import { Pagination } from "@/util/pagination.js"
 import { menu } from "./menu/index.js"
 import { cardPackMenu } from "./menu/pages/cardPackMenu.js"
 import { characterPackMenu } from "./menu/pages/characterPackMenu.js"
 import { optionsMenu } from "./menu/pages/optionsMenu.js"
 import { otherMenu } from "./menu/pages/otherMenu.js"
 import { startMenu } from "./menu/pages/startMenu.js"
-import { Pagination } from "@/util/pagination.js"
 
 export class Create {
   /**
@@ -17,9 +17,13 @@ export class Create {
    */
   identityCard(identity, position, noclick) {
     const card = ui.create.card(position, "noclick", noclick)
-    card.removeEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.card)
+    card.removeEventListener(
+      lib.config.touchscreen ? "touchend" : "click",
+      ui.click.card,
+    )
     card.classList.add("button")
-    card._customintro = (uiintro) => uiintro.add(`${get.translation(`${identity}${2}`)}的身份牌`)
+    card._customintro = (uiintro) =>
+      uiintro.add(`${get.translation(`${identity}${2}`)}的身份牌`)
     const fileName = `image/card/identity_${identity}.jpg`
     new Promise((resolve, reject) => {
       const image = new Image()
@@ -39,7 +43,7 @@ export class Create {
    * 让卡牌旋转
    */
   cardSpinning(card) {
-    if (lib.config.cardback_style != "default") {
+    if (lib.config.cardback_style !== "default") {
       card.style.transitionProperty = "none"
       ui.refresh(card)
       card.classList.add("infohidden")
@@ -50,15 +54,17 @@ export class Create {
     }
     card.style.transition = "all 0s"
     card.style.transform = "perspective(600px) rotateY(180deg) translateX(0)"
-    const onEnd01 = function () {
-      setTimeout(function () {
+    const onEnd01 = () => {
+      setTimeout(() => {
         card.style.transition = "all ease-in 0.3s"
-        card.style.transform = "perspective(600px) rotateY(270deg) translateX(52px)"
-        var onEnd = function () {
+        card.style.transform =
+          "perspective(600px) rotateY(270deg) translateX(52px)"
+        var onEnd = () => {
           card.classList.remove("infohidden")
           card.style.transition = "all 0s"
           ui.refresh(card)
-          card.style.transform = "perspective(600px) rotateY(-90deg) translateX(52px)"
+          card.style.transform =
+            "perspective(600px) rotateY(-90deg) translateX(52px)"
           ui.refresh(card)
           card.style.transition = ""
           ui.refresh(card)
@@ -86,20 +92,26 @@ export class Create {
    * @param {{ value?: string, language?: string, saveInput?: (code: string) => any }} config
    */
   async editor(config = {}) {
-    const { value = "", language = "javascript", saveInput = (code) => {} } = config
+    const {
+      value = "",
+      language = "javascript",
+      saveInput = (code) => {},
+    } = config
 
     const container = ui.create.div(".popup-container.editor2")
     ui.window.appendChild(container)
     ui.window.classList.add("shortcutpaused")
     ui.window.classList.add("systempaused")
 
-    const callback = function (/**@type {import("@codemirror/view").EditorView}*/ view) {
+    const callback = (
+      /**@type {import("@codemirror/view").EditorView}*/ view,
+    ) => {
       const code = view.state.doc.toString()
       try {
         saveInput(code)
       } catch (e) {
         const tip = lib.getErrorTip(e) || ""
-        alert("代码语法有错误，请仔细检查（" + e + "）" + tip)
+        alert(`代码语法有错误，请仔细检查（${e}）${tip}`)
         window.focus()
         view.dom.focus()
         return
@@ -113,24 +125,30 @@ export class Create {
     const { basicSetup } = await import("codemirror")
     const { EditorView } = await import("@codemirror/view")
     const { linter, lintGutter } = await import("@codemirror/lint")
-    const { search, highlightSelectionMatches, openSearchPanel } =
-      await import("@codemirror/search")
+    const { search, highlightSelectionMatches, openSearchPanel } = await import(
+      "@codemirror/search"
+    )
 
     // 在editorpage中添加功能按钮等
     const editorpage = ui.create.div(container)
-    editorpage.addEventListener("keydown", function (e) {
+    editorpage.addEventListener("keydown", (e) => {
       e.stopPropagation()
     })
-    editorpage.addEventListener("keyup", function (e) {
+    editorpage.addEventListener("keyup", (e) => {
       e.stopPropagation()
     })
 
-    const discardConfig = ui.create.div(".editbutton", "取消", editorpage, () => {
-      ui.window.classList.remove("shortcutpaused")
-      ui.window.classList.remove("systempaused")
-      container.delete()
-      delete window.saveWTKInput
-    })
+    const discardConfig = ui.create.div(
+      ".editbutton",
+      "取消",
+      editorpage,
+      () => {
+        ui.window.classList.remove("shortcutpaused")
+        ui.window.classList.remove("systempaused")
+        container.delete()
+        delete window.saveWTKInput
+      },
+    )
 
     const saveConfig = ui.create.div(".editbutton", "保存", editorpage, () => {
       callback(view)
@@ -144,13 +162,12 @@ export class Create {
           if (size === false) {
             return
           }
-          container.style.fontSize = Number(size.slice(0, -2)) / game.documentZoom + "px"
+          container.style.fontSize = `${Number(size.slice(0, -2)) / game.documentZoom}px`
           game.saveConfig("codeMirror_fontSize", size)
         })
     })
 
-    container.style.fontSize =
-      Number((lib.config.codeMirror_fontSize || "16px").slice(0, -2)) / game.documentZoom + "px"
+    container.style.fontSize = `${Number((lib.config.codeMirror_fontSize || "16px").slice(0, -2)) / game.documentZoom}px`
 
     const searchPanel = ui.create.div(".editbutton", "搜索", editorpage, () => {
       openSearchPanel(view)
@@ -188,7 +205,7 @@ export class Create {
     }
     if (!ui.toastStyle) {
       ui.toastStyle = lib.init.promises
-        .css(lib.assetURL + "layout/default/toast.css")
+        .css(`${lib.assetURL}layout/default/toast.css`)
         .then(() => toShow())
     } else {
       toShow()
@@ -208,43 +225,44 @@ export class Create {
     return toast
   }
   cardTempName(card, applyNode) {
-    let getApplyNode = applyNode || card
+    const getApplyNode = applyNode || card
     let cardName = get.name(card)
-    let cardNature = get.nature(card)
+    const cardNature = get.nature(card)
     let tempname = get.translation(cardName)
-    let cardTempNameConfig = lib.config.cardtempname
-    let node = getApplyNode._tempName || ui.create.div(".tempname", getApplyNode)
+    const cardTempNameConfig = lib.config.cardtempname
+    const node =
+      getApplyNode._tempName || ui.create.div(".tempname", getApplyNode)
     let datasetNature = ""
-    let cardPosition = get.position(card)
+    const cardPosition = get.position(card)
     getApplyNode._tempName = node
-    if (cardTempNameConfig != "image") {
+    if (cardTempNameConfig !== "image") {
       //清空，避免和下面的image部分有冲突
       node.innerHTML = ""
       datasetNature = "fire"
       if (
         (cardPosition === "e" || cardPosition === "j") &&
         card.viewAs &&
-        card.viewAs != card.name
+        card.viewAs !== card.name
       ) {
         datasetNature = "wood"
         tempname = get.translation(card.viewAs)
       } else {
-        if (cardName == "sha") {
+        if (cardName === "sha") {
           if (cardNature) {
             tempname = get.translation(cardNature) + tempname
           }
-          if (cardNature == "thunder") {
+          if (cardNature === "thunder") {
             datasetNature = "thunder"
           }
-          if (cardNature == "kami") {
+          if (cardNature === "kami") {
             datasetNature = "kami"
           }
-          if (cardNature == "ice") {
+          if (cardNature === "ice") {
             datasetNature = "ice"
           }
         }
       }
-      if (cardTempNameConfig == "default") {
+      if (cardTempNameConfig === "default") {
         getApplyNode._tempName.classList.add("vertical")
       }
       if (datasetNature.length > 0) {
@@ -257,32 +275,32 @@ export class Create {
       if (
         (cardPosition === "e" || cardPosition === "j") &&
         card.viewAs &&
-        card.viewAs != card.name
+        card.viewAs !== card.name
       ) {
         cardName = card.viewAs
         tempname = get.translation(card.viewAs)
       }
-      if (cardName == "sha") {
+      if (cardName === "sha") {
         if (cardNature) {
           tempname = get.translation(cardNature) + tempname
         }
-        if (cardNature == "fire") {
+        if (cardNature === "fire") {
           datasetNature = "fire"
         }
-        if (cardNature == "thunder") {
+        if (cardNature === "thunder") {
           datasetNature = "thunder"
         }
-        if (cardNature == "kami") {
+        if (cardNature === "kami") {
           datasetNature = "kami"
         }
-        if (cardNature == "ice") {
+        if (cardNature === "ice") {
           datasetNature = "ice"
         }
       }
       let bg = node.querySelector("div")
       if (bg) {
         Array.from(node.childNodes)
-          .filter((v) => v != bg)
+          .filter((v) => v !== bg)
           .forEach((v) => node.removeChild(v))
       } else {
         bg = ui.create.div(node)
@@ -290,7 +308,7 @@ export class Create {
       node.classList.add("tempimage")
       let img = get.dynamicVariable(lib.card[cardName].image, card)
       if (img) {
-        if (typeof img != "string") {
+        if (typeof img !== "string") {
           img = null
         } else {
           if (
@@ -305,25 +323,27 @@ export class Create {
         if (img) {
           if (img.startsWith("db:")) {
             bg.setBackgroundDB(img.slice(3))
-          } else if (typeof img == "string") {
+          } else if (typeof img === "string") {
             bg.setBackgroundImage(img)
           }
         } else {
           if (lib.card[cardName].modeimage) {
             bg.setBackgroundImage(
-              "image/mode/" + lib.card[cardName].modeimage + "/card/" + cardName + ".png",
+              `image/mode/${lib.card[cardName].modeimage}/card/${cardName}.png`,
             )
           } else {
-            if (cardName == "sha" && lib.natureBg.has(cardNature)) {
+            if (cardName === "sha" && lib.natureBg.has(cardNature)) {
               bg.setBackgroundImage(lib.natureBg.get(cardNature))
             } else {
-              bg.setBackgroundImage("image/card/" + cardName + ".png")
+              bg.setBackgroundImage(`image/card/${cardName}.png`)
             }
           }
         }
-      } else if (get.dynamicVariable(lib.card[cardName].image, card) == "background") {
+      } else if (
+        get.dynamicVariable(lib.card[cardName].image, card) === "background"
+      ) {
         if (cardNature) {
-          bg.setBackground(cardName + "_" + cardNature, "card")
+          bg.setBackground(`${cardName}_${cardNature}`, "card")
         } else {
           bg.setBackground(cardName, "card")
         }
@@ -331,41 +351,50 @@ export class Create {
         if (img) {
           if (img.startsWith("db:")) {
             bg.setBackgroundDB(img.slice(3))
-          } else if (typeof img == "string") {
+          } else if (typeof img === "string") {
             bg.setBackgroundImage(img)
             bg.style.backgroundSize = "cover"
           }
         } else if (get.dynamicVariable(lib.card[cardName].image, card)) {
-          if (get.dynamicVariable(lib.card[cardName].image, card).startsWith("character:")) {
+          if (
+            get
+              .dynamicVariable(lib.card[cardName].image, card)
+              .startsWith("character:")
+          ) {
             bg.setBackground(
               get.dynamicVariable(lib.card[cardName].image, card).slice(10),
               "character",
             )
           } else {
-            bg.setBackground(get.dynamicVariable(lib.card[cardName].image, card))
+            bg.setBackground(
+              get.dynamicVariable(lib.card[cardName].image, card),
+            )
           }
         } else {
-          let cardPack = lib.cardPack["mode_" + get.mode()]
+          const cardPack = lib.cardPack[`mode_${get.mode()}`]
           if (Array.isArray(cardPack) && cardPack.includes(cardName)) {
-            bg.setBackground("mode/" + get.mode() + "/card/" + cardName)
+            bg.setBackground(`mode/${get.mode()}/card/${cardName}`)
           } else {
-            bg.setBackground("card/" + cardName)
+            bg.setBackground(`card/${cardName}`)
           }
         }
-      } else if (get.dynamicVariable(lib.card[cardName].image, card) == "card") {
+      } else if (
+        get.dynamicVariable(lib.card[cardName].image, card) === "card"
+      ) {
         if (cardNature) {
-          bg.setBackground(cardName + "_" + cardNature, "card")
+          bg.setBackground(`${cardName}_${cardNature}`, "card")
         } else {
           bg.setBackground(cardName, "card")
         }
       } else if (
-        typeof get.dynamicVariable(lib.card[cardName].image, card) == "string" &&
+        typeof get.dynamicVariable(lib.card[cardName].image, card) ===
+          "string" &&
         !lib.card[cardName].fullskin
       ) {
         if (img) {
           if (img.startsWith("db:")) {
             bg.setBackgroundDB(img.slice(3))
-          } else if (typeof img == "string") {
+          } else if (typeof img === "string") {
             bg.setBackgroundImage(img)
             bg.style.backgroundSize = "cover"
           }
@@ -380,7 +409,7 @@ export class Create {
       }
       delete node.dataset.nature
     }
-    node.innerHTML += `<span>${cardTempNameConfig == "default" ? get.verticalStr(tempname) : tempname}</span>`
+    node.innerHTML += `<span>${cardTempNameConfig === "default" ? get.verticalStr(tempname) : tempname}</span>`
     node.tempname = tempname
     return node
   }
@@ -399,14 +428,17 @@ export class Create {
       )
       player.roomindex = i
       player.initRoom = lib.element.Player.prototype.initRoom
-      player.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.connectroom)
+      player.addEventListener(
+        lib.config.touchscreen ? "touchend" : "click",
+        ui.click.connectroom,
+      )
       player.initRoom(list[i])
       ui.rooms.push(player)
     }
   }
   rarity(button) {
     var rarity = game.getRarity(button.link)
-    if (rarity != "common" && lib.config.show_rarity) {
+    if (rarity !== "common" && lib.config.show_rarity) {
       var intro = button.node.intro
       intro.classList.add("showintro")
       intro.style.fontFamily = "yuanli"
@@ -440,48 +472,53 @@ export class Create {
   div() {
     var str, innerHTML, position, position2, style, divposition, listen
     for (var i = 0; i < arguments.length; i++) {
-      if (typeof arguments[i] == "string") {
-        if (typeof str == "string") {
+      if (typeof arguments[i] === "string") {
+        if (typeof str === "string") {
           innerHTML = arguments[i]
         } else {
           str = arguments[i]
         }
       } else if (
-        ["div", "table", "tr", "td", "body", "fragment"].includes(get.objtype(arguments[i]))
+        ["div", "table", "tr", "td", "body", "fragment"].includes(
+          get.objtype(arguments[i]),
+        )
       ) {
         position = arguments[i]
-      } else if (typeof arguments[i] == "number") {
+      } else if (typeof arguments[i] === "number") {
         position2 = arguments[i]
-      } else if (get.itemtype(arguments[i]) == "divposition") {
+      } else if (get.itemtype(arguments[i]) === "divposition") {
         divposition = arguments[i]
-      } else if (typeof arguments[i] == "object") {
+      } else if (typeof arguments[i] === "object") {
         style = arguments[i]
-      } else if (typeof arguments[i] == "function") {
+      } else if (typeof arguments[i] === "function") {
         listen = arguments[i]
       }
     }
-    if (str == undefined) {
+    if (str === undefined) {
       str = ""
     }
     var node = document.createElement("div")
     for (var i = 0; i < str.length; i++) {
-      if (str[i] == ".") {
-        if (node.className.length != 0) {
+      if (str[i] === ".") {
+        if (node.className.length !== 0) {
           node.className += " "
         }
-        while (str[i + 1] != "." && str[i + 1] != "#" && i + 1 < str.length) {
+        while (str[i + 1] !== "." && str[i + 1] !== "#" && i + 1 < str.length) {
           node.className += str[i + 1]
           i++
         }
-      } else if (str[i] == "#") {
-        while (str[i + 1] != "." && str[i + 1] != "#" && i + 1 < str.length) {
+      } else if (str[i] === "#") {
+        while (str[i + 1] !== "." && str[i + 1] !== "#" && i + 1 < str.length) {
           node.id += str[i + 1]
           i++
         }
       }
     }
     if (position) {
-      if (typeof position2 == "number" && position.childNodes.length > position2) {
+      if (
+        typeof position2 === "number" &&
+        position.childNodes.length > position2
+      ) {
         position.insertBefore(node, position.childNodes[position2])
       } else {
         position.appendChild(node)
@@ -505,7 +542,7 @@ export class Create {
     var args = Array.from(arguments)
     var func = null
     for (var i = 0; i < args.length; i++) {
-      if (typeof args[i] == "function") {
+      if (typeof args[i] === "function") {
         func = args[i]
         args.splice(i, 1)
         break
@@ -524,33 +561,35 @@ export class Create {
   node() {
     var tagName, str, innerHTML, position, position2, style, divposition, listen
     for (var i = 0; i < arguments.length; i++) {
-      if (typeof arguments[i] == "string") {
-        if (typeof tagName == "string") {
+      if (typeof arguments[i] === "string") {
+        if (typeof tagName === "string") {
           innerHTML = arguments[i]
         } else {
           tagName = arguments[i]
         }
       } else if (
-        ["div", "table", "tr", "td", "body", "fragment"].includes(get.objtype(arguments[i]))
+        ["div", "table", "tr", "td", "body", "fragment"].includes(
+          get.objtype(arguments[i]),
+        )
       ) {
         position = arguments[i]
-      } else if (typeof arguments[i] == "number") {
+      } else if (typeof arguments[i] === "number") {
         position2 = arguments[i]
-      } else if (get.itemtype(arguments[i]) == "divposition") {
+      } else if (get.itemtype(arguments[i]) === "divposition") {
         divposition = arguments[i]
-      } else if (typeof arguments[i] == "object") {
+      } else if (typeof arguments[i] === "object") {
         style = arguments[i]
-      } else if (typeof arguments[i] == "function") {
+      } else if (typeof arguments[i] === "function") {
         listen = arguments[i]
       }
     }
-    if (tagName == undefined) {
+    if (tagName === undefined) {
       tagName = "div"
     } else {
       var i1 = tagName.indexOf(".")
       var i2 = tagName.indexOf("#")
-      if (i1 != -1 || i2 != -1) {
-        if (i2 != -1 && i2 < i1) {
+      if (i1 !== -1 || i2 !== -1) {
+        if (i2 !== -1 && i2 < i1) {
           i1 = i2
         }
         str = tagName.slice(i1)
@@ -560,16 +599,24 @@ export class Create {
     var node = document.createElement(tagName)
     if (str) {
       for (var i = 0; i < str.length; i++) {
-        if (str[i] == ".") {
-          if (node.className.length != 0) {
+        if (str[i] === ".") {
+          if (node.className.length !== 0) {
             node.className += " "
           }
-          while (str[i + 1] != "." && str[i + 1] != "#" && i + 1 < str.length) {
+          while (
+            str[i + 1] !== "." &&
+            str[i + 1] !== "#" &&
+            i + 1 < str.length
+          ) {
             node.className += str[i + 1]
             i++
           }
-        } else if (str[i] == "#") {
-          while (str[i + 1] != "." && str[i + 1] != "#" && i + 1 < str.length) {
+        } else if (str[i] === "#") {
+          while (
+            str[i + 1] !== "." &&
+            str[i + 1] !== "#" &&
+            i + 1 < str.length
+          ) {
             node.id += str[i + 1]
             i++
           }
@@ -577,7 +624,10 @@ export class Create {
       }
     }
     if (position) {
-      if (typeof position2 == "number" && position.childNodes.length > position2) {
+      if (
+        typeof position2 === "number" &&
+        position.childNodes.length > position2
+      ) {
         position.insertBefore(node, position.childNodes[position2])
       } else {
         position.appendChild(node)
@@ -616,7 +666,7 @@ export class Create {
     webview.style.border = "none"
     layer.appendChild(webview)
 
-    var backbutton = ui.create.div(".menubutton.round", "返", layer, function () {
+    var backbutton = ui.create.div(".menubutton.round", "返", layer, () => {
       layer.remove()
     })
     backbutton.style.bottom = "10px"
@@ -624,7 +674,8 @@ export class Create {
     backbutton.style.background = "rgba(0,0,0,0.4)"
     backbutton.style.color = "white"
     backbutton.style.textShadow = "rgba(0,0,0,0.5) 0px 0px 2px"
-    backbutton.style.boxShadow = "rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 3px 10px"
+    backbutton.style.boxShadow =
+      "rgba(0, 0, 0, 0.3) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 3px 10px"
     backbutton.style.position = "fixed"
 
     ui.window.appendChild(layer)
@@ -640,13 +691,13 @@ export class Create {
       sec2.dataset.color = list[i]
       var deg1 = (360 / list.length) * i
       var deg2 = 0
-      if (list.length == 2) {
+      if (list.length === 2) {
         deg2 = 90
-      } else if (list.length == 3) {
+      } else if (list.length === 3) {
         deg2 = 30
       }
-      sec1.style.transform = "rotate(" + deg1 + "deg)"
-      sec2.style.transform = "rotate(" + (deg1 + deg2) + "deg)"
+      sec1.style.transform = `rotate(${deg1}deg)`
+      sec2.style.transform = `rotate(${deg1 + deg2}deg)`
     }
   }
   chat() {
@@ -671,7 +722,7 @@ export class Create {
       ui.connecting = ui.create.div(".fullsize.connectlayer")
       document.body.appendChild(ui.connecting)
       ui.create.div("", "正在重连...", ui.connecting)
-      ui.connecting.splashtimeout = setTimeout(function () {
+      ui.connecting.splashtimeout = setTimeout(() => {
         if (ui.connecting) {
           delete ui.connecting.splashtimeout
         }
@@ -686,7 +737,7 @@ export class Create {
   roomInfo() {
     var chat = ui.create.system(
       game.online ? "房间信息" : "房间设置",
-      function () {
+      () => {
         if (!game.online || game.onlinezhu) {
           ui.click.connectMenu()
         }
@@ -696,7 +747,7 @@ export class Create {
     ui.roomInfo = chat
     lib.setPopped(
       chat,
-      function () {
+      () => {
         if (game.getRoomInfo) {
           var uiintro = ui.create.dialog("hidden")
           game.getRoomInfo(uiintro)
@@ -707,11 +758,11 @@ export class Create {
     )
   }
   templayer(time) {
-    if (typeof time != "number" || isNaN(time) || time == Infinity) {
+    if (typeof time !== "number" || Number.isNaN(time) || time === Infinity) {
       time = 500
     }
     var templayer = ui.create.div(".popup-container", ui.window)
-    setTimeout(function () {
+    setTimeout(() => {
       templayer.remove()
     }, time)
   }
@@ -726,7 +777,7 @@ export class Create {
         option.value = list[i]
         option.innerHTML = list[i]
       }
-      if (init == option.value) {
+      if (init === option.value) {
         option.selected = "selected"
       }
       select.appendChild(option)
@@ -754,11 +805,11 @@ export class Create {
   statictable() {
     var str, row, col, position, position2, fixed, style, divposition
     for (var i = 0; i < arguments.length; i++) {
-      if (typeof arguments[i] == "string") {
+      if (typeof arguments[i] === "string") {
         str = arguments[i]
-      } else if (typeof arguments[i] == "number") {
-        if (typeof row == "number") {
-          if (typeof col == "number") {
+      } else if (typeof arguments[i] === "number") {
+        if (typeof row === "number") {
+          if (typeof col === "number") {
             position2 = arguments[i]
           } else {
             col = arguments[i]
@@ -767,32 +818,34 @@ export class Create {
           row = arguments[i]
         }
       } else if (
-        ["div", "table", "tr", "td", "body", "fragment"].includes(get.objtype(arguments[i]))
+        ["div", "table", "tr", "td", "body", "fragment"].includes(
+          get.objtype(arguments[i]),
+        )
       ) {
         position = arguments[i]
-      } else if (typeof arguments[i] == "boolean") {
+      } else if (typeof arguments[i] === "boolean") {
         fixed = arguments[i]
-      } else if (get.itemtype(arguments[i]) == "divposition") {
+      } else if (get.itemtype(arguments[i]) === "divposition") {
         divposition = arguments[i]
-      } else if (typeof arguments[i] == "object") {
+      } else if (typeof arguments[i] === "object") {
         style = arguments[i]
       }
     }
-    if (str == undefined) {
+    if (str === undefined) {
       str = ""
     }
     var node = document.createElement("table")
     for (var i = 0; i < str.length; i++) {
-      if (str[i] == ".") {
-        if (node.className.length != 0) {
+      if (str[i] === ".") {
+        if (node.className.length !== 0) {
           node.className += " "
         }
-        while (str[i + 1] != "." && str[i + 1] != "#" && i + 1 < str.length) {
+        while (str[i + 1] !== "." && str[i + 1] !== "#" && i + 1 < str.length) {
           node.className += str[i + 1]
           i++
         }
-      } else if (str[i] == "#") {
-        while (str[i + 1] != "." && str[i + 1] != "#" && i + 1 < str.length) {
+      } else if (str[i] === "#") {
+        while (str[i + 1] !== "." && str[i + 1] !== "#" && i + 1 < str.length) {
           node.id += str[i + 1]
           i++
         }
@@ -802,7 +855,7 @@ export class Create {
     for (var i = 0; i < row; i++) {
       tr = document.createElement("tr")
       if (fixed) {
-        tr.style.height = 100 / row + "%"
+        tr.style.height = `${100 / row}%`
       }
       node.appendChild(tr)
       for (var j = 0; j < col; j++) {
@@ -811,7 +864,10 @@ export class Create {
       }
     }
     if (position) {
-      if (typeof position2 == "number" && position.childNodes.length > position2) {
+      if (
+        typeof position2 === "number" &&
+        position.childNodes.length > position2
+      ) {
         position.insertBefore(node, position.childNodes[position2])
       } else {
         position.appendChild(node)
@@ -838,7 +894,7 @@ export class Create {
           game
             .createEvent("giveup", false)
             .set("includeOut", true)
-            .setContent(function () {
+            .setContent(() => {
               game.log(player, "投降")
               player.popup("投降")
               player.die("nosource").set("_triggered", null).includeOut = true
@@ -862,8 +918,8 @@ export class Create {
       "jin",
       "western",
       "key",
-      function (link, node) {
-        if (link == "全部") {
+      (link, node) => {
+        if (link === "全部") {
           dialog.currentcapt = ""
           dialog.currentgroup = ""
           for (var i = 0; i < dialog.buttons.length; i++) {
@@ -877,8 +933,11 @@ export class Create {
             for (var i = 0; i < dialog.buttons.length; i++) {
               if (
                 dialog.currentcapt &&
-                dialog.buttons[i].capt !=
-                  dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)
+                dialog.buttons[i].capt !==
+                  dialog.getCurrentCapt(
+                    dialog.buttons[i].link,
+                    dialog.buttons[i].capt,
+                  )
               ) {
                 dialog.buttons[i].classList.add("nodisplay")
               } else {
@@ -894,10 +953,13 @@ export class Create {
             node.classList.add("thundertext")
             for (var i = 0; i < dialog.buttons.length; i++) {
               if (
-                dialog.buttons[i].group != link ||
+                dialog.buttons[i].group !== link ||
                 (dialog.currentcapt &&
-                  dialog.buttons[i].capt !=
-                    dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt))
+                  dialog.buttons[i].capt !==
+                    dialog.getCurrentCapt(
+                      dialog.buttons[i].link,
+                      dialog.buttons[i].capt,
+                    ))
               ) {
                 dialog.buttons[i].classList.add("nodisplay")
               } else {
@@ -923,7 +985,7 @@ export class Create {
         continue
       }
       if (lib.character[i].isBoss || lib.character[i].isHiddenBoss) {
-        if (lib.config.mode == "boss") {
+        if (lib.config.mode === "boss") {
           continue
         }
         if (!lib.character[i].isBossAllowed) {
@@ -937,7 +999,7 @@ export class Create {
       if (lib.config.banned.includes(i)) {
         continue
       }
-      if (filter && filter(i)) {
+      if (filter?.(i)) {
         continue
       }
       list.push(i)
@@ -950,7 +1012,7 @@ export class Create {
     list.sort(lib.sort.character)
     dialog.classList.add("character")
     dialog.classList.add("choose-character")
-    var getPack = function (name) {
+    var getPack = (name) => {
       for (var i in lib.characterPack) {
         if (lib.characterPack[i][name]) {
           return i
@@ -975,15 +1037,20 @@ export class Create {
         }
       }
     }
-    var createNode = function (packname) {
+    var createNode = (packname) => {
       var translate
       var pack = null
-      if (packname == "最近") {
+      if (packname === "最近") {
         pack = get.config("recentCharacter") || []
-      } else if (packname == "收藏") {
+      } else if (packname === "收藏") {
         pack = lib.config.favouriteCharacter
       }
-      var node = ui.create.div(".dialogbutton.menubutton.large", packname, packnode, clickCapt)
+      var node = ui.create.div(
+        ".dialogbutton.menubutton.large",
+        packname,
+        packnode,
+        clickCapt,
+      )
       node.pack = pack
       return node
     }
@@ -991,22 +1058,22 @@ export class Create {
     var bool = true
     var node
     var recent = get.config("recentCharacter")
-    if (recent && recent.length) {
+    if (recent?.length) {
       node = createNode("最近")
-      if (lib.config.character_dialog_tool == "最近") {
+      if (lib.config.character_dialog_tool === "最近") {
         clickCapt.call(node)
         bool = false
       }
     }
     if (lib.config.favouriteCharacter.length) {
       node = createNode("收藏")
-      if (lib.config.character_dialog_tool == "收藏") {
+      if (lib.config.character_dialog_tool === "收藏") {
         clickCapt.call(node)
         bool = false
       }
     }
     var node = createNode("全部")
-    if (lib.config.character_dialog_tool == "all") {
+    if (lib.config.character_dialog_tool === "all") {
       clickCapt.call(node)
       bool = false
     }
@@ -1035,7 +1102,15 @@ export class Create {
     //      			return ui.create.characterDialog2.apply(this,arguments);
     //     }
     // }
-    var filter, str, noclick, thisiscard, seperate, expandall, onlypack, heightset, characterx
+    var filter,
+      str,
+      noclick,
+      thisiscard,
+      seperate,
+      expandall,
+      onlypack,
+      heightset,
+      characterx
     for (var i = 0; i < arguments.length; i++) {
       if (arguments[i] === "thisiscard") {
         thisiscard = true
@@ -1043,17 +1118,23 @@ export class Create {
         expandall = true
       } else if (arguments[i] === "heightset") {
         heightset = true
-      } else if (arguments[i] == "characterx") {
+      } else if (arguments[i] === "characterx") {
         characterx = true
-      } else if (typeof arguments[i] == "string" && arguments[i].startsWith("onlypack:")) {
+      } else if (
+        typeof arguments[i] === "string" &&
+        arguments[i].startsWith("onlypack:")
+      ) {
         onlypack = arguments[i].slice(9)
-      } else if (typeof arguments[i] == "object" && typeof arguments[i].seperate == "function") {
+      } else if (
+        typeof arguments[i] === "object" &&
+        typeof arguments[i].seperate === "function"
+      ) {
         seperate = arguments[i].seperate
       } else if (typeof arguments[i] === "string") {
         str = arguments[i]
       } else if (typeof arguments[i] === "function") {
         filter = arguments[i]
-      } else if (typeof arguments[i] == "boolean") {
+      } else if (typeof arguments[i] === "boolean") {
         noclick = arguments[i]
       }
     }
@@ -1067,9 +1148,9 @@ export class Create {
       node.style.fontSize = "30px"
     }
     var namecapt = []
-    var getCapt = function (str) {
+    var getCapt = (str) => {
       var capt
-      if (str.indexOf("_") == -1) {
+      if (str.indexOf("_") === -1) {
         capt = str[0]
       } else {
         capt = str[str.lastIndexOf("_") + 1]
@@ -1082,14 +1163,14 @@ export class Create {
     }
     if (thisiscard) {
       for (var i in lib.card) {
-        if (!lib.translate[i + "_info"]) {
+        if (!lib.translate[`${i}_info`]) {
           continue
         }
-        if (filter && filter(i)) {
+        if (filter?.(i)) {
           continue
         }
         list.push(["", get.translation(lib.card[i].type), i])
-        if (namecapt.indexOf(getCapt(i)) == -1) {
+        if (namecapt.indexOf(getCapt(i)) === -1) {
           namecapt.push(getCapt(i))
         }
       }
@@ -1100,7 +1181,7 @@ export class Create {
             continue
           }
           if (lib.character[i].isBoss || lib.character[i].isHiddenBoss) {
-            if (lib.config.mode == "boss") {
+            if (lib.config.mode === "boss") {
               continue
             }
             if (!lib.character[i].isBossAllowed) {
@@ -1121,7 +1202,7 @@ export class Create {
         if (lib.characterFilter[i] && !lib.characterFilter[i](get.mode())) {
           continue
         }
-        if (filter && filter(i)) {
+        if (filter?.(i)) {
           continue
         }
         list.push(i)
@@ -1130,14 +1211,12 @@ export class Create {
         } else {
           groups.add(lib.character[i][1])
         }
-        if (namecapt.indexOf(getCapt(i)) == -1) {
+        if (namecapt.indexOf(getCapt(i)) === -1) {
           namecapt.push(getCapt(i))
         }
       }
     }
-    namecapt.sort(function (a, b) {
-      return a > b ? 1 : -1
-    })
+    namecapt.sort((a, b) => (a > b ? 1 : -1))
     groups.sort(lib.sort.group)
     if (!thisiscard) {
       namecapt.remove("自定义")
@@ -1155,8 +1234,8 @@ export class Create {
         return
       }
       if (
-        dialog.currentcapt2 == "最近" &&
-        dialog.currentcaptnode2 != this &&
+        dialog.currentcapt2 === "最近" &&
+        dialog.currentcaptnode2 !== this &&
         !dialog.currentcaptnode2.inited
       ) {
         dialog.currentcapt2 = null
@@ -1174,12 +1253,19 @@ export class Create {
           }
           for (var i = 0; i < dialog.buttons.length; i++) {
             restoreState(dialog.buttons[i])
-            if (dialog.currentgroup && dialog.buttons[i].group != dialog.currentgroup) {
+            if (
+              dialog.currentgroup &&
+              dialog.buttons[i].group !== dialog.currentgroup
+            ) {
               dialog.buttons[i].classList.add("nodisplay")
             } else if (
               dialog.currentcapt2 &&
-              dialog.buttons[i].capt !=
-                dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)
+              dialog.buttons[i].capt !==
+                dialog.getCurrentCapt(
+                  dialog.buttons[i].link,
+                  dialog.buttons[i].capt,
+                  true,
+                )
             ) {
               dialog.buttons[i].classList.add("nodisplay")
             } else {
@@ -1202,17 +1288,27 @@ export class Create {
           for (var i = 0; i < dialog.buttons.length; i++) {
             restoreState(dialog.buttons[i])
             if (
-              dialog.buttons[i].capt !=
-              dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)
+              dialog.buttons[i].capt !==
+              dialog.getCurrentCapt(
+                dialog.buttons[i].link,
+                dialog.buttons[i].capt,
+              )
             ) {
               dialog.buttons[i].classList.add("nodisplay")
             } else if (
               dialog.currentcapt2 &&
-              dialog.buttons[i].capt !=
-                dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)
+              dialog.buttons[i].capt !==
+                dialog.getCurrentCapt(
+                  dialog.buttons[i].link,
+                  dialog.buttons[i].capt,
+                  true,
+                )
             ) {
               dialog.buttons[i].classList.add("nodisplay")
-            } else if (dialog.currentgroup && dialog.buttons[i].group != dialog.currentgroup) {
+            } else if (
+              dialog.currentgroup &&
+              dialog.buttons[i].group !== dialog.currentgroup
+            ) {
               dialog.buttons[i].classList.add("nodisplay")
             } else {
               dialog.buttons[i].classList.remove("nodisplay")
@@ -1238,12 +1334,18 @@ export class Create {
           }
           for (var i = 0; i < dialog.buttons.length; i++) {
             restoreState(dialog.buttons[i])
-            if (dialog.currentgroup && dialog.buttons[i].group != dialog.currentgroup) {
+            if (
+              dialog.currentgroup &&
+              dialog.buttons[i].group !== dialog.currentgroup
+            ) {
               dialog.buttons[i].classList.add("nodisplay")
             } else if (
               dialog.currentcapt &&
-              dialog.buttons[i].capt !=
-                dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)
+              dialog.buttons[i].capt !==
+                dialog.getCurrentCapt(
+                  dialog.buttons[i].link,
+                  dialog.buttons[i].capt,
+                )
             ) {
               dialog.buttons[i].classList.add("nodisplay")
             } else {
@@ -1262,7 +1364,7 @@ export class Create {
           this.classList.add("thundertext")
           if (this.touchlink) {
             this.touchlink.classList.add("active")
-          } else if (this.parentNode == newlined2) {
+          } else if (this.parentNode === newlined2) {
             packsource.innerHTML = this.innerHTML
             packsource.classList.add("thundertext")
           }
@@ -1270,16 +1372,26 @@ export class Create {
             restoreState(dialog.buttons[i])
             if (
               dialog.currentcapt &&
-              dialog.buttons[i].capt !=
-                dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)
+              dialog.buttons[i].capt !==
+                dialog.getCurrentCapt(
+                  dialog.buttons[i].link,
+                  dialog.buttons[i].capt,
+                )
             ) {
               dialog.buttons[i].classList.add("nodisplay")
             } else if (
-              dialog.buttons[i].capt !=
-              dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)
+              dialog.buttons[i].capt !==
+              dialog.getCurrentCapt(
+                dialog.buttons[i].link,
+                dialog.buttons[i].capt,
+                true,
+              )
             ) {
               dialog.buttons[i].classList.add("nodisplay")
-            } else if (dialog.currentgroup && dialog.buttons[i].group != dialog.currentgroup) {
+            } else if (
+              dialog.currentgroup &&
+              dialog.buttons[i].group !== dialog.currentgroup
+            ) {
               dialog.buttons[i].classList.add("nodisplay")
             } else {
               if (dialog.buttons[i].activate) {
@@ -1292,7 +1404,11 @@ export class Create {
       }
       if (dialog.seperate) {
         for (var i = 0; i < dialog.seperate.length; i++) {
-          if (!dialog.seperate[i].nextSibling.querySelector(".button:not(.nodisplay)")) {
+          if (
+            !dialog.seperate[i].nextSibling.querySelector(
+              ".button:not(.nodisplay)",
+            )
+          ) {
             dialog.seperate[i].style.display = "none"
             dialog.seperate[i].nextSibling.style.display = "none"
           } else {
@@ -1314,7 +1430,7 @@ export class Create {
       }
     }
     for (i = 0; i < namecapt.length; i++) {
-      if (namecapt[i] == "newline") {
+      if (namecapt[i] === "newline") {
         newlined = document.createElement("div")
         newlined.style.marginTop = "5px"
         newlined.style.display = "block"
@@ -1330,22 +1446,28 @@ export class Create {
         var span = ui.create.div(".tdnode.pointerdiv.shadowed.reduce_radius")
         span.style.margin = "3px"
         span.style.width = "auto"
-        span.innerHTML = " " + namecapt[i].toUpperCase() + " "
+        span.innerHTML = ` ${namecapt[i].toUpperCase()} `
         span.link = namecapt[i]
-        span.addEventListener(lib.config.touchscreen ? "touchend" : "click", clickCapt)
+        span.addEventListener(
+          lib.config.touchscreen ? "touchend" : "click",
+          clickCapt,
+        )
         newlined.appendChild(span)
         node[namecapt[i]] = span
-        if (namecapt[i] == "收藏") {
+        if (namecapt[i] === "收藏") {
           span._nature = "fire"
         } else {
           span._nature = "wood"
         }
       } else {
         var span = document.createElement("span")
-        span.innerHTML = " " + namecapt[i].toUpperCase() + " "
+        span.innerHTML = ` ${namecapt[i].toUpperCase()} `
         span.link = namecapt[i]
         span.alphabet = true
-        span.addEventListener(lib.config.touchscreen ? "touchend" : "click", clickCapt)
+        span.addEventListener(
+          lib.config.touchscreen ? "touchend" : "click",
+          clickCapt,
+        )
         node.appendChild(span)
       }
     }
@@ -1360,8 +1482,8 @@ export class Create {
           return
         }
         if (
-          dialog.currentcapt2 == "最近" &&
-          dialog.currentcaptnode2 != this &&
+          dialog.currentcapt2 === "最近" &&
+          dialog.currentcaptnode2 !== this &&
           !dialog.currentcaptnode2.inited
         ) {
           dialog.currentcapt2 = null
@@ -1369,24 +1491,30 @@ export class Create {
           dialog.currentcaptnode2.inited = true
           dialog.currentcaptnode2 = null
         }
-        var node = this,
-          link = this.link
-        if (node.classList.contains("thundertext")) {
+        var link = this.link
+        if (this.classList.contains("thundertext")) {
           dialog.currentgroup = null
           dialog.currentgroupnode = null
-          node.classList.remove("thundertext")
+          this.classList.remove("thundertext")
           for (var i = 0; i < dialog.buttons.length; i++) {
             restoreState(dialog.buttons[i])
             if (
               dialog.currentcapt &&
-              dialog.buttons[i].capt !=
-                dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)
+              dialog.buttons[i].capt !==
+                dialog.getCurrentCapt(
+                  dialog.buttons[i].link,
+                  dialog.buttons[i].capt,
+                )
             ) {
               dialog.buttons[i].classList.add("nodisplay")
             } else if (
               dialog.currentcapt2 &&
-              dialog.buttons[i].capt !=
-                dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)
+              dialog.buttons[i].capt !==
+                dialog.getCurrentCapt(
+                  dialog.buttons[i].link,
+                  dialog.buttons[i].capt,
+                  true,
+                )
             ) {
               dialog.buttons[i].classList.add("nodisplay")
             } else {
@@ -1398,30 +1526,37 @@ export class Create {
             dialog.currentgroupnode.classList.remove("thundertext")
           }
           dialog.currentgroup = link
-          dialog.currentgroupnode = node
-          node.classList.add("thundertext")
+          dialog.currentgroupnode = this
+          this.classList.add("thundertext")
           for (var i = 0; i < dialog.buttons.length; i++) {
             restoreState(dialog.buttons[i])
             if (
               dialog.currentcapt &&
-              dialog.buttons[i].capt !=
-                dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)
+              dialog.buttons[i].capt !==
+                dialog.getCurrentCapt(
+                  dialog.buttons[i].link,
+                  dialog.buttons[i].capt,
+                )
             ) {
               dialog.buttons[i].classList.add("nodisplay")
             } else if (
               dialog.currentcapt2 &&
-              dialog.buttons[i].capt !=
-                dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)
+              dialog.buttons[i].capt !==
+                dialog.getCurrentCapt(
+                  dialog.buttons[i].link,
+                  dialog.buttons[i].capt,
+                  true,
+                )
             ) {
               dialog.buttons[i].classList.add("nodisplay")
-            } else if (dialog.currentgroup == "double") {
+            } else if (dialog.currentgroup === "double") {
               if (dialog.buttons[i]._changeGroup) {
                 dialog.buttons[i].classList.remove("nodisplay")
               } else {
                 dialog.buttons[i].classList.add("nodisplay")
               }
-            } else if (dialog.currentgroup == "ye") {
-              if (dialog.buttons[i].group == "ye") {
+            } else if (dialog.currentgroup === "ye") {
+              if (dialog.buttons[i].group === "ye") {
                 dialog.buttons[i].classList.remove("nodisplay")
               } else {
                 dialog.buttons[i].classList.add("nodisplay")
@@ -1429,7 +1564,7 @@ export class Create {
             } else {
               if (
                 dialog.buttons[i]._changeGroup ||
-                dialog.buttons[i].group != dialog.currentgroup
+                dialog.buttons[i].group !== dialog.currentgroup
               ) {
                 dialog.buttons[i].classList.add("nodisplay")
               } else {
@@ -1441,20 +1576,27 @@ export class Create {
         updatePagination()
       }
       for (var i = 0; i < groups.length; i++) {
-        var span = ui.create.div(".tdnode.pointerdiv.shadowed.reduce_radius.reduce_margin")
+        var span = ui.create.div(
+          ".tdnode.pointerdiv.shadowed.reduce_radius.reduce_margin",
+        )
         span.style.margin = "3px"
         newlined.appendChild(span)
         span.innerHTML = get.translation(groups[i])
         span.link = groups[i]
         span._nature = natures[i]
-        span.addEventListener(lib.config.touchscreen ? "touchend" : "click", clickGroup)
+        span.addEventListener(
+          lib.config.touchscreen ? "touchend" : "click",
+          clickGroup,
+        )
       }
 
       var span = document.createElement("span")
       newlined.appendChild(span)
       span.style.margin = "8px"
 
-      packsource = ui.create.div(".tdnode.pointerdiv.shadowed.reduce_radius.reduce_margin")
+      packsource = ui.create.div(
+        ".tdnode.pointerdiv.shadowed.reduce_radius.reduce_margin",
+      )
       packsource.style.margin = "3px"
       newlined.appendChild(packsource)
       var filternode = null
@@ -1468,7 +1610,9 @@ export class Create {
       if (get.is.phoneLayout() && lib.config.filternode_button) {
         newlined.style.marginTop = ""
         packsource.innerHTML = "筛选"
-        filternode = ui.create.div(".popup-container.filter-character.modenopause")
+        filternode = ui.create.div(
+          ".popup-container.filter-character.modenopause",
+        )
         ui.create.div(filternode)
         filternode.listen(function (e) {
           if (this.classList.contains("removing")) {
@@ -1481,7 +1625,7 @@ export class Create {
           e.stopPropagation()
         })
         for (var i = 0; i < node.childElementCount; i++) {
-          if (node.childNodes[i].tagName.toLowerCase() == "span") {
+          if (node.childNodes[i].tagName.toLowerCase() === "span") {
             node.childNodes[i].style.display = "none"
             node.childNodes[i].touchlink = ui.create.div(
               filternode.firstChild,
@@ -1496,7 +1640,7 @@ export class Create {
       } else {
         if (onlypack) {
           packsource.onlypack = true
-          packsource.innerHTML = get.translation(onlypack + "_character_config")
+          packsource.innerHTML = get.translation(`${onlypack}_character_config`)
           packsource.style.display = "none"
           packsource.previousSibling.style.display = "none"
         } else {
@@ -1517,33 +1661,41 @@ export class Create {
       newlined2.style.textAlign = "center"
       node.appendChild(newlined2)
 
-      packsource.addEventListener(lib.config.touchscreen ? "touchend" : "click", function () {
-        if (packsource.onlypack) {
-          return
-        }
-        if (_status.dragged) {
-          return
-        }
-        if (get.is.phoneLayout() && lib.config.filternode_button && filternode) {
-          _status.filterCharacter = true
-          ui.window.classList.add("shortcutpaused")
-          ui.window.appendChild(filternode)
-          ui.refresh(filternode)
-          filternode.classList.add("shown")
-          var dh = filternode.offsetHeight - filternode.firstChild.offsetHeight
-          if (dh > 0) {
-            filternode.firstChild.style.top = dh / 2 + "px"
-          } else {
-            filternode.firstChild.style.top = ""
+      packsource.addEventListener(
+        lib.config.touchscreen ? "touchend" : "click",
+        () => {
+          if (packsource.onlypack) {
+            return
           }
-        } else {
-          if (newlined2.style.display == "none") {
-            newlined2.style.display = "block"
-          } else {
-            newlined2.style.display = "none"
+          if (_status.dragged) {
+            return
           }
-        }
-      })
+          if (
+            get.is.phoneLayout() &&
+            lib.config.filternode_button &&
+            filternode
+          ) {
+            _status.filterCharacter = true
+            ui.window.classList.add("shortcutpaused")
+            ui.window.appendChild(filternode)
+            ui.refresh(filternode)
+            filternode.classList.add("shown")
+            var dh =
+              filternode.offsetHeight - filternode.firstChild.offsetHeight
+            if (dh > 0) {
+              filternode.firstChild.style.top = `${dh / 2}px`
+            } else {
+              filternode.firstChild.style.top = ""
+            }
+          } else {
+            if (newlined2.style.display === "none") {
+              newlined2.style.display = "block"
+            } else {
+              newlined2.style.display = "none"
+            }
+          }
+        },
+      )
       var packlist = []
       for (var i = 0; i < lib.config.all.characters.length; i++) {
         if (!lib.config.characters.includes(lib.config.all.characters[i])) {
@@ -1558,7 +1710,7 @@ export class Create {
         if (!lib.characterPack[lib.config.characters[i]]) {
           continue
         }
-        if (!lib.translate[lib.config.characters[i] + "_character_config"]) {
+        if (!lib.translate[`${lib.config.characters[i]}_character_config`]) {
           continue
         }
         packlist.add(lib.config.characters[i])
@@ -1573,9 +1725,12 @@ export class Create {
         } else {
           span.style.fontSize = "22px"
         }
-        span.innerHTML = lib.translate[packlist[i] + "_character_config"]
+        span.innerHTML = lib.translate[`${packlist[i]}_character_config`]
         span.link = packlist[i]
-        span.addEventListener(lib.config.touchscreen ? "touchend" : "click", clickCapt)
+        span.addEventListener(
+          lib.config.touchscreen ? "touchend" : "click",
+          clickCapt,
+        )
         newlined2.appendChild(span)
         if (filternode && !onlypack) {
           span.touchlink = ui.create.div(
@@ -1591,7 +1746,7 @@ export class Create {
 
     var groupSort
     if (thisiscard) {
-      groupSort = function (name) {
+      groupSort = (name) => {
         var type = lib.card[name[2]].type
         if (lib.cardType[type]) {
           return lib.cardType[type]
@@ -1613,9 +1768,9 @@ export class Create {
             return 6
         }
       }
-      list.sort(function (a, b) {
+      list.sort((a, b) => {
         var del = groupSort(a) - groupSort(b)
-        if (del != 0) {
+        if (del !== 0) {
           return del
         }
         var aa = a,
@@ -1626,7 +1781,7 @@ export class Create {
         if (b.includes("_")) {
           b = b.slice(b.lastIndexOf("_") + 1)
         }
-        if (a != b) {
+        if (a !== b) {
           return a > b ? 1 : -1
         }
         return aa > bb ? 1 : -1
@@ -1640,15 +1795,22 @@ export class Create {
     dialog.classList.add("scroll1")
     dialog.classList.add("scroll2")
     dialog.classList.add("scroll3")
-    dialog.supportsPagination = Boolean(parseInt(lib.config.showMax_character_number))
-    dialog.paginationMaxCount.set("character", parseInt(lib.config.showMax_character_number))
-    dialog.addEventListener(lib.config.touchscreen ? "touchend" : "mouseup", function () {
-      _status.clicked2 = true
-    })
+    dialog.supportsPagination = Boolean(
+      parseInt(lib.config.showMax_character_number, 10),
+    )
+    dialog.paginationMaxCount.set(
+      "character",
+      parseInt(lib.config.showMax_character_number, 10),
+    )
+    dialog.addEventListener(
+      lib.config.touchscreen ? "touchend" : "mouseup",
+      () => {
+        _status.clicked2 = true
+      },
+    )
     if (heightset) {
       //这里如果dialog的高度较低的话，会显示不全下面的分页按钮，所以我增加了50px，后面遇到高度问题，可以研究更完美的方案，在这里更改。
-      dialog.style.height =
-        (game.layout == "long2" || game.layout == "nova" ? 380 : 350) + 50 + "px"
+      dialog.style.height = `${(game.layout === "long2" || game.layout === "nova" ? 380 : 350) + 50}px`
       dialog._scrollset = true
     }
     dialog.getCurrentCapt = function (link, capt, noalph) {
@@ -1685,13 +1847,15 @@ export class Create {
     const div = ui.create.div(".searcher.find")
     input.placeholder = "支持正则搜索和技能搜索"
     //使用click事件搜索，因为用input事件，难以解决按下a键会触发自动托管的bug
-    let find = ui.create.button(["find", "搜索"], "tdnodes")
+    const find = ui.create.button(["find", "搜索"], "tdnodes")
     find.style.display = "inline"
     const updatePagination = () => {
       if (dialog.paginationMaxCount.get("character")) {
         const buttons = dialog.content.querySelector(".buttons")
         const array = dialog.buttons.filter(
-          (item) => !item.classList.contains("nodisplay") && item.style.display !== "none",
+          (item) =>
+            !item.classList.contains("nodisplay") &&
+            item.style.display !== "none",
         )
         /** @type { Pagination } */
         // @ts-expect-error ignore
@@ -1699,12 +1863,16 @@ export class Create {
         if (p) {
           p.state.data = array
           // @ts-expect-error ignore
-          p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")))
+          p.setTotalPageCount(
+            Math.ceil(
+              array.length / dialog.paginationMaxCount.get("character"),
+            ),
+          )
         }
       }
     }
     const restoreState = (btn) => {
-      if (btn.style.display == "none") {
+      if (btn.style.display === "none") {
         btn.style.display = ""
       }
     }
@@ -1744,14 +1912,17 @@ export class Create {
           this.#skillRegsCache.set(value, skills)
         }
       }
-      for (let btn of dialog.buttons) {
+      for (const btn of dialog.buttons) {
         const name = btn.link
         const character = lib.character[name]
 
-        const nameHit = reg.test(get.translation(name)) || reg.test(get.translation(`${name}_ab`))
+        const nameHit =
+          reg.test(get.translation(name)) ||
+          reg.test(get.translation(`${name}_ab`))
         const skillHit = value in lib.skill && character.skills.includes(value)
         const skillTransHit =
-          skills?.size > 0 && character.skills.some((skill) => skills.has(skill))
+          skills?.size > 0 &&
+          character.skills.some((skill) => skills.has(skill))
         if (nameHit || skillHit || skillTransHit) {
           btn.classList.remove("nodisplay")
         } else {
@@ -1761,14 +1932,14 @@ export class Create {
       updatePagination()
     }
     find.addEventListener("click", updateFind)
-    input.onkeydown = function (e) {
+    input.onkeydown = (e) => {
       e.stopPropagation()
-      if (e.key == "Enter") {
+      if (e.key === "Enter") {
         updateFind()
       }
     }
     //阻止冒泡以防止触发窗口被拖动而无法选中文字
-    input.onmousedown = function (e) {
+    input.onmousedown = (e) => {
       e.stopPropagation()
     }
     Searcher.append(input, find)
@@ -1801,12 +1972,15 @@ export class Create {
             span.innerHTML = i
             span.link = i
             span.seperate = true
-            span.addEventListener(lib.config.touchscreen ? "touchend" : "click", clickCapt)
+            span.addEventListener(
+              lib.config.touchscreen ? "touchend" : "click",
+              clickCapt,
+            )
             newlined.appendChild(span)
           }
         }
         for (var i in seperate) {
-          if (i == "list") {
+          if (i === "list") {
             continue
           }
           var link = ""
@@ -1843,7 +2017,7 @@ export class Create {
       if (
         !thisiscard &&
         (lib.characterDialogGroup[lib.config.character_dialog_tool] ||
-          lib.config.character_dialog_tool == "自创")
+          lib.config.character_dialog_tool === "自创")
       ) {
         clickCapt.call(node[lib.config.character_dialog_tool])
       }
@@ -1853,14 +2027,18 @@ export class Create {
       // @ts-expect-error ignore
       const buttons = dialog.content.querySelector(".buttons")
       const array = dialog.buttons.filter(
-        (item) => !item.classList.contains("nodisplay") && item.style.display !== "none",
+        (item) =>
+          !item.classList.contains("nodisplay") &&
+          item.style.display !== "none",
       )
       // 传入初始配置 + 渲染元素
       dialog.addPagination({
         // 数据
         data: array,
         // 总页数(向上取整)
-        totalPageCount: Math.ceil(array.length / dialog.paginationMaxCount.get("character")),
+        totalPageCount: Math.ceil(
+          array.length / dialog.paginationMaxCount.get("character"),
+        ),
         // 父元素
         container: dialog.content,
         // 添加到容器的哪个子元素后面
@@ -1871,7 +2049,10 @@ export class Create {
           // 设一个dialog一页显示10张武将牌
           data.forEach((item, index) => {
             const maxCount = dialog.paginationMaxCount.get("character")
-            if (index >= (pageNumber - 1) * maxCount && index < pageNumber * maxCount) {
+            if (
+              index >= (pageNumber - 1) * maxCount &&
+              index < pageNumber * maxCount
+            ) {
               item.classList.remove("nodisplay")
             } else {
               item.classList.add("nodisplay")
@@ -1886,7 +2067,7 @@ export class Create {
     return dialog
   }
   dialog() {
-    let dialog = new lib.element.Dialog(...arguments)
+    const dialog = new lib.element.Dialog(...arguments)
     if (!Array.from(arguments).includes("hidden")) {
       dialog.open()
     }
@@ -1902,14 +2083,17 @@ export class Create {
       func
     var node = ui.create.div(".config")
     for (var i = 0; i < arguments.length; i++) {
-      if (typeof arguments[i] == "string" || typeof arguments[i] == "number") {
+      if (
+        typeof arguments[i] === "string" ||
+        typeof arguments[i] === "number"
+      ) {
         if (two) {
           ui.create.div(".toggle", node).innerHTML = arguments[i]
         } else {
           ui.create.div(node).innerHTML = arguments[i]
           two = true
         }
-      } else if (typeof arguments[i] == "function") {
+      } else if (typeof arguments[i] === "function") {
         func = arguments[i]
       }
     }
@@ -1923,34 +2107,43 @@ export class Create {
   switcher(name, current, current2) {
     var func
     var node = ui.create.div(".config")
-    ui.create.div(node).innerHTML = get.translation(name + "_config")
+    ui.create.div(node).innerHTML = get.translation(`${name}_config`)
     var switcher = ui.create.div(".toggle.pointerdiv", node)
     switcher.name = name
     for (var i = 0; i < arguments.length; i++) {
-      if (typeof arguments[i] == "function") {
+      if (typeof arguments[i] === "function") {
         func = arguments[i]
         break
       }
     }
-    if (typeof current == "string") {
+    if (typeof current === "string") {
       switcher.link = current
       switcher.innerHTML = get.translation(current)
       switcher.contentEditable = true
       switcher.style.webkitUserSelect = "text"
-      switcher.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.editor)
-    } else if (typeof current == "object") {
+      switcher.addEventListener(
+        lib.config.touchscreen ? "touchend" : "click",
+        ui.click.editor,
+      )
+    } else if (typeof current === "object") {
       switcher.link = current2 || current[0]
       switcher.innerHTML = get.translation(switcher.link)
       switcher.choice = current
-      switcher.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.switcher)
+      switcher.addEventListener(
+        lib.config.touchscreen ? "touchend" : "click",
+        ui.click.switcher,
+      )
     } else {
       if (current) {
         switcher.classList.add("on")
       }
       switcher.classList.add("onoff")
       ui.create.div(ui.create.div(switcher))
-      switcher.link = current ? true : false
-      switcher.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.toggle)
+      switcher.link = !!current
+      switcher.addEventListener(
+        lib.config.touchscreen ? "touchend" : "click",
+        ui.click.toggle,
+      )
     }
     if (func) {
       switcher.additionalCommand = func
@@ -1966,22 +2159,22 @@ export class Create {
     return new lib.element.Control(...arguments)
   }
   confirm(str, func) {
-    if (ui.confirm && ui.confirm.str == str) {
+    if (ui.confirm && ui.confirm.str === str) {
       return
     }
-    if (str == "o") {
+    if (str === "o") {
       if (ui.confirm) {
         ui.confirm.replace("ok")
       } else {
         ui.confirm = ui.create.control("ok")
       }
-    } else if (str == "oc" || str == "co") {
+    } else if (str === "oc" || str === "co") {
       if (ui.confirm) {
         ui.confirm.replace("ok", "cancel")
       } else {
         ui.confirm = ui.create.control("ok", "cancel")
       }
-    } else if (str == "c") {
+    } else if (str === "c") {
       if (ui.confirm) {
         ui.confirm.replace("cancel")
       } else {
@@ -2003,10 +2196,13 @@ export class Create {
   skills(skills) {
     var i, same
     if (ui.skills) {
-      if (ui.skills.skills.length == skills.length && ui.skills.style.display != "none") {
+      if (
+        ui.skills.skills.length === skills.length &&
+        ui.skills.style.display !== "none"
+      ) {
         same = true
         for (i = 0; i < skills.length; i++) {
-          if (ui.skills.skills.includes(skills[i]) == false) {
+          if (ui.skills.skills.includes(skills[i]) === false) {
             same = false
             break
           }
@@ -2018,7 +2214,7 @@ export class Create {
       ui.skills.close()
       delete ui.skills
     }
-    if (skills == undefined || skills.length == 0) {
+    if (skills === undefined || skills.length === 0) {
       return
     }
     if (!_status.event.isMine()) {
@@ -2044,10 +2240,13 @@ export class Create {
   skills2(skills) {
     var i, same
     if (ui.skills2) {
-      if (ui.skills2.skills.length == skills.length && ui.skills2.style.display != "none") {
+      if (
+        ui.skills2.skills.length === skills.length &&
+        ui.skills2.style.display !== "none"
+      ) {
         same = true
         for (i = 0; i < skills.length; i++) {
-          if (ui.skills2.skills.includes(skills[i]) == false) {
+          if (ui.skills2.skills.includes(skills[i]) === false) {
             same = false
             break
           }
@@ -2059,7 +2258,7 @@ export class Create {
       ui.skills2.close()
       delete ui.skills2
     }
-    if (skills == undefined || skills.length == 0) {
+    if (skills === undefined || skills.length === 0) {
       return
     }
     if (!_status.event.isMine()) {
@@ -2085,10 +2284,13 @@ export class Create {
   skills3(skills) {
     var i, same
     if (ui.skills3) {
-      if (ui.skills3.skills.length == skills.length && ui.skills3.style.display != "none") {
+      if (
+        ui.skills3.skills.length === skills.length &&
+        ui.skills3.style.display !== "none"
+      ) {
         same = true
         for (i = 0; i < skills.length; i++) {
-          if (ui.skills3.skills.includes(skills[i]) == false) {
+          if (ui.skills3.skills.includes(skills[i]) === false) {
             same = false
             break
           }
@@ -2100,7 +2302,7 @@ export class Create {
       ui.skills3.close()
       delete ui.skills3
     }
-    if (skills == undefined || skills.length == 0) {
+    if (skills === undefined || skills.length === 0) {
       return
     }
     if (!_status.event.isMine()) {
@@ -2148,7 +2350,7 @@ export class Create {
     if (range[1] <= 1) {
       return null // 只选一张牌就不使用全选哦喵
     }
-    return (event.cardChooseAll = ui.create.control("全选", function () {
+    return (event.cardChooseAll = ui.create.control("全选", () => {
       // 这个反选要封装喵？
       // 好像就只有这里用哦
       const event = get.event()
@@ -2181,7 +2383,7 @@ export class Create {
         card.updateTransform(false, 0)
       }
       game.check()
-      if (typeof event.custom?.add?.card == "function") {
+      if (typeof event.custom?.add?.card === "function") {
         _status.event.custom.add.card()
       }
     }))
@@ -2218,7 +2420,7 @@ export class Create {
     // 创建全选按钮喵
     const buttonChooseAll = ui.create.div(".select-all.popup.pointerdiv")
     event.buttonChooseAll = buttonChooseAll
-    buttonChooseAll.listen(function (e) {
+    buttonChooseAll.listen((e) => {
       const event = get.event()
       const selecteds = [...ui.selected.buttons]
 
@@ -2247,7 +2449,7 @@ export class Create {
         button.classList.remove("selected")
       }
       game.check()
-      if (typeof event.custom?.add?.button == "function") {
+      if (typeof event.custom?.add?.button === "function") {
         _status.event.custom.add.button()
       }
 
@@ -2262,10 +2464,10 @@ export class Create {
     ui.window = ui.create.div("#window.hidden", document.body)
     ui.create.div("#statusbg", document.body)
     ui.refresh(ui.window)
-    if (!localStorage.getItem(lib.configprefix + "playback")) {
+    if (!localStorage.getItem(`${lib.configprefix}playback`)) {
       ui.window.show()
     } else {
-      setTimeout(function () {
+      setTimeout(() => {
         ui.window.show()
       }, 1000)
     }
@@ -2296,10 +2498,13 @@ export class Create {
     // 	);
     // }
 
-    ui.window.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.window)
+    ui.window.addEventListener(
+      lib.config.touchscreen ? "touchend" : "click",
+      ui.click.window,
+    )
     ui.system = ui.create.div("#system.", ui.window)
     ui.arena = ui.create.div("#arena.nome", ui.window)
-    if (lib.device == "ios" && !get.is.phoneLayout()) {
+    if (lib.device === "ios" && !get.is.phoneLayout()) {
       ui.arena.classList.add("ipad")
     }
     ui.arena.setNumber = function (num) {
@@ -2322,44 +2527,48 @@ export class Create {
     if (lib.config.low_performance) {
       ui.window.classList.add("low_performance")
     }
-    if (game.layout == "mobile" || game.layout == "long") {
+    if (game.layout === "mobile" || game.layout === "long") {
       ui.arena.classList.add("mobile")
     }
-    if (game.layout == "long" || game.layout == "long2") {
+    if (game.layout === "long" || game.layout === "long2") {
       ui.arena.classList.add("long")
     }
-    if (game.layout == "default") {
+    if (game.layout === "default") {
       ui.arena.classList.add("oldlayout")
     }
-    if (lib.config.player_border != "wide" || game.layout == "long" || game.layout == "long2") {
+    if (
+      lib.config.player_border !== "wide" ||
+      game.layout === "long" ||
+      game.layout === "long2"
+    ) {
       ui.arena.classList.add("slim_player")
     }
-    if (lib.config.player_border == "slim") {
+    if (lib.config.player_border === "slim") {
       ui.arena.classList.add("uslim_player")
     }
-    if (lib.config.player_border == "narrow") {
+    if (lib.config.player_border === "narrow") {
       ui.arena.classList.add("mslim_player")
     }
     if (
-      lib.config.player_border == "normal" &&
-      lib.config.mode != "brawl" &&
-      (game.layout == "long" || game.layout == "long2")
+      lib.config.player_border === "normal" &&
+      lib.config.mode !== "brawl" &&
+      (game.layout === "long" || game.layout === "long2")
     ) {
       ui.arena.classList.add("lslim_player")
     }
     ui.window.dataset.player_border = lib.config.player_border
     ui.window.dataset.radius_size = lib.config.radius_size || "default"
-    if (game.layout == "long" || game.layout == "mobile") {
+    if (game.layout === "long" || game.layout === "mobile") {
       //if(lib.config.textequip=='text') ui.arena.classList.add('textequip');
       ui.arena.classList.add("textequip")
     }
     if (
-      game.layout == "long" ||
-      game.layout == "long2" ||
-      game.layout == "mobile" ||
-      game.layout == "nova"
+      game.layout === "long" ||
+      game.layout === "long2" ||
+      game.layout === "mobile" ||
+      game.layout === "nova"
     ) {
-      if (lib.config.cardshape == "oblong") {
+      if (lib.config.cardshape === "oblong") {
         ui.window.classList.add("oblongcard")
         ui.arena.classList.add("oblongcard")
       }
@@ -2374,14 +2583,14 @@ export class Create {
       lib.configMenu.appearence.config.custom_button.onclick("skip")
     }
 
-    if (lib.config.show_statusbar_ios == "overlay") {
+    if (lib.config.show_statusbar_ios === "overlay") {
       document.body.classList.add("statusbar")
     }
     if (lib.config.keep_awake) {
-      if (window.plugins && window.plugins.insomnia) {
+      if (window.plugins?.insomnia) {
         window.plugins.insomnia.keepAwake()
       } else {
-        import("nosleep.js").then(function ({ default: NoSleep }) {
+        import("nosleep.js").then(({ default: NoSleep }) => {
           var noSleep = new NoSleep()
           document.addEventListener(
             lib.config.touchscreen ? "touchend" : "click",
@@ -2399,13 +2608,13 @@ export class Create {
         })
       }
     }
-    lib.init.js(lib.assetURL + "game", "keyWords", function () {})
-
+    lib.init.js(`${lib.assetURL}game`, "keyWords", () => {})
 
     lib.init.cssstyles()
 
     ui.arena.dataset.player_height = lib.config.player_height || "default"
-    ui.arena.dataset.player_height_nova = lib.config.player_height_nova || "default"
+    ui.arena.dataset.player_height_nova =
+      lib.config.player_height_nova || "default"
     // if(lib.config.player_height_nova=='long') ui.arena.classList.add('player_autolong');
     ui.arena.dataset.target_shake = lib.config.target_shake || "off"
     ui.backgroundMusic = document.createElement("audio")
@@ -2419,34 +2628,34 @@ export class Create {
       () => {
         if (
           !ui.backgroundMusic.played.length &&
-          lib.config.background_music != "music_off" &&
-          !isNaN(ui.backgroundMusic.duration)
+          lib.config.background_music !== "music_off" &&
+          !Number.isNaN(ui.backgroundMusic.duration)
         ) {
           ui.backgroundMusic.play()
         }
       },
       { once: true },
     )
-    if (lib.config.cursor_style == "pointer") {
+    if (lib.config.cursor_style === "pointer") {
       ui.window.classList.add("nopointer")
     }
-    if (lib.config.turned_style == false) {
+    if (lib.config.turned_style === false) {
       ui.arena.classList.add("hide_turned")
     }
-    if (lib.config.link_style2 != "chain") {
+    if (lib.config.link_style2 !== "chain") {
       ui.arena.classList.add("nolink")
     }
-    if (lib.config.show_name == false) {
+    if (lib.config.show_name === false) {
       ui.arena.classList.add("hide_name")
     }
-    if (lib.config.border_style && lib.config.border_style.startsWith("dragon_")) {
+    if (lib.config.border_style?.startsWith("dragon_")) {
       ui.arena.dataset.framedecoration = lib.config.border_style.slice(7)
     }
 
     ui.gameinfo = ui.create.div("#time", ui.window)
 
     ui.arenalog = ui.create.div("#arenalog", ui.arena)
-    if (lib.config.show_log == "off") {
+    if (lib.config.show_log === "off") {
       ui.arenalog.style.display = "none"
     } else {
       ui.arenalog.dataset.position = lib.config.show_log
@@ -2454,7 +2663,10 @@ export class Create {
     ui.historybar = ui.create.div("#historybar.shadowed", ui.window)
     lib.setScroll(ui.historybar)
 
-    ui.roundmenu = ui.create.div("#roundmenu.roundarenabutton.menubutton.round", ui.arena)
+    ui.roundmenu = ui.create.div(
+      "#roundmenu.roundarenabutton.menubutton.round",
+      ui.arena,
+    )
     ui.roundmenu._position = [180, 210]
     ui.create.div(ui.roundmenu)
     ui.create.div(ui.roundmenu)
@@ -2495,26 +2707,26 @@ export class Create {
     }
     if (ui.time3) {
       ui.time3.starttime = get.utc()
-      ui.time3.interval = setInterval(function () {
+      ui.time3.interval = setInterval(() => {
         var num = Math.round((get.utc() - ui.time3.starttime) / 1000)
         if (num >= 3600) {
           var num1 = Math.floor(num / 3600)
           var num2 = Math.floor((num - num1 * 3600) / 60)
           if (num2 < 10) {
-            num2 = "0" + num2.toString()
+            num2 = `0${num2.toString()}`
           }
-          var num3 = num - num1 * 3600 - parseInt(num2) * 60
+          var num3 = num - num1 * 3600 - parseInt(num2, 10) * 60
           if (num3 < 10) {
-            num3 = "0" + num3.toString()
+            num3 = `0${num3.toString()}`
           }
-          ui.time3.innerHTML = num1 + ":" + num2 + ":" + num3
+          ui.time3.innerHTML = `${num1}:${num2}:${num3}`
         } else {
           var num1 = Math.floor(num / 60)
           var num2 = num - num1 * 60
           if (num2 < 10) {
-            num2 = "0" + num2.toString()
+            num2 = `0${num2.toString()}`
           }
-          ui.time3.innerHTML = num1 + ":" + num2
+          ui.time3.innerHTML = `${num1}:${num2}`
         }
       }, 1000)
     }
@@ -2526,7 +2738,7 @@ export class Create {
       ui.roundmenu.style.display = "none"
     }
 
-    var resetround = function (e) {
+    var resetround = (e) => {
       _status.draggingroundmenu = false
       ui.roundmenu.style.transform = ""
       ui.roundmenu._dragtransform = [0, 0]
@@ -2534,7 +2746,7 @@ export class Create {
       delete ui.roundmenu._dragtouches
       delete ui.roundmenu._dragorigin
       delete ui.roundmenu._dragorigintransform
-      setTimeout(function () {
+      setTimeout(() => {
         ui.roundmenu.style.transition = ""
       }, 500)
       game.saveConfig("roundmenu_transform", [0, 0])
@@ -2545,7 +2757,7 @@ export class Create {
     }
     ui.click.resetround = resetround
     if (lib.config.touchscreen) {
-      ui.roundmenu.addEventListener("touchstart", function (e) {
+      ui.roundmenu.addEventListener("touchstart", (e) => {
         _status.draggingroundmenu = true
         ui.roundmenu._dragorigin = {
           clientX: e.touches[0].clientX,
@@ -2555,7 +2767,7 @@ export class Create {
           ui.roundmenu._dragtransform = [0, 0]
         }
         ui.roundmenu._dragorigintransform = ui.roundmenu._dragtransform.slice(0)
-        ui.roundmenu._resetTimeout = setTimeout(function () {
+        ui.roundmenu._resetTimeout = setTimeout(() => {
           resetround()
           delete ui.roundmenu._resetTimeout
         }, 1000)
@@ -2569,7 +2781,7 @@ export class Create {
     if (lib.config.roundmenu_transform) {
       var translate = lib.config.roundmenu_transform
       ui.roundmenu._dragtransform = translate
-      ui.roundmenu.style.transform = "translate(" + translate[0] + "px," + translate[1] + "px)"
+      ui.roundmenu.style.transform = `translate(${translate[0]}px,${translate[1]}px)`
       ui.click.checkroundtranslate()
     }
     if (get.is.phoneLayout()) {
@@ -2588,8 +2800,8 @@ export class Create {
     ui.sidebar.ontouchmove = ui.click.touchScroll
     ui.sidebar.style.webkitOverflowScrolling = "touch"
 
-    let zoom = Number.parseInt(lib.config.ui_zoom)
-    if (isNaN(zoom) || zoom < 50 || zoom > 300) {
+    let zoom = Number.parseInt(lib.config.ui_zoom, 10)
+    if (Number.isNaN(zoom) || zoom < 50 || zoom > 300) {
       zoom = 100
       game.saveConfig("ui_zoom", `${zoom}%`)
     }
@@ -2641,9 +2853,9 @@ export class Create {
 
       ui.auto.style.opacity = 0.5
       ui.auto.style.transition = "all 0.5s"
-      lib.onfree.push(function () {
+      lib.onfree.push(() => {
         ui.auto.style.opacity = ""
-        setTimeout(function () {
+        setTimeout(() => {
           ui.auto.style.transition = ""
         }, 500)
       })
@@ -2651,7 +2863,7 @@ export class Create {
     ui.auto.id = "autobutton"
     ui.autonode = ui.create.div("#autonode", "<div>托管中...</div>", ui.arena)
     ui.autonode.listen(ui.click.auto)
-    if (lib.config.mode == "connect") {
+    if (lib.config.mode === "connect") {
       ui.auto.hide()
       ui.pause.hide()
     }
@@ -2689,7 +2901,7 @@ export class Create {
     // 	ui.cardPileButton.style.display='none';
     // }
 
-    ui.sortCard = ui.create.system("整理手牌", function () {
+    ui.sortCard = ui.create.system("整理手牌", () => {
       if (!game.me) {
         // || game.me.hasSkillTag("noSortCard")
         return
@@ -2733,7 +2945,7 @@ export class Create {
     //------添加记牌器 by Curpond-------
     ui.deckMonitor = ui.create.system(
       "记牌器",
-      async function () {
+      async () => {
         function getResult() {
           return new Promise((resolve, reject) => {
             if (game.online) {
@@ -2741,9 +2953,9 @@ export class Create {
                 game.ws.send(JSON.stringify(["cardPile"]))
                 game.ws.addEventListener(
                   "message",
-                  function (e) {
-                    let data = JSON.parse(JSON.parse(e.data)[0])
-                    if (data.type == "cardPile") {
+                  (e) => {
+                    const data = JSON.parse(JSON.parse(e.data)[0])
+                    if (data.type === "cardPile") {
                       resolve(data.data)
                     }
                   },
@@ -2765,22 +2977,26 @@ export class Create {
         }
         game.pause2()
 
-        let result = await getResult()
+        const result = await getResult()
         if (!result) {
           return
         }
-        let drawPile = result.drawPile
-        let discardPile = result.discardPile
+        const drawPile = result.drawPile
+        const discardPile = result.discardPile
 
-        let popupContainer = ui.create.div(".popupContainer.deckMonitor", ui.window, function () {
-          this.delete(400)
-          game.resume2()
-        })
-        let container = ui.create.div(".deckMonitor", popupContainer, function (e) {
+        const popupContainer = ui.create.div(
+          ".popupContainer.deckMonitor",
+          ui.window,
+          function () {
+            this.delete(400)
+            game.resume2()
+          },
+        )
+        const container = ui.create.div(".deckMonitor", popupContainer, (e) => {
           e.stopPropagation()
         })
         let flag = true
-        let titleContainer = ui.create.div(".title", container, function (e) {
+        const titleContainer = ui.create.div(".title", container, (e) => {
           if (flag) {
             statistic(discardPile, "弃牌牌堆")
           } else {
@@ -2788,7 +3004,7 @@ export class Create {
           }
           flag = !flag
         })
-        let contentContainer = ui.create.div(".contentContainer", container)
+        const contentContainer = ui.create.div(".contentContainer", container)
         statistic(drawPile, "摸牌牌堆")
         function statistic(cards, title) {
           titleContainer.innerHTML = `${title}【${cards.length}张】 <span>(点击切换)</span>`
@@ -2797,7 +3013,9 @@ export class Create {
           renderSuitColumn()
           renderTypeColumns()
           function renderNumberColumn() {
-            let numberResult = Object.groupBy(cards, (card) => get.number(card))
+            const numberResult = Object.groupBy(cards, (card) =>
+              get.number(card),
+            )
             for (let i = 1; i <= 13; i++) {
               if (!numberResult[i]) {
                 numberResult[i] = []
@@ -2806,18 +3024,22 @@ export class Create {
             createColumnContainer(numberResult, "点数", cards.length)
           }
           function renderSuitColumn() {
-            let suitResult = Object.groupBy(cards, (card) => get.suit(card))
+            const suitResult = Object.groupBy(cards, (card) => get.suit(card))
             Object.assign(
               suitResult,
               Object.groupBy(cards, (card) => {
-                if (get.suit(card) == "spade" && get.number(card) <= 9 && get.number(card) >= 2) {
+                if (
+                  get.suit(card) === "spade" &&
+                  get.number(card) <= 9 &&
+                  get.number(card) >= 2
+                ) {
                   return "♠2-9"
                 }
               }),
             )
             // @ts-expect-error ignore
             delete suitResult[void 0]
-            for (let suit of lib.suit) {
+            for (const suit of lib.suit) {
               if (!suitResult[suit]) {
                 suitResult[suit] = []
               }
@@ -2825,13 +3047,13 @@ export class Create {
             createColumnContainer(suitResult, "花色", cards.length)
           }
           function renderTypeColumns() {
-            let typeResult = Object.groupBy(cards, (card) => get.type(card))
+            const typeResult = Object.groupBy(cards, (card) => get.type(card))
             typeResult.basic ??= []
             typeResult.trick ??= []
             typeResult.equip ??= []
             typeResult.delay ??= []
-            for (let key of Object.keys(typeResult).sort((a, b) => {
-              let arr = [
+            for (const key of Object.keys(typeResult).sort((a, b) => {
+              const arr = [
                 "basic",
                 "trick",
                 "equip",
@@ -2845,15 +3067,17 @@ export class Create {
               ]
               return arr.indexOf(a) - arr.indexOf(b)
             })) {
-              let result = Object.groupBy(typeResult[key], (card) => get.name(card))
-              if (key == "basic") {
+              const result = Object.groupBy(typeResult[key], (card) =>
+                get.name(card),
+              )
+              if (key === "basic") {
                 Object.assign(
                   result,
                   Object.groupBy(typeResult[key], (card) => {
                     if (get.name(card) !== "sha") {
                       return
                     }
-                    return get.translation(get.color(card)) + "杀"
+                    return `${get.translation(get.color(card))}杀`
                   }),
                 )
                 Object.assign(
@@ -2863,59 +3087,73 @@ export class Create {
                       return
                     }
                     let perfix = get.translation(get.nature(card))
-                    if (perfix == "") {
+                    if (perfix === "") {
                       perfix = "普通"
                     }
-                    return perfix + "杀"
+                    return `${perfix}杀`
                   }),
                 )
                 // @ts-expect-error ignore
                 delete result[void 0]
-                createColumnContainer(result, get.translation(key), typeResult[key].length)
+                createColumnContainer(
+                  result,
+                  get.translation(key),
+                  typeResult[key].length,
+                )
               } else {
-                createColumnContainer(result, get.translation(key), typeResult[key].length)
+                createColumnContainer(
+                  result,
+                  get.translation(key),
+                  typeResult[key].length,
+                )
               }
             }
           }
           function createColumnContainer(result, title, count) {
-            let column = ui.create.div(".columnContainer", contentContainer)
-            let subtitle = ui.create.div(".subtitle", column)
+            const column = ui.create.div(".columnContainer", contentContainer)
+            const subtitle = ui.create.div(".subtitle", column)
             subtitle.textContent = `${title}(${count})`
-            let itemContainer = ui.create.div(".itemContainer", column)
-            for (let key in result) {
-              let item = ui.create.div(".item", itemContainer)
-              let tip = ui.create.div(".tip", item)
+            const itemContainer = ui.create.div(".itemContainer", column)
+            for (const key in result) {
+              const item = ui.create.div(".item", itemContainer)
+              const tip = ui.create.div(".tip", item)
               tip.innerHTML = handleColor(
                 result[key].reduce((a, c) => {
-                  return a + `${get.translation(get.suit(c))}${get.number(c)} `
+                  return `${a}${get.translation(get.suit(c))}${get.number(c)} `
                 }, ""),
               )
-              item.addEventListener("mouseenter", function (e) {
-                if (tip.innerHTML == "") {
+              item.addEventListener("mouseenter", (e) => {
+                if (tip.innerHTML === "") {
                   return
                 }
                 tip.style.display = "block"
-                let rect = item.getBoundingClientRect()
+                const rect = item.getBoundingClientRect()
                 if (rect.top < window.innerHeight / 2) {
                   tip.style.top = "110%"
                 } else {
                   tip.style.bottom = "110%"
                 }
               })
-              item.addEventListener("mouseleave", function (e) {
+              item.addEventListener("mouseleave", (e) => {
                 tip.style.display = "none"
               })
-              let itemName = ui.create.div(".itemName", item)
-              let itemCount = ui.create.div(".itemCount", item)
+              const itemName = ui.create.div(".itemName", item)
+              const itemCount = ui.create.div(".itemCount", item)
               itemName.innerHTML = handleColor(get.translation(key))
               itemCount.textContent = `×${result[key].length}`
             }
             function handleColor(str) {
-              let red = `[${get.translation("diamond")}${get.translation("heart")}]`
-              let black = `[${get.translation("club")}${get.translation("spade")}]`
+              const red = `[${get.translation("diamond")}${get.translation("heart")}]`
+              const black = `[${get.translation("club")}${get.translation("spade")}]`
               return str
-                .replace(new RegExp(red, "g"), '<span style="color:red">$&</span>')
-                .replace(new RegExp(black, "g"), '<span style="color:black">$&</span>')
+                .replace(
+                  new RegExp(red, "g"),
+                  '<span style="color:red">$&</span>',
+                )
+                .replace(
+                  new RegExp(black, "g"),
+                  '<span style="color:black">$&</span>',
+                )
             }
           }
         }
@@ -2924,7 +3162,7 @@ export class Create {
       true,
     )
 
-    lib.arenaReady?.push(function () {
+    lib.arenaReady?.push(() => {
       if (lib.config.show_deckMonitor && !_status.connectMode) {
         ui.deckMonitor.style.display = ""
         /*if (_status.connectMode && !lib.config.show_deckMonitor_online) {
@@ -2942,7 +3180,7 @@ export class Create {
     //---------------------------------
     ui.playerids = ui.create.system(
       "显示身份",
-      function () {
+      () => {
         if (game.showIdentity) {
           game.showIdentity()
           _status.identityShown = true
@@ -2966,22 +3204,20 @@ export class Create {
     ui.style = {}
 
     ui.time = ui.create.div(ui.gameinfo)
-    var timeInterval = function () {
+    var timeInterval = () => {
       var date = new Date()
       var hours = date.getHours()
       var minutes = date.getMinutes()
-      if (lib.config.watchface == "simple") {
-        ui.roundmenu.childNodes[13].style.transform =
-          "rotate(" + get.round((hours + 9) * 30, 2) + "deg)"
+      if (lib.config.watchface === "simple") {
+        ui.roundmenu.childNodes[13].style.transform = `rotate(${get.round((hours + 9) * 30, 2)}deg)`
       } else {
-        ui.roundmenu.childNodes[13].style.transform =
-          "rotate(" + get.round((hours + minutes / 60 + 9) * 30, 2) + "deg)"
+        ui.roundmenu.childNodes[13].style.transform = `rotate(${get.round((hours + minutes / 60 + 9) * 30, 2)}deg)`
       }
-      ui.roundmenu.childNodes[12].style.transform = "rotate(" + (minutes + 45) * 6 + "deg)"
+      ui.roundmenu.childNodes[12].style.transform = `rotate(${(minutes + 45) * 6}deg)`
       if (minutes < 10) {
-        minutes = "0" + minutes.toString()
+        minutes = `0${minutes.toString()}`
       }
-      ui.time.innerHTML = hours + ":" + minutes
+      ui.time.innerHTML = `${hours}:${minutes}`
     }
     _status.timeInterval = setInterval(timeInterval, 30000)
     timeInterval()
@@ -2998,11 +3234,11 @@ export class Create {
     ui.timer.popnode.style.opacity = 1
     ui.timer.position = 4
     ui.timer.style.zIndex = 5
-    ui.timer.set = function (text, percentage) {
-      if (typeof text == "string" || typeof text == "number") {
+    ui.timer.set = (text, percentage) => {
+      if (typeof text === "string" || typeof text === "number") {
         ui.timer.popnode.innerHTML = text
       }
-      ui.timer.fillnode.style.top = (1 - percentage) * 100 + "%"
+      ui.timer.fillnode.style.top = `${(1 - percentage) * 100}%`
     }
     var setTimerPosition = function (e) {
       this.position++
@@ -3013,18 +3249,18 @@ export class Create {
       var left2 = "calc(100% - 245px)"
       var top1 = "210px"
       var top2 = "calc(100% - 245px)"
-      if (game.layout == "default") {
+      if (game.layout === "default") {
         left1 = "265px"
         top1 = "160px"
         left2 = "calc(100% - 330px)"
         top2 = "calc(100% - 235px)"
       }
-      if (this.position == 1 || this.position == 2) {
+      if (this.position === 1 || this.position === 2) {
         this.style.top = top2
       } else {
         this.style.top = top1
       }
-      if (this.position == 1 || this.position == 4) {
+      if (this.position === 1 || this.position === 4) {
         this.style.left = left2
       } else {
         this.style.left = left1
@@ -3034,7 +3270,7 @@ export class Create {
 
     ui.shortcut = ui.create.div("#shortcut.hidden", ui.window)
     ui.shortcut.listen(ui.click.shortcut)
-    ui.create.div(ui.shortcut, function (e) {
+    ui.create.div(ui.shortcut, (e) => {
       e.stopPropagation()
     })
     ui.create.div(
@@ -3067,7 +3303,7 @@ export class Create {
       const favouriteMode = lib.config.favouriteMode
       let removed = false
       for (let index = 0; index < favouriteMode.length; index++) {
-        if (typeof favouriteMode[index] == "string") {
+        if (typeof favouriteMode[index] === "string") {
           continue
         }
         favouriteMode.splice(index--, 1)
@@ -3079,10 +3315,12 @@ export class Create {
         game.saveConfigValue("favouriteMode")
       }
       this.innerHTML = ""
-      favouriteMode.slice(0, 6).forEach((value, index) => this.add(value, index))
+      favouriteMode
+        .slice(0, 6)
+        .forEach((value, index) => this.add(value, index))
       let mode = lib.config.mode
       const config = get.config(`${mode}_mode`)
-      if (typeof config == "string") {
+      if (typeof config === "string") {
         mode += `|${config}`
       }
       if (favouriteMode.includes(mode)) {
@@ -3097,10 +3335,11 @@ export class Create {
         submode = info[1],
         node = ui.create.div(".menubutton.large", this),
         dataset = node.dataset
-      dataset.type = Math.min(6, lib.config.favouriteMode.length) % 2 == 0 ? "even" : "odd"
+      dataset.type =
+        Math.min(6, lib.config.favouriteMode.length) % 2 === 0 ? "even" : "odd"
       dataset.position = index
       let str = lib.translate[name] || lib.translate[mode] || ""
-      if (str.length == 2) {
+      if (str.length === 2) {
         str += "模式"
       }
       node.innerHTML = str
@@ -3114,7 +3353,9 @@ export class Create {
     }
     ui.favmode = ui.create.system("收藏", function () {
       const mode =
-        typeof _status.mode == "string" ? `${lib.config.mode}|${_status.mode}` : lib.config.mode
+        typeof _status.mode === "string"
+          ? `${lib.config.mode}|${_status.mode}`
+          : lib.config.mode
       if (this.classList.contains("glow")) {
         this.classList.remove("glow")
         lib.config.favouriteMode.remove(mode)
@@ -3138,11 +3379,11 @@ export class Create {
     ui.arena.appendChild(ui.timer)
 
     if (!game.syncMenu) {
-      lib.onfree.push(function () {
+      lib.onfree.push(() => {
         ui.create.menu()
         ui.config2.classList.remove("hidden")
         ui.roundmenu.classList.remove("transparent2")
-        setTimeout(function () {
+        setTimeout(() => {
           ui.config2.style.transition = ""
         }, 500)
       })
@@ -3157,39 +3398,7 @@ export class Create {
       lib.arenaReady?.shift()()
     }
     delete lib.arenaReady
-    if (lib.config.auto_check_update && !sessionStorage.getItem("auto_check_update")) {
-      setTimeout(() => {
-        sessionStorage.setItem("auto_check_update", "1")
-        game.checkForUpdate(false)
-      }, 3000)
-    }
-    if (!lib.config.asset_version) {
-      lib.onfree.push(function () {
-        setTimeout(function () {
-          if (!game.download) {
-            game.saveConfig("asset_version", "无")
-          } else {
-            var func = function () {
-              if (confirm("是否下载图片和字体素材？")) {
-                if (!ui.arena.classList.contains("menupaused")) {
-                  ui.click.configMenu()
-                  ui.click.menuTab("其它")
-                }
-                setTimeout(game.checkForAssetUpdate, 500)
-              } else {
-                game.saveConfig("asset_version", "无")
-              }
-            }
-            // if (_status.new_tutorial) {
-            // 	_status.new_tutorial = func;
-            // } else {
-            // 	func();
-            // }
-          }
-        }, 3000)
-      })
-    }
-    if (localStorage.getItem(lib.configprefix + "playback")) {
+    if (localStorage.getItem(`${lib.configprefix}playback`)) {
       setTimeout(lib.init.onfree)
     }
 
@@ -3200,7 +3409,7 @@ export class Create {
       lib.config.animation = false
       _status.auto = true
       ui.auto.classList.add("glow")
-      setTimeout(function () {
+      setTimeout(() => {
         var node = ui.create.pause().addTempClass("start")
         node.appendChild(ui.sidebar)
         node.firstChild.innerHTML = "正在测试"
@@ -3221,17 +3430,26 @@ export class Create {
       node.listen(func)
     }
     if (lib.config.button_press) {
-      node.addEventListener(lib.config.touchscreen ? "touchstart" : "mousedown", function (e) {
-        if (!node.classList.contains("hidden")) {
-          node.classList.add("pressdown")
-        }
-      })
-      node.addEventListener(lib.config.touchscreen ? "touchend" : "mouseup", function (e) {
-        node.classList.remove("pressdown")
-      })
-      node.addEventListener(lib.config.touchscreen ? "touchmove" : "mousemove", function (e) {
-        node.classList.remove("pressdown")
-      })
+      node.addEventListener(
+        lib.config.touchscreen ? "touchstart" : "mousedown",
+        (e) => {
+          if (!node.classList.contains("hidden")) {
+            node.classList.add("pressdown")
+          }
+        },
+      )
+      node.addEventListener(
+        lib.config.touchscreen ? "touchend" : "mouseup",
+        (e) => {
+          node.classList.remove("pressdown")
+        },
+      )
+      node.addEventListener(
+        lib.config.touchscreen ? "touchmove" : "mousemove",
+        (e) => {
+          node.classList.remove("pressdown")
+        },
+      )
     }
     return node
   }
@@ -3242,11 +3460,11 @@ export class Create {
     ui.click.shortcut(false)
     var node = ui.create.div(".pausedbg", ui.window)
     _status.pausing = true
-    setTimeout(function () {
+    setTimeout(() => {
       _status.pausing = false
     }, 500)
     if (lib.config.touchscreen) {
-      setTimeout(function () {
+      setTimeout(() => {
         node.addEventListener("touchend", ui.click.resume)
       }, 500)
     } else {
@@ -3280,7 +3498,7 @@ export class Create {
     var node = ui.create.div(position)
     node.style.display = "none"
     node.link = item
-    node.activate = function () {
+    node.activate = () => {
       ui.create.button(item, type, position, noclick, node)
       delete node.activate
     }
@@ -3292,12 +3510,15 @@ export class Create {
      * @returns { import("../../library/index.js").Button }
      */
     tdnodes: (item, type, position, noclick, node) => {
-      node = ui.create.div(".shadowed.reduce_radius.pointerdiv.tdnode.tdnodes", position)
+      node = ui.create.div(
+        ".shadowed.reduce_radius.pointerdiv.tdnode.tdnodes",
+        position,
+      )
       if (Array.isArray(item)) {
-        node.innerHTML = "<span>" + item[1] + "</span>"
+        node.innerHTML = `<span>${item[1]}</span>`
         node.link = item[0]
       } else {
-        node.innerHTML = "<span>" + item + "</span>"
+        node.innerHTML = `<span>${item}</span>`
         node.link = item
       }
       return node
@@ -3308,10 +3529,16 @@ export class Create {
     blank: (item, type, position, noclick, node) => {
       node = ui.create.div(".button.card.blank", position)
       node.link = item
-      if (get.position(item) == "j" && item.viewAs && lib.config.cardtempname != "off") {
+      if (
+        get.position(item) === "j" &&
+        item.viewAs &&
+        lib.config.cardtempname !== "off"
+      ) {
         node.classList.add("infoflip")
         node.classList.add("infohidden")
-        ui.create.cardTempName(item, node).style.setProperty("display", "block", "important")
+        ui.create
+          .cardTempName(item, node)
+          .style.setProperty("display", "block", "important")
       }
       return node
     },
@@ -3319,7 +3546,7 @@ export class Create {
      * @returns { import("../../library/index.js").Button }
      */
     card: (item, type, position, noclick, node) => {
-      if (typeof item.copy == "function") {
+      if (typeof item.copy === "function") {
         node = item.copy(false)
       } else {
         node = item.cloneNode(true)
@@ -3339,7 +3566,7 @@ export class Create {
         node.style.color = item.style.color
       }
       if (item.nature) {
-        let natures = get.natureList(item.nature)
+        const natures = get.natureList(item.nature)
         natures.forEach((n) => node.classList.add(n))
       }
       if (!noclick) {
@@ -3349,8 +3576,8 @@ export class Create {
       if (
         (itemPosition === "e" || itemPosition === "j") &&
         item.viewAs &&
-        item.viewAs != item.name &&
-        lib.config.cardtempname != "off"
+        item.viewAs !== item.name &&
+        lib.config.cardtempname !== "off"
       ) {
         ui.create.cardTempName(item, node)
       }
@@ -3360,7 +3587,7 @@ export class Create {
      * @returns { import("../../library/index.js").Button }
      */
     vcard: (item, type, position, noclick, node) => {
-      if (typeof item == "string") {
+      if (typeof item === "string") {
         item = [get.type(item), "", item]
       }
       node = ui.create.card(position, "noclick", noclick)
@@ -3381,11 +3608,11 @@ export class Create {
         node = ui.create.div(".button.character", position)
       }
       node._link = item
-      if (_status.noReplaceCharacter && type == "characterx") {
+      if (_status.noReplaceCharacter && type === "characterx") {
         type = "character"
       }
-      if (type == "characterx") {
-        if (lib.characterReplace[item] && lib.characterReplace[item].length) {
+      if (type === "characterx") {
+        if (lib.characterReplace[item]?.length) {
           item = lib.characterReplace[item].randomGet()
         }
       }
@@ -3395,13 +3622,13 @@ export class Create {
         node._changeGroup = true
       }
       if (
-        type == "characterx" &&
+        type === "characterx" &&
         lib.characterReplace[node._link] &&
         lib.characterReplace[node._link].length > 1
       ) {
         node._replaceButton = true
       }
-      var func = function (node, item) {
+      var func = (node, item) => {
         node.setBackground(item, "character")
         if (node.node) {
           node.node.name.remove()
@@ -3421,15 +3648,20 @@ export class Create {
         var infoitem = get.character(item)
         node.node.name.innerHTML = get.slimName(item)
         if (
-          lib.config.buttoncharacter_style == "default" ||
-          lib.config.buttoncharacter_style == "simple"
+          lib.config.buttoncharacter_style === "default" ||
+          lib.config.buttoncharacter_style === "simple"
         ) {
-          if (lib.config.buttoncharacter_style == "simple") {
+          if (lib.config.buttoncharacter_style === "simple") {
             node.node.group.style.display = "none"
           }
           node.classList.add("newstyle")
-          node.node.name.dataset.nature = get.groupnature(get.bordergroup(infoitem))
-          node.node.group.dataset.nature = get.groupnature(get.bordergroup(infoitem), "raw")
+          node.node.name.dataset.nature = get.groupnature(
+            get.bordergroup(infoitem),
+          )
+          node.node.group.dataset.nature = get.groupnature(
+            get.bordergroup(infoitem),
+            "raw",
+          )
           ui.create.div(node.node.hp)
           var hp = infoitem.hp,
             maxHp = infoitem.maxHp,
@@ -3440,7 +3672,7 @@ export class Create {
             str += get.numStr(maxHp)
           }
           var textnode = ui.create.div(".text", str, node.node.hp)
-          if (infoitem[2] == 0) {
+          if (infoitem[2] === 0) {
             node.node.hp.hide()
           } else if (get.infoHp(infoitem[2]) <= 3) {
             node.node.hp.dataset.condition = "mid"
@@ -3474,12 +3706,12 @@ export class Create {
             }
           }
         }
-        if (node.node.hp.childNodes.length == 0) {
+        if (node.node.hp.childNodes.length === 0) {
           node.node.name.style.top = "8px"
         }
         if (node.node.name.querySelectorAll("br").length >= 4) {
           node.node.name.classList.add("long")
-          if (lib.config.buttoncharacter_style == "old") {
+          if (lib.config.buttoncharacter_style === "old") {
             node.addEventListener("mouseenter", ui.click.buttonnameenter)
             node.addEventListener("mouseleave", ui.click.buttonnameleave)
           }
@@ -3518,24 +3750,27 @@ export class Create {
           node.node.replaceButton = intro
           intro.innerHTML = "切换"
           intro._node = node
-          intro.addEventListener(lib.config.touchscreen ? "touchend" : "click", function () {
-            _status.tempNoButton = true
-            var node = this._node
-            var list = lib.characterReplace[node._link]
-            var link = node.link
-            var index = list.indexOf(link)
-            if (index == list.length - 1) {
-              index = 0
-            } else {
-              index++
-            }
-            link = list[index]
-            node.link = link
-            node.refresh(node, link)
-            setTimeout(function () {
-              delete _status.tempNoButton
-            }, 200)
-          })
+          intro.addEventListener(
+            lib.config.touchscreen ? "touchend" : "click",
+            function () {
+              _status.tempNoButton = true
+              var node = this._node
+              var list = lib.characterReplace[node._link]
+              var link = node.link
+              var index = list.indexOf(link)
+              if (index === list.length - 1) {
+                index = 0
+              } else {
+                index++
+              }
+              link = list[index]
+              node.link = link
+              node.refresh(node, link)
+              setTimeout(() => {
+                delete _status.tempNoButton
+              }, 200)
+            },
+          )
         }
       }
       node.refresh = func
@@ -3547,7 +3782,13 @@ export class Create {
      * @returns { import("../../library/index.js").Button }
      */
     characterx: (item, type, position, noclick, node) => {
-      return ui.create.buttonPresets.character(item, type, position, noclick, node)
+      return ui.create.buttonPresets.character(
+        item,
+        type,
+        position,
+        noclick,
+        node,
+      )
     },
     /**
      * @returns { import("../../library/index.js").Button }
@@ -3566,8 +3807,8 @@ export class Create {
         name: ui.create.div(".name", node),
         intro: ui.create.div(".intro", node),
       }
-      if (item.name && item.name.startsWith("unknown")) {
-        if (item.node && item.node.name_seat) {
+      if (item.name?.startsWith("unknown")) {
+        if (item.node?.name_seat) {
           node.classList.add("cardbg")
           ui.create.div(".avatar_name", node, get.translation(item.name))
         } else {
@@ -3589,7 +3830,7 @@ export class Create {
       }
       let defaultName = _status.skillOwner[item[0]] || "shibing"
       if ("clanSkill" in get.info(item[0]) && get.player()) {
-        let name = get.nameList(get.player()).find((name) => {
+        const name = get.nameList(get.player()).find((name) => {
           return get.character(name, 3).includes(item[0])
         })
         defaultName = name || defaultName
@@ -3607,14 +3848,16 @@ export class Create {
       node.node.background.innerHTML = ""
       node.setBackground(characterName, "character")
       //添加右键查看技能信息
-      node._customintro = function (uiintro, evt) {
+      node._customintro = (uiintro, evt) => {
         const skill = node.link
         uiintro.add(get.translation(skill))
-        if (lib.translate[skill + "_info"]) {
-          uiintro.add(`<div class="text">${get.skillInfoTranslation(skill, null, false)}</div>`)
-          if (lib.translate[skill + "_append"]) {
+        if (lib.translate[`${skill}_info`]) {
+          uiintro.add(
+            `<div class="text">${get.skillInfoTranslation(skill, null, false)}</div>`,
+          )
+          if (lib.translate[`${skill}_append`]) {
             uiintro._place_text = uiintro.add(
-              '<div class="text">' + lib.translate[skill + "_append"] + "</div>",
+              `<div class="text">${lib.translate[`${skill}_append`]}</div>`,
             )
           }
         }
@@ -3623,11 +3866,16 @@ export class Create {
           if (!Array.isArray(skills)) {
             skills = [skills]
           }
-          skills = skills.filter((skill) => lib.translate[`${skill}_info`] && lib.skill[skill])
+          skills = skills.filter(
+            (skill) => lib.translate[`${skill}_info`] && lib.skill[skill],
+          )
           if (skills.length) {
             uiintro.add(`—— 衍生技能 ——`)
           }
-          uiintro.add([skills.map((i) => [i, node.owner]), ui.create.buttonPresets.skill])
+          uiintro.add([
+            skills.map((i) => [i, node.owner]),
+            ui.create.buttonPresets.skill,
+          ])
         }
       }
       return node
@@ -3638,11 +3886,11 @@ export class Create {
   }
   buttons(list, type, position, noclick, zoom) {
     var buttons = []
-    var pre = typeof type == "string" && type.slice(0, 3) == "pre"
+    var pre = typeof type === "string" && type.slice(0, 3) === "pre"
     if (pre) {
       if (!_status.prebutton) {
         _status.prebutton = []
-        lib.onfree.push(function () {
+        lib.onfree.push(() => {
           for (var i = 0; i < _status.prebutton.length; i++) {
             if (_status.prebutton[i].activate) {
               _status.prebutton[i].activate()
@@ -3655,7 +3903,9 @@ export class Create {
     var fragment = document.createDocumentFragment()
     for (var i = 0; i < list.length; i++) {
       if (pre) {
-        buttons.push(ui.create.prebutton(list[i], type.slice(3), fragment, noclick))
+        buttons.push(
+          ui.create.prebutton(list[i], type.slice(3), fragment, noclick),
+        )
       } else {
         buttons.push(ui.create.button(list[i], type, fragment, noclick))
       }
@@ -3676,7 +3926,7 @@ export class Create {
         link = item
       }
       if (!str.startsWith("<div")) {
-        str = '<div class="popup text textbutton">' + str + "</div>"
+        str = `<div class="popup text textbutton">${str}</div>`
       }
       var next = dialog.add(str)
       if (!noclick) {
@@ -3697,7 +3947,8 @@ export class Create {
     ui.updateConnectPlayerPositions()
     game.connectPlayers = []
     const configOL = lib.configOL
-    const numberOfPlayers = parseInt(configOL.player_number) || configOL.number
+    const numberOfPlayers =
+      parseInt(configOL.player_number, 10) || configOL.number
     for (let position = 0; position < numberOfPlayers; position++) {
       const player = ui.create.player(ui.window)
       player.dataset.position = position
@@ -3720,7 +3971,7 @@ export class Create {
       ".menubutton.large.highlight.connectbutton.connectbutton1.pointerdiv",
       game.online ? "退出联机" : "开始游戏",
       ui.window,
-      function () {
+      () => {
         if (button.clicked) {
           return
         }
@@ -3760,10 +4011,10 @@ export class Create {
       ".menubutton.large.highlight.connectbutton.connectbutton2.pointerdiv",
       "分享房间",
       ui.window,
-      function () {
+      () => {
         var text = `三国杀-联机-${lib.translate[get.mode()]}-${game.connectPlayers.filter((p) => p.avatar).length}/${game.connectPlayers.filter((p) => !p.classList.contains("unselectable2")).length}\n${get.connectNickname()}邀请你加入${game.roomId}房间\n联机地址:${game.ip}\n请先通过游戏内菜单-开始-联机中启用“读取邀请链接”选项`
         window.focus()
-        const fallbackCopyTextToClipboard = function (text) {
+        const fallbackCopyTextToClipboard = (text) => {
           const textArea = document.createElement("textarea")
           textArea.value = text
           textArea.style.position = "fixed"
@@ -3783,7 +4034,10 @@ export class Create {
             const successful = document.execCommand("copy")
             if (!successful) {
               console.error("Unable to copy using execCommand")
-              game.promises.prompt(`###分享内容复制失败，请自行复制以下内容###${text}`, true)
+              game.promises.prompt(
+                `###分享内容复制失败，请自行复制以下内容###${text}`,
+                true,
+              )
             } else {
               game.alert("分享内容复制成功")
             }
@@ -3815,14 +4069,14 @@ export class Create {
     if (numberOfPlayers === 0) {
       return
     }
-    if (numberOfPlayers == undefined) {
+    if (numberOfPlayers === undefined) {
       numberOfPlayers = lib.configOL.number
     }
-    if (numberOfPlayers == undefined) {
+    if (numberOfPlayers === undefined) {
       numberOfPlayers = get.playerNumber()
     }
-    if (typeof numberOfPlayers == "string") {
-      numberOfPlayers = parseInt(numberOfPlayers)
+    if (typeof numberOfPlayers === "string") {
+      numberOfPlayers = parseInt(numberOfPlayers, 10)
     }
     if (!numberOfPlayers) {
       numberOfPlayers = 5
@@ -3889,7 +4143,7 @@ export class Create {
   cardsAsync() {
     if (lib.onfree) {
       _status.waitingForCards = Array.from(arguments)
-      lib.onfree.push(function () {
+      lib.onfree.push(() => {
         if (_status.waitingForCards) {
           ui.create.cards.apply(ui.create, _status.waitingForCards)
           delete _status.waitingForCards
@@ -3923,12 +4177,12 @@ export class Create {
               continue
             }
           }
-          if (game.bannedcards && game.bannedcards.includes(lib.card.list[i][2])) {
+          if (game.bannedcards?.includes(lib.card.list[i][2])) {
             continue
           }
         }
         lib.inpile.add(lib.card.list[i][2])
-        if (lib.card.list[i][2] == "sha" && lib.card.list[i][3]) {
+        if (lib.card.list[i][2] === "sha" && lib.card.list[i][3]) {
           lib.inpile_nature.add(lib.card.list[i][3])
         }
         ui.create.card(ui.cardPile).init(lib.card.list[i])
@@ -3936,18 +4190,16 @@ export class Create {
     }
     lib.inpile.sort(lib.sort.card)
     const natures = Array.from(lib.nature.keys())
-    lib.inpile_nature.sort(function (a, b) {
-      return natures.indexOf(a) - natures.indexOf(b)
-    })
+    lib.inpile_nature.sort((a, b) => natures.indexOf(a) - natures.indexOf(b))
     for (var i in _status.cardtag) {
       if (!_status.cardtag[i].length) {
         delete _status.cardtag[i]
       }
     }
     game.broadcastAll(
-      function (num, pile, top, cardtag, inpile2) {
+      (num, pile, top, cardtag, inpile2) => {
         if (ui.cardPileNumber) {
-          ui.cardPileNumber.innerHTML = "0轮 剩余牌: " + num
+          ui.cardPileNumber.innerHTML = `0轮 剩余牌: ${num}`
         }
         lib.inpile = pile
         _status.pileTop = top

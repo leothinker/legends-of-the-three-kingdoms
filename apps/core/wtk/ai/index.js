@@ -12,9 +12,9 @@ export class AI {
    * @returns { string } cacheKey
    */
   getCacheKey(obj, similar) {
-    let str = "[" + typeof obj + ":"
+    let str = `[${typeof obj}:`
     if (typeof obj !== "object" || obj === null) {
-      return str + String(obj) + "]"
+      return `${str + String(obj)}]`
     }
     if (Array.isArray(obj)) {
       return (
@@ -32,15 +32,15 @@ export class AI {
     }
     if (similar !== false) {
       if (get.itemtype(obj)) {
-        str = "[" + get.itemtype(obj) + ":"
+        str = `[${get.itemtype(obj)}:`
       } else if (!similar) {
         str = "[undefined:"
       }
     }
     try {
-      return str + JSON.stringify(obj) + "]"
+      return `${str + JSON.stringify(obj)}]`
     } catch (error) {
-      return str + get.translation(obj) + "]"
+      return `${str + get.translation(obj)}]`
     }
   }
   /**
@@ -57,7 +57,7 @@ export class AI {
     if (viewer === true) {
       viewer = target
     }
-    let filter = typeof cards === "function" ? cards : () => true
+    const filter = typeof cards === "function" ? cards : () => true
     if (!Array.isArray(cards)) {
       cards = target.getCards("h", filter)
     }
@@ -77,7 +77,7 @@ export class AI {
         return cache
       }
     }
-    let nums = []
+    const nums = []
     const known = target.getKnownCards(viewer, filter),
       unknown = cards.length - known.length
     known.forEach((card) => {
@@ -86,8 +86,16 @@ export class AI {
     if (unknown) {
       cache = {
         nums,
-        max: Math.min(r, Math.max(...nums, r), (r + l) / 2 + ((r - l) / 2) * (1 - 1 / unknown)),
-        min: Math.max(l, Math.min(...nums, l), (r + l) / 2 - ((r - l) / 2) * (1 - 1 / unknown)),
+        max: Math.min(
+          r,
+          Math.max(...nums, r),
+          (r + l) / 2 + ((r - l) / 2) * (1 - 1 / unknown),
+        ),
+        min: Math.max(
+          l,
+          Math.min(...nums, l),
+          (r + l) / 2 - ((r - l) / 2) * (1 - 1 / unknown),
+        ),
       }
     } else {
       cache = {
@@ -108,7 +116,7 @@ export let ai = new AI()
 /**
  * @param { InstanceType<typeof AI> } [instance]
  */
-export let setAI = (instance) => {
+export const setAI = (instance) => {
   ai = instance || new AI()
   if (lib.config.dev) {
     window.wtkAI = ai

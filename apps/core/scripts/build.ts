@@ -1,11 +1,11 @@
-import { build } from "vite"
-import { join, dirname } from "path"
-import { existsSync, readdirSync } from "fs"
-import { Target, viteStaticCopy } from "vite-plugin-static-copy"
-import generateImportMap from "./vite-plugin-importmap"
+import { existsSync, readdirSync } from "node:fs"
+import { dirname, join } from "node:path"
 import jit from "@wtk/jit"
-
+import { build } from "vite"
+import { type Target, viteStaticCopy } from "vite-plugin-static-copy"
 import { moderned_characters } from "../game/config.json"
+import generateImportMap from "./vite-plugin-importmap"
+
 const root = join(import.meta.dirname, "..")
 
 /**
@@ -160,7 +160,11 @@ async function buildSelf(
         },
       },
     },
-    plugins: [viteStaticCopy({ targets: copies }), generateImportMap(importMap), jit()],
+    plugins: [
+      viteStaticCopy({ targets: copies }),
+      generateImportMap(importMap),
+      jit(),
+    ],
   })
 }
 

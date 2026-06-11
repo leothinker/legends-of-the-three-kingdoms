@@ -1,24 +1,13 @@
+import { _status, game, get, lib, ui } from "wtk"
 import {
-  menuContainer,
-  popupContainer,
-  updateActive,
-  setUpdateActive,
-  updateActiveCard,
-  setUpdateActiveCard,
+  createConfig,
   menux,
   menuxpages,
-  menuUpdates,
-  openMenu,
-  clickToggle,
-  clickSwitcher,
-  clickContainer,
-  clickMenuItem,
-  createMenu,
-  createConfig,
+  setUpdateActive,
+  updateActive,
 } from "../index.js"
-import { ui, game, get, ai, lib, _status } from "wtk"
 
-export const characterPackMenu = function (connectMenu) {
+export const characterPackMenu = (connectMenu) => {
   /**
    * 由于联机模式会创建第二个菜单，所以需要缓存一下可变的变量
    */
@@ -50,7 +39,7 @@ export const characterPackMenu = function (connectMenu) {
       rightPane.appendChild(this.link)
     }
   }
-  setUpdateActive(function (node) {
+  setUpdateActive((node) => {
     if (!node) {
       node = start.firstChild.querySelector(".active")
       if (!node) {
@@ -66,14 +55,14 @@ export const characterPackMenu = function (connectMenu) {
       }
     }
   })
-  var updateNodes = function () {
+  var updateNodes = () => {
     for (var i = 0; i < start.firstChild.childNodes.length; i++) {
       var node = start.firstChild.childNodes[i]
       if (node.mode) {
         if (node.mode.startsWith("mode_")) {
           continue
         }
-        if (node.mode == "custom") {
+        if (node.mode === "custom") {
           continue
         }
         if (connectMenu) {
@@ -125,12 +114,12 @@ export const characterPackMenu = function (connectMenu) {
     updateNodes()
   }
 
-  var createModeConfig = function (mode, position, position2) {
+  var createModeConfig = (mode, position, position2) => {
     var _info = lib.characterPack[mode]
     var page = ui.create.div("")
     var node = ui.create.div(
       ".menubutton.large",
-      lib.translate[mode + "_character_config"],
+      lib.translate[`${mode}_character_config`],
       position,
       clickMode,
     )
@@ -141,7 +130,7 @@ export const characterPackMenu = function (connectMenu) {
       position.insertBefore(node, position2)
     }
     node.mode = mode
-    node._initLink = function () {
+    node._initLink = () => {
       node.link = page
       page.node = node
       var list = []
@@ -161,7 +150,6 @@ export const characterPackMenu = function (connectMenu) {
         // }
         for (var j = 0; j < characterInfo.skills.length; j++) {
           if (!lib.skill[characterInfo.skills[j]]) {
-            continue
           }
         }
       }
@@ -172,6 +160,7 @@ export const characterPackMenu = function (connectMenu) {
         _name: mode,
         init: (() => {
           // 原逻辑
+
           return connectMenu
             ? !lib.config.connect_characters.includes(mode)
             : lib.config.characters.includes(mode)
@@ -196,11 +185,8 @@ export const characterPackMenu = function (connectMenu) {
       } else {
         page.style.paddingTop = "8px"
       }
-      if (lib.translate[mode + "_charactersInfo"]) {
-        var modeTranslation =
-          '<p style="padding-left: 2em; margin-block: unset;">' +
-          lib.translate[mode + "_charactersInfo"] +
-          "</p>"
+      if (lib.translate[`${mode}_charactersInfo`]) {
+        var modeTranslation = `<p style="padding-left: 2em; margin-block: unset;">${lib.translate[`${mode}_charactersInfo`]}</p>`
         page.insertAdjacentHTML("beforeend", modeTranslation)
       }
       var banCharacter = function (e) {
@@ -208,9 +194,17 @@ export const characterPackMenu = function (connectMenu) {
           _status.clicked = false
           return
         }
-        if (mode.startsWith("mode_") && mode != "mode_favourite" && mode != "mode_banned") {
+        if (
+          mode.startsWith("mode_") &&
+          mode !== "mode_favourite" &&
+          mode !== "mode_banned"
+        ) {
           if (!connectMenu && lib.config.show_charactercard) {
-            ui.click.charactercard(this.link, this, mode == "mode_guozhan" ? "guozhan" : true)
+            ui.click.charactercard(
+              this.link,
+              this,
+              mode === "mode_guozhan" ? "guozhan" : true,
+            )
           }
           return
         }
@@ -228,13 +222,13 @@ export const characterPackMenu = function (connectMenu) {
         var _list
         if (connectMenu) {
           var mode = cacheMenux.pages[0].firstChild.querySelector(".active")
-          if (mode && mode.mode) {
-            _list = lib.config["connect_" + mode.mode + "_banned"]
+          if (mode?.mode) {
+            _list = lib.config[`connect_${mode.mode}_banned`]
           }
         } else {
-          _list = lib.config[get.mode() + "_banned"]
+          _list = lib.config[`${get.mode()}_banned`]
         }
-        if (_list && _list.includes(this.link)) {
+        if (_list?.includes(this.link)) {
           this.classList.add("banned")
         } else {
           this.classList.remove("banned")
@@ -243,11 +237,11 @@ export const characterPackMenu = function (connectMenu) {
       if (lib.characterSort[mode]) {
         var listb = []
         if (!connectMenu) {
-          listb = lib.config[get.mode() + "_banned"] || []
+          listb = lib.config[`${get.mode()}_banned`] || []
         } else {
           var modex = cacheMenux.pages[0].firstChild.querySelector(".active")
-          if (modex && modex.mode) {
-            listb = lib.config["connect_" + modex.mode + "_banned"]
+          if (modex?.mode) {
+            listb = lib.config[`connect_${modex.mode}_banned`]
           }
         }
         for (var pak in lib.characterSort[mode]) {
@@ -266,20 +260,21 @@ export const characterPackMenu = function (connectMenu) {
           if (listx.length) {
             var cfgnodeY = {
               name: lib.translate[pak],
-              intro: lib.translate[pak + "_info"] || false,
+              intro: lib.translate[`${pak}_info`] || false,
               _name: pak,
               init: boolx,
               onclick(bool) {
                 var banned = []
                 if (connectMenu) {
-                  var modex = cacheMenux.pages[0].firstChild.querySelector(".active")
-                  if (modex && modex.mode) {
-                    banned = lib.config["connect_" + modex.mode + "_banned"]
+                  var modex =
+                    cacheMenux.pages[0].firstChild.querySelector(".active")
+                  if (modex?.mode) {
+                    banned = lib.config[`connect_${modex.mode}_banned`]
                   }
                 } else if (_status.connectMode) {
                   return
                 } else {
-                  banned = lib.config[get.mode() + "_banned"] || []
+                  banned = lib.config[`${get.mode()}_banned`] || []
                 }
                 var listx = lib.characterSort[mode][this._link.config._name]
                 if (bool) {
@@ -292,7 +287,9 @@ export const characterPackMenu = function (connectMenu) {
                   }
                 }
                 game.saveConfig(
-                  connectMenu ? "connect_" + modex.mode + "_banned" : get.mode() + "_banned",
+                  connectMenu
+                    ? `connect_${modex.mode}_banned`
+                    : `${get.mode()}_banned`,
                   banned,
                 )
                 updateActive()
@@ -311,7 +308,7 @@ export const characterPackMenu = function (connectMenu) {
               ui.create.rarity(buttons[i])
               buttons[i].node.hp.style.transition = "all 0s"
               buttons[i].node.hp._innerHTML = buttons[i].node.hp.innerHTML
-              if (mode != "mode_banned") {
+              if (mode !== "mode_banned") {
                 buttons[i].updateBanned = updateBanned
               }
             }
@@ -331,7 +328,7 @@ export const characterPackMenu = function (connectMenu) {
             ui.create.rarity(buttons[i])
             buttons[i].node.hp.style.transition = "all 0s"
             buttons[i].node.hp._innerHTML = buttons[i].node.hp.innerHTML
-            if (mode != "mode_banned") {
+            if (mode !== "mode_banned") {
               buttons[i].updateBanned = updateBanned
             }
           }
@@ -344,7 +341,7 @@ export const characterPackMenu = function (connectMenu) {
           buttons[i].listen(banCharacter)
           buttons[i].node.hp.style.transition = "all 0s"
           buttons[i].node.hp._innerHTML = buttons[i].node.hp.innerHTML
-          if (mode != "mode_banned") {
+          if (mode !== "mode_banned") {
             buttons[i].updateBanned = updateBanned
           }
         }
@@ -359,28 +356,34 @@ export const characterPackMenu = function (connectMenu) {
             page,
           )
         } else if (!mode.startsWith("mode_")) {
-          ui.create.div(".config.pointerspan", "<span>隐藏武将包</span>", page, function () {
-            if (this.firstChild.innerHTML == "隐藏武将包") {
-              if (
-                confirm(
-                  "真的要隐藏“" +
-                    get.translation(mode + "_character_config") +
-                    "”武将包吗？\n建议使用“关闭”而不是“隐藏”功能，否则将会影响其他相关武将包的正常运行！",
-                )
-              ) {
-                this.firstChild.innerHTML = "武将包将在重启后隐藏"
-                lib.config.hiddenCharacterPack.add(mode)
-                if (!lib.config.prompt_hidepack) {
-                  alert("隐藏的扩展包可通过选项-其它-重置隐藏内容恢复")
-                  game.saveConfig("prompt_hidepack", true)
+          ui.create.div(
+            ".config.pointerspan",
+            "<span>隐藏武将包</span>",
+            page,
+            function () {
+              if (this.firstChild.innerHTML === "隐藏武将包") {
+                if (
+                  confirm(
+                    `真的要隐藏“${get.translation(`${mode}_character_config`)}”武将包吗？\n建议使用“关闭”而不是“隐藏”功能，否则将会影响其他相关武将包的正常运行！`,
+                  )
+                ) {
+                  this.firstChild.innerHTML = "武将包将在重启后隐藏"
+                  lib.config.hiddenCharacterPack.add(mode)
+                  if (!lib.config.prompt_hidepack) {
+                    alert("隐藏的扩展包可通过选项-其它-重置隐藏内容恢复")
+                    game.saveConfig("prompt_hidepack", true)
+                  }
                 }
+              } else {
+                this.firstChild.innerHTML = "隐藏武将包"
+                lib.config.hiddenCharacterPack.remove(mode)
               }
-            } else {
-              this.firstChild.innerHTML = "隐藏武将包"
-              lib.config.hiddenCharacterPack.remove(mode)
-            }
-            game.saveConfig("hiddenCharacterPack", lib.config.hiddenCharacterPack)
-          })
+              game.saveConfig(
+                "hiddenCharacterPack",
+                lib.config.hiddenCharacterPack,
+              )
+            },
+          )
         }
       }
     }
@@ -401,7 +404,10 @@ export const characterPackMenu = function (connectMenu) {
         lib.characterPack.mode_favourite[favname] = lib.character[favname]
       }
     }
-    var favouriteCharacterNode = createModeConfig("mode_favourite", start.firstChild)
+    var favouriteCharacterNode = createModeConfig(
+      "mode_favourite",
+      start.firstChild,
+    )
     if (!favouriteCharacterNode.link) {
       favouriteCharacterNode._initLink()
     }
@@ -414,7 +420,7 @@ export const characterPackMenu = function (connectMenu) {
   if (!connectMenu && lib.config.show_ban_menu) {
     lib.characterPack.mode_banned = {}
     for (var i = 0; i < lib.config.all.mode.length; i++) {
-      var banned = lib.config[lib.config.all.mode[i] + "_banned"]
+      var banned = lib.config[`${lib.config.all.mode[i]}_banned`]
       if (banned) {
         for (var j = 0; j < banned.length; j++) {
           if (lib.character[banned[j]]) {
@@ -429,7 +435,9 @@ export const characterPackMenu = function (connectMenu) {
     }
     delete lib.characterPack.mode_banned
   }
-  var characterlist = connectMenu ? lib.connectCharacterPack : lib.config.all.characters
+  var characterlist = connectMenu
+    ? lib.connectCharacterPack
+    : lib.config.all.characters
   for (var i = 0; i < characterlist.length; i++) {
     createModeConfig(characterlist[i], start.firstChild)
   }
@@ -447,9 +455,9 @@ export const characterPackMenu = function (connectMenu) {
   var active = start.firstChild.querySelector(".active")
   if (!active) {
     active = start.firstChild.firstChild
-    if (active.style.display == "none") {
+    if (active.style.display === "none") {
       active = active.nextSibling
-      if (active.style.display == "none") {
+      if (active.style.display === "none") {
         active = active.nextSibling
       }
     }
@@ -463,7 +471,7 @@ export const characterPackMenu = function (connectMenu) {
 
   if (!connectMenu) {
     // 下面使用了var的特性，请不要在这里直接改为let
-    var node1 = ui.create.div(".lefttext", "全部开启", start.firstChild, function () {
+    var node1 = ui.create.div(".lefttext", "全部开启", start.firstChild, () => {
       game.saveConfig(
         "characters",
         Object.keys(lib.characterPack).filter((mode) => {
@@ -472,11 +480,11 @@ export const characterPackMenu = function (connectMenu) {
       )
       updateNodes()
     })
-    var node3 = ui.create.div(".lefttext", "全部关闭", start.firstChild, function () {
+    var node3 = ui.create.div(".lefttext", "全部关闭", start.firstChild, () => {
       game.saveConfig("characters", [])
       updateNodes()
     })
-    var node2 = ui.create.div(".lefttext", "恢复默认", start.firstChild, function () {
+    var node2 = ui.create.div(".lefttext", "恢复默认", start.firstChild, () => {
       game.saveConfig("characters", lib.config.defaultcharacters)
       updateNodes()
     })
@@ -492,9 +500,11 @@ export const characterPackMenu = function (connectMenu) {
    *
    * @param { string } packName
    */
-  return function (packName) {
+  return (packName) => {
     // 判断菜单栏有没有加载过这个武将包
-    if ([...start.firstChild.children].map((node) => node.mode).includes(packName)) {
+    if (
+      [...start.firstChild.children].map((node) => node.mode).includes(packName)
+    ) {
       return
     }
     // 显示不是三国杀自带的武将包

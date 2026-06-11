@@ -1,12 +1,18 @@
 /// <reference types="vite/client" />
-import { rootURL, lib, game, get, _status, ui, ai } from "wtk"
-import { userAgentLowerCase } from "@/util/index.js"
+import { _status, ai, game, get, lib, ui } from "wtk"
+import { CacheContext } from "@/library/cache/cacheContext.js"
 import * as config from "@/util/config.js"
 import { setOnError } from "@/util/error.ts"
-import { security, initializeSandboxRealms } from "@/util/sandbox.js"
-import { CacheContext } from "@/library/cache/cacheContext.js"
+import { userAgentLowerCase } from "@/util/index.js"
+import { initializeSandboxRealms, security } from "@/util/sandbox.js"
 import { importCardPack, importCharacterPack, importMode } from "./import.js"
-import { loadCard, loadCardPile, loadCharacter, loadMode, loadPlay } from "./loading.js"
+import {
+  loadCard,
+  loadCardPile,
+  loadCharacter,
+  loadMode,
+  loadPlay,
+} from "./loading.js"
 
 // 三国杀，启动！
 export async function boot() {
@@ -24,7 +30,10 @@ export async function boot() {
 
   await import("./polyfill.js")
   // 设定游戏加载时间，超过时间未加载就提醒
-  const configLoadTime = parseInt(localStorage.getItem(lib.configprefix + "loadtime") || "10000")
+  const configLoadTime = parseInt(
+    localStorage.getItem(`${lib.configprefix}loadtime`) || "10000",
+    10,
+  )
   // 现在不暴露到全局变量里了，直接传给onload
   const resetGameTimeout = setTimeout(lib.init.reset, configLoadTime)
 
@@ -63,18 +72,20 @@ export async function boot() {
   if ("ontouchstart" in document) {
     if (!config.get("totouched")) {
       game.saveConfig("totouched", true)
-      if (typeof lib.device != "undefined") {
+      if (typeof lib.device !== "undefined") {
         game.saveConfig("low_performance", true)
         game.saveConfig("confirm_exit", true)
         game.saveConfig("touchscreen", true)
         game.saveConfig("fold_mode", false)
-        if (ua.indexOf("ipad") == -1) {
+        if (ua.indexOf("ipad") === -1) {
           game.saveConfig("phonelayout", true)
         } else if (lib.device === "ios") {
           game.saveConfig("show_statusbar_ios", "overlay")
         }
       } else if (
-        confirm("是否切换到触屏模式？（触屏模式可提高触屏设备的响应速度，但无法使用鼠标）")
+        confirm(
+          "是否切换到触屏模式？（触屏模式可提高触屏设备的响应速度，但无法使用鼠标）",
+        )
       ) {
         game.saveConfig("touchscreen", true)
         if (ua.includes("iphone") || ua.includes("android")) {
@@ -92,10 +103,10 @@ export async function boot() {
   }
 
   let layout = config.get("layout")
-  if (layout == "default") {
+  if (layout === "default") {
     layout = "mobile"
   }
-  if (layout == "phone") {
+  if (layout === "phone") {
     layout = "mobile"
     game.saveConfig("layout", "mobile")
     game.saveConfig("phonelayout", true)
@@ -111,28 +122,28 @@ export async function boot() {
   for (const name in pack.character) {
     if (
       config.get("all").sgscharacters.includes(name) ||
-      config.get("hiddenCharacterPack").indexOf(name) == -1
+      config.get("hiddenCharacterPack").indexOf(name) === -1
     ) {
       config.get("all").characters.push(name)
-      lib.translate[name + "_character_config"] = pack.character[name]
+      lib.translate[`${name}_character_config`] = pack.character[name]
     }
   }
   for (const name in pack.card) {
     if (
       config.get("all").sgscards.includes(name) ||
-      config.get("hiddenCardPack").indexOf(name) == -1
+      config.get("hiddenCardPack").indexOf(name) === -1
     ) {
       config.get("all").cards.push(name)
-      lib.translate[name + "_card_config"] = pack.card[name]
+      lib.translate[`${name}_card_config`] = pack.card[name]
     }
   }
   for (const name in pack.play) {
     config.get("all").plays.push(name)
-    lib.translate[name + "_play_config"] = pack.play[name]
+    lib.translate[`${name}_play_config`] = pack.play[name]
   }
   for (const name in pack.submode) {
     for (const j in pack.submode[name]) {
-      lib.translate[name + "|" + j] = pack.submode[name][j]
+      lib.translate[`${name}|${j}`] = pack.submode[name][j]
     }
   }
   for (const name in pack.mode) {
@@ -141,7 +152,7 @@ export async function boot() {
     lib.translate[name] = pack.mode[name]
     config.get("gameRecord")[name] ??= { data: {} }
   }
-  if (config.get("all").mode.length == 0) {
+  if (config.get("all").mode.length === 0) {
     config.get("all").mode.push("identity")
     lib.translate.identity = "身份"
     config.get("gameRecord").identity ??= { data: {} }
@@ -159,7 +170,10 @@ export async function boot() {
   }
   if (pack.music) {
     const music = lib.configMenu.audio.config.background_music.item
-    if (typeof lib.device != "undefined" || typeof window.require === "function") {
+    if (
+      typeof lib.device !== "undefined" ||
+      typeof window.require === "function"
+    ) {
       music.music_custom = "自定义音乐"
     }
     config.get("all").background_music = ["music_default"]
@@ -221,7 +235,6 @@ export async function boot() {
     appearenceConfig.global_font.item.default = "默认"
   }
 
-
   // 三国杀更新日志
   await lib.init.promises.js("game", "update")
   if (window.wtk_update) {
@@ -229,14 +242,16 @@ export async function boot() {
     // 更全面的更新内容
     if (config.get(`version_description_v${window.wtk_update.version}`)) {
       try {
-        const description = config.get(`version_description_v${window.wtk_update.version}`)
+        const description = config.get(
+          `version_description_v${window.wtk_update.version}`,
+        )
         const html = String.raw
         // 匹配[xx](url)的格式
         const regex = /\[([^\]]*)\]\(([^)]+)\)/g
         lib.changeLog.push(
           html`
-            <div
-              style="
+						<div
+							style="
 							position:relative;
 							width:50px;
 							height:50px;
@@ -244,12 +259,15 @@ export async function boot() {
 							background-image:url('${description.author.avatar_url}');
 							background-size:cover;
 							vertical-align:middle;"
-            ></div>
-            ${description.author.login}于${description.published_at}发布
-          `.trim(),
-          description.body.replaceAll("\n", "<br/>").replace(regex, function (match, text, url) {
-            return `<a href="${url}">${text}</a>`
-          }),
+						></div>
+						${description.author.login}于${description.published_at}发布
+					`.trim(),
+          description.body
+            .replaceAll("\n", "<br/>")
+            .replace(
+              regex,
+              (match, text, url) => `<a href="${url}">${text}</a>`,
+            ),
         )
       } catch (e) {
         console.error(e)
@@ -261,10 +279,12 @@ export async function boot() {
       lib.changeLog.push(...window.wtk_update.changeLog)
     }
     if (window.wtk_update.players) {
-      lib.changeLog.push("players://" + JSON.stringify(window.wtk_update.players))
+      lib.changeLog.push(
+        `players://${JSON.stringify(window.wtk_update.players)}`,
+      )
     }
     if (window.wtk_update.cards) {
-      lib.changeLog.push("cards://" + JSON.stringify(window.wtk_update.cards))
+      lib.changeLog.push(`cards://${JSON.stringify(window.wtk_update.cards)}`)
     }
     delete window.wtk_update
   }
@@ -279,7 +299,9 @@ export async function boot() {
   // }
 
   if (!config.get("touchscreen")) {
-    document.addEventListener("mousewheel", ui.click.windowmousewheel, { passive: true })
+    document.addEventListener("mousewheel", ui.click.windowmousewheel, {
+      passive: true,
+    })
     document.addEventListener("mousemove", ui.click.windowmousemove)
     document.addEventListener("mousedown", ui.click.windowmousedown)
     document.addEventListener("mouseup", ui.click.windowmouseup)
@@ -347,7 +369,7 @@ export async function boot() {
   await Promise.allSettled(toLoad)
 
   if (_status.importing) {
-    let promises = []
+    const promises = []
     for (const type in _status.importing) {
       promises.addArray(_status.importing[type])
     }
@@ -373,12 +395,14 @@ export async function boot() {
   }
 
   // 重构了吗？如构
-  let loadingCustomStyle = [
+  const loadingCustomStyle = [
     tryLoadCustomStyle("card_style", (data) => {
       if (ui.css.card_stylesheet) {
         ui.css.card_stylesheet.remove()
       }
-      ui.css.card_stylesheet = lib.init.sheet(`.card:not(*:empty){background-image:url(${data})}`)
+      ui.css.card_stylesheet = lib.init.sheet(
+        `.card:not(*:empty){background-image:url(${data})}`,
+      )
     }),
     tryLoadCustomStyle("cardback_style", {
       cardback_style(data) {
@@ -484,27 +508,29 @@ export async function boot() {
     lib.configMenu.appearence.config.splash_style.item[splash.id] = splash.name
   })
 
-  localStorage.removeItem(lib.configprefix + "directstart")
+  localStorage.removeItem(`${lib.configprefix}directstart`)
   if (!lib.imported.mode?.[lib.config.mode]) {
     window.inSplash = true
     clearTimeout(window.resetGameTimeout)
 
-    if (typeof lib.config.splash_style == "undefined") {
+    if (typeof lib.config.splash_style === "undefined") {
       game.saveConfig("splash_style", lib.onloadSplashes[0].id)
     }
-    let splash = lib.onloadSplashes.find((item) => item.id === lib.config.splash_style)
+    let splash = lib.onloadSplashes.find(
+      (item) => item.id === lib.config.splash_style,
+    )
     if (!splash) {
       splash = lib.onloadSplashes[0]
     }
 
-    let node = ui.create.div("#splash", document.body)
+    const node = ui.create.div("#splash", document.body)
 
-    let { promise, resolve } = Promise.withResolvers()
+    const { promise, resolve } = Promise.withResolvers()
     await splash.init(node, resolve)
 
-    let result = await promise
+    const result = await promise
 
-    let splashInRemoing = await splash.dispose(node)
+    const splashInRemoing = await splash.dispose(node)
     if (!splashInRemoing) {
       node.remove()
     }
@@ -542,18 +568,20 @@ export async function boot() {
   }
 
   if (lib.cardPack.mode_derivation) {
-    lib.cardPack.mode_derivation = lib.cardPack.mode_derivation.filter((item) => {
-      if (
-        typeof lib.card[item].derivation == "string" &&
-        !lib.character[lib.card[item].derivation]
-      ) {
-        return false
-      }
-      return !(
-        typeof lib.card[item].derivationpack == "string" &&
-        !lib.config.cards.includes(lib.card[item].derivationpack)
-      )
-    })
+    lib.cardPack.mode_derivation = lib.cardPack.mode_derivation.filter(
+      (item) => {
+        if (
+          typeof lib.card[item].derivation === "string" &&
+          !lib.character[lib.card[item].derivation]
+        ) {
+          return false
+        }
+        return !(
+          typeof lib.card[item].derivationpack === "string" &&
+          !lib.config.cards.includes(lib.card[item].derivationpack)
+        )
+      },
+    )
 
     if (lib.cardPack.mode_derivation.length === 0) {
       delete lib.cardPack.mode_derivation
@@ -587,7 +615,10 @@ export async function boot() {
         cardData[2] = "sha"
         cardData[3] = "kami"
       }
-      return lib.card[cardData[2]] && !lib.card[cardData[2]].mode?.includes(lib.config.mode)
+      return (
+        lib.card[cardData[2]] &&
+        !lib.card[cardData[2]].mode?.includes(lib.config.mode)
+      )
     })
   }
 
@@ -596,7 +627,7 @@ export async function boot() {
   }
   lib.config.sort_card = get.sortCard(lib.config.sort)
 
-  for (let funcName in lib.init) {
+  for (const funcName in lib.init) {
     if (funcName.startsWith("setMode_")) {
       delete lib.init[funcName]
     }
@@ -620,7 +651,7 @@ export async function boot() {
 
 function initSheet() {
   const player_style = config.get("player_style")
-  if (player_style && player_style != "default" && player_style != "custom") {
+  if (player_style && player_style !== "default" && player_style !== "custom") {
     let str = ""
     switch (player_style) {
       case "wood":
@@ -643,9 +674,9 @@ function initSheet() {
   const border_style = config.get("border_style")
   if (
     border_style &&
-    border_style != "default" &&
-    border_style != "custom" &&
-    border_style != "auto"
+    border_style !== "default" &&
+    border_style !== "custom" &&
+    border_style !== "auto"
   ) {
     let bstyle = border_style
     if (bstyle.startsWith("dragon_")) bstyle = bstyle.slice(7)
@@ -653,11 +684,11 @@ function initSheet() {
       `#window .player>.framebg,
 			#window #arena.long.mobile:not(.fewplayer) .player[data-position="0"]>.framebg {
 				display:block;
-				background-image:url("${lib.assetURL + "theme/style/player/" + bstyle + "1.png"}")
+				background-image:url("${`${lib.assetURL}theme/style/player/${bstyle}1.png`}")
 			}`,
       `#window #arena.long:not(.fewplayer) .player>.framebg,
 			#arena.oldlayout .player>.framebg {
-				background-image: url("${lib.assetURL + "theme/style/player/" + bstyle + "3.png"}")
+				background-image: url("${`${lib.assetURL}theme/style/player/${bstyle}3.png`}")
 			}`,
       `.player>.count {
 				z-index: 3 !important;
@@ -668,21 +699,26 @@ function initSheet() {
   }
 
   const control_style = config.get("control_style")
-  if (control_style && control_style != "default" && control_style != "custom") {
+  if (
+    control_style &&
+    control_style !== "default" &&
+    control_style !== "custom"
+  ) {
     let str = ""
     switch (control_style) {
       case "wood":
         str = `url("${lib.assetURL}theme/woodden/wood.jpg")`
         break
       case "music":
-        str = "linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px"
+        str =
+          "linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px"
         break
       case "simple":
         str =
           "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4));color:white;text-shadow:black 0 0 2px"
         break
     }
-    if (control_style == "wood") {
+    if (control_style === "wood") {
       ui.css.control_stylesheet = lib.init.sheet(
         `#window .control,
 				#window .menubutton,
@@ -703,14 +739,15 @@ function initSheet() {
   }
 
   const menu_style = config.get("menu_style")
-  if (menu_style && menu_style != "default" && menu_style != "custom") {
+  if (menu_style && menu_style !== "default" && menu_style !== "custom") {
     let str = ""
     switch (menu_style) {
       case "wood":
         str = `url("${lib.assetURL}theme/woodden/wood2.png")`
         break
       case "music":
-        str = "linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px"
+        str =
+          "linear-gradient(#4b4b4b, #464646);color:white;text-shadow:black 0 0 2px"
         break
       case "simple":
         str =
@@ -727,19 +764,19 @@ function initSheet() {
 
   const zhishixian = config.get("zhishixian")
   game.zsOriginLineXy = game.linexy
-  if (zhishixian && zhishixian != "default") {
+  if (zhishixian && zhishixian !== "default") {
     const layout = zhishixian
     game.saveConfig("zhishixian", zhishixian)
-    if (layout == "default") {
+    if (layout === "default") {
       game.linexy = game.zsOriginLineXy
     } else {
-      game.linexy = game["zs" + layout + "LineXy"]
+      game.linexy = game[`zs${layout}LineXy`]
     }
   }
 }
 
 async function loadConfig() {
-  lib.config = await lib.init.promises.json(lib.assetURL + "game/config.json")
+  lib.config = await lib.init.promises.json(`${lib.assetURL}game/config.json`)
   lib.configOL = {}
 
   if (!window.indexedDB) {
@@ -781,11 +818,13 @@ async function loadConfig() {
       const configStr = await game.promises.readFileAsText("wtk.config.txt")
 
       let data
-      ;({ config: result = {}, data = {} } = JSON.parse(lib.init.decode(configStr)))
-      for (let i in result) {
+      ;({ config: result = {}, data = {} } = JSON.parse(
+        lib.init.decode(configStr),
+      ))
+      for (const i in result) {
         game.saveConfig(i, result[i])
       }
-      for (let i in data) {
+      for (const i in data) {
         game.putDB("data", i, data[i])
       }
     } catch (e) {
@@ -805,7 +844,8 @@ async function loadConfig() {
 
   // 复制共有模式设置
   for (const name in config.get("mode_config").global) {
-    config.get("mode_config")[config.get("mode")][name] ??= config.get("mode_config").global[name]
+    config.get("mode_config")[config.get("mode")][name] ??=
+      config.get("mode_config").global[name]
   }
 
   if (config.get("characters")) {
@@ -819,8 +859,9 @@ async function loadConfig() {
     if (name.includes("_mode_config")) {
       const thismode = name.slice(name.indexOf("_mode_config") + 13)
       config.get("mode_config")[thismode] ??= {}
-      config.get("mode_config")[thismode][name.slice(0, name.indexOf("_mode_config"))] =
-        result[name]
+      config.get("mode_config")[thismode][
+        name.slice(0, name.indexOf("_mode_config"))
+      ] = result[name]
     } else {
       config.set(name, result[name])
     }
@@ -841,49 +882,71 @@ async function loadConfig() {
 async function loadCss() {
   ui.css = {}
   const stylesLoading = {
-    menu: lib.init.promises.css(lib.assetURL + "layout/default", "menu"),
-    newmenu: lib.init.promises.css(lib.assetURL + "layout/default", "newmenu"),
-    default: lib.init.promises.css(lib.assetURL + "layout/default", "layout"),
-    layout: lib.init.promises.css(lib.assetURL + "layout/" + game.layout, "layout", void 0, true),
+    menu: lib.init.promises.css(`${lib.assetURL}layout/default`, "menu"),
+    newmenu: lib.init.promises.css(`${lib.assetURL}layout/default`, "newmenu"),
+    default: lib.init.promises.css(`${lib.assetURL}layout/default`, "layout"),
+    layout: lib.init.promises.css(
+      `${lib.assetURL}layout/${game.layout}`,
+      "layout",
+      void 0,
+      true,
+    ),
     theme: lib.init.promises.css(
-      lib.assetURL + "theme/" + config.get("theme"),
+      `${lib.assetURL}theme/${config.get("theme")}`,
       "style",
       void 0,
       true,
     ),
     card_style: lib.init.promises.css(
-      lib.assetURL + "theme/style/card",
+      `${lib.assetURL}theme/style/card`,
       config.get("card_style"),
       void 0,
       true,
     ),
     cardback_style: lib.init.promises.css(
-      lib.assetURL + "theme/style/cardback",
+      `${lib.assetURL}theme/style/cardback`,
       config.get("cardback_style"),
       void 0,
       true,
     ),
     hp_style: lib.init.promises.css(
-      lib.assetURL + "theme/style/hp",
+      `${lib.assetURL}theme/style/hp`,
       config.get("hp_style"),
       void 0,
       true,
     ),
     phone: get.is.phoneLayout()
-      ? lib.init.promises.css(lib.assetURL + "layout/default", "phone", void 0, true)
+      ? lib.init.promises.css(
+          `${lib.assetURL}layout/default`,
+          "phone",
+          void 0,
+          true,
+        )
       : lib.init.css(),
-    _others: lib.init.promises.css(lib.assetURL + "layout/" + "others", "dialog", void 0, true),
-    _skill: lib.init.promises.css(lib.assetURL + "layout/" + "others", "skill", void 0, true),
+    _others: lib.init.promises.css(
+      `${lib.assetURL}layout/others`,
+      "dialog",
+      void 0,
+      true,
+    ),
+    _skill: lib.init.promises.css(
+      `${lib.assetURL}layout/others`,
+      "skill",
+      void 0,
+      true,
+    ),
   }
   await Promise.allSettled(
-    Object.keys(stylesLoading).map(async (i) => (ui.css[i] = await stylesLoading[i])),
+    Object.keys(stylesLoading).map(
+      async (i) => (ui.css[i] = await stylesLoading[i]),
+    ),
   )
 }
 
 function setBackground() {
-  let htmlbg = localStorage.getItem(lib.configprefix + "background")
+  let htmlbg = localStorage.getItem(`${lib.configprefix}background`)
   if (htmlbg) {
-    if (htmlbg[0] == "[") {
+    if (htmlbg[0] === "[") {
       try {
         htmlbg = JSON.parse(htmlbg)
         if (!htmlbg) {
@@ -899,8 +962,7 @@ function setBackground() {
       }
     }
     if (htmlbg) {
-      document.documentElement.style.backgroundImage =
-        'url("' + lib.assetURL + "image/background/" + htmlbg + '.jpg")'
+      document.documentElement.style.backgroundImage = `url("${lib.assetURL}image/background/${htmlbg}.jpg")`
       document.documentElement.style.backgroundSize = "cover"
       document.documentElement.style.backgroundPosition = "50% 50%"
       // 由于html没设高度或最小高度导致了图片重复问题
@@ -911,22 +973,28 @@ function setBackground() {
 }
 
 function setWindowListener() {
-  window.onkeydown = function (e) {
-    if (typeof ui.menuContainer == "undefined" || !ui.menuContainer.classList.contains("hidden")) {
-      if (e.key === "F5" || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r")) {
+  window.onkeydown = (e) => {
+    if (
+      typeof ui.menuContainer === "undefined" ||
+      !ui.menuContainer.classList.contains("hidden")
+    ) {
+      if (
+        e.key === "F5" ||
+        ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r")
+      ) {
         if (e.shiftKey) {
           if (confirm("是否重置游戏？")) {
             const wtk_inited = localStorage.getItem("wtk_inited")
-            const onlineKey = localStorage.getItem(lib.configprefix + "key")
+            const onlineKey = localStorage.getItem(`${lib.configprefix}key`)
             localStorage.clear()
             if (wtk_inited) {
               localStorage.setItem("wtk_inited", wtk_inited)
             }
             if (onlineKey) {
-              localStorage.setItem(lib.configprefix + "key", onlineKey)
+              localStorage.setItem(`${lib.configprefix}key`, onlineKey)
             }
             if (indexedDB) {
-              indexedDB.deleteDatabase(lib.configprefix + "data")
+              indexedDB.deleteDatabase(`${lib.configprefix}data`)
             }
             game.reload()
             return
@@ -935,7 +1003,7 @@ function setWindowListener() {
           game.reload()
         }
       } else if (e.key.toLowerCase() === "s" && (e.ctrlKey || e.metaKey)) {
-        if (typeof window.saveWTKInput == "function") {
+        if (typeof window.saveWTKInput === "function") {
           window.saveWTKInput()
         }
         e.preventDefault()
@@ -944,18 +1012,20 @@ function setWindowListener() {
       } else if (
         e.key.toLowerCase() === "j" &&
         (e.ctrlKey || e.metaKey) &&
-        typeof lib.node != "undefined"
+        typeof lib.node !== "undefined"
       ) {
         lib.node.debug()
       }
     } else {
       game.closePopped()
-      const dialogs = document.querySelectorAll("#window>.dialog.popped:not(.static)")
+      const dialogs = document.querySelectorAll(
+        "#window>.dialog.popped:not(.static)",
+      )
       for (let i = 0; i < dialogs.length; i++) {
         // @ts-expect-error ignore
         dialogs[i].delete()
       }
-      if (e.key == "Space") {
+      if (e.key === "Space") {
         const node = ui.window.querySelector("pausedbg")
         if (node) {
           node.click()
@@ -963,29 +1033,35 @@ function setWindowListener() {
           ui.click.pause()
         }
       } else if (e.key.toLowerCase() === "a") {
-        if (typeof ui.auto != "undefined") {
+        if (typeof ui.auto !== "undefined") {
           ui.auto.click()
         }
       } else if (e.key.toLowerCase() === "w") {
-        if (typeof ui.wuxie != "undefined" && ui.wuxie.style.display != "none") {
+        if (
+          typeof ui.wuxie !== "undefined" &&
+          ui.wuxie.style.display !== "none"
+        ) {
           ui.wuxie.classList.toggle("glow")
-        } else if (typeof ui.tempnowuxie != "undefined") {
+        } else if (typeof ui.tempnowuxie !== "undefined") {
           ui.tempnowuxie.classList.toggle("glow")
         }
-      } else if (e.key === "F5" || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r")) {
+      } else if (
+        e.key === "F5" ||
+        ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r")
+      ) {
         if (e.shiftKey) {
           if (confirm("是否重置游戏？")) {
             const wtk_inited = localStorage.getItem("wtk_inited")
-            const onlineKey = localStorage.getItem(lib.configprefix + "key")
+            const onlineKey = localStorage.getItem(`${lib.configprefix}key`)
             localStorage.clear()
             if (wtk_inited) {
               localStorage.setItem("wtk_inited", wtk_inited)
             }
             if (onlineKey) {
-              localStorage.setItem(lib.configprefix + "key", onlineKey)
+              localStorage.setItem(`${lib.configprefix}key`, onlineKey)
             }
             if (indexedDB) {
-              indexedDB.deleteDatabase(lib.configprefix + "data")
+              indexedDB.deleteDatabase(`${lib.configprefix}data`)
             }
             game.reload()
             return
@@ -1000,7 +1076,7 @@ function setWindowListener() {
       } else if (
         e.key.toLowerCase() === "j" &&
         (e.ctrlKey || e.metaKey) &&
-        typeof lib.node != "undefined"
+        typeof lib.node !== "undefined"
       ) {
         lib.node.debug()
       }
@@ -1010,7 +1086,7 @@ function setWindowListener() {
     }
   }
 
-  window.onbeforeunload = function (e) {
+  window.onbeforeunload = (e) => {
     if (config.get("confirm_exit") && !_status.reloading) {
       e.preventDefault()
       e.returnValue = ""

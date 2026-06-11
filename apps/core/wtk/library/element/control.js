@@ -19,12 +19,12 @@ export class Control extends HTMLDivElement {
     Object.setPrototypeOf(control, (lib.element.Control || Control).prototype)
     ui.control.insertBefore(control, _status.createControl || ui.confirm)
     controls.forEach((argument) => {
-      if (argument == "nozoom") {
+      if (argument === "nozoom") {
         return
       }
-      if (typeof argument == "function") {
+      if (typeof argument === "function") {
         control.custom = argument
-      } else if (argument == "stayleft") {
+      } else if (argument === "stayleft") {
         control.stayleft = true
         control.classList.add("stayleft")
       } else {
@@ -47,24 +47,33 @@ export class Control extends HTMLDivElement {
       control.style.transition = ""
     }
 
-    control.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.control2)
+    control.addEventListener(
+      lib.config.touchscreen ? "touchend" : "click",
+      ui.click.control2,
+    )
 
     if (lib.config.button_press) {
-      control.addEventListener(lib.config.touchscreen ? "touchstart" : "mousedown", function () {
-        if (this.classList.contains("disabled")) {
-          return
-        }
-        this.classList.add("controlpressdown")
-        if (typeof this._offset == "number") {
-          this.style.transform = `translateX(${this._offset}px) scale(0.97)`
-        }
-      })
-      control.addEventListener(lib.config.touchscreen ? "touchend" : "mouseup", function () {
-        this.classList.remove("controlpressdown")
-        if (typeof this._offset == "number") {
-          this.style.transform = `translateX(${this._offset}px)`
-        }
-      })
+      control.addEventListener(
+        lib.config.touchscreen ? "touchstart" : "mousedown",
+        function () {
+          if (this.classList.contains("disabled")) {
+            return
+          }
+          this.classList.add("controlpressdown")
+          if (typeof this._offset === "number") {
+            this.style.transform = `translateX(${this._offset}px) scale(0.97)`
+          }
+        },
+      )
+      control.addEventListener(
+        lib.config.touchscreen ? "touchend" : "mouseup",
+        function () {
+          this.classList.remove("controlpressdown")
+          if (typeof this._offset === "number") {
+            this.style.transform = `translateX(${this._offset}px)`
+          }
+        },
+      )
     }
 
     ui.updatec()
@@ -78,7 +87,7 @@ export class Control extends HTMLDivElement {
     if (this.childNodes.length) {
       this.style.transition = "opacity 0.5s"
       ui.refresh(this)
-      this.style.transform = "translateX(-" + this.offsetWidth / 2 + "px)"
+      this.style.transform = `translateX(-${this.offsetWidth / 2}px)`
       this.style.opacity = 1
       ui.refresh(this)
       this.style.transition = ""
@@ -93,7 +102,10 @@ export class Control extends HTMLDivElement {
     this.appendChild(node)
     node.link = item
     node.innerHTML = get.translation(item)
-    node.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.control)
+    node.addEventListener(
+      lib.config.touchscreen ? "touchend" : "click",
+      ui.click.control,
+    )
   }
   close() {
     this.addTempClass("controlpressdownx", 500)
@@ -103,16 +115,16 @@ export class Control extends HTMLDivElement {
 
     setTimeout(ui.updatec, 100)
 
-    if (ui.confirm == this) {
+    if (ui.confirm === this) {
       delete ui.confirm
     }
-    if (ui.skills == this) {
+    if (ui.skills === this) {
       delete ui.skills
     }
-    if (ui.skills2 == this) {
+    if (ui.skills2 === this) {
       delete ui.skills2
     }
-    if (ui.skills3 == this) {
+    if (ui.skills3 === this) {
       delete ui.skills3
     }
   }
@@ -134,7 +146,7 @@ export class Control extends HTMLDivElement {
     }
     delete this.custom
     for (i = 0; i < controls.length; i++) {
-      if (typeof controls[i] == "function") {
+      if (typeof controls[i] === "function") {
         this.custom = controls[i]
       } else {
         this.add(controls[i])
@@ -146,13 +158,12 @@ export class Control extends HTMLDivElement {
         width += this.childNodes[i].offsetWidth
       }
       ui.refresh(this)
-      this.style.width = width + "px"
+      this.style.width = `${width}px`
     }
     ui.updatec()
     if (this.replaceTransition === false) {
-      var that = this
-      setTimeout(function () {
-        that.style.transitionProperty = ""
+      setTimeout(() => {
+        this.style.transitionProperty = ""
       }, 200)
     }
     return this

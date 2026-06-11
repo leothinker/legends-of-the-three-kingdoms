@@ -1,24 +1,15 @@
+import { _status, game, get, lib, ui } from "wtk"
 import {
-  menuContainer,
-  popupContainer,
-  updateActive,
-  setUpdateActive,
-  updateActiveCard,
-  setUpdateActiveCard,
-  menux,
-  menuxpages,
-  menuUpdates,
-  openMenu,
-  clickToggle,
-  clickSwitcher,
   clickContainer,
-  clickMenuItem,
-  createMenu,
   createConfig,
+  menuContainer,
+  menuUpdates,
+  menuxpages,
+  updateActive,
+  updateActiveCard,
 } from "../index.js"
-import { ui, game, get, ai, lib, _status } from "wtk"
 
-export const startMenu = function (connectMenu) {
+export const startMenu = (connectMenu) => {
   /**
    * 由于联机模式会创建第二个菜单，所以需要缓存一下可变的变量
    */
@@ -32,113 +23,119 @@ export const startMenu = function (connectMenu) {
   var rightPane = start.lastChild
 
   /** 启动按钮 */
-  let startButton = ui.create.div(".menubutton.round.highlight", "启", start, function () {
-    if (this.animating || this.classList.contains("dim")) {
-      return
-    }
-    var active = this.parentNode.querySelector(".active")
-    if (active) {
-      if (connectMenu) {
-        if (_status.waitingForPlayer) {
-          var config = {}
-          for (var i in lib.mode[lib.configOL.mode].connect) {
-            if (i == "update") {
-              continue
-            }
-            config[i.slice(8)] = get.config(i, lib.configOL.mode)
-          }
-          config.zhinang_tricks = lib.config.connect_zhinang_tricks
-          if (game.online) {
-            if (game.onlinezhu) {
-              game.send("changeRoomConfig", config)
-            }
-          } else {
-            game.broadcastAll(function (config) {
-              for (var i in config) {
-                lib.configOL[i] = config[i]
-              }
-            }, config)
-            if (
-              lib.configOL.mode == "identity" &&
-              lib.configOL.identity_mode == "zhong" &&
-              game.connectPlayers
-            ) {
-              for (var i = 0; i < game.connectPlayers.length; i++) {
-                game.connectPlayers[i].classList.remove("unselectable2")
-              }
-              lib.configOL.number = 8
-              game.updateWaiting()
-            }
-            if (game.onlineroom) {
-              game.send("server", "config", lib.configOL)
-            }
-            game.connectPlayers[0].chat("房间设置已更改")
-          }
-        } else if (_status.enteringroom || _status.creatingroom) {
-          lib.configOL.mode = active.mode
-          if (_status.enteringroomserver) {
-            game.saveConfig("connect_mode", lib.configOL.mode)
-
+  const startButton = ui.create.div(
+    ".menubutton.round.highlight",
+    "启",
+    start,
+    function () {
+      if (this.animating || this.classList.contains("dim")) {
+        return
+      }
+      var active = this.parentNode.querySelector(".active")
+      if (active) {
+        if (connectMenu) {
+          if (_status.waitingForPlayer) {
             var config = {}
             for (var i in lib.mode[lib.configOL.mode].connect) {
-              if (i == "update") {
+              if (i === "update") {
                 continue
               }
               config[i.slice(8)] = get.config(i, lib.configOL.mode)
             }
             config.zhinang_tricks = lib.config.connect_zhinang_tricks
+            if (game.online) {
+              if (game.onlinezhu) {
+                game.send("changeRoomConfig", config)
+              }
+            } else {
+              game.broadcastAll((config) => {
+                for (var i in config) {
+                  lib.configOL[i] = config[i]
+                }
+              }, config)
+              if (
+                lib.configOL.mode === "identity" &&
+                lib.configOL.identity_mode === "zhong" &&
+                game.connectPlayers
+              ) {
+                for (var i = 0; i < game.connectPlayers.length; i++) {
+                  game.connectPlayers[i].classList.remove("unselectable2")
+                }
+                lib.configOL.number = 8
+                game.updateWaiting()
+              }
+              if (game.onlineroom) {
+                game.send("server", "config", lib.configOL)
+              }
+              game.connectPlayers[0].chat("房间设置已更改")
+            }
+          } else if (_status.enteringroom || _status.creatingroom) {
+            lib.configOL.mode = active.mode
+            if (_status.enteringroomserver) {
+              game.saveConfig("connect_mode", lib.configOL.mode)
 
-            config.characterPack = lib.connectCharacterPack.slice(0)
-            config.cardPack = lib.connectCardPack.slice(0)
-            for (var i = 0; i < lib.config.connect_characters.length; i++) {
-              config.characterPack.remove(lib.config.connect_characters[i])
+              var config = {}
+              for (var i in lib.mode[lib.configOL.mode].connect) {
+                if (i === "update") {
+                  continue
+                }
+                config[i.slice(8)] = get.config(i, lib.configOL.mode)
+              }
+              config.zhinang_tricks = lib.config.connect_zhinang_tricks
+
+              config.characterPack = lib.connectCharacterPack.slice(0)
+              config.cardPack = lib.connectCardPack.slice(0)
+              for (var i = 0; i < lib.config.connect_characters.length; i++) {
+                config.characterPack.remove(lib.config.connect_characters[i])
+              }
+              for (var i = 0; i < lib.config.connect_cards.length; i++) {
+                config.cardPack.remove(lib.config.connect_cards[i])
+              }
+              config.banned = lib.config[`connect_${active.mode}_banned`]
+              config.bannedcards =
+                lib.config[`connect_${active.mode}_bannedcards`]
+              game.send(
+                "server",
+                "create",
+                game.onlineKey,
+                get.connectNickname(),
+                lib.config.connect_avatar,
+                config,
+                active.mode,
+              )
+            } else {
+              game.send(
+                "server",
+                "create",
+                game.onlineKey,
+                get.connectNickname(),
+                lib.config.connect_avatar,
+              )
             }
-            for (var i = 0; i < lib.config.connect_cards.length; i++) {
-              config.cardPack.remove(lib.config.connect_cards[i])
-            }
-            config.banned = lib.config["connect_" + active.mode + "_banned"]
-            config.bannedcards = lib.config["connect_" + active.mode + "_bannedcards"]
-            game.send(
-              "server",
-              "create",
-              game.onlineKey,
-              get.connectNickname(),
-              lib.config.connect_avatar,
-              config,
-              active.mode,
-            )
           } else {
-            game.send(
-              "server",
-              "create",
-              game.onlineKey,
-              get.connectNickname(),
-              lib.config.connect_avatar,
+            localStorage.setItem(`${lib.configprefix}directstart`, true)
+            game.saveConfig("directstartmode", active.mode)
+            game.saveConfig("mode", "connect")
+            ui.exitroom = ui.create.system(
+              "退出房间",
+              () => {
+                game.saveConfig("directstartmode")
+                game.reload()
+              },
+              true,
             )
+            game.switchMode(active.mode)
+            game.requireSandboxOn()
           }
+          clickContainer.call(cacheMenuContainer, connectMenu)
         } else {
-          localStorage.setItem(lib.configprefix + "directstart", true)
-          game.saveConfig("directstartmode", active.mode)
-          game.saveConfig("mode", "connect")
-          ui.exitroom = ui.create.system(
-            "退出房间",
-            function () {
-              game.saveConfig("directstartmode")
-              game.reload()
-            },
-            true,
-          )
-          game.switchMode(active.mode)
-          game.requireSandboxOn()
+          game.saveConfig("mode", active.mode)
+          localStorage.setItem(`${lib.configprefix}directstart`, true)
+          game.reload()
         }
-        clickContainer.call(cacheMenuContainer, connectMenu)
-      } else {
-        game.saveConfig("mode", active.mode)
-        localStorage.setItem(lib.configprefix + "directstart", true)
-        game.reload()
       }
-    }
-  })
+    },
+  )
 
   var clickMode = function () {
     if (this.classList.contains("unselectable")) {
@@ -168,16 +165,21 @@ export const startMenu = function (connectMenu) {
     }
   }
 
-  var createModeConfig = function (mode, position) {
+  var createModeConfig = (mode, position) => {
     var info = lib.mode[mode]
     var page = ui.create.div("")
-    var node = ui.create.div(".menubutton.large", info.name, position, clickMode)
+    var node = ui.create.div(
+      ".menubutton.large",
+      info.name,
+      position,
+      clickMode,
+    )
     node.mode = mode
     var connectDisplayMap = {
       connect_player_number: null,
       connect_versus_mode: null,
     }
-    var updateConnectDisplayMap = function () {
+    var updateConnectDisplayMap = () => {
       if (_status.waitingForPlayer) {
         if (connectDisplayMap.connect_player_number) {
           connectDisplayMap.connect_player_number.style.display = "none"
@@ -189,15 +191,15 @@ export const startMenu = function (connectMenu) {
     }
     if (connectMenu) {
       menuUpdates.push(updateConnectDisplayMap)
-      if (mode == lib.config.connect_mode) {
+      if (mode === lib.config.connect_mode) {
         node.classList.add("active")
       }
     } else {
-      if (mode == lib.config.mode) {
+      if (mode === lib.config.mode) {
         node.classList.add("active")
       }
     }
-    node._initLink = function () {
+    node._initLink = () => {
       node.link = page
       //“更多”下的内容
       var map = {}
@@ -252,7 +254,7 @@ export const startMenu = function (connectMenu) {
                 cfg.onsave.call(this, result)
               }
               if (!_status.connectMode || game.online) {
-                if (typeof cfg.restart == "function") {
+                if (typeof cfg.restart === "function") {
                   if (cfg.restart()) {
                     startButton.classList.add("glowing")
                   }
@@ -263,7 +265,7 @@ export const startMenu = function (connectMenu) {
             }
           }
           if (infoconfig.update) {
-            cfg.update = function () {
+            cfg.update = () => {
               infoconfig.update(config, map)
             }
           }
@@ -281,7 +283,7 @@ export const startMenu = function (connectMenu) {
             ".auto-hide.config",
             '<div style="margin-right:10px" class="pointerdiv">上移↑</div><div class="pointerdiv">下移↓</div>',
           )
-          move.firstChild.listen(function () {
+          move.firstChild.listen(() => {
             if (node.previousSibling) {
               node.parentNode.insertBefore(node, node.previousSibling)
               var order = []
@@ -291,7 +293,7 @@ export const startMenu = function (connectMenu) {
               game.saveConfig("modeorder", order)
             }
           })
-          move.lastChild.listen(function () {
+          move.lastChild.listen(() => {
             if (node.nextSibling) {
               if (node.nextSibling.nextSibling) {
                 node.parentNode.insertBefore(node, node.nextSibling.nextSibling)
@@ -327,7 +329,11 @@ export const startMenu = function (connectMenu) {
               }
               expanded = !expanded
             }
-            var morenodes = ui.create.div(".config.more", "更多 <div>&gt;</div>", page)
+            var morenodes = ui.create.div(
+              ".config.more",
+              "更多 <div>&gt;</div>",
+              page,
+            )
             morenodes.listen(clickmore)
             morenodes._onclick = clickmore
             page.morenodes = morenodes
@@ -349,7 +355,7 @@ export const startMenu = function (connectMenu) {
             "<span>隐藏此模式</span>",
             page,
             function () {
-              if (this.firstChild.innerHTML == "隐藏此模式") {
+              if (this.firstChild.innerHTML === "隐藏此模式") {
                 this.firstChild.innerHTML = "此模式将在重启后隐藏"
                 lib.config.hiddenModePack.add(mode)
                 if (!lib.config.prompt_hidepack) {
@@ -369,7 +375,7 @@ export const startMenu = function (connectMenu) {
         }
         if (infoconfig.update) {
           infoconfig.update(config, map)
-          node.update = function () {
+          node.update = () => {
             infoconfig.update(config, map)
           }
         }
@@ -394,11 +400,11 @@ export const startMenu = function (connectMenu) {
       if (!lib.mode[modeorder[i]].connect) {
         continue
       }
-      if (!lib.config["connect_" + modeorder[i] + "_banned"]) {
-        lib.config["connect_" + modeorder[i] + "_banned"] = []
+      if (!lib.config[`connect_${modeorder[i]}_banned`]) {
+        lib.config[`connect_${modeorder[i]}_banned`] = []
       }
-      if (!lib.config["connect_" + modeorder[i] + "_bannedcards"]) {
-        lib.config["connect_" + modeorder[i] + "_bannedcards"] = []
+      if (!lib.config[`connect_${modeorder[i]}_bannedcards`]) {
+        lib.config[`connect_${modeorder[i]}_bannedcards`] = []
       }
     }
     if (lib.config.all.mode.includes(modeorder[i])) {
@@ -422,7 +428,7 @@ export const startMenu = function (connectMenu) {
         if (morenodes) {
           if (e.wheelDelta < 0) {
             morenodes._onclick.call(morenodes, "expand")
-          } else if (this.scrollTop == 0) {
+          } else if (this.scrollTop === 0) {
             morenodes._onclick.call(morenodes, "unexpand")
           }
         }

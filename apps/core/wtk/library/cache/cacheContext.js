@@ -2,7 +2,7 @@
 import { MD5 } from "crypto-js"
 
 let cacheEnvironment = false
-let cacheContext = undefined
+let cacheContext
 let proxyed = {}
 
 /**
@@ -65,7 +65,7 @@ export class CacheContext {
    * @returns {CacheContext} 缓存上下文
    */
   static requireCacheContext() {
-    let cache = CacheContext.getCacheContext()
+    const cache = CacheContext.getCacheContext()
     if (!cache) {
       return new CacheContext()
     }
@@ -105,9 +105,9 @@ export class CacheContext {
     if (source == null || source === undefined) {
       return null
     }
-    for (let method of methods) {
-      let func = source[method]
-      if (typeof func != "function") {
+    for (const method of methods) {
+      const func = source[method]
+      if (typeof func !== "function") {
         continue
       }
       source[method] = function () {
@@ -148,24 +148,29 @@ export class CacheContext {
     const cacheStorage = {}
     return new Proxy(delegateObject, {
       get: (target, key) => {
-        if (key == "_cacheDelegateSource") {
+        if (key === "_cacheDelegateSource") {
           return delegateObject
         }
-        let value = target[key]
-        if (key.indexOf("cache") == 0) {
+        const value = target[key]
+        if (key.indexOf("cache") === 0) {
           return value
         }
-        if (typeof target.cacheSupportFunction == "function") {
+        if (typeof target.cacheSupportFunction === "function") {
           if (!target.cacheSupportFunction().includes(key)) {
             return value
           }
         }
-        if (typeof value == "function") {
+        if (typeof value === "function") {
           let wrapFunc = cacheFuncObj[key]
-          if (typeof wrapFunc != "function") {
+          if (typeof wrapFunc !== "function") {
             wrapFunc = function () {
               try {
-                return CacheContext._getCacheValueFromObject(cacheStorage, key, arguments, target)
+                return CacheContext._getCacheValueFromObject(
+                  cacheStorage,
+                  key,
+                  arguments,
+                  target,
+                )
               } catch (e) {
                 return value.call(target, ...arguments)
               }
@@ -180,12 +185,15 @@ export class CacheContext {
   }
 
   static _getCacheValueFromObject(storage, key, params, source, func) {
-    let cache = storage
-    let funcCache = CacheContext._ensureMember(cache, key)
-    let cacheKey = CacheContext._wrapParametersToCacheKey(params)
+    const cache = storage
+    const funcCache = CacheContext._ensureMember(cache, key)
+    const cacheKey = CacheContext._wrapParametersToCacheKey(params)
     let ret = funcCache[cacheKey]
     if (ret === undefined) {
-      ret = (typeof func == "function" ? func : source[key]).call(source, ...params)
+      ret = (typeof func === "function" ? func : source[key]).call(
+        source,
+        ...params,
+      )
       funcCache[cacheKey] = ret
       //console.log('缓存未命中!'+key+":"+cacheKey+":"+params.length+":ret:"+ret);
     } else {
@@ -226,7 +234,7 @@ export class CacheContext {
     if (typeof param === "boolean") {
       return `[bl:${param}]`
     }
-    if (typeof param.getCacheKey == "function") {
+    if (typeof param.getCacheKey === "function") {
       return param.getCacheKey()
     }
     if (Array.isArray(param)) {
@@ -238,8 +246,8 @@ export class CacheContext {
     if (typeof param === "function") {
       return `[f:${MD5(param.toString()).toString()}]`
     }
-    let entries = Object.entries(param)
+    const entries = Object.entries(param)
     entries.sort((a, b) => (a[0] < b[0] ? -1 : 1))
-    return `[obj:{${entries.map((e) => e[0] + ":" + CacheContext._wrapParameterToCacheKey(e[1])).join(",")}}]`
+    return `[obj:{${entries.map((e) => `${e[0]}:${CacheContext._wrapParameterToCacheKey(e[1])}`).join(",")}}]`
   }
 }

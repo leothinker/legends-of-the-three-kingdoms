@@ -339,7 +339,9 @@
   opacity: 0.6;
 }
 
-#window:not(.nopointer) .menubg.charactercard .menubutton:not(.ava):not(.intro):not(.unselectable),
+#window:not(.nopointer)
+  .menubg.charactercard
+  .menubutton:not(.ava):not(.intro):not(.unselectable),
 #window:not(.nopointer) .menubg.charactercard > .ava > .avatars > div {
   cursor: pointer;
 }
@@ -399,11 +401,17 @@
     margin-top: 0.5em;
   }
 
-  .menubg.charactercard .characterintro .character-intro-table > :not(:first-child) {
+  .menubg.charactercard
+    .characterintro
+    .character-intro-table
+    > :not(:first-child) {
     margin-left: 0.5em;
   }
 
-  .menubg.charactercard .characterintro .character-intro-table > :not(:last-child) {
+  .menubg.charactercard
+    .characterintro
+    .character-intro-table
+    > :not(:last-child) {
     margin-right: 0.5em;
   }
 }
@@ -680,16 +688,37 @@
   transition: all 0s;
 }
 
-.menu.main > .menu-content > div > .right.pane > div > .config.banskilladd.hidden {
+.menu.main
+  > .menu-content
+  > div
+  > .right.pane
+  > div
+  > .config.banskilladd.hidden {
   margin-top: -50px !important;
 }
 
-.menu.main > .menu-content > div > .right.pane > div > .config.banskilladd:not(.hidden),
-.menu.main > .menu-content > div > .right.pane > div > .config.cardpileadd:not(.hidden) {
+.menu.main
+  > .menu-content
+  > div
+  > .right.pane
+  > div
+  > .config.banskilladd:not(.hidden),
+.menu.main
+  > .menu-content
+  > div
+  > .right.pane
+  > div
+  > .config.cardpileadd:not(.hidden) {
   margin-top: 0;
 }
 
-.menu.main > .menu-content > div > .right.pane > div > .config.banskilladd > select {
+.menu.main
+  > .menu-content
+  > div
+  > .right.pane
+  > div
+  > .config.banskilladd
+  > select {
   margin-right: 3px;
 }
 
@@ -699,7 +728,12 @@
   white-space: nowrap;
 }
 
-.menu.main > .menu-content > div > .right.pane > div > .config.toggle.pointerspan.cardpilecfg {
+.menu.main
+  > .menu-content
+  > div
+  > .right.pane
+  > div
+  > .config.toggle.pointerspan.cardpilecfg {
   left: 0px !important;
 }
 
@@ -735,7 +769,13 @@
   > .right.pane
   > div:not(.expanded)
   > .config.auto-hide,
-#window.low_performance .menu.main > .menu-content > div > .right.pane > div > .config.hidden {
+#window.low_performance
+  .menu.main
+  > .menu-content
+  > div
+  > .right.pane
+  > div
+  > .config.hidden {
   display: none;
   transition-property: transform;
 }
@@ -1010,7 +1050,10 @@
 
 .themebutton.simple > div > div.active,
 .themebutton.music > div > div.active {
-  background-image: linear-gradient(rgba(47, 101, 150, 1), rgba(43, 90, 132, 1));
+  background-image: linear-gradient(
+    rgba(47, 101, 150, 1),
+    rgba(43, 90, 132, 1)
+  );
 }
 
 .themebutton > div > div:first-child {
@@ -1101,11 +1144,18 @@
   display: none;
 }
 
-.popup-container > .menu.visual.withbar > div.showdelete > div:first-child:not(.addbutton) {
+.popup-container
+  > .menu.visual.withbar
+  > div.showdelete
+  > div:first-child:not(.addbutton) {
   display: none;
 }
 
-#window:not(.nopointer) .popup-container > .menu.visual.withbar > div:last-child > div {
+#window:not(.nopointer)
+  .popup-container
+  > .menu.visual.withbar
+  > div:last-child
+  > div {
   cursor: pointer;
 }
 
@@ -1394,18 +1444,38 @@ input.fileinput::-webkit-file-upload-button {
   position: absolute;
 }
 
-#window[data-radius_size="reduce"] .menu-buttons > .new_character > .avatar > input,
-#window[data-radius_size="reduce"] .menu-buttons > .new_character > .card > input {
+#window[data-radius_size="reduce"]
+  .menu-buttons
+  > .new_character
+  > .avatar
+  > input,
+#window[data-radius_size="reduce"]
+  .menu-buttons
+  > .new_character
+  > .card
+  > input {
   border-radius: 4px;
 }
 
-#window[data-radius_size="off"] .menu-buttons > .new_character > .avatar > input,
+#window[data-radius_size="off"]
+  .menu-buttons
+  > .new_character
+  > .avatar
+  > input,
 #window[data-radius_size="off"] .menu-buttons > .new_character > .card > input {
   border-radius: 0px;
 }
 
-#window[data-radius_size="increase"] .menu-buttons > .new_character > .avatar > input,
-#window[data-radius_size="increase"] .menu-buttons > .new_character > .card > input {
+#window[data-radius_size="increase"]
+  .menu-buttons
+  > .new_character
+  > .avatar
+  > input,
+#window[data-radius_size="increase"]
+  .menu-buttons
+  > .new_character
+  > .card
+  > input {
   border-radius: 16px;
 }
 
@@ -1546,7 +1616,12 @@ input.fileinput::-webkit-file-upload-button {
   position: relative;
 }
 
-.menu-buttons > .new_character > .skill_list > div:first-child > div > div:last-child {
+.menu-buttons
+  > .new_character
+  > .skill_list
+  > div:first-child
+  > div
+  > div:last-child {
   float: right;
 }
 
@@ -1588,13 +1663,19 @@ input.fileinput::-webkit-file-upload-button {
 
 .menubutton.active,
 .menubutton.blue {
-  background-image: linear-gradient(rgba(47, 101, 150, 1), rgba(43, 90, 132, 1));
+  background-image: linear-gradient(
+    rgba(47, 101, 150, 1),
+    rgba(43, 90, 132, 1)
+  );
 }
 
 .tdnodes.selected,
 .text.selected,
 .bluebg {
-  background-image: linear-gradient(rgba(47, 101, 150, 1), rgba(43, 90, 132, 1)) !important;
+  background-image: linear-gradient(
+    rgba(47, 101, 150, 1),
+    rgba(43, 90, 132, 1)
+  ) !important;
 }
 
 #system > div > .pressdown {
@@ -1610,7 +1691,10 @@ input.fileinput::-webkit-file-upload-button {
 }
 
 #system > div > .pressdown2 {
-  background-image: linear-gradient(rgba(47, 101, 150, 1), rgba(43, 90, 132, 1));
+  background-image: linear-gradient(
+    rgba(47, 101, 150, 1),
+    rgba(43, 90, 132, 1)
+  );
 }
 
 .menubutton.highlight,
@@ -1646,7 +1730,10 @@ input.fileinput::-webkit-file-upload-button {
 
 .popup-container > .menu:not(.visual) > div:hover {
   color: white;
-  background-image: linear-gradient(rgba(47, 101, 150, 1), rgba(43, 90, 132, 1));
+  background-image: linear-gradient(
+    rgba(47, 101, 150, 1),
+    rgba(43, 90, 132, 1)
+  );
   box-shadow: rgba(0, 0, 0, 0.2) 0 0 0 1px;
 }
 
@@ -1695,8 +1782,8 @@ input.fileinput::-webkit-file-upload-button {
   line-height: 20px;
   text-align: left;
   font-family:
-    "STHeiti", "SimHei", "Microsoft JhengHei", "Microsoft YaHei", "WenQuanYi Micro Hei", Helvetica,
-    Arial, sans-serif;
+    "STHeiti", "SimHei", "Microsoft JhengHei", "Microsoft YaHei",
+    "WenQuanYi Micro Hei", Helvetica, Arial, sans-serif;
 }
 
 .videonode.menubutton > .victory {
@@ -2113,6 +2200,12 @@ div.popup-container.editor2 > div {
   padding-bottom: 2px;
 }
 
-#window:not(.nopointer) .popup-container > .prompt-container > div > div > div > .menubutton {
+#window:not(.nopointer)
+  .popup-container
+  > .prompt-container
+  > div
+  > div
+  > div
+  > .menubutton {
   cursor: pointer;
 }

@@ -14,4 +14,4 @@ export class Experimental {
   }
 }
 
-export let experimental = new Experimental()
+export const experimental = new Experimental()

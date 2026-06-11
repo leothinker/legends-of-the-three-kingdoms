@@ -1,4 +1,4 @@
-import { _status, game } from "wtk"
+import { game } from "wtk"
 
 export class NodeWS {
   /**
@@ -11,7 +11,7 @@ export class NodeWS {
     game.send("server", "send", this.wsid, message)
   }
   on(type, func) {
-    this["on" + type] = func
+    this[`on${type}`] = func
   }
   close() {
     game.send("server", "close", this.wsid)

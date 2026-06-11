@@ -1,9 +1,13 @@
 import { _status, game, get, lib, ui } from "wtk"
-import { Player } from "./index.js"
 import ContentCompiler from "./GameEvent/compilers/ContentCompiler.js"
-import { EventCompileable, EventCompiledContent } from "./GameEvent/compilers/IContentCompiler.js"
+import type {
+  EventCompileable,
+  EventCompiledContent,
+} from "./GameEvent/compilers/IContentCompiler.js"
 import GameEventManager from "./GameEvent/GameEventManager.js"
-export { GameEventManager, ContentCompiler }
+import type { Player } from "./index.js"
+
+export { ContentCompiler, GameEventManager }
 
 type triggerSkillTodo = {
   skill: string
@@ -22,7 +26,7 @@ export class GameEvent implements PromiseLike<void> {
     trigger: boolean = true,
     manager: GameEventManager = _status.eventManager,
   ) {
-    //@ts-ignore
+    //@ts-expect-error
     if (name instanceof GameEvent) {
       const other = name
       name = other.name
@@ -60,7 +64,7 @@ export class GameEvent implements PromiseLike<void> {
         }
       }
     } else {
-      if (typeof key != "string") {
+      if (typeof key !== "string") {
         console.log("warning: using non-string object as event key")
         console.log(key, value)
         console.log(_status.event)
@@ -96,10 +100,9 @@ export class GameEvent implements PromiseLike<void> {
     onfulfilled?: (() => TResult1 | Promise<TResult1>) | null,
     onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | null,
   ): Promise<TResult1 | TResult2> {
-    return (this.parent ? this.parent.waitNext().then(() => undefined) : this.start()).then(
-      onfulfilled,
-      onrejected,
-    )
+    return (
+      this.parent ? this.parent.waitNext().then(() => undefined) : this.start()
+    ).then(onfulfilled, onrejected)
   }
   /**
    * Attaches a callback for only the rejection of the Promise.
@@ -159,7 +162,11 @@ export class GameEvent implements PromiseLike<void> {
    * @param includeSelf 若level不是数字，指定搜索时是否包含事件本身
    */
   getParent(level?: number, forced?: boolean): GameEvent | undefined
-  getParent(level: string, forced?: boolean, includeSelf?: boolean): GameEvent | undefined
+  getParent(
+    level: string,
+    forced?: boolean,
+    includeSelf?: boolean,
+  ): GameEvent | undefined
   getParent(
     level: (evt: GameEvent) => boolean,
     forced?: boolean,
@@ -207,7 +214,7 @@ export class GameEvent implements PromiseLike<void> {
           childEvent.parent = event
           const type = childEvent.getDefaultNextHandlerType()
           if (type) {
-            //@ts-ignore
+            //@ts-expect-error
             childEvent.pushHandler(...event.getHandler(type))
           }
           if (event.#inContent && event.finished) {
@@ -272,8 +279,8 @@ export class GameEvent implements PromiseLike<void> {
   async loop() {
     const trigger = async (trigger: string, to: number) => {
       this._triggered = to
-      if (this.type == "card") {
-        await this.trigger("useCardTo" + trigger)
+      if (this.type === "card") {
+        await this.trigger(`useCardTo${trigger}`)
       }
       await this.trigger(this.name + trigger)
     }
@@ -289,9 +296,12 @@ export class GameEvent implements PromiseLike<void> {
           await trigger("Begin", 2)
         } else {
           this.#inContent = true
-          let next = this.content(this).catch((error) => {
-            if (lib.config.ignore_error || (_status.connectMode && !lib.config.debug)) {
-              game.print("游戏出错：" + this.name)
+          const next = this.content(this).catch((error) => {
+            if (
+              lib.config.ignore_error ||
+              (_status.connectMode && !lib.config.debug)
+            ) {
+              game.print(`游戏出错：${this.name}`)
               game.print(error.toString())
               console.error(error)
             } else {
@@ -316,7 +326,10 @@ export class GameEvent implements PromiseLike<void> {
     }
   }
   async checkSkipped(): Promise<boolean> {
-    if (!this.player || (!this.player.skipList.includes(this.name) && !this.isSkipped)) {
+    if (
+      !this.player ||
+      (!this.player.skipList.includes(this.name) && !this.isSkipped)
+    ) {
       return false
     }
     this.player.skipList.remove(this.name)
@@ -324,11 +337,11 @@ export class GameEvent implements PromiseLike<void> {
       this.player.getHistory("skipped").add(this.name)
     }
     this.finish()
-    await this.trigger(this.name + "Skipped")
+    await this.trigger(`${this.name}Skipped`)
     return true
   }
-  #waitNext?: Promise<Partial<Result> | void>
-  waitNext(): Promise<Partial<Result> | void> {
+  #waitNext?: Promise<Partial<Result> | undefined>
+  waitNext(): Promise<Partial<Result> | undefined> {
     if (this.#waitNext) {
       return this.#waitNext
     }
@@ -371,14 +384,14 @@ export class GameEvent implements PromiseLike<void> {
       return this
     }
     let evt: GameEvent = this
-    if (typeof skills == "string") {
+    if (typeof skills === "string") {
       skills = [skills]
     }
     //手动addTrigger请自己展开
     //game.expandSkills(skills);
     while (true) {
       evt = evt.getParent("arrangeTrigger")
-      if (!evt || evt.name != "arrangeTrigger" || !evt.doingList) {
+      if (evt?.name !== "arrangeTrigger" || !evt.doingList) {
         return this
       }
       const doing = evt.doingList.find((i) => i.player === player)
@@ -400,10 +413,14 @@ export class GameEvent implements PromiseLike<void> {
         ) {
           continue
         }
-        let toadds: triggerSkillTodo[] = []
+        const toadds: triggerSkillTodo[] = []
         const priority = get.priority(skill)
         if (typeof info.getIndex === "function") {
-          const indexedResult = info.getIndex<any>(evt.getTrigger(), player, evt.triggername)
+          const indexedResult = info.getIndex<any>(
+            evt.getTrigger(),
+            player,
+            evt.triggername,
+          )
           if (typeof indexedResult === "number") {
             for (let i = 0; i < indexedResult; i++) {
               toadds.push({
@@ -440,10 +457,18 @@ export class GameEvent implements PromiseLike<void> {
         }
         for (const toadd of toadds) {
           if (!toadd.indexedData) {
-            if (map.doneList.some((i) => i.skill === toadd.skill && i.player === toadd.player)) {
+            if (
+              map.doneList.some(
+                (i) => i.skill === toadd.skill && i.player === toadd.player,
+              )
+            ) {
               continue
             }
-            if (map.todoList.some((i) => i.skill === toadd.skill && i.player === toadd.player)) {
+            if (
+              map.todoList.some(
+                (i) => i.skill === toadd.skill && i.player === toadd.player,
+              )
+            ) {
               continue
             }
           }
@@ -452,7 +477,8 @@ export class GameEvent implements PromiseLike<void> {
         if (typeof map.player === "string") {
           map.todoList.sort(
             (a, b) =>
-              b.priority - a.priority || evt.playerMap.indexOf(a) - evt.playerMap.indexOf(b),
+              b.priority - a.priority ||
+              evt.playerMap.indexOf(a) - evt.playerMap.indexOf(b),
           )
         } else {
           map.todoList.sort((a, b) => b.priority - a.priority)
@@ -465,25 +491,27 @@ export class GameEvent implements PromiseLike<void> {
       return this
     }
     let evt = this
-    if (typeof skills == "string") {
+    if (typeof skills === "string") {
       skills = [skills]
     }
     game.expandSkills(skills)
     while (true) {
       evt = evt.getParent("arrangeTrigger")
-      if (!evt || evt.name != "arrangeTrigger" || !evt.doingList) {
+      if (evt?.name !== "arrangeTrigger" || !evt.doingList) {
         return this
       }
-      const doing = evt.doingList.find((i) => i.player == player)
-      const firstDo = evt.doingList.find((i) => i.player == "firstDo")
-      const lastDo = evt.doingList.find((i) => i.player == "lastDo")
+      const doing = evt.doingList.find((i) => i.player === player)
+      const firstDo = evt.doingList.find((i) => i.player === "firstDo")
+      const lastDo = evt.doingList.find((i) => i.player === "lastDo")
 
       skills.forEach((skill) =>
         [doing, firstDo, lastDo].forEach((map) => {
           if (!map) {
             return
           }
-          const toremove = map.todoList.filter((i) => i.skill == skill && i.player == player)
+          const toremove = map.todoList.filter(
+            (i) => i.skill === skill && i.player === player,
+          )
           if (toremove.length > 0) {
             map.todoList.removeArray(toremove)
           }
@@ -497,7 +525,14 @@ export class GameEvent implements PromiseLike<void> {
     }
     if (
       !_status.gameDrawed &&
-      ["lose", "gain", "loseAsync", "equip", "addJudge", "addToExpansion"].includes(this.name)
+      [
+        "lose",
+        "gain",
+        "loseAsync",
+        "equip",
+        "addJudge",
+        "addToExpansion",
+      ].includes(this.name)
     ) {
       return
     }
@@ -507,7 +542,7 @@ export class GameEvent implements PromiseLike<void> {
     if (name === "gameStart") {
       lib.announce.publish("WTK.Game.Event.GameStart", {})
       lib.announce.publish("gameStart", {})
-      if (_status.brawl && _status.brawl.gameStart) {
+      if (_status.brawl?.gameStart) {
         _status.brawl.gameStart()
       }
       if (lib.config.show_cardpile) {
@@ -522,16 +557,20 @@ export class GameEvent implements PromiseLike<void> {
     if (!lib.hookmap[name]) {
       return
     }
-    if (!game.players || !game.players.length) {
+    if (!game.players?.length) {
       return
     }
     const event = this
-    if (event.filterStop && event.filterStop()) {
+    if (event.filterStop?.()) {
       return
     }
-    let start = [_status.currentPhase, event.source, event.player, game.me, game.players[0]].find(
-      (i) => get.itemtype(i) == "player",
-    )
+    let start = [
+      _status.currentPhase,
+      event.source,
+      event.player,
+      game.me,
+      game.players[0],
+    ].find((i) => get.itemtype(i) === "player")
     if (!start) {
       return
     }
@@ -612,7 +651,7 @@ export class GameEvent implements PromiseLike<void> {
               priority: get.priority(skill),
             })
           }
-          if (typeof this.player == "string") {
+          if (typeof this.player === "string") {
             list.sort(
               (a, b) =>
                 b.priority - a.priority ||
@@ -646,7 +685,7 @@ export class GameEvent implements PromiseLike<void> {
                 return false
               }
               const checkTrigger = (trigger) => {
-                if (trigger == name) {
+                if (trigger === name) {
                   return true
                 }
                 const evt = names.find((evt) => trigger?.startsWith(evt))
@@ -654,7 +693,7 @@ export class GameEvent implements PromiseLike<void> {
                   return false
                 }
                 return map[evt].some((rawTrigger) => {
-                  return `${rawTrigger}${trigger.slice(evt.length)}` == name
+                  return `${rawTrigger}${trigger.slice(evt.length)}` === name
                 })
               }
               if (Array.isArray(expire[role])) {
@@ -670,8 +709,8 @@ export class GameEvent implements PromiseLike<void> {
         })
 
       roles.forEach((role) => {
-        doing.addList(lib.hook.globalskill[role + "_" + name])
-        doing.addList(lib.hook[player.playerid + "_" + role + "_" + name])
+        doing.addList(lib.hook.globalskill[`${role}_${name}`])
+        doing.addList(lib.hook[`${player.playerid}_${role}_${name}`])
       })
       delete doing.listAdded
       delete doing.addList
@@ -731,7 +770,7 @@ export class GameEvent implements PromiseLike<void> {
         this.player.getHistory("skipped").add(this.name)
       }
       this._cancelled = true
-      next = this.trigger(this.name + "Cancelled")
+      next = this.trigger(`${this.name}Cancelled`)
     }
     this.finish()
     return next
@@ -755,7 +794,7 @@ export class GameEvent implements PromiseLike<void> {
       }
     }
     await next
-    if (this._neutralized == true) {
+    if (this._neutralized === true) {
       this.untrigger()
       this.finish()
     }
@@ -765,7 +804,7 @@ export class GameEvent implements PromiseLike<void> {
       return
     }
     this._neutralized = false
-    if (this.type == "card" && this.card && this.name == "sha") {
+    if (this.type === "card" && this.card && this.name === "sha") {
       this.directHit = true
     }
   }
@@ -840,25 +879,25 @@ export class GameEvent implements PromiseLike<void> {
       this.skill = skill
       this._aiexclude = []
       if (info.viewAs) {
-        if (info.filterButton != undefined) {
+        if (info.filterButton !== undefined) {
           this.filterButton = get.filter(info.filterButton)
         }
-        if (info.selectButton != undefined) {
+        if (info.selectButton !== undefined) {
           this.selectButton = info.selectButton
         }
-        if (info.filterTarget != undefined) {
+        if (info.filterTarget !== undefined) {
           this.filterTarget = get.filter(info.filterTarget)
         }
-        if (info.selectTarget != undefined) {
+        if (info.selectTarget !== undefined) {
           this.selectTarget = info.selectTarget
         }
-        if (info.deadTarget != undefined) {
+        if (info.deadTarget !== undefined) {
           this.deadTarget = info.deadTarget
         }
-        if (info.chessForceAll != undefined) {
+        if (info.chessForceAll !== undefined) {
           this.chessForceAll = info.chessForceAll
         }
-        if (info.filterCard != undefined) {
+        if (info.filterCard !== undefined) {
           if (info.ignoreMod) {
             this.ignoreMod = true
           }
@@ -866,8 +905,14 @@ export class GameEvent implements PromiseLike<void> {
           this.filterCard = function (card, player, event) {
             const evt = event || _status.event
             if (!evt.ignoreMod && player) {
-              const mod = game.checkMod(card, player, "unchanged", "cardEnabled2", player)
-              if (mod != "unchanged") {
+              const mod = game.checkMod(
+                card,
+                player,
+                "unchanged",
+                "cardEnabled2",
+                player,
+              )
+              if (mod !== "unchanged") {
                 return mod
               }
             }
@@ -875,10 +920,12 @@ export class GameEvent implements PromiseLike<void> {
 							console.log(card);
 							card.cards = [];
 						}*/
-            return get.filter(evt.filterCard2).apply(this, [card, player, event])
+            return get
+              .filter(evt.filterCard2)
+              .apply(this, [card, player, event])
           }
         }
-        this.filterOk = function () {
+        this.filterOk = () => {
           const evt = _status.event
           const card = get.card(),
             player = get.player()
@@ -887,7 +934,7 @@ export class GameEvent implements PromiseLike<void> {
             //typeof info.viewAs !== "function" &&
             return false
           }
-          if (info.filterOk != undefined) {
+          if (info.filterOk !== undefined) {
             return info.filterOk()
           }
           if (evt._backup.filterOk) {
@@ -895,39 +942,45 @@ export class GameEvent implements PromiseLike<void> {
           }
           return true
         }
-        if (info.selectCard != undefined) {
+        if (info.selectCard !== undefined) {
           this.selectCard = info.selectCard
         }
-        if (info.position != undefined) {
+        if (info.position !== undefined) {
           this.position = info.position
         }
         //if(info.forced!=undefined) this.forced=info.forced;
-        if (info.allowChooseAll != undefined) {
+        if (info.allowChooseAll !== undefined) {
           this.allowChooseAll = info.allowChooseAll
         }
-        if (info.complexSelect != undefined) {
+        if (info.complexSelect !== undefined) {
           this.complexSelect = info.complexSelect
         }
-        if (info.complexCard != undefined) {
+        if (info.complexCard !== undefined) {
           this.complexCard = info.complexCard
         }
-        if (info.complexTarget != undefined) {
+        if (info.complexTarget !== undefined) {
           this.complexTarget = info.complexTarget
         }
-        if (info.ai1 != undefined) {
+        if (info.ai1 !== undefined) {
           this.ai1 = info.ai1
         }
-        if (info.ai2 != undefined) {
+        if (info.ai2 !== undefined) {
           this.ai2 = info.ai2
         }
       } else {
-        this.filterButton = info.filterButton ? get.filter(info.filterButton) : undefined
+        this.filterButton = info.filterButton
+          ? get.filter(info.filterButton)
+          : undefined
         this.selectButton = info.selectButton
-        this.filterTarget = info.filterTarget ? get.filter(info.filterTarget) : undefined
+        this.filterTarget = info.filterTarget
+          ? get.filter(info.filterTarget)
+          : undefined
         this.selectTarget = info.selectTarget
         this.deadTarget = info.deadTarget
         this.chessForceAll = info.chessForceAll
-        this.filterCard = info.filterCard ? get.filter(info.filterCard) : undefined
+        this.filterCard = info.filterCard
+          ? get.filter(info.filterCard)
+          : undefined
         this.selectCard = info.selectCard
         this.position = info.position
         //this.forced=info.forced;
@@ -935,10 +988,10 @@ export class GameEvent implements PromiseLike<void> {
         this.complexSelect = info.complexSelect
         this.complexCard = info.complexCard
         this.complexTarget = info.complexTarget
-        if (info.ai1 != undefined) {
+        if (info.ai1 !== undefined) {
           this.ai1 = info.ai1
         }
-        if (info.ai2 != undefined) {
+        if (info.ai2 !== undefined) {
           this.ai2 = info.ai2
         }
         this.filterOk = info.filterOk
@@ -1033,7 +1086,7 @@ export class GameEvent implements PromiseLike<void> {
   getLogv() {
     for (let i = 1; i <= 3; i++) {
       const event = this.getParent(i)
-      if (event && event.logvid) {
+      if (event?.logvid) {
         return event.logvid
       }
     }
@@ -1042,7 +1095,7 @@ export class GameEvent implements PromiseLike<void> {
 
   send() {
     this.player.send(
-      function (name, args, set, event, skills) {
+      (name, args, set, event, skills) => {
         game.me.applySkills(skills)
         const next = game.me[name].apply(game.me, args)
         for (let i = 0; i < set.length; i++) {
@@ -1105,14 +1158,17 @@ export class GameEvent implements PromiseLike<void> {
     return this.player?.isOnline()
   }
   notLink() {
-    return this.getParent().name != "_lianhuan" && this.getParent().name != "_lianhuan2"
+    return (
+      this.getParent().name !== "_lianhuan" &&
+      this.getParent().name !== "_lianhuan2"
+    )
   }
   isPhaseUsing(player) {
     const evt = this.getParent("phaseUse")
-    if (!evt || evt.name != "phaseUse") {
+    if (evt?.name !== "phaseUse") {
       return false
     }
-    return !player || player == evt.player
+    return !player || player === evt.player
   }
 
   // #region cache @todo
@@ -1127,7 +1183,7 @@ export class GameEvent implements PromiseLike<void> {
   callHandler(type, event, option) {
     if (this.hasHandler(type)) {
       this.getHandler(type).forEach((handler) => {
-        if (typeof handler == "function") {
+        if (typeof handler === "function") {
           handler(event, option)
         }
       })
@@ -1138,17 +1194,15 @@ export class GameEvent implements PromiseLike<void> {
     const eventName = this.name
     if (eventName) {
       return `on${eventName[0].toUpperCase()}${eventName.slice(1)}`
-    } else {
-      return ""
     }
+    return ""
   }
   getDefaultNextHandlerType() {
     const eventName = this.name
     if (eventName) {
       return `onNext${eventName[0].toUpperCase()}${eventName.slice(1)}`
-    } else {
-      return ""
     }
+    return ""
   }
   /**
    * @param {Parameters<typeof this.hasHandler>[0]} [type]
@@ -1194,7 +1248,7 @@ export class GameEvent implements PromiseLike<void> {
    */
   pushHandler(type) {
     // eslint-disable-next-line prefer-rest-params
-    return typeof type == "string"
+    return typeof type === "string"
       ? this.getHandler(type).push(...Array.from(arguments).slice(1))
       : this.getHandler().push(...arguments)
   }
@@ -1222,13 +1276,13 @@ export class GameEvent implements PromiseLike<void> {
     return this
   }
   callFuncUseStepCache(prefix, func, params) {
-    if (typeof func != "function") {
+    if (typeof func !== "function") {
       return
     }
     if (_status.closeStepCache) {
       return func.apply(null, params)
     }
-    const cacheKey = "[" + prefix + "]" + get.paramToCacheKey.apply(null, params)
+    const cacheKey = `[${prefix}]${get.paramToCacheKey.apply(null, params)}`
     let ret = this.getStepCache(cacheKey)
     if (ret === undefined || ret === null) {
       ret = func.apply(null, params)

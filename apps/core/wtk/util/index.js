@@ -7,7 +7,7 @@ export const assetURL = ""
 export const GeneratorFunction = function* () {}.constructor
 /** @type {typeof Function} */
 // @ts-expect-error ignore
-export const AsyncFunction = async function () {}.constructor
+export const AsyncFunction = (async () => {}).constructor
 /** @type {typeof Function} */
 // @ts-expect-error ignore
 export const AsyncGeneratorFunction = async function* () {}.constructor
@@ -20,7 +20,7 @@ export const characterDefaultPicturePath = "image/character/default_silhouette_"
 // - macOS 桌面浏览器不应被视为 iOS，否则会走 cordova 分支并尝试加载 cordova.js
 const isIPadOSMasqueradingAsMac =
   userAgentLowerCase.includes("macintosh") &&
-  typeof navigator != "undefined" &&
+  typeof navigator !== "undefined" &&
   Number(navigator.maxTouchPoints) > 1
 
 export const device =
@@ -52,7 +52,7 @@ export class Uninstantable {
  */
 export function delay(ms) {
   return new Promise((resolve) => {
-    let timeout = setTimeout(() => {
+    const timeout = setTimeout(() => {
       clearTimeout(timeout)
       resolve()
     }, ms)

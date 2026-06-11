@@ -2425,6 +2425,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         vcard[key] = value
       })
       return vcard
+      // biome-ignore lint/style/noUselessElse: <explanation>
     } else {
       const card = new lib.element.VCard(datas)
       // @ts-expect-error ignore

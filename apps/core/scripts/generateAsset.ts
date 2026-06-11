@@ -68,20 +68,25 @@ function toPosixRelative(fullPath: string, basePath: string): string {
 
 function getAllResources(basePath: string): string[] {
   const folders = ["audio", "font", "image", "theme"] as const
-  const excludeDirs = ["audio/effect", "image/flappybird", "image/pointer"] as const
+  const excludeDirs = [
+    "audio/effect",
+    "image/flappybird",
+    "image/pointer",
+  ] as const
 
   const allFiles: string[] = []
 
   for (const folder of folders) {
     const folderPath = path.join(basePath, folder)
-    if (!fs.existsSync(folderPath) || !fs.statSync(folderPath).isDirectory()) continue
+    if (!fs.existsSync(folderPath) || !fs.statSync(folderPath).isDirectory())
+      continue
 
     const files = walkFiles(folderPath)
     for (const file of files) {
       if (path.extname(file).toLowerCase() === ".css") continue
 
       const rel = toPosixRelative(file, basePath)
-      if (excludeDirs.some((ex) => rel.startsWith(ex + "/"))) continue
+      if (excludeDirs.some((ex) => rel.startsWith(`${ex}/`))) continue
 
       allFiles.push(rel)
     }
@@ -131,7 +136,9 @@ function main(): void {
 
   allFiles.sort(naturalCompare)
 
-  fs.writeFileSync(outputPath, JSON.stringify(allFiles, null, "\t"), { encoding: "utf8" })
+  fs.writeFileSync(outputPath, JSON.stringify(allFiles, null, "\t"), {
+    encoding: "utf8",
+  })
 
   console.log("✅ 资源清单生成成功！")
   console.log(`├─ 扫描目录: ${basePath.replace(/\\/g, "/")}`)

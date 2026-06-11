@@ -1,5 +1,5 @@
-import StackFrame from "stackframe"
 import ErrorStackParser from "error-stack-parser"
+import StackFrame from "stackframe"
 import StackTraceGPS from "stacktrace-gps"
 import { ErrorManager } from "@/util/sandbox.js"
 
@@ -12,7 +12,7 @@ function getStatusInfo({ lib, get, _status }) {
   if (evt.parent) {
     str += `\nevent.parent.name: ${evt.parent.name}\nevent.parent.step: ${evt.parent.step}`
   }
-  if (evt.parent && evt.parent.parent) {
+  if (evt.parent?.parent) {
     str += `\nevent.parent.parent.name: ${evt.parent.parent.name}\nevent.parent.parent.step: ${evt.parent.parent.step}`
   }
   if (evt.player || evt.target || evt.source || evt.skill || evt.card) {
@@ -22,10 +22,10 @@ function getStatusInfo({ lib, get, _status }) {
     if (lib.translate[evt.player.name]) {
       str += `\nplayer: ${lib.translate[evt.player.name]}[${evt.player.name}]`
     } else {
-      str += "\nplayer: " + evt.player.name
+      str += `\nplayer: ${evt.player.name}`
     }
-    let distance = get.distance(_status.roundStart, evt.player, "absolute")
-    if (distance != Infinity) {
+    const distance = get.distance(_status.roundStart, evt.player, "absolute")
+    if (distance !== Infinity) {
       str += `\n座位号: ${distance + 1}`
     }
   }
@@ -33,28 +33,28 @@ function getStatusInfo({ lib, get, _status }) {
     if (lib.translate[evt.target.name]) {
       str += `\ntarget: ${lib.translate[evt.target.name]}[${evt.target.name}]`
     } else {
-      str += "\ntarget: " + evt.target.name
+      str += `\ntarget: ${evt.target.name}`
     }
   }
   if (evt.source) {
     if (lib.translate[evt.source.name]) {
       str += `\nsource: ${lib.translate[evt.source.name]}[${evt.source.name}]`
     } else {
-      str += "\nsource: " + evt.source.name
+      str += `\nsource: ${evt.source.name}`
     }
   }
   if (evt.skill) {
     if (lib.translate[evt.skill]) {
       str += `\nskill: ${lib.translate[evt.skill]}[${evt.skill}]`
     } else {
-      str += "\nskill: " + evt.skill
+      str += `\nskill: ${evt.skill}`
     }
   }
   if (evt.card) {
     if (lib.translate[evt.card.name]) {
       str += `\ncard: ${lib.translate[evt.card.name]}[${evt.card.name}]`
     } else {
-      str += "\ncard: " + evt.card.name
+      str += `\ncard: ${evt.card.name}`
     }
   }
   return str
@@ -122,7 +122,7 @@ export function setOnError({ lib, game, get, _status }) {
     const src = frame.fileName
     const log: string[] = []
     log.push(
-      `错误文件: ${typeof src == "string" ? decodeURI(src).replace(lib.assetURL, "") : "未知文件"}`,
+      `错误文件: ${typeof src === "string" ? decodeURI(src).replace(lib.assetURL, "") : "未知文件"}`,
     )
     log.push(`错误信息: ${msg}`)
     const tip = lib.getErrorTip(msg)
@@ -131,18 +131,18 @@ export function setOnError({ lib, game, get, _status }) {
     }
     log.push(`行号: ${frame.lineNumber}`)
     log.push(`列号: ${frame.columnNumber}`)
-    const version = typeof lib.version != "undefined" ? lib.version : ""
+    const version = typeof lib.version !== "undefined" ? lib.version : ""
     const match = version.match(/[^\d.]/) != null
     log.push(`${match ? "游戏" : "三国杀"}版本: ${version || "未知版本"}`)
     log.push(getStatusInfo({ lib, get, _status }))
     log.push("-------------")
     const errorReporter = ErrorManager.getErrorReporter(err)
     if (errorReporter) {
-      game.print(errorReporter.report(log.join("\n") + "\n代码出现错误"))
+      game.print(errorReporter.report(`${log.join("\n")}\n代码出现错误`))
     } else {
       if (
-        typeof frame.lineNumber == "number" &&
-        (typeof game.readFile == "function" || location.origin != "file://")
+        typeof frame.lineNumber === "number" &&
+        (typeof game.readFile === "function" || location.origin !== "file://")
       ) {
         /**
          * @param code 源代码
@@ -152,8 +152,12 @@ export function setOnError({ lib, game, get, _status }) {
           const lines = code.split("\n")
           const showCode: string[] = []
           // 10行窗口
-          for (let i = Math.max(0, line - 5); i < line + 6 && i < lines.length; i++) {
-            showCode.push(`${i + 1}| ${line == i + 1 ? "⚠️" : ""}${lines[i]}`)
+          for (
+            let i = Math.max(0, line - 5);
+            i < line + 6 && i < lines.length;
+            i++
+          ) {
+            showCode.push(`${i + 1}| ${line === i + 1 ? "⚠️" : ""}${lines[i]}`)
           }
           showCode.push("-------------")
           return showCode
@@ -161,17 +165,19 @@ export function setOnError({ lib, game, get, _status }) {
         // 解析step content的错误
         if (frame.functionName === "packStep") {
           const codes = _status.event.content.originals[_status.event.step]
-          if (typeof codes == "function") {
+          if (typeof codes === "function") {
             const regex = /<anonymous>:(\d+):\d+/
             const match = err.stack?.split("\n")[1].match(regex)
             if (match) {
-              log.push(...createShowCode(codes.toString(), parseInt(match[1])))
+              log.push(
+                ...createShowCode(codes.toString(), parseInt(match[1], 10)),
+              )
             }
           }
         }
         // 协议名须和html一致(网页端防跨域)，且文件是js
         else if (
-          typeof src == "string" &&
+          typeof src === "string" &&
           src.startsWith(location.protocol) &&
           src.endsWith(".js")
         ) {
@@ -180,7 +186,7 @@ export function setOnError({ lib, game, get, _status }) {
             const source = stackframes[0].source
             if (!source?.fileName) throw new Error()
 
-            let rawSourceMap = await lib.init.promises.req(src + ".map")
+            const rawSourceMap = await lib.init.promises.req(`${src}.map`)
             if (!rawSourceMap) throw new Error()
             const sourceMap = JSON.parse(rawSourceMap)
 
@@ -199,12 +205,19 @@ export function setOnError({ lib, game, get, _status }) {
 
                 // 找到公共前缀长度
                 let i = 0
-                while (i < fromParts.length && i < toParts.length && fromParts[i] === toParts[i]) {
+                while (
+                  i < fromParts.length &&
+                  i < toParts.length &&
+                  fromParts[i] === toParts[i]
+                ) {
                   i++
                 }
 
                 const backSteps = fromParts.length - i
-                const relativeParts = [...Array(backSteps).fill(".."), ...toParts.slice(i)]
+                const relativeParts = [
+                  ...Array(backSteps).fill(".."),
+                  ...toParts.slice(i),
+                ]
 
                 return relativeParts.join("/") || toParts[toParts.length - 1]
               } catch {
@@ -213,16 +226,17 @@ export function setOnError({ lib, game, get, _status }) {
             }
 
             const file = relativeUrl(src, source.fileName)
-            const content = sourceMap.sourcesContent[sourceMap.sources.indexOf(file)]
+            const content =
+              sourceMap.sourcesContent[sourceMap.sources.indexOf(file)]
 
             log.push(...createShowCode(content, frame.lineNumber || 0))
           } catch (e) {
-            let code = await lib.init.promises.req(src)
+            const code = await lib.init.promises.req(src)
             if (code) log.push(...createShowCode(code, frame.lineNumber || 0))
           }
         }
       }
-      if (err && err.stack) {
+      if (err?.stack) {
         log.push(`${err.name}: ${err.message}`)
         log.push(
           ...stackframes.map((frame) => {

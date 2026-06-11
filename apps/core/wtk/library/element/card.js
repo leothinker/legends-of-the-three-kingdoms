@@ -26,37 +26,37 @@ export class Card extends HTMLDivElement {
    * @param {true} [noclick]
    */
   build(info, noclick) {
-    let card = this
-    card.buildNode()
-    card.buildIntro(noclick)
-    card.buildProperty()
-    card.buildEventListener(info)
+    this.buildNode()
+    this.buildIntro(noclick)
+    this.buildProperty()
+    this.buildEventListener(info)
     return this
   }
   buildEventListener(info) {
-    let card = this
-    if (info != "noclick") {
-      card.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.card)
+    if (info !== "noclick") {
+      this.addEventListener(
+        lib.config.touchscreen ? "touchend" : "click",
+        ui.click.card,
+      )
       if (lib.config.touchscreen) {
-        card.addEventListener("touchstart", ui.click.cardtouchstart)
-        card.addEventListener("touchmove", ui.click.cardtouchmove)
+        this.addEventListener("touchstart", ui.click.cardtouchstart)
+        this.addEventListener("touchmove", ui.click.cardtouchmove)
       } else {
-        card.addEventListener("mouseenter", ui.click.cardmouseenter)
-        card.addEventListener("mouseleave", ui.click.cardmouseleave)
+        this.addEventListener("mouseenter", ui.click.cardmouseenter)
+        this.addEventListener("mouseleave", ui.click.cardmouseleave)
       }
       if (lib.cardSelectObserver) {
-        lib.cardSelectObserver.observe(card, {
+        lib.cardSelectObserver.observe(this, {
           attributes: true,
         })
       }
     }
   }
   buildProperty() {
-    let card = this
-    card.storage = {}
-    card.vanishtag = []
-    card.gaintag = []
-    card._uncheck = []
+    this.storage = {}
+    this.vanishtag = []
+    this.gaintag = []
+    this._uncheck = []
   }
   buildNode() {
     this.node = {
@@ -125,7 +125,10 @@ export class Card extends HTMLDivElement {
     if (!info) {
       return
     }
-    if ((!("destroyLog" in this) || this.destroyLog !== false) && info.destroyLog !== false) {
+    if (
+      (!("destroyLog" in this) || this.destroyLog !== false) &&
+      info.destroyLog !== false
+    ) {
       game.log(this, "被销毁了")
     }
     if (info.onDestroy) {
@@ -135,9 +138,10 @@ export class Card extends HTMLDivElement {
   //判断一张牌进入某个区域后是否会被销毁
   willBeDestroyed(targetPosition, player, event) {
     const destroyed = this.destroyed
-    if (typeof destroyed == "function") {
+    if (typeof destroyed === "function") {
       return destroyed(this, targetPosition, player, event)
-    } else if (lib.skill[destroyed]) {
+    }
+    if (lib.skill[destroyed]) {
       if (player) {
         if (player.hasSkill(destroyed)) {
           delete this.destroyed
@@ -145,8 +149,9 @@ export class Card extends HTMLDivElement {
         }
       }
       return true
-    } else if (typeof destroyed == "string") {
-      return destroyed == targetPosition
+    }
+    if (typeof destroyed === "string") {
+      return destroyed === targetPosition
     }
     return destroyed
   }
@@ -155,7 +160,7 @@ export class Card extends HTMLDivElement {
   }
   //只针对【杀】起效果
   addNature(nature) {
-    let natures = []
+    const natures = []
     if (!this.nature) {
       this.nature = ""
     } else {
@@ -164,11 +169,11 @@ export class Card extends HTMLDivElement {
     natures.addArray(get.natureList(nature))
     this.nature = get.nature(natures)
     this.classList.add(nature)
-    let str = get.translation(this.nature) + "杀"
+    const str = `${get.translation(this.nature)}杀`
     this.node.name.innerText = str
-    let name = get.name(this, false)
+    const name = get.name(this, false)
     do {
-      if (name == "sha") {
+      if (name === "sha") {
         let _bg
         for (const n of natures) {
           if (lib.natureBg.has(n)) {
@@ -180,7 +185,7 @@ export class Card extends HTMLDivElement {
           break
         }
       }
-      this.node.image.setBackgroundImage("image/card/" + name + ".png")
+      this.node.image.setBackgroundImage(`image/card/${name}.png`)
     } while (0)
     return this.nature
   }
@@ -188,7 +193,7 @@ export class Card extends HTMLDivElement {
     if (!this.nature) {
       return
     }
-    let natures = get.natureList(this.nature)
+    const natures = get.natureList(this.nature)
     natures.remove(nature)
     if (!natures.length) {
       delete this.nature
@@ -196,11 +201,11 @@ export class Card extends HTMLDivElement {
       this.nature = get.nature(natures)
     }
     this.classList.remove(nature)
-    let str = get.translation(this.nature) + "杀"
+    const str = `${get.translation(this.nature)}杀`
     this.node.name.innerText = str
-    let name = get.name(this, false)
+    const name = get.name(this, false)
     do {
-      if (name == "sha") {
+      if (name === "sha") {
         let _bg
         for (const n of natures) {
           if (lib.natureBg.has(n)) {
@@ -212,7 +217,7 @@ export class Card extends HTMLDivElement {
           break
         }
       }
-      this.node.image.setBackgroundImage("image/card/" + name + ".png")
+      this.node.image.setBackgroundImage(`image/card/${name}.png`)
     } while (0)
     return this.nature
   }
@@ -228,10 +233,10 @@ export class Card extends HTMLDivElement {
     for (var gi = 0; gi < this.gaintag.length; gi++) {
       const tag = this.gaintag[gi]
       var translate = get.translation(tag)
-      if (translate == tag && tag.startsWith("eternal_")) {
+      if (translate === tag && tag.startsWith("eternal_")) {
         translate = get.translation(tag.slice(8))
       }
-      if (translate != "invisible") {
+      if (translate !== "invisible") {
         str += translate
         if (gi < this.gaintag.length - 1) {
           str += " "
@@ -242,7 +247,7 @@ export class Card extends HTMLDivElement {
   }
   removeGaintag(tag) {
     if (tag === true) {
-      if ((this.gaintag && this.gaintag.length) || this.node.gaintag.innerHTML.length) {
+      if (this.gaintag?.length || this.node.gaintag.innerHTML.length) {
         this.addGaintag([])
       }
     } else if (this.hasGaintag(tag)) {
@@ -251,7 +256,7 @@ export class Card extends HTMLDivElement {
     }
   }
   hasGaintag(tag) {
-    return this.gaintag && this.gaintag.includes(tag)
+    return this.gaintag?.includes(tag)
   }
   /**
    * @param {[string, number, string, string] | {
@@ -263,36 +268,36 @@ export class Card extends HTMLDivElement {
    */
   init(card) {
     if (Array.isArray(card)) {
-      if (card[2] == "huosha") {
+      if (card[2] === "huosha") {
         card[2] = "sha"
         card[3] = "fire"
-      } else if (card[2] == "leisha") {
+      } else if (card[2] === "leisha") {
         card[2] = "sha"
         card[3] = "thunder"
-      } else if (card[2] == "cisha") {
+      } else if (card[2] === "cisha") {
         card[2] = "sha"
         card[3] = "stab"
       } else if (card[2].length > 3) {
-        let prefix = card[2].slice(0, card[2].lastIndexOf("sha"))
+        const prefix = card[2].slice(0, card[2].lastIndexOf("sha"))
         if (lib.nature.has(prefix)) {
-          if (prefix.length + 3 == card[2].length) {
+          if (prefix.length + 3 === card[2].length) {
             card[2] = "sha"
             card[3] = prefix
           }
         }
         if (card[2].startsWith("sha_")) {
-          let suffix = card[2].slice(4)
-          let natureList = suffix.split("_")
+          const suffix = card[2].slice(4)
+          const natureList = suffix.split("_")
           card[2] = "sha"
           card[3] = get.nature(natureList)
         }
       }
-    } else if (typeof card == "object") {
+    } else if (typeof card === "object") {
       card = [card.suit, card.number, card.name, card.nature]
     }
     var cardnum = card[1] || ""
-    if (parseInt(cardnum) == cardnum) {
-      cardnum = parseInt(cardnum)
+    if (parseInt(cardnum, 10) === cardnum) {
+      cardnum = parseInt(cardnum, 10)
     }
     let vanish = false
     if (!lib.card[card[2]]) {
@@ -305,16 +310,20 @@ export class Card extends HTMLDivElement {
         while (info.global.length) {
           game.addGlobalSkill(info.global.shift())
         }
-      } else if (typeof info.global == "string") {
+      } else if (typeof info.global === "string") {
         game.addGlobalSkill(info.global)
       }
       delete info.global
     }
     this.suit = card[0]
-    this.number = parseInt(card[1]) || 0
+    this.number = parseInt(card[1], 10) || 0
     this.name = card[2]
 
-    if (info.destroy && typeof info.destroy != "boolean" && !lib.skill[info.destroy]) {
+    if (
+      info.destroy &&
+      typeof info.destroy !== "boolean" &&
+      !lib.skill[info.destroy]
+    ) {
       this.destroyed = info.destroy
     }
 
@@ -333,7 +342,7 @@ export class Card extends HTMLDivElement {
         this.inits[i](this)
       }
     }
-    if (typeof info.init == "function") {
+    if (typeof info.init === "function") {
       info.init()
     }
     if (vanish) {
@@ -347,11 +356,11 @@ export class Card extends HTMLDivElement {
   $init(card) {
     var info = lib.card[card[2]]
     var cardnum = card[1] || ""
-    if (parseInt(cardnum) == cardnum) {
-      cardnum = parseInt(cardnum)
+    if (parseInt(cardnum, 10) === cardnum) {
+      cardnum = parseInt(cardnum, 10)
     }
     cardnum = get.strNumber(cardnum, true) || cardnum
-    if (typeof cardnum != "string") {
+    if (typeof cardnum !== "string") {
       cardnum = ""
     }
     if (this.name) {
@@ -380,7 +389,7 @@ export class Card extends HTMLDivElement {
     }
     let img = get.dynamicVariable(lib.card[bg].image, this)
     if (img) {
-      if (typeof img != "string") {
+      if (typeof img !== "string") {
         img = null
       } else {
         if (
@@ -405,18 +414,18 @@ export class Card extends HTMLDivElement {
       if (img) {
         if (img.startsWith("db:")) {
           this.node.image.setBackgroundDB(img.slice(3))
-        } else if (typeof img == "string") {
+        } else if (typeof img === "string") {
           this.node.image.setBackgroundImage(img)
         }
       } else {
         if (lib.card[bg].modeimage) {
           this.node.image.setBackgroundImage(
-            "image/mode/" + lib.card[bg].modeimage + "/card/" + bg + ".png",
+            `image/mode/${lib.card[bg].modeimage}/card/${bg}.png`,
           )
         } else {
           do {
-            let nature = card[3]
-            if (bg == "sha" && typeof nature == "string") {
+            const nature = card[3]
+            if (bg === "sha" && typeof nature === "string") {
               let natures = get.natureList(nature),
                 _bg
               for (const n of natures) {
@@ -429,13 +438,16 @@ export class Card extends HTMLDivElement {
                 break
               }
             }
-            this.node.image.setBackgroundImage("image/card/" + bg + ".png")
+            this.node.image.setBackgroundImage(`image/card/${bg}.png`)
           } while (0)
         }
       }
-    } else if (get.dynamicVariable(lib.card[bg].image, this) == "background") {
+    } else if (get.dynamicVariable(lib.card[bg].image, this) === "background") {
       if (card[3]) {
-        this.node.background.setBackground(bg + "_" + get.natureList(card[3])[0], "card")
+        this.node.background.setBackground(
+          `${bg}_${get.natureList(card[3])[0]}`,
+          "card",
+        )
       } else {
         this.node.background.setBackground(bg, "card")
       }
@@ -444,29 +456,34 @@ export class Card extends HTMLDivElement {
       if (img) {
         if (img.startsWith("db:")) {
           this.setBackgroundDB(img.slice(3))
-        } else if (typeof img == "string") {
+        } else if (typeof img === "string") {
           this.setBackgroundImage(img)
           this.style.backgroundSize = "cover"
         }
       } else if (get.dynamicVariable(lib.card[bg].image, this)) {
-        if (get.dynamicVariable(lib.card[bg].image, this).startsWith("character:")) {
-          this.setBackground(get.dynamicVariable(lib.card[bg].image, this).slice(10), "character")
+        if (
+          get.dynamicVariable(lib.card[bg].image, this).startsWith("character:")
+        ) {
+          this.setBackground(
+            get.dynamicVariable(lib.card[bg].image, this).slice(10),
+            "character",
+          )
         } else {
           this.setBackground(get.dynamicVariable(lib.card[bg].image, this))
         }
       } else {
-        var cardPack = lib.cardPack["mode_" + get.mode()]
+        var cardPack = lib.cardPack[`mode_${get.mode()}`]
         if (Array.isArray(cardPack) && cardPack.includes(bg)) {
-          this.setBackground("mode/" + get.mode() + "/card/" + bg)
+          this.setBackground(`mode/${get.mode()}/card/${bg}`)
         } else {
-          this.setBackground("card/" + bg)
+          this.setBackground(`card/${bg}`)
         }
       }
     } else if (lib.card[bg].fullborder) {
       this.classList.add("fullborder")
-      if (lib.card[bg].fullborder == "gold") {
+      if (lib.card[bg].fullborder === "gold") {
         this.node.name.dataset.nature = "metalmm"
-      } else if (lib.card[bg].fullborder == "silver") {
+      } else if (lib.card[bg].fullborder === "silver") {
         this.node.name.dataset.nature = "watermm"
       }
       if (!this.node.avatar) {
@@ -481,41 +498,45 @@ export class Card extends HTMLDivElement {
       if (img) {
         if (img.startsWith("db:")) {
           this.node.avatar.setBackgroundDB(img.slice(3))
-        } else if (typeof img == "string") {
+        } else if (typeof img === "string") {
           this.node.avatar.setBackgroundImage(img)
           this.node.avatar.style.backgroundSize = "cover"
         }
       } else if (get.dynamicVariable(lib.card[bg].image, this)) {
-        if (get.dynamicVariable(lib.card[bg].image, this).startsWith("character:")) {
+        if (
+          get.dynamicVariable(lib.card[bg].image, this).startsWith("character:")
+        ) {
           this.node.avatar.setBackground(
             get.dynamicVariable(lib.card[bg].image, this).slice(10),
             "character",
           )
         } else {
-          this.node.avatar.setBackground(get.dynamicVariable(lib.card[bg].image, this))
+          this.node.avatar.setBackground(
+            get.dynamicVariable(lib.card[bg].image, this),
+          )
         }
       } else {
-        var cardPack = lib.cardPack["mode_" + get.mode()]
+        var cardPack = lib.cardPack[`mode_${get.mode()}`]
         if (Array.isArray(cardPack) && cardPack.includes(bg)) {
-          this.node.avatar.setBackground("mode/" + get.mode() + "/card/" + bg)
+          this.node.avatar.setBackground(`mode/${get.mode()}/card/${bg}`)
         } else {
-          this.node.avatar.setBackground("card/" + bg)
+          this.node.avatar.setBackground(`card/${bg}`)
         }
       }
-    } else if (get.dynamicVariable(lib.card[bg].image, this) == "card") {
+    } else if (get.dynamicVariable(lib.card[bg].image, this) === "card") {
       if (card[3]) {
-        this.setBackground(bg + "_" + get.natureList(card[3])[0], "card")
+        this.setBackground(`${bg}_${get.natureList(card[3])[0]}`, "card")
       } else {
         this.setBackground(bg, "card")
       }
     } else if (
-      typeof get.dynamicVariable(lib.card[bg].image, this) == "string" &&
+      typeof get.dynamicVariable(lib.card[bg].image, this) === "string" &&
       !lib.card[bg].fullskin
     ) {
       if (img) {
         if (img.startsWith("db:")) {
           this.setBackgroundDB(img.slice(3))
-        } else if (typeof img == "string") {
+        } else if (typeof img === "string") {
           this.setBackgroundImage(img)
           this.style.backgroundSize = "cover"
         }
@@ -524,7 +545,9 @@ export class Card extends HTMLDivElement {
       }
     } else {
       this.node.background.innerHTML =
-        lib.translate[bg + "_cbg"] || lib.translate[bg + "_bg"] || get.translation(bg)[0]
+        lib.translate[`${bg}_cbg`] ||
+        lib.translate[`${bg}_bg`] ||
+        get.translation(bg)[0]
       // this.node.background.style.fontFamily=lib.config.card_font;
       if (this.node.background.innerHTML.length > 1) {
         this.node.background.classList.add("tight")
@@ -554,11 +577,7 @@ export class Card extends HTMLDivElement {
     if (info.modinfo) {
       this.node.info.innerHTML = info.modinfo
     } else {
-      this.node.info.innerHTML =
-        get.translation(card[0]) +
-        '<span style="font-family:xinwei"> </span><span style="font-family:xinwei">' +
-        cardnum +
-        "</span>"
+      this.node.info.innerHTML = `${get.translation(card[0])}<span style="font-family:xinwei"> </span><span style="font-family:xinwei">${cardnum}</span>`
     }
     if (info.addinfo) {
       if (!this.node.addinfo) {
@@ -574,15 +593,16 @@ export class Card extends HTMLDivElement {
     }
     this.node.image.className = "image"
     var name = get.translation(card[2])
-    if (card[2] == "sha") {
+    if (card[2] === "sha") {
       name = ""
-      let nature = card[3]
+      const nature = card[3]
       if (nature) {
-        let natures = get.natureList(nature)
+        const natures = get.natureList(nature)
         natures.sort(lib.sort.nature)
-        for (let nature of natures) {
-          name += lib.translate["nature_" + nature] || lib.translate[nature] || ""
-          if (nature != "stab") {
+        for (const nature of natures) {
+          name +=
+            lib.translate[`nature_${nature}`] || lib.translate[nature] || ""
+          if (nature !== "stab") {
             this.node.image.classList.add(nature)
           }
         }
@@ -596,10 +616,10 @@ export class Card extends HTMLDivElement {
         this.node.name.classList.add("longlong")
       }
     }
-    this.node.name2.innerHTML = get.translation(card[0]) + cardnum + " " + name
+    this.node.name2.innerHTML = `${get.translation(card[0]) + cardnum} ${name}`
     this.classList.add("card")
     if (card[3]) {
-      let natures = get.natureList(card[3])
+      const natures = get.natureList(card[3])
       natures.forEach((n) => {
         if (n) {
           this.classList.add(n)
@@ -618,28 +638,29 @@ export class Card extends HTMLDivElement {
     }
     this.node.range.innerHTML = ""
     switch (get.subtype(this, false)) {
-      case "equip1":
+      case "equip1": {
         var added = false
         if (lib.card[this.name] && lib.card[this.name].distance) {
           var dist = lib.card[this.name].distance
           if (dist.attackFrom) {
             added = true
-            this.node.range.innerHTML = "范围: " + (-dist.attackFrom + 1)
+            this.node.range.innerHTML = `范围: ${-dist.attackFrom + 1}`
           }
         }
         if (!added) {
           this.node.range.innerHTML = "范围: 1"
         }
         break
+      }
       case "equip3":
-        if (info.distance && info.distance.globalTo) {
-          this.node.range.innerHTML = "防御: " + info.distance.globalTo
+        if (info.distance?.globalTo) {
+          this.node.range.innerHTML = `防御: ${info.distance.globalTo}`
           this.node.name2.innerHTML += "+"
         }
         break
       case "equip4":
-        if (info.distance && info.distance.globalFrom) {
-          this.node.range.innerHTML = "进攻: " + -info.distance.globalFrom
+        if (info.distance?.globalFrom) {
+          this.node.range.innerHTML = `进攻: ${-info.distance.globalFrom}`
           this.node.name2.innerHTML += "-"
         }
         break
@@ -665,7 +686,7 @@ export class Card extends HTMLDivElement {
             _status.cardtag[tag] = []
           }
           _status.cardtag[tag].add(this.cardid)
-          tagstr += lib.translate[tag + "_tag"]
+          tagstr += lib.translate[`${tag}_tag`]
           //if(i<tags.length-1) tagstr+=' ';
         }
         tagstr += "</span>"
@@ -679,9 +700,8 @@ export class Card extends HTMLDivElement {
    * @param { string } tag
    */
   addCardtag(tag) {
-    let card = this
     game.broadcastAll(
-      function (card, tag) {
+      (card, tag) => {
         if (!_status.cardtag) {
           _status.cardtag = {}
         }
@@ -691,7 +711,7 @@ export class Card extends HTMLDivElement {
         _status.cardtag[tag].add(card.cardid)
         card.$init([card.suit, card.number, card.name, card.nature])
       },
-      card,
+      this,
       tag,
     )
   }
@@ -700,9 +720,8 @@ export class Card extends HTMLDivElement {
    * @param { string } tag
    */
   removeCardtag(tag) {
-    let card = this
     game.broadcastAll(
-      function (card, tag) {
+      (card, tag) => {
         if (!_status.cardtag) {
           _status.cardtag = {}
         }
@@ -712,39 +731,36 @@ export class Card extends HTMLDivElement {
         _status.cardtag[tag].remove(card.cardid)
         card.$init([card.suit, card.number, card.name, card.nature])
       },
-      card,
+      this,
       tag,
     )
   }
   updateTransform(bool, delay) {
     if (delay) {
-      var that = this
-      setTimeout(function () {
-        that.updateTransform(that.classList.contains("selected"))
+      setTimeout(() => {
+        this.updateTransform(this.classList.contains("selected"))
       }, delay)
     } else {
-      if (_status.event.player != game.me) {
+      if (_status.event.player !== game.me) {
         return
       }
       if (
-        this.parentNode &&
-        this.parentNode.parentNode &&
-        this.parentNode.parentNode.parentNode == ui.me
+        this.parentNode?.parentNode &&
+        this.parentNode.parentNode.parentNode === ui.me
       ) {
         ui.updatehl()
       }
       if (
         this._transform &&
-        this.parentNode &&
-        this.parentNode.parentNode &&
-        this.parentNode.parentNode.parentNode == ui.me &&
+        this.parentNode?.parentNode &&
+        this.parentNode.parentNode.parentNode === ui.me &&
         (!_status.mousedown || _status.mouseleft) &&
         (!this.parentNode.parentNode.classList.contains("scrollh") ||
-          game.layout == "long2" ||
-          game.layout == "nova")
+          game.layout === "long2" ||
+          game.layout === "nova")
       ) {
         if (bool) {
-          this.style.transform = this._transform + " translateY(-20px)"
+          this.style.transform = `${this._transform} translateY(-20px)`
         } else {
           this.style.transform = this._transform || ""
         }
@@ -759,13 +775,13 @@ export class Card extends HTMLDivElement {
     if (!this._knowers) {
       this._knowers = []
     }
-    if (typeof player == "string") {
+    if (typeof player === "string") {
       this._knowers.add(player)
     } else {
-      let type = get.itemtype(player)
-      if (type == "player") {
+      const type = get.itemtype(player)
+      if (type === "player") {
         this._knowers.add(player.playerid)
-      } else if (type == "players") {
+      } else if (type === "players") {
         player.forEach((p) => this._knowers.add(p.playerid))
       }
     }
@@ -774,13 +790,13 @@ export class Card extends HTMLDivElement {
     if (!this._knowers) {
       return
     }
-    if (typeof player == "string") {
+    if (typeof player === "string") {
       this._knowers.remove(player)
     } else {
-      let type = get.itemtype(player)
-      if (type == "player") {
+      const type = get.itemtype(player)
+      if (type === "player") {
         this._knowers.remove(player.playerid)
-      } else if (type == "players") {
+      } else if (type === "players") {
         player.forEach((p) => this._knowers.remove(p.playerid))
       }
     }
@@ -796,9 +812,9 @@ export class Card extends HTMLDivElement {
     if (["e", "j"].includes(get.position(this))) {
       return true
     } //装备区或者判定区的牌，必知情。
-    let owner = get.owner(this)
+    const owner = get.owner(this)
     if (owner) {
-      if (owner == player) {
+      if (owner === player) {
         return true
       } //是牌主，必知情。
       if (player.hasSkillTag("viewHandcard", null, owner, true)) {
@@ -812,12 +828,15 @@ export class Card extends HTMLDivElement {
       return true
     } //此牌是明置牌，必知情。
     if (this._knowers && checkKnowers) {
-      return this._knowers.includes("everyone") || this._knowers.includes(player.playerid)
+      return (
+        this._knowers.includes("everyone") ||
+        this._knowers.includes(player.playerid)
+      )
     }
     return false
   }
   getSource(name) {
-    if (this.name == name) {
+    if (this.name === name) {
       return true
     }
     var info = lib.card[this.name]
@@ -830,9 +849,9 @@ export class Card extends HTMLDivElement {
     this.fixed = true
     if (!this._listeningEnd || this._transitionEnded) {
       this.moveTo(player)
-      var that = this
-      setTimeout(function () {
-        that.delete()
+
+      setTimeout(() => {
+        this.delete()
       }, 200)
     } else {
       this._onEndMoveDelete = player
@@ -849,8 +868,8 @@ export class Card extends HTMLDivElement {
       dx = player.getLeft() + player.offsetWidth / 2 - 52 - nx
       dy = player.getTop() + player.offsetHeight / 2 - 52 - ny
     } else {
-      this.style.left = this.offsetLeft + "px"
-      this.style.top = this.offsetTop + "px"
+      this.style.left = `${this.offsetLeft}px`
+      this.style.top = `${this.offsetTop}px`
 
       dx = player.getLeft() + player.offsetWidth / 2 - 52 - this.offsetLeft
       dy = player.getTop() + player.offsetHeight / 2 - 52 - this.offsetTop
@@ -864,12 +883,12 @@ export class Card extends HTMLDivElement {
 
     if (
       this.style.transform &&
-      this.style.transform != "none" &&
-      this.style.transform.indexOf("translate") == -1
+      this.style.transform !== "none" &&
+      this.style.transform.indexOf("translate") === -1
     ) {
-      this.style.transform += " translate(" + dx + "px," + dy + "px)"
+      this.style.transform += ` translate(${dx}px,${dy}px)`
     } else {
-      this.style.transform = "translate(" + dx + "px," + dy + "px)"
+      this.style.transform = `translate(${dx}px,${dy}px)`
     }
     return this
   }
@@ -904,11 +923,11 @@ export class Card extends HTMLDivElement {
     var clone = true
     var position
     for (var i = 0; i < arguments.length; i++) {
-      if (typeof arguments[i] == "string") {
+      if (typeof arguments[i] === "string") {
         node.classList.add(arguments[i])
       } else if (["div", "fragment"].includes(get.objtype(arguments[i]))) {
         position = arguments[i]
-      } else if (typeof arguments[i] == "boolean") {
+      } else if (typeof arguments[i] === "boolean") {
         clone = arguments[i]
       }
     }
@@ -934,7 +953,7 @@ export class Card extends HTMLDivElement {
     } else {
       this._uncheck.length = 0
     }
-    if (this._uncheck.length == 0) {
+    if (this._uncheck.length === 0) {
       this.classList.remove("uncheck")
     }
   }
@@ -946,7 +965,9 @@ export class Card extends HTMLDivElement {
    * @returns {boolean} 是否包含class
    */
   classListContains(className) {
-    return Array.from(arguments).some((name) => this.classList.contains(className))
+    return Array.from(arguments).some((name) =>
+      this.classList.contains(className),
+    )
   }
   /**
    * 判断此牌是否包含class样式，参数有多个时，需全部满足。
@@ -956,7 +977,9 @@ export class Card extends HTMLDivElement {
    * @returns {boolean} 是否包含class
    */
   classListContainsAll() {
-    return Array.from(arguments).every((name) => this.classList.contains(this.className))
+    return Array.from(arguments).every((name) =>
+      this.classList.contains(this.className),
+    )
   }
   /**
    * 返回一个键值，用于在缓存中作为键名。
@@ -969,12 +992,9 @@ export class Card extends HTMLDivElement {
       prefix = "[card:"
     }
     if (this.cardid) {
-      return prefix + this.cardid + "]"
+      return `${prefix + this.cardid}]`
     }
-    return (
-      prefix +
-      `${this.name}+${this.suit ? this.suit : "none"}+${this.number === undefined ? "none" : this.number}${this.nature ? "+" + this.nature : ""}]`
-    )
+    return `${prefix}${this.name}+${this.suit ? this.suit : "none"}+${this.number === undefined ? "none" : this.number}${this.nature ? `+${this.nature}` : ""}]`
   }
   discard(bool) {
     if (!this._selfDestroyed) {
@@ -985,7 +1005,9 @@ export class Card extends HTMLDivElement {
     if (bool === false) {
       ui.cardPile.insertBefore(
         this,
-        ui.cardPile.childNodes[Math.floor(Math.random() * ui.cardPile.childNodes.length)],
+        ui.cardPile.childNodes[
+          Math.floor(Math.random() * ui.cardPile.childNodes.length)
+        ],
       )
     } else {
       if (_status.discarded) {
@@ -994,12 +1016,7 @@ export class Card extends HTMLDivElement {
     }
   }
   hasTag(tag) {
-    if (
-      this.cardid &&
-      _status.cardtag &&
-      _status.cardtag[tag] &&
-      _status.cardtag[tag].includes(this.cardid)
-    ) {
+    if (this.cardid && _status.cardtag?.[tag]?.includes(this.cardid)) {
       return true
     }
     return false

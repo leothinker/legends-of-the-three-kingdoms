@@ -1,4 +1,4 @@
-import { _status, get, lib } from "wtk"
+import { get, lib } from "wtk"
 export class Character {
   /**
    * 武将牌的性别
@@ -337,7 +337,8 @@ export class Character {
   get 2() {
     if (this.hujia > 0) {
       return `${this.hp}/${this.maxHp}/${this.hujia}`
-    } else if (this.hp !== this.maxHp) {
+    }
+    if (this.hp !== this.maxHp) {
       return `${this.hp}/${this.maxHp}`
     }
     return this.hp
@@ -365,7 +366,10 @@ export class Character {
   get 4() {
     const trashes = [],
       character = this
-    if (character.groupInGuozhan && lib.group.includes(character.groupInGuozhan)) {
+    if (
+      character.groupInGuozhan &&
+      lib.group.includes(character.groupInGuozhan)
+    ) {
       trashes.push(`gzgroup:${character.groupInGuozhan}`)
     }
     if (character.junName) {

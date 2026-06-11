@@ -1,4 +1,5 @@
-.hp:not(.text):not(.actcount):not(.treasure)[data-condition="high"] > div:not(.lost):not(.shield) {
+.hp:not(.text):not(.actcount):not(.treasure)[data-condition="high"]
+  > div:not(.lost):not(.shield) {
   background: url("image/ol1.png");
   box-shadow: none;
   border: none;
@@ -7,7 +8,8 @@
   -webkit-filter: none;
   border-radius: 0px;
 }
-.hp:not(.text):not(.actcount):not(.treasure)[data-condition="mid"] > div:not(.lost):not(.shield) {
+.hp:not(.text):not(.actcount):not(.treasure)[data-condition="mid"]
+  > div:not(.lost):not(.shield) {
   background: url("image/ol2.png");
   box-shadow: none;
   border: none;
@@ -16,7 +18,8 @@
   -webkit-filter: none;
   border-radius: 0px;
 }
-.hp:not(.text):not(.actcount):not(.treasure)[data-condition="low"] > div:not(.lost):not(.shield) {
+.hp:not(.text):not(.actcount):not(.treasure)[data-condition="low"]
+  > div:not(.lost):not(.shield) {
   background: url("image/ol3.png");
   box-shadow: none;
   border: none;

@@ -1,4 +1,4 @@
-import { lib, get } from "wtk"
+import { get, lib } from "wtk"
 
 type logAudio = (...args: any[]) => AudioInfo
 type AudioInfo = AudioInfo[] | string | number | boolean
@@ -49,7 +49,8 @@ export class Audio {
       throw new ReferenceError(`skill is not defined`)
     }
 
-    const formatedPlayer = player != void 0 ? this.formatPlayer(player) : void 0
+    const formatedPlayer =
+      player != void 0 ? Audio.formatPlayer(player) : void 0
 
     let formatedInfo: SkillInfo | undefined
     if (info != void 0 && (typeof info !== "object" || Array.isArray(info))) {
@@ -87,11 +88,19 @@ export class Audio {
       formatedInfo = info
     }
 
-    return new Audio(new DieAudio(this.formatPlayer(player), formatedInfo), args)
+    return new Audio(
+      new DieAudio(Audio.formatPlayer(player), formatedInfo),
+      args,
+    )
   }
 
   static formatPlayer(player: Player | string): FormatedPlayer {
-    const formatedPlayer: FormatedPlayer = { name: "", sex: "male", tempname: [], skin: {} }
+    const formatedPlayer: FormatedPlayer = {
+      name: "",
+      sex: "male",
+      tempname: [],
+      skin: {},
+    }
     if (typeof player === "string") {
       formatedPlayer.name = player
       const sex = get.character(player).sex
@@ -185,7 +194,9 @@ export class Audio {
       return false
     }
     //deadlock
-    throw new RangeError(`${this.#Audio.name} in ${this.#history} forms a infinite recursion`)
+    throw new RangeError(
+      `${this.#Audio.name} in ${this.#history} forms a infinite recursion`,
+    )
   }
   parseAudio(name: string, audioInfo: AudioInfo): TextMap[] {
     if (Array.isArray(audioInfo)) {
@@ -221,7 +232,9 @@ export class Audio {
       return []
     }
 
-    if (["data:", "blob:"].some((prefix) => audioInfoString.startsWith(prefix))) {
+    if (
+      ["data:", "blob:"].some((prefix) => audioInfoString.startsWith(prefix))
+    ) {
       return [this.#Audio.textMap("", "", audioInfoString)]
     }
 
@@ -314,7 +327,12 @@ class SkillAudio implements AudioBase {
     return JSON.stringify(result)
   }
 
-  constructor(name: string, player?: FormatedPlayer, info?: SkillInfo, audioname?: string[]) {
+  constructor(
+    name: string,
+    player?: FormatedPlayer,
+    info?: SkillInfo,
+    audioname?: string[],
+  ) {
     this.name = name
 
     if (info != void 0) {
@@ -323,7 +341,11 @@ class SkillAudio implements AudioBase {
     } else if (this.isExist(this.name)) {
       this.info = get.info(this.name)
     } else {
-      console.error(new ReferenceError(`Cannot find ${this.name} when parsing ${this.type} audio.`))
+      console.error(
+        new ReferenceError(
+          `Cannot find ${this.name} when parsing ${this.type} audio.`,
+        ),
+      )
       this.info = {}
     }
 
@@ -331,8 +353,13 @@ class SkillAudio implements AudioBase {
     if (this.player) {
       const rawName = this.player.name
       const skinName = this.player.skin.name
-      if (skinName && lib.characterSubstitute[rawName]?.find((i) => i[0] === skinName)) {
-        const skin = lib.characterSubstitute[rawName].find((i) => i[0] === skinName)
+      if (
+        skinName &&
+        lib.characterSubstitute[rawName]?.find((i) => i[0] === skinName)
+      ) {
+        const skin = lib.characterSubstitute[rawName].find(
+          (i) => i[0] === skinName,
+        )
         const tempCharacter = get.convertedCharacter(["", "", 0, [], skin[1]])
         // 如果配置的皮肤设置了tempname，会进行覆盖
         if (tempCharacter.tempname.length) {
@@ -377,15 +404,21 @@ class SkillAudio implements AudioBase {
     }
     if (this.filteredLogAudio2 && args) {
       return this.filteredLogAudio2(...args)
-    } else if (this.filteredAudioName2 != void 0) {
+    }
+    if (this.filteredAudioName2 != void 0) {
       return this.filteredAudioName2
-    } else if (this.info.logAudio && args) {
+    }
+    if (this.info.logAudio && args) {
       const result = this.info.logAudio(...args)
       if (typeof result === "number" && typeof this.info.audio === "string") {
-        return Array.from({ length: result }, (_, i) => `${this.info.audio}${i + 1}.mp3`)
+        return Array.from(
+          { length: result },
+          (_, i) => `${this.info.audio}${i + 1}.mp3`,
+        )
       }
       return result
-    } else if (this.info.audio != void 0) {
+    }
+    if (this.info.audio != void 0) {
       return this.info.audio
     }
     return this.defaultInfo
@@ -406,7 +439,11 @@ class SkillAudio implements AudioBase {
     if (tempname) {
       return tempname
     }
-    for (const name of [this.player.name, this.player.name1, this.player.name2]) {
+    for (const name of [
+      this.player.name,
+      this.player.name1,
+      this.player.name2,
+    ]) {
       if (!name) {
         continue
       }
@@ -482,7 +519,9 @@ class DieAudio implements AudioBase {
           this.info = get.character(this.name)
         } else {
           console.error(
-            new ReferenceError(`Cannot find ${this.name} when parsing ${this.type} audio.`),
+            new ReferenceError(
+              `Cannot find ${this.name} when parsing ${this.type} audio.`,
+            ),
           )
           this.info = {}
         }
@@ -494,7 +533,9 @@ class DieAudio implements AudioBase {
       } else if (!lib.characterSubstitute[rawName]) {
         useDefaultInfo()
       } else {
-        const skin = lib.characterSubstitute[rawName].find((i) => i[0] === skinName)
+        const skin = lib.characterSubstitute[rawName].find(
+          (i) => i[0] === skinName,
+        )
         if (!skin) {
           useDefaultInfo()
         } else {
@@ -519,7 +560,10 @@ class DieAudio implements AudioBase {
     return audioInfo
   }
   getReferenceAudio(name: string, info?: AudioInfo): DieAudio {
-    return new DieAudio(Audio.formatPlayer(name), info != void 0 ? { dieAudios: info } : void 0)
+    return new DieAudio(
+      Audio.formatPlayer(name),
+      info != void 0 ? { dieAudios: info } : void 0,
+    )
   }
   textMap(path: string, ext: string, name: string): TextMap {
     const translatedPath = path.startsWith(this.defaultPath)

@@ -1,4 +1,4 @@
-import { lib, game, get, _status, ui } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
 export class Click {
   /**
    * @type {() => void}
@@ -21,7 +21,7 @@ export class Click {
       }
     }
     var info = this.link
-    if (list.length == 1) {
+    if (list.length === 1) {
       for (var i = 0; i < this.parentNode.childNodes.length; i++) {
         if (!this.parentNode.childNodes[i].classList.contains("transparent")) {
           var info2 = this.parentNode.childNodes[i].link
@@ -54,7 +54,7 @@ export class Click {
         uiintro.delete()
         this.delete()
       })
-      uiintro.listen(function () {
+      uiintro.listen(() => {
         _status.clicked = true
       })
       uiintro.style.zIndex = 21
@@ -68,7 +68,7 @@ export class Click {
       uiintro.style.top = "auto"
       uiintro.style.bottom = "75px"
 
-      uiintro.refresh = function () {
+      uiintro.refresh = () => {
         if (button.focused) {
           return
         }
@@ -80,10 +80,10 @@ export class Click {
         )
         uiintro.content.lastChild.style.paddingTop = 0
         button.input = uiintro.content.lastChild.lastChild
-        button.input.onfocus = function () {
+        button.input.onfocus = () => {
           button.focused = true
         }
-        button.input.onblur = function () {
+        button.input.onblur = () => {
           delete button.focused
         }
         if (button.interval) {
@@ -99,18 +99,18 @@ export class Click {
         var date = new Date()
         var days = []
         var currentDay = date.getDay()
-        if (currentDay == 0) {
+        if (currentDay === 0) {
           currentDay = 7
         }
         for (var i = 1; i <= 7; i++) {
           if (i < currentDay) {
-            days.push([i.toString(), "下周" + get.cnNumber(i, true)])
-          } else if (i == 7) {
+            days.push([i.toString(), `下周${get.cnNumber(i, true)}`])
+          } else if (i === 7) {
             days.push([i.toString(), "周日"])
-          } else if (i == currentDay) {
+          } else if (i === currentDay) {
             days.push([i.toString(), "今天"])
           } else {
-            days.push([i.toString(), "周" + get.cnNumber(i, true)])
+            days.push([i.toString(), `周${get.cnNumber(i, true)}`])
           }
         }
         days = days.concat(days.splice(0, currentDay - 1))
@@ -118,27 +118,35 @@ export class Click {
         if (initday > 7) {
           initday -= 7
         }
-        var daysselect = ui.create.selectlist(days, initday.toString(), datenode)
+        var daysselect = ui.create.selectlist(
+          days,
+          initday.toString(),
+          datenode,
+        )
         daysselect.style.width = "55px"
         var hours = []
         for (var i = 0; i < 24; i++) {
-          hours.push([i.toString(), i.toString() + "点"])
+          hours.push([i.toString(), `${i.toString()}点`])
         }
-        var hoursselect = ui.create.selectlist(hours, date.getHours().toString(), datenode)
+        var hoursselect = ui.create.selectlist(
+          hours,
+          date.getHours().toString(),
+          datenode,
+        )
         hoursselect.style.marginLeft = "5px"
         hoursselect.style.width = "55px"
         var timeconfirm = ui.create.node("button", "确定", datenode)
         timeconfirm.style.marginLeft = "5px"
-        timeconfirm.onclick = function () {
+        timeconfirm.onclick = () => {
           if (!button.input.value) {
             alert("请填写约战标题")
             return
           }
           var date2 = new Date()
-          date2.setHours(parseInt(hoursselect.value))
+          date2.setHours(parseInt(hoursselect.value, 10))
           date2.setMinutes(0)
           date2.setSeconds(0)
-          var deltaday = parseInt(daysselect.value) - currentDay
+          var deltaday = parseInt(daysselect.value, 10) - currentDay
           if (deltaday < 0) {
             deltaday += 7
           }
@@ -151,15 +159,14 @@ export class Click {
             var eventnode = ui.create.div(
               ".menubutton.videotext.onlineevent.pointerdiv",
               function () {
-                var that = this
-                setTimeout(function () {
-                  if (that.classList.contains("active")) {
-                    if (confirm("确定要离开" + that.info.content + "？")) {
-                      that.classList.remove("active")
+                setTimeout(() => {
+                  if (this.classList.contains("active")) {
+                    if (confirm(`确定要离开${this.info.content}？`)) {
+                      this.classList.remove("active")
                     }
                   } else {
-                    if (confirm("确定要加入" + that.info.content + "？")) {
-                      that.classList.add("active")
+                    if (confirm(`确定要加入${this.info.content}？`)) {
+                      this.classList.add("active")
                     }
                   }
                 })
@@ -169,8 +176,8 @@ export class Click {
             )
             var fakeinfo = {
               utc: utc,
-              day: parseInt(daysselect.value),
-              hour: parseInt(hoursselect.value),
+              day: parseInt(daysselect.value, 10),
+              hour: parseInt(hoursselect.value, 10),
               nickname: get.connectNickname(),
               avatar: lib.config.connect_avatar,
               content: get.plainText(button.input.value),
@@ -185,7 +192,7 @@ export class Click {
             } else {
               str = "周"
             }
-            if (fakeinfo.day == 7) {
+            if (fakeinfo.day === 7) {
               str += "日"
             } else {
               str += get.cnNumber(fakeinfo.day, true)
@@ -200,17 +207,17 @@ export class Click {
               } else {
                 str += "中午"
               }
-              str += fakeinfo.hour + "点"
+              str += `${fakeinfo.hour}点`
             } else {
               if (hour <= 17) {
                 str += "下午"
               } else {
                 str += "晚上"
               }
-              str += fakeinfo.hour - 12 + "点"
+              str += `${fakeinfo.hour - 12}点`
             }
-            ui.create.div("", "已有" + fakeinfo.members.length + "人加入", eventnode)
-            ui.create.div("", "时间：" + str, eventnode)
+            ui.create.div("", `已有${fakeinfo.members.length}人加入`, eventnode)
+            ui.create.div("", `时间：${str}`, eventnode)
             if (fakeinfo.members.includes(game.onlineKey)) {
               eventnode.classList.add("active")
             }
@@ -222,8 +229,8 @@ export class Click {
             "events",
             {
               utc: utc,
-              day: parseInt(daysselect.value),
-              hour: parseInt(hoursselect.value),
+              day: parseInt(daysselect.value, 10),
+              hour: parseInt(hoursselect.value, 10),
               nickname: get.connectNickname(),
               avatar: lib.config.connect_avatar,
               content: get.plainText(button.input.value),
@@ -235,30 +242,41 @@ export class Click {
         var num = 0
         for (var i = 0; i < button.info.length; i++) {
           if (
-            typeof button.info[i].creator == "string" &&
-            button.info[i].creator != game.onlineKey &&
+            typeof button.info[i].creator === "string" &&
+            button.info[i].creator !== game.onlineKey &&
             get.is.banWords(button.info[i].content)
           ) {
             continue
           }
-          if (button.info[i].creator == game.onlineKey) {
+          if (button.info[i].creator === game.onlineKey) {
             num++
           }
           var eventnode = ui.create.div(
             ".menubutton.videotext.onlineevent.pointerdiv",
             function () {
-              var that = this
-              if (typeof that.info.creator != "string") {
+              if (typeof this.info.creator !== "string") {
                 return
               }
-              setTimeout(function () {
-                if (that.classList.contains("active")) {
-                  if (confirm("确定要离开" + that.info.content + "？")) {
-                    game.send("server", "events", that.info.id, game.onlineKey, "leave")
+              setTimeout(() => {
+                if (this.classList.contains("active")) {
+                  if (confirm(`确定要离开${this.info.content}？`)) {
+                    game.send(
+                      "server",
+                      "events",
+                      this.info.id,
+                      game.onlineKey,
+                      "leave",
+                    )
                   }
                 } else {
-                  if (confirm("确定要加入" + that.info.content + "？")) {
-                    game.send("server", "events", that.info.id, game.onlineKey, "join")
+                  if (confirm(`确定要加入${this.info.content}？`)) {
+                    game.send(
+                      "server",
+                      "events",
+                      this.info.id,
+                      game.onlineKey,
+                      "join",
+                    )
                   }
                 }
               })
@@ -266,7 +284,7 @@ export class Click {
             uiintro.content,
           )
           eventnode.info = button.info[i]
-          if (typeof button.info[i].creator == "string") {
+          if (typeof button.info[i].creator === "string") {
             ui.create.div(".title", button.info[i].content, eventnode)
             var str
             if (button.info[i].day < currentDay) {
@@ -274,7 +292,7 @@ export class Click {
             } else {
               str = "周"
             }
-            if (button.info[i].day == 7) {
+            if (button.info[i].day === 7) {
               str += "日"
             } else {
               str += get.cnNumber(button.info[i].day, true)
@@ -289,26 +307,30 @@ export class Click {
               } else {
                 str += "中午"
               }
-              str += button.info[i].hour + "点"
+              str += `${button.info[i].hour}点`
             } else {
               if (hour <= 17) {
                 str += "下午"
               } else {
                 str += "晚上"
               }
-              str += button.info[i].hour - 12 + "点"
+              str += `${button.info[i].hour - 12}点`
             }
-            ui.create.div("", "创建者：" + button.info[i].nickname, eventnode)
+            ui.create.div("", `创建者：${button.info[i].nickname}`, eventnode)
             //ui.create.div('','创建者：'+(button.info[i].nickname)+'<br>ID：'+button.info[i].creator,eventnode);
-            ui.create.div("", "已有" + button.info[i].members.length + "人加入", eventnode)
-            ui.create.div("", "时间：" + str, eventnode)
+            ui.create.div(
+              "",
+              `已有${button.info[i].members.length}人加入`,
+              eventnode,
+            )
+            ui.create.div("", `时间：${str}`, eventnode)
             if (button.info[i].members.includes(game.onlineKey)) {
               eventnode.classList.add("active")
             }
           } else {
             ui.create.div(".title", button.info[i].title, eventnode)
             ui.create.div("", button.info[i].content, eventnode)
-            ui.create.div("", "创建者：" + button.info[i].nickname, eventnode)
+            ui.create.div("", `创建者：${button.info[i].nickname}`, eventnode)
           }
         }
         if (num >= 3) {
@@ -321,8 +343,8 @@ export class Click {
       }
       uiintro.refresh()
       ui.window.appendChild(uiintro)
-      _status.connectEventsCallback = function () {
-        if (uiintro.parentNode == ui.window) {
+      _status.connectEventsCallback = () => {
+        if (uiintro.parentNode === ui.window) {
           uiintro.refresh()
         }
       }
@@ -346,7 +368,7 @@ export class Click {
         uiintro.delete()
         this.delete()
       })
-      uiintro.listen(function () {
+      uiintro.listen(() => {
         _status.clicked = true
       })
       uiintro.style.zIndex = "21"
@@ -360,7 +382,7 @@ export class Click {
       uiintro.style.top = "auto"
       uiintro.style.bottom = "75px"
 
-      uiintro.refresh = function () {
+      uiintro.refresh = () => {
         if (button.focused) {
           return
         }
@@ -372,10 +394,10 @@ export class Click {
         )
         uiintro.content.lastChild.style.paddingTop = 0
         button.input = uiintro.content.lastChild.lastChild
-        button.input.onfocus = function () {
+        button.input.onfocus = () => {
           button.focused = true
         }
-        button.input.onblur = function () {
+        button.input.onblur = () => {
           delete button.focused
         }
         if (button.interval) {
@@ -386,7 +408,7 @@ export class Click {
           }
         }
         button.input.onkeydown = function (e) {
-          if (e.key == "Enter" && !this.disabled) {
+          if (e.key === "Enter" && !this.disabled) {
             game.send("server", "status", this.value)
             this.blur()
             this.disabled = true
@@ -394,14 +416,14 @@ export class Click {
             button.textnode.innerHTML = "发状态(10)"
             button.intervaltext = button.textnode.innerHTML
             var num = 10
-            var that = this
+
             button.input.disabled = true
             button.input.style.opacity = 0.6
             this.value = ""
-            button.interval = setInterval(function () {
+            button.interval = setInterval(() => {
               num--
               if (num > 0) {
-                button.textnode.innerHTML = "发状态(" + num + ")"
+                button.textnode.innerHTML = `发状态(${num})`
                 button.intervaltext = button.textnode.innerHTML
               } else {
                 button.textnode.innerHTML = "发状态"
@@ -416,14 +438,17 @@ export class Click {
         }
 
         for (var i = 0; i < button.info.length; i++) {
-          var node = ui.create.div(".menubutton.videonode.pointerdiv", uiintro.content)
+          var node = ui.create.div(
+            ".menubutton.videonode.pointerdiv",
+            uiintro.content,
+          )
           ui.create
             .div(".menubutton.videoavatar", node)
             .setBackground(button.info[i][1] || "caocao", "character")
-          if (button.info[i][4] == game.wsid) {
+          if (button.info[i][4] === game.wsid) {
             ui.create.div(
               ".name",
-              '<span class="thundertext thunderauto">' + (button.info[i][0] || "无名玩家"),
+              `<span class="thundertext thunderauto">${button.info[i][0] || "无名玩家"}`,
               node,
             )
             node.isme = true
@@ -432,7 +457,7 @@ export class Click {
           } else {
             ui.create.div(
               ".name",
-              '<span style="opacity:0.6">' + (button.info[i][0] || "无名玩家"),
+              `<span style="opacity:0.6">${button.info[i][0] || "无名玩家"}`,
               node,
             )
           }
@@ -440,7 +465,11 @@ export class Click {
           //ui.create.div('.videostatus',node,button.info[i][5]);
           //node.classList.add('videonodestatus');
           if (button.info[i][3]) {
-            ui.create.div(".videostatus", node, get.plainText(button.info[i][3].slice(0, 80)))
+            ui.create.div(
+              ".videostatus",
+              node,
+              get.plainText(button.info[i][3].slice(0, 80)),
+            )
             node.classList.add("videonodestatus")
           }
         }
@@ -448,8 +477,8 @@ export class Click {
 
       uiintro.refresh()
       ui.window.appendChild(uiintro)
-      _status.connectClientsCallback = function () {
-        if (uiintro.parentNode == ui.window) {
+      _status.connectClientsCallback = () => {
+        if (uiintro.parentNode === ui.window) {
           uiintro.refresh()
         }
       }
@@ -464,12 +493,12 @@ export class Click {
       nowSkin = lib.config.skin[name][1]
     }
     var fakeavatar = avatar.cloneNode(true)
-    var finish = function (bool) {
+    var finish = (bool) => {
       var player = avatar.parentNode
       if (bool) {
         fakeavatar.style.boxShadow = "none"
         player.insertBefore(fakeavatar, avatar.nextSibling)
-        setTimeout(function () {
+        setTimeout(() => {
           fakeavatar.delete()
         }, 100)
       }
@@ -491,7 +520,7 @@ export class Click {
       defaultFolder,
       (folders, files) => {
         if (files.length) {
-          const list = [...files, "defaultSkin"].filter((i) => i != nowSkin)
+          const list = [...files, "defaultSkin"].filter((i) => i !== nowSkin)
           if (list.length) {
             const skin = list.randomGet()
             if (skin === "defaultSkin") {
@@ -508,7 +537,10 @@ export class Click {
                 for (const nameList of lib.characterSubstitute[name]) {
                   const subName = nameList[0],
                     [fold, prefix] = skin.split(".")
-                  lib.config.skin[subName] = [name, `${defaultFolder}/${fold}/${subName}.${prefix}`]
+                  lib.config.skin[subName] = [
+                    name,
+                    `${defaultFolder}/${fold}/${subName}.${prefix}`,
+                  ]
                 }
               }
             }
@@ -531,7 +563,7 @@ export class Click {
     if (lib.config.touchscreen || forced) {
       _status.touchpopping = true
       clearTimeout(_status.touchpoppingtimeout)
-      _status.touchpoppingtimeout = setTimeout(function () {
+      _status.touchpoppingtimeout = setTimeout(() => {
         _status.touchpopping = false
       }, 600)
     }
@@ -544,17 +576,16 @@ export class Click {
       }
       game.reload()
       return
-    } else {
-      if (typeof game.roomId != "string") {
-        game.saveConfig("reconnect_info")
-      }
     }
-    if (!ui.exit || !ui.exit.stay) {
+    if (typeof game.roomId !== "string") {
+      game.saveConfig("reconnect_info")
+    }
+    if (!ui.exit?.stay) {
       if (lib.config.reconnect_info) {
         lib.config.reconnect_info.length = 1
         game.saveConfig("reconnect_info", lib.config.reconnect_info)
       }
-      game.saveConfig("tmp_user_roomId", undefined, false, function () {
+      game.saveConfig("tmp_user_roomId", undefined, false, () => {
         game.reload()
       })
     } else {
@@ -569,7 +600,7 @@ export class Click {
     }
     if (ui.shortcut.classList.contains("hidden")) {
       ui.favmode.style.display = "none"
-      if (window.StatusBar && lib.config.show_statusbar_ios == "auto") {
+      if (window.StatusBar && lib.config.show_statusbar_ios === "auto") {
         document.body.classList.remove("statusbar")
         window.StatusBar.hide()
       }
@@ -578,7 +609,7 @@ export class Click {
       if (lib.config.show_favmode) {
         ui.favmode.style.display = ""
       }
-      if (window.StatusBar && lib.config.show_statusbar_ios == "auto") {
+      if (window.StatusBar && lib.config.show_statusbar_ios === "auto") {
         document.body.classList.add("statusbar")
         window.StatusBar.overlaysWebView(true)
         window.StatusBar.backgroundColorByName("black")
@@ -593,8 +624,8 @@ export class Click {
     }
   }
   favouriteCharacter(e) {
-    if (typeof this.link == "string") {
-      if (this.innerHTML == "添加收藏") {
+    if (typeof this.link === "string") {
+      if (this.innerHTML === "添加收藏") {
         this.innerHTML = "移除收藏"
         lib.config.favouriteCharacter.add(this.link)
       } else {
@@ -604,11 +635,11 @@ export class Click {
       if (ui.favouriteCharacter) {
         if (lib.config.favouriteCharacter.includes(this.link)) {
           for (var i = 0; i < ui.favouriteCharacter.childElementCount; i++) {
-            if (ui.favouriteCharacter.childNodes[i].link == this.link) {
+            if (ui.favouriteCharacter.childNodes[i].link === this.link) {
               break
             }
           }
-          if (i == ui.favouriteCharacter.childElementCount) {
+          if (i === ui.favouriteCharacter.childElementCount) {
             ui.create
               .button(this.link, "character", ui.favouriteCharacter)
               .listen(function (e) {
@@ -622,7 +653,7 @@ export class Click {
           }
         } else {
           for (var i = 0; i < ui.favouriteCharacter.childElementCount; i++) {
-            if (ui.favouriteCharacter.childNodes[i].link == this.link) {
+            if (ui.favouriteCharacter.childNodes[i].link === this.link) {
               ui.favouriteCharacter.childNodes[i].remove()
               break
             }
@@ -652,12 +683,11 @@ export class Click {
     }
     var node = this.node.name
     if (node.offsetHeight < node.scrollHeight) {
-      var that = this
       var num = 40
-      that.buttonscrollinterval = setInterval(function () {
+      this.buttonscrollinterval = setInterval(() => {
         if (node.scrollTop + node.offsetHeight >= node.scrollHeight) {
-          clearInterval(that.buttonscrollinterval)
-          delete that.buttonscrollinterval
+          clearInterval(this.buttonscrollinterval)
+          delete this.buttonscrollinterval
         } else {
           if (num > 0) {
             num--
@@ -674,11 +704,10 @@ export class Click {
     }
     var node = this.node.name
     if (node.offsetHeight < node.scrollHeight) {
-      var that = this
-      that.buttonscrollinterval = setInterval(function () {
-        if (node.scrollTop == 0) {
-          clearInterval(that.buttonscrollinterval)
-          delete that.buttonscrollinterval
+      this.buttonscrollinterval = setInterval(() => {
+        if (node.scrollTop === 0) {
+          clearInterval(this.buttonscrollinterval)
+          delete this.buttonscrollinterval
         } else {
           node.scrollTop -= 2
         }
@@ -722,7 +751,7 @@ export class Click {
       !_status.connectMode &&
       this.parentNode.ai.stratagem_camouflage &&
       get.config("nei_auto_mark_camouflage") &&
-      game.me.identity == "nei"
+      game.me.identity === "nei"
     ) {
       return
     }
@@ -731,7 +760,7 @@ export class Click {
         _status.clickingidentity[1][i].delete()
         _status.clickingidentity[1][i].style.transform = ""
       }
-      if (_status.clickingidentity[0] == this.parentNode) {
+      if (_status.clickingidentity[0] === this.parentNode) {
         delete _status.clickingidentity
         return
       }
@@ -740,27 +769,34 @@ export class Click {
     if (!list) {
       return
     }
-    if (lib.config.mark_identity_style == "click") {
+    if (lib.config.mark_identity_style === "click") {
       var list2 = []
       for (var i in list) {
         list2.push(i)
       }
       list2.push(list2[0])
       for (var i = 0; i < list2.length; i++) {
-        if (this.firstChild.innerHTML == list[list2[i]]) {
+        if (this.firstChild.innerHTML === list[list2[i]]) {
           this.firstChild.innerHTML = list[list2[i + 1]]
           this.dataset.color = list2[i + 1]
           break
         }
       }
     } else {
-      if (get.mode() == "guozhan") {
-        list = { wei: "魏", shu: "蜀", wu: "吴", qun: "群", jin: "晋", ye: "野" }
+      if (get.mode() === "guozhan") {
+        list = {
+          wei: "魏",
+          shu: "蜀",
+          wu: "吴",
+          qun: "群",
+          jin: "晋",
+          ye: "野",
+        }
         if (_status.forceKey) {
           list.key = "键"
         }
-        for (let i in list) {
-          if (_status.bannedGroup?.slice(6) == i) {
+        for (const i in list) {
+          if (_status.bannedGroup?.slice(6) === i) {
             delete list[i]
           }
         }
@@ -771,7 +807,7 @@ export class Click {
       }
       var rect = this.parentNode.getBoundingClientRect()
       this._customintro = function (uiintro) {
-        if (get.mode() == "guozhan") {
+        if (get.mode() === "guozhan") {
           uiintro.clickintro = true
         } else {
           uiintro.touchclose = true
@@ -794,7 +830,7 @@ export class Click {
             node.firstChild.style.fontSize = "24px"
             node.firstChild.style.lineHeight = "24px"
           }
-          if (get.mode() == "guozhan") {
+          if (get.mode() === "guozhan") {
             if (source._guozhanguess) {
               if (!source._guozhanguess.includes(i)) {
                 node.classList.add("transparent")
@@ -909,7 +945,7 @@ export class Click {
       return
     }
     var uiintro = ui.create.dialog("hidden")
-    uiintro.listen(function (e) {
+    uiintro.listen((e) => {
       e.stopPropagation()
     })
 
@@ -926,18 +962,21 @@ export class Click {
       for (var i = 0; i < 3 && i + k * 3 < modes.length; i++) {
         var thismode = modes[i + k * 3]
         var div = ui.create.div(
-          thismode == (_status.sourcemode || lib.config.mode)
+          thismode === (_status.sourcemode || lib.config.mode)
             ? ".underlinenode.on"
             : ".underlinenode",
           node,
         )
         div.innerHTML = lib.translate[thismode]
         div.link = thismode
-        div.addEventListener(lib.config.touchscreen ? "touchend" : "click", function () {
-          game.saveConfig("mode", this.link)
-          localStorage.setItem(lib.configprefix + "directstart", true)
-          game.reload()
-        })
+        div.addEventListener(
+          lib.config.touchscreen ? "touchend" : "click",
+          function () {
+            game.saveConfig("mode", this.link)
+            localStorage.setItem(`${lib.configprefix}directstart`, true)
+            game.reload()
+          },
+        )
       }
       uiintro.add(node)
     }
@@ -946,7 +985,7 @@ export class Click {
   }
   cardPileButton() {
     var uiintro = ui.create.dialog("hidden")
-    uiintro.listen(function (e) {
+    uiintro.listen((e) => {
       e.stopPropagation()
     })
     var num
@@ -955,17 +994,13 @@ export class Click {
     } else {
       num = ui.cardPile.childNodes.length
     }
-    uiintro.add('剩余 <span style="font-family:' + "xinwei" + '">' + num)
+    uiintro.add(`剩余 <span style="font-family:xinwei">${num}`)
 
     if (_status.connectMode) {
       return uiintro
     }
     uiintro.add(
-      '<div class="text center">轮数 <span style="font-family:xinwei">' +
-        game.roundNumber +
-        '</span>&nbsp;&nbsp;&nbsp;&nbsp;洗牌 <span style="font-family:xinwei">' +
-        game.shuffleNumber +
-        "</div>",
+      `<div class="text center">轮数 <span style="font-family:xinwei">${game.roundNumber}</span>&nbsp;&nbsp;&nbsp;&nbsp;洗牌 <span style="font-family:xinwei">${game.shuffleNumber}</div>`,
     )
     uiintro.add('<div class="text center">弃牌堆</div>')
     if (ui.discardPile.childNodes.length) {
@@ -975,13 +1010,15 @@ export class Click {
       }
       uiintro.addSmall([list, "card"])
     } else {
-      uiintro.add('<div class="text center" style="padding-bottom:3px">无</div>')
+      uiintro.add(
+        '<div class="text center" style="padding-bottom:3px">无</div>',
+      )
     }
     return uiintro
   }
   commonCardPileButton() {
     var uiintro = ui.create.dialog("hidden")
-    uiintro.listen(function (e) {
+    uiintro.listen((e) => {
       e.stopPropagation()
     })
     for (const [key, value] of lib.commonArea) {
@@ -989,7 +1026,7 @@ export class Click {
       uiintro.add(
         `<div class="text center">${value.translate || get.translation(key)} (${get.cnNumber(cards?.length ?? 0)}张)</div>`,
       )
-      if (get.itemtype(cards) == "cards") {
+      if (get.itemtype(cards) === "cards") {
         if (!value.isUnseen) {
           uiintro.addSmall([cards, "card"])
         }
@@ -1003,7 +1040,7 @@ export class Click {
     ui.system2.classList.add("shown")
 
     var uiintro = ui.create.dialog("hidden")
-    uiintro.listen(function (e) {
+    uiintro.listen((e) => {
       e.stopPropagation()
     })
 
@@ -1018,16 +1055,16 @@ export class Click {
     uiintro.contentContainer.style.overflow = "hidden"
 
     var input
-    var addEntry = function (info, clear) {
+    var addEntry = (info, clear) => {
       if (list._chatempty) {
         list.innerHTML = ""
         delete list._chatempty
       }
       var node = ui.create.div(".text.chat")
-      node.innerHTML = info[0] + ": " + info[1]
+      node.innerHTML = `${info[0]}: ${info[1]}`
       list.appendChild(node)
       list.scrollTop = list.scrollHeight
-      uiintro.style.height = uiintro.content.scrollHeight + "px"
+      uiintro.style.height = `${uiintro.content.scrollHeight}px`
     }
     _status.addChatEntry = addEntry
     _status.addChatEntry._origin = uiintro
@@ -1040,29 +1077,29 @@ export class Click {
       list.appendChild(ui.create.div(".text.center", "无聊天记录"))
     }
     uiintro.add(list)
-    uiintro.style.height = uiintro.content.offsetHeight + "px"
+    uiintro.style.height = `${uiintro.content.offsetHeight}px`
     list.scrollTop = list.scrollHeight
 
     if (!_status.chatValue) {
       _status.chatValue = ""
     }
-    var node = uiintro.add('<input type="text" value="' + _status.chatValue + '">')
+    var node = uiintro.add(`<input type="text" value="${_status.chatValue}">`)
     node.style.paddingTop = 0
     node.style.marginBottom = "16px"
     input = node.firstChild
     input.style.width = "calc(100% - 20px)"
-    input.onchange = function () {
+    input.onchange = () => {
       _status.chatValue = input.value
     }
-    input.onkeydown = function (e) {
-      if (e.key == "Enter" && input.value) {
+    input.onkeydown = (e) => {
+      if (e.key === "Enter" && input.value) {
         var player = game.me
         var str = input.value
         if (!player) {
           if (game.connectPlayers) {
             if (game.online) {
               for (var i = 0; i < game.connectPlayers.length; i++) {
-                if (game.connectPlayers[i].playerid == game.onlineID) {
+                if (game.connectPlayers[i].playerid === game.onlineID) {
                   player = game.connectPlayers[i]
                   break
                 }
@@ -1091,13 +1128,13 @@ export class Click {
       }
       e.stopPropagation()
     }
-    uiintro._onopen = function () {
+    uiintro._onopen = () => {
       input.focus()
       list.scrollTop = list.scrollHeight
     }
     uiintro._heightfixed = true
-    var emotionTitle = ui.create.div(".text.center", "聊天表情", function () {
-      if (emotionTitle.innerHTML == "快捷语音") {
+    var emotionTitle = ui.create.div(".text.center", "聊天表情", () => {
+      if (emotionTitle.innerHTML === "快捷语音") {
         emotionTitle.innerHTML = "聊天表情"
         list2.remove()
         list3.remove()
@@ -1122,7 +1159,7 @@ export class Click {
     list1.style.overflow = "scroll"
     lib.setScroll(list1)
     uiintro.add(list1)
-    uiintro.style.height = uiintro.content.scrollHeight + "px"
+    uiintro.style.height = `${uiintro.content.scrollHeight}px`
     var list2 = ui.create.div("")
     if (get.is.phoneLayout()) {
       list2.style.height = "110px"
@@ -1132,7 +1169,7 @@ export class Click {
     list2.style.overflow = "scroll"
     lib.setScroll(list2)
     //uiintro.add(list2);
-    const createEmotion = function (name) {
+    const createEmotion = (name) => {
       const srcBase = `${lib.assetURL}image/emotion/${name}/`
       const files = _status.emotion_cache[name]
       for (const file of files) {
@@ -1145,7 +1182,7 @@ export class Click {
               if (game.connectPlayers) {
                 if (game.online) {
                   for (let j = 0; j < game.connectPlayers.length; j++) {
-                    if (game.connectPlayers[j].playerid == game.onlineID) {
+                    if (game.connectPlayers[j].playerid === game.onlineID) {
                       player = game.connectPlayers[j]
                       break
                     }
@@ -1190,7 +1227,7 @@ export class Click {
       list1.appendChild(emotionPack)
     }
     list1.scrollTop = list1.scrollHeight
-    uiintro.style.height = uiintro.content.scrollHeight + "px"
+    uiintro.style.height = `${uiintro.content.scrollHeight}px`
     var list3 = ui.create.div(".caption")
     if (get.is.phoneLayout()) {
       list3.style.height = "110px"
@@ -1207,7 +1244,7 @@ export class Click {
           if (game.connectPlayers) {
             if (game.online) {
               for (var i = 0; i < game.connectPlayers.length; i++) {
-                if (game.connectPlayers[i].playerid == game.onlineID) {
+                if (game.connectPlayers[i].playerid === game.onlineID) {
                   player = game.connectPlayers[i]
                   break
                 }
@@ -1234,7 +1271,7 @@ export class Click {
   }
   volumn() {
     var uiintro = ui.create.dialog("hidden")
-    uiintro.listen(function (e) {
+    uiintro.listen((e) => {
       e.stopPropagation()
     })
     uiintro.add("背景音乐")
@@ -1261,7 +1298,10 @@ export class Click {
     for (var i = 0; i < 8; i++) {
       var span = document.createElement("span")
       span.link = i + 1
-      span.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.volumn_audio)
+      span.addEventListener(
+        lib.config.touchscreen ? "touchend" : "click",
+        ui.click.volumn_audio,
+      )
       if (i < lib.config.volumn_audio) {
         span.innerHTML = "●"
       } else {
@@ -1321,7 +1361,7 @@ export class Click {
     if (!uiintro) {
       return
     }
-    if (ui.currentpopped && ui.currentpopped._uiintro) {
+    if (ui.currentpopped?._uiintro) {
       ui.currentpopped._uiintro.delete()
       delete ui.currentpopped._uiintro
     }
@@ -1333,33 +1373,37 @@ export class Click {
 
     ui.window.appendChild(uiintro)
     var width = this._poppedwidth || 330
-    uiintro.style.width = width + "px"
+    uiintro.style.width = `${width}px`
     if (get.is.phoneLayout()) {
       width *= 1.3
     }
 
     if (uiintro._heightfixed) {
-      uiintro.style.height = uiintro.content.scrollHeight + "px"
+      uiintro.style.height = `${uiintro.content.scrollHeight}px`
     } else {
       var height = this._poppedheight || uiintro.content.scrollHeight
       var height2 = ui.window.offsetHeight - 260
       if (get.is.phoneLayout()) {
         height2 = (ui.window.offsetHeight - 80) / 1.3
       }
-      uiintro.style.height = Math.min(height2, height) + "px"
+      uiintro.style.height = `${Math.min(height2, height)}px`
     }
     if (get.is.phoneLayout()) {
       uiintro.style.top = "70px"
     } else {
       uiintro.style.top = "50px"
     }
-    var left = this.parentNode.offsetLeft + this.offsetLeft + this.offsetWidth / 2 - width / 2
+    var left =
+      this.parentNode.offsetLeft +
+      this.offsetLeft +
+      this.offsetWidth / 2 -
+      width / 2
     if (left < 10) {
       left = 10
     } else if (left + width > ui.window.offsetWidth - 10) {
       left = ui.window.offsetWidth - width - 10
     }
-    uiintro.style.left = left + "px"
+    uiintro.style.left = `${left}px`
     uiintro._poppedorigin = this
     if (!lib.config.touchscreen) {
       uiintro.addEventListener("mouseleave", ui.click.leavehoverpopped)
@@ -1372,7 +1416,7 @@ export class Click {
       game.pause2()
       uiintro.classList.add("static")
       var layer = ui.create.div(".poplayer", ui.window)
-      var clicklayer = function (e) {
+      var clicklayer = (e) => {
         uiintro.delete()
         layer.remove()
         game.resume2()
@@ -1399,9 +1443,8 @@ export class Click {
     this.delete()
     var button = this._poppedorigin
 
-    var uiintro = this
-    setTimeout(function () {
-      if (button._uiintro == uiintro) {
+    setTimeout(() => {
+      if (button._uiintro === this) {
         delete button._uiintro
       }
     }, 500)
@@ -1423,7 +1466,7 @@ export class Click {
       var i, translation, intro, str
       if (ui.intro) {
         ui.intro.close()
-        if (ui.intro.source == "dieswap") {
+        if (ui.intro.source === "dieswap") {
           delete ui.intro
           ui.control.show()
           game.resume2()
@@ -1488,7 +1531,11 @@ export class Click {
     }
     if (_status.draggingroundmenu) {
       delete _status._swipeorigin
-      if (ui.roundmenu._dragorigin && ui.roundmenu._dragtransform && e.touches.length) {
+      if (
+        ui.roundmenu._dragorigin &&
+        ui.roundmenu._dragtransform &&
+        e.touches.length
+      ) {
         var translate = ui.roundmenu._dragtransform.slice(0)
         var dx =
           e.touches[0].clientX / game.documentZoom -
@@ -1534,19 +1581,33 @@ export class Click {
 
     if (_status.mousedragging && e.touches.length) {
       e.preventDefault()
-      var item = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY)
+      var item = document.elementFromPoint(
+        e.touches[0].clientX,
+        e.touches[0].clientY,
+      )
       if (game.chess && ui.selected.cards.length) {
         var itemtype = get.itemtype(item)
-        if (itemtype != "card" && itemtype != "button") {
-          var ex = e.touches[0].clientX / game.documentZoom - ui.arena.offsetLeft
+        if (itemtype !== "card" && itemtype !== "button") {
+          var ex =
+            e.touches[0].clientX / game.documentZoom - ui.arena.offsetLeft
           var ey = e.touches[0].clientY / game.documentZoom - ui.arena.offsetTop
           for (var i = 0; i < game.players.length; i++) {
             var left =
-              -ui.chessContainer.chessLeft + ui.chess.offsetLeft + game.players[i].getLeft()
-            var top = -ui.chessContainer.chessTop + ui.chess.offsetTop + game.players[i].getTop()
+              -ui.chessContainer.chessLeft +
+              ui.chess.offsetLeft +
+              game.players[i].getLeft()
+            var top =
+              -ui.chessContainer.chessTop +
+              ui.chess.offsetTop +
+              game.players[i].getTop()
             var width = game.players[i].offsetWidth
             var height = game.players[i].offsetHeight
-            if (ex > left && ex < left + width && ey > top && ey < top + height) {
+            if (
+              ex > left &&
+              ex < left + width &&
+              ey > top &&
+              ey < top + height
+            ) {
               item = game.players[i]
               break
             }
@@ -1554,7 +1615,11 @@ export class Click {
         }
       }
       while (item) {
-        if (lib.config.enable_touchdragline && _status.mouseleft && !game.chess) {
+        if (
+          lib.config.enable_touchdragline &&
+          _status.mouseleft &&
+          !game.chess
+        ) {
           ui.canvas.width = ui.arena.offsetWidth
           ui.canvas.height = ui.arena.offsetHeight
           var ctx = ui.ctx
@@ -1567,8 +1632,10 @@ export class Click {
           ctx.beginPath()
 
           ctx.moveTo(
-            _status.mousedragging.clientX / game.documentZoom - ui.arena.offsetLeft,
-            _status.mousedragging.clientY / game.documentZoom - ui.arena.offsetTop,
+            _status.mousedragging.clientX / game.documentZoom -
+              ui.arena.offsetLeft,
+            _status.mousedragging.clientY / game.documentZoom -
+              ui.arena.offsetTop,
           )
 
           if (_status.multitarget) {
@@ -1587,8 +1654,10 @@ export class Click {
           if (!_status.multitarget) {
             for (var i = 0; i < _status.lastdragchange.length; i++) {
               ctx.moveTo(
-                _status.mousedragging.clientX / game.documentZoom - ui.arena.offsetLeft,
-                _status.mousedragging.clientY / game.documentZoom - ui.arena.offsetTop,
+                _status.mousedragging.clientX / game.documentZoom -
+                  ui.arena.offsetLeft,
+                _status.mousedragging.clientY / game.documentZoom -
+                  ui.arena.offsetTop,
               )
               var exy = _status.lastdragchange[i]._lastdragchange
               ctx.lineTo(exy[0], exy[1])
@@ -1597,7 +1666,7 @@ export class Click {
           }
         }
 
-        if (item == _status.mousedragorigin) {
+        if (item === _status.mousedragorigin) {
           if (_status.mouseleft) {
             _status.mousedragging = null
             _status.mousedragorigin = null
@@ -1609,12 +1678,17 @@ export class Click {
           return
         }
         var itemtype = get.itemtype(item)
-        if (itemtype == "card" || itemtype == "button" || itemtype == "player") {
+        if (
+          itemtype === "card" ||
+          itemtype === "button" ||
+          itemtype === "player"
+        ) {
           _status.mouseleft = true
           if (ui.selected.cards.length) {
             ui.selected.cards[0].updateTransform(true, 100)
           }
-          var ex = e.touches[0].clientX / game.documentZoom - ui.arena.offsetLeft
+          var ex =
+            e.touches[0].clientX / game.documentZoom - ui.arena.offsetLeft
           var ey = e.touches[0].clientY / game.documentZoom - ui.arena.offsetTop
           var exx = ex,
             eyy = ey
@@ -1623,7 +1697,7 @@ export class Click {
             ey -= -ui.chessContainer.chessTop + ui.chess.offsetTop
           }
           if (
-            itemtype != "player" ||
+            itemtype !== "player" ||
             game.chess ||
             (ex > item.offsetLeft &&
               ex < item.offsetLeft + item.offsetWidth &&
@@ -1631,7 +1705,7 @@ export class Click {
               ey < item.offsetTop + item.offsetHeight)
           ) {
             var targetfixed = false
-            if (itemtype == "player") {
+            if (itemtype === "player") {
               if (get.select(_status.event.selectTarget)[1] <= -1) {
                 targetfixed = true
               }
@@ -1639,13 +1713,14 @@ export class Click {
             if (
               !targetfixed &&
               item.classList.contains("selectable") &&
-              _status.dragstatuschanged != item
+              _status.dragstatuschanged !== item
             ) {
               _status.mouseleft = true
               _status.dragstatuschanged = item
               _status.clicked = false
               _status.dragged = false
-              var notbefore = itemtype == "player" && !item.classList.contains("selected")
+              var notbefore =
+                itemtype === "player" && !item.classList.contains("selected")
               ui.click[itemtype].call(item)
               if (item.classList.contains("selected")) {
                 if (notbefore) {
@@ -1653,18 +1728,21 @@ export class Click {
                   item._lastdragchange = [exx, eyy]
                   if (lib.falseitem) {
                     var from = [
-                      _status.mousedragging.clientX / game.documentZoom - ui.arena.offsetLeft,
-                      _status.mousedragging.clientY / game.documentZoom - ui.arena.offsetTop,
+                      _status.mousedragging.clientX / game.documentZoom -
+                        ui.arena.offsetLeft,
+                      _status.mousedragging.clientY / game.documentZoom -
+                        ui.arena.offsetTop,
                     ]
                     var to = [exx, eyy]
                     var node = ui.create.div(".linexy.hidden")
-                    node.style.left = from[0] + "px"
-                    node.style.top = from[1] + "px"
+                    node.style.left = `${from[0]}px`
+                    node.style.top = `${from[1]}px`
                     node.style.transitionDuration = "0.3s"
                     node.style.backgroundColor = "white"
                     var dy = to[1] - from[1]
                     var dx = to[0] - from[0]
-                    var deg = (Math.atan(Math.abs(dy) / Math.abs(dx)) / Math.PI) * 180
+                    var deg =
+                      (Math.atan(Math.abs(dy) / Math.abs(dx)) / Math.PI) * 180
                     if (dx >= 0) {
                       if (dy <= 0) {
                         deg += 90
@@ -1678,8 +1756,8 @@ export class Click {
                         deg += 270
                       }
                     }
-                    node.style.transform = "rotate(" + -deg + "deg) scaleY(0)"
-                    node.style.height = get.xyDistance(from, to) + "px"
+                    node.style.transform = `rotate(${-deg}deg) scaleY(0)`
+                    node.style.height = `${get.xyDistance(from, to)}px`
                     if (game.chess) {
                       ui.chess.appendChild(node)
                     } else {
@@ -1687,7 +1765,7 @@ export class Click {
                     }
                     ui.refresh(node)
                     node.show()
-                    node.style.transform = "rotate(" + -deg + "deg) scaleY(1)"
+                    node.style.transform = `rotate(${-deg}deg) scaleY(1)`
                     ui.touchlines.push(node)
                     node._origin = item
                   }
@@ -1695,7 +1773,7 @@ export class Click {
               } else {
                 _status.lastdragchange.remove(item)
                 for (var i = 0; i < ui.touchlines.length; i++) {
-                  if (ui.touchlines[i]._origin == item) {
+                  if (ui.touchlines[i]._origin === item) {
                     ui.touchlines[i].delete()
                     ui.touchlines.splice(i--, 1)
                   }
@@ -1704,17 +1782,20 @@ export class Click {
               _status.selectionfull = true
               if (
                 _status.event.filterButton &&
-                ui.selected.buttons.length < get.select(_status.event.selectButton)[1]
+                ui.selected.buttons.length <
+                  get.select(_status.event.selectButton)[1]
               ) {
                 _status.selectionfull = false
               } else if (
                 _status.event.filterCard &&
-                ui.selected.cards.length < get.select(_status.event.selectCard)[1]
+                ui.selected.cards.length <
+                  get.select(_status.event.selectCard)[1]
               ) {
                 _status.selectionfull = false
               } else if (
                 _status.event.filterTarget &&
-                ui.selected.targets.length < get.select(_status.event.selectTarget)[1]
+                ui.selected.targets.length <
+                  get.select(_status.event.selectTarget)[1]
               ) {
                 _status.selectionfull = false
               }
@@ -1737,7 +1818,11 @@ export class Click {
     if (window.inSplash) {
       return
     }
-    if (e.touches.length == 1 && !_status.dragged && !_status.draggingtouchdialog) {
+    if (
+      e.touches.length === 1 &&
+      !_status.dragged &&
+      !_status.draggingtouchdialog
+    ) {
       ui.click.pause()
     }
     if (_status.draggingroundmenu) {
@@ -1747,7 +1832,11 @@ export class Click {
         delete ui.roundmenu._resetTimeout
       }
       var translate
-      if (ui.roundmenu._dragorigin && ui.roundmenu._dragtransform && ui.roundmenu._dragtouches) {
+      if (
+        ui.roundmenu._dragorigin &&
+        ui.roundmenu._dragtransform &&
+        ui.roundmenu._dragtouches
+      ) {
         var dx =
           ui.roundmenu._dragtouches.clientX / game.documentZoom -
           ui.roundmenu._dragorigin.clientX / game.documentZoom
@@ -1758,7 +1847,7 @@ export class Click {
           ui.click.roundmenu()
           ui.roundmenu._dragtransform = ui.roundmenu._dragorigintransform
           translate = ui.roundmenu._dragtransform
-          ui.roundmenu.style.transform = "translate(" + translate[0] + "px," + translate[1] + "px)"
+          ui.roundmenu.style.transform = `translate(${translate[0]}px,${translate[1]}px)`
         } else {
           translate = ui.roundmenu._dragtransform
           translate[0] += dx
@@ -1797,7 +1886,7 @@ export class Click {
       game.saveConfig("dialog_transform", translate)
       delete _status.draggingtouchdialog
       _status.justdragged = true
-      setTimeout(function () {
+      setTimeout(() => {
         _status.justdragged = false
       }, 500)
     } else if (
@@ -1814,7 +1903,7 @@ export class Click {
         var dy =
           _status._swipeorigin.touches.clientY / game.documentZoom -
           _status._swipeorigin.clientY / game.documentZoom
-        var goswipe = function (action) {
+        var goswipe = (action) => {
           game.closeConnectMenu()
           switch (action) {
             case "system":
@@ -1903,27 +1992,41 @@ export class Click {
       translate[1] + ui.roundmenu._position[1] + 50 + ui.arena.offsetTop >
       ui.window.offsetHeight
     ) {
-      translate[1] = ui.window.offsetHeight - (ui.roundmenu._position[1] + 50) - ui.arena.offsetTop
-    } else if (translate[1] + ui.roundmenu._position[1] + ui.arena.offsetTop < 0) {
+      translate[1] =
+        ui.window.offsetHeight -
+        (ui.roundmenu._position[1] + 50) -
+        ui.arena.offsetTop
+    } else if (
+      translate[1] + ui.roundmenu._position[1] + ui.arena.offsetTop <
+      0
+    ) {
       translate[1] = -ui.roundmenu._position[1] - ui.arena.offsetTop
     }
     if (
       translate[0] + ui.roundmenu._position[0] + 50 + ui.arena.offsetLeft >
       ui.window.offsetWidth
     ) {
-      translate[0] = ui.window.offsetWidth - (ui.roundmenu._position[0] + 50) - ui.arena.offsetLeft
-    } else if (translate[0] + ui.roundmenu._position[0] + ui.arena.offsetLeft < 0) {
+      translate[0] =
+        ui.window.offsetWidth -
+        (ui.roundmenu._position[0] + 50) -
+        ui.arena.offsetLeft
+    } else if (
+      translate[0] + ui.roundmenu._position[0] + ui.arena.offsetLeft <
+      0
+    ) {
       translate[0] = -ui.roundmenu._position[0] - ui.arena.offsetLeft
     }
-    ui.roundmenu.style.transform = "translate(" + translate[0] + "px," + translate[1] + "px)"
+    ui.roundmenu.style.transform = `translate(${translate[0]}px,${translate[1]}px)`
   }
   checkdialogtranslate(translate, dialog) {
     var translate = translate || dialog._dragtransform
-    if (Math.sqrt(translate[0] * translate[0] + translate[1] * translate[1]) < 10) {
+    if (
+      Math.sqrt(translate[0] * translate[0] + translate[1] * translate[1]) < 10
+    ) {
       translate[0] = 0
       translate[1] = 0
     }
-    dialog.style.transform = "translate(" + translate[0] + "px," + translate[1] + "px)"
+    dialog.style.transform = `translate(${translate[0]}px,${translate[1]}px)`
   }
   windowmousewheel(e) {
     _status.tempunpopup = e
@@ -1937,10 +2040,12 @@ export class Click {
         delete _status.tempunpopup
       }
     }
-    if (e.button == 2) {
+    if (e.button === 2) {
       return
     }
-    var dialogs = document.querySelectorAll("#window>.dialog.popped:not(.static)")
+    var dialogs = document.querySelectorAll(
+      "#window>.dialog.popped:not(.static)",
+    )
     for (var i = 0; i < dialogs.length; i++) {
       dialogs[i].delete()
     }
@@ -1948,12 +2053,18 @@ export class Click {
     var sourceitem = document.elementFromPoint(e.clientX, e.clientY)
     if (game.chess && ui.selected.cards.length) {
       var itemtype = get.itemtype(sourceitem)
-      if (itemtype != "card" && itemtype != "button") {
+      if (itemtype !== "card" && itemtype !== "button") {
         for (var i = 0; i < game.players.length; i++) {
           var ex = e.clientX / game.documentZoom - ui.arena.offsetLeft
           var ey = e.clientY / game.documentZoom - ui.arena.offsetTop
-          var left = -ui.chessContainer.chessLeft + ui.chess.offsetLeft + game.players[i].getLeft()
-          var top = -ui.chessContainer.chessTop + ui.chess.offsetTop + game.players[i].getTop()
+          var left =
+            -ui.chessContainer.chessLeft +
+            ui.chess.offsetLeft +
+            game.players[i].getLeft()
+          var top =
+            -ui.chessContainer.chessTop +
+            ui.chess.offsetTop +
+            game.players[i].getTop()
           var width = game.players[i].offsetWidth
           var height = game.players[i].offsetHeight
           if (ex > left && ex < left + width && ey > top && ey < top + height) {
@@ -2009,8 +2120,10 @@ export class Click {
         ctx.beginPath()
 
         ctx.moveTo(
-          _status.mousedragging.clientX / game.documentZoom - ui.arena.offsetLeft,
-          _status.mousedragging.clientY / game.documentZoom - ui.arena.offsetTop,
+          _status.mousedragging.clientX / game.documentZoom -
+            ui.arena.offsetLeft,
+          _status.mousedragging.clientY / game.documentZoom -
+            ui.arena.offsetTop,
         )
         if (_status.multitarget) {
           for (var i = 0; i < _status.lastdragchange.length; i++) {
@@ -2028,8 +2141,10 @@ export class Click {
         if (!_status.multitarget) {
           for (var i = 0; i < _status.lastdragchange.length; i++) {
             ctx.moveTo(
-              _status.mousedragging.clientX / game.documentZoom - ui.arena.offsetLeft,
-              _status.mousedragging.clientY / game.documentZoom - ui.arena.offsetTop,
+              _status.mousedragging.clientX / game.documentZoom -
+                ui.arena.offsetLeft,
+              _status.mousedragging.clientY / game.documentZoom -
+                ui.arena.offsetTop,
             )
             var exy = _status.lastdragchange[i]._lastdragchange
             ctx.lineTo(exy[0], exy[1])
@@ -2039,12 +2154,16 @@ export class Click {
       }
 
       while (item) {
-        if (item == _status.mousedragorigin) {
+        if (item === _status.mousedragorigin) {
           if (_status.mouseleft) {
             _status.mousedragging = null
             _status.mousedragorigin = null
             _status.clicked = false
-            if (_status.event.type == "phase" && !_status.event.skill && ui.confirm) {
+            if (
+              _status.event.type === "phase" &&
+              !_status.event.skill &&
+              ui.confirm
+            ) {
               ui.confirm.classList.add("removing")
             }
             game.uncheck()
@@ -2054,7 +2173,11 @@ export class Click {
           return
         }
         var itemtype = get.itemtype(item)
-        if (itemtype == "card" || itemtype == "button" || itemtype == "player") {
+        if (
+          itemtype === "card" ||
+          itemtype === "button" ||
+          itemtype === "player"
+        ) {
           _status.mouseleft = true
           if (ui.selected.cards.length) {
             ui.selected.cards[0].updateTransform(true, 100)
@@ -2068,7 +2191,7 @@ export class Click {
             ey -= -ui.chessContainer.chessTop + ui.chess.offsetTop
           }
           if (
-            itemtype != "player" ||
+            itemtype !== "player" ||
             game.chess ||
             (ex > item.offsetLeft &&
               ex < item.offsetLeft + item.offsetWidth &&
@@ -2076,7 +2199,7 @@ export class Click {
               ey < item.offsetTop + item.offsetHeight)
           ) {
             var targetfixed = false
-            if (itemtype == "player") {
+            if (itemtype === "player") {
               if (get.select(_status.event.selectTarget)[1] <= -1) {
                 targetfixed = true
               }
@@ -2084,12 +2207,13 @@ export class Click {
             if (
               !targetfixed &&
               item.classList.contains("selectable") &&
-              _status.dragstatuschanged != item
+              _status.dragstatuschanged !== item
             ) {
               _status.mouseleft = true
               _status.dragstatuschanged = item
               _status.clicked = false
-              var notbefore = itemtype == "player" && !item.classList.contains("selected")
+              var notbefore =
+                itemtype === "player" && !item.classList.contains("selected")
               ui.click[itemtype].call(item)
               if (item.classList.contains("selected")) {
                 if (notbefore) {
@@ -2102,17 +2226,20 @@ export class Click {
               _status.selectionfull = true
               if (
                 _status.event.filterButton &&
-                ui.selected.buttons.length < get.select(_status.event.selectButton)[1]
+                ui.selected.buttons.length <
+                  get.select(_status.event.selectButton)[1]
               ) {
                 _status.selectionfull = false
               } else if (
                 _status.event.filterCard &&
-                ui.selected.cards.length < get.select(_status.event.selectCard)[1]
+                ui.selected.cards.length <
+                  get.select(_status.event.selectCard)[1]
               ) {
                 _status.selectionfull = false
               } else if (
                 _status.event.filterTarget &&
-                ui.selected.targets.length < get.select(_status.event.selectTarget)[1]
+                ui.selected.targets.length <
+                  get.select(_status.event.selectTarget)[1]
               ) {
                 _status.selectionfull = false
               }
@@ -2132,23 +2259,23 @@ export class Click {
       _status.dragstatuschanged = null
     } else {
       while (item) {
-        if (item == node && !node._mouseentercreated) {
+        if (item === node && !node._mouseentercreated) {
           ui.click.mouseentercancel()
           var hoveration
-          if (typeof node._hoveration == "number") {
+          if (typeof node._hoveration === "number") {
             hoveration = node._hoveration
           } else {
-            hoveration = parseInt(lib.config.hoveration)
+            hoveration = parseInt(lib.config.hoveration, 10)
             if (
               node.classList.contains("button") ||
-              (node.parentNode && node.parentNode.parentNode) == ui.me
+              node.parentNode?.parentNode === ui.me
             ) {
               hoveration += 500
             }
           }
-          _status._mouseentertimeout = setTimeout(function () {
+          _status._mouseentertimeout = setTimeout(() => {
             if (
-              _status.currentmouseenter != node ||
+              _status.currentmouseenter !== node ||
               node._mouseentercreated ||
               _status.tempunpopup ||
               _status.mousedragging ||
@@ -2165,7 +2292,7 @@ export class Click {
                 ui.window.appendChild(dialog)
                 lib.placePoppedDialog(dialog, e)
                 if (node._hoverwidth) {
-                  dialog.style.width = node._hoverwidth + "px"
+                  dialog.style.width = `${node._hoverwidth}px`
                   dialog._hovercustomed = true
                 }
                 node._mouseenterdialog = dialog
@@ -2182,9 +2309,11 @@ export class Click {
         if (ddialog._dragorigin && ddialog._dragtransform) {
           var translate = ddialog._dragtransform.slice(0)
           translate[0] +=
-            e.clientX / game.documentZoom - ddialog._dragorigin.clientX / game.documentZoom
+            e.clientX / game.documentZoom -
+            ddialog._dragorigin.clientX / game.documentZoom
           translate[1] +=
-            e.clientY / game.documentZoom - ddialog._dragorigin.clientY / game.documentZoom
+            e.clientY / game.documentZoom -
+            ddialog._dragorigin.clientY / game.documentZoom
           ui.click.checkdialogtranslate(translate, ddialog)
         }
         _status.clicked = true
@@ -2193,9 +2322,11 @@ export class Click {
         if (ui.roundmenu._dragorigin && ui.roundmenu._dragtransform) {
           var translate = ui.roundmenu._dragtransform.slice(0)
           translate[0] +=
-            e.clientX / game.documentZoom - ui.roundmenu._dragorigin.clientX / game.documentZoom
+            e.clientX / game.documentZoom -
+            ui.roundmenu._dragorigin.clientX / game.documentZoom
           translate[1] +=
-            e.clientY / game.documentZoom - ui.roundmenu._dragorigin.clientY / game.documentZoom
+            e.clientY / game.documentZoom -
+            ui.roundmenu._dragorigin.clientY / game.documentZoom
           ui.click.checkroundtranslate(translate)
         }
         _status.clicked = true
@@ -2209,11 +2340,13 @@ export class Click {
     if (!ui.window) {
       return
     }
-    if (e.button == 2) {
+    if (e.button === 2) {
       return
     }
     _status.mousedown = true
-    var dialogs = ui.window.querySelectorAll("#window>.dialog.popped:not(.static)")
+    var dialogs = ui.window.querySelectorAll(
+      "#window>.dialog.popped:not(.static)",
+    )
     for (var i = 0; i < dialogs.length; i++) {
       dialogs[i].delete()
     }
@@ -2221,11 +2354,11 @@ export class Click {
     var item = sourceitem
     while (item) {
       var itemtype = get.itemtype(item)
-      if (itemtype == "button") {
+      if (itemtype === "button") {
         break
       }
       if (
-        itemtype == "dialog" &&
+        itemtype === "dialog" &&
         !item.classList.contains("popped") &&
         !item.classList.contains("fixed")
       ) {
@@ -2237,7 +2370,7 @@ export class Click {
         }
         return
       }
-      if (item == ui.roundmenu) {
+      if (item === ui.roundmenu) {
         _status.draggingroundmenu = true
         ui.roundmenu._dragorigin = e
         if (!ui.roundmenu._dragtransform) {
@@ -2262,7 +2395,11 @@ export class Click {
     item = sourceitem
     while (item) {
       var itemtype = get.itemtype(item)
-      if (itemtype == "card" || itemtype == "button" || itemtype == "player") {
+      if (
+        itemtype === "card" ||
+        itemtype === "button" ||
+        itemtype === "player"
+      ) {
         if (
           item.classList.contains("selectable") &&
           !item.classList.contains("selected") &&
@@ -2286,7 +2423,7 @@ export class Click {
     }
   }
   cardtouchstart(e) {
-    if (e.touches.length != 1) {
+    if (e.touches.length !== 1) {
       return
     }
     if (!lib.config.enable_drag) {
@@ -2298,7 +2435,7 @@ export class Click {
     if (!this.parentNode.parentNode) {
       return
     }
-    if (this.parentNode.parentNode.parentNode != ui.me) {
+    if (this.parentNode.parentNode.parentNode !== ui.me) {
       return
     }
     if (this.parentNode.parentNode.classList.contains("scrollh")) {
@@ -2349,7 +2486,7 @@ export class Click {
     }
   }
   playertouchstart(e) {
-    if (e.touches.length != 1 || !lib.config.enable_drag) {
+    if (e.touches.length !== 1 || !lib.config.enable_drag) {
       return
     }
     if (
@@ -2396,9 +2533,11 @@ export class Click {
       if (ddialog._dragorigin && ddialog._dragtransform) {
         translate = ddialog._dragtransform
         translate[0] +=
-          e.clientX / game.documentZoom - ddialog._dragorigin.clientX / game.documentZoom
+          e.clientX / game.documentZoom -
+          ddialog._dragorigin.clientX / game.documentZoom
         translate[1] +=
-          e.clientY / game.documentZoom - ddialog._dragorigin.clientY / game.documentZoom
+          e.clientY / game.documentZoom -
+          ddialog._dragorigin.clientY / game.documentZoom
         ui.click.checkdialogtranslate(null, ddialog)
         delete ddialog._dragorigin
       }
@@ -2409,9 +2548,11 @@ export class Click {
       var translate
       if (ui.roundmenu._dragorigin && ui.roundmenu._dragtransform) {
         var dx =
-          e.clientX / game.documentZoom - ui.roundmenu._dragorigin.clientX / game.documentZoom
+          e.clientX / game.documentZoom -
+          ui.roundmenu._dragorigin.clientX / game.documentZoom
         var dy =
-          e.clientY / game.documentZoom - ui.roundmenu._dragorigin.clientY / game.documentZoom
+          e.clientY / game.documentZoom -
+          ui.roundmenu._dragorigin.clientY / game.documentZoom
         if (dx * dx + dy * dy < 25) {
           ui.click.roundmenu()
         }
@@ -2424,7 +2565,7 @@ export class Click {
       game.saveConfig("roundmenu_transform", translate)
       delete _status.draggingroundmenu
     }
-    if (e.button == 2) {
+    if (e.button === 2) {
       if (_status.mousedragging) {
         _status.mousedragging = null
         _status.mouseleft = false
@@ -2476,7 +2617,11 @@ export class Click {
     }
   }
   mousemove() {
-    if (!lib.config.hover_handcard && this.parentNode && this.parentNode.parentNode == ui.me) {
+    if (
+      !lib.config.hover_handcard &&
+      this.parentNode &&
+      this.parentNode.parentNode === ui.me
+    ) {
       return
     }
     if (!_status.currentmouseenter) {
@@ -2484,21 +2629,25 @@ export class Click {
     }
   }
   mouseenter() {
-    if (!lib.config.hover_handcard && this.parentNode && this.parentNode.parentNode == ui.me) {
+    if (
+      !lib.config.hover_handcard &&
+      this.parentNode &&
+      this.parentNode.parentNode === ui.me
+    ) {
       return
     }
     _status.currentmouseenter = this
   }
   mouseleave() {
     ui.click.mouseentercancel()
-    if (_status.currentmouseenter == this) {
+    if (_status.currentmouseenter === this) {
       _status.currentmouseenter = null
     }
     this._mouseentercreated = false
   }
   mousedown() {
     ui.click.mouseentercancel()
-    if (_status.currentmouseenter == this) {
+    if (_status.currentmouseenter === this) {
       _status.currentmouseenter = null
     }
     this._mouseentercreated = true
@@ -2527,7 +2676,7 @@ export class Click {
       this._longpresstimeout = setTimeout(ui.click.longpresscallback, 500)
     }
     this._longpressevent = e
-    if (_status.longpressing && _status.longpressing != this) {
+    if (_status.longpressing && _status.longpressing !== this) {
       ui.click.longpresscancel.call(_status.longpressing)
     }
     // if(window.ForceTouch&&!_status.forcetouchinterval&&lib.config.enable_pressure){
@@ -2555,11 +2704,15 @@ export class Click {
     }
     if (!_status.longpressed) {
       _status.longpressed = true
-      setTimeout(function () {
+      setTimeout(() => {
         _status.longpressed = false
       }, 500)
       func.call(node, e)
-      if (lib.config.touchscreen && lib.config.enable_drag && !node._waitingfordrag) {
+      if (
+        lib.config.touchscreen &&
+        lib.config.enable_drag &&
+        !node._waitingfordrag
+      ) {
         _status.mousedragging = null
         _status.mousedragorigin = null
         _status.clicked = false
@@ -2577,7 +2730,7 @@ export class Click {
       delete this._longpresstimeout
     }
     delete this._longpressevent
-    if (_status.longpressing == this) {
+    if (_status.longpressing === this) {
       delete _status.longpressing
     }
   }
@@ -2632,11 +2785,14 @@ export class Click {
         delete ui.intro
         ui.control.show()
         game.resume2()
-      } else if ((_status.event.isMine() || _status.event.forceMine) && !dialogtouched) {
-        if (typeof _status.event.custom?.replace?.window == "function") {
+      } else if (
+        (_status.event.isMine() || _status.event.forceMine) &&
+        !dialogtouched
+      ) {
+        if (typeof _status.event.custom?.replace?.window === "function") {
           _status.event.custom.replace.window()
         } else {
-          if (_status.event.skill && _status.event.name == "chooseToUse") {
+          if (_status.event.skill && _status.event.name === "chooseToUse") {
             ui.click.cancel()
           } else if (_status.event._checked) {
             game.uncheck()
@@ -2649,12 +2805,11 @@ export class Click {
       }
       if (
         get.is.phoneLayout() &&
-        ui.menuContainer &&
-        ui.menuContainer.classList.contains("hidden")
+        ui.menuContainer?.classList.contains("hidden")
       ) {
         if (ui.system2.classList.contains("shown")) {
           _status.removinground = true
-          setTimeout(function () {
+          setTimeout(() => {
             _status.removinground = false
           }, 200)
         }
@@ -2671,7 +2826,7 @@ export class Click {
     } else {
       game.closePopped()
     }
-    if (typeof _status.event.custom?.add?.window == "function") {
+    if (typeof _status.event.custom?.add?.window === "function") {
       _status.event.custom.add.window(clicked)
     }
   }
@@ -2729,13 +2884,16 @@ export class Click {
       var choice = ui.create.div(".pointerdiv", node)
       choice.innerHTML = get.translation(this.choice[i])
       choice.link = this.choice[i]
-      choice.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.choice)
+      choice.addEventListener(
+        lib.config.touchscreen ? "touchend" : "click",
+        ui.click.choice,
+      )
     }
     // this.parentNode.style.height=(node.offsetHeight)+'px';
     _status.choosing = this
     if (!_status.choosing.expand) {
       _status.choosing.expand = true
-      setTimeout(function () {
+      setTimeout(() => {
         _status.choosing.expand = false
       }, 500)
     }
@@ -2780,14 +2938,14 @@ export class Click {
     }
     _status.clicked = true
     var custom = _status.event.custom
-    if (typeof custom?.replace?.button == "function") {
+    if (typeof custom?.replace?.button === "function") {
       custom.replace.button(this)
       return
     }
     if (!_status.event.isMine()) {
       return
     }
-    if (this.classList.contains("selectable") == false) {
+    if (this.classList.contains("selectable") === false) {
       return
     }
     if (this.classList.contains("selected")) {
@@ -2801,7 +2959,7 @@ export class Click {
       this.classList.add("selected")
       ui.selected.buttons.add(this)
     }
-    if (typeof custom?.add?.button == "function") {
+    if (typeof custom?.add?.button === "function") {
       custom.add.button()
     }
     game.check()
@@ -2829,7 +2987,8 @@ export class Click {
     _status.clicked = true
     if (
       this.parentNode &&
-      (this.parentNode.classList.contains("judges") || this.parentNode.classList.contains("marks"))
+      (this.parentNode.classList.contains("judges") ||
+        this.parentNode.classList.contains("marks"))
     ) {
       var rect = this.getBoundingClientRect()
       ui.click.touchpop()
@@ -2841,11 +3000,11 @@ export class Click {
       return
     }
     var custom = _status.event.custom
-    if (typeof custom?.replace?.card == "function") {
+    if (typeof custom?.replace?.card === "function") {
       custom.replace.card(this)
       return
     }
-    if (this.classList.contains("selectable") == false) {
+    if (this.classList.contains("selectable") === false) {
       return
     }
     if (this.classList.contains("selected")) {
@@ -2871,19 +3030,23 @@ export class Click {
       !_status.event.skill &&
       this.classList.contains("selected") &&
       _status.event.isMine() &&
-      _status.event.name == "chooseToUse"
+      _status.event.name === "chooseToUse"
     ) {
       var player = _status.event.player
       var range = get.info(this).range
       if (range) {
         if (typeof range.attack === "number") {
-          player.createRangeShadow(Math.min(8, player.getAttackRange(true) + range.attack - 1))
+          player.createRangeShadow(
+            Math.min(8, player.getAttackRange(true) + range.attack - 1),
+          )
         } else if (typeof range.global === "number") {
-          player.createRangeShadow(Math.min(8, player.getGlobalFrom() + range.global))
+          player.createRangeShadow(
+            Math.min(8, player.getGlobalFrom() + range.global),
+          )
         }
       }
     }
-    if (typeof custom?.add?.card == "function") {
+    if (typeof custom?.add?.card === "function") {
       custom.add.card()
     }
     game.check()
@@ -2891,11 +3054,9 @@ export class Click {
     if (
       lib.config.popequip &&
       get.is.phoneLayout() &&
-      arguments[0] != "popequip" &&
-      ui.arena &&
-      ui.arena.classList.contains("selecting") &&
-      this.parentNode &&
-      this.parentNode.classList.contains("popequip")
+      arguments[0] !== "popequip" &&
+      ui.arena?.classList.contains("selecting") &&
+      this.parentNode?.classList.contains("popequip")
     ) {
       var rect = this.getBoundingClientRect()
       ui.click.touchpop()
@@ -2918,22 +3079,29 @@ export class Click {
     if (!ui.menuContainer) {
       return
     }
-    var avatar = this
+
     var player = this.parentNode
     if (!game.players.includes(player) && !game.dead.includes(player)) {
       return
     }
     if (!this._doubleClicking) {
       this._doubleClicking = true
-      setTimeout(function () {
-        avatar._doubleClicking = false
+      setTimeout(() => {
+        this._doubleClicking = false
       }, 500)
       return
     }
     // ui.click.skin(this,player.name);
     game.pause2()
     var audioName = player.skin.name || player.name1 || player.name
-    ui.click.charactercard(player.name1 || player.name, null, null, true, this, audioName)
+    ui.click.charactercard(
+      player.name1 || player.name,
+      null,
+      null,
+      true,
+      this,
+      audioName,
+    )
   }
   avatar2() {
     if (!lib.config.doubleclick_intro) {
@@ -2948,21 +3116,28 @@ export class Click {
     if (!ui.menuContainer) {
       return
     }
-    var avatar = this
+
     var player = this.parentNode
     if (!game.players.includes(player) && !game.dead.includes(player)) {
       return
     }
     if (!this._doubleClicking) {
       this._doubleClicking = true
-      setTimeout(function () {
-        avatar._doubleClicking = false
+      setTimeout(() => {
+        this._doubleClicking = false
       }, 500)
       return
     }
     // ui.click.skin(this,player.name2);
     game.pause2()
-    ui.click.charactercard(player.name2, null, null, true, this, player.skin.name2 || player.name2)
+    ui.click.charactercard(
+      player.name2,
+      null,
+      null,
+      true,
+      this,
+      player.skin.name2 || player.name2,
+    )
   }
   connectroom(e) {
     if (_status.dragged) {
@@ -2977,12 +3152,12 @@ export class Click {
     if (this.roomfull) {
       alert("房间已满")
     } else if (this.roomgaming && !game.onlineID) {
-      if (this.config && this.config.observe) {
+      if (this.config?.observe) {
         alert("房间暂时不可旁观")
       } else {
         alert("房间不允许旁观")
       }
-    } else if (!this.roomempty && this.version != lib.versionOL) {
+    } else if (!this.roomempty && this.version !== lib.versionOL) {
       if (this.version > lib.versionOL) {
         alert("加入失败：你的游戏版本过低")
       } else {
@@ -2992,7 +3167,13 @@ export class Click {
       if (!_status.enteringroom) {
         _status.enteringroom = true
         _status.enteringroomserver = this.serving
-        game.send("server", "enter", this.key, get.connectNickname(), lib.config.connect_avatar)
+        game.send(
+          "server",
+          "enter",
+          this.key,
+          get.connectNickname(),
+          lib.config.connect_avatar,
+        )
       }
     }
   }
@@ -3013,13 +3194,22 @@ export class Click {
       if (game.online) {
         if (game.onlinezhu) {
           if (!this.playerid && game.connectPlayers) {
-            if (lib.configOL.mode == "versus" || lib.configOL.mode == "doudizhu") {
+            if (
+              lib.configOL.mode === "versus" ||
+              lib.configOL.mode === "doudizhu"
+            ) {
               return
             }
-            if (lib.configOL.mode == "identity" && lib.configOL.identity_mode == "zhong") {
+            if (
+              lib.configOL.mode === "identity" &&
+              lib.configOL.identity_mode === "zhong"
+            ) {
               return
             }
-            if (!this.classList.contains("unselectable2") && lib.configOL.number <= 2) {
+            if (
+              !this.classList.contains("unselectable2") &&
+              lib.configOL.number <= 2
+            ) {
               return
             }
             this.classList.toggle("unselectable2")
@@ -3040,18 +3230,20 @@ export class Click {
       }
       if (this.playerid) {
         if (this.ws) {
-          if (confirm("是否踢出" + this.nickname + "？")) {
+          if (confirm(`是否踢出${this.nickname}？`)) {
             var onlineKey = this.ws.onlineKey
             if (onlineKey) {
               if (confirm("是否永久踢出(加入黑名单)？")) {
                 var banBlacklist =
-                  lib.config.banBlacklist === undefined ? [] : lib.config.banBlacklist
+                  lib.config.banBlacklist === undefined
+                    ? []
+                    : lib.config.banBlacklist
                 banBlacklist.push(onlineKey)
                 game.saveConfig("banBlacklist", banBlacklist)
               }
             }
             var id = get.id()
-            this.ws.send(function (id) {
+            this.ws.send((id) => {
               if (game.ws) {
                 game.ws.close()
                 game.saveConfig("reconnect_info")
@@ -3063,19 +3255,23 @@ export class Click {
         }
       } else {
         if (
-          lib.configOL.mode == "versus" ||
-          lib.configOL.mode == "doudizhu" ||
-          lib.configOL.mode == "single"
+          lib.configOL.mode === "versus" ||
+          lib.configOL.mode === "doudizhu" ||
+          lib.configOL.mode === "single"
         ) {
           return
         }
         if (
-          lib.configOL.mode == "identity" &&
-          (lib.configOL.identity_mode == "zhong" || lib.configOL.identity_mode == "purple")
+          lib.configOL.mode === "identity" &&
+          (lib.configOL.identity_mode === "zhong" ||
+            lib.configOL.identity_mode === "purple")
         ) {
           return
         }
-        if (!this.classList.contains("unselectable2") && lib.configOL.number <= 2) {
+        if (
+          !this.classList.contains("unselectable2") &&
+          lib.configOL.number <= 2
+        ) {
           return
         }
         this.classList.toggle("unselectable2")
@@ -3091,11 +3287,11 @@ export class Click {
     }
     _status.clicked = true
     var custom = _status.event.custom
-    if (typeof custom?.replace?.target == "function") {
+    if (typeof custom?.replace?.target === "function") {
       custom.replace.target(this, e)
       return
     }
-    if (this.classList.contains("selectable") == false) {
+    if (this.classList.contains("selectable") === false) {
       return
     }
     this.unprompt()
@@ -3110,16 +3306,22 @@ export class Click {
     } else {
       ui.selected.targets.add(this)
       if (
-        ["chooseTarget", "chooseToUse", "chooseCardTarget", "chooseButtonTarget"].includes(
-          _status.event.name,
-        )
+        [
+          "chooseTarget",
+          "chooseToUse",
+          "chooseCardTarget",
+          "chooseButtonTarget",
+        ].includes(_status.event.name)
       ) {
         var targetprompt = null
         if (_status.event.targetprompt) {
           targetprompt = _status.event.targetprompt
-        } else if (_status.event.skill && !get.info(_status.event.skill).viewAs) {
+        } else if (
+          _status.event.skill &&
+          !get.info(_status.event.skill).viewAs
+        ) {
           targetprompt = get.info(_status.event.skill).targetprompt
-        } else if (_status.event.name == "chooseToUse") {
+        } else if (_status.event.name === "chooseToUse") {
           var currentcard = get.card()
           if (currentcard) {
             targetprompt = get.info(currentcard).targetprompt
@@ -3131,7 +3333,9 @@ export class Click {
             let index = ui.selected.targets.indexOf(this)
             for (let i = 0; i < targetprompt.length; i++) {
               const target = targets.find(
-                (cur) => cur.node.prompt && cur.node.prompt.innerHTML === targetprompt[i],
+                (cur) =>
+                  cur.node.prompt &&
+                  cur.node.prompt.innerHTML === targetprompt[i],
               )
               if (target) {
                 targets.remove(target)
@@ -3140,24 +3344,25 @@ export class Click {
                 break
               }
             }
-            targetprompt = targetprompt[Math.min(targetprompt.length - 1, index)]
-          } else if (typeof targetprompt == "function") {
+            targetprompt =
+              targetprompt[Math.min(targetprompt.length - 1, index)]
+          } else if (typeof targetprompt === "function") {
             targetprompt = targetprompt(this)
           }
-          if (targetprompt && typeof targetprompt == "string") {
+          if (targetprompt && typeof targetprompt === "string") {
             this.prompt(targetprompt)
           }
         }
       }
       this.classList.add("selected")
     }
-    if (typeof custom?.add?.target == "function") {
+    if (typeof custom?.add?.target === "function") {
       custom.add.target()
     }
     game.check()
   }
   control2() {
-    if (this.childNodes.length == 1 && !this._doubleclick) {
+    if (this.childNodes.length === 1 && !this._doubleclick) {
       ui.click.control.call(this.firstChild)
     }
   }
@@ -3172,12 +3377,11 @@ export class Click {
     if (node) {
       if (node._doubleclick) {
         return
-      } else {
-        node._doubleclick = true
-        setTimeout(function () {
-          node._doubleclick = false
-        }, 500)
       }
+      node._doubleclick = true
+      setTimeout(() => {
+        node._doubleclick = false
+      }, 500)
       if (node.classList.contains("hidden")) {
         return
       }
@@ -3197,9 +3401,9 @@ export class Click {
       this.parentNode.custom(this.link, this)
       return
     }
-    if (this.link == "ok") {
+    if (this.link === "ok") {
       ui.click.ok(this)
-    } else if (this.link == "cancel") {
+    } else if (this.link === "cancel") {
       ui.click.cancel(this)
     } else {
       _status.event.result = {
@@ -3209,7 +3413,7 @@ export class Click {
         control: this.link,
         links: get.links(ui.selected.buttons),
       }
-      if (this.parentNode.close != false) {
+      if (this.parentNode.close !== false) {
         game.uncheck()
         this.parentNode.close()
       }
@@ -3230,7 +3434,12 @@ export class Click {
     var info = get.info(skill)
     var event = _status.event
     event.backup(skill)
-    if (info.filterCard && info.discard != false && info.lose != false && !info.viewAs) {
+    if (
+      info.filterCard &&
+      info.discard !== false &&
+      info.lose !== false &&
+      !info.viewAs
+    ) {
       var cards = event.player.getCards(event.position)
       for (var i = 0; i < cards.length; i++) {
         if (!lib.filter.cardDiscardable(cards[i], event.player)) {
@@ -3238,7 +3447,7 @@ export class Click {
         }
       }
     }
-    if (typeof event.skillDialog == "object") {
+    if (typeof event.skillDialog === "object") {
       event.skillDialog.close()
     }
     if (event.isMine()) {
@@ -3250,14 +3459,14 @@ export class Click {
       var str = get.translation(skill)
       if (info.prompt) {
         var str2
-        if (typeof info.prompt == "function") {
+        if (typeof info.prompt === "function") {
           str2 = info.prompt(event, event.player)
         } else {
           str2 = info.prompt
         }
         event.skillDialog = ui.create.dialog(
           str,
-          '<div><div style="width:100%;text-align:center">' + str2 + "</div></div>",
+          `<div><div style="width:100%;text-align:center">${str2}</div></div>`,
         )
         if (info.longprompt) {
           event.skillDialog.forcebutton = true
@@ -3266,19 +3475,17 @@ export class Click {
       } else if (info.promptfunc) {
         event.skillDialog = ui.create.dialog(
           str,
-          '<div><div style="width:100%">' + info.promptfunc(event, event.player) + "</div></div>",
+          `<div><div style="width:100%">${info.promptfunc(event, event.player)}</div></div>`,
         )
       } else if (lib.dynamicTranslate[skill]) {
         event.skillDialog = ui.create.dialog(
           str,
-          '<div><div style="width:100%">' +
-            lib.dynamicTranslate[skill](event.player, skill) +
-            "</div></div>",
+          `<div><div style="width:100%">${lib.dynamicTranslate[skill](event.player, skill)}</div></div>`,
         )
-      } else if (lib.translate[skill + "_info"]) {
+      } else if (lib.translate[`${skill}_info`]) {
         event.skillDialog = ui.create.dialog(
           str,
-          '<div><div style="width:100%">' + lib.translate[skill + "_info"] + "</div></div>",
+          `<div><div style="width:100%">${lib.translate[`${skill}_info`]}</div></div>`,
         )
       }
     }
@@ -3287,7 +3494,7 @@ export class Click {
     const gameEvent = get.event(),
       custom = gameEvent.custom,
       replaceConfirm = custom?.replace?.confirm
-    if (typeof replaceConfirm == "function") {
+    if (typeof replaceConfirm === "function") {
       replaceConfirm(true)
       return
     }
@@ -3306,15 +3513,15 @@ export class Click {
     if (skill) {
       result.skill = skill
       const info = get.info(skill)
-      if (info && info.direct && !info.clearTime) {
+      if (info?.direct && !info.clearTime) {
         result._noHidingTimer = true
       }
       const skillInformation = get.info(gameEvent.skill),
         viewAs = skillInformation.viewAs
-      if (typeof viewAs == "function") {
+      if (typeof viewAs === "function") {
         let viewedAs = viewAs(result.cards, gameEvent.player)
         if (viewedAs) {
-          if (typeof viewedAs == "string") {
+          if (typeof viewedAs === "string") {
             viewedAs = { name: viewedAs }
           }
           result.card = get.autoViewAs(viewedAs)
@@ -3325,7 +3532,7 @@ export class Click {
       const resultCard = result.card
       if (resultCard) {
         const cards = result.cards
-        if (cards.length == 1) {
+        if (cards.length === 1) {
           const firstCard = cards[0]
           if (!resultCard.suit) {
             resultCard.suit = get.suit(firstCard)
@@ -3336,10 +3543,12 @@ export class Click {
         }
       }
       const skillDialog = gameEvent.skillDialog
-      if (skillDialog && get.objtype(skillDialog) == "div") {
+      if (skillDialog && get.objtype(skillDialog) === "div") {
         skillDialog.close()
       }
-      gameEvent.player.getCards("hej").forEach((card) => card.recheck("useSkill"))
+      gameEvent.player
+        .getCards("hej")
+        .forEach((card) => card.recheck("useSkill"))
       gameEvent.restore()
     } else if (["chooseToUse", "chooseToRespond"].includes(gameEvent.name)) {
       result.card = get.autoViewAs(result.cards[0])
@@ -3355,25 +3564,25 @@ export class Click {
     }
     game.uncheck()
     const addConfirm = custom?.add?.confirm
-    if (typeof addConfirm == "function") {
+    if (typeof addConfirm === "function") {
       addConfirm(true)
     }
     game.resume()
   }
   cancel(node) {
     var event = _status.event
-    if (typeof event.custom?.replace?.confirm == "function") {
+    if (typeof event.custom?.replace?.confirm === "function") {
       event.custom.replace.confirm(false)
       return
     }
     if (event.skill && !event.norestore) {
-      if (event.skillDialog && get.objtype(event.skillDialog) == "div") {
+      if (event.skillDialog && get.objtype(event.skillDialog) === "div") {
         event.skillDialog.close()
       }
-      if (typeof event.dialog == "string" && event.isMine()) {
+      if (typeof event.dialog === "string" && event.isMine()) {
         event.dialog = ui.create.dialog(event.dialog)
       }
-      if (_status.event.type == "phase" && ui.confirm) {
+      if (_status.event.type === "phase" && ui.confirm) {
         ui.confirm.classList.add("removing")
       }
       // ui.control.addTempClass('nozoom',100);
@@ -3403,7 +3612,7 @@ export class Click {
       ui.skills3.close()
     }
     game.uncheck()
-    if (typeof event.custom?.add?.confirm == "function") {
+    if (typeof event.custom?.add?.confirm === "function") {
       //event.custom.add.confirm(true);
       event.custom.add.confirm(false)
     }
@@ -3411,17 +3620,17 @@ export class Click {
   }
   logv(e) {
     if (_status.currentlogv) {
-      if (_status.currentlogv == this) {
+      if (_status.currentlogv === this) {
         return
       }
       if (_status.logvtimeout) {
         clearTimeout(_status.logvtimeout)
       }
-      var that = this
-      _status.logvtimeout = setTimeout(function () {
+
+      _status.logvtimeout = setTimeout(() => {
         if (!_status.currentlogv) {
-          _status.currentlogv = that
-          ui.click.intro.call(that, e)
+          _status.currentlogv = this
+          ui.click.intro.call(this, e)
         }
       }, 200)
       this.logvtimeout = _status.logvtimeout
@@ -3431,14 +3640,14 @@ export class Click {
     }
   }
   logvleave() {
-    if (_status.currentlogv == this) {
-      setTimeout(function () {
+    if (_status.currentlogv === this) {
+      setTimeout(() => {
         delete _status.currentlogv
       }, 150)
     }
     if (this.logvtimeout) {
       clearTimeout(this.logvtimeout)
-      if (_status.logvtimeout == this.logvtimeout) {
+      if (_status.logvtimeout === this.logvtimeout) {
         delete _status.logvtimeout
       }
       delete this.logvtimeout
@@ -3451,7 +3660,7 @@ export class Click {
     if (_status.dragged) {
       return
     }
-    if (lib.config.theme != "simple") {
+    if (lib.config.theme !== "simple") {
       ui.window.classList.add("shortcutpaused")
       ui.menuContainer.classList.add("forceopaque")
     } else {
@@ -3490,7 +3699,7 @@ export class Click {
     let iSTemp = false
     if (
       !lib.character[audioName] &&
-      lib.characterSubstitute[name]?.some((skin) => skin[0] == audioName)
+      lib.characterSubstitute[name]?.some((skin) => skin[0] === audioName)
     ) {
       iSTemp = true
       lib.character[audioName] = [
@@ -3498,11 +3707,14 @@ export class Click {
         "",
         0,
         [],
-        (lib.characterSubstitute[name].find((i) => i[0] == audioName) || [audioName, []])[1],
+        (lib.characterSubstitute[name].find((i) => i[0] === audioName) || [
+          audioName,
+          [],
+        ])[1],
       ]
     }
     var bg = ui.create
-      .div(".avatar", playerbg, function () {
+      .div(".avatar", playerbg, () => {
         if (changeskinfunc) {
           changeskinfunc()
         }
@@ -3522,57 +3734,70 @@ export class Click {
       gzbool = true
     }
     let refreshSkin = null
-    var ban = ui.create.div(".menubutton.large.ban.character", uiintro, "禁用", function (e) {
-      if (this.classList.contains("unselectable")) {
-        return
-      }
-      if (typeof noedit == "string") {
-        this.classList.toggle("active")
-        var bannedname = noedit + "_banned"
-        if (!lib.config[bannedname]) {
-          lib.config[bannedname] = []
+    var ban = ui.create.div(
+      ".menubutton.large.ban.character",
+      uiintro,
+      "禁用",
+      function (e) {
+        if (this.classList.contains("unselectable")) {
+          return
         }
-        if (this.classList.contains("active")) {
-          lib.config[bannedname].add(name)
+        if (typeof noedit === "string") {
+          this.classList.toggle("active")
+          var bannedname = `${noedit}_banned`
+          if (!lib.config[bannedname]) {
+            lib.config[bannedname] = []
+          }
+          if (this.classList.contains("active")) {
+            lib.config[bannedname].add(name)
+          } else {
+            lib.config[bannedname].remove(name)
+          }
+          game.saveConfig(bannedname, lib.config[bannedname])
+          ban.updateBanned()
         } else {
-          lib.config[bannedname].remove(name)
+          ui.click.touchpop()
+          ui.click.intro.call(this, e)
+          _status.clicked = true
         }
-        game.saveConfig(bannedname, lib.config[bannedname])
-        ban.updateBanned()
-      } else {
-        ui.click.touchpop()
-        ui.click.intro.call(this, e)
-        _status.clicked = true
-      }
-    })
+      },
+    )
     ban.link = name
     ban._banning = "offline"
-    ban.updateBanned = function () {
+    ban.updateBanned = () => {
       if (noedit === true) {
         return
       }
-      if (lib.config[get.mode() + "_banned"] && lib.config[get.mode() + "_banned"].includes(name)) {
+      if (
+        lib.config[`${get.mode()}_banned`] &&
+        lib.config[`${get.mode()}_banned`].includes(name)
+      ) {
         ban.classList.add("active")
       } else {
         ban.classList.remove("active")
       }
-      if (sourcenode && sourcenode.updateBanned) {
+      if (sourcenode?.updateBanned) {
         sourcenode.updateBanned()
       }
     }
     ban.updateBanned()
-    var fav = ui.create.div(".menubutton.large.fav", uiintro, "收藏", function () {
-      if (this.classList.contains("unselectable")) {
-        return
-      }
-      this.classList.toggle("active")
-      if (this.classList.contains("active")) {
-        lib.config.favouriteCharacter.add(name)
-      } else {
-        lib.config.favouriteCharacter.remove(name)
-      }
-      game.saveConfig("favouriteCharacter", lib.config.favouriteCharacter)
-    })
+    var fav = ui.create.div(
+      ".menubutton.large.fav",
+      uiintro,
+      "收藏",
+      function () {
+        if (this.classList.contains("unselectable")) {
+          return
+        }
+        this.classList.toggle("active")
+        if (this.classList.contains("active")) {
+          lib.config.favouriteCharacter.add(name)
+        } else {
+          lib.config.favouriteCharacter.remove(name)
+        }
+        game.saveConfig("favouriteCharacter", lib.config.favouriteCharacter)
+      },
+    )
     if (noedit === true) {
       fav.classList.add("unselectable")
       ban.classList.add("unselectable")
@@ -3583,14 +3808,24 @@ export class Click {
     let intro,
       list = [],
       clickSkill
-    let skills = ui.create.div(".characterskill", uiintro)
-    let btnIntro = ui.create.div(".menubutton.large.introButton", uiintro, "简介", function () {
-      applyViewMode("intro")
-    })
-    let btnSkill = ui.create.div(".menubutton.large.skillButton", uiintro, "技能", function () {
-      applyViewMode("skill")
-    })
-    const applyViewMode = function (viewMode = "intro") {
+    const skills = ui.create.div(".characterskill", uiintro)
+    const btnIntro = ui.create.div(
+      ".menubutton.large.introButton",
+      uiintro,
+      "简介",
+      () => {
+        applyViewMode("intro")
+      },
+    )
+    const btnSkill = ui.create.div(
+      ".menubutton.large.skillButton",
+      uiintro,
+      "技能",
+      () => {
+        applyViewMode("skill")
+      },
+    )
+    const applyViewMode = (viewMode = "intro") => {
       if (viewMode !== "skill") {
         viewMode = "intro"
       }
@@ -3607,7 +3842,11 @@ export class Click {
           skills.style.display = ""
           // 若尚未选中技能，则初始化第一个技能
           const first = skills.firstChild
-          if (first && !skills.querySelector(".active") && typeof clickSkill === "function") {
+          if (
+            first &&
+            !skills.querySelector(".active") &&
+            typeof clickSkill === "function"
+          ) {
             clickSkill.call(first, "init")
             first.classList.add("active")
           }
@@ -3618,7 +3857,7 @@ export class Click {
         btnSkill.classList.toggle("active", viewMode === "skill")
       }
     }
-    const refreshIntro = function () {
+    const refreshIntro = () => {
       if (intro?.firstChild) {
         while (intro.firstChild) {
           intro.removeChild(intro.lastChild)
@@ -3626,29 +3865,31 @@ export class Click {
       }
       // 样式二
       if (
-        lib.config.show_characternamepinyin == "showPinyin2" ||
-        lib.config.show_skillnamepinyin == "showPinyin2" ||
-        lib.config.show_characternamepinyin == "showCodeIdentifier2" ||
-        lib.config.show_skillnamepinyin == "showCodeIdentifier2"
+        lib.config.show_characternamepinyin === "showPinyin2" ||
+        lib.config.show_skillnamepinyin === "showPinyin2" ||
+        lib.config.show_characternamepinyin === "showCodeIdentifier2" ||
+        lib.config.show_skillnamepinyin === "showCodeIdentifier2"
       ) {
         var nameinfo = get.character(name)
         intro =
           uiintro.querySelector(".characterintro") ||
           ui.create.div(".characterintro", get.characterIntro(name), uiintro)
         if (
-          lib.config.show_characternamepinyin == "showPinyin2" ||
-          lib.config.show_characternamepinyin == "showCodeIdentifier2"
+          lib.config.show_characternamepinyin === "showPinyin2" ||
+          lib.config.show_characternamepinyin === "showCodeIdentifier2"
         ) {
           var charactername = get.rawName2(name)
           var characterpinyin =
-            lib.config.show_characternamepinyin == "showCodeIdentifier2"
+            lib.config.show_characternamepinyin === "showCodeIdentifier2"
               ? name
               : get.pinyin(charactername)
           var charactersex = get.translation(nameinfo[0])
           const charactergroups = get.is.double(name, true)
           let charactergroup
           if (charactergroups) {
-            charactergroup = charactergroups.map((i) => get.translation(i)).join("/")
+            charactergroup = charactergroups
+              .map((i) => get.translation(i))
+              .join("/")
           } else {
             charactergroup = get.translation(nameinfo[1])
           }
@@ -3669,16 +3910,16 @@ export class Click {
           var charactertitle = get.characterTitle(name, false, false)
           var titleHtml = ""
           if (charactertitle.length) {
-            titleHtml = '<div class="character-title">' + get.colorspan(charactertitle) + "</div>"
+            titleHtml = `<div class="character-title">${get.colorspan(charactertitle)}</div>`
           }
           let packName
-          for (let packname in lib.characterPack) {
+          for (const packname in lib.characterPack) {
             if (name in lib.characterPack[packname]) {
-              let pack = lib.translate[packname + "_character_config"],
+              let pack = lib.translate[`${packname}_character_config`],
                 sort
               if (lib.characterSort[packname]) {
-                let sorted = lib.characterSort[packname]
-                for (let sortname in sorted) {
+                const sorted = lib.characterSort[packname]
+                for (const sortname in sorted) {
                   if (sorted[sortname].includes(name)) {
                     sort = `<span style = "font-size:small">[${lib.translate[sortname]}]</span>`
                     break
@@ -3690,36 +3931,17 @@ export class Click {
               break
             }
           }
-          intro.innerHTML =
-            titleHtml +
-            '<span style="font-weight:bold;margin-right:5px">' +
-            charactername +
-            "</span>" +
-            '<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">' +
-            "[" +
-            characterpinyin +
-            "]" +
-            "</span>" +
-            spacemark +
-            charactersex +
-            spacemark +
-            charactergroup +
-            spacemark +
-            characterhp +
-            '<span style="line-height:2"></span>' +
-            "<br>" +
-            characterintroinfo
+          intro.innerHTML = `${titleHtml}<span style="font-weight:bold;margin-right:5px">${charactername}</span><span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">[${characterpinyin}]</span>${spacemark}${charactersex}${spacemark}${charactergroup}${spacemark}${characterhp}<span style="line-height:2"></span><br>${characterintroinfo}`
 
           // 添加角色append
           if (lib.characterAppend[name]) {
-            intro.innerHTML +=
-              '<br><br><span style="font-weight:bold;color:#ff6b6b;">引文</span><br>' +
-              lib.characterAppend[name]
+            intro.innerHTML += `<br><br><span style="font-weight:bold;color:#ff6b6b;">引文</span><br>${lib.characterAppend[name]}`
           }
         }
 
         var intro2 =
-          uiintro.querySelector(".intro2") || ui.create.div(".characterintro.intro2", uiintro)
+          uiintro.querySelector(".intro2") ||
+          ui.create.div(".characterintro.intro2", uiintro)
         list.addArray(get.character(name, 3) || [])
         if (lib.config.touchscreen) {
           lib.setScroll(intro)
@@ -3739,98 +3961,86 @@ export class Click {
             current.classList.remove("active")
           }
           this.classList.add("active")
-          if (this.link != "dieAudios") {
+          if (this.link !== "dieAudios") {
             var skillname = get.translation(this.link)
-            var skilltranslationinfo = get.skillInfoTranslation(this.link, null, false)
+            var skilltranslationinfo = get.skillInfoTranslation(
+              this.link,
+              null,
+              false,
+            )
             if (
-              (lib.config.show_skillnamepinyin == "showPinyin2" ||
-                lib.config.show_skillnamepinyin == "showCodeIdentifier2") &&
-              skillname != "阵亡"
+              (lib.config.show_skillnamepinyin === "showPinyin2" ||
+                lib.config.show_skillnamepinyin === "showCodeIdentifier2") &&
+              skillname !== "阵亡"
             ) {
               var skillpinyin =
-                lib.config.show_skillnamepinyin == "showCodeIdentifier2"
+                lib.config.show_skillnamepinyin === "showCodeIdentifier2"
                   ? this.link
                   : get.pinyin(skillname)
-              intro2.innerHTML =
-                '<span style="font-weight:bold;margin-right:5px">' +
-                skillname +
-                "</span>" +
-                '<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">' +
-                "[" +
-                skillpinyin +
-                "]" +
-                "</span>" +
-                "  " +
-                skilltranslationinfo
+              intro2.innerHTML = `<span style="font-weight:bold;margin-right:5px">${skillname}</span><span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">[${skillpinyin}]</span>  ${skilltranslationinfo}`
             } else {
-              intro2.innerHTML =
-                '<span style="font-weight:bold;margin-right:5px">' +
-                skillname +
-                "</span>" +
-                skilltranslationinfo
+              intro2.innerHTML = `<span style="font-weight:bold;margin-right:5px">${skillname}</span>${skilltranslationinfo}`
             }
             var info = get.info(this.link)
             var skill = this.link
             var playername = this.linkname
-            let audioName = this.linkAudioName
-            let skinName = bg.tempSkin || audioName
-            var skillnode = this
+            const audioName = this.linkAudioName
+            const skinName = bg.tempSkin || audioName
+
             if (info.derivation) {
               var derivation = info.derivation
-              if (typeof derivation == "string") {
+              if (typeof derivation === "string") {
                 derivation = [derivation]
               }
               for (var i = 0; i < derivation.length; i++) {
-                if (derivation[i].indexOf("_faq") == -1 && !get.info(derivation[i]).nopop) {
+                if (
+                  derivation[i].indexOf("_faq") === -1 &&
+                  !get.info(derivation[i]).nopop
+                ) {
                   continue
                 }
                 var derivationname = get.translation(derivation[i])
-                var derivationtranslationinfo = get.skillInfoTranslation(derivation[i], null, false)
+                var derivationtranslationinfo = get.skillInfoTranslation(
+                  derivation[i],
+                  null,
+                  false,
+                )
                 if (
-                  (lib.config.show_skillnamepinyin == "showPinyin2" ||
-                    lib.config.show_skillnamepinyin == "showCodeIdentifier2") &&
+                  (lib.config.show_skillnamepinyin === "showPinyin2" ||
+                    lib.config.show_skillnamepinyin ===
+                      "showCodeIdentifier2") &&
                   derivationname.length <= 5 &&
-                  derivation[i].indexOf("_faq") == -1
+                  derivation[i].indexOf("_faq") === -1
                 ) {
                   var derivationpinyin =
-                    lib.config.show_skillnamepinyin == "showCodeIdentifier2"
+                    lib.config.show_skillnamepinyin === "showCodeIdentifier2"
                       ? derivation[i]
                       : get.pinyin(derivationname)
-                  intro2.innerHTML +=
-                    '<br><br><span style="font-weight:bold;margin-right:5px">' +
-                    derivationname +
-                    "</span>" +
-                    '<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">' +
-                    "[" +
-                    derivationpinyin +
-                    "]" +
-                    "</span>" +
-                    "  " +
-                    derivationtranslationinfo
+                  intro2.innerHTML += `<br><br><span style="font-weight:bold;margin-right:5px">${derivationname}</span><span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">[${derivationpinyin}]</span>  ${derivationtranslationinfo}`
                 } else {
-                  intro2.innerHTML +=
-                    '<br><br><span style="font-weight:bold;margin-right:5px">' +
-                    derivationname +
-                    "</span>" +
-                    derivationtranslationinfo
+                  intro2.innerHTML += `<br><br><span style="font-weight:bold;margin-right:5px">${derivationname}</span>${derivationtranslationinfo}`
                 }
               }
             }
 
             // 添加技能append
-            if (lib.translate[this.link + "_append"]) {
+            if (lib.translate[`${this.link}_append`]) {
               intro2.innerHTML +=
                 '<br><br><span style="font-weight:bold;color:#ff6b6b;">引文</span><br>'
               const appendDiv = document.createElement("div")
               appendDiv.style.fontSize = "15.2px"
-              appendDiv.innerHTML = lib.translate[this.link + "_append"]
+              appendDiv.innerHTML = lib.translate[`${this.link}_append`]
               intro2.appendChild(appendDiv)
             }
 
             // 添加技能台词
-            let skillVoiceMap = get.Audio.skill({
+            const skillVoiceMap = get.Audio.skill({
               skill: this.link,
-              player: { name: playername, skin: { name: skinName }, tempname: [skinName] },
+              player: {
+                name: playername,
+                skin: { name: skinName },
+                tempname: [skinName],
+              },
             }).textList
             if (skillVoiceMap.length > 0) {
               intro2.innerHTML +=
@@ -3846,28 +4056,29 @@ export class Click {
             // 添加衍生技能台词
             if (info.derivation) {
               var derivation = info.derivation
-              if (typeof derivation == "string") {
+              if (typeof derivation === "string") {
                 derivation = [derivation]
               }
               for (var i = 0; i < derivation.length; i++) {
                 if (!get.info(derivation[i]).nopop) {
                   continue
                 }
-                if (derivation[i].indexOf("_faq") != -1) {
+                if (derivation[i].indexOf("_faq") !== -1) {
                   continue
                 }
                 if (nameinfo.skills.includes(derivation[i])) {
                   continue
                 }
-                let derivationVoiceMap = get.Audio.skill({
+                const derivationVoiceMap = get.Audio.skill({
                   skill: derivation[i],
-                  player: { name: playername, skin: { name: skinName }, tempname: [skinName] },
+                  player: {
+                    name: playername,
+                    skin: { name: skinName },
+                    tempname: [skinName],
+                  },
                 }).textList
                 if (derivationVoiceMap.length > 0) {
-                  intro2.innerHTML +=
-                    '<br><br><span style="font-weight:bold;color:#ff6b6b;">' +
-                    get.translation(derivation[i]) +
-                    "台词</span>"
+                  intro2.innerHTML += `<br><br><span style="font-weight:bold;color:#ff6b6b;">${get.translation(derivation[i])}台词</span>`
                   derivationVoiceMap.forEach((text, index) => {
                     const derivationTextSpan = document.createElement("span")
                     derivationTextSpan.style.fontSize = "15.2px"
@@ -3879,10 +4090,14 @@ export class Click {
             }
 
             if (lib.config.background_speak && e !== "init") {
-              if (!this.playAudio || name != this.audioName) {
+              if (!this.playAudio || name !== this.audioName) {
                 const audioList = get.Audio.skill({
                   skill: this.link,
-                  player: { name: playername, skin: { name: skinName }, tempname: [skinName] },
+                  player: {
+                    name: playername,
+                    skin: { name: skinName },
+                    tempname: [skinName],
+                  },
                 }).fileList
                 this.playAudio = game.tryAudio({
                   audioList,
@@ -3895,13 +4110,18 @@ export class Click {
               this.playAudio()
             }
           } else {
-            let skinName2 = bg.tempSkin || this.linkname
-            let dieAudios3 = get.Audio.die({
-              player: { name: this.playername, skin: { name: skinName2 }, tempname: [skinName2] },
+            const skinName2 = bg.tempSkin || this.linkname
+            const dieAudios3 = get.Audio.die({
+              player: {
+                name: this.playername,
+                skin: { name: skinName2 },
+                tempname: [skinName2],
+              },
             })
               .audioList.map((i3) => i3.text)
               .filter(Boolean)
-            intro2.innerHTML = '<span style="font-weight:bold;margin-right:5px">阵亡台词</span>'
+            intro2.innerHTML =
+              '<span style="font-weight:bold;margin-right:5px">阵亡台词</span>'
             dieAudios3.forEach((text, index) => {
               const dieTextSpan = document.createElement("span")
               dieTextSpan.style.fontSize = "15.2px"
@@ -3909,8 +4129,8 @@ export class Click {
               intro2.appendChild(dieTextSpan)
             })
             if (lib.config.background_speak && e !== "init") {
-              if (!this.playAudio || name != this.audioName) {
-                let audioList = get.Audio.die({
+              if (!this.playAudio || name !== this.audioName) {
+                const audioList = get.Audio.die({
                   player: {
                     name: this.playername,
                     skin: { name: skinName2 },
@@ -3935,17 +4155,20 @@ export class Click {
         const nameInfo = get.character(name),
           showCharacterNamePinyin = lib.config.show_characternamepinyin
         intro =
-          uiintro.querySelector(".characterintro") || ui.create.div(".characterintro", uiintro)
+          uiintro.querySelector(".characterintro") ||
+          ui.create.div(".characterintro", uiintro)
         // 添加武将称号
-        let characterTitle = get.colorspan(get.characterTitle(name, false, false)),
+        let characterTitle = get.colorspan(
+            get.characterTitle(name, false, false),
+          ),
           packName
-        for (let packname in lib.characterPack) {
+        for (const packname in lib.characterPack) {
           if (name in lib.characterPack[packname]) {
-            let pack = lib.translate[packname + "_character_config"],
+            let pack = lib.translate[`${packname}_character_config`],
               sort
             if (lib.characterSort[packname]) {
-              let sorted = lib.characterSort[packname]
-              for (let sortname in sorted) {
+              const sorted = lib.characterSort[packname]
+              for (const sortname in sorted) {
                 if (sorted[sortname].includes(name)) {
                   sort = `<span style = "font-size:small">[${lib.translate[sortname]}]</span>`
                   break
@@ -3972,13 +4195,17 @@ export class Click {
           hr.style.marginBottom = "5px"
           intro.appendChild(hr)
         }
-        if (showCharacterNamePinyin != "doNotShow") {
-          const characterIntroTable = ui.create.div(".character-intro-table", intro),
+        if (showCharacterNamePinyin !== "doNotShow") {
+          const characterIntroTable = ui.create.div(
+              ".character-intro-table",
+              intro,
+            ),
             span = document.createElement("span")
           span.style.fontWeight = "bold"
           const exInfo = nameInfo.trashBin,
-            characterName =
-              exInfo && exInfo.includes("ruby") ? lib.translate[name] : get.rawName2(name)
+            characterName = exInfo?.includes("ruby")
+              ? lib.translate[name]
+              : get.rawName2(name)
           span.innerHTML = characterName
           const ruby = document.createElement("ruby")
           ruby.appendChild(span)
@@ -3987,16 +4214,20 @@ export class Click {
           ruby.appendChild(leftParenthesisRP)
           const rt = document.createElement("rt")
           rt.innerHTML =
-            showCharacterNamePinyin == "showCodeIdentifier"
+            showCharacterNamePinyin === "showCodeIdentifier"
               ? name
-              : lib.translate[`${name}_rt`] || get.pinyin(characterName).join(" ")
+              : lib.translate[`${name}_rt`] ||
+                get.pinyin(characterName).join(" ")
           ruby.appendChild(rt)
           const rightParenthesisRP = document.createElement("rp")
           rightParenthesisRP.textContent = "）"
           ruby.appendChild(rightParenthesisRP)
           characterIntroTable.appendChild(ruby)
-          const characterSexDiv = ui.create.div(".character-sex", characterIntroTable),
-            exInfoSex = exInfo && exInfo.find((value) => value.startsWith("sex:")),
+          const characterSexDiv = ui.create.div(
+              ".character-sex",
+              characterIntroTable,
+            ),
+            exInfoSex = exInfo?.find((value) => value.startsWith("sex:")),
             characterSex = exInfoSex ? exInfoSex.split(":").pop() : nameInfo[0]
           new Promise((resolve, reject) => {
             const imageName = `sex_${characterSex}`,
@@ -4024,8 +4255,13 @@ export class Click {
                 }),
             )
             .then((image) => characterSexDiv.appendChild(image))
-            .catch(() => (characterSexDiv.innerHTML = get.translation(characterSex)))
-          const characterGroupDiv = ui.create.div(".character-group", characterIntroTable),
+            .catch(
+              () => (characterSexDiv.innerHTML = get.translation(characterSex)),
+            )
+          const characterGroupDiv = ui.create.div(
+              ".character-group",
+              characterIntroTable,
+            ),
             characterGroups = get.is.double(name, true)
           if (characterGroups) {
             Promise.all(
@@ -4058,7 +4294,7 @@ export class Click {
               ),
             )
               .then((images) => {
-                let documentFragment = document.createDocumentFragment()
+                const documentFragment = document.createDocumentFragment()
                 images.forEach(documentFragment.appendChild, documentFragment)
                 characterGroupDiv.appendChild(documentFragment)
               })
@@ -4096,7 +4332,11 @@ export class Click {
                   }),
               )
               .then((image) => characterGroupDiv.appendChild(image))
-              .catch(() => (characterGroupDiv.innerHTML = get.translation(characterGroup)))
+              .catch(
+                () =>
+                  (characterGroupDiv.innerHTML =
+                    get.translation(characterGroup)),
+              )
           }
           const hpDiv = ui.create.div(".hp", characterIntroTable),
             nameInfoHP = nameInfo[2],
@@ -4105,7 +4345,8 @@ export class Click {
           ui.create.div(hpDiv)
           const hpTextDiv = ui.create.div(".text", hpDiv),
             infoMaxHP = get.infoMaxHp(nameInfoHP)
-          hpTextDiv.innerHTML = infoHP == infoMaxHP ? `×${infoHP}` : `×${infoHP}/${infoMaxHP}`
+          hpTextDiv.innerHTML =
+            infoHP === infoMaxHP ? `×${infoHP}` : `×${infoHP}/${infoMaxHP}`
           const infoShield = get.infoHujia(nameInfoHP)
           if (infoShield) {
             ui.create.div(".shield", hpDiv)
@@ -4116,17 +4357,18 @@ export class Click {
         }
         const htmlParser = document.createElement("body")
         htmlParser.innerHTML = get.characterIntro(name)
-        Array.from(htmlParser.childNodes).forEach((value) => intro.appendChild(value))
+        Array.from(htmlParser.childNodes).forEach((value) =>
+          intro.appendChild(value),
+        )
 
         // 添加角色append
         if (lib.characterAppend[name]) {
-          intro.innerHTML +=
-            '<br><br><span style="font-weight:bold;color:#ff6b6b;">引文</span><br>' +
-            lib.characterAppend[name]
+          intro.innerHTML += `<br><br><span style="font-weight:bold;color:#ff6b6b;">引文</span><br>${lib.characterAppend[name]}`
         }
 
         const introduction2 =
-          uiintro.querySelector(".intro2") || ui.create.div(".characterintro.intro2", uiintro)
+          uiintro.querySelector(".intro2") ||
+          ui.create.div(".characterintro.intro2", uiintro)
         list.addArray(get.character(name).skills || [])
         if (lib.config.touchscreen) {
           lib.setScroll(intro)
@@ -4146,7 +4388,7 @@ export class Click {
             current2.classList.remove("active")
           }
           this.classList.add("active")
-          if (this.link != "dieAudios") {
+          if (this.link !== "dieAudios") {
             const skillNameSpan = document.createElement("span"),
               skillNameSpanStyle = skillNameSpan.style
             skillNameSpanStyle.fontWeight = "bold"
@@ -4154,7 +4396,7 @@ export class Click {
               skillName = get.translation(link)
             skillNameSpan.innerHTML = skillName
             const showSkillNamePinyin = lib.config.show_skillnamepinyin
-            if (showSkillNamePinyin != "doNotShow" && skillName != "阵亡") {
+            if (showSkillNamePinyin !== "doNotShow" && skillName !== "阵亡") {
               const ruby = document.createElement("ruby")
               ruby.appendChild(skillNameSpan)
               const leftParenthesisRP = document.createElement("rp")
@@ -4162,9 +4404,10 @@ export class Click {
               ruby.appendChild(leftParenthesisRP)
               const rt = document.createElement("rt")
               rt.innerHTML =
-                showSkillNamePinyin == "showCodeIdentifier"
+                showSkillNamePinyin === "showCodeIdentifier"
                   ? link
-                  : lib.translate[`${link}_rt`] || get.pinyin(skillName).join(" ")
+                  : lib.translate[`${link}_rt`] ||
+                    get.pinyin(skillName).join(" ")
               ruby.appendChild(rt)
               const rightParenthesisRP = document.createElement("rp")
               rightParenthesisRP.textContent = "）"
@@ -4176,23 +4419,30 @@ export class Click {
               skillNameSpanStyle.marginRight = "5px"
               introduction2.appendChild(skillNameSpan)
             }
-            htmlParser.innerHTML = get.skillInfoTranslation(this.link, null, false)
+            htmlParser.innerHTML = get.skillInfoTranslation(
+              this.link,
+              null,
+              false,
+            )
             Array.from(htmlParser.childNodes).forEach((childNode) =>
               introduction2.appendChild(childNode),
             )
             var info = get.info(this.link)
             var skill = this.link
             var playername = this.linkname
-            let audioName2 = this.linkAudioName
-            let skinName2 = bg.tempSkin || audioName2
-            var skillnode = this
+            const audioName2 = this.linkAudioName
+            const skinName2 = bg.tempSkin || audioName2
+
             let derivations = info.derivation
             if (derivations) {
-              if (typeof derivations == "string") {
+              if (typeof derivations === "string") {
                 derivations = [derivations]
               }
               derivations.forEach((derivation) => {
-                if (derivation.indexOf("_faq") == -1 && !get.info(derivation).nopop) {
+                if (
+                  derivation.indexOf("_faq") === -1 &&
+                  !get.info(derivation).nopop
+                ) {
                   return false
                 }
                 introduction2.appendChild(document.createElement("br"))
@@ -4203,9 +4453,9 @@ export class Click {
                 const derivationName = get.translation(derivation)
                 derivationNameSpan.innerHTML = derivationName
                 if (
-                  showSkillNamePinyin != "doNotShow" &&
+                  showSkillNamePinyin !== "doNotShow" &&
                   derivationName.length <= 5 &&
-                  derivation.indexOf("_faq") == -1
+                  derivation.indexOf("_faq") === -1
                 ) {
                   const ruby = document.createElement("ruby")
                   ruby.appendChild(derivationNameSpan)
@@ -4214,9 +4464,10 @@ export class Click {
                   ruby.appendChild(leftParenthesisRP)
                   const rt = document.createElement("rt")
                   rt.innerHTML =
-                    showSkillNamePinyin == "showCodeIdentifier"
+                    showSkillNamePinyin === "showCodeIdentifier"
                       ? derivation
-                      : lib.translate[`${derivation}_rt`] || get.pinyin(derivationName).join(" ")
+                      : lib.translate[`${derivation}_rt`] ||
+                        get.pinyin(derivationName).join(" ")
                   ruby.appendChild(rt)
                   const rightParenthesisRP = document.createElement("rp")
                   rightParenthesisRP.textContent = "）"
@@ -4228,7 +4479,11 @@ export class Click {
                   derivationNameSpanStyle.marginRight = "5px"
                   introduction2.appendChild(derivationNameSpan)
                 }
-                htmlParser.innerHTML = get.skillInfoTranslation(derivation, null, false)
+                htmlParser.innerHTML = get.skillInfoTranslation(
+                  derivation,
+                  null,
+                  false,
+                )
                 Array.from(htmlParser.childNodes).forEach((childNode) =>
                   introduction2.appendChild(childNode),
                 )
@@ -4236,19 +4491,23 @@ export class Click {
             }
 
             // 添加技能append
-            if (lib.translate[this.link + "_append"]) {
+            if (lib.translate[`${this.link}_append`]) {
               introduction2.innerHTML +=
                 '<br><br><span style="font-weight:bold;color:#ff6b6b;">引文</span><br>'
               const appendDiv = document.createElement("div")
               appendDiv.style.fontSize = "15.2px"
-              appendDiv.innerHTML = lib.translate[this.link + "_append"]
+              appendDiv.innerHTML = lib.translate[`${this.link}_append`]
               introduction2.appendChild(appendDiv)
             }
 
             // 添加技能台词
-            let skillVoiceMap = get.Audio.skill({
+            const skillVoiceMap = get.Audio.skill({
               skill: this.link,
-              player: { name: playername, skin: { name: skinName2 }, tempname: [skinName2] },
+              player: {
+                name: playername,
+                skin: { name: skinName2 },
+                tempname: [skinName2],
+              },
             }).textList
             if (skillVoiceMap.length > 0) {
               introduction2.innerHTML +=
@@ -4288,10 +4547,14 @@ export class Click {
 						}*/
 
             if (lib.config.background_speak && e !== "init") {
-              if (!this.playAudio || name != this.audioName) {
+              if (!this.playAudio || name !== this.audioName) {
                 const audioList = get.Audio.skill({
                   skill: this.link,
-                  player: { name: playername, skin: { name: skinName2 }, tempname: [skinName2] },
+                  player: {
+                    name: playername,
+                    skin: { name: skinName2 },
+                    tempname: [skinName2],
+                  },
                 }).fileList
                 this.playAudio = game.tryAudio({
                   audioList,
@@ -4304,9 +4567,13 @@ export class Click {
               this.playAudio()
             }
           } else {
-            let skinName2 = bg.tempSkin || this.linkname
-            let dieAudios3 = get.Audio.die({
-              player: { name: this.playername, skin: { name: skinName2 }, tempname: [skinName2] },
+            const skinName2 = bg.tempSkin || this.linkname
+            const dieAudios3 = get.Audio.die({
+              player: {
+                name: this.playername,
+                skin: { name: skinName2 },
+                tempname: [skinName2],
+              },
             })
               .audioList.map((i2) => i2.text)
               .filter(Boolean)
@@ -4319,8 +4586,8 @@ export class Click {
               introduction2.appendChild(dieTextSpan)
             })
             if (lib.config.background_speak && e !== "init") {
-              if (!this.playAudio || name != this.audioName) {
-                let audioList = get.Audio.die({
+              if (!this.playAudio || name !== this.audioName) {
+                const audioList = get.Audio.die({
                   player: {
                     name: this.playername,
                     skin: { name: skinName2 },
@@ -4346,14 +4613,14 @@ export class Click {
     applyViewMode("intro")
     // 创建皮肤容器并添加到intro底部
     if (lib.characterSubstitute[name]) {
-      refreshSkin = function () {
+      refreshSkin = () => {
         if (!intro) {
           intro = uiintro.querySelector(".characterintro")
         }
         if (intro) {
           intro.style.display = "flex"
           intro.style.flexDirection = "column"
-          let contentWrapper = ui.create.div(".intro-content-wrapper")
+          const contentWrapper = ui.create.div(".intro-content-wrapper")
           contentWrapper.style.flex = "1"
           while (intro.firstChild) {
             contentWrapper.appendChild(intro.firstChild)
@@ -4361,7 +4628,8 @@ export class Click {
           intro.appendChild(contentWrapper)
           // 清除已有皮肤
           delete bg.tempSkin
-          const skillButtons = document.getElementsByClassName("characterskill")?.[0]?.childNodes
+          const skillButtons =
+            document.getElementsByClassName("characterskill")?.[0]?.childNodes
           if (skillButtons) {
             for (let i = 0; i < skillButtons.length; i++) {
               delete skillButtons[i].playAudio
@@ -4372,84 +4640,107 @@ export class Click {
             currentSkinsContainer.remove()
           }
           // 创建皮肤容器
-          let skinsContainer = ui.create.div(".skins-container", intro)
+          const skinsContainer = ui.create.div(".skins-container", intro)
           skinsContainer.style.marginTop = "auto"
           skinsContainer.style.paddingTop = "20px"
           // 创建皮肤列表
-          let skinsList = ui.create.div(".skins-list.horizontal", skinsContainer)
+          const skinsList = ui.create.div(
+            ".skins-list.horizontal",
+            skinsContainer,
+          )
           skinsList.style.display = "flex"
           skinsList.style.flexWrap = "wrap"
           skinsList.style.gap = "8px"
           skinsList.style.justifyContent = "flex-start"
-          let skinList = lib.characterSubstitute[name]
-          let skinButtonList = [name, ...skinList.map((skin) => skin[0])]
-          for (let skinName of skinButtonList) {
-            let skinButton = ui.create.div(".skin-button", skinsList, function () {
-              bg.style.backgroundImage = this.style.backgroundImage
-              bg.tempSkin = this.name
-              const skillButtons =
-                document.getElementsByClassName("characterskill")?.[0]?.childNodes
-              if (skillButtons) {
-                for (let i = 0; i < skillButtons.length; i++) {
-                  delete skillButtons[i].playAudio
+          const skinList = lib.characterSubstitute[name]
+          const skinButtonList = [name, ...skinList.map((skin) => skin[0])]
+          for (const skinName of skinButtonList) {
+            const skinButton = ui.create.div(
+              ".skin-button",
+              skinsList,
+              function () {
+                bg.style.backgroundImage = this.style.backgroundImage
+                bg.tempSkin = this.name
+                const skillButtons =
+                  document.getElementsByClassName("characterskill")?.[0]
+                    ?.childNodes
+                if (skillButtons) {
+                  for (let i = 0; i < skillButtons.length; i++) {
+                    delete skillButtons[i].playAudio
+                  }
                 }
-              }
-              const currentSkinsContainer = intro.querySelector(".skins-container")
-              if (currentSkinsContainer) {
-                currentSkinsContainer.remove()
-              }
-              const currentWrapper = intro.querySelector(".intro-content-wrapper")
-              if (currentWrapper) {
-                while (intro.firstChild) {
-                  intro.removeChild(intro.firstChild)
+                const currentSkinsContainer =
+                  intro.querySelector(".skins-container")
+                if (currentSkinsContainer) {
+                  currentSkinsContainer.remove()
                 }
-                while (currentWrapper.firstChild) {
-                  intro.appendChild(currentWrapper.firstChild)
+                const currentWrapper = intro.querySelector(
+                  ".intro-content-wrapper",
+                )
+                if (currentWrapper) {
+                  while (intro.firstChild) {
+                    intro.removeChild(intro.firstChild)
+                  }
+                  while (currentWrapper.firstChild) {
+                    intro.appendChild(currentWrapper.firstChild)
+                  }
                 }
-              }
-              refreshIntro()
-              intro.style.display = "flex"
-              intro.style.flexDirection = "column"
-              let newWrapper = ui.create.div(".intro-content-wrapper")
-              newWrapper.style.flex = "1"
-              while (
-                intro.firstChild &&
-                (!intro.firstChild.classList ||
-                  !intro.firstChild.classList.contains("skins-container"))
-              ) {
-                newWrapper.appendChild(intro.firstChild)
-              }
-              if (intro.firstChild) {
-                intro.insertBefore(newWrapper, intro.firstChild)
-              } else {
-                intro.appendChild(newWrapper)
-              }
-              if (currentSkinsContainer) {
-                intro.appendChild(currentSkinsContainer)
-              }
+                refreshIntro()
+                intro.style.display = "flex"
+                intro.style.flexDirection = "column"
+                const newWrapper = ui.create.div(".intro-content-wrapper")
+                newWrapper.style.flex = "1"
+                while (
+                  intro.firstChild &&
+                  !intro.firstChild.classList?.contains("skins-container")
+                ) {
+                  newWrapper.appendChild(intro.firstChild)
+                }
+                if (intro.firstChild) {
+                  intro.insertBefore(newWrapper, intro.firstChild)
+                } else {
+                  intro.appendChild(newWrapper)
+                }
+                if (currentSkinsContainer) {
+                  intro.appendChild(currentSkinsContainer)
+                }
 
-              game.callHook("refreshSkin", [skinButtonList[0], this.name, sourcenode, avatar])
-            })
+                game.callHook("refreshSkin", [
+                  skinButtonList[0],
+                  this.name,
+                  sourcenode,
+                  avatar,
+                ])
+              },
+            )
             skinButton.name = skinName
             skinButton.style.width = "80px"
             skinButton.style.height = "110px"
             skinButton.style.borderRadius = "4px"
             skinButton.style.backgroundSize = "cover"
             skinButton.style.backgroundPosition = "50% 0"
-            skinButton.style.boxShadow = "rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 5px"
+            skinButton.style.boxShadow =
+              "rgba(0, 0, 0, 0.2) 0 0 0 1px, rgba(0, 0, 0, 0.45) 0 0 5px"
             skinButton.style.cursor = "pointer"
             let iSTemp = false
-            if (!lib.character[skinName] && skinList.some((skin) => skin[0] == skinName)) {
+            if (
+              !lib.character[skinName] &&
+              skinList.some((skin) => skin[0] === skinName)
+            ) {
               iSTemp = true
               lib.character[skinName] = get.convertedCharacter([
                 "",
                 "",
                 0,
                 [],
-                (skinList.find((skin) => skin[0] == skinName) || [skinName, []])[1],
+                (skinList.find((skin) => skin[0] === skinName) || [
+                  skinName,
+                  [],
+                ])[1],
               ])
             }
-            const skinImg = !lib.config.skin[skinName] && lib.character[skinName]?.img
+            const skinImg =
+              !lib.config.skin[skinName] && lib.character[skinName]?.img
             skinImg
               ? skinButton.setBackgroundImage(skinImg)
               : skinButton.setBackground(skinName, "character")
@@ -4466,19 +4757,24 @@ export class Click {
     applyViewMode(lib.config.show_charactercardMode)
 
     var initskill = false
-    let deri = []
+    const deri = []
     for (var i = 0; i < list.length; i++) {
       if (get.info(list[i])?.nopop) {
         continue
       }
-      if (!lib.translate[list[i]] || !lib.translate[list[i] + "_info"]) {
+      if (!lib.translate[list[i]] || !lib.translate[`${list[i]}_info`]) {
         continue
       }
       var skilltrans = get.translation(list[i])
       if (skilltrans.startsWith("&nbsp;")) {
         skilltrans = skilltrans.slice(6)
       }
-      var current = ui.create.div(".menubutton.large", skills, clickSkill, skilltrans)
+      var current = ui.create.div(
+        ".menubutton.large",
+        skills,
+        clickSkill,
+        skilltrans,
+      )
       current.link = list[i]
       current.linkname = name
       current.linkAudioName = audioName
@@ -4494,19 +4790,19 @@ export class Click {
         deri.addArray(derivations)
       }
     }
-    let border = get.groupnature(get.bordergroup(name), "raw")
-    for (let skill of deri) {
+    const border = get.groupnature(get.bordergroup(name), "raw")
+    for (const skill of deri) {
       if (list.includes(skill)) {
         continue
       }
-      let info = get.info(skill)
+      const info = get.info(skill)
       if (info?.nopop) {
         continue
       }
-      if (!lib.translate[skill] || !lib.translate[skill + "_info"]) {
+      if (!lib.translate[skill] || !lib.translate[`${skill}_info`]) {
         continue
       }
-      if (skill.indexOf("_faq") != -1) {
+      if (skill.indexOf("_faq") !== -1) {
         continue
       }
       let tran = get.translation(skill)
@@ -4514,7 +4810,12 @@ export class Click {
         tran = tran.slice(6)
       }
       tran = `<span data-nature="${border}">${tran}</span>`
-      let currentx = ui.create.div(".menubutton.large", skills, clickSkill, tran)
+      const currentx = ui.create.div(
+        ".menubutton.large",
+        skills,
+        clickSkill,
+        tran,
+      )
       currentx.link = skill
       currentx.linkname = name
       currentx.linkAudioName = audioName
@@ -4523,13 +4824,18 @@ export class Click {
         clickSkill.call(currentx, "init")
       }
     }
-    let dieAudios = get.Audio.die({
+    const dieAudios = get.Audio.die({
       player: { name: name, skin: { name: bg.tempSkin || audioName } },
     })
       .audioList.map((i) => i.text)
       .filter(Boolean)
     if (dieAudios.length) {
-      let dieaudio = ui.create.div(".menubutton.large", skills, clickSkill, "阵亡")
+      const dieaudio = ui.create.div(
+        ".menubutton.large",
+        skills,
+        clickSkill,
+        "阵亡",
+      )
       dieaudio.style.backgroundColor = "rgb(0, 0, 0, 1)"
       dieaudio.link = "dieAudios"
       dieaudio.dieAudios = dieAudios
@@ -4537,8 +4843,14 @@ export class Click {
       dieaudio.linkname = audioName
     }
 
-    uiintro.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.touchpop)
-    layer.addEventListener(lib.config.touchscreen ? "touchend" : "click", clicklayer)
+    uiintro.addEventListener(
+      lib.config.touchscreen ? "touchend" : "click",
+      ui.click.touchpop,
+    )
+    layer.addEventListener(
+      lib.config.touchscreen ? "touchend" : "click",
+      clicklayer,
+    )
     ui.window.appendChild(layer)
   }
   intro(e) {
@@ -4549,10 +4861,10 @@ export class Click {
     if (this.classList.contains("player") && !this.name) {
       return
     }
-    if (this.parentNode == ui.historybar) {
-      if (ui.historybar.style.zIndex == "22") {
+    if (this.parentNode === ui.historybar) {
+      if (ui.historybar.style.zIndex === "22") {
         if (_status.removePop) {
-          if (_status.removePop(this) == false) {
+          if (_status.removePop(this) === false) {
             return
           }
         } else {
@@ -4564,8 +4876,7 @@ export class Click {
     var uiintro
     if (
       this.classList.contains("card") &&
-      this.parentNode &&
-      this.parentNode.classList.contains("equips") &&
+      this.parentNode?.classList.contains("equips") &&
       get.is.phoneLayout() &&
       !get.is.mobileMe(this.parentNode.parentNode)
     ) {
@@ -4593,7 +4904,7 @@ export class Click {
       if (!ui.arena.classList.contains("menupaused") && !uiintro.noresume) {
         game.resume2()
       }
-      if (e && e.stopPropagation) {
+      if (e?.stopPropagation) {
         e.stopPropagation()
       }
       if (uiintro._onclose) {
@@ -4601,26 +4912,31 @@ export class Click {
       }
       return false
     }
-    layer.addEventListener(lib.config.touchscreen ? "touchend" : "click", clicklayer)
+    layer.addEventListener(
+      lib.config.touchscreen ? "touchend" : "click",
+      clicklayer,
+    )
     if (!lib.config.touchscreen) {
       layer.oncontextmenu = clicklayer
     }
-    if (this.parentNode == ui.historybar && lib.config.touchscreen) {
+    if (this.parentNode === ui.historybar && lib.config.touchscreen) {
       var rect = this.getBoundingClientRect()
       e = { clientX: 0, clientY: rect.top + 30 }
     }
     lib.placePoppedDialog(uiintro, e)
-    if (this.parentNode == ui.historybar) {
-      if (lib.config.show_history == "right") {
-        uiintro.style.left = ui.historybar.offsetLeft - 230 + "px"
+    if (this.parentNode === ui.historybar) {
+      if (lib.config.show_history === "right") {
+        uiintro.style.left = `${ui.historybar.offsetLeft - 230}px`
       } else {
-        uiintro.style.left = ui.historybar.offsetLeft + 60 + "px"
+        uiintro.style.left = `${ui.historybar.offsetLeft + 60}px`
       }
     }
     uiintro.style.zIndex = 21
     var clickintro = function (e) {
       const poptip = e.relatedTarget?.parentNode?.parentNode
-      const isPoptip = e.target?.matches("wtk-poptip") || (poptip && poptip === _status.poptip?.[0])
+      const isPoptip =
+        e.target?.matches("wtk-poptip") ||
+        (poptip && poptip === _status.poptip?.[0])
       if (_status.touchpopping || isPoptip) {
         return
       }
@@ -4637,9 +4953,9 @@ export class Click {
         uiintro._onclose()
       }
     }
-    var currentpop = this
-    _status.removePop = function (node) {
-      if (node == currentpop) {
+
+    _status.removePop = (node) => {
+      if (node === this) {
         return false
       }
       layer.remove()
@@ -4648,7 +4964,7 @@ export class Click {
       return true
     }
     if (uiintro.clickintro) {
-      uiintro.listen(function () {
+      uiintro.listen(() => {
         _status.clicked = true
       })
       uiintro._clickintro = clicklayer
@@ -4666,7 +4982,7 @@ export class Click {
   intro2() {
     if (ui.intro) {
       ui.intro.close()
-      if (ui.intro.source == this) {
+      if (ui.intro.source === this) {
         delete ui.intro
         ui.control.show()
         game.resume2()
@@ -4675,7 +4991,10 @@ export class Click {
     }
   }
   auto() {
-    if (!ui || !ui.auto || (ui.auto.classList.contains("hidden") && arguments[0] !== "forced")) {
+    if (
+      !ui?.auto ||
+      (ui.auto.classList.contains("hidden") && arguments[0] !== "forced")
+    ) {
       return
     }
     if (_status.paused2) {
@@ -4709,8 +5028,8 @@ export class Click {
       if (game.online) {
         game.send("auto")
       } else if (_status.connectMode) {
-        game.broadcastAll(function (player) {
-          player.setNickname(player.nickname + " - 托管")
+        game.broadcastAll((player) => {
+          player.setNickname(`${player.nickname} - 托管`)
         }, game.me)
       }
     } else {
@@ -4725,7 +5044,7 @@ export class Click {
       if (game.online) {
         game.send("unauto")
       } else if (_status.connectMode) {
-        game.broadcastAll(function (player) {
+        game.broadcastAll((player) => {
           player.setNickname(player.nickname)
         }, game.me)
       }
@@ -4738,7 +5057,7 @@ export class Click {
     this.classList.toggle("glow")
     if (
       this.classList.contains("glow") &&
-      _status.event.type == "wuxie" &&
+      _status.event.type === "wuxie" &&
       _status.event.isMine() &&
       ui.confirm &&
       _status.imchoosing
@@ -4753,14 +5072,17 @@ export class Click {
     this.classList.toggle("glow")
     if (
       this.classList.contains("glow") &&
-      _status.event.type == "wuxie" &&
+      _status.event.type === "wuxie" &&
       _status.event.isMine() &&
       ui.confirm &&
       _status.imchoosing
     ) {
       var triggerevent = _status.event.getTrigger()
-      if (triggerevent && this._origin == triggerevent.parent.id) {
-        if (triggerevent.targets && triggerevent.num == triggerevent.targets.length - 1) {
+      if (triggerevent && this._origin === triggerevent.parent.id) {
+        if (
+          triggerevent.targets &&
+          triggerevent.num === triggerevent.targets.length - 1
+        ) {
           this.close()
         }
       }
@@ -4869,30 +5191,32 @@ export class Click {
   }
   mousewheel(evt) {
     if (
-      this.firstElementChild &&
-      this.firstElementChild.classList.contains("handcards") &&
+      this.firstElementChild?.classList.contains("handcards") &&
       !this.classList.contains("scrollh")
     ) {
       return
     }
-    var node = this
+
     var num = this._scrollnum || 6
     var speed = this._scrollspeed || 16
-    clearInterval(node.interval)
+    clearInterval(this.interval)
     if (evt.detail > 0 || evt.wheelDelta < 0) {
-      node.interval = setInterval(function () {
-        if (num-- && Math.abs(node.scrollLeft + node.clientWidth - node.scrollWidth) > 0) {
-          node.scrollLeft += speed
+      this.interval = setInterval(() => {
+        if (
+          num-- &&
+          Math.abs(this.scrollLeft + this.clientWidth - this.scrollWidth) > 0
+        ) {
+          this.scrollLeft += speed
         } else {
-          clearInterval(node.interval)
+          clearInterval(this.interval)
         }
       }, 16)
     } else {
-      node.interval = setInterval(function () {
-        if (num-- && node.scrollLeft > 0) {
-          node.scrollLeft -= speed
+      this.interval = setInterval(() => {
+        if (num-- && this.scrollLeft > 0) {
+          this.scrollLeft -= speed
         } else {
-          clearInterval(node.interval)
+          clearInterval(this.interval)
         }
       }, 16)
     }
@@ -4922,12 +5246,12 @@ export class Click {
       }
     }
     if (
-      (this == ui.handcards1Container || this == ui.handcards2Container) &&
+      (this === ui.handcards1Container || this === ui.handcards2Container) &&
       !this.classList.contains("scrollh")
     ) {
       e.preventDefault()
     } else if (
-      lib.device == "ios" &&
+      lib.device === "ios" &&
       this.scrollHeight <= this.offsetHeight + 5 &&
       this.scrollWidth <= this.offsetWidth + 5
     ) {
@@ -4957,7 +5281,7 @@ export class Click {
     }
     if (lib.skill[this.link].subfrequent) {
       for (var i = 0; i < lib.skill[this.link].subfrequent.length; i++) {
-        list.push(this.link + "_" + lib.skill[this.link].subfrequent[i])
+        list.push(`${this.link}_${lib.skill[this.link].subfrequent[i]}`)
       }
     }
     for (var i = 0; i < list.length; i++) {
@@ -4997,7 +5321,7 @@ export class Click {
       return false
     }
 
-    if (this._mouseenterdialog && this._mouseenterdialog.parentNode) {
+    if (this._mouseenterdialog?.parentNode) {
       this._mouseenterdialog.delete()
     } else {
       ui.click.intro.call(this, e)

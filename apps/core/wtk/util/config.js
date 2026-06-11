@@ -1,4 +1,4 @@
-import { lib, game } from "wtk"
+import { game, lib } from "wtk"
 
 /**
  * @param {string} name
@@ -49,11 +49,16 @@ export function has(name) {
  * @param {any} [reinitIndexedDB=undefined] - 是否在用`indexedDB`读取失败时将对应键的值初始化；若给定值，则初始化为给定的值
  * @return {Promise<any>}
  */
-export function load(name, type, reinitLocalStorage = true, reinitIndexedDB = undefined) {
+export function load(
+  name,
+  type,
+  reinitLocalStorage = true,
+  reinitIndexedDB = undefined,
+) {
   if (lib.db) {
     let result = game.getDB(type, name)
 
-    if (typeof reinitIndexedDB != "undefined") {
+    if (typeof reinitIndexedDB !== "undefined") {
       result = result.catch(() =>
         game.putDB(type, name, reinitIndexedDB).then(() => reinitIndexedDB),
       )
@@ -64,12 +69,14 @@ export function load(name, type, reinitLocalStorage = true, reinitIndexedDB = un
 
   let config
   try {
-    let json = localStorage.getItem(`${lib.configprefix}${type === "data" ? name : type}`)
+    const json = localStorage.getItem(
+      `${lib.configprefix}${type === "data" ? name : type}`,
+    )
     if (!json) {
       throw new Error()
     }
     config = JSON.parse(json)
-    if (typeof config != "object" || config == null) {
+    if (typeof config !== "object" || config == null) {
       throw new Error()
     }
   } catch (err) {
@@ -93,31 +100,30 @@ export function load(name, type, reinitLocalStorage = true, reinitIndexedDB = un
  * @return {Promise<void>}
  */
 export function save(name, type, value) {
-  let noValue = typeof value == "undefined"
+  const noValue = typeof value === "undefined"
 
   if (lib.db) {
     return noValue ? game.deleteDB(type, name) : game.putDB(type, name, value)
   }
 
-  let database = type === "data"
-  let key = database ? name : type
+  const database = type === "data"
+  const key = database ? name : type
 
   let config
   if (database) {
     if (noValue) {
       localStorage.removeItem(`${lib.configprefix}${key}`)
       return Promise.resolve()
-    } else {
-      config = value
     }
+    config = value
   } else {
     try {
-      let json = localStorage.getItem(`${lib.configprefix}${key}`)
+      const json = localStorage.getItem(`${lib.configprefix}${key}`)
       if (!json) {
         throw new Error()
       }
       config = JSON.parse(json)
-      if (typeof config != "object" || config == null) {
+      if (typeof config !== "object" || config == null) {
         throw new Error()
       }
     } catch (err) {

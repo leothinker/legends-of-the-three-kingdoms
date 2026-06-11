@@ -1,6 +1,7 @@
-import { ui, game, get, lib, _status } from "wtk"
-import { createApp, ref, reactive, onMounted, toRaw, isReactive, watch } from "vue"
+import { isReactive, reactive, toRaw, watch } from "vue"
+import { _status, game, lib } from "wtk"
 import { WTKConfig } from "./wtkConfig.js"
+
 /**
  * 使字符串有html的代码提示
  */
@@ -28,11 +29,11 @@ export const startMenuData = {
         if (!lib.mode[mode].connect) {
           return
         }
-        if (!lib.config["connect_" + mode + "_banned"]) {
-          lib.config["connect_" + mode + "_banned"] = []
+        if (!lib.config[`connect_${mode}_banned`]) {
+          lib.config[`connect_${mode}_banned`] = []
         }
-        if (!lib.config["connect_" + mode + "_bannedcards"]) {
-          lib.config["connect_" + mode + "_bannedcards"] = []
+        if (!lib.config[`connect_${mode}_bannedcards`]) {
+          lib.config[`connect_${mode}_bannedcards`] = []
         }
       }
       if (lib.config.all.mode.includes(mode)) {
@@ -55,11 +56,11 @@ export const startMenuData = {
       const mode = node.getAttribute("mode")
       if (connectMenu) {
         // todo: menuUpdates.push(updateConnectDisplayMap);
-        if (mode == lib.config.connect_mode) {
+        if (mode === lib.config.connect_mode) {
           return node
         }
       } else {
-        if (mode == lib.config.mode) {
+        if (mode === lib.config.mode) {
           return node
         }
       }
@@ -125,11 +126,11 @@ export const startMenuData = {
             // var value = this._link.config;
             // @ts-expect-error ignore
             game.saveConfig(value._name, result, mode)
-            if (typeof value.onsave == "function") {
+            if (typeof value.onsave === "function") {
               value.onsave.call(this, result)
             }
             if (!_status.connectMode || game.online) {
-              if (typeof value.restart == "function") {
+              if (typeof value.restart === "function") {
                 if (value.restart()) {
                   startButton.classList.add("glowing")
                 }
@@ -175,8 +176,8 @@ export const startMenuData = {
   },
   rightPaneTemplate: {
     template: html` <div ref="root">
-      <wtk-config v-for="config in configsWithOutUpdate" :config="config" />
-    </div>`,
+			<wtk-config v-for="config in configsWithOutUpdate" :config="config" />
+		</div>`,
     props: {
       configs: Object,
     },
@@ -216,7 +217,7 @@ const connectDisplayMap = {
   connect_versus_mode: null,
 }
 
-const updateConnectDisplayMap = function () {
+const updateConnectDisplayMap = () => {
   if (_status.waitingForPlayer) {
     if (connectDisplayMap.connect_player_number) {
       connectDisplayMap.connect_player_number.style.display = "none"

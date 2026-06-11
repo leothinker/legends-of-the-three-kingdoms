@@ -354,13 +354,18 @@
   left: 0;
 }
 
-#arena[data-player_height_nova="default"] > .player[data-position="0"]:not(.minskin) {
+#arena[data-player_height_nova="default"]
+  > .player[data-position="0"]:not(.minskin) {
   top: calc(100% - 236px);
 }
-[data-number="8"][data-player_height_nova="default"] > .player[data-position="1"],
-[data-number="8"][data-player_height_nova="default"] > .player[data-position="7"],
-[data-number="7"][data-player_height_nova="default"] > .player[data-position="1"],
-[data-number="7"][data-player_height_nova="default"] > .player[data-position="6"] {
+[data-number="8"][data-player_height_nova="default"]
+  > .player[data-position="1"],
+[data-number="8"][data-player_height_nova="default"]
+  > .player[data-position="7"],
+[data-number="7"][data-player_height_nova="default"]
+  > .player[data-position="1"],
+[data-number="7"][data-player_height_nova="default"]
+  > .player[data-position="6"] {
   top: calc(55% - 143px);
 }
 
@@ -374,31 +379,44 @@
 #arena[data-player_height_nova="default"] > .player .avatar {
   height: 176px;
 }
-#arena.slim_player[data-player_height_nova="default"] .player:not(.minskin):not(.fakeme) .avatar {
+#arena.slim_player[data-player_height_nova="default"]
+  .player:not(.minskin):not(.fakeme)
+  .avatar {
   height: 182px;
 }
 
-#arena.uslim_player[data-player_height_nova="default"] .player:not(.minskin):not(.fakeme) .avatar {
+#arena.uslim_player[data-player_height_nova="default"]
+  .player:not(.minskin):not(.fakeme)
+  .avatar {
   height: 190px;
 }
-#arena.mslim_player[data-player_height_nova="default"] .player:not(.minskin):not(.fakeme) .avatar {
+#arena.mslim_player[data-player_height_nova="default"]
+  .player:not(.minskin):not(.fakeme)
+  .avatar {
   height: 186px;
 }
 #arena[data-player_height_nova="default"] > .player.fullskin2 .avatar2 {
   height: 176px;
 }
 
-#arena.slim_player[data-player_height_nova="default"] > .player.fullskin2:not(.minskin) .avatar2 {
+#arena.slim_player[data-player_height_nova="default"]
+  > .player.fullskin2:not(.minskin)
+  .avatar2 {
   height: 182px;
 }
-#arena.uslim_player[data-player_height_nova="default"] > .player.fullskin2:not(.minskin) .avatar2 {
+#arena.uslim_player[data-player_height_nova="default"]
+  > .player.fullskin2:not(.minskin)
+  .avatar2 {
   height: 190px;
 }
-#arena.mslim_player[data-player_height_nova="default"] > .player.fullskin2:not(.minskin) .avatar2 {
+#arena.mslim_player[data-player_height_nova="default"]
+  > .player.fullskin2:not(.minskin)
+  .avatar2 {
   height: 186px;
 }
 
-#arena[data-player_height_nova="long"] > .player[data-position="0"]:not(.minskin) {
+#arena[data-player_height_nova="long"]
+  > .player[data-position="0"]:not(.minskin) {
   top: calc(100% - 250px);
 }
 [data-number="8"][data-player_height_nova="long"] > .player[data-position="1"],
@@ -418,27 +436,39 @@
 #arena[data-player_height_nova="long"] > .player .avatar {
   height: 190px;
 }
-#arena.slim_player[data-player_height_nova="long"] .player:not(.minskin):not(.fakeme) .avatar {
+#arena.slim_player[data-player_height_nova="long"]
+  .player:not(.minskin):not(.fakeme)
+  .avatar {
   height: 196px;
 }
 
-#arena.uslim_player[data-player_height_nova="long"] .player:not(.minskin):not(.fakeme) .avatar {
+#arena.uslim_player[data-player_height_nova="long"]
+  .player:not(.minskin):not(.fakeme)
+  .avatar {
   height: 204px;
 }
-#arena.mslim_player[data-player_height_nova="long"] .player:not(.minskin):not(.fakeme) .avatar {
+#arena.mslim_player[data-player_height_nova="long"]
+  .player:not(.minskin):not(.fakeme)
+  .avatar {
   height: 200px;
 }
 #arena[data-player_height_nova="long"] > .player.fullskin2 .avatar2 {
   height: 190px;
 }
 
-#arena.slim_player[data-player_height_nova="long"] > .player.fullskin2:not(.minskin) .avatar2 {
+#arena.slim_player[data-player_height_nova="long"]
+  > .player.fullskin2:not(.minskin)
+  .avatar2 {
   height: 196px;
 }
-#arena.uslim_player[data-player_height_nova="long"] > .player.fullskin2:not(.minskin) .avatar2 {
+#arena.uslim_player[data-player_height_nova="long"]
+  > .player.fullskin2:not(.minskin)
+  .avatar2 {
   height: 204px;
 }
-#arena.mslim_player[data-player_height_nova="long"] > .player.fullskin2:not(.minskin) .avatar2 {
+#arena.mslim_player[data-player_height_nova="long"]
+  > .player.fullskin2:not(.minskin)
+  .avatar2 {
   height: 200px;
 }
 

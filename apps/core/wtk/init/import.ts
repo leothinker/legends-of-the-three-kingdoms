@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { lib, game, _status } from "wtk"
+import { game, lib } from "wtk"
 
 export async function importCardPack(name: string) {
   await importFunction("card", `/card/${name}`)
@@ -22,24 +22,33 @@ export async function importCharacterPack(name: string) {
 
 export async function importMode(name: string) {
   const alreadyModernMode = lib.config.moderned_modes || []
-  const path = alreadyModernMode.includes(name) ? `/mode/${name}/index` : `/mode/${name}`
+  const path = alreadyModernMode.includes(name)
+    ? `/mode/${name}/index`
+    : `/mode/${name}`
   await importFunction("mode", path)
 }
 
-async function importFunction(type: "card" | "character" | "mode", path: string): Promise<void> {
-  const modeContent = await import(/* @vite-ignore */ path + ".js").catch(async (e) => {
-    if (window.isSecureContext) {
-      try {
-        return await import(/* @vite-ignore */ path + ".ts")
-      } catch {
-        throw e
+async function importFunction(
+  type: "card" | "character" | "mode",
+  path: string,
+): Promise<void> {
+  const modeContent = await import(/* @vite-ignore */ `${path}.js`).catch(
+    async (e) => {
+      if (window.isSecureContext) {
+        try {
+          return await import(/* @vite-ignore */ `${path}.ts`)
+        } catch {
+          throw e
+        }
       }
-    }
-    throw e
-  })
+      throw e
+    },
+  )
   if (!modeContent.type) return
   if (modeContent.type !== type) {
-    throw new Error(`Loaded Content doesn't match "${type}" (received "${modeContent.type}").`)
+    throw new Error(
+      `Loaded Content doesn't match "${type}" (received "${modeContent.type}").`,
+    )
   }
   // @ts-expect-error ignore
   await game.import(type, modeContent.default)

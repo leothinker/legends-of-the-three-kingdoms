@@ -31,6 +31,7 @@ window.wtk_package = {
     guozhan: "国战",
     versus: "对决",
     connect: "联机",
+    boss: "挑战",
     doudizhu: "斗地主",
     single: "单挑",
     brawl: "乱斗",
@@ -57,7 +58,6 @@ window.wtk_package = {
       normal: "新1v1",
     },
   },
-  background: { ol_bg: "龙纹" },
   font: {
     xiaozhuan: "方正小篆体",
     xinwei: "华文新魏_GBK",
@@ -66,5 +66,4 @@ window.wtk_package = {
     xingkai: "方正行楷_GBK",
     shousha: "方正隶变_GBK",
   },
-  theme: { simple: "简约" },
 }

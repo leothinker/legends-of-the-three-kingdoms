@@ -1,14 +1,13 @@
 import { lib } from "wtk"
-import {
-  IContentCompiler,
+import ArrayCompiler from "./ArrayCompiler.ts"
+import AsyncCompiler from "./AsyncCompiler.ts"
+import type {
   EventCompileable,
   EventCompiledContent,
   EventContent,
+  IContentCompiler,
 } from "./IContentCompiler.ts"
-
 import StepCompiler from "./StepCompiler.ts"
-import AsyncCompiler from "./AsyncCompiler.ts"
-import ArrayCompiler from "./ArrayCompiler.ts"
 
 type Class<T> = new (...args: any) => T
 
@@ -55,7 +54,8 @@ class ContentCompiler {
     // 无法直接编译的数据做处理
     if (typeof content === "string") {
       return lib.element.content[content] ?? lib.element.contents[content]
-    } else if (Symbol.iterator in content) {
+    }
+    if (Symbol.iterator in content) {
       return Array.from(content)
     }
     return content

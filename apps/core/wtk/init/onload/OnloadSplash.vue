@@ -15,8 +15,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
-import { lib, get } from "wtk"
+import { onMounted, ref } from "vue"
+// biome-ignore lint/correctness/noUnusedImports: <explanation>
+import { get, lib } from "wtk"
 import { delay } from "@/util/index.js"
 
 interface Props {
@@ -32,7 +33,7 @@ let clicked = false
 onMounted(() => {
   nodeList.value.forEach(async (node: HTMLElement) => {
     const mode = node.getAttribute("link") as string
-    const index = parseInt(node.getAttribute("index") || "0")
+    const index = parseInt(node.getAttribute("index") || "0", 10)
 
     ;(node as any).listen(() => {
       if (!clicked) {

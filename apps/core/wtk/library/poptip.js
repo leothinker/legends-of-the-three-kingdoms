@@ -4,7 +4,13 @@ import { game, get, lib } from "wtk"
  * @type {Map<string, {name: string, info: string}>}
  */
 const _poptipMap = new Map([
-  ["rule_hujia", { name: "护甲", info: "和体力类似，每点护甲可抵挡1点伤害，但不影响手牌上限。" }],
+  [
+    "rule_hujia",
+    {
+      name: "护甲",
+      info: "和体力类似，每点护甲可抵挡1点伤害，但不影响手牌上限。",
+    },
+  ],
   [
     "rule_suicong",
     {
@@ -14,7 +20,10 @@ const _poptipMap = new Map([
   ],
   [
     "rule_faxian",
-    { name: "发现", info: "从三张随机亮出的牌中选择一张，若无特殊说明，则获得此牌。" },
+    {
+      name: "发现",
+      info: "从三张随机亮出的牌中选择一张，若无特殊说明，则获得此牌。",
+    },
   ],
   [
     "rule_xunengji",
@@ -37,7 +46,10 @@ const _poptipMap = new Map([
       info: "部分武将使用的游戏外共通区域。至多包含六张牌。当有新牌注入后，若牌数超过上限，则将最早进入仁库的溢出牌置入弃牌堆。",
     },
   ],
-  ["rule_chihengji", { name: "持恒技", info: "拥有此标签的技能不会被其他技能无效。" }],
+  [
+    "rule_chihengji",
+    { name: "持恒技", info: "拥有此标签的技能不会被其他技能无效。" },
+  ],
   [
     "rule_chengshi",
     {
@@ -200,20 +212,20 @@ export class PoptipManager {
   #customPoptip = new Map()
 
   constructor() {
-    this.#poptip["rule"] = {
+    this.#poptip.rule = {
       idList: Array.from(_poptipMap.keys()),
     }
-    this.#poptip["card"] = {
+    this.#poptip.card = {
       get idList() {
         return Object.keys(lib.card)
       },
     }
-    this.#poptip["skill"] = {
+    this.#poptip.skill = {
       get idList() {
         return Object.keys(lib.skill)
       },
     }
-    this.#poptip["character"] = {
+    this.#poptip.character = {
       idList: [],
     }
   }
@@ -255,7 +267,7 @@ export class PoptipManager {
     window.customElements.define("wtk-poptip", HTMLPoptipElement)
     _poptipMap.forEach((value, key) => {
       lib.translate[key] = value.name
-      lib.translate[key + "_info"] = value.info
+      lib.translate[`${key}_info`] = value.info
     })
   }
   /**
@@ -343,7 +355,7 @@ export class PoptipManager {
    * @param {string} id
    */
   getInfo(id) {
-    return this.#customPoptip.get(id)?.info || get.translation(id + "_info")
+    return this.#customPoptip.get(id)?.info || get.translation(`${id}_info`)
   }
   /**
    * 添加名词解释
@@ -359,13 +371,14 @@ export class PoptipManager {
     let { type = "rule", id, name, info = "", dialog } = poptip
     if (!this.#poptip[type]) {
       throw new Error(`未注册的poptip类型: ${type}`)
-    } else if (id && (type === "skill" || type === "card")) {
+    }
+    if (id && (type === "skill" || type === "card")) {
       console.warn("请于lib.skill/lib.card中显式注册技能/卡牌。")
     }
 
     if (id) {
       lib.translate[id] = name
-      lib.translate[id + "_info"] = info
+      lib.translate[`${id}_info`] = info
       if (dialog) {
         this.createDialog.set(id, dialog)
       }
@@ -410,15 +423,22 @@ export class HTMLPoptipElement extends HTMLElement {
     this.#inited = true
 
     this.createdCallback()
-    this.addEventListener(lib.config.touchscreen ? "touchstart" : "click", (e) => {
-      // 保证同一时间只能出现一个poptip框，做完窗口管理后可删
-      game.closePoptipDialog()
-      return get.poptipIntro(this.dialog, this.getAttribute("poptip") || "", e)
-    })
+    this.addEventListener(
+      lib.config.touchscreen ? "touchstart" : "click",
+      (e) => {
+        // 保证同一时间只能出现一个poptip框，做完窗口管理后可删
+        game.closePoptipDialog()
+        return get.poptipIntro(
+          this.dialog,
+          this.getAttribute("poptip") || "",
+          e,
+        )
+      },
+    )
   }
 
   createdCallback() {
-    this.textContent = this.name
+    this.innerHTML = this.name
   }
 
   /**
@@ -430,9 +450,9 @@ export class HTMLPoptipElement extends HTMLElement {
     // 先写死
     switch (this.type) {
       case "skill":
-        return "〖" + name + "〗"
+        return `〖${name}〗`
       case "card":
-        return "【" + name + "】"
+        return `【${name}】`
       default:
         return name
     }
@@ -443,12 +463,12 @@ export class HTMLPoptipElement extends HTMLElement {
   get dialog() {
     const poptip = this.getAttribute("poptip")
     let dialog
-    if (this.type == "card") {
+    if (this.type === "card") {
       dialog = lib.poptip.createDialog.get("cardDialog")
     }
     if (poptip && lib.poptip.createDialog.has(poptip)) {
       dialog = lib.poptip.createDialog.get(poptip)
-      if (typeof dialog == "string" && lib.poptip.createDialog.has(dialog)) {
+      if (typeof dialog === "string" && lib.poptip.createDialog.has(dialog)) {
         dialog = lib.poptip.createDialog.get(dialog)
       }
     }

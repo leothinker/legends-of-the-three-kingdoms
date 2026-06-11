@@ -50,9 +50,9 @@ export class Pagination {
   constructor(paramsObj = {}) {
     if (!Pagination.loaded) {
       Pagination.loaded = true
-      lib.init.css(lib.assetURL + "layout/default/pagination.css")
+      lib.init.css(`${lib.assetURL}layout/default/pagination.css`)
     }
-    let { state } = this
+    const { state } = this
     for (const [key, value] of Object.entries(paramsObj)) {
       state[key] = value
     }
@@ -62,39 +62,45 @@ export class Pagination {
   }
   /** 切换页码并设置按钮点击事件 */
   switchPage() {
-    let { state } = this
-    let pCNameList = this.selectorEle("." + state.pCName, true)
+    const { state } = this
+    const pCNameList = this.selectorEle(`.${state.pCName}`, true)
     let pageNumber
     if (!pCNameList) {
-      console.error(`未找到类名为${"." + state.pCName}的元素`)
+      console.error(`未找到类名为${`.${state.pCName}`}的元素`)
       return
     }
     pCNameList.forEach((item) => {
-      item.addEventListener(state.changePageEvent, (/** @type { Event } */ e) => {
-        /** @type { HTMLElement } */
-        // @ts-expect-error ignore
-        const currentPageEle = e.target
-        // 点击的是当前页数不进行操作
-        if (this.hasClass(currentPageEle, state.activeCName)) {
-          return
-        }
-        let dataNumberAttr = currentPageEle.getAttribute(state.dataNumberAttr)
-        // 点击数字按钮
-        if (dataNumberAttr) {
-          pageNumber = +dataNumberAttr
-        }
-        // 点击上一页按钮
-        else if (this.hasClass(currentPageEle, state.prevCName)) {
-          state.pageNumber > 1 && (pageNumber = state.pageNumber - 1)
-        }
-        // 点击下一页按钮
-        else if (this.hasClass(currentPageEle, state.nextCName)) {
-          state.pageNumber < state.totalPageCount && (pageNumber = state.pageNumber + 1)
-        }
-        if (pageNumber) {
-          this.gotoPage(pageNumber)
-        }
-      })
+      item.addEventListener(
+        state.changePageEvent,
+        (/** @type { Event } */ e) => {
+          /** @type { HTMLElement } */
+          // @ts-expect-error ignore
+          const currentPageEle = e.target
+          // 点击的是当前页数不进行操作
+          if (this.hasClass(currentPageEle, state.activeCName)) {
+            return
+          }
+          const dataNumberAttr = currentPageEle.getAttribute(
+            state.dataNumberAttr,
+          )
+          // 点击数字按钮
+          if (dataNumberAttr) {
+            pageNumber = +dataNumberAttr
+          }
+          // 点击上一页按钮
+          else if (this.hasClass(currentPageEle, state.prevCName)) {
+            state.pageNumber > 1 && (pageNumber = state.pageNumber - 1)
+          }
+          // 点击下一页按钮
+          else if (this.hasClass(currentPageEle, state.nextCName)) {
+            state.pageNumber < state.totalPageCount &&
+              (pageNumber = state.pageNumber + 1)
+          }
+          if (pageNumber) {
+            this.gotoPage(pageNumber)
+          }
+        },
+      )
     })
   }
   /**
@@ -102,13 +108,13 @@ export class Pagination {
    * @param { number } pageNumber
    */
   gotoPage(pageNumber) {
-    let { state } = this
-    let evaNumberLi = this.selectorEle("." + state.pageNumberCName, true)
+    const { state } = this
+    const evaNumberLi = this.selectorEle(`.${state.pageNumberCName}`, true)
     if (!evaNumberLi) {
-      console.error(`未找到类名为${"." + state.pageNumberCName}的元素`)
+      console.error(`未找到类名为${`.${state.pageNumberCName}`}的元素`)
       return
     }
-    let len = evaNumberLi.length
+    const len = evaNumberLi.length
     // 不合法的页数
     if (len === 0 || this.isIllegal(pageNumber)) {
       return
@@ -120,14 +126,18 @@ export class Pagination {
         this.removeClass(active, state.activeCName)
       }
       if (state.activePosition) {
-        let rEllipseSign = state.totalPageCount - (state.maxShowBtnCount - state.activePosition) - 1
+        const rEllipseSign =
+          state.totalPageCount -
+          (state.maxShowBtnCount - state.activePosition) -
+          1
         // 左边不需要出现省略符号占位
         if (pageNumber <= state.maxShowBtnCount && pageNumber < rEllipseSign) {
           if (+(evaNumberLi[1].getAttribute(state.dataNumberAttr) || 0) > 2) {
             for (let i = 1; i < state.maxShowBtnCount + 1; i++) {
-              let value = String(i + 1)
+              const value = String(i + 1)
               // @ts-expect-error ignore
-              evaNumberLi[i].innerText = state.pageNumberForCN?.[parseInt(value) - 1] ?? value
+              evaNumberLi[i].innerText =
+                state.pageNumberForCN?.[parseInt(value, 10) - 1] ?? value
               evaNumberLi[i].setAttribute(state.dataNumberAttr, value)
             }
           }
@@ -138,12 +148,16 @@ export class Pagination {
         // 两边都需要出现省略符号占位
         if (pageNumber > state.maxShowBtnCount && pageNumber < rEllipseSign) {
           // 针对 maxShowBtnCount===1 的特殊处理
-          this.hiddenEllipse(".ellipsis-head", pageNumber === 2 && state.maxShowBtnCount === 1)
+          this.hiddenEllipse(
+            ".ellipsis-head",
+            pageNumber === 2 && state.maxShowBtnCount === 1,
+          )
           this.hiddenEllipse(".ellipsis-tail", false)
           for (let i = 1; i < state.maxShowBtnCount + 1; i++) {
-            let value = String(pageNumber + (i - state.activePosition))
+            const value = String(pageNumber + (i - state.activePosition))
             // @ts-expect-error ignore
-            evaNumberLi[i].innerText = state.pageNumberForCN?.[parseInt(value) - 1] ?? value
+            evaNumberLi[i].innerText =
+              state.pageNumberForCN?.[parseInt(value, 10) - 1] ?? value
             evaNumberLi[i].setAttribute(state.dataNumberAttr, value)
           }
           this.addClass(evaNumberLi[state.activePosition], state.activeCName)
@@ -157,14 +171,18 @@ export class Pagination {
             state.totalPageCount - 1
           ) {
             for (let i = 1; i < state.maxShowBtnCount + 1; i++) {
-              let value = String(state.totalPageCount - (state.maxShowBtnCount - i) - 1)
+              const value = String(
+                state.totalPageCount - (state.maxShowBtnCount - i) - 1,
+              )
               // @ts-expect-error ignore
-              evaNumberLi[i].innerText = state.pageNumberForCN?.[parseInt(value) - 1] ?? value
+              evaNumberLi[i].innerText =
+                state.pageNumberForCN?.[parseInt(value, 10) - 1] ?? value
               evaNumberLi[i].setAttribute(state.dataNumberAttr, value)
             }
           }
           const active = Array.from(evaNumberLi).find(
-            (item) => item.getAttribute(state.dataNumberAttr) === String(pageNumber),
+            (item) =>
+              item.getAttribute(state.dataNumberAttr) === String(pageNumber),
           )
           if (active) {
             this.addClass(active, state.activeCName)
@@ -176,15 +194,15 @@ export class Pagination {
       }
       state.pageNumber = pageNumber
     }
-    state.onPageChange && state.onPageChange(state)
+    state.onPageChange?.(state)
     // 判断 上一页 下一页 是否可使用
     this.switchPrevNextAble()
   }
   /** 设置上一页下一页按钮合法性 */
   switchPrevNextAble() {
-    let { state } = this
-    let prevBtn = this.selectorEle("." + state.prevCName)
-    let nextBtn = this.selectorEle("." + state.nextCName)
+    const { state } = this
+    const prevBtn = this.selectorEle(`.${state.prevCName}`)
+    const nextBtn = this.selectorEle(`.${state.nextCName}`)
     if (!prevBtn) {
       console.error(`未找到上一页按钮的元素`)
       return
@@ -208,21 +226,26 @@ export class Pagination {
   }
   /** 渲染Dom */
   renderPageDOM() {
-    let { state } = this
-    let pageContainer =
-      state.container instanceof Element ? state.container : document.querySelector(state.container)
+    const { state } = this
+    const pageContainer =
+      state.container instanceof Element
+        ? state.container
+        : document.querySelector(state.container)
     if (!pageContainer) {
       console.error(`未根据配置找到父元素`)
       return
     }
 
-    if (this.element instanceof HTMLElement && pageContainer.contains(this.element)) {
+    if (
+      this.element instanceof HTMLElement &&
+      pageContainer.contains(this.element)
+    ) {
       pageContainer.removeChild(this.element)
       // @ts-expect-error ignore
       this.element = void 0
     }
 
-    let {
+    const {
       totalPageCount,
       pCName,
       prevCName,
@@ -255,10 +278,10 @@ export class Pagination {
         paginationStr += `<li class="${pCName} ${pageNumberCName}" ${dataNumberAttr}='${i}'>${state.pageNumberForCN?.[i - 1] ?? i}</li>`
       }
     }
-    paginationStr += `<li class="${pCName} ${nextCName}${totalPageCount === 1 ? " " + disbaleNextCName : ""}">${state.pageLimitForCN?.[1] ?? "下一页"}</li></ul>`
+    paginationStr += `<li class="${pCName} ${nextCName}${totalPageCount === 1 ? ` ${disbaleNextCName}` : ""}">${state.pageLimitForCN?.[1] ?? "下一页"}</li></ul>`
 
     if (state.insertAfter) {
-      let afterElement =
+      const afterElement =
         state.insertAfter instanceof Element
           ? state.insertAfter
           : document.querySelector(state.insertAfter)
@@ -311,12 +334,13 @@ export class Pagination {
    * @param { number } pageNumber
    */
   isIllegal(pageNumber) {
-    let { state } = this
+    const { state } = this
     if (state.pageRefuseChanged) {
       return true
     }
     return (
-      /*state.pageNumber === pageNumber || */ Math.ceil(pageNumber) !== pageNumber ||
+      /*state.pageNumber === pageNumber || */ Math.ceil(pageNumber) !==
+        pageNumber ||
       pageNumber > state.totalPageCount ||
       pageNumber < 1 ||
       typeof pageNumber !== "number" ||
@@ -380,7 +404,7 @@ export class Pagination {
    * @param { number } totalPageCount
    */
   setTotalPageCount(totalPageCount) {
-    let { state } = this
+    const { state } = this
     state.pageNumber = 1
     state.totalPageCount = totalPageCount
     if (state.totalPageCount > state.maxShowBtnCount + 2) {

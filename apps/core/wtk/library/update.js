@@ -1,4 +1,4 @@
-import { ui, game, lib } from "wtk"
+import { game, lib, ui } from "wtk"
 
 // https://github.com/libnoname/noname/archive/refs/tags/v1.10.10.zip
 
@@ -18,20 +18,23 @@ const defaultHeaders = {
 }
 
 if (localStorage.getItem("wtk_authorization")) {
-  defaultHeaders["Authorization"] = `token ${localStorage.getItem("wtk_authorization")}`
+  defaultHeaders.Authorization = `token ${localStorage.getItem("wtk_authorization")}`
 }
 
 /**
  * 获取github授权的token
  */
 export async function gainAuthorization() {
-  if (!localStorage.getItem("wtk_authorization") && !sessionStorage.getItem("wtk_authorization")) {
+  if (
+    !localStorage.getItem("wtk_authorization") &&
+    !sessionStorage.getItem("wtk_authorization")
+  ) {
     const result = await game.promises.prompt(
       "请输入您github的token以解除访问每小时60次的限制(可不输入)",
     )
-    if (typeof result == "string") {
+    if (typeof result === "string") {
       localStorage.setItem("wtk_authorization", result)
-      defaultHeaders["Authorization"] = `token ${localStorage.getItem("wtk_authorization")}`
+      defaultHeaders.Authorization = `token ${localStorage.getItem("wtk_authorization")}`
     } else {
       sessionStorage.setItem("wtk_authorization", "false")
     }
@@ -54,7 +57,10 @@ const defaultResponse = async (/** @type {Response} */ response) => {
       )) ||
     (response.status === 401 &&
       (localStorage.removeItem("wtk_authorization"), true) &&
-      (alert(`身份验证凭证错误，是否重新输入您github账号的token以获取更高的请求总量限制`), true))
+      (alert(
+        `身份验证凭证错误，是否重新输入您github账号的token以获取更高的请求总量限制`,
+      ),
+      true))
   ) {
     return gainAuthorization()
   }
@@ -68,26 +74,26 @@ export function parseSize(limit) {
   let size = ""
   if (limit < 1 * 1024) {
     // 小于1KB，则转化成B
-    size = limit.toFixed(2) + "B"
+    size = `${limit.toFixed(2)}B`
   } else if (limit < 1 * 1024 * 1024) {
     // 小于1MB，则转化成KB
-    size = (limit / 1024).toFixed(2) + "KB"
+    size = `${(limit / 1024).toFixed(2)}KB`
   } else if (limit < 1 * 1024 * 1024 * 1024) {
     // 小于1GB，则转化成MB
-    size = (limit / (1024 * 1024)).toFixed(2) + "MB"
+    size = `${(limit / (1024 * 1024)).toFixed(2)}MB`
   } else {
     // 其他转化成GB
-    size = (limit / (1024 * 1024 * 1024)).toFixed(2) + "GB"
+    size = `${(limit / (1024 * 1024 * 1024)).toFixed(2)}GB`
   }
 
   // 转成字符串
-  let sizeStr = size + ""
+  const sizeStr = `${size}`
   // 获取小数点处的索引
-  let index = sizeStr.indexOf(".")
+  const index = sizeStr.indexOf(".")
   // 获取小数点后两位的值
-  let dou = sizeStr.slice(index + 1, 2)
+  const dou = sizeStr.slice(index + 1, 2)
   // 判断后两位是否为00，如果是则删除00
-  if (dou == "00") {
+  if (dou === "00") {
     return sizeStr.slice(0, index) + sizeStr.slice(index + 3, 2)
   }
   return size
@@ -152,16 +158,17 @@ export function checkVersion(ver1, ver2) {
     item1 = item1 === undefined ? 0 : item1
     item2 = item2 === undefined ? 0 : item2
 
-    if (isNaN(item1) || isNaN(item2)) {
+    if (Number.isNaN(item1) || Number.isNaN(item2)) {
       throw new Error("Non-numeric part found in the version numbers")
-    } else if (item1 > item2) {
+    }
+    if (item1 > item2) {
       return 1
-    } else if (item1 < item2) {
+    }
+    if (item1 < item2) {
       return -1
-    } else {
-      if (iter1.done && iter2.done) {
-        break
-      }
+    }
+    if (iter1.done && iter2.done) {
+      break
     }
   }
 
@@ -188,14 +195,16 @@ export function checkVersion(ver1, ver2) {
  * });
  * ```
  */
-export async function getRepoTags(options = { username: "libwtk", repository: "wtk" }) {
+export async function getRepoTags(
+  options = { username: "libwtk", repository: "wtk" },
+) {
   // if (!localStorage.getItem("wtk_authorization")) {
   // 	await gainAuthorization();
   // }
   const { username = "libwtk", repository = "wtk", accessToken } = options
   const headers = Object.assign({}, defaultHeaders)
   if (accessToken) {
-    headers["Authorization"] = `token ${accessToken}`
+    headers.Authorization = `token ${accessToken}`
   }
   const url = `https://api.github.com/repos/${username}/${repository}/tags`
   const response = await fetch(url, { headers })
@@ -203,9 +212,8 @@ export async function getRepoTags(options = { username: "libwtk", repository: "w
   if (response.ok) {
     const data = await response.json()
     return data
-  } else {
-    throw new Error(`Error fetching tags: ${response.statusText}`)
   }
+  throw new Error(`Error fetching tags: ${response.statusText}`)
 }
 
 /**
@@ -233,7 +241,7 @@ export async function getRepoTagDescription(
   const { username = "libwtk", repository = "wtk", accessToken } = options
   const headers = Object.assign({}, defaultHeaders)
   if (accessToken) {
-    headers["Authorization"] = `token ${accessToken}`
+    headers.Authorization = `token ${accessToken}`
   }
   const apiUrl = `https://api.github.com/repos/${username}/${repository}/releases/tags/${tagName}`
   const response = await fetch(apiUrl, { headers })
@@ -297,17 +305,17 @@ export async function getRepoFilesList(
   const { username = "libwtk", repository = "wtk", accessToken } = options
   const headers = Object.assign({}, defaultHeaders)
   if (accessToken) {
-    headers["Authorization"] = `token ${accessToken}`
+    headers.Authorization = `token ${accessToken}`
   }
   let url = `https://api.github.com/repos/${username}/${repository}/contents/${path}`
-  if (typeof branch == "string" && branch.length > 0) {
+  if (typeof branch === "string" && branch.length > 0) {
     const pathURL = new URL(url)
     const searchParams = new URLSearchParams(pathURL.search.slice(1))
     if (searchParams.has("ref")) {
       throw new TypeError(`设置了branch参数后，不应在path参数内拼接ref`)
     }
     searchParams.append("ref", branch)
-    url = pathURL.origin + pathURL.pathname + "?" + searchParams.toString()
+    url = `${pathURL.origin + pathURL.pathname}?${searchParams.toString()}`
   }
   const response = await fetch(url, { headers })
   await defaultResponse(response)
@@ -377,7 +385,9 @@ export async function flattenRepositoryFiles(
   }
 
   // 开始遍历初始dir目录下的内容
-  const allFiles = await traverseDirectory(await getRepoFilesList(path, branch, options))
+  const allFiles = await traverseDirectory(
+    await getRepoFilesList(path, branch, options),
+  )
 
   // 返回不含文件夹的扁平化文件列表
   return allFiles
@@ -414,7 +424,7 @@ export async function request(url, onProgress, options = {}) {
   let total = parseInt(response.headers.get("Content-Length"), 10)
   // 如果服务器未返回Content-Length，则无法准确计算进度
   // @ts-expect-error ignore
-  if (isNaN(total)) {
+  if (Number.isNaN(total)) {
     total = null
   }
   // @ts-expect-error ignore
@@ -422,12 +432,15 @@ export async function request(url, onProgress, options = {}) {
   let filename
   try {
     // @ts-expect-error ignore
-    filename = response.headers.get("Content-Disposition").split(";")[1].split("=")[1]
+    filename = response.headers
+      .get("Content-Disposition")
+      .split(";")[1]
+      .split("=")[1]
   } catch {
     /* empty */
   }
   let receivedBytes = 0
-  let chunks = []
+  const chunks = []
 
   while (true) {
     // 使用ReadableStream来获取部分数据并计算进度
@@ -440,7 +453,7 @@ export async function request(url, onProgress, options = {}) {
     chunks.push(value)
     receivedBytes += value.length
 
-    if (typeof onProgress == "function") {
+    if (typeof onProgress === "function") {
       if (total) {
         // const progress = (receivedBytes / total) * 100;
         onProgress(receivedBytes, total, filename)
@@ -535,7 +548,8 @@ export function createProgress(title, max, fileName, value) {
   parent.getFileName = () => file.innerText
   parent.setFileName = (name) => (file.innerHTML = name)
   parent.getProgressValue = () => progress.value
-  parent.setProgressValue = (value) => (progress.value = index.innerHTML = value)
+  parent.setProgressValue = (value) =>
+    (progress.value = index.innerHTML = value)
   parent.getProgressMax = () => progress.max
   parent.setProgressMax = (max) => (progress.max = maxSpan.innerHTML = max)
   parent.autoSetFileNameFromArray = (fileNameList) => {
@@ -546,9 +560,9 @@ export function createProgress(title, max, fileName, value) {
           .concat(`......等${fileNameList.length - 2}个文件`)
           .join("<br/>"),
       )
-    } else if (fileNameList.length == 2) {
+    } else if (fileNameList.length === 2) {
       parent.setFileName(fileNameList.join("<br/>"))
-    } else if (fileNameList.length == 1) {
+    } else if (fileNameList.length === 1) {
       parent.setFileName(fileNameList[0])
     } else {
       parent.setFileName("当前没有正在下载的文件")
@@ -566,7 +580,10 @@ export function createProgress(title, max, fileName, value) {
  * @returns {Promise<string>} 以最新版本tag的名称解析的promise，或者如果操作失败则以错误拒绝。
  * @throws {Error} 如果获取操作失败或找不到有效tag，将抛出错误。
  */
-export async function getLatestVersionFromGitHub(owner = "libwtk", repo = "wtk") {
+export async function getLatestVersionFromGitHub(
+  owner = "libwtk",
+  repo = "wtk",
+) {
   const tags = await getRepoTags({
     username: owner,
     repository: repo,
@@ -604,7 +621,12 @@ export async function getLatestVersionFromGitHub(owner = "libwtk", repo = "wtk")
  * }[][]>} A promise that resolves with trees from the specified directories.
  * @throws {Error} Will throw an error if unable to fetch the repository tree from GitHub.
  */
-export async function getTreesFromGithub(directories, version, owner = "libwtk", repo = "wtk") {
+export async function getTreesFromGithub(
+  directories,
+  version,
+  owner = "libwtk",
+  repo = "wtk",
+) {
   // if (!localStorage.getItem("wtk_authorization")) await gainAuthorization();
 
   const treesResponse = await fetch(
@@ -637,6 +659,8 @@ export async function getTreesFromGithub(directories, version, owner = "libwtk",
   const trees = await treesResponse.json()
   const tree = trees.tree
   return directories.map((directory) =>
-    tree.filter(({ type, path }) => type === "blob" && path.startsWith(directory)),
+    tree.filter(
+      ({ type, path }) => type === "blob" && path.startsWith(directory),
+    ),
   )
 }

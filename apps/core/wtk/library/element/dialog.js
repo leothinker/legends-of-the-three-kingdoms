@@ -1,4 +1,4 @@
-import { _status, game, get, lib, ui } from "wtk"
+import { game, get, lib, ui } from "wtk"
 import { Pagination } from "@/util/pagination.js"
 
 export class Dialog extends HTMLDivElement {
@@ -62,17 +62,17 @@ export class Dialog extends HTMLDivElement {
     dialog.bar2 = ui.create.div(".bar.bottom", dialog)
     dialog.buttons = []
     Array.from(args).forEach((argument) => {
-      if (typeof argument == "boolean") {
+      if (typeof argument === "boolean") {
         dialog.static = argument
-      } else if (argument == "hidden") {
+      } else if (argument === "hidden") {
         hidden = true
-      } else if (argument == "notouchscroll") {
+      } else if (argument === "notouchscroll") {
         noTouchScroll = true
-      } else if (argument == "forcebutton") {
+      } else if (argument === "forcebutton") {
         forceButton = true
-      } else if (argument == "noforcebutton") {
+      } else if (argument === "noforcebutton") {
         noForceButton = true
-      } else if (argument == "peaceDialog") {
+      } else if (argument === "peaceDialog") {
         peaceDialog = true
       } else {
         dialog.add(argument)
@@ -121,23 +121,23 @@ export class Dialog extends HTMLDivElement {
     this.classList.add("addNewRow")
     this.classList.remove("nobutton")
     //参数归一化
-    let itemOptions = parameterNormolize()
+    const itemOptions = parameterNormolize()
     //设置比例字符串
-    let ratioStr = itemOptions.map((o) => o.ratio || 1).join("fr ") + "fr"
+    const ratioStr = `${itemOptions.map((o) => o.ratio || 1).join("fr ")}fr`
     //定义一个属性记录加入的所有的框，框的links是加入时真实数据，方便最后获取数据，这里可以设计一下别的数据格式向外暴露结果
     if (!this.itemContainers) {
       this.itemContainers = []
     }
-    let that = this
+    const that = this
     //创建一个行的父容器
-    let rowContainer = createRowContainer(this)
+    const rowContainer = createRowContainer(this)
     //遍历参数
-    for (let itemOption of itemOptions) {
+    for (const itemOption of itemOptions) {
       //为每个列创建一个子容器
-      let itemContainer = createItemContainer(itemOption)
+      const itemContainer = createItemContainer(itemOption)
       //将项目加入到每个子容器中
-      let item = itemOption.item
-      let addedItems = addItemToItemContainer(item, itemContainer, itemOption)
+      const item = itemOption.item
+      const addedItems = addItemToItemContainer(item, itemContainer, itemOption)
       //注册点击事件
       BindEvent(itemOption, addedItems, itemContainer)
       //检查溢出处理的逻辑
@@ -165,7 +165,7 @@ export class Dialog extends HTMLDivElement {
       itemContainer.Observer.observe(itemContainer, { childList: true })
     }
     function createItemContainer(itemOption) {
-      let itemContainer = ui.create.div(".item-container", rowContainer)
+      const itemContainer = ui.create.div(".item-container", rowContainer)
       itemContainer.originWidth = itemContainer.getBoundingClientRect().width
       itemContainer.links = itemOption.item
       if (itemOption.itemContainerCss) {
@@ -185,24 +185,35 @@ export class Dialog extends HTMLDivElement {
       if (itemOption.clickItemContainer) {
         itemContainer.addEventListener("click", (e) => {
           e.stopPropagation()
-          itemOption.clickItemContainer(itemContainer, itemOption.item, that.itemContainers, e)
+          itemOption.clickItemContainer(
+            itemContainer,
+            itemOption.item,
+            that.itemContainers,
+            e,
+          )
         })
       }
     }
     function checkOverflow(itemOption, itemContainer, addedItems) {
-      if (itemOption.overflow == "scroll") {
+      if (itemOption.overflow === "scroll") {
         itemContainer.css({ overflowX: "scroll" })
-      } else if (itemOption.overflow == "hidden") {
+      } else if (itemOption.overflow === "hidden") {
         itemContainer.css({ overflow: "hidden" })
       } else if (addedItems?.length) {
-        game.callHook("checkOverflow", [itemOption, itemContainer, addedItems, game])
+        game.callHook("checkOverflow", [
+          itemOption,
+          itemContainer,
+          addedItems,
+          game,
+        ])
       }
     }
     function parameterNormolize() {
       let itemOptions = []
-      if (args.length == 0) {
+      if (args.length === 0) {
         throw new Error("参数不能为空")
-      } else if (args.length == 1) {
+      }
+      if (args.length === 1) {
         if (isOption(args[0])) {
           itemOptions = [args[0]]
         } else {
@@ -229,10 +240,10 @@ export class Dialog extends HTMLDivElement {
       if (["card", "player", "cards", "players"].includes(get.itemtype(obj))) {
         return false
       }
-      return typeof obj == "object" && "item" in obj
+      return typeof obj === "object" && "item" in obj
     }
     function createRowContainer(dialog) {
-      let rowContainer = ui.create.div(".row-container", dialog.content)
+      const rowContainer = ui.create.div(".row-container", dialog.content)
       rowContainer.css({
         gridTemplateColumns: ratioStr,
       })
@@ -245,20 +256,22 @@ export class Dialog extends HTMLDivElement {
         return
       }
       /**@type {HTMLDivElement[]} */
-      let items = []
-      if (typeof item == "string") {
+      const items = []
+      if (typeof item === "string") {
         if (item.startsWith("###")) {
           const items = item.slice(3).split("###")
           itemContainer.closest(".dialog").add(items[0])
-          itemContainer.closest(".dialog").addText(items[1], items[1].length <= 20)
+          itemContainer
+            .closest(".dialog")
+            .addText(items[1], items[1].length <= 20)
         } else {
-          let caption = ui.create.caption(item, itemContainer)
+          const caption = ui.create.caption(item, itemContainer)
           caption.css(itemOption.itemCss ?? {})
           items.push(caption)
         }
       } else if (!Array.isArray(item)) {
         itemContainer.classList.add("popup")
-        let button = ui.create.button(
+        const button = ui.create.button(
           item,
           get.itemtype(item),
           itemContainer,
@@ -270,7 +283,7 @@ export class Dialog extends HTMLDivElement {
         }
         items.push(button)
       } else {
-        for (let i of item) {
+        for (const i of item) {
           items.addArray(addItemToItemContainer(i, itemContainer, itemOption))
         }
       }
@@ -292,7 +305,7 @@ export class Dialog extends HTMLDivElement {
       item.forEach((itemx) => {
         this.add(itemx, noclick, zoom)
       })
-    } else if (typeof item == "string") {
+    } else if (typeof item === "string") {
       if (item.startsWith("###")) {
         const items = item.slice(3).split("###")
         this.add(items[0], noclick, zoom)
@@ -311,34 +324,40 @@ export class Dialog extends HTMLDivElement {
       this.content.appendChild(item)
     }
     // @ts-expect-error ignore
-    else if (get.itemtype(item) == "cards") {
+    else if (get.itemtype(item) === "cards") {
       const buttons = ui.create.div(".buttons", this.content)
       if (zoom) {
         buttons.classList.add("smallzoom")
       }
       // @ts-expect-error ignore
-      this.buttons = this.buttons.concat(ui.create.buttons(item, "card", buttons, noclick))
+      this.buttons = this.buttons.concat(
+        ui.create.buttons(item, "card", buttons, noclick),
+      )
     }
     // @ts-expect-error ignore
-    else if (get.itemtype(item) == "players") {
+    else if (get.itemtype(item) === "players") {
       var buttons = ui.create.div(".buttons", this.content)
       if (zoom) {
         buttons.classList.add("smallzoom")
       }
       // @ts-expect-error ignore
-      this.buttons = this.buttons.concat(ui.create.buttons(item, "player", buttons, noclick))
-    } else if (item[1] == "textbutton") {
+      this.buttons = this.buttons.concat(
+        ui.create.buttons(item, "player", buttons, noclick),
+      )
+    } else if (item[1] === "textbutton") {
       ui.create.textbuttons(item[0], this, noclick)
-    } else if (item[1] == "skill") {
+    } else if (item[1] === "skill") {
       var buttons = ui.create.div(".buttons", this.content)
       if (zoom) {
         buttons.classList.add("smallzoom")
       }
       // @ts-expect-error ignore
-      this.buttons = this.buttons.concat(ui.create.buttons(item[0], "skill", buttons, noclick))
-    } else if (item[1] == "addNewRow") {
+      this.buttons = this.buttons.concat(
+        ui.create.buttons(item[0], "skill", buttons, noclick),
+      )
+    } else if (item[1] === "addNewRow") {
       this.addNewRow(...item[0])
-    } else if (item[1] == "handle") {
+    } else if (item[1] === "handle") {
       item[0](this)
     } else {
       var buttons = ui.create.div(".buttons", this.content)
@@ -346,7 +365,9 @@ export class Dialog extends HTMLDivElement {
         buttons.classList.add("smallzoom")
       }
       // @ts-expect-error ignore
-      this.buttons = this.buttons.concat(ui.create.buttons(item[0], item[1], buttons, noclick))
+      this.buttons = this.buttons.concat(
+        ui.create.buttons(item[0], item[1], buttons, noclick),
+      )
     }
     if (this.buttons.length) {
       if (this.forcebutton !== false) {
@@ -366,12 +387,12 @@ export class Dialog extends HTMLDivElement {
    * @param { boolean } [center]
    */
   addText(str, center) {
-    if (str && str.startsWith("<div")) {
+    if (str?.startsWith("<div")) {
       this.add(str)
     } else if (center !== false) {
-      this.add('<div class="text center">' + str + "</div>")
+      this.add(`<div class="text center">${str}</div>`)
     } else {
-      this.add('<div class="text">' + str + "</div>")
+      this.add(`<div class="text">${str}</div>`)
     }
     return this
   }
@@ -392,7 +413,7 @@ export class Dialog extends HTMLDivElement {
       return
     }
     for (let i = 0; i < ui.dialogs.length; i++) {
-      if (ui.dialogs[i] == this) {
+      if (ui.dialogs[i] === this) {
         this.show()
         this.refocus()
         ui.dialogs.remove(this)
@@ -417,7 +438,7 @@ export class Dialog extends HTMLDivElement {
     ) {
       translate = lib.config.dialog_transform
       this._dragtransform = translate
-      this.style.transform = "translate(" + translate[0] + "px," + translate[1] + "px) scale(0.8)"
+      this.style.transform = `translate(${translate[0]}px,${translate[1]}px) scale(0.8)`
     } else {
       this.style.transform = "scale(0.8)"
     }
@@ -432,7 +453,7 @@ export class Dialog extends HTMLDivElement {
       lib.config.dialog_transform &&
       !this.classList.contains("fixed")
     ) {
-      this.style.transform = "translate(" + translate[0] + "px," + translate[1] + "px) scale(1)"
+      this.style.transform = `translate(${translate[0]}px,${translate[1]}px) scale(1)`
     } else {
       this.style.transform = "scale(1)"
     }

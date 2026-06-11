@@ -1,5 +1,9 @@
-import { _status, lib, game, get, ui } from "wtk"
-import { userAgentLowerCase, GeneratorFunction, AsyncFunction } from "@/util/index.js"
+import { _status, game, get, lib, ui } from "wtk"
+import {
+  AsyncFunction,
+  GeneratorFunction,
+  userAgentLowerCase,
+} from "@/util/index.js"
 
 export class Is {
   /**
@@ -32,7 +36,7 @@ export class Is {
    * @returns
    */
   emotion(str) {
-    let regExp =
+    const regExp =
       /^<img\b(?=[^>]*\bsrc="##assetURL##image\/emotion\/([^"/]+)\/([^"/]+)\.gif")(?=[^>]*\bwidth="50")(?=[^>]*\bheight="50")(?!.*\b(?!src|width|height)\w+=)[^>]*\/?>$/i
     return regExp.test(str)
   }
@@ -44,9 +48,10 @@ export class Is {
    */
   attackingMount(card, player) {
     const subtype = get.subtype(card, player)
-    if (subtype == "equip4") {
+    if (subtype === "equip4") {
       return true
-    } else if (subtype == "equip6") {
+    }
+    if (subtype === "equip6") {
       const subtypes = get.subtypes(card, player)
       if (subtypes.includes("equip4")) {
         return true
@@ -70,9 +75,10 @@ export class Is {
    */
   defendingMount(card, player) {
     const subtype = get.subtype(card, player)
-    if (subtype == "equip3") {
+    if (subtype === "equip3") {
       return true
-    } else if (subtype == "equip6") {
+    }
+    if (subtype === "equip6") {
       const subtypes = get.subtypes(card, player)
       if (subtypes.includes("equip3")) {
         return true
@@ -97,7 +103,7 @@ export class Is {
     let processedArguments = [],
       every = false
     Array.from(arguments).forEach((argument) => {
-      if (typeof argument == "boolean") {
+      if (typeof argument === "boolean") {
         every = argument
       } else if (argument) {
         processedArguments.push(argument)
@@ -106,7 +112,7 @@ export class Is {
     if (!processedArguments.length) {
       return true
     }
-    if (processedArguments.length == 1) {
+    if (processedArguments.length === 1) {
       const argument = processedArguments[0]
       if (!Array.isArray(argument)) {
         return false
@@ -114,15 +120,16 @@ export class Is {
       if (!argument.length) {
         return true
       }
-      if (argument.length == 1) {
+      if (argument.length === 1) {
         return false
       }
       processedArguments = argument
     }
     const naturesList = processedArguments.map((card) => {
-      if (typeof card == "string") {
+      if (typeof card === "string") {
         return card.split(lib.natureSeparator)
-      } else if (Array.isArray(card)) {
+      }
+      if (Array.isArray(card)) {
         return card
       }
       return get.natureList(card || {})
@@ -134,7 +141,7 @@ export class Is {
           .slice(index + 1)
           .every(
             (testingNatures) =>
-              testingNatures.length == natures.length &&
+              testingNatures.length === natures.length &&
               testingNatures.every((nature) => natures.includes(nature)),
           ),
       )
@@ -143,10 +150,14 @@ export class Is {
       const comparingNaturesList = naturesList.slice(index + 1)
       if (natures.length) {
         return natures.some((nature) =>
-          comparingNaturesList.every((testingNatures) => testingNatures.includes(nature)),
+          comparingNaturesList.every((testingNatures) =>
+            testingNatures.includes(nature),
+          ),
         )
       }
-      return comparingNaturesList.every((testingNatures) => !testingNatures.length)
+      return comparingNaturesList.every(
+        (testingNatures) => !testingNatures.length,
+      )
     })
   }
   /**
@@ -158,7 +169,7 @@ export class Is {
     let processedArguments = [],
       every = false
     Array.from(arguments).forEach((argument) => {
-      if (typeof argument == "boolean") {
+      if (typeof argument === "boolean") {
         every = argument
       } else if (argument) {
         processedArguments.push(argument)
@@ -167,7 +178,7 @@ export class Is {
     if (!processedArguments.length) {
       return false
     }
-    if (processedArguments.length == 1) {
+    if (processedArguments.length === 1) {
       const argument = processedArguments[0]
       if (!Array.isArray(argument)) {
         return true
@@ -175,15 +186,16 @@ export class Is {
       if (!argument.length) {
         return false
       }
-      if (argument.length == 1) {
+      if (argument.length === 1) {
         return true
       }
       processedArguments = argument
     }
     const naturesList = processedArguments.map((card) => {
-      if (typeof card == "string") {
+      if (typeof card === "string") {
         return card.split(lib.natureSeparator)
-      } else if (Array.isArray(card)) {
+      }
+      if (Array.isArray(card)) {
         return card
       }
       return get.natureList(card || {})
@@ -193,7 +205,9 @@ export class Is {
       return testingNaturesList.every((natures, index) =>
         naturesList
           .slice(index + 1)
-          .every((testingNatures) => testingNatures.every((nature) => !natures.includes(nature))),
+          .every((testingNatures) =>
+            testingNatures.every((nature) => !natures.includes(nature)),
+          ),
       )
     }
     return testingNaturesList.every((natures, index) => {
@@ -203,11 +217,13 @@ export class Is {
           comparingNaturesList.every(
             (testingNatures) =>
               !testingNatures.length ||
-              testingNatures.some((testingNature) => testingNature != nature),
+              testingNatures.some((testingNature) => testingNature !== nature),
           ),
         )
       }
-      return comparingNaturesList.every((testingNatures) => testingNatures.length)
+      return comparingNaturesList.every(
+        (testingNatures) => testingNatures.length,
+      )
     })
   }
   /**
@@ -258,21 +274,35 @@ export class Is {
    * @param { Card | VCard } card
    */
   virtualCard(card) {
-    return !("cards" in card) || !Array.isArray(card.cards) || card.cards.length === 0
+    return (
+      !("cards" in card) ||
+      !Array.isArray(card.cards) ||
+      card.cards.length === 0
+    )
   }
   /**
    * 是否是转化牌
    * @param { Card | VCard } card
    */
   convertedCard(card) {
-    return !card.isCard && "cards" in card && Array.isArray(card.cards) && card.cards.length > 0
+    return (
+      !card.isCard &&
+      "cards" in card &&
+      Array.isArray(card.cards) &&
+      card.cards.length > 0
+    )
   }
   /**
    * 是否是实体牌
    * @param { Card | VCard } card
    */
   ordinaryCard(card) {
-    return card.isCard && "cards" in card && Array.isArray(card.cards) && card.cards.length === 1
+    return (
+      card.isCard &&
+      "cards" in card &&
+      Array.isArray(card.cards) &&
+      card.cards.length === 1
+    )
   }
   /**
    * 押韵判断
@@ -280,20 +310,20 @@ export class Is {
    * @param { string } str2
    */
   yayun(str1, str2) {
-    if (str1 == str2) {
+    if (str1 === str2) {
       return true
     }
-    let pinyin1 = get.pinyin(str1, false),
+    const pinyin1 = get.pinyin(str1, false),
       pinyin2 = get.pinyin(str2, false)
     if (!pinyin1.length || !pinyin2.length) {
       return false
     }
-    let pron1 = pinyin1[pinyin1.length - 1],
+    const pron1 = pinyin1[pinyin1.length - 1],
       pron2 = pinyin2[pinyin2.length - 1]
-    if (pron1 == pron2) {
+    if (pron1 === pron2) {
       return true
     }
-    return get.yunjiao(pron1) == get.yunjiao(pron2)
+    return get.yunjiao(pron1) === get.yunjiao(pron2)
   }
   /**
    * @param { string } skill 技能id
@@ -301,11 +331,11 @@ export class Is {
    * @returns
    */
   blocked(skill, player) {
-    if (!player.storage.skill_blocker || !player.storage.skill_blocker.length) {
+    if (!player.storage.skill_blocker?.length) {
       return false
     }
-    for (let i of player.storage.skill_blocker) {
-      if (lib.skill[i] && lib.skill[i].skillBlocker && lib.skill[i].skillBlocker(skill, player)) {
+    for (const i of player.storage.skill_blocker) {
+      if (lib.skill[i]?.skillBlocker?.(skill, player)) {
         return true
       }
     }
@@ -320,8 +350,7 @@ export class Is {
   double(name, array) {
     const extraInformation = get.character(name)
     if (
-      extraInformation &&
-      extraInformation.doubleGroup &&
+      extraInformation?.doubleGroup &&
       extraInformation.doubleGroup.length > 0
     ) {
       return array ? extraInformation.doubleGroup.slice(0) : true
@@ -335,7 +364,10 @@ export class Is {
    * @param { Card | VCard } card
    */
   yingbianConditional(card) {
-    return get.is.complexlyYingbianConditional(card) || get.is.simplyYingbianConditional(card)
+    return (
+      get.is.complexlyYingbianConditional(card) ||
+      get.is.simplyYingbianConditional(card)
+    )
   }
   /**
    * @param { Card | VCard } card
@@ -385,7 +417,7 @@ export class Is {
    */
   emoji(substring) {
     if (substring) {
-      const reg = new RegExp("[~#^$@%&!?%*]", "g")
+      const reg = /[~#^$@%&!?%*]/g
       if (substring.match(reg)) {
         return true
       }
@@ -401,27 +433,31 @@ export class Is {
           }
         } else if (substring.length > 1) {
           const ls = substring.charCodeAt(i + 1)
-          if (ls == 0x20e3) {
+          if (ls === 0x20e3) {
             return true
           }
         } else {
           if (0x2100 <= hs && hs <= 0x27ff) {
             return true
-          } else if (0x2b05 <= hs && hs <= 0x2b07) {
+          }
+          if (0x2b05 <= hs && hs <= 0x2b07) {
             return true
-          } else if (0x2934 <= hs && hs <= 0x2935) {
+          }
+          if (0x2934 <= hs && hs <= 0x2935) {
             return true
-          } else if (0x3297 <= hs && hs <= 0x3299) {
+          }
+          if (0x3297 <= hs && hs <= 0x3299) {
             return true
-          } else if (
-            hs == 0xa9 ||
-            hs == 0xae ||
-            hs == 0x303d ||
-            hs == 0x3030 ||
-            hs == 0x2b55 ||
-            hs == 0x2b1c ||
-            hs == 0x2b1b ||
-            hs == 0x2b50
+          }
+          if (
+            hs === 0xa9 ||
+            hs === 0xae ||
+            hs === 0x303d ||
+            hs === 0x3030 ||
+            hs === 0x2b55 ||
+            hs === 0x2b1c ||
+            hs === 0x2b1b ||
+            hs === 0x2b50
           ) {
             return true
           }
@@ -434,16 +470,22 @@ export class Is {
    * @param { string } str
    */
   banWords(str) {
-    return get.is.emoji(str) || window.bannedKeyWords?.some((item) => str.includes(item))
+    return (
+      get.is.emoji(str) ||
+      window.bannedKeyWords?.some((item) => str.includes(item))
+    )
   }
   /**
    * @param { GameEvent } event
    */
   converted(event) {
-    return !(event.card && event.card.isCard)
+    return !event.card?.isCard
   }
   safari() {
-    return userAgentLowerCase.indexOf("safari") != -1 && userAgentLowerCase.indexOf("chrome") == -1
+    return (
+      userAgentLowerCase.indexOf("safari") !== -1 &&
+      userAgentLowerCase.indexOf("chrome") === -1
+    )
   }
   /**
    * @param { (Card | VCard)[]} cards
@@ -489,13 +531,15 @@ export class Is {
         return false
       }
     } else {
-      if (configs.right_click == "config") {
+      if (configs.right_click === "config") {
         return false
       }
     }
     if (name) {
-      setTimeout(function () {
-        alert("请将至少一个操作绑定为显示按钮或打开菜单，否则将永远无法打开菜单")
+      setTimeout(() => {
+        alert(
+          "请将至少一个操作绑定为显示按钮或打开菜单，否则将永远无法打开菜单",
+        )
       })
     }
     return true
@@ -540,70 +584,74 @@ export class Is {
    * @returns { boolean }
    */
   singleSelect(func) {
-    if (typeof func == "function") {
+    if (typeof func === "function") {
       return false
     }
     const select = get.select(func)
-    return select[0] == 1 && select[1] == 1
+    return select[0] === 1 && select[1] === 1
   }
   /**
    * @param { string | Player } name
    */
   jun(name) {
-    if (get.mode() == "guozhan") {
+    if (get.mode() === "guozhan") {
       if (name instanceof lib.element.Player) {
-        if (name.isUnseen && name.isUnseen(0)) {
+        if (name.isUnseen?.(0)) {
           return false
         }
         name = name.name1
       }
-      if (typeof name == "string" && name.startsWith("gz_jun_")) {
+      if (typeof name === "string" && name.startsWith("gz_jun_")) {
         return true
       }
     }
     return false
   }
   versus() {
-    return !_status.connectMode && get.mode() == "versus" && _status.mode == "three"
+    return (
+      !_status.connectMode &&
+      get.mode() === "versus" &&
+      _status.mode === "three"
+    )
   }
   changban() {
-    return get.mode() == "single" && _status.mode == "changban"
+    return get.mode() === "single" && _status.mode === "changban"
   }
   single() {
-    return get.mode() == "single" && _status.mode == "normal"
+    return get.mode() === "single" && _status.mode === "normal"
   }
   /**
    * @param { Player } [player]
    */
   mobileMe(player) {
     return (
-      (game.layout == "mobile" || game.layout == "long") &&
+      (game.layout === "mobile" || game.layout === "long") &&
       !game.chess &&
       player &&
-      player.dataset.position == "0"
+      player.dataset.position === "0"
     )
   }
   newLayout() {
-    return game.layout != "default"
+    return game.layout !== "default"
   }
   phoneLayout() {
     if (!lib.config.phonelayout) {
       return false
     }
     return (
-      game.layout == "mobile" ||
-      game.layout == "long" ||
-      game.layout == "long2" ||
-      game.layout == "nova"
+      game.layout === "mobile" ||
+      game.layout === "long" ||
+      game.layout === "long2" ||
+      game.layout === "nova"
     )
   }
   singleHandcard() {
     return (
       game.singleHandcard ||
-      game.layout == "mobile" ||
-      game.layout == "long" ||
-      game.layout == "long2" ||
-      game.layout == "nova"
+      game.layout === "mobile" ||
+      game.layout === "long" ||
+      game.layout === "long2" ||
+      game.layout === "nova"
     )
   }
   /**
@@ -613,14 +661,18 @@ export class Is {
     if (game.chess) {
       return true
     }
-    if (lib.config.link_style2 != "rotate") {
+    if (lib.config.link_style2 !== "rotate") {
       return true
     }
     // if(game.chess) return false;
-    if (game.layout == "long" || game.layout == "long2" || game.layout == "nova") {
+    if (
+      game.layout === "long" ||
+      game.layout === "long2" ||
+      game.layout === "nova"
+    ) {
       return true
     }
-    if (player.dataset.position == "0") {
+    if (player.dataset.position === "0") {
       return ui.arena.classList.contains("oblongcard")
     }
     return false
@@ -629,7 +681,7 @@ export class Is {
    * @param { {} } obj
    */
   empty(obj) {
-    return Object.keys(obj).length == 0
+    return Object.keys(obj).length === 0
   }
   /**
    * @param { string } str
@@ -637,13 +689,13 @@ export class Is {
    */
   pos(str) {
     return (
-      str == "h" ||
-      str == "e" ||
-      str == "j" ||
-      str == "he" ||
-      str == "hj" ||
-      str == "ej" ||
-      str == "hej"
+      str === "h" ||
+      str === "e" ||
+      str === "j" ||
+      str === "he" ||
+      str === "hj" ||
+      str === "ej" ||
+      str === "hej"
     )
   }
   /**
@@ -656,10 +708,10 @@ export class Is {
     if (!info) {
       return false
     }
-    if (typeof info.locked == "function") {
+    if (typeof info.locked === "function") {
       return info.locked(skill, player)
     }
-    if (info.locked == false) {
+    if (info.locked === false) {
       return false
     }
     if (info.trigger && info.forced) {

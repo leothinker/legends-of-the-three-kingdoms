@@ -2,8 +2,7 @@
  * 从读取的内容中获取数据
  */
 
-import { lib, game, get, _status, ui, ai } from "wtk"
-import { isClass } from "@/util/index.js"
+import { ai, game, get, lib, ui } from "wtk"
 
 /**
  * 读取导入的卡牌包信息
@@ -13,8 +12,10 @@ export function loadCard(cardConfig: importCardConfig) {
 
   lib.cardPack[cardConfigName] ??= []
   if (cardConfig.card) {
-    for (let [cardPackName, cardPack2] of Object.entries(cardConfig.card)) {
-      if (!(!cardPack2.hidden && cardConfig.translate[`${cardPackName}_info`])) {
+    for (const [cardPackName, cardPack2] of Object.entries(cardConfig.card)) {
+      if (
+        !(!cardPack2.hidden && cardConfig.translate[`${cardPackName}_info`])
+      ) {
         continue
       }
       lib.cardPack[cardConfigName].add(cardPackName)
@@ -41,14 +42,16 @@ export function loadCard(cardConfig: importCardConfig) {
           /**
            * @type {any[]}
            */
-          let pile = typeof configItem == "function" ? configItem() : configItem
+          let pile =
+            typeof configItem === "function" ? configItem() : configItem
 
           lib.cardPile[cardConfigName] ??= []
           lib.cardPile[cardConfigName].addArray(pile)
 
           if (lib.config.bannedpile[cardConfigName]) {
             pile = pile.filter(
-              (_value, index) => !lib.config.bannedpile[cardConfigName].includes(index),
+              (_value, index) =>
+                !lib.config.bannedpile[cardConfigName].includes(index),
             )
           }
 
@@ -124,7 +127,8 @@ export function loadCardPile() {
     // @ts-expect-error ignore
     lib.cardPackList = {}
   } else {
-    let pilecfg = lib.config.customcardpile[get.config("cardpilename") || "当前牌堆"]
+    const pilecfg =
+      lib.config.customcardpile[get.config("cardpilename") || "当前牌堆"]
     if (pilecfg) {
       lib.config.bannedpile = get.copy(pilecfg[0] || {})
       lib.config.addedpile = get.copy(pilecfg[1] || {})
@@ -139,7 +143,7 @@ export function loadCardPile() {
  * 读取导入的武将包信息
  */
 export function loadCharacter(character: importCharacterConfig) {
-  let name = character.name
+  const name = character.name
 
   if (character.character) {
     const characterPack = lib.characterPack[name]
@@ -151,8 +155,8 @@ export function loadCharacter(character: importCharacterConfig) {
   }
 
   // 摆了
-  for (let key in character) {
-    let value = character[key]
+  for (const key in character) {
+    const value = character[key]
 
     switch (key) {
       case "name":
@@ -164,7 +168,10 @@ export function loadCharacter(character: importCharacterConfig) {
         lib.connectCharacterPack.push(name)
         break
       case "character":
-        if (!lib.config.characters.includes(name) && lib.config.mode !== "connect") {
+        if (
+          !lib.config.characters.includes(name) &&
+          lib.config.mode !== "connect"
+        ) {
           if (
             lib.config.mode === "chess" &&
             get.config("chess_mode") === "leader" &&
@@ -185,18 +192,24 @@ export function loadCharacter(character: importCharacterConfig) {
           break
         }
 
-        for (let key2 in value) {
-          let value2 = value[key2]
+        for (const key2 in value) {
+          const value2 = value[key2]
 
           if (key === "character") {
-            if (lib.config[`forbidai_user_${name}`] || lib.config.forbidai_user?.includes(key2)) {
+            if (
+              lib.config[`forbidai_user_${name}`] ||
+              lib.config.forbidai_user?.includes(key2)
+            ) {
               lib.config.forbidai.add(key2)
             }
             if (Array.isArray(value2)) {
               if (!value2[4]) {
                 value2[4] = []
               }
-              if (value2[4].includes("boss") || value2[4].includes("hiddenboss")) {
+              if (
+                value2[4].includes("boss") ||
+                value2[4].includes("hiddenboss")
+              ) {
                 lib.config.forbidai.add(key2)
               }
               for (const skill of value2[3]) {
@@ -284,6 +297,7 @@ export function loadMode(mode: importModeConfig) {
   mixinGeneral(mode, "ui", ui)
   mixinGeneral(mode, "get", get)
   mixinGeneral(mode, "ai", ai)
+
   ;["onwash", "onover"].forEach((name) => {
     if (game[name]) {
       lib[name]?.push(game[name])
@@ -291,7 +305,7 @@ export function loadMode(mode: importModeConfig) {
     }
   })
 
-  if (typeof mode.init == "function") {
+  if (typeof mode.init === "function") {
     mode.init()
   }
 }
@@ -305,7 +319,7 @@ export function loadPlay(playConfig: importPlayConfig) {
   if (lib.config.hiddenPlayPack.includes(i)) {
     return
   }
-  if (playConfig.forbid && playConfig.forbid.includes(lib.config.mode)) {
+  if (playConfig.forbid?.includes(lib.config.mode)) {
     return
   }
   if (playConfig.mode && !playConfig.mode.includes(lib.config.mode)) {
@@ -347,16 +361,19 @@ export function loadPlay(playConfig: importPlayConfig) {
     }
   }
 
-  if (typeof playConfig.init == "function") {
+  if (typeof playConfig.init === "function") {
     playConfig.init()
   }
-  if (typeof playConfig.arenaReady == "function") {
+  if (typeof playConfig.arenaReady === "function") {
     lib.arenaReady?.push(playConfig.arenaReady)
   }
 }
 
 function extSkillInject(extName, skillInfo) {
-  if (typeof skillInfo.audio == "number" || typeof skillInfo.audio == "boolean") {
+  if (
+    typeof skillInfo.audio === "number" ||
+    typeof skillInfo.audio === "boolean"
+  ) {
     skillInfo.audio = `ext:${extName}:${Number(skillInfo.audio)}`
   }
 }
@@ -377,14 +394,14 @@ function mixinGeneral(config, name, where) {
     return
   }
 
-  for (let [key, value] of Object.entries(config[name])) {
+  for (const [key, value] of Object.entries(config[name])) {
     if (["ui", "ai"].includes(name)) {
-      if (typeof value == "object") {
+      if (typeof value === "object") {
         // 我甚至不敢把这个双等于改了，怕了
-        if (where[key] == undefined) {
+        if (where[key] === undefined) {
           where[key] = {}
         }
-        for (let [key2, value2] of Object.entries(value)) {
+        for (const [key2, value2] of Object.entries(value)) {
           where[key][key2] = value2
         }
       } else {
@@ -438,7 +455,7 @@ function mixinLibrary(config, lib) {
   // @ts-expect-error ignore
   delete window.wtk_character_perfectPairs
 
-  for (let name in config) {
+  for (const name in config) {
     if (KeptWords.includes(name)) {
       continue
     }
@@ -458,18 +475,18 @@ function mixinLibrary(config, lib) {
  * @return {Record<string, Object>}
  */
 function mixinElement(config, element) {
-  let newElement = { ...element }
+  const newElement = { ...element }
 
   if (config.element) {
-    for (let name in config.element) {
+    for (const name in config.element) {
       if (!newElement[name]) {
         newElement[name] = []
       }
 
-      let source = config.element[name]
-      let target = newElement[name]
+      const source = config.element[name]
+      const target = newElement[name]
 
-      for (let key in source) {
+      for (const key in source) {
         if (key === "init") {
           if (!target.inits) {
             target.inits = []

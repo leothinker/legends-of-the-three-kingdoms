@@ -1,4 +1,4 @@
-import type { Card, VCard, Player, Button, Dialog, GameEvent } from ".."
+import type { Button, Card, Dialog, GameEvent, Player, VCard } from ".."
 
 // 一些常用的封装
 
@@ -28,7 +28,9 @@ export interface CheckCardParams {
    * @param event - 触发选择事件的名称，一般情况下可能不存在
    * @returns 牌是否符合条件
    */
-  filterCard?: boolean | ((card: Card, player: Player, event?: string) => boolean)
+  filterCard?:
+    | boolean
+    | ((card: Card, player: Player, event?: string) => boolean)
 
   /**
    * 需要选择牌数量的范围
@@ -97,7 +99,9 @@ export interface CheckTargetParams {
    * @param target - 被选择的目标玩家
    * @returns 目标是否符合条件
    */
-  filterTarget?: boolean | ((card: Card, player: Player, target: Player) => boolean)
+  filterTarget?:
+    | boolean
+    | ((card: Card, player: Player, target: Player) => boolean)
 
   /**
    * 需要选择目标的范围
@@ -167,7 +171,9 @@ export interface CheckButtonParams {
 /**
  *
  */
-export interface CheckCardTargetParams extends CheckCardParams, CheckTargetParams {
+export interface CheckCardTargetParams
+  extends CheckCardParams,
+    CheckTargetParams {
   ai?: undefined
 
   /**
@@ -190,7 +196,9 @@ export interface CheckCardTargetParams extends CheckCardParams, CheckTargetParam
 /**
  *
  */
-export interface CheckButtonTargetParams extends CheckButtonParams, CheckTargetParams {
+export interface CheckButtonTargetParams
+  extends CheckButtonParams,
+    CheckTargetParams {
   ai?: undefined
 
   /**
@@ -288,11 +296,15 @@ export interface EventChooseToDisableParams extends CheckButtonParams {
   horse?: boolean
 }
 
-export interface EventChooseToUseParams extends ChooseBase, CheckCardTargetParams {
+export interface EventChooseToUseParams
+  extends ChooseBase,
+    CheckCardTargetParams {
   chooseonly?: boolean
 }
 
-export interface EventChooseToRespondParams extends ChooseBase, CheckCardParams {
+export interface EventChooseToRespondParams
+  extends ChooseBase,
+    CheckCardParams {
   nosource?: boolean
   card?: VCard
 }
@@ -303,7 +315,9 @@ export interface EventChooseToGiveParams extends ChooseBase, CheckCardParams {
   dialog?: Dialog
 }
 
-export interface EventChooseToDiscardParams extends ChooseBase, CheckCardParams {
+export interface EventChooseToDiscardParams
+  extends ChooseBase,
+    CheckCardParams {
   chooseonly?: boolean
   dialog?: Dialog
 }
@@ -344,16 +358,18 @@ export interface EventChooseButtonParams extends ChooseBase, CheckButtonParams {
   processAI?(): Partial<Result>
 }
 
-export interface EventChooseCardOLParams {
-  list?: Player[]
-  args: any[]
+export interface EventChooseCardOLParams extends EventChooseCardParams {
+  list: Player[]
+  args?: any[]
 }
 
 export interface EventChooseCardParams extends ChooseBase, CheckCardParams {
   glow_result?: boolean
 }
 
-export interface EventChooseUseTargetParams extends ChooseBase, CheckTargetParams {
+export interface EventChooseUseTargetParams
+  extends ChooseBase,
+    CheckTargetParams {
   cards?: Card[]
   card?: Card | VCard
   nopopup?: boolean
@@ -369,9 +385,13 @@ export interface EventChooseTargetParams extends ChooseBase, CheckTargetParams {
   dialog?: Dialog
 }
 
-export interface EventChooseCardTargetParams extends ChooseBase, CheckCardTargetParams {}
+export interface EventChooseCardTargetParams
+  extends ChooseBase,
+    CheckCardTargetParams {}
 
-export interface EventChooseButtonTargetParams extends ChooseBase, CheckButtonTargetParams {}
+export interface EventChooseButtonTargetParams
+  extends ChooseBase,
+    CheckButtonTargetParams {}
 
 export interface EventChooseControlListParams extends ChooseBase {
   list?: string[]
@@ -411,7 +431,9 @@ export interface EventChooseNumbersParams extends ChooseBase {
   filterOk?(event: GameEvent): boolean
 }
 
-export interface EventChoosePlayerCardParams extends ChooseBase, CheckButtonParams {
+export interface EventChoosePlayerCardParams
+  extends ChooseBase,
+    CheckButtonParams {
   target: Player
   position?: string
   visible?: boolean

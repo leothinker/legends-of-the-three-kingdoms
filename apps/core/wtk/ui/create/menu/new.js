@@ -1,6 +1,7 @@
-import { ui, game, get, lib, _status } from "wtk"
-import { createApp, ref, reactive } from "vue"
-import { startMenutabName, startMenuData } from "./startMenu.js"
+import { createApp, reactive } from "vue"
+import { ui } from "wtk"
+import { startMenuData, startMenutabName } from "./startMenu.js"
+
 /**
  * 使字符串有html的代码提示
  */
@@ -11,30 +12,23 @@ const html = (strings, ...values) => String.raw({ raw: strings }, ...values)
  */
 export const defaultTemplate = {
   template: html`
-    <div class="new-menu">
-      <!-- tab -->
-      <div class="new-menu-tab" ref="menuTabs">
-        <div v-for="[tabName] in tabDataMap" @click="toggleTabName">{{ tabName }}</div>
-      </div>
-      <!-- content -->
-      <div class="new-menu-content">
-        <div>
-          <div class="left pane" ref="leftPane">
-            <div
-              v-for="data in leftPaneData"
-              :mode="data.attrs.mode"
-              @click="toggleLeftPaneName"
-              class="new-menubutton large"
-            >
-              {{ data.name }}
-            </div>
-          </div>
-          <div class="right pane" ref="rightPane"></div>
-          <div class="menubutton round highlight" ref="startButton">启</div>
-        </div>
-      </div>
-    </div>
-  `,
+		<div class="new-menu">
+			<!-- tab -->
+			<div class="new-menu-tab" ref="menuTabs">
+				<div v-for="[tabName] in tabDataMap" @click="toggleTabName">{{ tabName }}</div>
+			</div>
+			<!-- content -->
+			<div class="new-menu-content">
+				<div>
+					<div class="left pane" ref="leftPane">
+						<div v-for="data in leftPaneData" :mode="data.attrs.mode" @click="toggleLeftPaneName" class="new-menubutton large">{{ data.name }}</div>
+					</div>
+					<div class="right pane" ref="rightPane"></div>
+					<div class="menubutton round highlight" ref="startButton">启</div>
+				</div>
+			</div>
+		</div>
+	`,
   props: {
     connectMenu: Boolean,
   },
@@ -83,8 +77,10 @@ export const defaultTemplate = {
       // 高亮默认元素
       this.$nextTick(() => {
         const ele =
-          data?.getDefaultActive(this.connectMenu, Array.from(this.$refs.leftPane.children)) ||
-          this.$refs.leftPane.firstElementChild
+          data?.getDefaultActive(
+            this.connectMenu,
+            Array.from(this.$refs.leftPane.children),
+          ) || this.$refs.leftPane.firstElementChild
         this.toggleLeftPaneName({ target: ele })
       })
     },
@@ -117,7 +113,9 @@ export const defaultTemplate = {
         this.rightPaneData.element = parentElement
         this.rightPaneData.app = rightPaneAppData.app
       } else {
-        const rightPaneTemplate = data?.rightPaneTemplate || { template: html`<div>还未编写</div>` }
+        const rightPaneTemplate = data?.rightPaneTemplate || {
+          template: html`<div>还未编写</div>`,
+        }
         data?.initConfigs?.(this.connectMenu, target, this.$refs.startButton)
         /** @type { string } */
         // @ts-expect-error ignore
@@ -130,7 +128,10 @@ export const defaultTemplate = {
         app.mount(this.$refs.rightPane)
         this.rightPaneData.element = this.$refs.rightPane.firstElementChild
         this.rightPaneData.app = app
-        data.rightPaneApps.set(target, { element: this.$refs.rightPane.firstElementChild, app })
+        data.rightPaneApps.set(target, {
+          element: this.$refs.rightPane.firstElementChild,
+          app,
+        })
       }
     },
   },
@@ -142,7 +143,11 @@ export const defaultTemplate = {
 /**
  * @param { boolean } connectMenu
  */
-export function menu(connectMenu, template = defaultTemplate, props = { connectMenu }) {
+export function menu(
+  connectMenu,
+  template = defaultTemplate,
+  props = { connectMenu },
+) {
   // const menuContainer = ui.create.div(".menu-container.hidden", ui.window);
   const menuContainer = ui.create.div(".new-menu-container", ui.window)
   const app = createApp(template, props)

@@ -17,28 +17,22 @@ export const WTKToggle = {
  */
 export const WTKConfig = {
   template: html`
-    <div
-      ref="node"
-      :class="{ config: true, switcher: config.item || config.input, toggle: !config.item && !config.range && !config.clear && !config.input }"
-      @click="nodeClick"
-      :style="nodeStyle"
-    >
-      <span>{{ config.name }}</span>
-      <div v-if="config.item">{{ config.item[config.init] }}</div>
-      <div v-else-if="config.range">
-        <input type="range" />
-      </div>
-      <div v-else-if="config.clear"></div>
-      <div
-        v-else-if="config.input"
-        ref="input"
-        :contentEditable="!config.fixed"
-        :style="inputStyle"
-        @keydown="inputKeydown"
-      ></div>
-      <wtk-toggle v-else></wtk-toggle>
-    </div>
-  `,
+		<div
+			ref="node"
+			:class="{ config: true, switcher: config.item || config.input, toggle: !config.item && !config.range && !config.clear && !config.input }"
+			@click="nodeClick"
+			:style="nodeStyle"
+		>
+			<span>{{ config.name }}</span>
+			<div v-if="config.item">{{ config.item[config.init] }}</div>
+			<div v-else-if="config.range">
+				<input type="range" />
+			</div>
+			<div v-else-if="config.clear"></div>
+			<div v-else-if="config.input" ref="input" :contentEditable="!config.fixed" :style="inputStyle" @keydown="inputKeydown"></div>
+			<wtk-toggle v-else></wtk-toggle>
+		</div>
+	`,
   props: {
     config: Object,
   },
@@ -50,7 +44,12 @@ export const WTKConfig = {
       if (this.config.item) {
         this.clickSwitcher(this.$refs.node)
       }
-      if (!this.config.item && !this.config.range && !this.config.clear && !this.config.input) {
+      if (
+        !this.config.item &&
+        !this.config.range &&
+        !this.config.clear &&
+        !this.config.input
+      ) {
         this.clickToggle(this.$refs.node)
       }
     },
@@ -65,7 +64,9 @@ export const WTKConfig = {
       node.classList.toggle("on")
       const config = this.config
       if (config.onclick) {
-        if (config.onclick.call(node, node.classList.contains("on")) === false) {
+        if (
+          config.onclick.call(node, node.classList.contains("on")) === false
+        ) {
           node.classList.toggle("on")
         }
       }
@@ -91,7 +92,7 @@ export const WTKConfig = {
       }
     },
     inputKeydown(e) {
-      if (e.key == "Enter") {
+      if (e.key === "Enter") {
         e.preventDefault()
         e.stopPropagation()
         e.target.blur()
@@ -104,25 +105,26 @@ export const WTKConfig = {
       const config = this.config
       // root._link = { config: this.config };
       if (!config.clear) {
-        if (config.name != "开启") {
-          if (config.name == "屏蔽弱将") {
-            config.intro = "强度过低的武将（孙策除外）不会出现在选将框，也不会被AI选择"
-          } else if (config.name == "屏蔽强将") {
+        if (config.name !== "开启") {
+          if (config.name === "屏蔽弱将") {
+            config.intro =
+              "强度过低的武将（孙策除外）不会出现在选将框，也不会被AI选择"
+          } else if (config.name === "屏蔽强将") {
             config.intro = "强度过高的武将不会出现在选将框，也不会被AI选择"
           } else if (!config.intro) {
-            config.intro = "设置" + config.name
+            config.intro = `设置${config.name}`
           }
-          lib.setIntro(this.$refs.node, function (uiintro) {
+          lib.setIntro(this.$refs.node, (uiintro) => {
             if (lib.config.touchscreen) {
               _status.dragged = true
             }
             uiintro.style.width = "170px"
             let str = config.intro
-            if (typeof str == "function") {
+            if (typeof str === "function") {
               str = str()
             }
             uiintro._place_text = uiintro.add(
-              '<div class="text" style="display:inline">' + str + "</div>",
+              `<div class="text" style="display:inline">${str}</div>`,
             )
           })
         }
@@ -134,18 +136,29 @@ export const WTKConfig = {
       if (config.item) {
         // 还没写，是false
         if (this.$refs.menu) {
-          if (typeof this.config.textMenu == "function" && this.$refs.menu.childElementCount > 0) {
+          if (
+            typeof this.config.textMenu === "function" &&
+            this.$refs.menu.childElementCount > 0
+          ) {
             Array.from(this.$refs.menu.children).forEach((node) => {
               const link = node.getAttribute("link")
               // 设置不同字体时，修改对应node的文字字体
-              this.config.textMenu?.(node, link, this.config.item[link], this.config)
+              this.config.textMenu?.(
+                node,
+                link,
+                this.config.item[link],
+                this.config,
+              )
             })
           }
-          if (typeof this.config.visualBar == "function" && this.$refs.visualBar) {
+          if (
+            typeof this.config.visualBar === "function" &&
+            this.$refs.visualBar
+          ) {
             this.config.visualBar(
               this.$refs.visualBar,
               this.config.item,
-              function (i, before) {},
+              (i, before) => {},
               this.$refs.root,
             )
           }
@@ -157,9 +170,9 @@ export const WTKConfig = {
         void 0
       } else if (config.input) {
         const input = this.$refs.input
-        if (config.name == "联机昵称") {
+        if (config.name === "联机昵称") {
           input.innerHTML = config.init || "无名玩家"
-          input.onblur = function () {
+          input.onblur = () => {
             input.innerHTML = input.innerHTML.replace(/<br>/g, "")
             if (!input.innerHTML || get.is.banWords(input.innerHTML)) {
               input.innerHTML = "无名玩家"
@@ -168,14 +181,14 @@ export const WTKConfig = {
             game.saveConfig("connect_nickname", input.innerHTML)
             game.saveConfig("connect_nickname", input.innerHTML, "connect")
           }
-        } else if (config.name == "联机头像") {
+        } else if (config.name === "联机头像") {
           // 显示当前配置的武将名称（直接使用翻译，不额外添加前缀）
           const currentId = lib.config.connect_avatar || config.init || "caocao"
           input.innerHTML = lib.translate[currentId] || "曹操"
           input.onblur = config.onblur
-        } else if (config.name == "联机大厅") {
+        } else if (config.name === "联机大厅") {
           input.innerHTML = config.init || lib.hallURL
-          input.onblur = function () {
+          input.onblur = () => {
             if (!input.innerHTML) {
               input.innerHTML = lib.hallURL
             }
@@ -187,7 +200,7 @@ export const WTKConfig = {
           input.onblur = config.onblur
         }
       } else {
-        if (config.init == true) {
+        if (config.init === true) {
           this.$refs.node.classList.add("on")
         }
       }
@@ -196,7 +209,7 @@ export const WTKConfig = {
   beforeMount() {
     const config = this.config
     if (config.item) {
-      if (typeof config.item == "function") {
+      if (typeof config.item === "function") {
         config.item = config.item()
       }
     }
@@ -208,28 +221,17 @@ export const WTKConfig = {
  */
 export const menuConfigTemplate = {
   template: html`
-    <div
-      ref="menu"
-      v-if="config.item"
-      :class="{ menu: true, visual: config.visualMenu, withbar: config.visualBar }"
-    >
-      <!-- visualBar -->
-      <div ref="visualBar" v-if="config.visualMenu" @click="visualBarClick"></div>
-      <!-- visualMenu -->
-      <div
-        v-if="config.visualMenu"
-        v-for="(value, i) in config.item"
-        :link="i"
-        @click="clickMenuItem"
-      >
-        <div class="name">{{ get.verticalStr(value) }}</div>
-      </div>
-      <!-- itemMenu -->
-      <div v-else v-for="(value, i) in config.item" @click="clickMenuItem" :link="i">
-        {{ value }}
-      </div>
-    </div>
-  `,
+		<div ref="menu" v-if="config.item" :class="{ menu: true, visual: config.visualMenu, withbar: config.visualBar }">
+			<!-- visualBar -->
+			<div ref="visualBar" v-if="config.visualMenu" @click="visualBarClick"></div>
+			<!-- visualMenu -->
+			<div v-if="config.visualMenu" v-for="(value, i) in config.item" :link="i" @click="clickMenuItem">
+				<div class="name">{{ get.verticalStr(value) }}</div>
+			</div>
+			<!-- itemMenu -->
+			<div v-else v-for="(value, i) in config.item" @click="clickMenuItem" :link="i">{{ value }}</div>
+		</div>
+	`,
   props: {
     config: Object,
   },
@@ -250,7 +252,14 @@ export const menuConfigTemplate = {
       }
       ui.create.div(".name", get.verticalStr(this.config.item[i]), visualMenu)
       visualMenu._link = i
-      if (this.config.visualMenu(visualMenu, i, this.config.item[i], this.config) !== false) {
+      if (
+        this.config.visualMenu(
+          visualMenu,
+          i,
+          this.config.item[i],
+          this.config,
+        ) !== false
+      ) {
         visualMenu.listen(this.clickMenuItem)
       }
       visualMenu.update = this.updateVisual

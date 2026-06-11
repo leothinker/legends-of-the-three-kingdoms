@@ -1,4 +1,4 @@
-import { ui, game, get, lib, _status } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
 
 export function openMenu(node, e, onclose) {
   popupContainer.innerHTML = ""
@@ -29,8 +29,8 @@ export function openMenu(node, e, onclose) {
   } else if ((idealtop + height) * zoom + 10 > ui.window.offsetHeight) {
     idealtop = (ui.window.offsetHeight - 10) / zoom - height
   }
-  node.style.top = idealtop + "px"
-  node.style.left = left + "px"
+  node.style.top = `${idealtop}px`
+  node.style.left = `${left}px`
   // }
 
   popupContainer.classList.remove("hidden")
@@ -55,7 +55,7 @@ export function clickSwitcher() {
   if (this.classList.contains("disabled")) {
     return
   }
-  var node = this
+
   this.classList.add("on")
   if (this._link.menu) {
     var pos1 = this.lastChild.getBoundingClientRect()
@@ -67,8 +67,8 @@ export function clickSwitcher() {
           clientX: pos1.left + pos1.width + 5 - pos2.left,
           clientY: pos1.top - pos2.top,
         },
-        function () {
-          node.classList.remove("on")
+        () => {
+          this.classList.remove("on")
         },
       )
     } else if (this._link.menu.childElementCount > 10) {
@@ -76,10 +76,13 @@ export function clickSwitcher() {
         this._link.menu,
         {
           clientX: pos1.left + pos1.width + 5 - pos2.left,
-          clientY: Math.min((ui.window.offsetHeight - 400) / 2, pos1.top - pos2.top),
+          clientY: Math.min(
+            (ui.window.offsetHeight - 400) / 2,
+            pos1.top - pos2.top,
+          ),
         },
-        function () {
-          node.classList.remove("on")
+        () => {
+          this.classList.remove("on")
         },
       )
       lib.setScroll(this._link.menu)
@@ -90,8 +93,8 @@ export function clickSwitcher() {
           clientX: pos1.left + pos1.width + 5 - pos2.left,
           clientY: pos1.top - pos2.top,
         },
-        function () {
-          node.classList.remove("on")
+        () => {
+          this.classList.remove("on")
         },
       )
     }
@@ -137,22 +140,26 @@ export function clickMenuItem() {
   }
 }
 export function createMenu(connectMenu, tabs, config) {
-  var createPage = function (position) {
+  var createPage = (position) => {
     var node = ui.create.div(position)
     lib.setScroll(ui.create.div(".left.pane", node))
     lib.setScroll(ui.create.div(".right.pane", node))
     return node
   }
-  var menu = ui.create.div(".main.menu.dialog.popped.static", config.position, function (e) {
-    e.stopPropagation()
-  })
+  var menu = ui.create.div(
+    ".main.menu.dialog.popped.static",
+    config.position,
+    (e) => {
+      e.stopPropagation()
+    },
+  )
   if (connectMenu) {
     menu.classList.add("center")
     menuContainer.classList.add("centermenu")
   }
   var menuTab = ui.create.div(".menu-tab", menu)
   var menuTabBar = ui.create.div(".menu-tab-bar", menu)
-  menuTabBar.style.left = (config.bar || 0) + "px"
+  menuTabBar.style.left = `${config.bar || 0}px`
   if (Math.round(2 * get.menuZoom()) < 2) {
     menuTabBar.style.height = "3px"
   }
@@ -167,17 +174,12 @@ export function createMenu(connectMenu, tabs, config) {
       active._link.remove()
     }
     this.classList.add("active")
-    menuTabBar.style.transform =
-      "translateX(" +
-      (this.getBoundingClientRect().left -
-        this.parentNode.firstChild.getBoundingClientRect().left) /
-        get.menuZoom() +
-      "px)"
+    menuTabBar.style.transform = `translateX(${(this.getBoundingClientRect().left - this.parentNode.firstChild.getBoundingClientRect().left) / get.menuZoom()}px)`
     menuContent.appendChild(this._link)
   }
-  ui.click.menuTab = function (tab) {
+  ui.click.menuTab = (tab) => {
     for (var i = 0; i < menuTab.childNodes.length; i++) {
-      if (menuTab.childNodes[i].innerHTML == tab) {
+      if (menuTab.childNodes[i].innerHTML === tab) {
         clickTab.call(menuTab.childNodes[i])
         return
       }
@@ -187,7 +189,8 @@ export function createMenu(connectMenu, tabs, config) {
   for (var i = 0; i < tabs.length; i++) {
     var active = i === (config.init || 0)
     pages[i] = createPage(active ? menuContent : null)
-    ui.create.div(active ? ".active" : "", tabs[i], menuTab, clickTab)._link = pages[i]
+    ui.create.div(active ? ".active" : "", tabs[i], menuTab, clickTab)._link =
+      pages[i]
   }
   return {
     menu: menu,
@@ -198,36 +201,37 @@ export function createConfig(config, position) {
   var node = ui.create.div(".config", config.name)
   node._link = { config: config }
   if (!config.clear) {
-    if (config.name != "开启") {
-      if (config.name == "屏蔽弱将") {
-        config.intro = "强度过低的武将（孙策除外）不会出现在选将框，也不会被AI选择"
-      } else if (config.name == "屏蔽强将") {
+    if (config.name !== "开启") {
+      if (config.name === "屏蔽弱将") {
+        config.intro =
+          "强度过低的武将（孙策除外）不会出现在选将框，也不会被AI选择"
+      } else if (config.name === "屏蔽强将") {
         config.intro = "强度过高的武将不会出现在选将框，也不会被AI选择"
       } else if (!config.intro) {
-        config.intro = "设置" + config.name
+        config.intro = `设置${config.name}`
       }
-      lib.setIntro(node, function (uiintro) {
+      lib.setIntro(node, (uiintro) => {
         if (lib.config.touchscreen) {
           _status.dragged = true
         }
         uiintro.style.width = "170px"
         var str = config.intro
-        if (typeof str == "function") {
+        if (typeof str === "function") {
           str = str()
         }
         uiintro._place_text = uiintro.add(
-          '<div class="text" style="display:inline">' + str + "</div>",
+          `<div class="text" style="display:inline">${str}</div>`,
         )
       })
     }
   } else {
-    node.innerHTML = "<span>" + config.name + "</span>"
+    node.innerHTML = `<span>${config.name}</span>`
     if (!config.nopointer) {
       node.classList.add("pointerspan")
     }
   }
   if (config.item) {
-    if (typeof config.item == "function") {
+    if (typeof config.item === "function") {
       config.item = config.item()
     }
     if (Array.isArray(config.init)) {
@@ -235,27 +239,46 @@ export function createConfig(config, position) {
     } else {
       node.classList.add("switcher")
       node.listen(clickSwitcher)
-      node._link.choosing = ui.create.div("", config.item[config.init] || config.init, node)
+      node._link.choosing = ui.create.div(
+        "",
+        config.item[config.init] || config.init,
+        node,
+      )
       node._link.menu = ui.create.div(".menu")
       if (config.visualMenu) {
         node._link.menu.classList.add("visual")
         var updateVisual = function () {
-          config.visualMenu(this, this._link, config.item[this._link] || this._link, config)
+          config.visualMenu(
+            this,
+            this._link,
+            config.item[this._link] || this._link,
+            config,
+          )
         }
-        var createNode = function (i, before) {
+        var createNode = (i, before) => {
           var visualMenu = ui.create.div()
           if (config.visualBar) {
             if (before) {
               node._link.menu.insertBefore(visualMenu, before)
             } else {
-              node._link.menu.insertBefore(visualMenu, node._link.menu.lastChild)
+              node._link.menu.insertBefore(
+                visualMenu,
+                node._link.menu.lastChild,
+              )
             }
           } else {
             node._link.menu.appendChild(visualMenu)
           }
-          ui.create.div(".name", get.verticalStr(config.item[i] || i), visualMenu)
+          ui.create.div(
+            ".name",
+            get.verticalStr(config.item[i] || i),
+            visualMenu,
+          )
           visualMenu._link = i
-          if (config.visualMenu(visualMenu, i, config.item[i] || i, config) !== false) {
+          if (
+            config.visualMenu(visualMenu, i, config.item[i] || i, config) !==
+            false
+          ) {
             visualMenu.listen(clickMenuItem)
           }
           visualMenu.update = updateVisual
@@ -266,7 +289,7 @@ export function createConfig(config, position) {
           })
           node._link.menu.classList.add("withbar")
           config.visualBar(visualBar, config.item, createNode, node)
-          visualBar.update = function () {
+          visualBar.update = () => {
             config.visualBar(visualBar, config.item, createNode, node)
           }
         }
@@ -281,7 +304,7 @@ export function createConfig(config, position) {
           }
           var split = []
           for (var i = 1; i < this.childElementCount; i++) {
-            if (i % 3 == 0) {
+            if (i % 3 === 0) {
               split.push(this.childNodes[i])
             }
           }
@@ -292,7 +315,12 @@ export function createConfig(config, position) {
         node._link.menu.updateBr()
       } else {
         for (var i in config.item) {
-          var textMenu = ui.create.div("", config.item[i] || i, node._link.menu, clickMenuItem)
+          var textMenu = ui.create.div(
+            "",
+            config.item[i] || i,
+            node._link.menu,
+            clickMenuItem,
+          )
           textMenu._link = i
           if (config.textMenu) {
             config.textMenu(textMenu, i, config.item[i] || i, config)
@@ -321,16 +349,16 @@ export function createConfig(config, position) {
     input.style.maxWidth = "60%"
     input.style.overflow = "hidden"
     input.style.whiteSpace = "nowrap"
-    input.onkeydown = function (e) {
-      if (e.key == "Enter") {
+    input.onkeydown = (e) => {
+      if (e.key === "Enter") {
         e.preventDefault()
         e.stopPropagation()
         input.blur()
       }
     }
-    if (config.name == "联机昵称") {
+    if (config.name === "联机昵称") {
       input.innerHTML = config.init || "无名玩家"
-      input.onblur = function () {
+      input.onblur = () => {
         input.innerHTML = input.innerHTML.replace(/<br>/g, "")
         if (!input.innerHTML || get.is.banWords(input.innerHTML)) {
           input.innerHTML = "无名玩家"
@@ -339,14 +367,14 @@ export function createConfig(config, position) {
         game.saveConfig("connect_nickname", input.innerHTML)
         game.saveConfig("connect_nickname", input.innerHTML, "connect")
       }
-    } else if (config.name == "联机头像") {
+    } else if (config.name === "联机头像") {
       // 显示当前配置的武将名称（直接使用翻译，不额外添加前缀）
       const currentId = lib.config.connect_avatar || config.init || "caocao"
       input.innerHTML = lib.translate[currentId] || "曹操"
       input.onblur = config.onblur
-    } else if (config.name == "联机大厅") {
+    } else if (config.name === "联机大厅") {
       input.innerHTML = config.init || lib.hallURL
-      input.onblur = function () {
+      input.onblur = () => {
         if (!input.innerHTML) {
           input.innerHTML = lib.hallURL
         }
@@ -361,7 +389,7 @@ export function createConfig(config, position) {
     node.classList.add("toggle")
     node.listen(clickToggle)
     ui.create.div(ui.create.div(node))
-    if (config.init == true) {
+    if (config.init === true) {
       node.classList.add("on")
     }
   }
@@ -457,7 +485,7 @@ export function menu(connectMenu) {
         return
       }
       cachePopupContainer.classList.add("hidden")
-      if (typeof cachePopupContainer.onclose == "function") {
+      if (typeof cachePopupContainer.onclose === "function") {
         // @ts-expect-error ignore
         cachePopupContainer.onclose()
       }
@@ -466,7 +494,7 @@ export function menu(connectMenu) {
 
   if (!connectMenu) {
     ui.menuContainer = cacheMenuContainer
-    ui.click.configMenu = function () {
+    ui.click.configMenu = () => {
       ui.click.shortcut(false)
       if (cacheMenuContainer.classList.contains("hidden")) {
         ui.config2.classList.add("pressdown2")
@@ -483,17 +511,17 @@ export function menu(connectMenu) {
     }
     menux = createMenu(connectMenu, ["开始", "选项", "武将", "卡牌", "其它"], {
       position: cacheMenuContainer,
-      bar: 67.5,
+      bar: 68,
     })
   } else {
     ui.connectMenuContainer = cacheMenuContainer
-    ui.click.connectMenu = function () {
+    ui.click.connectMenu = () => {
       if (cacheMenuContainer.classList.contains("hidden")) {
         if (_status.waitingForPlayer) {
           startButton.innerHTML = "设"
           var start = cacheMenux.pages[0].firstChild
           for (var i = 0; i < start.childNodes.length; i++) {
-            if (start.childNodes[i].mode != lib.configOL.mode) {
+            if (start.childNodes[i].mode !== lib.configOL.mode) {
               start.childNodes[i].classList.add("unselectable")
               start.childNodes[i].classList.remove("active")
               if (start.childNodes[i].link) {
@@ -521,25 +549,25 @@ export function menu(connectMenu) {
 
     menux = createMenu(connectMenu, ["模式", "武将", "卡牌"], {
       position: cacheMenuContainer,
-      bar: 122.5,
+      bar: 123,
     })
     // menu = menux.menu;
-    let cacheMenux = menux
+    const cacheMenux = menux
   }
   menuxpages = menux.pages.slice(0)
 
   // 开始
-  let startButton = ui.create.startMenu(connectMenu)
+  const startButton = ui.create.startMenu(connectMenu)
 
   // 选项
   ui.create.optionsMenu(connectMenu)
 
   // 武将
-  let updateCharacterPackMenu = ui.create.characterPackMenu(connectMenu)
+  const updateCharacterPackMenu = ui.create.characterPackMenu(connectMenu)
   ui.updateCharacterPackMenu.push(updateCharacterPackMenu)
 
   // 卡牌
-  let updatecardPackMenu = ui.create.cardPackMenu(connectMenu)
+  const updatecardPackMenu = ui.create.cardPackMenu(connectMenu)
   ui.updateCardPackMenu.push(updatecardPackMenu)
 
   // 其他

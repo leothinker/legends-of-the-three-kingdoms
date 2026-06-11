@@ -11,7 +11,11 @@
  * 从Iterable和Iterator中获取遍历类型
  */
 type ValueTypeOf<T> =
-  T extends Iterable<infer U> ? U : T extends Iterator<infer U, any, any> ? U : never
+  T extends Iterable<infer U>
+    ? U
+    : T extends Iterator<infer U, any, any>
+      ? U
+      : never
 
 interface IteratorZipOptions {
   /**
@@ -35,7 +39,9 @@ interface IteratorZipOptions {
   padding?: Iterable<unknown>
 }
 
-interface IteratorZipKeyedOptions<T extends Record<string, Iterable<any> | Iterator<any>>> {
+interface IteratorZipKeyedOptions<
+  T extends Record<string, Iterable<any> | Iterator<any>>,
+> {
   /**
    * One of the following:
    * - "shortest" (default): The resulting iterator stops when one input iterable is exhausted.
@@ -71,7 +77,9 @@ interface IteratorConstructor {
    * the resulting iterator is created as completed.
    */
   zip<T extends readonly unknown[]>(
-    iterables: { [K in keyof T]: Iterable<T[K]> | Iterator<T[K], any, undefined> },
+    iterables: {
+      [K in keyof T]: Iterable<T[K]> | Iterator<T[K], any, undefined>
+    },
     options?: IteratorZipOptions,
   ): Iterable<{ [K in keyof T]: T[K] }>
   zip(
@@ -98,7 +106,9 @@ interface IteratorConstructor {
   ): Iterator<{ [K in keyof T]: ValueTypeOf<T[K]> }>
   zipKeyed(
     iterables: Record<string, Iterable<any> | Iterator<any>>,
-    options?: IteratorZipKeyedOptions<Record<string, Iterable<any> | Iterator<any>>>,
+    options?: IteratorZipKeyedOptions<
+      Record<string, Iterable<any> | Iterator<any>>
+    >,
   ): Iterator<Record<string, unknown>>
 }
 

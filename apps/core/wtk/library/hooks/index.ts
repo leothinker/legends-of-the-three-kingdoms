@@ -1,20 +1,20 @@
-import { _status, get, game, lib, ui } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
 export const defaultHooks: {
   [K in keyof WTKHookType]?: WTKHookType[K][]
 } = {
   addGroup: [
     function addColor(id, _short, _name, config) {
-      if (typeof config.color != "undefined" && config.color != null) {
+      if (typeof config.color !== "undefined" && config.color != null) {
         let color1, color2, color3, color4
         if (
-          typeof config.color == "string" &&
+          typeof config.color === "string" &&
           /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(config.color)
         ) {
-          let c1 = parseInt(`0x${config.color.slice(1, 3)}`)
-          let c2 = parseInt(`0x${config.color.slice(3, 5)}`)
-          let c3 = parseInt(`0x${config.color.slice(5, 7)}`)
+          const c1 = parseInt(`0x${config.color.slice(1, 3)}`, 10)
+          const c2 = parseInt(`0x${config.color.slice(3, 5)}`, 10)
+          const c3 = parseInt(`0x${config.color.slice(5, 7)}`, 10)
           color1 = color2 = color3 = color4 = [c1, c2, c3, 1]
-        } else if (Array.isArray(config.color) && config.color.length == 4) {
+        } else if (Array.isArray(config.color) && config.color.length === 4) {
           if (config.color.every((item) => Array.isArray(item))) {
             color1 = config.color[0]
             color2 = config.color[1]
@@ -62,7 +62,7 @@ export const defaultHooks: {
       }
     },
     function addImage(id, _short, _name, config) {
-      if (typeof config.image == "string") {
+      if (typeof config.image === "string") {
         Reflect.defineProperty(lib.card, `group_${id}`, {
           configurable: true,
           enumerable: false,
@@ -79,7 +79,7 @@ export const defaultHooks: {
 
   addNature: [
     function addColor(nature, _translation, config) {
-      if (typeof config != "object") {
+      if (typeof config !== "object") {
         config = {}
       }
       /**
@@ -102,16 +102,16 @@ export const defaultHooks: {
        */
       // @ts-expect-error ignore
       let lineColor = config.lineColor
-      if (typeof linked != "boolean") {
+      if (typeof linked !== "boolean") {
         linked = true
       }
-      if (typeof order != "number") {
+      if (typeof order !== "number") {
         order = 0
       }
-      if (typeof background != "string") {
+      if (typeof background !== "string") {
         background = ""
       }
-      if (!Array.isArray(lineColor) || lineColor.length != 3) {
+      if (!Array.isArray(lineColor) || lineColor.length !== 3) {
         lineColor = []
       }
       if (linked) {
@@ -125,11 +125,11 @@ export const defaultHooks: {
         lib.natureBg.set(nature, background)
       }
       if (config.audio) {
-        for (let key in config.audio) {
+        for (const key in config.audio) {
           if (!lib.natureAudio[key]) {
             lib.natureAudio[key] = config.audio[key]
           } else {
-            for (let key2 in config.audio[key]) {
+            for (const key2 in config.audio[key]) {
               lib.natureAudio[key][key2] = config.audio[key][key2]
             }
           }
@@ -138,12 +138,12 @@ export const defaultHooks: {
 
       let color1, color2
       if (
-        typeof config.color == "string" &&
+        typeof config.color === "string" &&
         /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(config.color)
       ) {
-        let c1 = parseInt(`0x${config.color.slice(1, 3)}`)
-        let c2 = parseInt(`0x${config.color.slice(3, 5)}`)
-        let c3 = parseInt(`0x${config.color.slice(5, 7)}`)
+        const c1 = parseInt(`0x${config.color.slice(1, 3)}`, 10)
+        const c2 = parseInt(`0x${config.color.slice(3, 5)}`, 10)
+        const c3 = parseInt(`0x${config.color.slice(5, 7)}`, 10)
         color1 = color2 = [c1, c2, c3, 1]
       } else if (
         Array.isArray(config.color) &&
@@ -154,15 +154,15 @@ export const defaultHooks: {
           color1 = config.color[0]
           color2 = config.color[1]
         } else {
-          let color = config.color.slice()
-          if (color.length == 3) {
+          const color = config.color.slice()
+          if (color.length === 3) {
             color.push(1)
           }
           color1 = color2 = color
         }
       }
       if (color1 && color2) {
-        let result = {}
+        const result = {}
         result[`.card.fullskin.${nature}>.name`] = {
           color: `rgba(${color1.join()})`,
           border: `1px solid rgba(${color2.join()})`,
@@ -170,7 +170,7 @@ export const defaultHooks: {
         // @ts-expect-error ignore
         game.dynamicStyle.addObject(result)
 
-        let result2 = {}
+        const result2 = {}
         result2[`.tempname.${nature}:not([data-nature])>.span`] = {
           color: `rgba(${color1.join()})`,
         }
@@ -187,7 +187,10 @@ export const defaultHooks: {
       if (lib.config.cardtempname === "off") {
         return
       }
-      if (get.name(card) === card.name && get.is.sameNature(get.nature(card), card.nature, true)) {
+      if (
+        get.name(card) === card.name &&
+        get.is.sameNature(get.nature(card), card.nature, true)
+      ) {
         return
       }
       const node = ui.create.cardTempName(card)
@@ -359,18 +362,21 @@ export const defaultHooks: {
       function isEqual(a, b) {
         return Math.abs(a - b) < 3
       }
-      let equal = isEqual(itemContainer.originWidth, itemContainer.getBoundingClientRect().width)
+      const equal = isEqual(
+        itemContainer.originWidth,
+        itemContainer.getBoundingClientRect().width,
+      )
       const L = (itemContainer.originWidth - 2 * gap) * (equal ? 0.8 : 1)
       const W = 90 //这里需要填卡的实际宽度，扩展中需要自行调整。
       // @ts-expect-error ignore
-      let n = addedItems.length
+      const n = addedItems.length
       const r = 16 //为偏移留出的空间，如果r为0，可能会把前面的卡牌全遮住
       if (n * W + (n + 1) * gap < L) {
-        itemContainer.style.setProperty("--ml", gap + "px")
+        itemContainer.style.setProperty("--ml", `${gap}px`)
         itemContainer.classList.remove("zoom")
       } else {
         const ml = Math.min((n * W - L + gap) / (n - 1), W - r)
-        itemContainer.style.setProperty("--ml", "-" + ml + "px")
+        itemContainer.style.setProperty("--ml", `-${ml}px`)
         itemContainer.classList.add("zoom")
       }
     },
@@ -381,28 +387,30 @@ export const defaultHooks: {
         return
       }
       if (
-        (lib.config.layout == "mobile" || lib.config.layout == "long") &&
-        player.dataset.position == "0"
+        (lib.config.layout === "mobile" || lib.config.layout === "long") &&
+        player.dataset.position === "0"
       ) {
         player.style.removeProperty("--bottom")
       } else {
         //如果全是空的装备栏
         if (
-          Array.from(player.node.equips.children).every((e) => e.classList.contains("emptyequip"))
+          Array.from(player.node.equips.children).every((e) =>
+            e.classList.contains("emptyequip"),
+          )
         ) {
           player.style.removeProperty("--bottom")
         } else {
-          let eqipContainerTop = player.node.equips.offsetTop
+          const eqipContainerTop = player.node.equips.offsetTop
           let equipTop = 0
-          for (let equip of Array.from(player.node.equips.children)) {
+          for (const equip of Array.from(player.node.equips.children)) {
             if (!equip.classList.contains("emptyequip")) {
               equipTop = equip.offsetTop
               break
             }
           }
-          let top = equipTop + eqipContainerTop
+          const top = equipTop + eqipContainerTop
           const bottom = player.getBoundingClientRect().height - top
-          player.style.setProperty("--bottom", bottom + "px")
+          player.style.setProperty("--bottom", `${bottom}px`)
         }
       }
     },

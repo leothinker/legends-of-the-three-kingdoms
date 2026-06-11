@@ -4,5 +4,5 @@ interface HTMLTableElement {
    * @param row
    * @param col
    */
-  get(row: number, col: number): HTMLElement | void
+  get(row: number, col: number): HTMLElement | undefined
 }

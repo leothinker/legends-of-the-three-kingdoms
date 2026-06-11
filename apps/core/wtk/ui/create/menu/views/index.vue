@@ -1,33 +1,25 @@
 <template>
-  <div class="new-menu">
-    <!-- tab -->
-    <div class="new-menu-tab" ref="menuTabs">
-      <div v-for="[tabName] in tabDataMap" :key="tabName" @click="toggleTabName">{{ tabName }}</div>
-    </div>
-    <!-- content -->
-    <div class="new-menu-content">
-      <div>
-        <div class="left pane" ref="leftPane">
-          <div
-            v-for="data in leftPaneData"
-            :key="data.name"
-            :mode="data.attrs.mode"
-            @click="toggleLeftPaneName"
-            class="new-menubutton large"
-          >
-            {{ data.name }}
-          </div>
-        </div>
-        <div class="right pane" ref="rightPane"></div>
-        <div class="menubutton round highlight" ref="startButton">启</div>
-      </div>
-    </div>
-  </div>
+	<div class="new-menu">
+		<!-- tab -->
+		<div class="new-menu-tab" ref="menuTabs">
+			<div v-for="[tabName] in tabDataMap" :key="tabName" @click="toggleTabName">{{ tabName }}</div>
+		</div>
+		<!-- content -->
+		<div class="new-menu-content">
+			<div>
+				<div class="left pane" ref="leftPane">
+					<div v-for="data in leftPaneData" :key="data.name" :mode="data.attrs.mode" @click="toggleLeftPaneName" class="new-menubutton large">{{ data.name }}</div>
+				</div>
+				<div class="right pane" ref="rightPane"></div>
+				<div class="menubutton round highlight" ref="startButton">启</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
-import { startMenuData, startMenutabName } from "../startMenu.js"
 import { createApp, reactive } from "vue"
+import { startMenuData, startMenutabName } from "../startMenu.js"
 
 export default {
   props: {
@@ -83,8 +75,10 @@ export default {
       // 高亮默认元素
       this.$nextTick(() => {
         const ele =
-          data?.getDefaultActive(this.connectMenu, Array.from(this.$refs.leftPane.children)) ||
-          this.$refs.leftPane.firstElementChild
+          data?.getDefaultActive(
+            this.connectMenu,
+            Array.from(this.$refs.leftPane.children),
+          ) || this.$refs.leftPane.firstElementChild
         this.toggleLeftPaneName({ target: ele })
       })
     },
@@ -117,7 +111,9 @@ export default {
         this.rightPaneData.element = parentElement
         this.rightPaneData.app = rightPaneAppData.app
       } else {
-        const rightPaneTemplate = data?.rightPaneTemplate || { template: html`<div>还未编写</div>` }
+        const rightPaneTemplate = data?.rightPaneTemplate || {
+          template: html`<div>还未编写</div>`,
+        }
         data?.initConfigs?.(this.connectMenu, target, this.$refs.startButton)
         /** @type { string } */
         // @ts-expect-error transfer
@@ -130,7 +126,10 @@ export default {
         app.mount(this.$refs.rightPane)
         this.rightPaneData.element = this.$refs.rightPane.firstElementChild
         this.rightPaneData.app = app
-        data.rightPaneApps.set(target, { element: this.$refs.rightPane.firstElementChild, app })
+        data.rightPaneApps.set(target, {
+          element: this.$refs.rightPane.firstElementChild,
+          app,
+        })
       }
     },
   },

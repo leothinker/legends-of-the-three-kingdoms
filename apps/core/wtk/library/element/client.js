@@ -54,7 +54,7 @@ export class Client {
       return this
     }
     var args = Array.from(arguments)
-    if (typeof args[0] == "function") {
+    if (typeof args[0] === "function") {
       args.unshift("exec")
     }
     for (var i = 1; i < args.length; i++) {
@@ -81,21 +81,21 @@ export class Client {
     this.closed = true
     if (_status.waitingForPlayer) {
       for (var i = 0; i < game.connectPlayers.length; i++) {
-        if (game.connectPlayers[i].playerid == this.id) {
+        if (game.connectPlayers[i].playerid === this.id) {
           game.connectPlayers[i].uninitOL()
           delete game.connectPlayers[i].playerid
         }
       }
-      if (game.onlinezhu == this.id) {
+      if (game.onlinezhu === this.id) {
         game.onlinezhu = null
       }
       game.updateWaiting()
     } else if (lib.playerOL[this.id]) {
       var player = lib.playerOL[this.id]
-      player.setNickname(player.nickname + " - 离线")
+      player.setNickname(`${player.nickname} - 离线`)
       // @ts-expect-error ignore
-      game.broadcast(function (player) {
-        player.setNickname(player.nickname + " - 离线")
+      game.broadcast((player) => {
+        player.setNickname(`${player.nickname} - 离线`)
       }, player)
       player.unwait("ai")
     }

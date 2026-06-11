@@ -555,7 +555,12 @@ declare interface SelectConfigData {
    * @param name item选项
    * @param config 当前的config
    */
-  visualMenu?: (node: HTMLDivElement, link: any, name: string, config: SelectConfigData) => void
+  visualMenu?: (
+    node: HTMLDivElement,
+    link: any,
+    name: string,
+    config: SelectConfigData,
+  ) => void
   /**
    * 文本菜单
    * 当前不存在visualMenu的话，则创建item列表节点，若有该属性则执行
@@ -579,8 +584,8 @@ declare interface SelectConfigData {
    *
    * 若有返回值false，则当前点击事件的toggle切换无效
    */
-  onclick?(item: any): void | boolean
-  onclick?(link: any, node: HTMLDivElement): void | boolean
+  onclick?(item: any): undefined | boolean
+  onclick?(link: any, node: HTMLDivElement): undefined | boolean
 
   /** 当前没有onclick方法时，除了默认game.saveConfig保存数据配置key的数据，可以使用该方法进行数据处理啊 */
   onsave?(reslut: any): void
@@ -615,56 +620,6 @@ declare interface SelectConfigData {
 
   /** 内部属性，记录当前配置的key */
   _name?: string
-}
-
-/**
- * 扩展的包信息
- * 游戏自带编辑器的代码编辑区域的扩展结构：
- * （主要是通过系统内部自带编译器编辑的代码，导入逻辑其实基本一致）
- */
-declare interface PackageData {
-  /** 扩展制作作者名 */
-  author?: string
-  /** 扩展描述 */
-  intro?: string
-  /** 讨论地址 */
-  diskURL?: string
-  /** 网盘地址 */
-  forumURL?: string
-  /** 扩展版本 */
-  version?: string
-  /** 扩展在UI中显示的名字 */
-  translation?: string
-
-  /** 武将导入信息 */
-  character?: Partial<importCharacterConfig> &
-    Required<Pick<importCharacterConfig, "character" | "translate">>
-  /** 卡牌导入信息 */
-  card?: Partial<importCardConfig> & Pick<importCardConfig, "card" | "translate" | "list">
-  /** 技能导入信息 */
-  skill?: {
-    skill: Record<string, Skill>
-    translate: Record<string, string>
-  }
-
-  /** 相关文件名（扩展所使用的一些图片） */
-  files?: {
-    character: string[]
-    card: string[]
-    skill: string[]
-  }
-
-  /** 主代码中，pack.code包括以下属性： */
-  code?: {
-    /** 扩展的config配置信息 */
-    config?: Record<string, SelectConfigData>
-    /** 扩展主代码 */
-    content?: (config: Record<string, any>, pack: PackageData) => void
-    /** 扩展帮助信息 */
-    help?: Record<string, string>
-    /** 扩展启动代码 */
-    precontent?: (data?: Record<string, any>) => void
-  }
 }
 
 interface When {
@@ -1231,11 +1186,9 @@ type EnableSignal1 = "chooseToUse" | "chooseToRespond" | "chooseCard"
 //技能的enable
 type EnableSignal = "phaseUse" | EnableSignal1 | EnableSignal1[]
 
-interface CheckMod {
-  <T extends string & keyof Mod>(
-    ...args: [...Parameters<Required<Mod>[T]>, name: T, player: Player | string[]]
-  ): ReturnType<Required<Mod>[T]>
-}
+type CheckMod = <T extends string & keyof Mod>(
+  ...args: [...Parameters<Required<Mod>[T]>, name: T, player: Player | string[]]
+) => ReturnType<Required<Mod>[T]>
 
 interface History_UseSkill {
   /** 技能事件 */
@@ -1294,7 +1247,10 @@ declare interface menuData {
   /** 菜单左方的数据列表 */
   leftPaneData: { name: string; attrs: Record<string, any> }[][]
   /** 缓存的vue实例 */
-  rightPaneApps: Map<HTMLElement, { element: HTMLElement; app: import("vue").App<HTMLElement> }>
+  rightPaneApps: Map<
+    HTMLElement,
+    { element: HTMLElement; app: import("vue").App<HTMLElement> }
+  >
   /** 响应式的config */
   configDatas: Map<
     string,
@@ -1306,11 +1262,20 @@ declare interface menuData {
   /** 初始化菜单左方的数据列表
    * @param connectMenu 是否是联机菜单
    */
-  initLeftPaneData(connectMenu: boolean): { name: string; attrs: Record<string, any> }[][]
+  initLeftPaneData(
+    connectMenu: boolean,
+  ): { name: string; attrs: Record<string, any> }[][]
   /** 获取默认选中的元素 */
-  getDefaultActive(connectMenu: boolean, nodes: HTMLElement[]): HTMLElement | void
+  getDefaultActive(
+    connectMenu: boolean,
+    nodes: HTMLElement[],
+  ): HTMLElement | undefined
   /** 初始化配置 */
-  initConfigs(connectMenu: boolean, node: HTMLElement, startButton: HTMLElement): void
+  initConfigs(
+    connectMenu: boolean,
+    node: HTMLElement,
+    startButton: HTMLElement,
+  ): void
   /** 右方html模板 */
   rightPaneTemplate: import("vue").Component
 }

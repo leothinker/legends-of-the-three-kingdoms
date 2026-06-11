@@ -1,4 +1,4 @@
-import { _status, get, lib, ai } from "wtk"
+import { ai, get, lib } from "wtk"
 
 export class VCard {
   /**
@@ -28,7 +28,7 @@ export class VCard {
       this.nature = suitOrCard[3]
     }
     // @ts-expect-error ignore
-    else if (get.itemtype(suitOrCard) == "card") {
+    else if (get.itemtype(suitOrCard) === "card") {
       this.name = get.name(suitOrCard, owner)
       this.suit = get.suit(suitOrCard, owner)
       this.color = get.color(suitOrCard, owner)
@@ -56,17 +56,20 @@ export class VCard {
       const info = get.info(this, false)
       if (info) {
         const autoViewAs = info.autoViewAs
-        if (typeof autoViewAs == "string") {
+        if (typeof autoViewAs === "string") {
           this.name = autoViewAs
         }
       }
-    } else if (suitOrCard && typeof suitOrCard != "string") {
+    } else if (suitOrCard && typeof suitOrCard !== "string") {
       Object.keys(suitOrCard).forEach((key) => {
         /**
          * @type { PropertyDescriptor }
          */
         // @ts-expect-error ignore
-        const propertyDescriptor = Object.getOwnPropertyDescriptor(suitOrCard, key),
+        const propertyDescriptor = Object.getOwnPropertyDescriptor(
+            suitOrCard,
+            key,
+          ),
           value = propertyDescriptor.value
         if (Array.isArray(value)) {
           this[key] = value.slice()
@@ -87,7 +90,7 @@ export class VCard {
           if (!Object.keys(lib.color).includes(this.color)) {
             this.color = get.color(this, owner)
           }
-          if (typeof this.number != "number") {
+          if (typeof this.number !== "number") {
             this.number = get.number(this, owner)
           }
           if (!this.nature) {
@@ -108,21 +111,21 @@ export class VCard {
       const info = get.info(this, false)
       if (info) {
         const autoViewAs = info.autoViewAs
-        if (typeof autoViewAs == "string") {
+        if (typeof autoViewAs === "string") {
           this.name = autoViewAs
         }
       }
     }
-    if (typeof suitOrCard == "string") {
+    if (typeof suitOrCard === "string") {
       this.suit = suitOrCard
     }
-    if (typeof numberOrCards == "number") {
+    if (typeof numberOrCards === "number") {
       this.number = numberOrCards
     }
-    if (typeof name == "string") {
+    if (typeof name === "string") {
       this.name = name
     }
-    if (typeof nature == "string") {
+    if (typeof nature === "string") {
       this.nature = nature
     }
     if (!this.storage) {
@@ -133,22 +136,22 @@ export class VCard {
     }
   }
   sameSuitAs(card) {
-    return get.suit(this) == get.suit(card)
+    return get.suit(this) === get.suit(card)
   }
   differentSuitFrom(card) {
-    return get.suit(this) != get.suit(card)
+    return get.suit(this) !== get.suit(card)
   }
   sameNumberAs(card) {
-    return get.number(this) == get.number(card)
+    return get.number(this) === get.number(card)
   }
   differentNumberFrom(card) {
-    return get.number(this) != get.number(card)
+    return get.number(this) !== get.number(card)
   }
   sameNameAs(card) {
-    return get.name(this) == get.name(card)
+    return get.name(this) === get.name(card)
   }
   differentNameFrom(card) {
-    return get.name(this) != get.name(card)
+    return get.name(this) !== get.name(card)
   }
   /**
    * @param { Player } player
@@ -158,7 +161,7 @@ export class VCard {
     if (!nature) {
       return natures.length > 0
     }
-    if (nature == "linked") {
+    if (nature === "linked") {
       return natures.some((n) => lib.linked.includes(n))
     }
     return get.is.sameNature(natures, nature)
@@ -174,13 +177,10 @@ export class VCard {
       prefix = similar ? "[card:" : "[vcard:"
     }
     if (this.cardid) {
-      return prefix + this.cardid + "]"
+      return `${prefix + this.cardid}]`
     }
     if (!this.cards.length) {
-      return (
-        prefix +
-        `${this.name}+${this.suit ? this.suit : this.color || "none"}+${this.number === undefined ? "none" : this.number}${this.nature ? "+" + this.nature : ""}]`
-      )
+      return `${prefix}${this.name}+${this.suit ? this.suit : this.color || "none"}+${this.number === undefined ? "none" : this.number}${this.nature ? `+${this.nature}` : ""}]`
     }
     if (similar !== undefined && this.cards.length === 1) {
       return ai.getCacheKey(this.cards[0], similar)
@@ -197,7 +197,7 @@ export class VCard {
     )
   }
   hasGaintag(tag) {
-    return this.gaintag && this.gaintag.includes(tag)
+    return this.gaintag?.includes(tag)
   }
   initID() {
     if (!this.vcardID) {

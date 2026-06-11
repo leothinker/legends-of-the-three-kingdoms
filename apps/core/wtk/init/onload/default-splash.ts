@@ -1,5 +1,5 @@
-import { lib, game, ui } from "wtk"
 import { createApp } from "vue"
+import { game, lib, ui } from "wtk"
 
 import OnloadSplash from "./OnloadSplash.vue"
 import type { OnloadSplash as IOnloadSplash } from "./onload-splash"
@@ -13,7 +13,10 @@ export class DefaultSplash implements IOnloadSplash {
   private app: any
   private clicked: HTMLDivElement
 
-  async init(node: HTMLDivElement, resolve: (mode: string) => void): Promise<void> {
+  async init(
+    node: HTMLDivElement,
+    resolve: (mode: string) => void,
+  ): Promise<void> {
     this.resolve = resolve
 
     if (lib.config.touchscreen) {
@@ -42,7 +45,9 @@ export class DefaultSplash implements IOnloadSplash {
   async dispose(node: HTMLDivElement): Promise<boolean> {
     node.delete(1000)
 
-    await new Promise<void>((resolve) => this.clicked.listenTransition(resolve, 500))
+    await new Promise<void>((resolve) =>
+      this.clicked.listenTransition(resolve, 500),
+    )
 
     return true
   }

@@ -1,4 +1,4 @@
-import { lib, _status } from "wtk"
+import { lib } from "wtk"
 
 export class LibInitPromises {
   /**
@@ -9,7 +9,9 @@ export class LibInitPromises {
    * @returns {Promise<Event>}
    */
   js(path, file) {
-    return new Promise((resolve, reject) => lib.init.js(path, file, resolve, reject))
+    return new Promise((resolve, reject) =>
+      lib.init.js(path, file, resolve, reject),
+    )
   }
 
   /**
@@ -38,7 +40,9 @@ export class LibInitPromises {
    * @returns {Promise<ProgressEvent>}
    */
   req(str, master) {
-    return new Promise((resolve, reject) => lib.init.req(str, resolve, reject, master))
+    return new Promise((resolve, reject) =>
+      lib.init.req(str, resolve, reject, master),
+    )
   }
 
   /**
@@ -75,9 +79,11 @@ export class LibInitPromises {
     if (!forceLoadAsDataUrl) {
       return Promise.resolve(lib.init.parseResourceAddress(link, defaultHandle))
     }
-    let { promise, resolve } = Promise.withResolvers()
+    const { promise, resolve } = Promise.withResolvers()
 
-    lib.init.parseResourceAddress(link, defaultHandle, (result) => resolve(result))
+    lib.init.parseResourceAddress(link, defaultHandle, (result) =>
+      resolve(result),
+    )
     return promise
   }
 
@@ -88,9 +94,13 @@ export class LibInitPromises {
    * @returns {Promise<[origin: URL, data: URL]>}
    */
   async parseResourceAddressExt(link, defaultHandle = null) {
-    let { promise, resolve } = Promise.withResolvers()
+    const { promise, resolve } = Promise.withResolvers()
 
-    let origin = lib.init.parseResourceAddress(link, defaultHandle, (result) => resolve(result))
+    const origin = lib.init.parseResourceAddress(
+      link,
+      defaultHandle,
+      (result) => resolve(result),
+    )
     return [origin, await promise]
   }
 }

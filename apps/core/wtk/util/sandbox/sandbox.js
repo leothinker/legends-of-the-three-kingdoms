@@ -7,7 +7,7 @@
 
 // 最后为安全考虑，请遵守规范，尽量不要使用 `eval` 函数而是使用 `security.exec2` 来替代
 
-import { SANDBOX_EXPORT, isSandboxEnabled } from "./initRealms.js"
+import { isSandboxEnabled, SANDBOX_EXPORT } from "./initRealms.js"
 
 // 很重要的事情！
 // 请不要在在其他文件中import sandbox.js！
@@ -77,7 +77,7 @@ const WeakRef =
 const GeneratorFunction = function* () {}.constructor
 /** @type {typeof Function} */
 // @ts-expect-error Sandbox
-const AsyncFunction = async function () {}.constructor
+const AsyncFunction = (async () => {}).constructor
 /** @type {typeof Function} */
 // @ts-expect-error Sandbox
 const AsyncGeneratorFunction = async function* () {}.constructor
@@ -147,7 +147,7 @@ class AccessAction {
    * @returns
    */
   static isAccessAction(action) {
-    return typeof action == "number" && action >= 0 && action < 12
+    return typeof action === "number" && action >= 0 && action < 12
   }
 }
 
@@ -251,7 +251,8 @@ class Rule {
     // 存在于封送白名单或不存在于封送黑名单
     if (this.#allowMarshalTo) {
       return this.#allowMarshalTo.has(domain)
-    } else if (this.#disallowMarshalTo) {
+    }
+    if (this.#disallowMarshalTo) {
       return !this.#disallowMarshalTo.has(domain)
     }
 
@@ -378,7 +379,7 @@ class Rule {
   setAccessControl(accessControl) {
     Rule.#assertOperator(this)
 
-    if (typeof accessControl != "function") {
+    if (typeof accessControl !== "function") {
       throw new TypeError("无效的权限控制器")
     }
     if (this.#accessControl) {
@@ -414,7 +415,9 @@ class Rule {
  */
 function buildGlobalIndexes(window, selector) {
   /** @type {Array<string|symbol|RegExp>} */
-  const items = Array.isArray(selector) ? selector : selector.split("/").filter(Boolean)
+  const items = Array.isArray(selector)
+    ? selector
+    : selector.split("/").filter(Boolean)
 
   items.unshift(window)
 
@@ -431,7 +434,7 @@ function buildGlobalIndexes(window, selector) {
     const path = pathes.shift()
 
     // 如果已经是长度为二了
-    if (path.length == 2) {
+    if (path.length === 2) {
       // 最后一项如果不是正则表达式直接添加为索引
       if (!(path[1] instanceof RegExp)) {
         if (path[1] in path[0]) {
@@ -448,7 +451,11 @@ function buildGlobalIndexes(window, selector) {
       indexes.push(
         // @ts-expect-error Sandbox
         ...Reflect.ownKeys(root)
-          .filter((k) => k in root && pattern.test(typeof k == "string" ? k : `@${k.description}`))
+          .filter(
+            (k) =>
+              k in root &&
+              pattern.test(typeof k === "string" ? k : `@${k.description}`),
+          )
           .map((k) => [root, k]),
       )
 
@@ -480,7 +487,9 @@ function buildGlobalIndexes(window, selector) {
     const root = path.shift()
     const pattern = path.shift()
     const keys = Reflect.ownKeys(root).filter(
-      (k) => k in root && pattern.test(typeof k == "string" ? k : `@${k.description}`),
+      (k) =>
+        k in root &&
+        pattern.test(typeof k === "string" ? k : `@${k.description}`),
     )
 
     if (!keys.length) {
@@ -563,10 +572,16 @@ const MAPPING_GLOBALS = Object.freeze([
   ["/Generator", "(function*(){})().constructor"],
   ["/AsyncGenerator", "(async function*(){})().constructor"],
   ["/Generator/prototype", "(function*(){})().constructor.prototype"],
-  ["/AsyncGenerator/prototype", "(async function*(){})().constructor.prototype"],
+  [
+    "/AsyncGenerator/prototype",
+    "(async function*(){})().constructor.prototype",
+  ],
   ["/GeneratorFunction/prototype", "(function*(){}).constructor.prototype"],
   ["/AsyncFunction/prototype", "(async()=>{}).constructor.prototype"],
-  ["/AsyncGeneratorFunction/prototype", "(async function*(){}).constructor.prototype"],
+  [
+    "/AsyncGeneratorFunction/prototype",
+    "(async function*(){}).constructor.prototype",
+  ],
   "/JSON",
   "/Proxy",
   "/Math",
@@ -620,7 +635,7 @@ const MARSHALLED_LIST = Object.freeze([
   // 补充所有的事件喵
   // 因为需要判断原型链，所以这里要让顶级域把它的事件类传过来喵
   ...Reflect.ownKeys(globalThis)
-    .filter((key) => typeof key == "string")
+    .filter((key) => typeof key === "string")
     .filter((key) => /^\w*?Event$/.test(key))
     .map((key) => `/${key}`),
 ])
@@ -664,7 +679,7 @@ class Globals {
    * @returns {[string, any]} [映射键名, 映射值]
    */
   static parseFrom(path, window) {
-    if (typeof path == "string") {
+    if (typeof path === "string") {
       const items = path.split("/").filter(Boolean)
       let obj = window
 
@@ -675,9 +690,8 @@ class Globals {
       }
 
       return [path, obj]
-    } else {
-      return [path[0], window.eval(path[1])]
     }
+    return [path[0], window.eval(path[1])]
   }
 
   /**
@@ -959,8 +973,8 @@ class NativeWrapper {
 
       if (
         !descriptor ||
-        typeof descriptor.get != "function" ||
-        typeof descriptor.set != "function"
+        typeof descriptor.get !== "function" ||
+        typeof descriptor.set !== "function"
       ) {
         throw new TypeError("不支持的HTML实现")
       }
@@ -979,7 +993,10 @@ class NativeWrapper {
       if (defaultFunction.prototype) {
         // 如果此函数是一个构造函数
         const wrappedApply = NativeWrapper.wrapApply(defaultFunction, flags)
-        const wrappedConstruct = NativeWrapper.wrapConstruct(defaultFunction, flags)
+        const wrappedConstruct = NativeWrapper.wrapConstruct(
+          defaultFunction,
+          flags,
+        )
 
         // 使用代理封装
         parent[name] = new Proxy(defaultFunction, {
@@ -1016,7 +1033,9 @@ class NativeWrapper {
     const wrapped =
       flags & 2
         ? function (/** @type {any[]} */ ...args) {
-            const list = args.map((a) => NativeWrapper.boxCallback(a, prototype))
+            const list = args.map((a) =>
+              NativeWrapper.boxCallback(a, prototype),
+            )
             // @ts-expect-error Sandbox
             return ContextInvoker1(func, this, list)
           }
@@ -1046,7 +1065,9 @@ class NativeWrapper {
     const wrapped =
       flags & 2
         ? function (/** @type {any[]} */ ...args) {
-            const list = args.map((a) => NativeWrapper.boxCallback(a, prototype))
+            const list = args.map((a) =>
+              NativeWrapper.boxCallback(a, prototype),
+            )
             return ContextInvoker2(func, list, new.target)
           }
         : function (/** @type {any[]} */ ...args) {
@@ -1092,7 +1113,9 @@ class NativeWrapper {
     const prototype = NativeWrapper.#currentFunction.prototype
     const wrapped = function (/** @type {ProxyConstructor} */ value) {
       // @ts-expect-error Sandbox
-      return ContextInvoker1(func, this, [NativeWrapper.boxCallback(value, prototype)])
+      return ContextInvoker1(func, this, [
+        NativeWrapper.boxCallback(value, prototype),
+      ])
     }
 
     // 构造原型链
@@ -1110,7 +1133,7 @@ class NativeWrapper {
    * @returns
    */
   static boxCallback(unboxed, prototype) {
-    if (typeof unboxed != "function") {
+    if (typeof unboxed !== "function") {
       return unboxed
     }
 
@@ -1212,10 +1235,9 @@ class DomainMonitors {
   static #installMonitor(thiz, monitor) {
     // 解构 Monitor 相关条件
     // @ts-expect-error Sandbox
-    const [actions, allowDomains, disallowDomains, targets] = Monitor[SandboxExposer2](
-      SandboxSignal_ExposeInfo,
-      monitor,
-    )
+    const [actions, allowDomains, disallowDomains, targets] = Monitor[
+      SandboxExposer2
+    ](SandboxSignal_ExposeInfo, monitor)
 
     /**
      * @param {{ [x: number]: Set<Monitor>; }} actionMap
@@ -1254,7 +1276,9 @@ class DomainMonitors {
     if (!allowDomains) {
       // 取运行域补集
       // @ts-expect-error Sandbox
-      const totalDomains = new Set(Domain[SandboxExposer2](SandboxSignal_ListDomain))
+      const totalDomains = new Set(
+        Domain[SandboxExposer2](SandboxSignal_ListDomain),
+      )
       totalDomains.delete(monitor.domain)
 
       if (disallowDomains) {
@@ -1291,10 +1315,9 @@ class DomainMonitors {
    */
   static #uninstallMonitor(thiz, monitor) {
     // 解构 Monitor 相关条件
-    const [actions, allowDomains, disallowDomains, targets] = Monitor[SandboxExposer2](
-      SandboxSignal_ExposeInfo,
-      monitor,
-    )
+    const [actions, allowDomains, disallowDomains, targets] = Monitor[
+      SandboxExposer2
+    ](SandboxSignal_ExposeInfo, monitor)
 
     /**
      * @param {{ [x: number]: Set<Monitor>; }} actionMap
@@ -1332,7 +1355,9 @@ class DomainMonitors {
     if (!allowDomains) {
       // 取运行域补集
       // @ts-expect-error Sandbox
-      const totalDomains = new Set(Domain[SandboxExposer2](SandboxSignal_ListDomain))
+      const totalDomains = new Set(
+        Domain[SandboxExposer2](SandboxSignal_ListDomain),
+      )
 
       if (disallowDomains) {
         for (const domain of disallowDomains) {
@@ -1377,9 +1402,9 @@ class DomainMonitors {
     }
 
     const targetActionMap = instance.#targetMonitorsMap.get(target)
-    const targetMonitors = targetActionMap && targetActionMap[action]
+    const targetMonitors = targetActionMap?.[action]
     const actionMap = instance.#monitorsMap.get(targetDomain)
-    const actionMonitors = actionMap && actionMap[action]
+    const actionMonitors = actionMap?.[action]
 
     let array = null
 
@@ -1416,10 +1441,9 @@ class DomainMonitors {
       }
 
       // 解构 Monitor 相关条件
-      const [actions, allowDomains, disallowDomains, targets] = Monitor[SandboxExposer2](
-        SandboxSignal_ExposeInfo,
-        monitor,
-      )
+      const [actions, allowDomains, disallowDomains, targets] = Monitor[
+        SandboxExposer2
+      ](SandboxSignal_ExposeInfo, monitor)
 
       // 指定了目标的 Monitor 不参与新运行域处理
       if (targets) {
@@ -1430,7 +1454,7 @@ class DomainMonitors {
       if (allowDomains && !allowDomains.has(domain)) {
         continue
       }
-      if (disallowDomains && disallowDomains.has(domain)) {
+      if (disallowDomains?.has(domain)) {
         continue
       }
 
@@ -1460,7 +1484,9 @@ class DomainMonitors {
    */
   static handleNewDomain(newDomain) {
     // @ts-expect-error Sandbox
-    const totalDomains = new Set(Domain[SandboxExposer2](SandboxSignal_ListDomain))
+    const totalDomains = new Set(
+      Domain[SandboxExposer2](SandboxSignal_ListDomain),
+    )
 
     for (const domain of totalDomains) {
       const instance = DomainMonitors.#domainMonitors.get(domain)
@@ -1559,7 +1585,12 @@ class DomainMonitors {
     Object.freeze(nameds)
 
     // 获取可能的 Monitor 集合
-    const monitorMap = DomainMonitors.#getMonitorsBy(sourceDomain, targetDomain, action, args[0])
+    const monitorMap = DomainMonitors.#getMonitorsBy(
+      sourceDomain,
+      targetDomain,
+      action,
+      args[0],
+    )
 
     const result = {
       preventDefault: false,
@@ -1567,7 +1598,7 @@ class DomainMonitors {
       returnValue: undefined,
     }
 
-    if (!monitorMap || !monitorMap.length) {
+    if (!monitorMap?.length) {
       return result
     }
 
@@ -1607,7 +1638,13 @@ class DomainMonitors {
 
     // 遍历并尝试分发监听事件
     for (const monitor of monitorMap) {
-      Monitor[SandboxExposer2](SandboxSignal_DiapatchMonitor, monitor, access, nameds, control)
+      Monitor[SandboxExposer2](
+        SandboxSignal_DiapatchMonitor,
+        monitor,
+        access,
+        nameds,
+        control,
+      )
 
       if (result.stopPropagation) {
         break
@@ -1629,7 +1666,10 @@ class DomainMonitors {
     let instance = DomainMonitors.#domainMonitors.get(domain)
 
     if (!instance) {
-      DomainMonitors.#domainMonitors.set(domain, (instance = new DomainMonitors()))
+      DomainMonitors.#domainMonitors.set(
+        domain,
+        (instance = new DomainMonitors()),
+      )
     }
 
     DomainMonitors.#installMonitor(instance, monitor)
@@ -1820,7 +1860,7 @@ class Monitor {
     if (this.isStarted) {
       throw new Error("Monitor 在启动期间不能修改")
     }
-    if (action.length == 0 || !action.every(AccessAction.isAccessAction)) {
+    if (action.length === 0 || !action.every(AccessAction.isAccessAction)) {
       throw new TypeError("无效的访问动作")
     }
 
@@ -1898,7 +1938,7 @@ class Monitor {
     if (this.isStarted) {
       throw new Error("Monitor 在启动期间不能修改")
     }
-    if (typeof name != "string") {
+    if (typeof name !== "string") {
       throw new TypeError("无效的检查名称")
     }
     if (!values.length) {
@@ -1934,7 +1974,7 @@ class Monitor {
     if (this.isStarted) {
       throw new Error("Monitor 在启动期间不能修改")
     }
-    if (typeof filter != "function") {
+    if (typeof filter !== "function") {
       throw new TypeError("无效的过滤器")
     }
 
@@ -1963,7 +2003,7 @@ class Monitor {
     if (this.isStarted) {
       throw new Error("Monitor 在启动期间不能修改")
     }
-    if (typeof handler != "function") {
+    if (typeof handler !== "function") {
       throw new TypeError("无效的回调")
     }
 
@@ -1993,7 +2033,7 @@ class Monitor {
     if (this.isStarted) {
       throw new Error("Monitor 已经启动")
     }
-    if (typeof this.#handler != "function") {
+    if (typeof this.#handler !== "function") {
       throw new Error("Monitor 未指定回调函数")
     }
 
@@ -2025,7 +2065,12 @@ class Monitor {
    * @param {Monitor} thiz
    */
   static #exposeInfo(thiz) {
-    return [thiz.#actions, thiz.#allowDomains, thiz.#disallowDomains, thiz.#checkInfo["target"]]
+    return [
+      thiz.#actions,
+      thiz.#allowDomains,
+      thiz.#disallowDomains,
+      thiz.#checkInfo.target,
+    ]
   }
 
   /**
@@ -2141,7 +2186,9 @@ class Marshal {
    * @returns {boolean}
    */
   static #strictMarshal(obj) {
-    return obj instanceof Sandbox || obj instanceof Rule || obj instanceof Monitor
+    return (
+      obj instanceof Sandbox || obj instanceof Rule || obj instanceof Monitor
+    )
   }
 
   /**
@@ -2296,7 +2343,7 @@ class Marshal {
       paramList = paramList.join(",")
     }
 
-    if (type == "any") {
+    if (type === "any") {
       return (
         ["async", "generator", "agenerator", null]
           // @ts-expect-error Sandbox // 突然发现ts-ignore也挺方便的喵
@@ -2339,7 +2386,7 @@ class Marshal {
 
     // 如果可能，应该尽量避免陷入相同运行域
     if (prevDomain === domain) {
-      return (console.warn("trapDomain 处于相同 domain"), action())
+      return console.warn("trapDomain 处于相同 domain"), action()
     }
 
     Domain[SandboxExposer2](SandboxSignal_EnterDomain, domain)
@@ -2416,8 +2463,12 @@ class Marshal {
 
     if (typeof src === "function") {
       const descriptor = Reflect.getOwnPropertyDescriptor(src, "prototype")
-      if (descriptor && descriptor.value && !descriptor.enumerable && !descriptor.configurable) {
-        cloned = function () {}
+      if (
+        descriptor?.value &&
+        !descriptor.enumerable &&
+        !descriptor.configurable
+      ) {
+        cloned = () => {}
       } else {
         cloned = () => {}
       }
@@ -2447,7 +2498,7 @@ class Marshal {
     }
 
     // 尝试拆除代理
-    let [sourceDomain, target] = Marshal.#marshalledProxies.has(obj)
+    const [sourceDomain, target] = Marshal.#marshalledProxies.has(obj)
       ? Marshal.#revertProxy(obj)
       : [Domain.current, obj]
 
@@ -2488,11 +2539,10 @@ class Marshal {
         const newError = new mappedCtor()
         const silentAccess = (o, p, d) => {
           try {
-            if (typeof p == "function") {
+            if (typeof p === "function") {
               return p(o)
-            } else {
-              return o[p]
             }
+            return o[p]
           } catch (e) {
             return d
           }
@@ -2506,7 +2556,9 @@ class Marshal {
         }
 
         const name = String(silentAccess(target, "name", "#无法获取错误名#"))
-        const message = String(silentAccess(target, "message", "#无法获取错误消息#"))
+        const message = String(
+          silentAccess(target, "message", "#无法获取错误消息#"),
+        )
         const stack = String(silentAccess(target, "stack", "#无法获取调用栈#"))
         const string = silentAccess(target, String, "#无法获取错误信息#")
 
@@ -2517,7 +2569,10 @@ class Marshal {
 
         // 继承原本的错误信息
         const errorReporter = ErrorManager.getErrorReporter(target)
-        ErrorManager.setErrorReporter(newError, errorReporter || new ErrorReporter(target)) // 无论有没有都捕获当前的错误信息
+        ErrorManager.setErrorReporter(
+          newError,
+          errorReporter || new ErrorReporter(target),
+        ) // 无论有没有都捕获当前的错误信息
 
         return newError
       }
@@ -2558,7 +2613,12 @@ class Marshal {
 
             if (
               rule &&
-              !rule.canAccess(AccessAction.CALL, target, marshalledThis, marshalledArgs)
+              !rule.canAccess(
+                AccessAction.CALL,
+                target,
+                marshalledThis,
+                marshalledArgs,
+              )
             ) {
               throw new ReferenceError("封送对象的源运行域禁止了此项操作")
             }
@@ -2596,7 +2656,10 @@ class Marshal {
         return Marshal.#trapDomain(sourceDomain, () => {
           const rule = ruleRef.rule
 
-          if (rule && !rule.canAccess(AccessAction.NEW, target, argArray, newTarget)) {
+          if (
+            rule &&
+            !rule.canAccess(AccessAction.NEW, target, argArray, newTarget)
+          ) {
             throw new ReferenceError("封送对象的源运行域禁止了此项操作")
           }
 
@@ -2624,10 +2687,10 @@ class Marshal {
           let getter = attributes.get
           let setter = attributes.set
 
-          if (typeof getter == "function") {
+          if (typeof getter === "function") {
             getter = Marshal.#marshal(getter, sourceDomain)
           }
-          if (typeof setter == "function") {
+          if (typeof setter === "function") {
             setter = Marshal.#marshal(setter, sourceDomain)
           }
 
@@ -2659,7 +2722,10 @@ class Marshal {
         const domainTrapAction = () => {
           const rule = ruleRef.rule
 
-          if (rule && !rule.canAccess(AccessAction.DEFINE, target, property, attributes)) {
+          if (
+            rule &&
+            !rule.canAccess(AccessAction.DEFINE, target, property, attributes)
+          ) {
             throw new ReferenceError("封送对象的源运行域禁止了此项操作")
           }
 
@@ -2742,7 +2808,10 @@ class Marshal {
           // 获取封送规则并检查
           const rule = ruleRef.rule
 
-          if (rule && !rule.canAccess(AccessAction.READ, target, p, marshalledReceiver)) {
+          if (
+            rule &&
+            !rule.canAccess(AccessAction.READ, target, p, marshalledReceiver)
+          ) {
             throw new ReferenceError("封送对象的源运行域禁止了此项操作")
           }
 
@@ -2943,7 +3012,13 @@ class Marshal {
 
           if (
             rule &&
-            !rule.canAccess(AccessAction.WRITE, target, p, marshalledNewValue, marshalledReceiver)
+            !rule.canAccess(
+              AccessAction.WRITE,
+              target,
+              p,
+              marshalledNewValue,
+              marshalledReceiver,
+            )
           ) {
             throw new ReferenceError("封送对象的源运行域禁止了此项操作")
           }
@@ -2997,7 +3072,11 @@ class Marshal {
     })
 
     Marshal.#marshalledProxies.add(proxy)
-    targetDomain[SandboxExposer](SandboxSignal_SetMarshalledProxy, target, proxy)
+    targetDomain[SandboxExposer](
+      SandboxSignal_SetMarshalledProxy,
+      target,
+      proxy,
+    )
     return proxy
   }
 
@@ -3157,7 +3236,10 @@ class Domain {
    */
   isPromise(promise) {
     if (Marshal.isMarshalled(promise)) {
-      ;[, promise] = Marshal[SandboxExposer2](SandboxSignal_UnpackProxy, promise)
+      ;[, promise] = Marshal[SandboxExposer2](
+        SandboxSignal_UnpackProxy,
+        promise,
+      )
     }
 
     return Domain.#hasInstance.call(this.#domainPromise, promise)
@@ -3246,7 +3328,10 @@ class Domain {
       return Domain.current.isError(error)
     }
 
-    const [domain, target] = Marshal[SandboxExposer2](SandboxSignal_UnpackProxy, error)
+    const [domain, target] = Marshal[SandboxExposer2](
+      SandboxSignal_UnpackProxy,
+      error,
+    )
 
     return target instanceof Error || domain.isError(target)
   }
@@ -3502,7 +3587,8 @@ class Sandbox {
    * @param {string} persistId
    */
   constructor(persistId) {
-    this.#persistId = typeof persistId == "string" && persistId.length > 0 ? persistId : null
+    this.#persistId =
+      typeof persistId === "string" && persistId.length > 0 ? persistId : null
 
     this.#sourceDomain = Domain.current
     this.#domain = new Domain()
@@ -3548,7 +3634,9 @@ class Sandbox {
     /** @type {typeof Function} */
     const defaultAsyncFunction = global.eval("(async function(){}).constructor")
     /** @type {typeof Function} */
-    const defaultAsyncGeneratorFunction = global.eval("(async function*(){}).constructor")
+    const defaultAsyncGeneratorFunction = global.eval(
+      "(async function*(){}).constructor",
+    )
 
     /**
      * @param {typeof Function} target
@@ -3566,7 +3654,10 @@ class Sandbox {
       const params = argArray.slice(0, -1)
 
       const compiled = Sandbox.#compileCore(thiz, code, null, params, true)
-      Sandbox.#functionRefCodes.set(compiled, `function (${params.join(", ")}) {\n${code}\n}`)
+      Sandbox.#functionRefCodes.set(
+        compiled,
+        `function (${params.join(", ")}) {\n${code}\n}`,
+      )
       return compiled
     }
 
@@ -3594,11 +3685,10 @@ class Sandbox {
      * @param {any} newCtor
      */
     function rewriteCtor(prototype, newCtor) {
-      const descriptor = Object.getOwnPropertyDescriptor(prototype, "constructor") || {
-        configurable: true,
-        writable: true,
-        enumerable: false,
-      }
+      const descriptor = Object.getOwnPropertyDescriptor(
+        prototype,
+        "constructor",
+      ) || { configurable: true, writable: true, enumerable: false }
       if (!descriptor.configurable) {
         throw new TypeError("无法覆盖不可配置的构造函数")
       }
@@ -3609,9 +3699,18 @@ class Sandbox {
     // 封装当前运行域所有Function类型的构造函数
     // 确保沙盒代码无法访问真正的 Window 对象
     // (不过理论上说访问了也基本上没什么东西喵)
-    rewriteCtor(defaultFunction.prototype, (global.Function = new Proxy(defaultFunction, handler)))
-    rewriteCtor(defaultGeneratorFunction.prototype, new Proxy(defaultGeneratorFunction, handler))
-    rewriteCtor(defaultAsyncFunction.prototype, new Proxy(defaultAsyncFunction, handler))
+    rewriteCtor(
+      defaultFunction.prototype,
+      (global.Function = new Proxy(defaultFunction, handler)),
+    )
+    rewriteCtor(
+      defaultGeneratorFunction.prototype,
+      new Proxy(defaultGeneratorFunction, handler),
+    )
+    rewriteCtor(
+      defaultAsyncFunction.prototype,
+      new Proxy(defaultAsyncFunction, handler),
+    )
     rewriteCtor(
       defaultAsyncGeneratorFunction.prototype,
       new Proxy(defaultAsyncGeneratorFunction, handler),
@@ -3714,7 +3813,11 @@ class Sandbox {
    */
   set document(value) {
     Sandbox.#assertOperator(this)
-    this.#domainDocument = Marshal[SandboxExposer2](SandboxSignal_Marshal, value, this.#domain)
+    this.#domainDocument = Marshal[SandboxExposer2](
+      SandboxSignal_Marshal,
+      value,
+      this.#domain,
+    )
   }
 
   /**
@@ -3868,7 +3971,9 @@ class Sandbox {
     }
 
     // 先从沙盒运行域实际的window中得到所有的全局属性名
-    const globalKeys = Reflect.ownKeys(this.#domainWindow).filter((key) => typeof key == "string")
+    const globalKeys = Reflect.ownKeys(this.#domainWindow).filter(
+      (key) => typeof key === "string",
+    )
 
     // 我们遍历 `patternBuiltins` 并将符合条件的属性放到 `builtins` 中
     for (const key of globalKeys) {
@@ -3888,7 +3993,7 @@ class Sandbox {
         }
 
         // 非类的函数应该要绑定 this 为 null
-        if (typeof v == "function" && !("prototype" in v)) {
+        if (typeof v === "function" && !("prototype" in v)) {
           builtins[k] = v.bind(null)
         }
       }
@@ -3959,7 +4064,7 @@ class Sandbox {
     inheritScope = false,
     writeContext = "exists",
   ) {
-    if (typeof code != "string") {
+    if (typeof code !== "string") {
       throw new TypeError("代码需要是一个字符串")
     }
 
@@ -3971,13 +4076,15 @@ class Sandbox {
     new thiz.#domainFunction(code)
 
     const passThis = !("this" in context)
-    const executingScope = Sandbox.#executingScope[Sandbox.#executingScope.length - 1]
+    const executingScope =
+      Sandbox.#executingScope[Sandbox.#executingScope.length - 1]
     const scope = (inheritScope && executingScope) || thiz.#scope
     const contextName = Sandbox.#makeName("_", scope)
     const argsName = Sandbox.#makeName("_", scope)
     const applyName = Sandbox.#makeName("_", scope)
     const parameters = paramList ? paramList.join(", ") : ""
-    const writeContextAction = { exists: 0, extend: 1, all: 2 }[writeContext] || 0
+    const writeContextAction =
+      { exists: 0, extend: 1, all: 2 }[writeContext] || 0
 
     let argumentList
     let wrappedEval
@@ -3991,7 +4098,11 @@ class Sandbox {
 
     const domain = thiz.#domain
     const domainWindow = thiz.#domainWindow
-    const marshalledContext = Marshal[SandboxExposer2](SandboxSignal_Marshal, context, domain)
+    const marshalledContext = Marshal[SandboxExposer2](
+      SandboxSignal_Marshal,
+      context,
+      domain,
+    )
 
     // 构建上下文拦截器
     const intercepter = new Proxy(scope, {
@@ -4024,7 +4135,10 @@ class Sandbox {
         return target[p]
       },
       set(target, p, v) {
-        if (writeContextAction == 2 || (writeContextAction == 1 && !(p in target))) {
+        if (
+          writeContextAction === 2 ||
+          (writeContextAction === 1 && !(p in target))
+        ) {
           return Reflect.set(marshalledContext, p, v)
         }
 
@@ -4050,15 +4164,27 @@ class Sandbox {
         try {
           // 传递 `this`、以及函数参数
           if (passThis) {
-            context.this = Marshal[SandboxExposer2](SandboxSignal_Marshal, this, domain)
+            context.this = Marshal[SandboxExposer2](
+              SandboxSignal_Marshal,
+              this,
+              domain,
+            )
           }
-          argumentList = Marshal[SandboxExposer2](SandboxSignal_MarshalArray, args, domain)
+          argumentList = Marshal[SandboxExposer2](
+            SandboxSignal_MarshalArray,
+            args,
+            domain,
+          )
 
           // 调用闭包函数
           const result = raw.call(null, intercepter)
 
           // 封送返回结果
-          return Marshal[SandboxExposer2](SandboxSignal_Marshal, result, prevDomain)
+          return Marshal[SandboxExposer2](
+            SandboxSignal_Marshal,
+            result,
+            prevDomain,
+          )
         } catch (e) {
           // @ts-expect-error Sandbox
           if (!Domain.isError(e)) {
@@ -4079,7 +4205,11 @@ class Sandbox {
         return domainAction()
       }
 
-      return Marshal[SandboxExposer2](SandboxSignal_TrapDomain, domain, domainAction)
+      return Marshal[SandboxExposer2](
+        SandboxSignal_TrapDomain,
+        domain,
+        domainAction,
+      )
     }
   }
 
@@ -4183,7 +4313,7 @@ class Sandbox {
    * @param {Sandbox} thiz
    */
   static #createScope(thiz) {
-    let baseScope = thiz.#scope
+    const baseScope = thiz.#scope
     const rawScope = new thiz.#domainObject()
 
     thiz.#scope = new Proxy(rawScope, {
@@ -4204,7 +4334,7 @@ class Sandbox {
           const accessTarget = topWindow[p]
 
           if (
-            typeof accessTarget == "function" &&
+            typeof accessTarget === "function" &&
             "prototype" in accessTarget &&
             accessTarget.prototype instanceof Sandbox.#topWindowHTMLElement
           ) {
@@ -4220,14 +4350,17 @@ class Sandbox {
         }
 
         if (thiz.#freeAccess && !Globals.isBuiltinKey(p)) {
-          const topWindow = Domain.topDomain[SandboxExposer](SandboxSignal_GetWindow)
+          const topWindow = Domain.topDomain[SandboxExposer](
+            SandboxSignal_GetWindow,
+          )
           return p in topWindow
-        } else if (thiz.#domAccess) {
+        }
+        if (thiz.#domAccess) {
           const topWindow = Sandbox.#topWindow
           const accessTarget = topWindow[p]
 
           if (
-            typeof accessTarget == "function" &&
+            typeof accessTarget === "function" &&
             "prototype" in accessTarget &&
             accessTarget.prototype instanceof Sandbox.#topWindowHTMLElement
           ) {
@@ -4301,9 +4434,11 @@ class Sandbox {
     /** @type {Storage} */
     const localStorage = Sandbox.#topWindow.localStorage
     /** @type {Array<string>} */
-    const keys = Object.keys(localStorage).filter((key) => key.startsWith(prefix))
+    const keys = Object.keys(localStorage).filter((key) =>
+      key.startsWith(prefix),
+    )
 
-    Sandbox.#topWindow.addEventListener("storage", function (e) {
+    Sandbox.#topWindow.addEventListener("storage", (e) => {
       if (e.storageArea !== localStorage) {
         return
       }
@@ -4331,7 +4466,7 @@ class Sandbox {
       }
     })
 
-    prototype.clear = function () {
+    prototype.clear = () => {
       const removingKeys = Object.assign([], keys)
       keys.length = 0
 
@@ -4340,19 +4475,15 @@ class Sandbox {
       }
     }
 
-    prototype.getItem = function (key) {
-      return localStorage[prefix + key]
-    }
+    prototype.getItem = (key) => localStorage[prefix + key]
 
-    prototype.key = function (index) {
-      return keys[index] || null
-    }
+    prototype.key = (index) => keys[index] || null
 
-    prototype.removeItem = function (key) {
+    prototype.removeItem = (key) => {
       delete localStorage[prefix + key]
     }
 
-    prototype.setItem = function (key, value) {
+    prototype.setItem = (key, value) => {
       localStorage[prefix + key] = value
     }
 
@@ -4383,7 +4514,7 @@ class Sandbox {
 
     return new Proxy(storage, {
       get(target, p, receiver) {
-        if (typeof p != "string") {
+        if (typeof p !== "string") {
           return undefined
         }
         if (p in prototype) {
@@ -4393,7 +4524,7 @@ class Sandbox {
         return prototype.getItem(p)
       },
       set(target, p, newValue, receiver) {
-        if (typeof p != "string") {
+        if (typeof p !== "string") {
           return true
         }
         if (p in prototype) {
@@ -4404,7 +4535,7 @@ class Sandbox {
         return true
       },
       deleteProperty(target, p) {
-        if (typeof p != "string") {
+        if (typeof p !== "string") {
           return true
         }
 
@@ -4433,7 +4564,7 @@ class Sandbox {
 function sealClass(clazz) {
   sealObjectTree(clazz)
 
-  if (typeof clazz == "function") {
+  if (typeof clazz === "function") {
     sealObjectTree(clazz.prototype)
   } else if (clazz.constructor) {
     sealObjectTree(clazz.constructor)
@@ -4536,7 +4667,7 @@ if (SANDBOX_ENABLED) {
     sealClass(SyntaxError)
 
     sealClass(function* () {}.constructor)
-    sealClass(async function () {}.constructor)
+    sealClass((async () => {}).constructor)
     sealClass(async function* () {}.constructor)
 
     // 改为此处初始化，防止多次初始化
@@ -4560,4 +4691,12 @@ if (SANDBOX_ENABLED) {
   }
 }
 
-export { AccessAction, Rule, Monitor, Marshal, Domain, Sandbox, SANDBOX_ENABLED }
+export {
+  AccessAction,
+  Domain,
+  Marshal,
+  Monitor,
+  Rule,
+  SANDBOX_ENABLED,
+  Sandbox,
+}

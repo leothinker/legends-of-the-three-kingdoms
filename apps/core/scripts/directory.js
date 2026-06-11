@@ -2,12 +2,12 @@
 // 年久失修
 //@ts-nocheck
 
-var fs = require("fs")
-var path = require("path")
-var exec = require("child_process").exec
+var fs = require("node:fs")
+var path = require("node:path")
+var exec = require("node:child_process").exec
 global.window = global
-require(__dirname + "/update.js")
-require(__dirname + "/asset.js")
+require(`${__dirname}/update.js`)
+require(`${__dirname}/asset.js`)
 
 var updates = window.wtk_update
 var newversion = false
@@ -16,7 +16,7 @@ if (process.argv[2]) {
   if (/[0-9]/.test(process.argv[2][0])) {
     newversion = true
     updates.update = updates.version
-    updates.version = "1.10." + process.argv[2]
+    updates.version = `1.10.${process.argv[2]}`
     commit = updates.version
   } else {
     commit = process.argv[2]
@@ -26,33 +26,35 @@ var assetlist = ""
 var skinlist = "window.wtk_skin_list={\n"
 var entrylist = []
 var entrymap = {}
-var get = function (dir, callback) {
-  fs.readdir(dir, function (err, list) {
-    var shift = function () {
+var get = (dir, callback) => {
+  fs.readdir(dir, (err, list) => {
+    var shift = () => {
       if (list.length) {
         var filename = list.shift()
         var delay = false
         if (!/\.|~|_/.test(filename[0])) {
-          var url = dir + "/" + filename
+          var url = `${dir}/${filename}`
           var stat = fs.statSync(url)
           if (stat.isFile()) {
-            if ([".jpg", ".png", ".mp3", ".ttf"].indexOf(path.extname(url)) != -1) {
+            if (
+              [".jpg", ".png", ".mp3", ".ttf"].indexOf(path.extname(url)) !== -1
+            ) {
               var assetentry = path.relative(path.dirname(__dirname), url)
-              assetlist += ",\n\t'" + assetentry + "'"
+              assetlist += `,\n\t'${assetentry}'`
               entrylist.push(assetentry)
             }
           } else if (stat.isDirectory()) {
-            if (dir == path.dirname(__dirname) + "/image/skin") {
-              fs.readdir(url, function (err, list) {
+            if (dir === `${path.dirname(__dirname)}/image/skin`) {
+              fs.readdir(url, (err, list) => {
                 var num = 0
                 for (var i = 0; i < list.length; i++) {
-                  var url2 = url + "/" + list[i]
+                  var url2 = `${url}/${list[i]}`
                   var stat = fs.statSync(url2)
-                  if (stat.isFile() && path.extname(url2) == ".jpg") {
+                  if (stat.isFile() && path.extname(url2) === ".jpg") {
                     num++
                   }
                 }
-                skinlist += "\t" + filename + ":" + num + ",\n"
+                skinlist += `\t${filename}:${num},\n`
                 entrymap[filename] = num
                 shift()
               })
@@ -74,11 +76,11 @@ var get = function (dir, callback) {
   })
 }
 
-get(path.dirname(__dirname), function () {
+get(path.dirname(__dirname), () => {
   var diff = false
-  if (window.wtk_asset_list.length == entrylist.length + 1) {
+  if (window.wtk_asset_list.length === entrylist.length + 1) {
     for (var i = 0; i < entrylist.length; i++) {
-      if (entrylist[i] != window.wtk_asset_list[i + 1]) {
+      if (entrylist[i] !== window.wtk_asset_list[i + 1]) {
         diff = true
         break
       }
@@ -100,14 +102,14 @@ get(path.dirname(__dirname), function () {
   } else {
     diff = true
   }
-  var next = function () {
+  var next = () => {
     exec("git diff --name-only", (error, stdout, stderr) => {
-      var updatelist = "window.wtk_update={\n\tversion:'" + updates.version + "',"
-      updatelist += "\n\tupdate:'" + (updates.update || "") + "',"
-      var apply = function (name, list) {
-        updatelist += "\n\t" + name + ":[\n"
+      var updatelist = `window.wtk_update={\n\tversion:'${updates.version}',`
+      updatelist += `\n\tupdate:'${updates.update || ""}',`
+      var apply = (name, list) => {
+        updatelist += `\n\t${name}:[\n`
         for (var i = 0; i < list.length; i++) {
-          updatelist += "\t\t'" + list[i] + "'"
+          updatelist += `\t\t'${list[i]}'`
           if (i < list.length - 1) {
             updatelist += ","
           }
@@ -132,8 +134,8 @@ get(path.dirname(__dirname), function () {
         var extname = path.extname(changes[i])
         if (
           !changes[i] ||
-          (extname != ".js" && extname != ".css") ||
-          changes[i] == "game/update.js"
+          (extname !== ".js" && extname !== ".css") ||
+          changes[i] === "game/update.js"
         ) {
           changes.splice(i--, 1)
         }
@@ -149,7 +151,7 @@ get(path.dirname(__dirname), function () {
           files.push(changes[i])
         }
       }
-      files.sort(function (a, b) {
+      files.sort((a, b) => {
         if (a > b) {
           return 1
         }
@@ -159,22 +161,26 @@ get(path.dirname(__dirname), function () {
         return 0
       })
       apply("files", files)
-      fs.writeFile("game/update.js", updatelist + "\n};", "utf-8", function () {
+      fs.writeFile("game/update.js", `${updatelist}\n};`, "utf-8", () => {
         console.log("updated update.js")
         if (commit && typeof commit === "string") {
-          exec("git add . && git commit -am " + commit)
-          console.log("committed " + commit)
+          exec(`git add . && git commit -am ${commit}`)
+          console.log(`committed ${commit}`)
         }
       })
     })
   }
   if (diff) {
-    var assetversion = "window.wtk_asset_list=[\n\t'" + updates.version + "'"
+    var assetversion = `window.wtk_asset_list=[\n\t'${updates.version}'`
     fs.writeFile(
       "game/asset.js",
-      assetversion + assetlist + "\n];\n" + skinlist.slice(0, skinlist.length - 2) + "\n};",
+      assetversion +
+        assetlist +
+        "\n];\n" +
+        skinlist.slice(0, skinlist.length - 2) +
+        "\n};",
       "utf-8",
-      function () {
+      () => {
         console.log("udpated asset.js")
         next()
       },

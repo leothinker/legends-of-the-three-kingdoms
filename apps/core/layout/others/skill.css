@@ -2,7 +2,7 @@
 .dialog.dclieqiong {
   background-repeat: no-repeat;
   width: auto !important;
-  aspect-ratio: 4/7;
+  aspect-ratio: 4 / 7;
   height: 80% !important;
 
   background-size: contain;
@@ -16,7 +16,7 @@
   height: 50px;
   width: 50px;
   /* background: yellow; */
-  background: url(../../image/card/yiwu_click.png) center/100% no-repeat;
+  background: url(../../image/card/yiwu_click.png) center / 100% no-repeat;
   left: 50%;
   transform: translate(-50%, -50%);
   top: 14%;

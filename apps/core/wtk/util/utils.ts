@@ -31,16 +31,17 @@ export function debounce<T extends (...args: any[]) => any>(
     delay = 500
   }
 
-  let failResult = typeof options === "number" ? NO_RETURN : options?.failResult
+  const failResult =
+    typeof options === "number" ? NO_RETURN : options?.failResult
 
-  // @ts-ignore
+  // @ts-expect-error
   return function (this: any, ...args: any[]) {
     if (lastTimerId != null) {
       if (failResult !== NO_RETURN) {
         lastResolve?.(failResult)
       }
 
-      // @ts-ignore
+      // @ts-expect-error
       clearTimeout(lastTimerId)
     }
 
@@ -74,9 +75,10 @@ export function throttle<T extends (...args: any[]) => any>(
     delay = 500
   }
 
-  let failResult = typeof options === "number" ? NO_RETURN : options?.failResult
+  const failResult =
+    typeof options === "number" ? NO_RETURN : options?.failResult
 
-  // @ts-ignore
+  // @ts-expect-error
   return function (this: any, ...args: any[]) {
     if (lastTimerId != null) {
       if (failResult !== NO_RETURN) {

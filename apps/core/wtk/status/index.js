@@ -157,7 +157,7 @@ export let _status = new status()
 /**
  * @param { InstanceType<typeof status> } [instance]
  */
-export let setStatus = (instance) => {
+export const setStatus = (instance) => {
   _status = instance || new status()
   if (lib.config.dev) {
     window._status = _status

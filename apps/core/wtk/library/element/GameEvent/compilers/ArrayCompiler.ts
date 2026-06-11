@@ -1,12 +1,15 @@
-import { GameEvent } from "../../gameEvent.js"
-import { EventContent } from "./IContentCompiler.ts"
+import type { GameEvent } from "../../gameEvent.js"
 import ContentCompilerBase from "./ContentCompilerBase.ts"
+import type { EventContent } from "./IContentCompiler.ts"
 
 export default class ArrayCompiler extends ContentCompilerBase {
   type = "array"
 
   filter(content: EventContent): boolean {
-    return Array.isArray(content) && content.every((item) => typeof item === "function")
+    return (
+      Array.isArray(content) &&
+      content.every((item) => typeof item === "function")
+    )
   }
 
   compile(content: EventContent) {

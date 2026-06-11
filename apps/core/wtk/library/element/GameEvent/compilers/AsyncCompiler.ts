@@ -2,7 +2,7 @@
 import { AsyncFunction } from "@/util/index.js"
 import ContentCompiler from "./ContentCompiler.ts"
 import ContentCompilerBase from "./ContentCompilerBase.ts"
-import { EventContent } from "./IContentCompiler.ts"
+import type { EventContent } from "./IContentCompiler.ts"
 
 type AsyncFunction<R> = (...args: any[]) => Promise<R>
 

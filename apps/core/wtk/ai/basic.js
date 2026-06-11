@@ -1,4 +1,4 @@
-import { _status, lib, game, get, ui } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
 import { CacheContext } from "@/library/cache/cacheContext.js"
 export class Basic {
   /**
@@ -30,7 +30,7 @@ export class Basic {
         return j > 0
       }
       buttons = get.selectableButtons()
-      if (buttons.length == 0) {
+      if (buttons.length === 0) {
         CacheContext.setInCacheEnvironment(false)
         CacheContext.removeCacheContext()
         return ok
@@ -39,7 +39,7 @@ export class Basic {
       let ix = 0
       let checkix = check(buttons[0], buttons2)
       for (i = 1; i < buttons.length; i++) {
-        let checkixtmp = check(buttons[i], buttons2)
+        const checkixtmp = check(buttons[i], buttons2)
         if (checkixtmp > checkix) {
           ix = i
           checkix = checkixtmp
@@ -63,7 +63,7 @@ export class Basic {
       if (ui.selected.buttons.length >= range[0]) {
         ok = true
       }
-      if (ui.selected.buttons.length == range[1]) {
+      if (ui.selected.buttons.length === range[1]) {
         return true
       }
     }
@@ -77,7 +77,7 @@ export class Basic {
    */
   chooseCard(check) {
     const event = _status.event
-    if (event.filterCard == undefined) {
+    if (event.filterCard === undefined) {
       return check() > 0
     }
     let i, j, range, cards, cards2, skills, effect
@@ -90,7 +90,7 @@ export class Basic {
         ok = true
       }
       if (range[1] <= -1) {
-        if (ui.selected.cards.length == 0) {
+        if (ui.selected.cards.length === 0) {
           return true
         }
         j = 0
@@ -114,7 +114,7 @@ export class Basic {
         // @ts-expect-error ignore
         cards = cards.concat(get.skills())
       }
-      if (cards.length == 0) {
+      if (cards.length === 0) {
         return ok
       }
       cards2 = cards.slice(0)
@@ -141,25 +141,23 @@ export class Basic {
       }
       CacheContext.setInCacheEnvironment(false)
       CacheContext.removeCacheContext()
-      if (typeof cards[ix] == "string") {
+      if (typeof cards[ix] === "string") {
         ui.click.skill(cards[ix])
         var info = get.info(event.skill)
         if (info.filterCard) {
           check = info.check || get.unuseful2
           return this.chooseCard(check)
-        } else {
-          return true
         }
-      } else {
-        cards[ix].classList.add("selected")
-        ui.selected.cards.add(cards[ix])
-        game.check()
-        if (ui.selected.cards.length >= range[0]) {
-          ok = true
-        }
-        if (ui.selected.cards.length == range[1]) {
-          return true
-        }
+        return true
+      }
+      cards[ix].classList.add("selected")
+      ui.selected.cards.add(cards[ix])
+      game.check()
+      if (ui.selected.cards.length >= range[0]) {
+        ok = true
+      }
+      if (ui.selected.cards.length === range[1]) {
+        return true
       }
     }
   }
@@ -171,7 +169,7 @@ export class Basic {
    */
   chooseTarget(check) {
     const event = _status.event
-    if (event.filterTarget == undefined) {
+    if (event.filterTarget === undefined) {
       return check() > 0
     }
     let i, j, range, targets, targets2, effect
@@ -198,12 +196,13 @@ export class Basic {
         CacheContext.setInCacheEnvironment(false)
         CacheContext.removeCacheContext()
         return j > 0
-      } else if (range[1] == 0) {
+      }
+      if (range[1] === 0) {
         return check() > 0
       }
       targets = get.selectableTargets()
-      if (targets.length == 0) {
-        return range[0] == 0 || ok
+      if (targets.length === 0) {
+        return range[0] === 0 || ok
       }
       targets2 = targets.slice(0)
       // targets.sort(function(a,b){
@@ -214,7 +213,7 @@ export class Basic {
       CacheContext.setInCacheEnvironment(true)
       let checkix = check(targets[0], targets2)
       for (i = 1; i < targets.length; i++) {
-        let checkixtmp = check(targets[i], targets2)
+        const checkixtmp = check(targets[i], targets2)
         if (checkixtmp > checkix) {
           ix = i
           checkix = checkixtmp
@@ -235,7 +234,7 @@ export class Basic {
       if (ui.selected.targets.length >= range[0]) {
         ok = true
       }
-      if (ui.selected.targets.length == range[1]) {
+      if (ui.selected.targets.length === range[1]) {
         return true
       }
     }

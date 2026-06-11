@@ -1,10 +1,13 @@
-import { normalizePath, Plugin } from "vite"
-import fs from "fs"
-import path from "path"
-import { createRequire } from "module"
+import fs from "node:fs"
+import { createRequire } from "node:module"
+import path from "node:path"
+import { normalizePath, type Plugin } from "vite"
+
 const require = createRequire(import.meta.url)
 
-export default function vitePluginJIT(importMap: Record<string, string> = {}): Plugin {
+export default function vitePluginJIT(
+  importMap: Record<string, string> = {},
+): Plugin {
   let root = process.cwd()
   let isBuild = false
   const resolvedImportMap: Record<string, string> = {}
@@ -22,7 +25,9 @@ export default function vitePluginJIT(importMap: Record<string, string> = {}): P
       for (const key in importMap) {
         try {
           const resolved = require.resolve(importMap[key])
-          resolvedImportMap[key] = normalizePath("/" + path.relative(root, resolved))
+          resolvedImportMap[key] = normalizePath(
+            `/${path.relative(root, resolved)}`,
+          )
         } catch (e) {
           resolvedImportMap[key] = importMap[key]
         }

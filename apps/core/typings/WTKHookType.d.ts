@@ -6,7 +6,12 @@ declare interface WTKHookType {
    * @param name - 势力的完整名称
    * @param config - 关于势力的配置情况
    */
-  addGroup(id: string, short: string, name: string, config: Record<string, unknown>): any
+  addGroup(
+    id: string,
+    short: string,
+    name: string,
+    config: Record<string, unknown>,
+  ): any
 
   /**
    *
@@ -14,7 +19,11 @@ declare interface WTKHookType {
    * @param translation - 属性的名称
    * @param config - 关于属性的配置
    */
-  addNature(nature: string, translation: string, config: Record<string, unknown>): any
+  addNature(
+    nature: string,
+    translation: string,
+    config: Record<string, unknown>,
+  ): any
 
   /**
    *
@@ -27,7 +36,10 @@ declare interface WTKHookType {
    * @param event - 当前检查的事件
    * @param config - 一些配置
    */
-  checkEnd(event: GameEvent, config: { ok: boolean; auto: boolean; autoConfirm: boolean }): any
+  checkEnd(
+    event: GameEvent,
+    config: { ok: boolean; auto: boolean; autoConfirm: boolean },
+  ): any
 
   /**
    *
@@ -90,7 +102,12 @@ declare interface WTKHookType {
    * @param target - 取消检查的玩家
    * @param event - 当前检查的事件
    */
-  checkOverflow(itemOption: Dialog, itemContainer: Dialog, addedItems: Dialog, game: Game): any
+  checkOverflow(
+    itemOption: Dialog,
+    itemContainer: Dialog,
+    addedItems: Dialog,
+    game: Game,
+  ): any
   checkTipBottom(player: Player): void
 
   /**

@@ -1,21 +1,15 @@
-import {
-  menuContainer,
-  menuxpages,
-  menuUpdates,
-  openMenu,
-  clickToggle,
-  clickSwitcher,
-  clickContainer,
-  clickMenuItem,
-  createMenu,
-  createConfig,
-} from "../index.js"
-import { ui, game, get, ai, lib, _status } from "wtk"
-import { createApp } from "vue"
-import { security } from "@/util/sandbox.js"
 import dedent from "dedent"
+import { createApp } from "vue"
+import { _status, ai, game, get, lib, ui } from "wtk"
+import { security } from "@/util/sandbox.js"
+import {
+  clickContainer,
+  menuContainer,
+  menuUpdates,
+  menuxpages,
+} from "../index.js"
 
-export const otherMenu = function (/** @type { boolean | undefined } */ connectMenu) {
+export const otherMenu = (/** @type { boolean | undefined } */ connectMenu) => {
   if (connectMenu) {
     return
   }
@@ -37,15 +31,27 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
   var clearButton = ui.create.div(".menubutton.round.highlight", "清", start)
   clearButton.style.display = "none"
   clearButton.style.left = "275px"
-  var playButton = ui.create.div(".menubutton.round.highlight.hidden", "播", start)
+  var playButton = ui.create.div(
+    ".menubutton.round.highlight.hidden",
+    "播",
+    start,
+  )
   playButton.style.display = "none"
   playButton.style.left = "215px"
   playButton.style.transition = "opacity 0.3s"
-  var deleteButton = ui.create.div(".menubutton.round.highlight.hidden", "删", start)
+  var deleteButton = ui.create.div(
+    ".menubutton.round.highlight.hidden",
+    "删",
+    start,
+  )
   deleteButton.style.display = "none"
   deleteButton.style.left = "275px"
   deleteButton.style.transition = "opacity 0.3s"
-  var saveButton = ui.create.div(".menubutton.round.highlight.hidden", "存", start)
+  var saveButton = ui.create.div(
+    ".menubutton.round.highlight.hidden",
+    "存",
+    start,
+  )
   saveButton.style.display = "none"
   saveButton.style.transition = "opacity 0.3s"
 
@@ -72,19 +78,19 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
       this._initLink()
       rightPane.appendChild(this.link)
     }
-    if (this.type == "cheat") {
+    if (this.type === "cheat") {
       cheatButton.style.display = ""
     } else {
       cheatButton.style.display = "none"
     }
-    if (this.type == "cmd") {
+    if (this.type === "cmd") {
       runButton.style.display = ""
       clearButton.style.display = ""
     } else {
       runButton.style.display = "none"
       clearButton.style.display = "none"
     }
-    if (this.type == "video") {
+    if (this.type === "video") {
       playButton.style.display = ""
       saveButton.style.display = ""
       deleteButton.style.display = ""
@@ -95,20 +101,25 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
     }
   }
 
-  ui.click.consoleMenu = function () {
+  ui.click.consoleMenu = () => {
     ui.click.menuTab("其它")
     clickMode.call(ui.commandnode)
   }
   //更新菜单有本体函数赋值，就不要懒加载了
-  ;(function () {
+  ;(() => {
     var page = ui.create.div("")
-    var node = ui.create.div(".menubutton.large", "更新", start.firstChild, clickMode)
+    var node = ui.create.div(
+      ".menubutton.large",
+      "更新",
+      start.firstChild,
+      clickMode,
+    )
     node.link = page
     page.classList.add("menu-help")
     var ul = document.createElement("ul")
     var li1 = document.createElement("li")
     var li3 = document.createElement("li")
-    li1.innerHTML = "游戏版本：" + lib.version + ""
+    li1.innerHTML = `游戏版本：${lib.version}`
     li3.innerHTML =
       "由于三国杀正在重构项目结构，在线更新暂时无法使用，请访问github主页获取最新版本。"
 
@@ -116,7 +127,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
     var updatepx = ui.create.node("p")
     updatepx.style.whiteSpace = "nowrap"
     updatepx.style.marginTop = "8px"
-    var buttonx = ui.create.node("button", "访问项目主页", function () {
+    var buttonx = ui.create.node("button", "访问项目主页", () => {
       window.open("https://github.com/libnoname/noname")
     })
     updatepx.appendChild(buttonx)
@@ -126,20 +137,20 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
     ul.appendChild(updatepx)
     page.appendChild(ul)
   })()
-  ;(function () {
-    var norow2 = function () {
+  ;(() => {
+    var norow2 = () => {
       var node = currentrow1
       if (!node) {
         return false
       }
       return (
-        node.innerHTML == "横置" ||
-        node.innerHTML == "翻面" ||
-        node.innerHTML == "换人" ||
-        node.innerHTML == "复活"
+        node.innerHTML === "横置" ||
+        node.innerHTML === "翻面" ||
+        node.innerHTML === "换人" ||
+        node.innerHTML === "复活"
       )
     }
-    var checkCheat = function () {
+    var checkCheat = () => {
       if (norow2()) {
         for (var i = 0; i < row2.childElementCount; i++) {
           row2.childNodes[i].classList.remove("selectedx")
@@ -150,7 +161,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
           row2.childNodes[i].classList.remove("unselectable")
         }
       }
-      if (currentrow1 && currentrow1.innerHTML == "复活") {
+      if (currentrow1 && currentrow1.innerHTML === "复活") {
         for (var i = 0; i < row3.childNodes.length; i++) {
           if (row3.childNodes[i].dead) {
             row3.childNodes[i].style.display = ""
@@ -164,8 +175,8 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
         for (var i = 0; i < row3.childElementCount; i++) {
           if (
             currentrow1 &&
-            currentrow1.innerHTML == "换人" &&
-            row3.childNodes[i].link == game.me
+            currentrow1.innerHTML === "换人" &&
+            row3.childNodes[i].link === game.me
           ) {
             row3.childNodes[i].classList.add("unselectable")
           } else {
@@ -179,15 +190,18 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
           }
         }
       }
-      if (currentrow1 && (currentrow2 || norow2()) && row3.querySelector(".glow")) {
+      if (
+        currentrow1 &&
+        (currentrow2 || norow2()) &&
+        row3.querySelector(".glow")
+      ) {
         cheatButton.classList.add("glowing")
         return true
-      } else {
-        cheatButton.classList.remove("glowing")
-        return false
       }
+      cheatButton.classList.remove("glowing")
+      return false
     }
-    cheatButton.listen(function () {
+    cheatButton.listen(() => {
       if (checkCheat()) {
         var num
         if (currentrow2) {
@@ -241,9 +255,9 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
             case "换人": {
               if (_status.event.isMine()) {
                 if (!ui.auto.classList.contains("hidden")) {
-                  setTimeout(function () {
+                  setTimeout(() => {
                     ui.click.auto()
-                    setTimeout(function () {
+                    setTimeout(() => {
                       ui.click.auto()
                       game.swapPlayer(target)
                     }, 500)
@@ -264,7 +278,12 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
     })
 
     var page = ui.create.div("")
-    var node = ui.create.div(".menubutton.large", "控制", start.firstChild, clickMode)
+    var node = ui.create.div(
+      ".menubutton.large",
+      "控制",
+      start.firstChild,
+      clickMode,
+    )
     node.link = page
     node.type = "cheat"
     page.classList.add("menu-sym")
@@ -275,7 +294,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
       if (this.classList.contains("unselectable")) {
         return
       }
-      if (currentrow1 == this) {
+      if (currentrow1 === this) {
         this.classList.remove("selectedx")
         currentrow1 = null
       } else {
@@ -284,7 +303,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
           currentrow1.classList.remove("selectedx")
         }
         currentrow1 = this
-        if (this.innerHTML == "换人") {
+        if (this.innerHTML === "换人") {
           for (var i = 0; i < row3.childNodes.length; i++) {
             row3.childNodes[i].classList.remove("glow")
           }
@@ -300,7 +319,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
     var nodeturnover = ui.create.div(".menubutton", "翻面", row1, clickrow1)
     var noderevive = ui.create.div(".menubutton", "复活", row1, clickrow1)
     var nodereplace = ui.create.div(".menubutton", "换人", row1, clickrow1)
-    if (!game.canReplaceViewpoint || !game.canReplaceViewpoint()) {
+    if (!game.canReplaceViewpoint?.()) {
       nodereplace.classList.add("unselectable")
     }
 
@@ -310,7 +329,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
       if (this.classList.contains("unselectable")) {
         return
       }
-      if (currentrow2 == this) {
+      if (currentrow2 === this) {
         this.classList.remove("selectedx")
         currentrow2 = null
       } else {
@@ -335,19 +354,23 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
         return
       }
       this.classList.toggle("glow")
-      if (currentrow1 && currentrow1.innerHTML == "换人" && this.classList.contains("glow")) {
-        if (this.link == game.me) {
+      if (
+        currentrow1 &&
+        currentrow1.innerHTML === "换人" &&
+        this.classList.contains("glow")
+      ) {
+        if (this.link === game.me) {
           this.classList.remove("glow")
         }
         for (var i = 0; i < row3.childElementCount; i++) {
-          if (row3.childNodes[i] != this) {
+          if (row3.childNodes[i] !== this) {
             row3.childNodes[i].classList.remove("glow")
           }
         }
       }
       checkCheat()
     }
-    menuUpdates.push(function () {
+    menuUpdates.push(() => {
       if (_status.video || _status.connectMode) {
         node.classList.add("off")
         if (node.classList.contains("active")) {
@@ -393,28 +416,29 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
         row2.hide()
       }
       if (
-        lib.config.mode == "identity" ||
-        lib.config.mode == "guozhan" ||
-        lib.config.mode == "doudizhu"
+        lib.config.mode === "identity" ||
+        lib.config.mode === "guozhan" ||
+        lib.config.mode === "doudizhu"
       ) {
         if (
           game.notMe ||
           (game.me &&
             (game.me._trueMe ||
-              game.hasPlayer(function (current) {
-                return current._trueMe == game.me
-              }))) ||
+              game.hasPlayer((current) => current._trueMe === game.me))) ||
           !game.phaseNumber ||
           _status.qianlidanji
         ) {
           nodereplace.classList.add("unselectable")
-        } else if (_status.event.isMine() && ui.auto.classList.contains("hidden")) {
+        } else if (
+          _status.event.isMine() &&
+          ui.auto.classList.contains("hidden")
+        ) {
           nodereplace.classList.add("unselectable")
         } else {
           nodereplace.classList.remove("unselectable")
         }
       }
-      if (game.dead.length == 0) {
+      if (game.dead.length === 0) {
         noderevive.classList.add("unselectable")
       } else {
         noderevive.classList.remove("unselectable")
@@ -422,12 +446,17 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
       checkCheat()
     })
   })()
-  ;(function () {
+  ;(() => {
     var page = ui.create.div("")
-    var node = ui.create.div(".menubutton.large", "命令", start.firstChild, clickMode)
+    var node = ui.create.div(
+      ".menubutton.large",
+      "命令",
+      start.firstChild,
+      clickMode,
+    )
     ui.commandnode = node
     node.type = "cmd"
-    menuUpdates.push(function () {
+    menuUpdates.push(() => {
       if (_status.connectMode) {
         node.classList.add("off")
         if (node.classList.contains("active")) {
@@ -441,7 +470,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
         }
       }
     })
-    node._initLink = function () {
+    node._initLink = () => {
       node.link = page
       page.classList.add("menu-sym")
 
@@ -505,9 +534,18 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
           .action(AccessAction.WRITE)
           .action(AccessAction.DELETE)
           .require("target", proxyWindow)
-          .require("property", "_status", "lib", "game", "ui", "get", "ai", "cheat")
+          .require(
+            "property",
+            "_status",
+            "lib",
+            "game",
+            "ui",
+            "get",
+            "ai",
+            "cheat",
+          )
           .then((access, nameds, control) => {
-            if (access.action == AccessAction.DEFINE) {
+            if (access.action === AccessAction.DEFINE) {
               control.preventDefault()
               control.stopPropagation()
               control.setReturnValue(false)
@@ -534,7 +572,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 
         proxyWindow = new Proxy(proxyWindow, {
           set(target, propertyKey, value, receiver) {
-            if (typeof propertyKey == "string" && keys.includes(propertyKey)) {
+            if (typeof propertyKey === "string" && keys.includes(propertyKey)) {
               return Reflect.set(target, propertyKey, value, receiver)
             }
 
@@ -550,10 +588,13 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
       if (security.isSandboxRequired()) {
         const reg =
           /^\{([^{}]+:\s*([^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\)))(?:,\s*([^{}]+:\s*(?:[^\s,]*|'[^']*'|"[^"]*"|\{[^}]*\}|\[[^\]]*\]|null|undefined|([a-zA-Z$_][a-zA-Z0-9$_]*\s*:\s*)?[a-zA-Z$_][a-zA-Z0-9$_]*\(\))))*\}$/
-        fun = function (value) {
+        fun = (value) => {
           const exp = reg.test(value) ? `(${value})` : value
-          const expName = "_" + Math.random().toString().slice(2)
-          return security.exec(`return eval(${expName})`, { window: proxyWindow, [expName]: exp })
+          const expName = `_${Math.random().toString().slice(2)}`
+          return security.exec(`return eval(${expName})`, {
+            window: proxyWindow,
+            [expName]: exp,
+          })
         }
         // security.exec(`
         // 	const _status=window._status;
@@ -595,16 +636,16 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
           logindex = -1
           logs.unshift(text2.value)
         }
-        if (text2.value == "cls") {
+        if (text2.value === "cls") {
           pre.innerHTML = ""
           text2.value = ""
-        } else if (text2.value == "up") {
+        } else if (text2.value === "up") {
           if (logindex + 1 < logs.length) {
             text2.value = logs[++logindex]
           } else {
             text2.value = ""
           }
-        } else if (text2.value == "down") {
+        } else if (text2.value === "down") {
           if (logindex >= 0) {
             logindex--
             if (logindex < 0) {
@@ -639,13 +680,13 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
         }
       }
       text2.addEventListener("keydown", (e) => {
-        if (e.key == "Enter") {
+        if (e.key === "Enter") {
           runCommand()
-        } else if (e.key == "ArrowUp") {
+        } else if (e.key === "ArrowUp") {
           if (logindex + 1 < logs.length) {
             text2.value = logs[++logindex]
           }
-        } else if (e.key == "ArrowDown") {
+        } else if (e.key === "ArrowDown") {
           if (logindex >= 0) {
             logindex--
             if (logindex < 0) {
@@ -661,26 +702,26 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
         const args = [...arguments]
         const printResult = args
           .map((arg) => {
-            if (typeof arg != "string") {
+            if (typeof arg !== "string") {
               const parse = (obj) => {
                 if (Array.isArray(obj)) {
                   return `[${obj.map((v) => parse(v))}]`
-                } else if (typeof obj == "function") {
-                  if (typeof obj.name == "string") {
+                }
+                if (typeof obj === "function") {
+                  if (typeof obj.name === "string") {
                     return `[Function ${obj.name}]`
-                  } else {
-                    return `[Function]`
                   }
-                } else if (typeof obj != "string") {
+                  return `[Function]`
+                }
+                if (typeof obj !== "string") {
                   if (obj instanceof Error) {
                     return `<span style="color:red;">${String(obj)}</span>`
                   }
                   return String(obj)
-                } else {
-                  return `'${String(obj)}'`
                 }
+                return `'${String(obj)}'`
               }
-              if (typeof arg == "function") {
+              if (typeof arg === "function") {
                 let argi
                 try {
                   argi = get.stringify(arg)
@@ -696,31 +737,29 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
                   .replace(/>/g, "&gt;")
                   .replace(/"/g, "&quot;")
                   .replace(/'/g, "&#39;")
-              } else if (typeof arg == "object") {
+              }
+              if (typeof arg === "object") {
                 let msg = ""
                 for (const name of Object.getOwnPropertyNames(arg)) {
                   msg += `${name}: ${parse(arg[name])}<br>`
                 }
                 return `<details><summary>${parse(arg)}</summary>${msg}</details>`
-              } else {
-                return parse(arg)
               }
-            } else {
-              const str = String(arg)
-              if (!/<[a-zA-Z]+[^>]*?\/?>.*?(?=<\/[a-zA-Z]+[^>]*?>|$)/.exec(str)) {
-                return str
-                  .replace(/&/g, "&amp;")
-                  .replace(/</g, "&lt;")
-                  .replace(/>/g, "&gt;")
-                  .replace(/"/g, "&quot;")
-                  .replace(/'/g, "&#39;")
-              } else {
-                return str
-              }
+              return parse(arg)
             }
+            const str = String(arg)
+            if (!/<[a-zA-Z]+[^>]*?\/?>.*?(?=<\/[a-zA-Z]+[^>]*?>|$)/.exec(str)) {
+              return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;")
+            }
+            return str
           })
           .join(" ")
-        pre.innerHTML += printResult + "<br>"
+        pre.innerHTML += `${printResult}<br>`
         text.scrollTop = text.scrollHeight
       }
       if (_status.toprint) {
@@ -731,7 +770,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
       clearButton.listen(() => {
         pre.innerHTML = ""
       })
-      if (typeof window.wtk_shijianInterfaces?.showDevTools == "function") {
+      if (typeof window.wtk_shijianInterfaces?.showDevTools === "function") {
         game.print("点击以下按钮\n将开启诗笺版内置的控制台")
         game.print(
           "<button onclick='window.wtk_shijianInterfaces.showDevTools();'>开启DevTools</button>",
@@ -742,10 +781,15 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
       node._initLink()
     }
   })()
-  ;(function () {
+  ;(() => {
     var page = ui.create.div("")
-    var node = ui.create.div(".menubutton.large", "内核", start.firstChild, clickMode)
-    node._initLink = function () {
+    var node = ui.create.div(
+      ".menubutton.large",
+      "内核",
+      start.firstChild,
+      clickMode,
+    )
+    node._initLink = () => {
       node.link = page
       page.classList.add("menu-sym")
 
@@ -766,7 +810,9 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
           agentText += dedent`安卓应用包名: ${window.WTKAndroidBridge.getPackageName()}<br/>`
         }
 
-        if (typeof window.WTKAndroidBridge?.getPackageVersionCode === "function") {
+        if (
+          typeof window.WTKAndroidBridge?.getPackageVersionCode === "function"
+        ) {
           agentText += dedent`安卓应用版本: ${window.WTKAndroidBridge.getPackageVersionCode()}<br/>`
         }
 
@@ -778,9 +824,9 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
       } else if (lib.device === "ios") {
         agentText += dedent`应用平台: 苹果<br/>`
       } else if (
-        typeof window.require == "function" &&
-        typeof window.process == "object" &&
-        typeof window.__dirname == "string"
+        typeof window.require === "function" &&
+        typeof window.process === "object" &&
+        typeof window.__dirname === "string"
       ) {
         agentText += dedent`应用平台: Electron<br/>
 				Electron版本: ${process.versions.electron}<br/>`
@@ -793,8 +839,10 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
       const button = document.createElement("button")
       button.classList.add("changeWebviewProvider")
       button.innerText = "点击切换WebView实现"
-      button.addEventListener("click", function () {
-        if (typeof window.WTKAndroidBridge?.changeWebviewProvider === "function") {
+      button.addEventListener("click", () => {
+        if (
+          typeof window.WTKAndroidBridge?.changeWebviewProvider === "function"
+        ) {
           window.WTKAndroidBridge.changeWebviewProvider()
         } else {
           alert("此客户端不支持此功能")
@@ -806,19 +854,24 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
       node._initLink()
     }
   })()
-  ;(function () {
+  ;(() => {
     var page = ui.create.div("")
-    var node = ui.create.div(".menubutton.large", "战绩", start.firstChild, clickMode)
+    var node = ui.create.div(
+      ".menubutton.large",
+      "战绩",
+      start.firstChild,
+      clickMode,
+    )
     node.type = "rec"
-    node._initLink = function () {
+    node._initLink = () => {
       node.link = page
       page.style.paddingBottom = "10px"
       var reset = function () {
-        if (this.innerHTML == "重置") {
+        if (this.innerHTML === "重置") {
           this.innerHTML = "确定"
-          var that = this
-          setTimeout(function () {
-            that.innerHTML = "重置"
+
+          setTimeout(() => {
+            this.innerHTML = "重置"
           }, 1000)
         } else {
           this.parentNode.previousSibling.remove()
@@ -839,7 +892,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
           ).style.marginBottom = "-5px"
           var item = ui.create.div(
             ".config.indent",
-            lib.config.gameRecord[lib.config.all.mode[i]].str + "<span>重置</span>",
+            `${lib.config.gameRecord[lib.config.all.mode[i]].str}<span>重置</span>`,
             page,
           )
           item.style.height = "auto"
@@ -853,12 +906,17 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
       node._initLink()
     }
   })()
-  ;(function () {
+  ;(() => {
     if (!window.indexedDB || window.nodb) {
       return
     }
     var page = ui.create.div("")
-    var node = ui.create.div(".menubutton.large", "录像", start.firstChild, clickMode)
+    var node = ui.create.div(
+      ".menubutton.large",
+      "录像",
+      start.firstChild,
+      clickMode,
+    )
     node.type = "video"
     lib.videos = []
     ui.create.videoNode = (video, before) => {
@@ -868,21 +926,21 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
       }
       lib.videos[before === true ? "unshift" : "push"](video)
     }
-    node._initLink = function () {
+    node._initLink = () => {
       node.link = page
-      var store = lib.db.transaction(["video"], "readwrite").objectStore("video")
-      store.openCursor().onsuccess = function (e) {
+      var store = lib.db
+        .transaction(["video"], "readwrite")
+        .objectStore("video")
+      store.openCursor().onsuccess = (e) => {
         var cursor = e.target.result
         if (cursor) {
           lib.videos.push(cursor.value)
           cursor.continue()
         } else {
-          lib.videos.sort(function (a, b) {
-            return parseInt(b.time) - parseInt(a.time)
-          })
+          lib.videos.sort((a, b) => parseInt(b.time, 10) - parseInt(a.time, 10))
           var clickcapt = function () {
             var current = this.parentNode.querySelector(".videonode.active")
-            if (current && current != this) {
+            if (current && current !== this) {
               current.classList.remove("active")
             }
             if (this.classList.toggle("active")) {
@@ -897,7 +955,9 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
           }
           var staritem = function () {
             this.parentNode.classList.toggle("starred")
-            var store = lib.db.transaction(["video"], "readwrite").objectStore("video")
+            var store = lib.db
+              .transaction(["video"], "readwrite")
+              .objectStore("video")
             if (this.parentNode.classList.contains("starred")) {
               this.parentNode.link.starred = true
             } else {
@@ -905,7 +965,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
             }
             store.put(this.parentNode.link)
           }
-          var createNode = function (video, before) {
+          var createNode = (video, before) => {
             var node = ui.create.div(".videonode.menubutton.large", clickcapt)
             node.link = video
             var nodename1 = ui.create.div(".menubutton.videoavatar", node)
@@ -915,22 +975,14 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
               nodename2.setBackground(video.name2, "character")
             }
             var date = new Date(video.time)
-            var str =
-              date.getFullYear() +
-              "." +
-              (date.getMonth() + 1) +
-              "." +
-              date.getDate() +
-              " " +
-              date.getHours() +
-              ":"
+            var str = `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()} ${date.getHours()}:`
             var minutes = date.getMinutes()
             if (minutes < 10) {
               str += "0"
             }
             str += minutes
             ui.create.div(".caption", video.name[0], node)
-            ui.create.div(".text", str + "<br>" + video.name[1], node)
+            ui.create.div(".text", `${str}<br>${video.name[1]}`, node)
             if (video.win) {
               ui.create.div(".victory", "胜", node)
             }
@@ -967,10 +1019,10 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
           importVideo.innerHTML =
             '<input type="file" accept="*/*" style="width:calc(100% - 40px)">' +
             '<button style="width:40px">确定</button>'
-          importVideo.lastChild.onclick = function () {
+          importVideo.lastChild.onclick = () => {
             var fileToLoad = importVideo.firstChild.files[0]
             var fileReader = new FileReader()
-            fileReader.onload = function (fileLoadedEvent) {
+            fileReader.onload = (fileLoadedEvent) => {
               var data = fileLoadedEvent.target.result
               if (!data) {
                 return
@@ -982,7 +1034,9 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
                 alert("导入失败")
                 return
               }
-              var store = lib.db.transaction(["video"], "readwrite").objectStore("video")
+              var store = lib.db
+                .transaction(["video"], "readwrite")
+                .objectStore("video")
               var videos = lib.videos.slice(0)
               for (var i = 0; i < videos.length; i++) {
                 if (videos[i].starred) {
@@ -990,12 +1044,15 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
                 }
               }
               for (var deletei = 0; deletei < 5; deletei++) {
-                if (videos.length >= parseInt(lib.config.video) && videos.length) {
+                if (
+                  videos.length >= parseInt(lib.config.video, 10) &&
+                  videos.length
+                ) {
                   var toremove = videos.pop()
                   lib.videos.remove(toremove)
                   store.delete(toremove.time)
                   for (var i = 0; i < page.childNodes.length; i++) {
-                    if (page.childNodes[i].link == toremove) {
+                    if (page.childNodes[i].link === toremove) {
                       page.childNodes[i].remove()
                       break
                     }
@@ -1005,7 +1062,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
                 }
               }
               for (var i = 0; i < lib.videos.length; i++) {
-                if (lib.videos[i].time == data.time) {
+                if (lib.videos[i].time === data.time) {
                   alert("录像已存在")
                   return
                 }
@@ -1027,7 +1084,9 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
             var current = this.parentNode.querySelector(".videonode.active")
             if (current) {
               lib.videos.remove(current.link)
-              var store = lib.db.transaction(["video"], "readwrite").objectStore("video")
+              var store = lib.db
+                .transaction(["video"], "readwrite")
+                .objectStore("video")
               store.delete(current.link.time)
               current.remove()
             }
@@ -1037,12 +1096,12 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
             if (current) {
               game.export(
                 lib.init.encode(JSON.stringify(current.link)),
-                "三国杀 - 录像 - " + current.link.name[0] + " - " + current.link.name[1],
+                `三国杀 - 录像 - ${current.link.name[0]} - ${current.link.name[1]}`,
               )
             }
           })
 
-          ui.updateVideoMenu = function () {
+          ui.updateVideoMenu = () => {
             var active = start.firstChild.querySelector(".active")
             if (active) {
               active.classList.remove("active")
@@ -1067,7 +1126,12 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
     const page = ui.create.div("")
     // 创建帮助按钮
     // TODO: 对是否应该对按钮进行其他框架的挂载处理
-    var node = ui.create.div(".menubutton.large", name, start.firstChild, clickMode)
+    var node = ui.create.div(
+      ".menubutton.large",
+      name,
+      start.firstChild,
+      clickMode,
+    )
     // 设置帮助按钮的类型
     Reflect.set(node, "type", "help")
     // 初始化帮助按钮的链接
@@ -1078,18 +1142,18 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
     page.classList.add("menu-help")
 
     // 若传递的内容为对象，则特殊处理
-    if (typeof content == "object") {
+    if (typeof content === "object") {
       /** @type {object} */
       const contentObject = content
 
       // 如果对象拥有"mount"方式，则调用该方法进行挂载
-      if (typeof contentObject.mount == "function") {
+      if (typeof contentObject.mount === "function") {
         contentObject.mount(page)
       }
       // 如果对象拥有"data"方式或"setup"方式，则视为vue组件
       else if (
-        typeof contentObject.data == "function" ||
-        typeof contentObject.setup == "function"
+        typeof contentObject.data === "function" ||
+        typeof contentObject.setup === "function"
       ) {
         // 创建vue组件
         const component = createApp(contentObject)
@@ -1108,56 +1172,61 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
   }
 
   if (!connectMenu) {
-    var node = ui.create.div(".menubutton.large", "帮助", start.firstChild, function () {
-      var activex = start.firstChild.querySelector(".active")
-      if (this.innerHTML == "帮助") {
-        cheatButton.style.display = "none"
-        runButton.style.display = "none"
-        clearButton.style.display = "none"
-        playButton.style.display = "none"
-        saveButton.style.display = "none"
-        deleteButton.style.display = "none"
+    var node = ui.create.div(
+      ".menubutton.large",
+      "帮助",
+      start.firstChild,
+      function () {
+        var activex = start.firstChild.querySelector(".active")
+        if (this.innerHTML === "帮助") {
+          cheatButton.style.display = "none"
+          runButton.style.display = "none"
+          clearButton.style.display = "none"
+          playButton.style.display = "none"
+          saveButton.style.display = "none"
+          deleteButton.style.display = "none"
 
-        this.innerHTML = "返回"
-        for (var i = 0; i < start.firstChild.childElementCount; i++) {
-          var nodex = start.firstChild.childNodes[i]
-          if (nodex == node) {
-            continue
-          }
-          if (nodex.type == "help") {
-            nodex.style.display = ""
-            if (activex && activex.type != "help") {
-              activex.classList.remove("active")
-              activex.link.remove()
-              activex = null
-              nodex.classList.add("active")
-              rightPane.appendChild(nodex.link)
+          this.innerHTML = "返回"
+          for (var i = 0; i < start.firstChild.childElementCount; i++) {
+            var nodex = start.firstChild.childNodes[i]
+            if (nodex === node) {
+              continue
             }
-          } else {
-            nodex.style.display = "none"
+            if (nodex.type === "help") {
+              nodex.style.display = ""
+              if (activex && activex.type !== "help") {
+                activex.classList.remove("active")
+                activex.link.remove()
+                activex = null
+                nodex.classList.add("active")
+                rightPane.appendChild(nodex.link)
+              }
+            } else {
+              nodex.style.display = "none"
+            }
+          }
+        } else {
+          this.innerHTML = "帮助"
+          for (var i = 0; i < start.firstChild.childElementCount; i++) {
+            var nodex = start.firstChild.childNodes[i]
+            if (nodex === node) {
+              continue
+            }
+            if (nodex.type !== "help") {
+              nodex.style.display = ""
+              if (activex && activex.type === "help") {
+                activex.classList.remove("active")
+                activex.link.remove()
+                activex = null
+                clickMode.call(nodex)
+              }
+            } else {
+              nodex.style.display = "none"
+            }
           }
         }
-      } else {
-        this.innerHTML = "帮助"
-        for (var i = 0; i < start.firstChild.childElementCount; i++) {
-          var nodex = start.firstChild.childNodes[i]
-          if (nodex == node) {
-            continue
-          }
-          if (nodex.type != "help") {
-            nodex.style.display = ""
-            if (activex && activex.type == "help") {
-              activex.classList.remove("active")
-              activex.link.remove()
-              activex = null
-              clickMode.call(nodex)
-            }
-          } else {
-            nodex.style.display = "none"
-          }
-        }
-      }
-    })
+      },
+    )
   }
 
   var active = start.firstChild.querySelector(".active")

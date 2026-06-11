@@ -46,7 +46,12 @@ interface HTMLDivElement {
    * @param ext 文件类型后缀名（例:.jpg）,填noskin，或者不填，默认为".jpg"
    * @param subfolder 子文件夹路径（基本都是按规定文件夹放置，命名）,不填走默认路径
    */
-  setBackground(name: string, type?: string, ext?: string, subfolder?: string): this
+  setBackground(
+    name: string,
+    type?: string,
+    ext?: string,
+    subfolder?: string,
+  ): this
   /**
    * 设置游戏背景，并且缓存该设置
    * @param img

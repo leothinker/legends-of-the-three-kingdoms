@@ -35,18 +35,26 @@ export default class GameEventManager {
     } else if (this.eventStack.includes(event)) {
       this.tempEvent = event
     } else {
-      throw new Error("Cannot assign a value to _status.event that is not in eventStack.")
+      throw new Error(
+        "Cannot assign a value to _status.event that is not in eventStack.",
+      )
     }
 
     if (oldEvent == null || event !== oldEvent) {
-      lib.announce.publish<WTKGameEventChangedArgs>("WTK.Game.Event.Changed", [event, oldEvent!])
+      lib.announce.publish<WTKGameEventChangedArgs>("WTK.Game.Event.Changed", [
+        event,
+        oldEvent!,
+      ])
     }
   }
   popStatusEvent() {
     const lastEvent = this.eventStack.pop()
     const now = this.getStatusEvent()
     if (lastEvent == null || lastEvent !== now) {
-      lib.announce.publish<WTKGameEventChangedArgs>("WTK.Game.Event.Changed", [now!, lastEvent!])
+      lib.announce.publish<WTKGameEventChangedArgs>("WTK.Game.Event.Changed", [
+        now!,
+        lastEvent!,
+      ])
     }
   }
 }

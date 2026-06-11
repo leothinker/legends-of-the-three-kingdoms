@@ -13,7 +13,7 @@ export class CodeSnippet {
    */
   constructor(code: string, erroff: number = 0) {
     this.#code = String(code)
-    this.#erroff = parseInt(String(erroff)) || 0
+    this.#erroff = parseInt(String(erroff), 10) || 0
   }
 
   get code(): string {
@@ -48,7 +48,7 @@ export class CodeSnippet {
       }
 
       codeView += String(i + 1).padStart(width, "0")
-      codeView += `|${i == index ? "⚠️" : "    "}${lines[i]}\n`
+      codeView += `|${i === index ? "⚠️" : "    "}${lines[i]}\n`
     }
 
     return codeView
@@ -60,11 +60,11 @@ export class CodeSnippet {
    * ```
    */
   static get currentSnippet() {
-    if (!this.#snippetStack.length) {
+    if (!CodeSnippet.#snippetStack.length) {
       return null
     }
 
-    return this.#snippetStack[this.#snippetStack.length - 1]
+    return CodeSnippet.#snippetStack[CodeSnippet.#snippetStack.length - 1]
   }
 
   /**
@@ -77,7 +77,7 @@ export class CodeSnippet {
       throw new TypeError("参数必须是一个代码片段对象")
     }
 
-    this.#snippetStack.push(snippet)
+    CodeSnippet.#snippetStack.push(snippet)
   }
 
   /**
@@ -86,11 +86,11 @@ export class CodeSnippet {
    * ```
    */
   static popSnippet(): CodeSnippet {
-    if (!this.#snippetStack.length) {
+    if (!CodeSnippet.#snippetStack.length) {
       throw new Error("代码片段栈为空")
     }
 
-    return this.#snippetStack.pop()!
+    return CodeSnippet.#snippetStack.pop()!
   }
 }
 
@@ -114,7 +114,10 @@ export class ErrorReporter {
    * 以此来保存错误相关信息
    * ```
    */
-  constructor(error: Error, snippet: CodeSnippet | null = CodeSnippet.currentSnippet) {
+  constructor(
+    error: Error,
+    snippet: CodeSnippet | null = CodeSnippet.currentSnippet,
+  ) {
     if (!("stack" in error)) {
       throw new TypeError("传入的对象不是一个错误对象")
     }
@@ -137,7 +140,7 @@ export class ErrorReporter {
       const match = pattern.exec(line)
 
       if (match) {
-        return parseInt(match[1])
+        return parseInt(match[1], 10)
       }
     }
 
@@ -153,7 +156,7 @@ export class ErrorReporter {
     const line = stack.split("\n")[1]
     const lineno = ErrorReporter.#findLineNo(line)
 
-    if (!isNaN(lineno)) {
+    if (!Number.isNaN(lineno)) {
       return this.#snippet.viewCode(lineno)
     }
 
@@ -198,7 +201,7 @@ export class ErrorManager {
       throw new TypeError("参数func必须是一个function")
     }
 
-    return this.#codeSnippets.get(func) || null
+    return ErrorManager.#codeSnippets.get(func) || null
   }
 
   /**
@@ -214,7 +217,7 @@ export class ErrorManager {
       throw new TypeError("参数snippet必须是一个CodeSnippet")
     }
 
-    return this.#codeSnippets.set(func, snippet)
+    return ErrorManager.#codeSnippets.set(func, snippet)
   }
 
   /**
@@ -289,7 +292,7 @@ export class ErrorManager {
       if (snippet) {
         const diff = ErrorManager.#compareStackLevel(e, new Error())
 
-        if (diff && diff == 2 + extraLevel) {
+        if (diff && diff === 2 + extraLevel) {
           ErrorManager.setErrorReporter(e, snippet)
         }
       }
@@ -305,7 +308,10 @@ export class ErrorManager {
    * 在报告错误时可以从此处获取错误报告器来直接报告错误
    * ```
    */
-  static setErrorReporter(obj: object, reporter: ErrorReporter | CodeSnippet | null = null) {
+  static setErrorReporter(
+    obj: object,
+    reporter: ErrorReporter | CodeSnippet | null = null,
+  ) {
     if (obj !== Object(obj)) {
       throw new TypeError("参数必须是一个对象")
     }

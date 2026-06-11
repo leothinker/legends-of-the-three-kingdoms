@@ -1,7 +1,7 @@
-import { rootURL, get, lib, game, _status, ui } from "wtk"
-import { LibInitPromises } from "./promises.js"
+import { _status, game, get, lib, rootURL, ui } from "wtk"
 import { ContentCompiler } from "@/library/element/gameEvent.js"
 import { security } from "@/util/sandbox.js"
+import { LibInitPromises } from "./promises.js"
 
 export class LibInit {
   #promises
@@ -21,24 +21,24 @@ export class LibInit {
       if (navigator.notification) {
         navigator.notification.confirm(
           "游戏似乎未正常载入，是否重置游戏？",
-          function (index) {
-            if (index == 2) {
+          (index) => {
+            if (index === 2) {
               localStorage.removeItem("wtk_inited")
               window.location.reload()
-            } else if (index == 3) {
+            } else if (index === 3) {
               var wtk_inited = localStorage.getItem("wtk_inited")
-              var onlineKey = localStorage.getItem(lib.configprefix + "key")
+              var onlineKey = localStorage.getItem(`${lib.configprefix}key`)
               localStorage.clear()
               if (wtk_inited) {
                 localStorage.setItem("wtk_inited", wtk_inited)
               }
               if (onlineKey) {
-                localStorage.setItem(lib.configprefix + "key", onlineKey)
+                localStorage.setItem(`${lib.configprefix}key`, onlineKey)
               }
               if (indexedDB) {
-                indexedDB.deleteDatabase(lib.configprefix + "data")
+                indexedDB.deleteDatabase(`${lib.configprefix}data`)
               }
-              setTimeout(function () {
+              setTimeout(() => {
                 window.location.reload()
               }, 200)
             }
@@ -54,15 +54,15 @@ export class LibInit {
       }
     } else {
       if (confirm("游戏似乎未正常载入，是否重置游戏？")) {
-        var onlineKey = localStorage.getItem(lib.configprefix + "key")
+        var onlineKey = localStorage.getItem(`${lib.configprefix}key`)
         localStorage.clear()
         if (onlineKey) {
-          localStorage.setItem(lib.configprefix + "key", onlineKey)
+          localStorage.setItem(`${lib.configprefix}key`, onlineKey)
         }
         if (indexedDB) {
-          indexedDB.deleteDatabase(lib.configprefix + "data")
+          indexedDB.deleteDatabase(`${lib.configprefix}data`)
         }
-        setTimeout(function () {
+        setTimeout(() => {
           window.location.reload()
         }, 200)
       }
@@ -91,10 +91,9 @@ export class LibInit {
       clearTimeout(window.resetGameTimeout)
       delete window.resetGameTimeout
 
-
       var onfree = lib.onfree
       delete lib.onfree
-      var loop = function () {
+      var loop = () => {
         if (onfree.length) {
           onfree.shift()()
           setTimeout(loop, 100)
@@ -110,11 +109,14 @@ export class LibInit {
   connection(ws) {
     const client = new lib.element.Client(ws)
     lib.node.clients.push(client)
-    ws.on("message", function (messagestr) {
+    ws.on("message", (messagestr) => {
       var message
       try {
         message = JSON.parse(messagestr)
-        if (!Array.isArray(message) || typeof lib.message.server[message[0]] !== "function") {
+        if (
+          !Array.isArray(message) ||
+          typeof lib.message.server[message[0]] !== "function"
+        ) {
           throw new Error("err")
         }
         if (client.sandbox) {
@@ -131,12 +133,12 @@ export class LibInit {
         }
       } catch (e) {
         console.log(e)
-        console.log("invalid message: " + messagestr)
+        console.log(`invalid message: ${messagestr}`)
         return
       }
       lib.message.server[message.shift()].apply(client, message)
     })
-    ws.on("close", function () {
+    ws.on("close", () => {
       client.close()
     })
     client.send("opened")
@@ -146,7 +148,7 @@ export class LibInit {
     var style = document.createElement("style")
     document.head.appendChild(style)
     for (var i = 0; i < arguments.length; i++) {
-      if (typeof arguments[i] == "string") {
+      if (typeof arguments[i] === "string") {
         style.sheet.insertRule(arguments[i], 0)
       }
     }
@@ -157,7 +159,7 @@ export class LibInit {
     const style = document.createElement("link")
     style.rel = "stylesheet"
     if (path) {
-      if (path[path.length - 1] == "/") {
+      if (path[path.length - 1] === "/") {
         path = path.slice(0, path.length - 1)
       }
       if (file) {
@@ -168,7 +170,7 @@ export class LibInit {
         : new Promise((resolve) => resolve(path))
       ).then((resolvedPath) => {
         style.href = resolvedPath
-        if (typeof before == "function") {
+        if (typeof before === "function") {
           style.addEventListener("load", before)
           document.head.appendChild(style)
         } else if (before) {
@@ -182,10 +184,13 @@ export class LibInit {
   }
 
   js(path, file, onLoad, onError) {
-    if (path[path.length - 1] == "/") {
+    if (path[path.length - 1] === "/") {
       path = path.slice(0, path.length - 1)
     }
-    if (path == `${lib.assetURL}mode` && lib.config.all.stockmode.indexOf(file) == -1) {
+    if (
+      path === `${lib.assetURL}mode` &&
+      lib.config.all.stockmode.indexOf(file) === -1
+    ) {
       Promise.resolve(lib.init[`setMode_${file}`]()).then(onLoad)
       return
     }
@@ -210,10 +215,10 @@ export class LibInit {
         script.addEventListener("load", () => script.remove())
       }
       document.head.appendChild(script)
-      if (typeof onLoad == "function") {
+      if (typeof onLoad === "function") {
         script.addEventListener("load", onLoad)
       }
-      if (typeof onError == "function") {
+      if (typeof onError === "function") {
         script.addEventListener("error", onError)
       }
     })
@@ -226,12 +231,14 @@ export class LibInit {
       sScriptURL = str
     } else if (str.startsWith("local:")) {
       if (
-        lib.assetURL.length == 0 &&
-        location.origin == "file://" &&
-        typeof game.readFile == "undefined"
+        lib.assetURL.length === 0 &&
+        location.origin === "file://" &&
+        typeof game.readFile === "undefined"
       ) {
-        const e = new Error("浏览器file协议下无法使用此api，请在http/https协议下使用此api")
-        if (typeof onerror == "function") {
+        const e = new Error(
+          "浏览器file协议下无法使用此api，请在http/https协议下使用此api",
+        )
+        if (typeof onerror === "function") {
           onerror(e)
         } else {
           throw e
@@ -241,10 +248,10 @@ export class LibInit {
       sScriptURL = lib.assetURL + str.slice(6)
     }
     const oReq = new XMLHttpRequest()
-    if (typeof onload == "function") {
+    if (typeof onload === "function") {
       oReq.addEventListener("load", (result) => {
         if (![0, 200].includes(oReq.status)) {
-          if (typeof onerror == "function") {
+          if (typeof onerror === "function") {
             onerror(new Error(oReq.statusText || oReq.status))
           }
           return
@@ -252,7 +259,7 @@ export class LibInit {
         onload(oReq.responseText)
       })
     }
-    if (typeof onerror == "function") {
+    if (typeof onerror === "function") {
       oReq.addEventListener("error", onerror)
     }
     oReq.open("GET", sScriptURL)
@@ -261,10 +268,10 @@ export class LibInit {
 
   json(url, onload, onerror) {
     const oReq = new XMLHttpRequest()
-    if (typeof onload == "function") {
+    if (typeof onload === "function") {
       oReq.addEventListener("load", () => {
         if (![0, 200].includes(oReq.status)) {
-          if (typeof onerror == "function") {
+          if (typeof onerror === "function") {
             onerror(new Error(oReq.statusText || oReq.status))
           }
           return
@@ -276,7 +283,7 @@ export class LibInit {
             throw new Error("err")
           }
         } catch (e) {
-          if (typeof onerror == "function") {
+          if (typeof onerror === "function") {
             onerror(e)
           }
           return
@@ -284,7 +291,7 @@ export class LibInit {
         onload(result)
       })
     }
-    if (typeof onerror == "function") {
+    if (typeof onerror === "function") {
       oReq.addEventListener("error", onerror)
     }
     oReq.open("GET", url)
@@ -297,38 +304,30 @@ export class LibInit {
     }
     ui.css.styles = lib.init.sheet()
     ui.css.styles.sheet.insertRule(
-      "#arena .player>.name,#arena .button.character>.name {font-family: " +
-        (lib.config.name_font || "xinwei") +
-        ",xinwei}",
+      `#arena .player>.name,#arena .button.character>.name {font-family: ${lib.config.name_font || "xinwei"},xinwei}`,
       0,
     )
     ui.css.styles.sheet.insertRule(
-      "#arena .player>.name,.button.character>.name {font-family: " +
-        (lib.config.name_font || "xinwei") +
-        ",xinwei}",
+      `#arena .player>.name,.button.character>.name {font-family: ${lib.config.name_font || "xinwei"},xinwei}`,
       0,
     )
     ui.css.styles.sheet.insertRule(
-      "#arena .player .identity>div {font-family: " +
-        (lib.config.identity_font || "huangcao") +
-        ",xinwei}",
+      `#arena .player .identity>div {font-family: ${lib.config.identity_font || "huangcao"},xinwei}`,
       0,
     )
     ui.css.styles.sheet.insertRule(
-      ".button.character.newstyle>.identity {font-family: " +
-        (lib.config.identity_font || "huangcao") +
-        ",xinwei}",
+      `.button.character.newstyle>.identity {font-family: ${lib.config.identity_font || "huangcao"},xinwei}`,
       0,
     )
-    if (lib.config.cardtext_font && lib.config.cardtext_font != "default") {
+    if (lib.config.cardtext_font && lib.config.cardtext_font !== "default") {
       ui.css.styles.sheet.insertRule(
-        ".card div:not(.info):not(.background) {font-family: " + lib.config.cardtext_font + ";}",
+        `.card div:not(.info):not(.background) {font-family: ${lib.config.cardtext_font};}`,
         0,
       )
     }
-    if (lib.config.global_font && lib.config.global_font != "default") {
+    if (lib.config.global_font && lib.config.global_font !== "default") {
       ui.css.styles.sheet.insertRule(
-        "#window {font-family: " + lib.config.global_font + ",xinwei}",
+        `#window {font-family: ${lib.config.global_font},xinwei}`,
         0,
       )
       ui.css.styles.sheet.insertRule(
@@ -364,7 +363,7 @@ export class LibInit {
     loadingScreenStyle.animationDuration = "1s"
     loadingScreenStyle.animationFillMode = "forwards"
     loadingScreenStyle.animationName = "opacity-0-1"
-    if (layout == "default") {
+    if (layout === "default") {
       layout = "mobile"
     }
     if (!nosave) {
@@ -374,39 +373,41 @@ export class LibInit {
     ui.arena.hide()
     new Promise((resolve) => setTimeout(resolve, 500))
       .then(() => {
-        if (game.layout == "default") {
+        if (game.layout === "default") {
           ui.css.layout.href = ""
         } else {
-          ui.css.layout.href = lib.assetURL + "layout/" + game.layout + "/layout.css"
+          ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`
         }
-        if (game.layout == "mobile" || game.layout == "long") {
+        if (game.layout === "mobile" || game.layout === "long") {
           ui.arena.classList.add("mobile")
         } else {
           ui.arena.classList.remove("mobile")
         }
         if (
-          game.layout == "mobile" ||
-          game.layout == "long" ||
-          game.layout == "long2" ||
-          game.layout == "nova"
+          game.layout === "mobile" ||
+          game.layout === "long" ||
+          game.layout === "long2" ||
+          game.layout === "nova"
         ) {
-          if (game.me && game.me.node.handcards2.childNodes.length) {
+          if (game.me?.node.handcards2.childNodes.length) {
             while (game.me.node.handcards2.childNodes.length) {
-              game.me.node.handcards1.appendChild(game.me.node.handcards2.firstChild)
+              game.me.node.handcards1.appendChild(
+                game.me.node.handcards2.firstChild,
+              )
             }
           }
         }
-        if (game.layout == "default") {
+        if (game.layout === "default") {
           ui.arena.classList.add("oldlayout")
         } else {
           ui.arena.classList.remove("oldlayout")
         }
         if (
-          lib.config.cardshape == "oblong" &&
-          (game.layout == "long" ||
-            game.layout == "mobile" ||
-            game.layout == "long2" ||
-            game.layout == "nova")
+          lib.config.cardshape === "oblong" &&
+          (game.layout === "long" ||
+            game.layout === "mobile" ||
+            game.layout === "long2" ||
+            game.layout === "nova")
         ) {
           ui.arena.classList.add("oblongcard")
           ui.window.classList.add("oblongcard")
@@ -415,13 +416,13 @@ export class LibInit {
           ui.window.classList.remove("oblongcard")
         }
         //if(lib.config.textequip=='text'&&(game.layout=='long'||game.layout=='mobile')){
-        if (game.layout == "long" || game.layout == "mobile") {
+        if (game.layout === "long" || game.layout === "mobile") {
           ui.arena.classList.add("textequip")
         } else {
           ui.arena.classList.remove("textequip")
         }
         if (get.is.phoneLayout()) {
-          ui.css.phone.href = lib.assetURL + "layout/default/phone.css"
+          ui.css.phone.href = `${lib.assetURL}layout/default/phone.css`
           ui.arena.classList.add("phone")
         } else {
           ui.css.phone.href = ""
@@ -440,31 +441,35 @@ export class LibInit {
             }
           }
         }
-        if (game.layout == "long" || game.layout == "long2") {
+        if (game.layout === "long" || game.layout === "long2") {
           ui.arena.classList.add("long")
         } else {
           ui.arena.classList.remove("long")
         }
-        if (lib.config.player_border != "wide" || game.layout == "long" || game.layout == "long2") {
+        if (
+          lib.config.player_border !== "wide" ||
+          game.layout === "long" ||
+          game.layout === "long2"
+        ) {
           ui.arena.classList.add("slim_player")
         } else {
           ui.arena.classList.remove("slim_player")
         }
         if (
-          lib.config.player_border == "normal" &&
-          lib.config.mode != "brawl" &&
-          (game.layout == "long" || game.layout == "long2")
+          lib.config.player_border === "normal" &&
+          lib.config.mode !== "brawl" &&
+          (game.layout === "long" || game.layout === "long2")
         ) {
           ui.arena.classList.add("lslim_player")
         } else {
           ui.arena.classList.remove("lslim_player")
         }
-        if (lib.config.player_border == "slim") {
+        if (lib.config.player_border === "slim") {
           ui.arena.classList.add("uslim_player")
         } else {
           ui.arena.classList.remove("uslim_player")
         }
-        if (lib.config.player_border == "narrow") {
+        if (lib.config.player_border === "narrow") {
           ui.arena.classList.add("mslim_player")
         } else {
           ui.arena.classList.remove("mslim_player")
@@ -497,14 +502,20 @@ export class LibInit {
   background() {
     if (
       lib.config.image_background &&
-      lib.config.image_background != "default" &&
+      lib.config.image_background !== "default" &&
       !lib.config.image_background.startsWith("custom_")
     ) {
-      localStorage.setItem(lib.configprefix + "background", lib.config.image_background)
-    } else if (lib.config.image_background == "default" && lib.config.theme == "simple") {
-      localStorage.setItem(lib.configprefix + "background", "ol_bg")
+      localStorage.setItem(
+        `${lib.configprefix}background`,
+        lib.config.image_background,
+      )
+    } else if (
+      lib.config.image_background === "default" &&
+      lib.config.theme === "simple"
+    ) {
+      localStorage.setItem(`${lib.configprefix}background`, "ol_bg")
     } else {
-      localStorage.removeItem(lib.configprefix + "background")
+      localStorage.removeItem(`${lib.configprefix}background`)
     }
   }
 
@@ -520,27 +531,34 @@ export class LibInit {
   }
 
   encode(strUni) {
-    var strUtf = strUni.replace(/[\u0080-\u07ff]/g, function (c) {
+    var strUtf = strUni.replace(/[\u0080-\u07ff]/g, (c) => {
       var cc = c.charCodeAt(0)
       return String.fromCharCode(0xc0 | (cc >> 6), 0x80 | (cc & 0x3f))
     })
-    strUtf = strUtf.replace(/[\u0800-\uffff]/g, function (c) {
+    strUtf = strUtf.replace(/[\u0800-\uffff]/g, (c) => {
       var cc = c.charCodeAt(0)
-      return String.fromCharCode(0xe0 | (cc >> 12), 0x80 | ((cc >> 6) & 0x3f), 0x80 | (cc & 0x3f))
+      return String.fromCharCode(
+        0xe0 | (cc >> 12),
+        0x80 | ((cc >> 6) & 0x3f),
+        0x80 | (cc & 0x3f),
+      )
     })
     return btoa(strUtf)
   }
 
   decode(str) {
     var strUtf = atob(str)
-    var strUni = strUtf.replace(/[\u00e0-\u00ef][\u0080-\u00bf][\u0080-\u00bf]/g, function (c) {
-      var cc =
-        ((c.charCodeAt(0) & 0x0f) << 12) |
-        ((c.charCodeAt(1) & 0x3f) << 6) |
-        (c.charCodeAt(2) & 0x3f)
-      return String.fromCharCode(cc)
-    })
-    strUni = strUni.replace(/[\u00c0-\u00df][\u0080-\u00bf]/g, function (c) {
+    var strUni = strUtf.replace(
+      /[\u00e0-\u00ef][\u0080-\u00bf][\u0080-\u00bf]/g,
+      (c) => {
+        var cc =
+          ((c.charCodeAt(0) & 0x0f) << 12) |
+          ((c.charCodeAt(1) & 0x3f) << 6) |
+          (c.charCodeAt(2) & 0x3f)
+        return String.fromCharCode(cc)
+      },
+    )
+    strUni = strUni.replace(/[\u00c0-\u00df][\u0080-\u00bf]/g, (c) => {
       var cc = ((c.charCodeAt(0) & 0x1f) << 6) | (c.charCodeAt(1) & 0x3f)
       return String.fromCharCode(cc)
     })
@@ -550,10 +568,10 @@ export class LibInit {
   stringify(obj) {
     var str = "{"
     for (var i in obj) {
-      str += '"' + i + '":'
-      if (Object.prototype.toString.call(obj[i]) == "[object Object]") {
+      str += `"${i}":`
+      if (Object.prototype.toString.call(obj[i]) === "[object Object]") {
         str += lib.init.stringify(obj[i])
-      } else if (typeof obj[i] == "function") {
+      } else if (typeof obj[i] === "function") {
         str += obj[i].toString()
       } else {
         str += JSON.stringify(obj[i])
@@ -567,10 +585,10 @@ export class LibInit {
   stringifySkill(obj) {
     var str = ""
     for (var i in obj) {
-      str += i + ":"
-      if (Object.prototype.toString.call(obj[i]) == "[object Object]") {
-        str += "{\n" + lib.init.stringifySkill(obj[i]) + "}"
-      } else if (typeof obj[i] == "function") {
+      str += `${i}:`
+      if (Object.prototype.toString.call(obj[i]) === "[object Object]") {
+        str += `{\n${lib.init.stringifySkill(obj[i])}}`
+      } else if (typeof obj[i] === "function") {
         str += obj[i].toString().replace(/\t/g, "")
       } else {
         str += JSON.stringify(obj[i])
@@ -585,8 +603,11 @@ export class LibInit {
    * @param {*} url 传入import.meta.url
    */
   getCurrentFileLocation(url) {
-    let head = window.location.href.slice(0, window.location.href.lastIndexOf("/") + 1)
-    let ret = url.replace(head, "")
+    const head = window.location.href.slice(
+      0,
+      window.location.href.lastIndexOf("/") + 1,
+    )
+    const ret = url.replace(head, "")
     return decodeURIComponent(ret)
   }
 
@@ -597,17 +618,24 @@ export class LibInit {
    * @param {boolean} [dbNow] - 此刻是否在解析数据库中的内容，请勿直接使用
    * @returns {URL}
    */
-  parseResourceAddress(link, defaultHandle = null, loadAsDataUrlCallback = null, dbNow = false) {
+  parseResourceAddress(
+    link,
+    defaultHandle = null,
+    loadAsDataUrlCallback = null,
+    dbNow = false,
+  ) {
     // 适当的摆了，中文错误应该没人会反对
     if (!link) {
-      throw new Error(dbNow ? "传入的数据库链接中不存在内容" : "请传入需要解析的链接")
+      throw new Error(
+        dbNow ? "传入的数据库链接中不存在内容" : "请传入需要解析的链接",
+      )
     }
 
-    let linkString = link instanceof URL ? link.href : link
+    const linkString = link instanceof URL ? link.href : link
 
     // 如果传入值为Data URL，经过分析可知无需处理，故直接返回成品URL
     if (linkString.startsWith("data:")) {
-      let result = new URL(linkString)
+      const result = new URL(linkString)
       if (loadAsDataUrlCallback) {
         loadAsDataUrlCallback(result)
       }
@@ -621,23 +649,29 @@ export class LibInit {
     if (URL.canParse(linkString)) {
       resultUrl = new URL(linkString)
     } else if (dbNow) {
-      let content = new Blob([linkString], { type: "text/plain" })
+      const content = new Blob([linkString], { type: "text/plain" })
       get.dataUrlAsync(content).then(loadAsDataUrlCallback)
       // @ts-expect-error 此处的返回值无任何用处
       return
     } else {
-      let resultLink = defaultHandle == null ? linkString : defaultHandle(linkString)
+      const resultLink =
+        defaultHandle == null ? linkString : defaultHandle(linkString)
       resultUrl = new URL(resultLink, rootURL)
     }
 
     if (loadAsDataUrlCallback != null) {
-      if (resultUrl.protocol == "db:") {
+      if (resultUrl.protocol === "db:") {
         // 我思索了一下，如果这玩意能造成无限递归
         // 那么我只能说，你赢了
         game
           .getDB("image", linkString.slice(3))
           .then((storeResult) =>
-            this.parseResourceAddress(storeResult, defaultHandle, loadAsDataUrlCallback, true),
+            this.parseResourceAddress(
+              storeResult,
+              defaultHandle,
+              loadAsDataUrlCallback,
+              true,
+            ),
           )
       } else {
         get

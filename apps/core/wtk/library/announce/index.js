@@ -152,7 +152,7 @@ export class AnnounceSubscriber {
    * @param {EventTarget} target
    */
   constructor(content, target) {
-    this.#content = function (event) {
+    this.#content = (event) => {
       content(event.detail[0], event.detail[1])
     }
     this.#listening = []

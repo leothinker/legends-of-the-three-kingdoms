@@ -1,4 +1,4 @@
-import { lib, _status } from "wtk"
+import { _status, lib } from "wtk"
 
 export default class PauseManager {
   pause = new Deferred()
@@ -32,10 +32,13 @@ export default class PauseManager {
       }
     }
     await Promise.all(
-      [this.pause, this.pause2, this.pause3, this.over, this.delay].filter((i) => i.isStarted),
+      [this.pause, this.pause2, this.pause3, this.over, this.delay].filter(
+        (i) => i.isStarted,
+      ),
     )
     if (lib.status.dateDelaying) {
-      lib.status.dateDelayed += lib.getUTC(new Date()) - lib.getUTC(lib.status.dateDelaying)
+      lib.status.dateDelayed +=
+        lib.getUTC(new Date()) - lib.getUTC(lib.status.dateDelaying)
       delete lib.status.dateDelaying
     }
   }
@@ -51,21 +54,22 @@ class Deferred {
     if (this.isStarted) {
       return
     }
-    ;({ promise: this.#promise, resolve: this.#resolver } = Promise.withResolvers())
+    ;({ promise: this.#promise, resolve: this.#resolver } =
+      Promise.withResolvers())
   }
   resolve() {
     if (!this.isStarted) {
       return
     }
     Promise.resolve()
-      .then(() => this.#resolver && this.#resolver())
+      .then(() => this.#resolver?.())
       .then(() => {
         this.#promise = null
         this.#resolver = null
       })
   }
   then(
-    onfulfilled?: ((value: void) => void | PromiseLike<void>) | null,
+    onfulfilled?: ((value: undefined) => void | PromiseLike<void>) | null,
     onrejected?: ((reason: any) => never | PromiseLike<never>) | null,
   ) {
     if (!this.#promise) {

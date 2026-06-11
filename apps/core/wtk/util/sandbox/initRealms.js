@@ -1,4 +1,4 @@
-import { CodeSnippet, ErrorReporter, ErrorManager } from "./error.ts"
+import { CodeSnippet, ErrorManager, ErrorReporter } from "./error.ts"
 
 // 方便开关确定沙盒的问题喵
 // 当此处为true、debug模式未启用、设备非苹果时，沙盒生效
@@ -11,26 +11,23 @@ const SANDBOX_DEBUG = true
 // 用于传递顶级execute context
 
 /** @type {(target: Function, thiz: Object, args: Array) => any} */
-const ContextInvoker1 = function (apply, target, thiz, args) {
-  return apply(target, thiz, args)
-}.bind(null, Reflect.apply)
+const ContextInvoker1 = ((apply, target, thiz, args) =>
+  apply(target, thiz, args)).bind(null, Reflect.apply)
 
 /** @type {(target: Function, args: Array, newTarget: Function) => any} */
-const ContextInvoker2 = function (construct, target, args, newTarget) {
-  return construct(target, args, newTarget)
-}.bind(null, Reflect.construct)
+const ContextInvoker2 = ((construct, target, args, newTarget) =>
+  construct(target, args, newTarget)).bind(null, Reflect.construct)
 
 /** @type {(closure: Object, target: Function) => ((...args: any[]) => any)} */
-const ContextInvokerCreator = function (apply, closure, target) {
-  return function (...args) {
+const ContextInvokerCreator = ((apply, closure, target) =>
+  function (...args) {
     return apply(
       target,
       closure,
       // @ts-expect-error ignore
       [this === window ? null : this, args, new.target],
     )
-  }
-}.bind(null, Reflect.apply)
+  }).bind(null, Reflect.apply)
 
 /**
  * @param {string} path
@@ -103,7 +100,11 @@ async function initializeSandboxRealms(enabled) {
   // @ts-expect-error ignore
   iframe.contentWindow.replacedCIC = ContextInvokerCreator
   // @ts-expect-error ignore
-  iframe.contentWindow.replacedErrors = { CodeSnippet, ErrorReporter, ErrorManager }
+  iframe.contentWindow.replacedErrors = {
+    CodeSnippet,
+    ErrorReporter,
+    ErrorManager,
+  }
 
   // 重新以新的变量域载入当前脚本
   const script = iframe.contentWindow.document.createElement("script")

@@ -153,7 +153,10 @@ export class DynamicStyle {
    * @returns {boolean} 添加的结果，为`true`则添加成功，为`false`则添加失败
    */
   add(name, style) {
-    return this.update(name, this.has(name) ? Object.assign({}, this.get(name), style) : style)
+    return this.update(
+      name,
+      this.has(name) ? Object.assign({}, this.get(name), style) : style,
+    )
   }
 
   /**

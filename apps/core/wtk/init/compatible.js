@@ -1,18 +1,20 @@
-import { lib, game, get, _status, ui, ai } from "wtk"
+import dedent from "dedent"
+import { _status, ai, game, get, lib, ui } from "wtk"
 import ContentCompiler from "@/library/element/GameEvent/compilers/ContentCompiler"
 import ContentCompilerBase from "@/library/element/GameEvent/compilers/ContentCompilerBase"
-import { GeneratorFunction, AsyncFunction } from "@/util/index.js"
+import { AsyncFunction, GeneratorFunction } from "@/util/index.js"
 import { security } from "@/util/sandbox"
-import dedent from "dedent"
 
 // 改为HTMLDivElement.prototype.addTempClass
 HTMLDivElement.prototype.animate = function (keyframes, options) {
-  if (typeof keyframes == "string") {
-    console.trace(this, "三国杀开发者修改的animate方法已废弃，请改为使用addTempClass方法")
+  if (typeof keyframes === "string") {
+    console.trace(
+      this,
+      "三国杀开发者修改的animate方法已废弃，请改为使用addTempClass方法",
+    )
     return HTMLDivElement.prototype.addTempClass.call(this, keyframes, options)
-  } else {
-    return HTMLElement.prototype.animate.call(this, keyframes, options)
   }
+  return HTMLElement.prototype.animate.call(this, keyframes, options)
 }
 
 /*处理lib.nature等从array改为map的兼容性问题*/
@@ -91,13 +93,13 @@ HTMLDivElement.prototype.animate = function (keyframes, options) {
 // addNumber
 Object.assign(lib.element.GameEvent.prototype, {
   addNumber(key, value, baseValue) {
-    if (typeof value != "number") {
+    if (typeof value !== "number") {
       value = 0
     }
-    if (typeof this[key] == "number") {
+    if (typeof this[key] === "number") {
       this[key] += value
     } else {
-      if (typeof baseValue != "number") {
+      if (typeof baseValue !== "number") {
         baseValue = 0
       }
       this[key] = baseValue + value
@@ -105,7 +107,7 @@ Object.assign(lib.element.GameEvent.prototype, {
     return this
   },
   decrease(key, baseValue) {
-    if (typeof this[key] == "number") {
+    if (typeof this[key] === "number") {
       this[key]--
     } else {
       this.subtractNumber(key, 1, baseValue)
@@ -113,7 +115,7 @@ Object.assign(lib.element.GameEvent.prototype, {
     return this
   },
   increase(key, baseValue) {
-    if (typeof this[key] == "number") {
+    if (typeof this[key] === "number") {
       this[key]++
     } else {
       this.addNumber(key, 1, baseValue)
@@ -121,13 +123,13 @@ Object.assign(lib.element.GameEvent.prototype, {
     return this
   },
   subtractNumber(key, value, baseValue) {
-    if (typeof value != "number") {
+    if (typeof value !== "number") {
       value = 0
     }
-    if (typeof this[key] == "number") {
+    if (typeof this[key] === "number") {
       this[key] -= value
     } else {
-      if (typeof baseValue != "number") {
+      if (typeof baseValue !== "number") {
         baseValue = 0
       }
       this[key] = baseValue - value
@@ -159,10 +161,10 @@ Object.assign(lib.element.GameEvent.prototype, {
   },
   async forResult(...params) {
     await this
-    if (params.length == 0) {
+    if (params.length === 0) {
       return this.result
     }
-    if (params.length == 1) {
+    if (params.length === 1) {
       return this.result[params[0]]
     }
     return Array.from(params).map((key) => this.result[key])
@@ -188,9 +190,11 @@ Object.assign(lib.element.GameEvent.prototype, {
 })
 
 // get.event("xxx")
-get.event = function (key) {
+get.event = (key) => {
   if (key) {
-    console.warn(`get.event("${key}")写法即将被废弃，请更改为get.event().${key}`)
+    console.warn(
+      `get.event("${key}")写法即将被废弃，请更改为get.event().${key}`,
+    )
     return _status.event[key]
   }
   return _status.event
@@ -248,7 +252,9 @@ get.event = function (key) {
       }
 
       filter(content) {
-        return typeof content === "function" && content instanceof GeneratorFunction
+        return (
+          typeof content === "function" && content instanceof GeneratorFunction
+        )
       }
 
       compile(content) {
@@ -270,7 +276,9 @@ get.event = function (key) {
               if (done) {
                 break
               }
-              result = await (value instanceof GameEvent ? value.forResult() : value)
+              result = await (value instanceof GameEvent
+                ? value.forResult()
+                : value)
             }
 
             const nextResult = await event.waitNext()
@@ -291,7 +299,7 @@ get.event = function (key) {
   Object.assign(lib.element.Player.prototype, {
     get(arg1, arg2, arg3, arg4) {
       var i, j
-      if (arg1 == "s") {
+      if (arg1 === "s") {
         var skills = this.skills.slice(0)
         var es = []
         if (arg3 !== false) {
@@ -307,7 +315,7 @@ get.event = function (key) {
               }
             }
           }
-          if (arg2 == "e") {
+          if (arg2 === "e") {
             return es
           }
         }
@@ -318,7 +326,10 @@ get.event = function (key) {
                 skills.add(this.additionalSkills[i][j])
               }
             }
-          } else if (this.additionalSkills[i] && typeof this.additionalSkills[i] == "string") {
+          } else if (
+            this.additionalSkills[i] &&
+            typeof this.additionalSkills[i] === "string"
+          ) {
             skills.add(this.additionalSkills[i])
           }
         }
@@ -338,16 +349,23 @@ get.event = function (key) {
           skills = game.filterSkills(skills, this, es)
         }
         return skills
-      } else if (get.is.pos(arg1)) {
+      }
+      if (get.is.pos(arg1)) {
         var cards = [],
           cards1 = []
         for (i = 0; i < arg1.length; i++) {
-          if (arg1[i] == "h") {
+          if (arg1[i] === "h") {
             for (j = 0; j < this.node.handcards1.childElementCount; j++) {
               if (
-                !this.node.handcards1.childNodes[j].classList.contains("removing") &&
-                !this.node.handcards1.childNodes[j].classList.contains("feichu") &&
-                !this.node.handcards1.childNodes[j].classList.contains("emptyequip") &&
+                !this.node.handcards1.childNodes[j].classList.contains(
+                  "removing",
+                ) &&
+                !this.node.handcards1.childNodes[j].classList.contains(
+                  "feichu",
+                ) &&
+                !this.node.handcards1.childNodes[j].classList.contains(
+                  "emptyequip",
+                ) &&
                 !this.node.handcards1.childNodes[j].classList.contains("glows")
               ) {
                 cards.push(this.node.handcards1.childNodes[j])
@@ -355,147 +373,164 @@ get.event = function (key) {
             }
             for (j = 0; j < this.node.handcards2.childElementCount; j++) {
               if (
-                !this.node.handcards2.childNodes[j].classList.contains("removing") &&
-                !this.node.handcards2.childNodes[j].classList.contains("feichu") &&
-                !this.node.handcards2.childNodes[j].classList.contains("emptyequip") &&
+                !this.node.handcards2.childNodes[j].classList.contains(
+                  "removing",
+                ) &&
+                !this.node.handcards2.childNodes[j].classList.contains(
+                  "feichu",
+                ) &&
+                !this.node.handcards2.childNodes[j].classList.contains(
+                  "emptyequip",
+                ) &&
                 !this.node.handcards2.childNodes[j].classList.contains("glows")
               ) {
                 cards.push(this.node.handcards2.childNodes[j])
               }
             }
-          } else if (arg1[i] == "e") {
+          } else if (arg1[i] === "e") {
             for (j = 0; j < this.node.equips.childElementCount; j++) {
               if (
-                !this.node.equips.childNodes[j].classList.contains("removing") &&
+                !this.node.equips.childNodes[j].classList.contains(
+                  "removing",
+                ) &&
                 !this.node.equips.childNodes[j].classList.contains("feichu") &&
                 !this.node.equips.childNodes[j].classList.contains("emptyequip")
               ) {
                 cards.push(this.node.equips.childNodes[j])
               }
             }
-            if (arguments.length == 2 && typeof arg2 == "string" && /1|2|3|4|5/.test(arg2)) {
+            if (
+              arguments.length === 2 &&
+              typeof arg2 === "string" &&
+              /1|2|3|4|5/.test(arg2)
+            ) {
               for (j = 0; j < cards.length; j++) {
-                if (get.subtype(cards[j]) == "equip" + arg2) {
+                if (get.subtype(cards[j]) === `equip${arg2}`) {
                   return cards[j]
                 }
               }
               return
             }
-          } else if (arg1[i] == "j") {
+          } else if (arg1[i] === "j") {
             for (j = 0; j < this.node.judges.childElementCount; j++) {
               if (
-                !this.node.judges.childNodes[j].classList.contains("removing") &&
+                !this.node.judges.childNodes[j].classList.contains(
+                  "removing",
+                ) &&
                 !this.node.judges.childNodes[j].classList.contains("feichu") &&
                 !this.node.judges.childNodes[j].classList.contains("emptyequip")
               ) {
                 cards.push(this.node.judges.childNodes[j])
-                if (this.node.judges.childNodes[j].viewAs && arguments.length > 1) {
-                  this.node.judges.childNodes[j].tempJudge = this.node.judges.childNodes[j].name
-                  this.node.judges.childNodes[j].name = this.node.judges.childNodes[j].viewAs
+                if (
+                  this.node.judges.childNodes[j].viewAs &&
+                  arguments.length > 1
+                ) {
+                  this.node.judges.childNodes[j].tempJudge =
+                    this.node.judges.childNodes[j].name
+                  this.node.judges.childNodes[j].name =
+                    this.node.judges.childNodes[j].viewAs
                   cards1.push(this.node.judges.childNodes[j])
                 }
               }
             }
           }
         }
-        if (arguments.length == 1) {
+        if (arguments.length === 1) {
           return cards
         }
-        if (arg2 != undefined) {
-          if (typeof arg3 == "function") {
+        if (arg2 !== undefined) {
+          if (typeof arg3 === "function") {
             var cards2 = cards.slice(0)
-            cards.sort(function (a, b) {
-              return arg3(b, cards2) - arg3(a, cards2)
-            })
+            cards.sort((a, b) => arg3(b, cards2) - arg3(a, cards2))
           }
-          if (typeof arg2 == "string") {
+          if (typeof arg2 === "string") {
             for (i = 0; i < cards.length; i++) {
-              if (cards[i].name != arg2) {
+              if (cards[i].name !== arg2) {
                 cards.splice(i, 1)
                 i--
               }
             }
-          } else if (typeof arg2 == "object") {
+          } else if (typeof arg2 === "object") {
             for (i = 0; i < cards.length; i++) {
               for (j in arg2) {
-                if (j == "type") {
-                  if (typeof arg2[j] == "object") {
-                    if (arg2[j].includes(get.type(cards[i])) == false) {
+                if (j === "type") {
+                  if (typeof arg2[j] === "object") {
+                    if (arg2[j].includes(get.type(cards[i])) === false) {
                       cards.splice(i, 1)
                       i--
                       break
                     }
-                  } else if (typeof arg2[j] == "string") {
-                    if (get.type(cards[i]) != arg2[j]) {
-                      cards.splice(i, 1)
-                      i--
-                      break
-                    }
-                  }
-                } else if (j == "subtype") {
-                  if (typeof arg2[j] == "object") {
-                    if (arg2[j].includes(get.subtype(cards[i])) == false) {
-                      cards.splice(i, 1)
-                      i--
-                      break
-                    }
-                  } else if (typeof arg2[j] == "string") {
-                    if (get.subtype(cards[i]) != arg2[j]) {
+                  } else if (typeof arg2[j] === "string") {
+                    if (get.type(cards[i]) !== arg2[j]) {
                       cards.splice(i, 1)
                       i--
                       break
                     }
                   }
-                } else if (j == "color") {
-                  if (typeof arg2[j] == "object") {
-                    if (arg2[j].includes(get.color(cards[i])) == false) {
+                } else if (j === "subtype") {
+                  if (typeof arg2[j] === "object") {
+                    if (arg2[j].includes(get.subtype(cards[i])) === false) {
                       cards.splice(i, 1)
                       i--
                       break
                     }
-                  } else if (typeof arg2[j] == "string") {
-                    if (get.color(cards[i]) != arg2[j]) {
-                      cards.splice(i, 1)
-                      i--
-                      break
-                    }
-                  }
-                } else if (j == "suit") {
-                  if (typeof arg2[j] == "object") {
-                    if (arg2[j].includes(get.suit(cards[i])) == false) {
-                      cards.splice(i, 1)
-                      i--
-                      break
-                    }
-                  } else if (typeof arg2[j] == "string") {
-                    if (get.suit(cards[i]) != arg2[j]) {
+                  } else if (typeof arg2[j] === "string") {
+                    if (get.subtype(cards[i]) !== arg2[j]) {
                       cards.splice(i, 1)
                       i--
                       break
                     }
                   }
-                } else if (j == "number") {
-                  if (typeof arg2[j] == "object") {
-                    if (arg2[j].includes(get.number(cards[i])) == false) {
+                } else if (j === "color") {
+                  if (typeof arg2[j] === "object") {
+                    if (arg2[j].includes(get.color(cards[i])) === false) {
                       cards.splice(i, 1)
                       i--
                       break
                     }
-                  } else if (typeof arg2[j] == "string") {
-                    if (get.number(cards[i]) != arg2[j]) {
+                  } else if (typeof arg2[j] === "string") {
+                    if (get.color(cards[i]) !== arg2[j]) {
                       cards.splice(i, 1)
                       i--
                       break
                     }
                   }
-                } else if (typeof arg2[j] == "object") {
-                  if (arg2[j].includes(cards[i][j]) == false) {
+                } else if (j === "suit") {
+                  if (typeof arg2[j] === "object") {
+                    if (arg2[j].includes(get.suit(cards[i])) === false) {
+                      cards.splice(i, 1)
+                      i--
+                      break
+                    }
+                  } else if (typeof arg2[j] === "string") {
+                    if (get.suit(cards[i]) !== arg2[j]) {
+                      cards.splice(i, 1)
+                      i--
+                      break
+                    }
+                  }
+                } else if (j === "number") {
+                  if (typeof arg2[j] === "object") {
+                    if (arg2[j].includes(get.number(cards[i])) === false) {
+                      cards.splice(i, 1)
+                      i--
+                      break
+                    }
+                  } else if (typeof arg2[j] === "string") {
+                    if (get.number(cards[i]) !== arg2[j]) {
+                      cards.splice(i, 1)
+                      i--
+                      break
+                    }
+                  }
+                } else if (typeof arg2[j] === "object") {
+                  if (arg2[j].includes(cards[i][j]) === false) {
                     cards.splice(i, 1)
                     i--
                     break
                   }
-                } else if (typeof arg2[j] == "string") {
-                  if (cards[i][j] != arg2[j]) {
+                } else if (typeof arg2[j] === "string") {
+                  if (cards[i][j] !== arg2[j]) {
                     cards.splice(i, 1)
                     i--
                     break
@@ -503,9 +538,9 @@ get.event = function (key) {
                 }
               }
             }
-          } else if (typeof arg2 == "number" && arg2 > 0) {
+          } else if (typeof arg2 === "number" && arg2 > 0) {
             cards.splice(arg2)
-          } else if (typeof arg2 == "function") {
+          } else if (typeof arg2 === "function") {
             for (i = 0; i < cards.length; i++) {
               if (!arg2(cards[i])) {
                 cards.splice(i, 1)
@@ -523,14 +558,14 @@ get.event = function (key) {
         if (arg2 === 0) {
           return cards[0]
         }
-        if (typeof arg3 == "number") {
-          if (arg3 == 0) {
+        if (typeof arg3 === "number") {
+          if (arg3 === 0) {
             return cards[0]
           }
           cards.splice(arg3)
         }
-        if (typeof arg4 == "number") {
-          if (arg4 == 0) {
+        if (typeof arg4 === "number") {
+          if (arg4 === 0) {
             return cards[0]
           }
           cards.splice(arg4)
@@ -542,14 +577,18 @@ get.event = function (key) {
      * @deprecated
      */
     num(arg1, arg2, arg3) {
-      if (get.itemtype(arg1) == "position") {
+      if (get.itemtype(arg1) === "position") {
         return this.get(arg1, arg2, arg3).length
-      } else if (arg1 == "s") {
-        if (typeof arg2 == "boolean") {
-          return game.expandSkills(this.getSkills(arg2).concat(lib.skill.global)).includes(arg3)
-        } else {
-          return game.expandSkills(this.getSkills().concat(lib.skill.global)).includes(arg2)
+      }
+      if (arg1 === "s") {
+        if (typeof arg2 === "boolean") {
+          return game
+            .expandSkills(this.getSkills(arg2).concat(lib.skill.global))
+            .includes(arg3)
         }
+        return game
+          .expandSkills(this.getSkills().concat(lib.skill.global))
+          .includes(arg2)
       }
     },
   })
@@ -559,7 +598,7 @@ get.event = function (key) {
 lib.element.Player.prototype.insertEvent = function (name, content, arg) {
   var evt = _status.event.getParent("phase")
   var next
-  if (evt && evt.parent && evt.parent.next) {
+  if (evt?.parent?.next) {
     next = game.createEvent(name, null, evt.parent)
   } else {
     next = game.createEvent(name)
@@ -575,7 +614,11 @@ lib.element.Player.prototype.insertEvent = function (name, content, arg) {
 // Draw result
 {
   const originDrawContent = lib.element.content.draw
-  lib.element.content.draw = async function compatibleDraw(event, trigger, player) {
+  lib.element.content.draw = async function compatibleDraw(
+    event,
+    trigger,
+    player,
+  ) {
     await originDrawContent(event, trigger, player)
     const cards = event.result.cards.slice(0)
     event.result = Object.assign(cards, event.result)
@@ -587,15 +630,14 @@ lib.element.Player.prototype.when = function (...triggerNames) {
   const player = this
   if (!_status.postReconnect.player_when) {
     _status.postReconnect.player_when = [
-      function (map) {
-        "use strict"
-        for (let i in map) {
+      (map) => {
+        for (const i in map) {
           lib.skill[i] = {
             charlotte: true,
             forced: true,
             popup: false,
           }
-          if (typeof map[i] == "string") {
+          if (typeof map[i] === "string") {
             lib.translate[i] = map[i]
           }
         }
@@ -610,16 +652,16 @@ lib.element.Player.prototype.when = function (...triggerNames) {
     instantlyAdd = false
     triggerNames.remove(false)
   }
-  if (triggerNames.length == 0) {
+  if (triggerNames.length === 0) {
     throw new Error("player.when的参数数量应大于0")
   }
   // add other triggerNames
   // arguments.length = 1
-  if (triggerNames.length == 1) {
+  if (triggerNames.length === 1) {
     // 以下两种情况:
     // triggerNames = [ ['xxAfter', ...args] ]
     // triggerNames = [ 'xxAfter' ]
-    if (Array.isArray(triggerNames[0]) || typeof triggerNames[0] == "string") {
+    if (Array.isArray(triggerNames[0]) || typeof triggerNames[0] === "string") {
       trigger = { player: triggerNames[0] }
     }
     // triggerNames = [ {player:'xxx'} ]
@@ -630,7 +672,7 @@ lib.element.Player.prototype.when = function (...triggerNames) {
   // arguments.length > 1
   else {
     // triggerNames = [ 'xxAfter', 'yyBegin' ]
-    if (triggerNames.every((t) => typeof t == "string")) {
+    if (triggerNames.every((t) => typeof t === "string")) {
       trigger = { player: triggerNames }
     }
     // triggerNames = [ {player: 'xxAfter'}, {global: 'yyBegin'} ]
@@ -640,11 +682,11 @@ lib.element.Player.prototype.when = function (...triggerNames) {
     }
   }
   if (!trigger) {
-    throw new Error("player.when传参数类型错误:" + triggerNames)
+    throw new Error(`player.when传参数类型错误:${triggerNames}`)
   }
   let skillName
   do {
-    skillName = "player_when_" + Math.random().toString(36).slice(-8)
+    skillName = `player_when_${Math.random().toString(36).slice(-8)}`
   } while (lib.skill[skillName] != null)
   const vars = {}
   //获取sourceSkill
@@ -671,7 +713,7 @@ lib.element.Player.prototype.when = function (...triggerNames) {
    */
   let scope
   /** @type { Skill } */
-  let skill = {
+  const skill = {
     trigger: trigger,
     forced: true,
     charlotte: true,
@@ -720,10 +762,14 @@ lib.element.Player.prototype.when = function (...triggerNames) {
     let varstr = ""
     for (const key in vars) {
       if (warnVars.includes(key)) {
-        console.warn(`Variable '${key}' should not be referenced by vars objects`)
+        console.warn(
+          `Variable '${key}' should not be referenced by vars objects`,
+        )
       }
       if (errVars.includes(key)) {
-        throw new Error(`Variable '${key}' should not be referenced by vars objects`)
+        throw new Error(
+          `Variable '${key}' should not be referenced by vars objects`,
+        )
       }
       varstr += `var ${key}=lib.skill['${skillName}'].vars['${key}'];\n`
     }
@@ -768,7 +814,12 @@ lib.element.Player.prototype.when = function (...triggerNames) {
       originals.push(compiled)
       contents.push(function (event, trigger, player) {
         // @ts-expect-error ignore
-        return compiled.apply(this, [{ lib, game, ui, get, ai, _status }, event, trigger, player])
+        return compiled.apply(this, [
+          { lib, game, ui, get, ai, _status },
+          event,
+          trigger,
+          player,
+        ])
       })
     }
     for (let i = 0; i < skill.contentFuns.length; i++) {
@@ -780,11 +831,16 @@ lib.element.Player.prototype.when = function (...triggerNames) {
         const a = fun2
         //防止传入()=>xxx的情况
         const begin =
-          a.indexOf("{") == a.indexOf("}") && a.indexOf("{") == -1 && a.indexOf("=>") > -1
+          a.indexOf("{") === a.indexOf("}") &&
+          a.indexOf("{") === -1 &&
+          a.indexOf("=>") > -1
             ? a.indexOf("=>") + 2
             : a.indexOf("{") + 1
         const str2 = a
-          .slice(begin, a.lastIndexOf("}") != -1 ? a.lastIndexOf("}") : undefined)
+          .slice(
+            begin,
+            a.lastIndexOf("}") !== -1 ? a.lastIndexOf("}") : undefined,
+          )
           .trim()
         // 防止注入喵
         if (!get.isFunctionBody(str2)) {
@@ -812,7 +868,7 @@ lib.element.Player.prototype.when = function (...triggerNames) {
     writable: true,
     value: skill,
   })
-  game.broadcast(function (skillName) {
+  game.broadcast((skillName) => {
     Object.defineProperty(lib.skill, skillName, {
       configurable: true,
       enumerable: false,
@@ -832,35 +888,35 @@ lib.element.Player.prototype.when = function (...triggerNames) {
   return {
     skill: skillName,
     filter(fun) {
-      if (lib.skill[skillName] != skill) {
+      if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
       }
       skill.filterFuns.push(fun)
       return this
     },
     removeFilter(fun) {
-      if (lib.skill[skillName] != skill) {
+      if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
       }
       skill.filterFuns.remove(fun)
       return this
     },
     filter2(fun) {
-      if (lib.skill[skillName] != skill) {
+      if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
       }
       skill.filter2Funs.push(fun)
       return this
     },
     removeFilter2(fun) {
-      if (lib.skill[skillName] != skill) {
+      if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
       }
       skill.filter2Funs.remove(fun)
       return this
     },
     then(fun) {
-      if (lib.skill[skillName] != skill) {
+      if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
       }
       if (fun instanceof AsyncFunction) {
@@ -872,7 +928,7 @@ lib.element.Player.prototype.when = function (...triggerNames) {
       return this
     },
     step(fun) {
-      if (lib.skill[skillName] != skill) {
+      if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
       }
       skill.contentFuns.push(fun)
@@ -880,19 +936,19 @@ lib.element.Player.prototype.when = function (...triggerNames) {
       return this
     },
     popup(str) {
-      if (lib.skill[skillName] != skill) {
+      if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
       }
-      if (typeof str == "string") {
+      if (typeof str === "string") {
         skill.popup = str
       }
       return this
     },
     translation(translation) {
-      if (lib.skill[skillName] != skill) {
+      if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
       }
-      if (typeof translation == "string") {
+      if (typeof translation === "string") {
         _status.postReconnect.player_when[1][skillName] = translation
         game.broadcastAll(
           (skillName, translation) => (lib.translate[skillName] = translation),
@@ -903,10 +959,10 @@ lib.element.Player.prototype.when = function (...triggerNames) {
       return this
     },
     assign(obj) {
-      if (lib.skill[skillName] != skill) {
+      if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
       }
-      if (typeof obj == "object" && obj !== null) {
+      if (typeof obj === "object" && obj !== null) {
         Object.assign(skill, obj)
         game.broadcast(
           (skillName, obj) => {
@@ -919,7 +975,7 @@ lib.element.Player.prototype.when = function (...triggerNames) {
       return this
     },
     vars(arg) {
-      if (lib.skill[skillName] != skill) {
+      if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
       }
       if (!get.is.object(arg)) {
@@ -930,7 +986,7 @@ lib.element.Player.prototype.when = function (...triggerNames) {
       return this
     },
     apply(_scope) {
-      if (lib.skill[skillName] != skill) {
+      if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
       }
       if (security.isSandboxRequired()) {
@@ -943,7 +999,7 @@ lib.element.Player.prototype.when = function (...triggerNames) {
       return this
     },
     finish() {
-      if (lib.skill[skillName] != skill) {
+      if (lib.skill[skillName] !== skill) {
         throw new Error(`This skill has been destroyed`)
       }
       player.addSkill(skillName)
@@ -960,27 +1016,34 @@ Object.assign(lib.init, {
    */
   jsSync(path, file, onLoad, onError) {
     if (
-      lib.assetURL.length == 0 &&
-      location.origin == "file://" &&
-      typeof game.readFile == "undefined"
+      lib.assetURL.length === 0 &&
+      location.origin === "file://" &&
+      typeof game.readFile === "undefined"
     ) {
-      const e = new Error("浏览器file协议下无法使用此api，请在http/https协议下使用此api")
-      if (typeof onError == "function") {
+      const e = new Error(
+        "浏览器file协议下无法使用此api，请在http/https协议下使用此api",
+      )
+      if (typeof onError === "function") {
         onError(e)
       } else {
         throw e
       }
       return
     }
-    if (path[path.length - 1] == "/") {
+    if (path[path.length - 1] === "/") {
       path = path.slice(0, path.length - 1)
     }
-    if (path == `${lib.assetURL}mode` && lib.config.all.stockmode.indexOf(file) == -1) {
+    if (
+      path === `${lib.assetURL}mode` &&
+      lib.config.all.stockmode.indexOf(file) === -1
+    ) {
       Promise.resolve(lib.init[`setMode_${file}`]()).then(onLoad)
       return
     }
     if (Array.isArray(file)) {
-      return file.forEach((value) => lib.init.jsSync(path, value, onLoad, onError))
+      return file.forEach((value) =>
+        lib.init.jsSync(path, value, onLoad, onError),
+      )
     }
     let scriptSource
     if (!file) {
@@ -995,30 +1058,30 @@ Object.assign(lib.init, {
     let data
     xmlHttpRequest.addEventListener("load", () => {
       if (![0, 200].includes(xmlHttpRequest.status)) {
-        if (typeof onError == "function") {
+        if (typeof onError === "function") {
           onError(new Error(xmlHttpRequest.statusText || xmlHttpRequest.status))
         }
         return
       }
       data = xmlHttpRequest.responseText
       if (!data) {
-        if (typeof onError == "function") {
+        if (typeof onError === "function") {
           onError(new Error(`${scriptSource}加载失败！`))
         }
         return
       }
       try {
         security.eval(data)
-        if (typeof onLoad == "function") {
+        if (typeof onLoad === "function") {
           onLoad()
         }
       } catch (error) {
-        if (typeof onError == "function") {
+        if (typeof onError === "function") {
           onError(error)
         }
       }
     })
-    if (typeof onError == "function") {
+    if (typeof onError === "function") {
       xmlHttpRequest.addEventListener("error", onError)
     }
     xmlHttpRequest.open("GET", scriptSource, false)
@@ -1034,12 +1097,14 @@ Object.assign(lib.init, {
       sScriptURL = str
     } else if (str.startsWith("local:")) {
       if (
-        lib.assetURL.length == 0 &&
-        location.origin == "file://" &&
-        typeof game.readFile == "undefined"
+        lib.assetURL.length === 0 &&
+        location.origin === "file://" &&
+        typeof game.readFile === "undefined"
       ) {
-        const e = new Error("浏览器file协议下无法使用此api，请在http/https协议下使用此api")
-        if (typeof onerror == "function") {
+        const e = new Error(
+          "浏览器file协议下无法使用此api，请在http/https协议下使用此api",
+        )
+        if (typeof onerror === "function") {
           onerror(e)
         } else {
           throw e
@@ -1049,10 +1114,10 @@ Object.assign(lib.init, {
       sScriptURL = lib.assetURL + str.slice(6)
     }
     const oReq = new XMLHttpRequest()
-    if (typeof onload == "function") {
+    if (typeof onload === "function") {
       oReq.addEventListener("load", (result) => {
         if (![0, 200].includes(oReq.status)) {
-          if (typeof onerror == "function") {
+          if (typeof onerror === "function") {
             onerror(new Error(oReq.statusText || oReq.status))
           }
           return
@@ -1060,7 +1125,7 @@ Object.assign(lib.init, {
         onload(result)
       })
     }
-    if (typeof onerror == "function") {
+    if (typeof onerror === "function") {
       oReq.addEventListener("error", onerror)
     }
     oReq.open("GET", sScriptURL, false)
@@ -1075,12 +1140,14 @@ Object.assign(lib.init, {
    */
   jsonSync(url, onload, onerror) {
     if (
-      lib.assetURL.length == 0 &&
-      location.origin == "file://" &&
-      typeof game.readFile == "undefined"
+      lib.assetURL.length === 0 &&
+      location.origin === "file://" &&
+      typeof game.readFile === "undefined"
     ) {
-      const e = new Error("浏览器file协议下无法使用此api，请在http/https协议下使用此api")
-      if (typeof onerror == "function") {
+      const e = new Error(
+        "浏览器file协议下无法使用此api，请在http/https协议下使用此api",
+      )
+      if (typeof onerror === "function") {
         onerror(e)
       } else {
         throw e
@@ -1088,10 +1155,10 @@ Object.assign(lib.init, {
       return
     }
     const oReq = new XMLHttpRequest()
-    if (typeof onload == "function") {
+    if (typeof onload === "function") {
       oReq.addEventListener("load", () => {
         if (![0, 200].includes(oReq.status)) {
-          if (typeof onerror == "function") {
+          if (typeof onerror === "function") {
             onerror(new Error(oReq.statusText || oReq.status))
           }
           return
@@ -1103,7 +1170,7 @@ Object.assign(lib.init, {
             throw new Error("err")
           }
         } catch (e) {
-          if (typeof onerror == "function") {
+          if (typeof onerror === "function") {
             onerror(e)
           }
           return
@@ -1111,7 +1178,7 @@ Object.assign(lib.init, {
         onload(result)
       })
     }
-    if (typeof onerror == "function") {
+    if (typeof onerror === "function") {
       oReq.addEventListener("error", onerror)
     }
     oReq.open("GET", url, false)

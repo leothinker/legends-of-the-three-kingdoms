@@ -1,9 +1,8 @@
 // 不经过编译
-import { _status, game, get, lib, ui, ai } from "wtk"
-import { GameEvent } from "./gameEvent.js"
-import { Player } from "./player.js"
-
+import { _status, ai, game, get, lib, ui } from "wtk"
 import { delay } from "@/util/index.js"
+import type { GameEvent } from "./gameEvent.js"
+import type { Player } from "./player.js"
 
 // 未来再改
 export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
@@ -25,8 +24,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const taoEnemyConfig =
         lib.config.tao_enemy &&
         dying.side !== player.side &&
-        lib.config.mode != "identity" &&
-        lib.config.mode != "guozhan" &&
+        lib.config.mode !== "identity" &&
+        lib.config.mode !== "guozhan" &&
         !dying.hasSkillTag("revertsave")
       let result: Partial<Result> = { bool: false }
       if (!taoEnemyConfig && player.canSave(dying) && player.isIn()) {
@@ -37,19 +36,33 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               return lib.filter.cardSavable(card, player, event.dying)
             },
             filterTarget(card, player, target) {
-              if (target != _status.event.dying) {
+              if (target !== _status.event.dying) {
                 return false
               }
               if (!card) {
                 return false
               }
               const info = get.info(card)
-              if (!info.singleCard || ui.selected.targets.length == 0) {
-                let mod = game.checkMod(card, player, target, "unchanged", "playerEnabled", player)
-                if (mod == false) {
+              if (!info.singleCard || ui.selected.targets.length === 0) {
+                let mod = game.checkMod(
+                  card,
+                  player,
+                  target,
+                  "unchanged",
+                  "playerEnabled",
+                  player,
+                )
+                if (mod === false) {
                   return false
                 }
-                mod = game.checkMod(card, player, target, "unchanged", "targetEnabled", target)
+                mod = game.checkMod(
+                  card,
+                  player,
+                  target,
+                  "unchanged",
+                  "targetEnabled",
+                  target,
+                )
                 if (mod !== "unchanged") {
                   return mod ?? false
                 }
@@ -59,12 +72,13 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             prompt,
             prompt2: `当前体力：${dying.hp}`,
             ai1(card) {
-              if (typeof card == "string") {
+              if (typeof card === "string") {
                 const info = get.info(card)
-                if (info.ai && info.ai.order) {
-                  if (typeof info.ai.order == "number") {
+                if (info.ai?.order) {
+                  if (typeof info.ai.order === "number") {
                     return info.ai.order
-                  } else if (typeof info.ai.order == "function") {
+                  }
+                  if (typeof info.ai.order === "function") {
                     return info.ai.order()
                   }
                 }
@@ -138,7 +152,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (Array.isArray(item)) {
           if (["asc", "sort"].includes(item[0])) {
             event.numbers.push(item.slice(1).sort((a, b) => a - b)[0])
-          } else if (item[0] == "desc") {
+          } else if (item[0] === "desc") {
             event.numbers.push(item.slice(1).sort((a, b) => b - a)[0])
           } else {
             event.numbers.push(item[0])
@@ -152,7 +166,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       result = await new Promise((resolve, reject) => {
         _status.imchoosing = true
         event.settleed = false
-        event.dialog = ui.create.dialog(event.prompt || "请调整以下数值", "forcebutton", "hidden")
+        event.dialog = ui.create.dialog(
+          event.prompt || "请调整以下数值",
+          "forcebutton",
+          "hidden",
+        )
         if (event.prompt2) {
           event.dialog.addText(event.prompt2)
         }
@@ -176,7 +194,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
 
         function optionUpdate(select) {
-          const index = parseInt(select.id.slice(6))
+          const index = parseInt(select.id.slice(6), 10)
           const item = event.list[index]
           const current = event.numbers[index]
           while (select.childElementCount) {
@@ -186,7 +204,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             let numbers
             if (["asc", "sort"].includes(item[0])) {
               numbers = item.slice(1).sort((a, b) => a - b)
-            } else if (item[0] == "desc") {
+            } else if (item[0] === "desc") {
               numbers = item.slice(1).sort((a, b) => b - a)
             } else {
               numbers = item
@@ -195,16 +213,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               const option = document.createElement("option")
               option.innerHTML = num
               if (event.optprompt) {
-                if (typeof event.optprompt == "string") {
+                if (typeof event.optprompt === "string") {
                   option.innerHTML = event.optprompt
                     .replace("#", num)
                     .replace("$", get.cnNumber(num, true))
-                } else if (typeof event.optprompt == "function") {
+                } else if (typeof event.optprompt === "function") {
                   option.innerHTML = event.optprompt(num, index)
                 }
               }
               option.value = num
-              if (num == current) {
+              if (num === current) {
                 option.selected = true
               }
               if (!event.filterSelect(num, index, event)) {
@@ -216,7 +234,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             let actual
             const max = item.max || 9
             if (event.optionSum) {
-              actual = event.optionSum - event.numbers.reduce((sum, num) => sum + num, 0) + current
+              actual =
+                event.optionSum -
+                event.numbers.reduce((sum, num) => sum + num, 0) +
+                current
             }
             for (
               let num = item.min || 0;
@@ -226,16 +247,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               const option = document.createElement("option")
               option.innerHTML = num
               if (event.optprompt) {
-                if (typeof event.optprompt == "string") {
+                if (typeof event.optprompt === "string") {
                   option.innerHTML = event.optprompt
                     .replace("#", num)
                     .replace("$", get.cnNumber(num, true))
-                } else if (typeof event.optprompt == "function") {
+                } else if (typeof event.optprompt === "function") {
                   option.innerHTML = event.optprompt(num, index)
                 }
               }
               option.value = num
-              if (num == current) {
+              if (num === current) {
                 option.selected = true
               }
               if (!event.filterSelect(num, index, event)) {
@@ -255,7 +276,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           select.style.width = "30%"
           select.style.position = "relative"
           select.onchange = () => {
-            event.numbers[parseInt(select.id.slice(6))] = parseInt(select.value)
+            event.numbers[parseInt(select.id.slice(6), 10)] = parseInt(
+              select.value,
+              10,
+            )
             event.dialog.content
               .querySelectorAll(`[id ^= 'select']`)
               .forEach((select) => optionUpdate(select))
@@ -319,10 +343,13 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         lib.configOL.choose_timeout = time
       }, event.time)
     }
-    if ((!result || result == "ai" || (event.forced && !result.bool)) && event.processAI) {
+    if (
+      (!result || result === "ai" || (event.forced && !result.bool)) &&
+      event.processAI
+    ) {
       const numbers = event.processAI(event)
-      if (typeof numbers == "boolean") {
-        if (numbers == true) {
+      if (typeof numbers === "boolean") {
+        if (numbers === true) {
           result = { bool: true, numbers: event.numbers }
         } else {
           result = { bool: false }
@@ -345,7 +372,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     const newPairs = event.newPairs
     for (const name of newPairs) {
       if (!lib.character[name]) {
-        console.warn(`警告：Player[${player.name}]试图将武将牌变更为不存在的武将:`, name)
+        console.warn(
+          `警告：Player[${player.name}]试图将武将牌变更为不存在的武将:`,
+          name,
+        )
         return
       }
     }
@@ -354,21 +384,21 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     //进行Log
     if (event.log !== false) {
       //变更前后数量相同的情况
-      if (rawPairs.length == newPairs.length) {
+      if (rawPairs.length === newPairs.length) {
         for (let i = 0; i < Math.min(2, rawPairs.length); i++) {
           const rawName = rawPairs[i]
           const newName = newPairs[i]
-          if (rawName != newName) {
+          if (rawName !== newName) {
             game.log(
               player,
-              `将${i == 0 ? "主" : "副"}将从`,
+              `将${i === 0 ? "主" : "副"}将从`,
               `#b${get.translation(rawName)}`,
               "变更为了",
               `#b${get.translation(newName)}`,
             )
           }
         }
-      } else if (rawPairs.length == 1 && newPairs.length == 2) {
+      } else if (rawPairs.length === 1 && newPairs.length === 2) {
         game.log(
           player,
           "将单将",
@@ -376,7 +406,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           "变更为了双将",
           `#b${get.translation(newPairs[0])}+${get.translation(newPairs[1])}`,
         )
-      } else if (rawPairs.length == 2 && newPairs.length == 1) {
+      } else if (rawPairs.length === 2 && newPairs.length === 1) {
         game.log(
           player,
           "将双将",
@@ -423,22 +453,26 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
     await next
     //变更角色的所属势力。如果新将是双势力，重选一下势力。 国战不因换将而重选势力
-    if (event.changeGroup !== false && get.mode() != "guozhan") {
+    if (event.changeGroup !== false && get.mode() !== "guozhan") {
       let newGroups = []
       if (!player.isUnseen(1)) {
-        newGroups = get.is.double(player.name1, true) || [get.character(player.name1, 1)]
+        newGroups = get.is.double(player.name1, true) || [
+          get.character(player.name1, 1),
+        ]
       } else if (player.name2 && !player.isUnseen(2)) {
-        newGroups = get.is.double(player.name2, true) || [get.character(player.name2, 1)]
+        newGroups = get.is.double(player.name2, true) || [
+          get.character(player.name2, 1),
+        ]
       }
       if (newGroups.length > 1) {
         const { control: newGroup } = await player
           .chooseControl(newGroups)
           .set("prompt", "请选择一个新的势力")
           .forResult()
-        if (newGroup != player.group) {
+        if (newGroup !== player.group) {
           await player.changeGroup(newGroup)
         }
-      } else if (newGroups.length == 1 && newGroups[0] != player.group) {
+      } else if (newGroups.length === 1 && newGroups[0] !== player.group) {
         await player.changeGroup(newGroups[0])
       }
     }
@@ -451,8 +485,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     event.addSkill.unique()
     event.removeSkill.unique()
     //避免失去还没拥有的技能
-    event.removeSkill = event.removeSkill.filter((skill) => ownedSkills.includes(skill))
-    const duplicatedSkills = event.addSkill.filter((skill) => event.removeSkill.includes(skill))
+    event.removeSkill = event.removeSkill.filter((skill) =>
+      ownedSkills.includes(skill),
+    )
+    const duplicatedSkills = event.addSkill.filter((skill) =>
+      event.removeSkill.includes(skill),
+    )
     if (duplicatedSkills.length) {
       event.addSkill.removeArray(duplicatedSkills)
       event.removeSkill.removeArray(duplicatedSkills)
@@ -511,7 +549,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     if (log) {
       game.log(
         source,
-        `连接了<span class="bluetext">${player == source ? "自己" : get.translation(player)}</span>的`,
+        `连接了<span class="bluetext">${player === source ? "自己" : get.translation(player)}</span>的`,
         event.cards,
       )
     }
@@ -523,7 +561,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     if (log) {
       game.log(
         source,
-        `重置了<span class="bluetext">${player == source ? "自己" : get.translation(player)}</span>的连接牌（`,
+        `重置了<span class="bluetext">${player === source ? "自己" : get.translation(player)}</span>的连接牌（`,
         event.cards,
         "）",
       )
@@ -532,14 +570,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   //增加明置手牌
   async addShownCards(event, _trigger, player) {
     const hs = player.getCards("h")
-    const showingCards = event.cards.filter((showingCard) => hs.includes(showingCard))
+    const showingCards = event.cards.filter((showingCard) =>
+      hs.includes(showingCard),
+    )
     const shown = player.getShownCards()
 
     for (const tag of event.gaintag) {
       player.addGaintag(showingCards, tag)
     }
 
-    event.cards = showingCards.filter((showingCard) => !shown.includes(showingCard))
+    event.cards = showingCards.filter(
+      (showingCard) => !shown.includes(showingCard),
+    )
     if (!event.cards.length) {
       return
     }
@@ -551,7 +593,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   //隐藏明置手牌
   async hideShownCards(event, _trigger, player) {
     const shown = player.getShownCards()
-    const hidingCards = event.cards.filter((hidingCard) => shown.includes(hidingCard))
+    const hidingCards = event.cards.filter((hidingCard) =>
+      shown.includes(hidingCard),
+    )
 
     if (!hidingCards.length) {
       return
@@ -565,7 +609,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const map = new Map()
       for (const hidingCard of hidingCards) {
         for (const tag of hidingCard.gaintag) {
-          if (tag.startsWith("eternal_") && !tag.slice(8).startsWith("visible_")) {
+          if (
+            tag.startsWith("eternal_") &&
+            !tag.slice(8).startsWith("visible_")
+          ) {
             continue
           }
           if (!tag.startsWith("visible_")) {
@@ -608,7 +655,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     if (!lib.card[event.cardName].effect) {
       await game.delay()
       return
-    } else if (!lib.card[event.cardName].judge) {
+    }
+    if (!lib.card[event.cardName].judge) {
       await game.delay()
       event.nojudge = true
     }
@@ -713,7 +761,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       await game.delay(0.5)
       await event.trigger("giftAccept")
 
-      if (get.type(card) == "equip") {
+      if (get.type(card) === "equip") {
         const next = target.equip(card)
         next.log = false
         await next
@@ -740,7 +788,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const lost = event.trigger("recastingLost")
       // ?
       event.recastingLosingEvents.push(
-        ...event.next.filter((value) => value.name != "arrangeTrigger"),
+        ...event.next.filter((value) => value.name !== "arrangeTrigger"),
       )
       await lose
       await recast
@@ -755,7 +803,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const gained = event.trigger("recastingGained")
       // ?
       event.recastingGainingEvents.push(
-        ...event.next.filter((value) => value.name != "arrangeTrigger"),
+        ...event.next.filter((value) => value.name !== "arrangeTrigger"),
       )
       await gain
       await recast
@@ -779,10 +827,13 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
       let slot_key = slot
       let lose: number
-      if (slot == "equip3_4") {
+      if (slot === "equip3_4") {
         lose = Math.min(
           left,
-          Math.max(get.numOf(event.slots, "equip3"), get.numOf(event.slots, "equip4")),
+          Math.max(
+            get.numOf(event.slots, "equip3"),
+            get.numOf(event.slots, "equip4"),
+          ),
         )
         slot_key = "equip3"
       } else {
@@ -790,14 +841,19 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
 
       if (lose > 0) {
-        game.log(player, `废除了${get.cnNumber(lose)}个`, `#g${get.translation(slot)}栏`)
+        game.log(
+          player,
+          `废除了${get.cnNumber(lose)}个`,
+          `#g${get.translation(slot)}栏`,
+        )
         player.disabledSlots ??= {}
         player.disabledSlots[slot_key] ??= 0
         player.disabledSlots[slot_key] += lose
 
         const discardingCards = player.getCards(
           "e",
-          (card) => get.subtypes(card).includes(slot) && !event.cards.includes(card),
+          (card) =>
+            get.subtypes(card).includes(slot) && !event.cards.includes(card),
         )
         if (discardingCards.length < 0) {
           continue
@@ -807,14 +863,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (lose < left) {
           let source = event.source
           const num = cards.length - (left - lose)
-          if (!source || !source.isIn()) {
+          if (!source?.isIn()) {
             source = player
           }
 
           result = await source
             .chooseButton(
               [
-                `选择${player == source ? "你" : get.translation(player)}的${get.cnNumber(num)}张${get.translation(slot)}牌置入弃牌堆`,
+                `选择${player === source ? "你" : get.translation(player)}的${get.cnNumber(num)}张${get.translation(slot)}牌置入弃牌堆`,
                 cards,
               ],
               true,
@@ -825,13 +881,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
               let result = 0
               for (const button of ui.selected.buttons) {
-                if (evt.slot == "equip3_4") {
+                if (evt.slot === "equip3_4") {
                   result += Math.max(
                     get.numOf(get.subtypes(button.link, false), "equip3"),
                     get.numOf(get.subtypes(button.link, false), "equip4"),
                   )
                 } else {
-                  result += get.numOf(get.subtypes(button.link, false), evt.slot)
+                  result += get.numOf(
+                    get.subtypes(button.link, false),
+                    evt.slot,
+                  )
                 }
               }
 
@@ -869,7 +928,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         continue
       }
 
-      game.log(player, `恢复了${get.cnNumber(gain)}个`, `#g${get.translation(slot)}栏`)
+      game.log(
+        player,
+        `恢复了${get.cnNumber(gain)}个`,
+        `#g${get.translation(slot)}栏`,
+      )
       player.disabledSlots ??= {}
       player.disabledSlots[slot] ??= 0
       player.disabledSlots[slot] -= gain
@@ -891,11 +954,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     for (const slot of slotsx) {
       let expand = get.numOf(slots, slot)
       let slot_key = slot
-      if (slot == "equip3_4") {
-        expand = Math.max(get.numOf(slots, "equip3"), get.numOf(slots, "equip4"))
+      if (slot === "equip3_4") {
+        expand = Math.max(
+          get.numOf(slots, "equip3"),
+          get.numOf(slots, "equip4"),
+        )
         slot_key = "equip3"
       }
-      game.log(player, `获得了${get.cnNumber(expand)}个额外的`, `#g${get.translation(slot)}栏`)
+      game.log(
+        player,
+        `获得了${get.cnNumber(expand)}个额外的`,
+        `#g${get.translation(slot)}栏`,
+      )
 
       player.expandedSlots ??= {}
       player.expandedSlots[slot_key] ??= 0
@@ -921,9 +991,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     })
     specializedVCards.forEach((card) => {
       const info = get.info(card, false)
-      replacedCards.addArray(player.getVCards("e", (card) => info.customSwap(card)))
+      replacedCards.addArray(
+        player.getVCards("e", (card) => info.customSwap(card)),
+      )
     })
-    const types = normalVCards.reduce((types, card) => types.concat(get.subtypes(card, false)), [])
+    const types = normalVCards.reduce(
+      (types, card) => types.concat(get.subtypes(card, false)),
+      [],
+    )
     if (types.length > 0) {
       const slots = types
       const slotsx = []
@@ -932,59 +1007,66 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       for (const slot of slotsx) {
         const left = player.countEquipableSlot(slot)
         let lose
-        if (slot == "equip3_4") {
-          lose = Math.min(left, Math.max(get.numOf(slots, "equip3"), get.numOf(slots, "equip4")))
+        if (slot === "equip3_4") {
+          lose = Math.min(
+            left,
+            Math.max(get.numOf(slots, "equip3"), get.numOf(slots, "equip4")),
+          )
         } else {
           lose = Math.min(left, get.numOf(slots, slot))
         }
         let result
         if (lose <= 0) {
           continue
-        } else {
-          const cards = player
-            .getVEquips(slot)
-            .filter(
-              (card) => !replacedCards.includes(card) && lib.filter.canBeReplaced(card, player),
-            )
-          if (cards.length > 0) {
-            if (lose >= left) {
-              result = { bool: true, links: cards }
-            } else if (cards.length > left - lose) {
-              let source = event.source
-              const num = cards.length - (left - lose)
-              if (!source || !source.isIn()) {
-                source = player
-              }
-              const chooseEvent = source
-                .chooseButton(
-                  [
-                    `选择替换掉${get.cnNumber(num)}张${get.translation(slot)}装备牌`,
-                    [cards, "vcard"],
-                  ],
-                  true,
-                  [1, num],
-                )
-                .set("filterOk", () => {
-                  const evt = _status.event
-                  return (
-                    ui.selected.buttons.reduce((num, button) => {
-                      if (evt.slot == "equip3_4") {
-                        return (
-                          num +
-                          Math.max(
-                            get.numOf(get.subtypes(button.link, false), "equip3"),
-                            get.numOf(get.subtypes(button.link, false), "equip4"),
-                          )
-                        )
-                      }
-                      return num + get.numOf(get.subtypes(button.link, false), evt.slot)
-                    }, 0) == evt.required
-                  )
-                })
-                .set("required", num)
-                .set("slot", slot)
-              result = await chooseEvent.forResult()
+        }
+        const cards = player
+          .getVEquips(slot)
+          .filter(
+            (card) =>
+              !replacedCards.includes(card) &&
+              lib.filter.canBeReplaced(card, player),
+          )
+        if (cards.length > 0) {
+          if (lose >= left) {
+            result = { bool: true, links: cards }
+          } else if (cards.length > left - lose) {
+            let source = event.source
+            const num = cards.length - (left - lose)
+            if (!source?.isIn()) {
+              source = player
             }
+            const chooseEvent = source
+              .chooseButton(
+                [
+                  `选择替换掉${get.cnNumber(num)}张${get.translation(slot)}装备牌`,
+                  [cards, "vcard"],
+                ],
+                true,
+                [1, num],
+              )
+              .set("filterOk", () => {
+                const evt = _status.event
+                return (
+                  ui.selected.buttons.reduce((num, button) => {
+                    if (evt.slot === "equip3_4") {
+                      return (
+                        num +
+                        Math.max(
+                          get.numOf(get.subtypes(button.link, false), "equip3"),
+                          get.numOf(get.subtypes(button.link, false), "equip4"),
+                        )
+                      )
+                    }
+                    return (
+                      num +
+                      get.numOf(get.subtypes(button.link, false), evt.slot)
+                    )
+                  }, 0) === evt.required
+                )
+              })
+              .set("required", num)
+              .set("slot", slot)
+            result = await chooseEvent.forResult()
           }
         }
         if (result?.links) {
@@ -994,14 +1076,19 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
     event.result = {
       vcards: replacedCards,
-      cards: player.getCards("e", (i) => replacedCards.includes(i[i.cardSymbol])),
+      cards: player.getCards("e", (i) =>
+        replacedCards.includes(i[i.cardSymbol]),
+      ),
     }
   },
   //装备牌
   async equip(event, trigger, player) {
     event.visible = true
     //先确定这次的cards是什么成分也防止有人在equipBegin之类的时机往里面塞垃圾
-    if (event.cards.length > 1 && event.cards.some((cardx) => cardx.isViewAsCard)) {
+    if (
+      event.cards.length > 1 &&
+      event.cards.some((cardx) => cardx.isViewAsCard)
+    ) {
       //实体牌数大于1且里面有虚拟假牌，终止此事件
       event.untrigger()
       return
@@ -1018,19 +1105,19 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const map = {}
       for (const i of loseCards) {
         const owner = get.owner(i, "judge")
-        if (owner && (owner != player || get.position(i) != "e")) {
+        if (owner && (owner !== player || get.position(i) !== "e")) {
           const id = owner.playerid
           if (!map[id]) {
             map[id] = [[], [], []]
           }
           map[id][0].push(i)
           const position = get.position(i)
-          if (position == "h") {
+          if (position === "h") {
             map[id][1].push(i)
           } else {
             map[id][2].push(i)
           }
-        } else if (!event.updatePile && get.position(i) == "c") {
+        } else if (!event.updatePile && get.position(i) === "c") {
           event.updatePile = true
         }
         if (event.visible) {
@@ -1045,7 +1132,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           .set("type", "equip")
           .set("forceDie", true)
           .set("getlx", false)
-        if (event.visible == true) {
+        if (event.visible === true) {
           // @ts-expect-error ignore
           next.visible = true
         }
@@ -1077,7 +1164,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         return
       }
       let audioSubtype = get.subtype(card)
-      if (audioSubtype == "equip6") {
+      if (audioSubtype === "equip6") {
         audioSubtype = "equip3"
       }
       // @ts-expect-error ignore
@@ -1090,7 +1177,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       player.addVirtualEquip(card, cards)
       //player.$equip(card);
       //game.addVideo("equip", player, get.cardInfo(card));
-      if (event.log != false) {
+      if (event.log !== false) {
         const isViewAsCard = cards.length !== 1 || cards[0].name !== card.name
         if (isViewAsCard && cards.length) {
           game.log(
@@ -1103,7 +1190,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           game.log(player, "装备了", card)
         }
       }
-      if (cardInfo.onEquip && (!cardInfo.filterEquip || cardInfo.filterEquip(card, player))) {
+      if (
+        cardInfo.onEquip &&
+        (!cardInfo.filterEquip || cardInfo.filterEquip(card, player))
+      ) {
         if (Array.isArray(cardInfo.onEquip)) {
           for (const onEquip of cardInfo.onEquip) {
             const next = game.createEvent(`equip_${card.name}`)
@@ -1119,7 +1209,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           next.card = event.vcards[0]
           await next
         }
-        if (cardInfo.equipDelay != false) {
+        if (cardInfo.equipDelay !== false) {
           await game.delayx()
         }
       }
@@ -1152,7 +1242,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     const card = event.card
     if (get.itemtype(card) === "card" && !card.isViewAsCard) {
       //cards = [card];
-      event.card = card.cardSymbol ? card[card.cardSymbol] : get.autoViewAs(card, void 0, false)
+      event.card = card.cardSymbol
+        ? card[card.cardSymbol]
+        : get.autoViewAs(card, void 0, false)
       event.vcards.push(event.card)
     } else {
       if (get.itemtype(card) === "card" && card.isViewAsCard) {
@@ -1207,7 +1299,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     replaceEquipEvent.setContent("replaceEquip")
     const result = await replaceEquipEvent.forResult()
     // @ts-expect-error ignore
-    if (get.itemtype(result?.cards) == "cards") {
+    if (get.itemtype(result?.cards) === "cards") {
       // @ts-expect-error ignore
       event.swapped = true
       const loseEvent = player
@@ -1233,7 +1325,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     //然后处理每一张装备牌的装备
     await handleEquip(event.card)
     //如果event.card是实体牌，改为虚拟牌
-    if (get.itemtype(event.card) == "card") {
+    if (get.itemtype(event.card) === "card") {
       event.card = event.card[event.card.cardSymbol]
     }
     if (event.updatePile) {
@@ -1280,21 +1372,27 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
       if (targets.length) {
         const next = player
-          .chooseCardOL(targets, `${get.translation(player)}发起了议事，请选择展示的手牌`, true)
+          .chooseCardOL({
+            list: targets,
+            prompt: `${get.translation(player)}发起了议事，请选择展示的手牌`,
+            forced: true,
+            glow_result: false,
+            ai: event.ai ?? (() => Math.random()),
+          })
           .set("type", "debate")
           .set("source", player)
-          .set("ai", event.ai ?? (() => Math.random()))
           .set(
             "aiCard",
             event.aiCard ??
               ((target) => {
                 const getAi = get.event().ai || (() => Math.random())
-                const hs = target.getCards("h").sort((a, b) => getAi(b) - getAi(a))
+                const hs = target
+                  .getCards("h")
+                  .sort((a, b) => getAi(b) - getAi(a))
                 return { bool: true, cards: [hs[0]] }
               }),
           )
 
-        next._args.remove("glow_result")
         result = await next.forResult()
       } else {
         event.noselected = true
@@ -1314,12 +1412,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     event.videoId = lib.status.videoId++
 
     if (!event.noselected) {
-      for (const [i, target] of targets.entries()) {
-        const card = result[i].cards[0]
+      for (const [target, r] of Iterator.zip([
+        targets,
+        result as Partial<Result>[],
+      ])) {
+        const card = r.cards[0]
 
-        if (card == "red" || get.color(card, target) == "red") {
+        if (card === "red" || get.color(card, target) === "red") {
           red.push([target, card])
-        } else if (card == "black" || get.color(card, target) == "black") {
+        } else if (card === "black" || get.color(card, target) === "black") {
           black.push([target, card])
         } else {
           others.push([target, card])
@@ -1329,9 +1430,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
     if (event.fixedResult) {
       for (const list of event.fixedResult) {
-        if (list[1] == "red" || get.color(list[1], list[0]) == "red") {
+        if (list[1] === "red" || get.color(list[1], list[0]) === "red") {
           red.push(list)
-        } else if (list[1] == "black" || get.color(list[1], list[0]) == "black") {
+        } else if (
+          list[1] === "black" ||
+          get.color(list[1], list[0]) === "black"
+        ) {
           black.push(list)
         } else {
           others.push(list)
@@ -1345,7 +1449,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     } else {
       const colors = new Map()
       for (const list of others) {
-        const color = typeof list[1] == "string" ? list[1] : get.color(list[1], list[0])
+        const color =
+          typeof list[1] === "string" ? list[1] : get.color(list[1], list[0])
 
         if (!colors.has(color)) {
           colors.set(color, [])
@@ -1392,10 +1497,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const pairs = getPairs(color)
 
       if (pairs.length) {
-        const filteredPair = pairs.filter((card) => get.itemtype(card[1]) == "card")
+        const filteredPair = pairs.filter(
+          (card) => get.itemtype(card[1]) === "card",
+        )
         game.log(
           [...new Set(pairs.map((pair) => pair[0]))],
-          color == "other"
+          color === "other"
             ? "没有意见"
             : `意见为<span class="firetext">${get.translation(color)}</span>`,
           pairs.length ? "，展示了" : "",
@@ -1407,7 +1514,13 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
     }
 
-    game.broadcastAll(showDebateResult, get.translation(player), event.videoId, event, colors)
+    game.broadcastAll(
+      showDebateResult,
+      get.translation(player),
+      event.videoId,
+      event,
+      colors,
+    )
 
     await game.delay(4)
 
@@ -1415,15 +1528,20 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     game.broadcastAll("closeDialog", event.videoId)
 
     const opinions = event.opinions
-      .filter((i) => i != "others")
+      .filter((i) => i !== "others")
       .toSorted((a, b) => getPairs(b).length - getPairs(a).length)
 
-    const opinion = getPairs(opinions[0]).length > getPairs(opinions[1]).length ? opinions[0] : null
+    const opinion =
+      getPairs(opinions[0]).length > getPairs(opinions[1]).length
+        ? opinions[0]
+        : null
     if (opinion) {
       game.log(
         player,
         "本次发起的议事结果为",
-        opinion == "red" ? '<span class="firetext">红色</span>' : `#g${get.translation(opinion)}`,
+        opinion === "red"
+          ? '<span class="firetext">红色</span>'
+          : `#g${get.translation(opinion)}`,
       )
     } else {
       game.log(player, "本次发起的议事无结果")
@@ -1459,7 +1577,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
      * @param {Record<string, [player: Player, card: Card | string][]>} colors
      */
     function showDebateResult(name, id, event, colors) {
-      const dialog = ui.create.dialog(`${name}发起了议事`, "hidden", "forcebutton")
+      const dialog = ui.create.dialog(
+        `${name}发起了议事`,
+        "hidden",
+        "forcebutton",
+      )
       dialog.videoId = id
       dialog.classList.add("scroll1")
       dialog.classList.add("scroll2")
@@ -1470,7 +1592,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           dialog.classList.add("fullheight")
         }
         for (const color of event.opinions) {
-          if (color == "others" && !colors.other?.length) {
+          if (color === "others" && !colors.other?.length) {
             continue
           }
           dialog.addNewRow(
@@ -1478,12 +1600,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             {
               item: colors[color].slice().map((list) => {
                 let element = get.copy(list[1])
-                if (typeof element == "string") {
+                if (typeof element === "string") {
                   if (!lib.card[`debate_${element}`]) {
                     lib.card[`debate_${element}`] = {}
-                    lib.translate[`debate_${element}`] = get.translation(element)
+                    lib.translate[`debate_${element}`] =
+                      get.translation(element)
                   }
-                  element = new lib.element.VCard(game.createCard(`debate_${element}`, " ", " "))
+                  element = new lib.element.VCard(
+                    game.createCard(`debate_${element}`, " ", " "),
+                  )
                 }
                 element._custom = (button) => {
                   game.createButtonCardsetion(list[0].getName(true), button)
@@ -1505,8 +1630,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         for (const color of event.opinions) {
           for (const list of colors[color]) {
             let button
-            if (typeof list[1] == "string") {
-              button = ui.create.button(["", "", list[1]], "vcard", dialog.buttonss[0])
+            if (typeof list[1] === "string") {
+              button = ui.create.button(
+                ["", "", list[1]],
+                "vcard",
+                dialog.buttonss[0],
+              )
             } else {
               button = ui.create.button(list[1], "card", dialog.buttonss[0])
             }
@@ -1558,7 +1687,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             ) + 5
           ).toString()
         }
-        if (player == game.me) {
+        if (player === game.me) {
           return
         }
         let str = `${get.translation(player)}正在演奏《${beatmap.name}》...`
@@ -1611,7 +1740,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       let node_pos = 0
       if (custom_mapping) {
         node_pos = mapping.shift()
-      } else if (mapping == "random") {
+      } else if (mapping === "random") {
         abs = get.rand(number_of_tracks)
         node_pos = abs
       }
@@ -1620,7 +1749,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const nodes = []
       let roundmenu = false
       //隐藏菜单按钮
-      if (ui.roundmenu && ui.roundmenu.display != "none") {
+      if (ui.roundmenu && ui.roundmenu.display !== "none") {
         roundmenu = true
         ui.roundmenu.style.display = "none"
       }
@@ -1659,7 +1788,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         game.saveConfigValue("choose_to_play_beatmap_accuracies")
         let rank
-        if (acc == 100) {
+        if (acc === 100) {
           rank = ["SS", "metal"]
         } else if (acc >= 94) {
           rank = ["S", "orange"]
@@ -1686,7 +1815,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           if (roundmenu) {
             ui.roundmenu.style.display = ""
           }
-          if (ui.backgroundMusic && !isNaN(ui.backgroundMusic.duration)) {
+          if (
+            ui.backgroundMusic &&
+            !Number.isNaN(ui.backgroundMusic.duration)
+          ) {
             ui.backgroundMusic.play()
           }
           hitsound_audio.remove()
@@ -1708,7 +1840,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       //初始化底部的条子
       const judger = ui.create.div("")
       judger.style["background-image"] =
-        beatmap.judgebar_color || "linear-gradient(rgba(240, 235, 3, 1), rgba(230, 225, 5, 1))"
+        beatmap.judgebar_color ||
+        "linear-gradient(rgba(240, 235, 3, 1), rgba(230, 225, 5, 1))"
       judger.style["border-radius"] = "3px"
       judger.style.position = "absolute"
       judger.style.opacity = "0.3"
@@ -1723,7 +1856,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const node = ui.create.div("")
         nodes.push(node)
         node.style["background-image"] =
-          beatmap.node_color || "linear-gradient(rgba(120, 120, 240, 1), rgba(100, 100, 230, 1))"
+          beatmap.node_color ||
+          "linear-gradient(rgba(120, 120, 240, 1), rgba(100, 100, 230, 1))"
         node.style["border-radius"] = "3px"
         node.style.position = "absolute"
         node.style.height = `${Math.ceil(height / 10)}px`
@@ -1749,8 +1883,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
         if (custom_mapping) {
           node_pos = mapping.shift()
-        } else if (mapping == "random") {
-          while (node_pos == abs) {
+        } else if (mapping === "random") {
+          while (node_pos === abs) {
             node_pos = get.rand(number_of_tracks)
           }
           abs = node_pos
@@ -1788,7 +1922,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           const top = (time - node._position) / speed
           if (top > range1[1]) {
             continue
-          } else if (top < range1[0]) {
+          }
+          if (top < range1[0]) {
             return
           }
           nodes.remove(node)
@@ -1822,7 +1957,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           break
         }
       }
-      document.addEventListener(lib.config.touchscreen ? "touchstart" : "mousedown", click)
+      document.addEventListener(
+        lib.config.touchscreen ? "touchstart" : "mousedown",
+        click,
+      )
 
       game.countChoose()
       setTimeout(
@@ -1836,7 +1974,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             game.playAudio("effect", beatmap.filename)
           }
         },
-        Math.floor(speed * 100 * (0.9 + beatmap.judgebar_height)) + beatmap.current,
+        Math.floor(speed * 100 * (0.9 + beatmap.judgebar_height)) +
+          beatmap.current,
       )
       setTimeout(() => {
         addNode()
@@ -1862,24 +2001,34 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const delays = [songPlaybackDelay]
       if (!_status.connectMode) {
         const skip = () => {
-          Array.from(ui.window.getElementsByTagName("audio")).forEach((audio) => {
-            if (
-              audio.currentSrc.includes(
-                beatmap.filename.startsWith("ext:") ? beatmap.name : beatmap.filename,
-              )
-            ) {
-              audio.remove()
-            }
-          })
+          Array.from(ui.window.getElementsByTagName("audio")).forEach(
+            (audio) => {
+              if (
+                audio.currentSrc.includes(
+                  beatmap.filename.startsWith("ext:")
+                    ? beatmap.name
+                    : beatmap.filename,
+                )
+              ) {
+                audio.remove()
+              }
+            },
+          )
           control.abort()
         }
 
-        document.addEventListener(lib.config.touchscreen ? "touchend" : "click", skip)
+        document.addEventListener(
+          lib.config.touchscreen ? "touchend" : "click",
+          skip,
+        )
         const skipDelay = delayExt(songDuration, {
           signal: control.signal,
           rejectOnAbort: false,
         }).then(() => {
-          document.removeEventListener(lib.config.touchscreen ? "touchend" : "click", skip)
+          document.removeEventListener(
+            lib.config.touchscreen ? "touchend" : "click",
+            skip,
+          )
         })
         delays.push(skipDelay)
       }
@@ -1894,7 +2043,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       ).concat(
         Array.from(
           {
-            length: 6 - (lib.config.choose_to_play_beatmap_accuracies || []).length,
+            length:
+              6 - (lib.config.choose_to_play_beatmap_accuracies || []).length,
           },
           () => get.rand(70, 100),
         ),
@@ -1907,7 +2057,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const half_standard_deviation = Math.round(
         Math.sqrt(
           chooseToPlayBeatmapAccuracies.reduce(
-            (previousValue, currentValue) => previousValue + Math.pow(currentValue - mean, 2),
+            (previousValue, currentValue) =>
+              previousValue + (currentValue - mean) ** 2,
             0,
           ),
         ) / 2,
@@ -1917,8 +2068,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           get.rand.apply(
             get,
             beatmap.aiAcc || [
-              mean - half_standard_deviation - get.rand(0, half_standard_deviation),
-              mean + half_standard_deviation + get.rand(0, half_standard_deviation),
+              mean -
+                half_standard_deviation -
+                get.rand(0, half_standard_deviation),
+              mean +
+                half_standard_deviation +
+                get.rand(0, half_standard_deviation),
             ],
           ),
           0,
@@ -1926,7 +2081,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         100,
       )
       let rank
-      if (acc == 100) {
+      if (acc === 100) {
         rank = ["SS", "metal"]
       } else if (acc >= 94) {
         rank = ["S", "orange"]
@@ -1962,7 +2117,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (dialog) {
           dialog.close()
         }
-        if (ui.backgroundMusic && !isNaN(ui.backgroundMusic.duration)) {
+        if (ui.backgroundMusic && !Number.isNaN(ui.backgroundMusic.duration)) {
           ui.backgroundMusic.play()
         }
       },
@@ -2030,12 +2185,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const filterOk = event.filterOk
         // 如果只有一行那么多选一般来说就没什么意义喵
         const canMultiselect =
-          list.length > 1 && lib.config.choose_all_button && event.allowChooseAll
+          list.length > 1 &&
+          lib.config.choose_all_button &&
+          event.allowChooseAll
 
         //_status.imchoosing = true;
         event.settleed = false
 
-        event.dialog = ui.create.dialog(event.prompt || "请选择要操作的牌", "hidden", "forcebutton")
+        event.dialog = ui.create.dialog(
+          event.prompt || "请选择要操作的牌",
+          "hidden",
+          "forcebutton",
+        )
 
         event.switchToAuto = () => {
           if (!filterOk(event.moved)) {
@@ -2101,7 +2262,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             // 更新每次移动后的对应实体牌的位置
             event.moved[i._link] = get.links(Array.from(i.childNodes))
             // 更新这个buttons的提示文本
-            if (typeof i.textPrompt == "function") {
+            if (typeof i.textPrompt === "function") {
               i.previousSibling.innerHTML = `<div class="text center">${i.textPrompt(event.moved[i._link])}</div>`
             }
           }
@@ -2180,10 +2341,13 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
 
         const updateSelectAllButtons = () => {
-          const buttons = Array.from(event.dialog.querySelectorAll(".select-all"))
+          const buttons = Array.from(
+            event.dialog.querySelectorAll(".select-all"),
+          )
 
           for (const button of buttons) {
-            const hasSelected = button.nextElementSibling.querySelector(".glow2")
+            const hasSelected =
+              button.nextElementSibling.querySelector(".glow2")
             button.innerHTML = hasSelected ? "反选" : "全选"
           }
         }
@@ -2220,7 +2384,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
           const container = buttons[0].parentElement
           clearSelected((button) => button.parentElement !== container)
-          buttons = buttons.filter((button) => button.parentElement === container)
+          buttons = buttons.filter(
+            (button) => button.parentElement === container,
+          )
 
           buttons.forEach((button) => {
             button.classList.add("glow2")
@@ -2243,7 +2409,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           if (!nextState) {
             button.classList.remove("glow2")
             ui.selected.guanxing_buttons.remove(button)
-            ui.selected.guanxing_button = ui.selected.guanxing_buttons[0] || null
+            ui.selected.guanxing_button =
+              ui.selected.guanxing_buttons[0] || null
             updateSelectAllButtons()
           } else {
             if (!canMultiselect) {
@@ -2262,7 +2429,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
          */
         const revertSelection = (container) => {
           const selecteds = new Set(
-            ui.selected.guanxing_buttons.filter((button) => button.parentElement === container),
+            ui.selected.guanxing_buttons.filter(
+              (button) => button.parentElement === container,
+            ),
           )
           const nextSelecteds = Array.prototype.filter.call(
             container.childNodes,
@@ -2287,13 +2456,13 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           const container = e.currentTarget
           // 左键按下
           if (e instanceof MouseEvent) {
-            if (e.which != 1) {
+            if (e.which !== 1) {
               return
             }
           }
           // 单个手指按下
           if (window.TouchEvent && e instanceof TouchEvent) {
-            if (e.touches.length != 1) {
+            if (e.touches.length !== 1) {
               return
             }
 
@@ -2313,8 +2482,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             }
             touchStartX = e.clientX / game.documentZoom
             touchStartY = e.clientY / game.documentZoom
-            elementOffsetX = target.getBoundingClientRect().x / game.documentZoom - touchStartX
-            elementOffsetY = target.getBoundingClientRect().y / game.documentZoom - touchStartY
+            elementOffsetX =
+              target.getBoundingClientRect().x / game.documentZoom - touchStartX
+            elementOffsetY =
+              target.getBoundingClientRect().y / game.documentZoom - touchStartY
             currentElement = target
             // e.stopPropagation();
           }
@@ -2332,18 +2503,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             return
           }
           if (e instanceof MouseEvent) {
-            if (e.which != 1) {
+            if (e.which !== 1) {
               return
             }
           }
           if (window.TouchEvent && e instanceof TouchEvent) {
-            if (e.touches.length != 1) {
+            if (e.touches.length !== 1) {
               return
             }
 
             e = e.touches[0]
           }
-          if (!currentElement || !currentElement.copy) {
+          if (!currentElement?.copy) {
             return
           }
 
@@ -2354,7 +2525,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           // 如果是首次移动距离
           if (!document.contains(currentElement.copy)) {
             // 检查过小的移动距离，防止误触
-            if (Math.abs(ex - touchStartX) < 10 && Math.abs(ey - touchStartY) < 10) {
+            if (
+              Math.abs(ex - touchStartX) < 10 &&
+              Math.abs(ey - touchStartY) < 10
+            ) {
               // 我们取消本次移动
               return
             }
@@ -2398,12 +2572,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             return
           }
           if (e instanceof MouseEvent) {
-            if (e.which != 1) {
+            if (e.which !== 1) {
               return
             }
           }
           if (window.TouchEvent && e instanceof TouchEvent) {
-            if (e.changedTouches.length != 1) {
+            if (e.changedTouches.length !== 1) {
               return
             }
 
@@ -2494,7 +2668,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
               if (buttons.hasChildNodes()) {
                 const firstChild = children[0]
-                if (clientX < firstChild.getBoundingClientRect().left / game.documentZoom) {
+                if (
+                  clientX <
+                  firstChild.getBoundingClientRect().left / game.documentZoom
+                ) {
                   position = "first"
                 }
               } else {
@@ -2502,7 +2679,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               }
 
               // 执行动画喵
-              aniamtionPromise = game.$elementGoto(curCard, buttons, position, animationDuration)
+              aniamtionPromise = game.$elementGoto(
+                curCard,
+                buttons,
+                position,
+                animationDuration,
+              )
             } else {
               // 如果拖动到按钮上面，我们交换两个按钮喵
               const buttons2 = curCard.parentElement
@@ -2510,7 +2692,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               const pos2 = curCard.nextElementSibling || "last"
 
               // 执行动画喵
-              aniamtionPromise = game.$elementSwap(curCard, card, animationDuration)
+              aniamtionPromise = game.$elementSwap(
+                curCard,
+                card,
+                animationDuration,
+              )
             }
 
             clearSelected()
@@ -2531,7 +2717,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             if (buttons.hasChildNodes()) {
               const firstChild = buttons.childNodes[0]
 
-              if (clientX < firstChild.getBoundingClientRect().left / game.documentZoom) {
+              if (
+                clientX <
+                firstChild.getBoundingClientRect().left / game.documentZoom
+              ) {
                 position = firstChild // 此处不可以使用"first"喵，会导致倒序哦喵
               }
             } else {
@@ -2546,7 +2735,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             const subPromises = []
 
             for (const element of selected) {
-              subPromises.push(game.$elementGoto(element, buttons, position, animationDuration))
+              subPromises.push(
+                game.$elementGoto(
+                  element,
+                  buttons,
+                  position,
+                  animationDuration,
+                ),
+              )
             }
 
             aniamtionPromise = Promise.all(subPromises)
@@ -2567,16 +2763,24 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
         // 根据数据创建区域
         for (const [i, item] of list.entries()) {
-          const tex = event.dialog.add(`<div class="text center">${item[0]}</div>`)
+          const tex = event.dialog.add(
+            `<div class="text center">${item[0]}</div>`,
+          )
           tex.classList.add("choosetomove")
           if (canMultiselect) {
-            const selectAll = ui.create.div(".select-all.popup.pointerdiv", event.dialog.content)
+            const selectAll = ui.create.div(
+              ".select-all.popup.pointerdiv",
+              event.dialog.content,
+            )
             selectAll.innerHTML = "全选"
             selectAll.listen((e) => {
               revertSelection(e.target.nextElementSibling)
             })
           }
-          const buttons = ui.create.div(".buttons.popup.guanxing", event.dialog.content)
+          const buttons = ui.create.div(
+            ".buttons.popup.guanxing",
+            event.dialog.content,
+          )
           buttons.addEventListener(
             lib.config.touchscreen ? "touchstart" : "mousedown",
             dragStart,
@@ -2595,18 +2799,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           buttonss.push(buttons)
           buttons._link = i
           if (item[1]) {
-            if (get.itemtype(item[1]) == "cards") {
+            if (get.itemtype(item[1]) === "cards") {
               const cardsb = ui.create.buttons(item[1], "card", buttons)
-              if (item[2] && typeof item[2] == "string") {
+              if (item[2] && typeof item[2] === "string") {
                 for (const ij of cardsb) {
                   ij.node.gaintag.innerHTML = get.translation(item[2])
                 }
               }
-            } else if (item[1].length == 2) {
+            } else if (item[1].length === 2) {
               ui.create.buttons(item[1][0], item[1][1], buttons)
             }
           }
-          if (item[2] && typeof item[2] == "function") {
+          if (item[2] && typeof item[2] === "function") {
             buttons.textPrompt = item[2]
           }
         }
@@ -2679,7 +2883,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }, event.time)
     }
 
-    if ((!result || result == "ai" || (event.forced && !result.bool)) && event.processAI) {
+    if (
+      (!result || result === "ai" || (event.forced && !result.bool)) &&
+      event.processAI
+    ) {
       const moved = event.processAI(event.list)
       if (moved) {
         result = {
@@ -2697,7 +2904,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     await event.trigger("showCharacterBegin")
     await event.trigger("showCharacterEnd")
     await event.trigger("showCharacterAfter")
-    if (get.mode() == "identity" && player.isZhu) {
+    if (get.mode() === "identity" && player.isZhu) {
       await event.trigger("zhuUpdate")
     }
   },
@@ -2713,7 +2920,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (get.is.object(card) && event.viewAs === false) {
         card.isCard = true
       }
-      if (cards && get.itemtype(card) != "card") {
+      if (cards && get.itemtype(card) !== "card") {
         card = get.copy(card)
         card.cards = cards.slice(0)
         event.card = card
@@ -2738,7 +2945,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         range = get.select(select)
         if (event.selectTarget) {
           range = get.select(event.selectTarget)
-          if (typeof range == "number") {
+          if (typeof range === "number") {
             range = [range, range]
           }
         }
@@ -2774,92 +2981,94 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         if (event.forced) {
           return { bool: true }
-        } else {
-          const next = player.chooseBool()
-          next.set(
-            "prompt",
-            event.prompt ||
-              `是否${event.targets2.length ? "对" : ""}${get.translation(event.targets2)}使用${get.translation(card)}?`,
-          )
-          if (event.hsskill) {
-            next.setHiddenSkill(event.hsskill)
-          }
-          if (event.prompt2) {
-            next.set("prompt2", event.prompt2)
-          }
-          next.set(
-            "choice",
-            (() => {
-              let eff = 0
-              for (const target of event.targets2) {
-                eff += get.effect(target, card, player, player)
-              }
-              return eff > 0
-            })(),
-          )
-          if (typeof event.ai == "function") {
-            next.set("ai", event.ai)
-          }
-
-          return next.forResult()
         }
-      } else {
-        if (event.filterTarget) {
-          const targets = game.filterPlayer2(
-            (current) => event.filterTarget(card, player, current),
-            null,
-            true,
-          )
-          if (targets.length < range[0]) {
-            return { bool: false }
-          } else if (
-            !info.complexTarget &&
-            targets.length == range[0] &&
-            range[0] == range[1] &&
-            event.forced
-          ) {
-            event.targets2 = targets
-            return { bool: true }
-          }
-        }
-
-        const next = player.chooseTarget()
-        next.set("_get_card", card)
+        const next = player.chooseBool()
         next.set(
-          "filterTarget",
-          event.filterTarget ||
-            ((card, player, target) => {
-              if (!_status.event.targets.includes(target)) {
-                return false
-              }
-              if (!_status.event.nodistance && !lib.filter.targetInRange(card, player, target)) {
-                return false
-              }
-              return lib.filter.targetEnabledx(card, player, target)
-            }),
+          "prompt",
+          event.prompt ||
+            `是否${event.targets2.length ? "对" : ""}${get.translation(event.targets2)}使用${get.translation(card)}?`,
         )
-        next.set("ai", event.ai || get.effect_use)
-        next.set("selectTarget", event.selectTarget || lib.filter.selectTarget)
-        if (event.nodistance) {
-          next.set("nodistance", true)
+        if (event.hsskill) {
+          next.setHiddenSkill(event.hsskill)
         }
-        if (event.forced) {
-          next.set("forced", true)
-        }
-        if (event.addCount !== false) {
-          next.set("addCount_extra", true)
-        }
-        next.set("targets", targets)
-        next.set("prompt", event.prompt || `选择${get.translation(card)}的目标`)
         if (event.prompt2) {
           next.set("prompt2", event.prompt2)
         }
-        if (event.hsskill) {
-          next.setHiddenSkill(event.hsskill)
+        next.set(
+          "choice",
+          (() => {
+            let eff = 0
+            for (const target of event.targets2) {
+              eff += get.effect(target, card, player, player)
+            }
+            return eff > 0
+          })(),
+        )
+        if (typeof event.ai === "function") {
+          next.set("ai", event.ai)
         }
 
         return next.forResult()
       }
+      if (event.filterTarget) {
+        const targets = game.filterPlayer2(
+          (current) => event.filterTarget(card, player, current),
+          null,
+          true,
+        )
+        if (targets.length < range[0]) {
+          return { bool: false }
+        }
+        if (
+          !info.complexTarget &&
+          targets.length === range[0] &&
+          range[0] === range[1] &&
+          event.forced
+        ) {
+          event.targets2 = targets
+          return { bool: true }
+        }
+      }
+
+      const next = player.chooseTarget()
+      next.set("_get_card", card)
+      next.set(
+        "filterTarget",
+        event.filterTarget ||
+          ((card, player, target) => {
+            if (!_status.event.targets.includes(target)) {
+              return false
+            }
+            if (
+              !_status.event.nodistance &&
+              !lib.filter.targetInRange(card, player, target)
+            ) {
+              return false
+            }
+            return lib.filter.targetEnabledx(card, player, target)
+          }),
+      )
+      next.set("ai", event.ai || get.effect_use)
+      next.set("selectTarget", event.selectTarget || lib.filter.selectTarget)
+      if (event.nodistance) {
+        next.set("nodistance", true)
+      }
+      if (event.forced) {
+        next.set("forced", true)
+      }
+      if (event.addCount !== false) {
+        next.set("addCount_extra", true)
+      }
+      next.set("targets", targets)
+      next.set("prompt", event.prompt || `选择${get.translation(card)}的目标`)
+      if (event.prompt2) {
+        next.set("prompt2", event.prompt2)
+      }
+      if (event.hsskill) {
+        next.setHiddenSkill(event.hsskill)
+      }
+
+      return next.forResult()
     },
     async (event, trigger, player, result) => {
       const { card, cards } = event
@@ -2897,7 +3106,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           next.delayx = false
         }
         if (event.logSkill) {
-          if (typeof event.logSkill == "string") {
+          if (typeof event.logSkill === "string") {
             next.skill = event.logSkill
           } else if (Array.isArray(event.logSkill)) {
             player.logSkill.apply(player, event.logSkill)
@@ -2923,7 +3132,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     event.ai ??= () => 1 + Math.random()
 
     const cardNameList = ["db_atk1", "db_atk2", "db_def1", "db_def2"]
-    game.broadcastAll(loadImages, cardNameList, event.namelist, event.translationList)
+    game.broadcastAll(
+      loadImages,
+      cardNameList,
+      event.namelist,
+      event.translationList,
+    )
     game.log(player, "向", target, "发起了", `#y${event.title}`)
 
     const defendChoices = ["db_def1", "db_def2"]
@@ -2961,11 +3175,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     } else {
       const playerChooseEvent = player.chooseButton(defendChoose, true)
       playerChooseEvent.ai = event.ai
-      playerResult = await playerChooseEvent.forResult().then((result) => result.links[0][2])
+      playerResult = await playerChooseEvent
+        .forResult()
+        .then((result) => result.links[0][2])
 
       const targetChooseEvent = target.chooseButton(attackChoose, true)
       targetChooseEvent.ai = event.ai
-      targetResult = await targetChooseEvent.forResult().then((result) => result.links[0][2])
+      targetResult = await targetChooseEvent
+        .forResult()
+        .then((result) => result.links[0][2])
     }
 
     game.broadcast(() => void ui.arena.classList.add("thrownhighlight"))
@@ -2978,12 +3196,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     )
     game.log(target, "选择的策略为", `#g${get.translation(targetResult)}`)
     game.log(player, "选择的策略为", `#g${get.translation(playerResult)}`)
-    await game.delay(0, lib.config.game_speed == "vvfast" ? 4000 : 1500)
+    await game.delay(0, lib.config.game_speed === "vvfast" ? 4000 : 1500)
 
     const playerResultType = playerResult.slice(6)
     const targetResultType = targetResult.slice(6)
     let resultPopup
-    if (playerResultType == targetResultType) {
+    if (playerResultType === targetResultType) {
       resultPopup = `${get.translation(player) + event.title}成功`
       player.popup("胜", "wood")
       target.popup("负", "fire")
@@ -3028,7 +3246,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const translation = translationList[i]
 
         lib.card[cardName].image =
-          `image/card/${cardName}${nameList[0] == "全军出击" ? "" : `_${name}`}.jpg`
+          `image/card/${cardName}${nameList[0] === "全军出击" ? "" : `_${name}`}.jpg`
         lib.translate[cardName] = name
         lib.translate[`${cardName}_info`] = translation
       }
@@ -3075,11 +3293,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     } else {
       const playerChooseEvent = player.chooseButton(pssChoose, true)
       playerChooseEvent.ai = () => 1 + Math.random()
-      playerResult = await playerChooseEvent.forResult().then((result) => result.links[0][2])
+      playerResult = await playerChooseEvent
+        .forResult()
+        .then((result) => result.links[0][2])
 
       const targetChooseEvent = target.chooseButton(pssChoose, true)
       targetChooseEvent.ai = () => 1 + Math.random()
-      targetResult = await targetChooseEvent.forResult().then((result) => result.links[0][2])
+      targetResult = await targetChooseEvent
+        .forResult()
+        .then((result) => result.links[0][2])
     }
 
     game.broadcastAll(() => void ui.arena.classList.add("thrownhighlight"))
@@ -3097,14 +3319,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     const mes = playerResult.slice(4)
     const tes = targetResult.slice(4)
     let str
-    if (mes == tes) {
+    if (mes === tes) {
       str = "二人平局"
       player.popup("平", "metal")
       target.popup("平", "metal")
       game.log("猜拳的结果为", "#g平局")
       event.result = { tie: true }
     } else {
-      if ({ paper: "stone", scissor: "paper", stone: "scissor" }[mes] == tes) {
+      if ({ paper: "stone", scissor: "paper", stone: "scissor" }[mes] === tes) {
         str = `${get.translation(player)}胜利`
         player.popup("胜", "wood")
         target.popup("负", "fire")
@@ -3143,7 +3365,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         continue
       }
 
-      if (get.position(card, true) == "c") {
+      if (get.position(card, true) === "c") {
         withPile = true
       }
 
@@ -3154,7 +3376,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
     const waitings = []
     for (const [key, value] of lib.commonArea) {
-      const list = (_status[value.areaStatusName] || []).filter((card) => cards.includes(card))
+      const list = (_status[value.areaStatusName] || []).filter((card) =>
+        cards.includes(card),
+      )
       if (event[value.fromName] || list.length) {
         const next = game.createEvent(`from_${value.fromName}`)
         next.setContent(value.removeHandeler)
@@ -3167,7 +3391,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     await Promise.all(waitings)
   },
   async orderingDiscard(event, trigger, player) {
-    const cards = event.relatedEvent.orderingCards.filter((card) => get.position(card, true) == "o")
+    const cards = event.relatedEvent.orderingCards.filter(
+      (card) => get.position(card, true) === "o",
+    )
     if (cards.length) {
       await game.cardsDiscard(cards)
     }
@@ -3181,7 +3407,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         card.selfDestroy(event)
         continue
       }
-      if (get.position(card, true) == "c") {
+      if (get.position(card, true) === "c") {
         withPile = true
       }
       card.fix()
@@ -3192,7 +3418,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
     const waitings = []
     for (const [key, value] of lib.commonArea) {
-      const list = (_status[value.areaStatusName] || []).filter((card) => cards.includes(card))
+      const list = (_status[value.areaStatusName] || []).filter((card) =>
+        cards.includes(card),
+      )
       if (event[value.fromName] || list.length) {
         const next = game.createEvent(`from_${value.fromName}`)
         next.setContent(value.removeHandeler)
@@ -3232,7 +3460,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         card.selfDestroy(event)
         continue
       }
-      if (get.position(card, true) == "c") {
+      if (get.position(card, true) === "c") {
         withPile = true
       }
       card.fix()
@@ -3263,7 +3491,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     if (event.washCard) {
       waitings.push(event.trigger("washCard"))
       for (let i = 0; i < lib.onwash.length; ++i) {
-        if (lib.onwash[i]() == "remove") {
+        if (lib.onwash[i]() === "remove") {
           lib.onwash.splice(i--, 1)
         }
       }
@@ -3272,7 +3500,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     if (!event._triggeronly) {
       game.$cardsGotoPile(event)
       for (const [key, value] of lib.commonArea) {
-        const list = (_status[value.areaStatusName] || []).filter((card) => cards.includes(card))
+        const list = (_status[value.areaStatusName] || []).filter((card) =>
+          cards.includes(card),
+        )
         if (event[value.fromName] || list.length) {
           const next = game.createEvent(`from_${value.fromName}`)
           next.setContent(value.removeHandeler)
@@ -3303,21 +3533,28 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.list = list
         result = { links: list }
       } else {
-        const sortedList = list.toSorted().map((current) => [current, get.translation(current)])
+        const sortedList = list
+          .toSorted()
+          .map((current) => [current, get.translation(current)])
         event.list = sortedList
         let str = `请选择恢复${get.translation(player.name)}的`
         const selectButton = get.select(event.selectButton)
-        if (selectButton[0] == selectButton[1]) {
+        if (selectButton[0] === selectButton[1]) {
           str += get.cnNumber(selectButton[0])
-        } else if (selectButton[1] == Infinity) {
+        } else if (selectButton[1] === Infinity) {
           str += `至少${get.cnNumber(selectButton[0])}`
         } else {
           str += `${get.cnNumber(selectButton[0])}至${get.cnNumber(selectButton[1])}`
         }
         str += "个装备栏"
 
-        const next = source.chooseButton(selectButton, true, [str, [sortedList, "tdnodes"]])
-        next.set("filterButton", (button) => player.hasDisabledSlot(button.link))
+        const next = source.chooseButton(selectButton, true, [
+          str,
+          [sortedList, "tdnodes"],
+        ])
+        next.set("filterButton", (button) =>
+          player.hasDisabledSlot(button.link),
+        )
 
         event.ai ??= () => Math.random()
         next.set("ai", event.ai)
@@ -3339,12 +3576,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
 
       let result: Partial<Result>
-      if (list.length == 1) {
+      if (list.length === 1) {
         event.list = list
         result = { control: list[0] }
       } else {
         const next = source.chooseControl(list)
-        next.set("prompt", `请选择恢复${get.translation(player.name)}的一个装备栏`)
+        next.set(
+          "prompt",
+          `请选择恢复${get.translation(player.name)}的一个装备栏`,
+        )
         event.ai ??= (event, player, list) => list.randomGet()
         event.ai = event.ai(event.getParent(), player, list)
         next.ai = () => event.ai
@@ -3363,7 +3603,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       const realList = list.filter((current) => player.hasEnabledSlot(current))
       if (event.horse) {
-        if (list.includes("equip3") && ( list.includes("equip4"))) {
+        if (list.includes("equip3") && list.includes("equip4")) {
           list.push("equip3_4")
           realList.push("equip3_4")
         }
@@ -3379,20 +3619,25 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.list = list
         result = { links: list }
       } else {
-        const sortedList = list.toSorted().map((current) => [current, get.translation(current)])
+        const sortedList = list
+          .toSorted()
+          .map((current) => [current, get.translation(current)])
         event.list = sortedList
         let str = `请选择废除${get.translation(player.name)}的`
         const selectButton = get.select(event.selectButton)
-        if (selectButton[0] == selectButton[1]) {
+        if (selectButton[0] === selectButton[1]) {
           str += get.cnNumber(selectButton[0])
-        } else if (selectButton[1] == Infinity) {
+        } else if (selectButton[1] === Infinity) {
           str += `至少${get.cnNumber(selectButton[0])}`
         } else {
           str += `${get.cnNumber(selectButton[0])}至${get.cnNumber(selectButton[1])}`
         }
         str += "个装备栏"
 
-        const next = source.chooseButton(selectButton, true, [str, [sortedList, "tdnodes"]])
+        const next = source.chooseButton(selectButton, true, [
+          str,
+          [sortedList, "tdnodes"],
+        ])
         next.set("filterButton", (button) => player.hasEnabledSlot(button.link))
         event.ai ??= () => Math.random()
         next.set("ai", event.ai)
@@ -3416,7 +3661,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
       if (event.horse) {
-        if (list.includes("equip3") && ( list.includes("equip4"))) {
+        if (list.includes("equip3") && list.includes("equip4")) {
           list.push("equip3_4")
         }
         list.remove("equip3")
@@ -3427,7 +3672,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
 
       let result: Partial<Result>
-      if (list.length == 1) {
+      if (list.length === 1) {
         event.list = list
         result = { control: list[0] }
       } else {
@@ -3435,7 +3680,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.list = list
 
         const next = source.chooseControl(list)
-        next.set("prompt", `请选择废除${get.translation(player.name)}的一个装备栏`)
+        next.set(
+          "prompt",
+          `请选择废除${get.translation(player.name)}的一个装备栏`,
+        )
         event.ai ??= (event, player, list) => list.randomGet()
         event.ai = event.ai(event.getParent(), player, list)
         next.ai = () => event.ai
@@ -3443,7 +3691,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         result = await next.forResult()
       }
       event.result = { control: result.control }
-      if (result.control == "equip3_4") {
+      if (result.control === "equip3_4") {
         await player.disableEquip(3, 4)
       } else {
         await player.disableEquip(result.control)
@@ -3464,14 +3712,20 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
     for (const card of cards[1]) {
       const vcard = card[card.cardSymbol]
-      if (vcard.cards?.length && vcard.cards.some((i) => get.position(i, true) !== "o")) {
+      if (
+        vcard.cards?.length &&
+        vcard.cards.some((i) => get.position(i, true) !== "o")
+      ) {
         continue
       }
       await player.equip(vcard)
     }
     for (const card of cards[0]) {
       const vcard = card[card.cardSymbol]
-      if (vcard.cards?.length && vcard.cards.some((i) => get.position(i, true) !== "o")) {
+      if (
+        vcard.cards?.length &&
+        vcard.cards.some((i) => get.position(i, true) !== "o")
+      ) {
         continue
       }
       await target.equip(vcard)
@@ -3537,8 +3791,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     game.log(player, "的回合开始")
     player._noVibrate = true
     if (
-      get.config("identity_mode") != "zhong" &&
-      get.config("identity_mode") != "purple" &&
+      get.config("identity_mode") !== "zhong" &&
+      get.config("identity_mode") !== "purple" &&
       !_status.connectMode
     ) {
       let num
@@ -3573,7 +3827,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
     }
     player.ai.tempIgnore = []
-    if (ui.land && ui.land.player == player) {
+    if (ui.land && ui.land.player === player) {
       game.addVideo("destroyLand")
       ui.land.destroy()
     }
@@ -3591,7 +3845,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const dialog = ui.create.dialog("更换一个随从", "hidden")
         dialog.add([list, "character"])
         result = await player.chooseButton(dialog, true).forResult()
-      } else if (list.length == 1) {
+      } else if (list.length === 1) {
         event.directresult = list[0]
       } else {
         return
@@ -3603,7 +3857,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
 
     if (!event.directresult) {
-      if (result && result.bool && result.links[0]) {
+      if (result?.bool && result.links[0]) {
         event.directresult = result.links[0]
       } else {
         return
@@ -3613,7 +3867,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     let waiting = null
     if (player.storage.subplayer) {
       const current = player.storage.subplayer.name2
-      if (event.directresult == current) {
+      if (event.directresult === current) {
         return
       }
       player.storage[current].hp = player.hp
@@ -3629,7 +3883,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const cfg = player.storage[event.directresult]
       player.storage.subplayer.name2 = event.directresult
       player.reinit(current, event.directresult, [cfg.hp, cfg.maxHp, cfg.hujia])
-      if (player.name == event.directresult || player.name1 == event.directresult) {
+      if (
+        player.name === event.directresult ||
+        player.name1 === event.directresult
+      ) {
         const groupx = cfg.group || "qun"
         player.group = groupx
         player.node.name.dataset.nature = get.groupnature(groupx)
@@ -3649,7 +3906,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   async exitSubPlayer(event, trigger, player) {
     if (player.storage.subplayer) {
       const current = player.storage.subplayer.name2
-      const goon = player.name == current || player.name1 == current
+      const goon = player.name === current || player.name1 === current
       if (event.remove) {
         player.lose(player.getCards("he"), ui.discardPile)._triggered = null
       } else {
@@ -3703,10 +3960,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         dialog.add([list, "character"])
         const result = await player.chooseButton(dialog, true).forResult()
 
-        if (result && result.bool && result.links[0]) {
+        if (result?.bool && result.links[0]) {
           event.directresult = result.links[0]
         }
-      } else if (list.length == 1) {
+      } else if (list.length === 1) {
         event.directresult = list[0]
       } else {
         return
@@ -3740,7 +3997,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
     player.removeSkill(event.list)
     player.reinit(source, name, [cfg.hp, cfg.maxHp, cfg.hujia])
-    if (player.name == name || player.name1 == name) {
+    if (player.name === name || player.name1 === name) {
       const groupx = cfg.group || "qun"
       player.group = groupx
       player.node.name.dataset.nature = get.groupnature(groupx)
@@ -3762,24 +4019,33 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     const info = get.info(card)
     for (const target of targets) {
       let result: Partial<Result>
-      if (target == event.target && event.addedTarget) {
+      if (target === event.target && event.addedTarget) {
         event.addedTargets.push(event.addedTarget)
         result = { bool: false }
       } else if (
-        game.hasPlayer((current) => info.filterAddedTarget(card, player, current, target))
+        game.hasPlayer((current) =>
+          info.filterAddedTarget(card, player, current, target),
+        )
       ) {
         const next = player.chooseTarget(
           `${get.translation(event.card)}：选择${get.translation(target)}对应的指向目标`,
           (_card, player, target) => {
             const card = get.card()
             const info = get.info(card)
-            return info.filterAddedTarget(card, player, target, _status.event.preTarget)
+            return info.filterAddedTarget(
+              card,
+              player,
+              target,
+              _status.event.preTarget,
+            )
           },
           true,
         )
         next.set("_get_card", card)
         next.set("preTarget", target)
-        next.set("ai", (target) => get.effect(target, get.card(), player, _status.event.player))
+        next.set("ai", (target) =>
+          get.effect(target, get.card(), player, _status.event.player),
+        )
 
         result = await next.forResult()
       } else {
@@ -3798,32 +4064,39 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
     let choice
     if (get.tag(card, "multineg")) {
-      choice = player.previous.side == player.side ? "逆时针" : "顺时针"
+      choice = player.previous.side === player.side ? "逆时针" : "顺时针"
     } else {
-      choice = player.next.side == player.side ? "逆时针" : "顺时针"
+      choice = player.next.side === player.side ? "逆时针" : "顺时针"
     }
 
     const result = await player
-      .chooseControl("顺时针", "逆时针", (event, player) => _status.event.choice || "逆时针")
+      .chooseControl(
+        "顺时针",
+        "逆时针",
+        (event, player) => _status.event.choice || "逆时针",
+      )
       .set("prompt", `选择${get.translation(card)}的结算方向`)
       .set("choice", choice)
       .set("forceDie", true)
       .forResult()
 
-    if (result && result.control == "顺时针") {
+    if (result && result.control === "顺时针") {
       const evt = event.getParent()
       const sorter = _status.currentPhase || player
       evt.fixedSeat = true
       evt.targets.sortBySeat(sorter)
       evt.targets.reverse()
-      if (evt.targets[evt.targets.length - 1] == sorter) {
+      if (evt.targets[evt.targets.length - 1] === sorter) {
         evt.targets.unshift(evt.targets.pop())
       }
     }
   },
   async addJudgeCard(event) {
     const { target, card, cards } = event
-    if (!card?.cards.some((card) => get.position(card, true) !== "o") && target.canAddJudge(card)) {
+    if (
+      !card?.cards.some((card) => get.position(card, true) !== "o") &&
+      target.canAddJudge(card)
+    ) {
       await target.addJudge(card, cards)
     }
   },
@@ -3837,7 +4110,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   },
   async gameDraw(event, trigger, player) {
     const { num, targets } = event
-    if (_status.brawl && _status.brawl.noGameDraw) {
+    if (_status.brawl?.noGameDraw) {
       return
     }
 
@@ -3847,7 +4120,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     const waitings = []
     do {
       if (targets.includes(player)) {
-        if (typeof num == "function") {
+        if (typeof num === "function") {
           numx = num(player)
         }
 
@@ -3869,7 +4142,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         //event.gaintag支持函数、字符串、数组。数组就是添加一连串的标记；函数的返回格式为[[cards1,gaintag1],[cards2,gaintag2]...]
         if (event.gaintag?.[player.playerid]) {
           const gaintag = event.gaintag[player.playerid]
-          const list = typeof gaintag == "function" ? gaintag(numx, cards) : [[cards, gaintag]]
+          const list =
+            typeof gaintag === "function"
+              ? gaintag(numx, cards)
+              : [[cards, gaintag]]
           game.broadcastAll(
             (player, list) => {
               for (let i = list.length - 1; i >= 0; i--) {
@@ -3886,8 +4162,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
       if (
         player.singleHp === true &&
-        get.mode() != "guozhan" &&
-        (lib.config.mode != "doudizhu" || _status.mode != "online")
+        get.mode() !== "guozhan" &&
+        (lib.config.mode !== "doudizhu" || _status.mode !== "online")
       ) {
         const next = player.doubleDraw()
         waitings.push(next)
@@ -3895,17 +4171,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
       player._start_cards = player.getCards("h")
       player = player.next
-    } while (player != end)
+    } while (player !== end)
 
     event.changeCard = get.config("change_card")
     if (
       _status.connectMode ||
-      (lib.config.mode == "single" && _status.mode != "wuxianhuoli") ||
-      (lib.config.mode == "doudizhu" && _status.mode == "online") ||
-      (lib.config.mode != "identity" &&
-        lib.config.mode != "guozhan" &&
-        lib.config.mode != "doudizhu" &&
-        lib.config.mode != "single")
+      (lib.config.mode === "single" && _status.mode !== "wuxianhuoli") ||
+      (lib.config.mode === "doudizhu" && _status.mode === "online") ||
+      (lib.config.mode !== "identity" &&
+        lib.config.mode !== "guozhan" &&
+        lib.config.mode !== "doudizhu" &&
+        lib.config.mode !== "single")
     ) {
       event.changeCard = "disabled"
     }
@@ -3914,7 +4190,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
     if (
       !targets.includes(game.me) ||
-      event.changeCard == "disabled" ||
+      event.changeCard === "disabled" ||
       _status.auto ||
       !game.me.countCards("h")
     ) {
@@ -3929,11 +4205,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
 
     while (true) {
-      if (event.changeCard == "once") {
+      if (event.changeCard === "once") {
         event.changeCard = "disabled"
-      } else if (event.changeCard == "twice") {
+      } else if (event.changeCard === "twice") {
         event.changeCard = "once"
-      } else if (event.changeCard == "disabled") {
+      } else if (event.changeCard === "disabled") {
         event.bool = false
         _status.imchoosing = false
         break
@@ -3982,7 +4258,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       //event.gaintag支持函数、字符串、数组。数组就是添加一连串的标记；函数的返回格式为[[cards1,gaintag1],[cards2,gaintag2]...]
       if (event.gaintag?.[game.me.playerid]) {
         const gaintag = event.gaintag[game.me.playerid]
-        const list = typeof gaintag == "function" ? gaintag(hs.length, cards) : [[cards, gaintag]]
+        const list =
+          typeof gaintag === "function"
+            ? gaintag(hs.length, cards)
+            : [[cards, gaintag]]
         for (let i = list.length - 1; i >= 0; i--) {
           game.me.directgain(list[i][0], null, list[i][1])
         }
@@ -4020,15 +4299,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             isRoundEnd = _status.isRoundFilter(phase, event.player)
           } else if (_status.seatNumSettled) {
             const seatNum = event.player.getSeatNum()
-            if (seatNum != 0) {
+            if (seatNum !== 0) {
               if (
-                get.itemtype(_status.lastPhasedPlayer) != "player" ||
+                get.itemtype(_status.lastPhasedPlayer) !== "player" ||
                 seatNum < _status.lastPhasedPlayer.getSeatNum()
               ) {
                 isRoundEnd = true
               }
             }
-          } else if (event.player == _status.roundStart) {
+          } else if (event.player === _status.roundStart) {
             isRoundEnd = true
           }
           if (isRoundEnd && _status.globalHistory.some((i) => i.isRound)) {
@@ -4044,10 +4323,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const players = game.players
           .slice(0)
           .concat(game.dead)
-          .sort((a, b) => parseInt(a.dataset.position) - parseInt(b.dataset.position))
-        const position = parseInt(current.dataset.position)
+          .sort(
+            (a, b) =>
+              parseInt(a.dataset.position, 10) -
+              parseInt(b.dataset.position, 10),
+          )
+        const position = parseInt(current.dataset.position, 10)
         for (const player of players) {
-          if (parseInt(player.dataset.position) > position) {
+          if (parseInt(player.dataset.position, 10) > position) {
             return player
           }
         }
@@ -4077,10 +4360,13 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             lib.characterPack[charaPackName] = charaPack.character
           }
         }
-        if (charaPack.forbid && charaPack.forbid.includes(lib.config.mode)) {
+        if (charaPack.forbid?.includes(lib.config.mode)) {
           continue
         }
-        if (charaPack.mode && charaPack.mode.includes(lib.config.mode) == false) {
+        if (
+          charaPack.mode &&
+          charaPack.mode.includes(lib.config.mode) === false
+        ) {
           continue
         }
 
@@ -4091,10 +4377,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         // }
         for (const itemName in charaPack) {
           if (
-            itemName == "name" ||
-            itemName == "mode" ||
-            itemName == "forbid" ||
-            itemName == "characterSort"
+            itemName === "name" ||
+            itemName === "mode" ||
+            itemName === "forbid" ||
+            itemName === "characterSort"
           ) {
             continue
           }
@@ -4102,7 +4388,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           for (const termName in item) {
             const term = item[termName]
 
-            if (itemName == "character") {
+            if (itemName === "character") {
               const character = get.convertedCharacter(term)
 
               if (character.isBoss || character.isHiddenBoss) {
@@ -4118,7 +4404,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                 lib.skilllist.add(skill)
               }
             }
-            if (itemName == "translate" && termName == charaPackName) {
+            if (itemName === "translate" && termName === charaPackName) {
               lib[itemName][`${termName}_character_config`] = term
             } else {
               if (lib[itemName][termName] == null) {
@@ -4127,7 +4413,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                   termName,
                   Object.getOwnPropertyDescriptor(item, termName),
                 )
-              } else if (Array.isArray(lib[itemName][termName]) && Array.isArray(term)) {
+              } else if (
+                Array.isArray(lib[itemName][termName]) &&
+                Array.isArray(term)
+              ) {
                 lib[itemName][termName].addArray(term)
               } else {
                 console.log(
@@ -4156,25 +4445,29 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
           for (const itemName in cards[cardPackName]) {
             const item = cards[cardPackName][itemName]
-            if (itemName == "name" || itemName == "mode" || itemName == "forbid") {
+            if (
+              itemName === "name" ||
+              itemName === "mode" ||
+              itemName === "forbid"
+            ) {
               continue
             }
-            if (itemName == "list") {
+            if (itemName === "list") {
               continue
             }
             for (const termName in item) {
               const term = item[termName]
               if (
-                itemName == "skill" &&
-                termName[0] == "_" &&
+                itemName === "skill" &&
+                termName[0] === "_" &&
                 !lib.config.cards.includes(cardPackName)
               ) {
                 continue
               }
-              if (itemName == "translate" && termName == cardPackName) {
+              if (itemName === "translate" && termName === cardPackName) {
                 lib[itemName][`${termName}_card_config`] = term
               } else {
-                if (lib[itemName][termName] == undefined) {
+                if (lib[itemName][termName] === undefined) {
                   Object.defineProperty(
                     lib[itemName],
                     termName,
@@ -4210,7 +4503,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     while (ui.dialogs.length) {
       ui.dialogs[0].close()
     }
-    if (event.bool != "noover") {
+    if (event.bool !== "noover") {
       game.over(event.bool)
     }
     if (event.callback) {
@@ -4223,7 +4516,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     while (doingList.length > 0) {
       event.doing = doingList.shift()
       while (true) {
-        if (trigger.filterStop && trigger.filterStop()) {
+        if (trigger.filterStop?.()) {
           return
         }
         const usableSkills = event.doing.todoList.filter((info) =>
@@ -4235,66 +4528,72 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             info.indexedData,
           ),
         )
-        if (usableSkills.length == 0) {
+        if (usableSkills.length === 0) {
           break
+        }
+        event.doing.todoList = event.doing.todoList.filter(
+          (i) => i.priority <= usableSkills[0].priority,
+        )
+        //firstDo时机和lastDo时机不进行技能优先级选择
+        if (get.itemtype(event.doing.player) !== "player") {
+          event.current = usableSkills[0]
         } else {
-          event.doing.todoList = event.doing.todoList.filter(
-            (i) => i.priority <= usableSkills[0].priority,
+          event.choice = usableSkills.filter(
+            (n) => n.priority === usableSkills[0].priority,
           )
-          //firstDo时机和lastDo时机不进行技能优先级选择
-          if (get.itemtype(event.doing.player) !== "player") {
-            event.current = usableSkills[0]
+          //现在只要找到一个同优先度技能为silent，或没有技能描述的技能 便优先执行该技能
+          const silentSkill = event.choice.find((item) => {
+            const skillInfo = lib.skill[item.skill]
+            return skillInfo && (skillInfo.silent || !lib.translate[item.skill])
+          })
+          if (silentSkill) {
+            event.current = silentSkill
           } else {
-            event.choice = usableSkills.filter((n) => n.priority == usableSkills[0].priority)
-            //现在只要找到一个同优先度技能为silent，或没有技能描述的技能 便优先执行该技能
-            const silentSkill = event.choice.find((item) => {
-              const skillInfo = lib.skill[item.skill]
-              return skillInfo && (skillInfo.silent || !lib.translate[item.skill])
-            })
-            if (silentSkill) {
-              event.current = silentSkill
+            const currentChoice = event.choice[0]
+            const skillsToChoose = event.choice.map((i) => i.skill).unique()
+            if (event.choice.length === 1 || skillsToChoose.length === 1) {
+              event.current = currentChoice
             } else {
-              const currentChoice = event.choice[0]
-              const skillsToChoose = event.choice.map((i) => i.skill).unique()
-              if (event.choice.length === 1 || skillsToChoose.length === 1) {
-                event.current = currentChoice
-              } else {
-                const currentPlayer = currentChoice.player
-                const next = currentPlayer.chooseControl(
-                  skillsToChoose.map((skill) => get.skillTranslation(skill, currentPlayer, true)),
+              const currentPlayer = currentChoice.player
+              const next = currentPlayer.chooseControl(
+                skillsToChoose.map((skill) =>
+                  get.skillTranslation(skill, currentPlayer, true),
+                ),
+              )
+              next.set("prompt", "选择下一个触发的技能")
+              next.set("forceDie", true)
+              next.set("arrangeSkill", true)
+              next.set("includeOut", true)
+              const result = await next.forResult()
+              //千里走单骑全责，把敌人打死可能会打断chooseControl
+              if (result) {
+                event.current = usableSkills.find(
+                  (info) => info.skill === skillsToChoose[result.index],
                 )
-                next.set("prompt", "选择下一个触发的技能")
-                next.set("forceDie", true)
-                next.set("arrangeSkill", true)
-                next.set("includeOut", true)
-                const result = await next.forResult()
-                //千里走单骑全责，把敌人打死可能会打断chooseControl
-                if (result) {
-                  event.current = usableSkills.find(
-                    (info) => info.skill == skillsToChoose[result.index],
-                  )
-                } else {
-                  event.current = usableSkills[0]
-                }
+              } else {
+                event.current = usableSkills[0]
               }
             }
           }
-          event.doing.doneList.push(event.current)
-          event.doing.todoList.remove(event.current)
-          const result = await game
-            .createTrigger(
-              event.triggername,
-              event.current.skill,
-              event.current.player,
-              trigger,
-              event.current.indexedData,
-            )
-            .forResult()
-          if (get.itemtype(event.doing.player) === "player" && result === "cancelled") {
-            for (let i = 0; i < event.doing.todoList.length; i++) {
-              if (event.current.skill === event.doing.todoList[i].skill) {
-                event.doing.doneList.push(event.doing.todoList.splice(i--, 1)[0])
-              }
+        }
+        event.doing.doneList.push(event.current)
+        event.doing.todoList.remove(event.current)
+        const result = await game
+          .createTrigger(
+            event.triggername,
+            event.current.skill,
+            event.current.player,
+            trigger,
+            event.current.indexedData,
+          )
+          .forResult()
+        if (
+          get.itemtype(event.doing.player) === "player" &&
+          result === "cancelled"
+        ) {
+          for (let i = 0; i < event.doing.todoList.length; i++) {
+            if (event.current.skill === event.doing.todoList[i].skill) {
+              event.doing.doneList.push(event.doing.todoList.splice(i--, 1)[0])
             }
           }
         }
@@ -4305,7 +4604,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     const info = get.info(event.skill)
 
     if (
-      !game.expandSkills(player.getSkills().concat(lib.skill.global)).includes(event.skill) &&
+      !game
+        .expandSkills(player.getSkills().concat(lib.skill.global))
+        .includes(event.skill) &&
       !event.uncheckHasSkill
     ) {
       const hidden = player.hiddenSkills.slice(0)
@@ -4313,11 +4614,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       game.expandSkills(hidden)
       game.expandSkills(invisible)
       if (hidden.includes(event.skill)) {
-        if (!info.silent && player.hasSkillTag("nomingzhi", false, null, true)) {
+        if (
+          !info.silent &&
+          player.hasSkillTag("nomingzhi", false, null, true)
+        ) {
           return
-        } else if (
+        }
+        if (
           (!info.direct && typeof info.cost !== "function") ||
-          (get.is.locked(event.skill, player) && typeof info.cost == "function")
+          (get.is.locked(event.skill, player) &&
+            typeof info.cost === "function")
         ) {
           await event.trigger("triggerHidden")
         } else {
@@ -4332,7 +4638,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             continue
           }
 
-          if (!game.expandSkills(player.additionalSkills[skill]).includes(event.skill)) {
+          if (
+            !game
+              .expandSkills(player.additionalSkills[skill])
+              .includes(event.skill)
+          ) {
             continue
           }
 
@@ -4360,14 +4670,24 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (player.hasSkillTag("nofrequent", false, event.skill)) {
           return false
         }
-        if (typeof info.frequent == "boolean") {
+        if (typeof info.frequent === "boolean") {
           return info.frequent
         }
-        if (typeof info.frequent == "function") {
-          return info.frequent(trigger, player, event.triggername, event.indexedData)
+        if (typeof info.frequent === "function") {
+          return info.frequent(
+            trigger,
+            player,
+            event.triggername,
+            event.indexedData,
+          )
         }
-        if (info.frequent == "check" && typeof info.check == "function") {
-          return info.check(trigger, player, event.triggername, event.indexedData)
+        if (info.frequent === "check" && typeof info.check === "function") {
+          return info.check(
+            trigger,
+            player,
+            event.triggername,
+            event.indexedData,
+          )
         }
         return false
       }
@@ -4415,17 +4735,22 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const check = info.check
         if (info.prompt) {
           str = info.prompt
-        } else if (typeof info.logTarget == "string") {
+        } else if (typeof info.logTarget === "string") {
           str = get.prompt(event.skill, trigger[info.logTarget], player)
-        } else if (typeof info.logTarget == "function") {
-          const logTarget = info.logTarget(trigger, player, event.triggername, event.indexedData)
+        } else if (typeof info.logTarget === "function") {
+          const logTarget = info.logTarget(
+            trigger,
+            player,
+            event.triggername,
+            event.indexedData,
+          )
           if (get.itemtype(logTarget).startsWith("player")) {
             str = get.prompt(event.skill, logTarget, player)
           }
         } else {
           str = get.prompt(event.skill, null, player)
         }
-        if (typeof str == "function") {
+        if (typeof str === "function") {
           str = str(trigger, player, event.triggername, event.indexedData)
         }
 
@@ -4435,15 +4760,22 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         next.set("forceDie", true)
         next.set("includeOut", true)
-        next.ai = () => !check || check(trigger, player, event.triggername, event.indexedData)
+        next.ai = () =>
+          !check || check(trigger, player, event.triggername, event.indexedData)
 
-        if (typeof info.prompt2 == "function") {
-          next.set("prompt2", info.prompt2(trigger, player, event.triggername, event.indexedData))
-        } else if (typeof info.prompt2 == "string") {
+        if (typeof info.prompt2 === "function") {
+          next.set(
+            "prompt2",
+            info.prompt2(trigger, player, event.triggername, event.indexedData),
+          )
+        } else if (typeof info.prompt2 === "string") {
           next.set("prompt2", info.prompt2)
-        } else if (info.prompt2 != false) {
+        } else if (info.prompt2 !== false) {
           if (lib.dynamicTranslate[event.skill]) {
-            next.set("prompt2", lib.dynamicTranslate[event.skill](player, event.skill))
+            next.set(
+              "prompt2",
+              lib.dynamicTranslate[event.skill](player, event.skill),
+            )
           } else if (lib.translate[`${event.skill}_info`]) {
             next.set("prompt2", lib.translate[`${event.skill}_info`])
           }
@@ -4464,10 +4796,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
     }
 
-    if (result && result.control) {
+    if (result?.control) {
       result.bool = !result.control.includes("cancel")
     }
-    if (!result || !result.bool) {
+    if (!result?.bool) {
       if (info.oncancel) {
         info.oncancel(trigger, player)
       }
@@ -4478,11 +4810,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
 
     let autodelay = info.autodelay
-    if (typeof autodelay == "function") {
+    if (typeof autodelay === "function") {
       autodelay = autodelay(trigger, player)
     }
     if (autodelay && (info.forced || !event.isMine())) {
-      if (typeof autodelay == "number") {
+      if (typeof autodelay === "number") {
         await game.delayx(autodelay)
       } else {
         await game.delayx()
@@ -4496,20 +4828,38 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (typeof info.logTarget === "string") {
         targets = trigger[info.logTarget]
       } else if (typeof info.logTarget === "function") {
-        targets = info.logTarget(trigger, player, event.triggername, event.indexedData)
+        targets = info.logTarget(
+          trigger,
+          player,
+          event.triggername,
+          event.indexedData,
+        )
       }
     }
     if (get.itemtype(targets) === "player") {
       targets = [targets]
     }
     if (
-      info.popup != false &&
+      info.popup !== false &&
       !info.direct &&
-      !("skill_popup" in result && !result["skill_popup"])
+      !("skill_popup" in result && !result.skill_popup)
     ) {
-      const popup_info = typeof info.popup === "string" ? [event.skill, info.popup] : event.skill
-      const args = [trigger, player, event.triggername, event.indexedData, result]
-      player.logSkill(popup_info, info.logLine === false ? false : targets, info.line, null, args)
+      const popup_info =
+        typeof info.popup === "string" ? [event.skill, info.popup] : event.skill
+      const args = [
+        trigger,
+        player,
+        event.triggername,
+        event.indexedData,
+        result,
+      ]
+      player.logSkill(
+        popup_info,
+        info.logLine === false ? false : targets,
+        info.line,
+        null,
+        args,
+      )
     }
     if (info.usable !== undefined) {
       player.getStat("triggerSkill")[event.skill] ??= 0
@@ -4530,7 +4880,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       next.includeOut = true
     }
     //传入数据
-    if (get.itemtype(targets) == "players") {
+    if (get.itemtype(targets) === "players") {
       next.targets = targets.slice(0)
     }
     if (get.itemtype(result.cards) === "cards") {
@@ -4559,7 +4909,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     if (
       player._hookTrigger.some((i) => {
         const info = lib.skill[i].hookTrigger
-        return info && info.after && info.after(event, player, event.triggername)
+        return info?.after?.(event, player, event.triggername)
       })
     ) {
       await event.trigger("triggerAfter")
@@ -4572,19 +4922,19 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       ui.control.innerHTML = ""
       const nodes = [...ui.arena.childNodes]
       for (const node of nodes) {
-        if (node == ui.canvas) {
+        if (node === ui.canvas) {
           continue
         }
-        if (node == ui.control) {
+        if (node === ui.control) {
           continue
         }
-        if (node == ui.mebg) {
+        if (node === ui.mebg) {
           continue
         }
-        if (node == ui.me) {
+        if (node === ui.me) {
           continue
         }
-        if (node == ui.roundmenu) {
+        if (node === ui.roundmenu) {
           continue
         }
         node.remove()
@@ -4603,7 +4953,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       ui.updateVideoMenu()
     }
 
-    _status.videoDuration = 1 / parseFloat(lib.config.video_default_play_speed.slice(0, -1))
+    _status.videoDuration =
+      1 / parseFloat(lib.config.video_default_play_speed.slice(0, -1))
     ui.create.system("返回", () => {
       const mode = localStorage.getItem(`${lib.configprefix}playbackmode`)
       if (mode) {
@@ -4658,7 +5009,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     ui.refresh(ui.system)
     ui.system.show()
     ui.window.show()
-    if (lib.config.mode != "versus" && lib.config.mode != "boss") {
+    if (lib.config.mode !== "versus" && lib.config.mode !== "boss") {
       ui.arena.style.display = ""
       ui.refresh(ui.arena)
       ui.arena.show()
@@ -4674,9 +5025,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     while (event.video.length) {
       const content = event.video.shift()
       // console.log(content);
-      if (content.type == "delay") {
+      if (content.type === "delay") {
         await game.delay(content.content)
-      } else if (content.type == "play") {
+      } else if (content.type === "play") {
         window.play = {}
         if (!event.playtoload) {
           event.playtoload = 1
@@ -4686,26 +5037,32 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const script = lib.init.js(`${lib.assetURL}play`, content.name)
         script.addEventListener("load", () => {
           const play = window.play[content.name]
-          if (play && play.video) {
+          if (play?.video) {
             play.video(content.init)
           }
           event.playtoload--
-          if (event.playtoload == 0) {
+          if (event.playtoload === 0) {
             delete window.play
           }
         })
       } else if (
-        typeof content.player == "string" &&
+        typeof content.player === "string" &&
         game.playerMap[content.player] &&
         game.playerMap[content.player].classList &&
         !game.playerMap[content.player].classList.contains("obstacle")
       ) {
-        await game.videoContent[content.type](game.playerMap[content.player], content.content)
+        await game.videoContent[content.type](
+          game.playerMap[content.player],
+          content.content,
+        )
       } else {
         await game.videoContent[content.type](content.content)
       }
       if (event.video.length) {
-        await game.delay(0, _status.videoDuration * Math.min(2000, event.video[0].delay))
+        await game.delay(
+          0,
+          _status.videoDuration * Math.min(2000, event.video[0].delay),
+        )
       }
 
       // 同上，~~早知道不改成Async Content了~~
@@ -4728,7 +5085,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       event.func()
     }
     if (!lib.configOL.number) {
-      lib.configOL.number = parseInt(lib.configOL.player_number)
+      lib.configOL.number = parseInt(lib.configOL.player_number, 10)
     }
     if (game.onlineroom) {
       game.send("server", "config", lib.configOL)
@@ -4779,7 +5136,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
 
     const result = await game.me.chooseBool("是否置换手牌？").forResult()
-    if (result && result.bool) {
+    if (result?.bool) {
       /*otherPile主要是针对那些用专属牌堆，不从一般牌堆摸牌的角色（如陈寿），该属性目前只有两个键值对，且都为函数
        *getCards函数与获得牌相关，只传入要获得的牌数num作为参数
        *discard与手气卡换牌后弃置牌相关，只传入要弃置的牌card作为参数
@@ -4808,7 +5165,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       //event.gaintag支持函数、字符串、数组。数组就是添加一连串的标记；函数的返回格式为[[cards1,gaintag1],[cards2,gaintag2]...]
       if (event.gaintag?.[game.me.playerid]) {
         const gaintag = event.gaintag[game.me.playerid]
-        const list = typeof gaintag == "function" ? gaintag(hs.length, cards) : [[cards, gaintag]]
+        const list =
+          typeof gaintag === "function"
+            ? gaintag(hs.length, cards)
+            : [[cards, gaintag]]
         for (let i = list.length - 1; i >= 0; i--) {
           game.me.directgain(list[i][0], null, list[i][1])
         }
@@ -4832,7 +5192,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           current.wait((result) => resolve(!!result?.bool))
           current.send(chooseRemote)
           return
-        } else if (current === game.me) {
+        }
+        if (current === game.me) {
           const next = chooseMe()
           game.me.wait((result) => resolve(!!result?.bool))
           next
@@ -4887,7 +5248,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       //event.gaintag支持函数、字符串、数组。数组就是添加一连串的标记；函数的返回格式为[[cards1,gaintag1],[cards2,gaintag2]...]
       if (event.gaintag?.[current.playerid]) {
         const gaintag = event.gaintag[current.playerid]
-        const list = typeof gaintag == "function" ? gaintag(hs.length, cards) : [[cards, gaintag]]
+        const list =
+          typeof gaintag === "function"
+            ? gaintag(hs.length, cards)
+            : [[cards, gaintag]]
         game.broadcastAll(
           (player, list) => {
             for (let i = list.length - 1; i >= 0; i--) {
@@ -4921,7 +5285,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         "phaseDiscard",
         "phaseJieshu",
       ]
-      if (typeof event.num != "number") {
+      if (typeof event.num !== "number") {
         event.num = 0
       }
       //规则集中的“回合开始后①”，更新游戏轮数，触发“一轮游戏开始时”
@@ -4932,16 +5296,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           isRound = _status.isRoundFilter(event, player)
         } else if (_status.seatNumSettled) {
           const seatNum = player.getSeatNum()
-          if (seatNum != 0) {
+          if (seatNum !== 0) {
             if (
-              get.itemtype(_status.lastPhasedPlayer) != "player" ||
+              get.itemtype(_status.lastPhasedPlayer) !== "player" ||
               seatNum < _status.lastPhasedPlayer.getSeatNum()
             ) {
               isRound = true
             }
             _status.lastPhasedPlayer = player
           }
-        } else if (player == _status.roundStart) {
+        } else if (player === _status.roundStart) {
           isRound = true
         }
         if (isRound) {
@@ -4952,7 +5316,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           for (const current of game.players) {
             if (current.isOut() && current.outCount > 0) {
               current.outCount--
-              if (current.outCount == 0 && !current.outSkills) {
+              if (current.outCount === 0 && !current.outSkills) {
                 current.in()
               }
             }
@@ -5011,11 +5375,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         event.cancel()
         return next.forResult()
-      } else {
-        player.phaseSkipped = false
-        player.getHistory().isMe = true
-        player.getStat().isMe = true
       }
+      player.phaseSkipped = false
+      player.getHistory().isMe = true
+      player.getStat().isMe = true
     },
     async (event, trigger, player) => {
       //规则集中的“回合开始后⑥”，更新“当前回合角色”
@@ -5050,11 +5413,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       game.log()
       const skill = event.skill && get.sourceSkillFor(event.skill)
-      game.log(player, "的", skill ? `#y【${get.translation(skill)}】` : "", "回合开始")
+      game.log(
+        player,
+        "的",
+        skill ? `#y【${get.translation(skill)}】` : "",
+        "回合开始",
+      )
       player._noVibrate = true
       if (
-        get.config("identity_mode") != "zhong" &&
-        get.config("identity_mode") != "purple" &&
+        get.config("identity_mode") !== "zhong" &&
+        get.config("identity_mode") !== "purple" &&
         !_status.connectMode
       ) {
         let num
@@ -5089,7 +5457,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
       player.ai.tempIgnore = []
-      if (ui.land && ui.land.player == player) {
+      if (ui.land && ui.land.player === player) {
         game.addVideo("destroyLand")
         ui.land.destroy()
       }
@@ -5143,9 +5511,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         game.log(player, "跳过了", event.currentPhase)
       }
-      if (event.currentPhase == "phaseDraw" || event.currentPhase == "phaseDiscard") {
+      if (
+        event.currentPhase === "phaseDraw" ||
+        event.currentPhase === "phaseDiscard"
+      ) {
         if (!player.noPhaseDelay) {
-          if (player == game.me) {
+          if (player === game.me) {
             await game.delay()
           } else {
             await game.delayx()
@@ -5156,7 +5527,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       return next.forResult()
     },
     async (event, trigger, player) => {
-      if (event.currentPhase == "phaseUse") {
+      if (event.currentPhase === "phaseUse") {
         game.broadcastAll(() => {
           if (ui.tempnowuxie) {
             ui.tempnowuxie.close()
@@ -5228,7 +5599,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       if (!event.cancelled && !event.nojudge) {
-        event.result = await player.judge(event.card).set("type", "phase").forResult()
+        event.result = await player
+          .judge(event.card)
+          .set("type", "phase")
+          .forResult()
       }
     },
     async (event, trigger, player) => {
@@ -5269,23 +5643,22 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       if (game.modPhaseDraw) {
         return game.modPhaseDraw(player, event.num)
-      } else {
-        if (event.num > 0) {
-          let num = event.num
+      }
+      if (event.num > 0) {
+        let num = event.num
 
-          if (event.attachDraw) {
-            for (const card of event.attachDraw) {
-              ui.cardPile.insertBefore(card, ui.cardPile.firstChild)
-            }
-            num += event.attachDraw.length
+        if (event.attachDraw) {
+          for (const card of event.attachDraw) {
+            ui.cardPile.insertBefore(card, ui.cardPile.firstChild)
           }
-
-          const next = player.draw(num)
-          if (event.attachDraw) {
-            next.minnum = event.attachDraw.length
-          }
-          return next.forResult()
+          num += event.attachDraw.length
         }
+
+        const next = player.draw(num)
+        if (event.attachDraw) {
+          next.minnum = event.attachDraw.length
+        }
+        return next.forResult()
       }
     },
     async (event, trigger, player, result) => {
@@ -5303,10 +5676,13 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (!info) {
           continue
         }
-        if (info.enable != undefined) {
-          if (typeof info.enable == "string" && info.enable == "phaseUse") {
+        if (info.enable !== undefined) {
+          if (typeof info.enable === "string" && info.enable === "phaseUse") {
             bool = true
-          } else if (typeof info.enable == "object" && info.enable.includes("phaseUse")) {
+          } else if (
+            typeof info.enable === "object" &&
+            info.enable.includes("phaseUse")
+          ) {
             bool = true
           }
         }
@@ -5320,7 +5696,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (!info) {
           continue
         }
-        if (info.updateUsable == "phaseUse") {
+        if (info.updateUsable === "phaseUse") {
           stat.card[card] = 0
         }
       }
@@ -5368,13 +5744,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (event.num <= 0) {
         event.finish()
         return
-      } else {
-        game.broadcastAll((player) => {
-          if (lib.config.show_phase_prompt) {
-            player.popup("弃牌阶段", null, false)
-          }
-        }, player)
       }
+      game.broadcastAll((player) => {
+        if (lib.config.show_phase_prompt) {
+          player.popup("弃牌阶段", null, false)
+        }
+      }, player)
       await event.trigger("phaseDiscard")
     },
     async (event, trigger, player) => {
@@ -5410,18 +5785,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       game.expandSkills(skills)
       for (const name of skills) {
         const info = lib.skill[name]
-        if (info && info.onChooseToUse) {
+        if (info?.onChooseToUse) {
           info.onChooseToUse(event)
         }
       }
       if (_status.noclearcountdown !== "direct") {
         _status.noclearcountdown = true
       }
-      if (event.type == "phase") {
+      if (event.type === "phase") {
         if (event.isMine()) {
           event.endButton = ui.create.control("结束回合", "stayleft", () => {
             const evt = _status.event
-            if (evt.name != "chooseToUse" || evt.type != "phase") {
+            if (evt.name !== "chooseToUse" || evt.type !== "phase") {
               return
             }
             if (evt.skill) {
@@ -5443,18 +5818,22 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           bool: false,
         }
         return
-      } else if (event.isMine()) {
-        if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
+      }
+      if (event.isMine()) {
+        if (
+          event.hsskill &&
+          !event.forced &&
+          _status.prehidden_skills.includes(event.hsskill)
+        ) {
           ui.click.cancel()
           return
         }
-        if (event.type == "wuxie") {
+        if (event.type === "wuxie") {
           if (ui.tempnowuxie) {
             const triggerevent = event.getTrigger()
             if (
-              triggerevent &&
-              triggerevent.targets &&
-              triggerevent.num == triggerevent.targets.length - 1
+              triggerevent?.targets &&
+              triggerevent.num === triggerevent.targets.length - 1
             ) {
               ui.tempnowuxie.close()
             }
@@ -5480,7 +5859,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             delete player._noVibrate
             game.vibrate()
           }
-          if (typeof event.prompt == "string") {
+          if (typeof event.prompt === "string") {
             if (event.openskilldialog) {
               event.skillDialog = ui.create.dialog(event.openskilldialog)
               delete event.openskilldialog
@@ -5491,11 +5870,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                 event.dialog.addText(event.prompt2)
               }
             }
-          } else if (typeof event.prompt == "function") {
+          } else if (typeof event.prompt === "function") {
             event.dialog = ui.create.dialog(event.prompt(event))
-          } else if (event.prompt == undefined) {
+          } else if (event.prompt === undefined) {
             let str
-            if (typeof event.filterCard == "object") {
+            if (typeof event.filterCard === "object") {
               const filter = event.filterCard
               str = `请使用${get.cnNumber(event.selectCard[0])}张`
               if (filter.name) {
@@ -5510,7 +5889,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               event.skillDialog = ui.create.dialog(event.openskilldialog)
               delete event.openskilldialog
               event.dialog = str
-            } else if (typeof event.skillDialog != "string") {
+            } else if (typeof event.skillDialog !== "string") {
               event.dialog = ui.create.dialog(str)
             } else {
               event.dialog = str
@@ -5528,7 +5907,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const { forced } = event
 
-      if (event.result != "ai") {
+      if (event.result !== "ai") {
         return
       }
 
@@ -5536,7 +5915,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (ok) {
         ui.click.ok()
       } else if (ai.basic.chooseCard(event.ai1) || forced) {
-        if ((ai.basic.chooseTarget(event.ai2) || forced) && (!event.filterOk || event.filterOk())) {
+        if (
+          (ai.basic.chooseTarget(event.ai2) || forced) &&
+          (!event.filterOk || event.filterOk())
+        ) {
           ui.click.ok()
           event._aiexcludeclear = true
         } else {
@@ -5572,7 +5954,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       } else {
         ui.click.cancel()
       }
-      if (event.aidelay && event.result && event.result.bool) {
+      if (event.aidelay && event.result?.bool) {
         await game.delayx()
       }
     },
@@ -5596,15 +5978,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
 
       const info = get.info(event.result.skill)
-      if (info && info.chooseButton) {
-        if (event.dialog && typeof event.dialog == "object") {
+      if (info?.chooseButton) {
+        if (event.dialog && typeof event.dialog === "object") {
           event.dialog.close()
         }
         const dialog = info.chooseButton.dialog(event, player)
 
         let next
         if (info.chooseButton.chooseControl) {
-          next = player.chooseControl(info.chooseButton.chooseControl(event, player))
+          next = player.chooseControl(
+            info.chooseButton.chooseControl(event, player),
+          )
           if (dialog.direct) {
             next.direct = true
           }
@@ -5638,9 +6022,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                 ) {
                   // 如果complexSelect没有被显式的定义但是全选被显式要求了，那么我们默认认为调用者需要全选而不是complexSelect喵
                   return false
-                } else {
-                  return true
                 }
+                return true
               }
               return false
             })(),
@@ -5655,7 +6038,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.buttoned = event.result.skill
 
         return next.forResult()
-      } else if (info && info.precontent && !game.online && !event.nouse) {
+      }
+      if (info?.precontent && !game.online && !event.nouse) {
         const next = game.createEvent(`pre_${event.result.skill}`)
 
         next.setContent(info.precontent)
@@ -5670,7 +6054,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         return
       }
 
-      if (result.bool || (result.control && result.control != "cancel2")) {
+      if (result.bool || (result.control && result.control !== "cancel2")) {
         const info = get.info(event.buttoned).chooseButton
         lib.skill[`${event.buttoned}_backup`] = info.backup(
           info.chooseControl ? result : result.links,
@@ -5678,7 +6062,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         )
         lib.skill[`${event.buttoned}_backup`].sourceSkill = event.buttoned
         if (game.online) {
-          event._sendskill = [`${event.buttoned}_backup`, lib.skill[`${event.buttoned}_backup`]]
+          event._sendskill = [
+            `${event.buttoned}_backup`,
+            lib.skill[`${event.buttoned}_backup`],
+          ]
         } else {
           game.broadcast(
             (skill, audio) => {
@@ -5693,7 +6080,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         event.backup(`${event.buttoned}_backup`)
         if (info.prompt) {
-          event.openskilldialog = info.prompt(info.chooseControl ? result : result.links, player)
+          event.openskilldialog = info.prompt(
+            info.chooseControl ? result : result.links,
+            player,
+          )
         }
       } else {
         ui.control.addTempClass("nozoom", 100)
@@ -5709,10 +6099,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event._aiexclude.length = 0
       }
       delete _status.noclearcountdown
-      if (event.skillDialog && get.objtype(event.skillDialog) == "div") {
+      if (event.skillDialog && get.objtype(event.skillDialog) === "div") {
         event.skillDialog.close()
       }
-      if (event.result && event.result.bool && !game.online && !event.nouse) {
+      if (event.result?.bool && !game.online && !event.nouse) {
         if (event.result?.cancel) {
           event.goto(0)
         } else {
@@ -5739,13 +6129,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       ) {
         const info = get.info(
           event.result.skill ||
-            (Array.isArray(event.logSkill) ? event.logSkill[0] : event.logSkill),
+            (Array.isArray(event.logSkill)
+              ? event.logSkill[0]
+              : event.logSkill),
         )
         if (info.direct && !info.clearTime) {
           _status.noclearcountdown = "direct"
         }
       }
-      if (event.dialog && typeof event.dialog == "object") {
+      if (event.dialog && typeof event.dialog === "object") {
         event.dialog.close()
       }
       if (!_status.noclearcountdown) {
@@ -5769,21 +6161,29 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       game.expandSkills(skills)
       for (const skill of skills) {
         const info = lib.skill[skill]
-        if (info && info.onChooseToRespond) {
+        if (info?.onChooseToRespond) {
           info.onChooseToRespond(event)
         }
       }
       if (_status.noclearcountdown !== "direct") {
         _status.noclearcountdown = true
       }
-      if (!_status.connectMode && lib.config.skip_shan && event.autochoose && event.autochoose()) {
+      if (
+        !_status.connectMode &&
+        lib.config.skip_shan &&
+        event.autochoose?.()
+      ) {
         event.result = { bool: false }
       } else {
         if (game.modeSwapPlayer && !_status.auto && player.isUnderControl()) {
           game.modeSwapPlayer(player)
         }
         if (event.isMine()) {
-          if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
+          if (
+            event.hsskill &&
+            !event.forced &&
+            _status.prehidden_skills.includes(event.hsskill)
+          ) {
             ui.click.cancel()
             return
           }
@@ -5822,7 +6222,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const { forced } = event
 
-      if (event.result != "ai") {
+      if (event.result !== "ai") {
         return
       }
 
@@ -5830,7 +6230,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (ok) {
         ui.click.ok()
       } else if (ai.basic.chooseCard(event.ai1 || event.ai) || forced) {
-        if ((ai.basic.chooseTarget(event.ai2) || forced) && (!event.filterOk || event.filterOk())) {
+        if (
+          (ai.basic.chooseTarget(event.ai2) || forced) &&
+          (!event.filterOk || event.filterOk())
+        ) {
           ui.click.ok()
           event._aiexcludeclear = true
         } else {
@@ -5866,7 +6269,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       } else {
         ui.click.cancel()
       }
-      if (event.aidelay && event.result && event.result.bool) {
+      if (event.aidelay && event.result?.bool) {
         game.delayx()
       }
     },
@@ -5881,15 +6284,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       if (event.result.skill) {
         const info = get.info(event.result.skill)
-        if (info && info.chooseButton) {
-          if (event.dialog && typeof event.dialog == "object") {
+        if (info?.chooseButton) {
+          if (event.dialog && typeof event.dialog === "object") {
             event.dialog.close()
           }
           const dialog = info.chooseButton.dialog(event, player)
 
           let next
           if (info.chooseButton.chooseControl) {
-            next = player.chooseControl(info.chooseButton.chooseControl(event, player))
+            next = player.chooseControl(
+              info.chooseButton.chooseControl(event, player),
+            )
             if (dialog.direct) {
               next.direct = true
             }
@@ -5920,9 +6325,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                   ) {
                     // 如果complexSelect没有被显式的定义但是全选被显式要求了，那么我们默认认为调用者需要全选而不是complexSelect喵
                     return false
-                  } else {
-                    return true
                   }
+                  return true
                 }
                 return false
               })(),
@@ -5932,7 +6336,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           event.buttoned = event.result.skill
 
           return next.forResult()
-        } else if (info && info.precontent && !game.online) {
+        }
+        if (info?.precontent && !game.online) {
           const next = game.createEvent(`pre_${event.result.skill}`)
           next.setContent(info.precontent)
           next.set("result", event.result)
@@ -5946,7 +6351,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         return
       }
 
-      if (result.bool || (result.control && result.control != "cancel2")) {
+      if (result.bool || (result.control && result.control !== "cancel2")) {
         const info = get.info(event.buttoned).chooseButton
         lib.skill[`${event.buttoned}_backup`] = info.backup(
           info.chooseControl ? result : result.links,
@@ -5954,7 +6359,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         )
         lib.skill[`${event.buttoned}_backup`].sourceSkill = event.buttoned
         if (game.online) {
-          event._sendskill = [`${event.buttoned}_backup`, lib.skill[`${event.buttoned}_backup`]]
+          event._sendskill = [
+            `${event.buttoned}_backup`,
+            lib.skill[`${event.buttoned}_backup`],
+          ]
         } else {
           game.broadcast(
             (skill, audio) => {
@@ -5969,7 +6377,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         event.backup(`${event.buttoned}_backup`)
         if (info.prompt) {
-          event.openskilldialog = info.prompt(info.chooseControl ? result : result.links, player)
+          event.openskilldialog = info.prompt(
+            info.chooseControl ? result : result.links,
+            player,
+          )
         }
       } else {
         ui.control.addTempClass("nozoom", 100)
@@ -5980,7 +6391,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       delete _status.noclearcountdown
-      if (event.skillDialog && get.objtype(event.skillDialog) == "div") {
+      if (event.skillDialog && get.objtype(event.skillDialog) === "div") {
         event.skillDialog.close()
       }
       if (event.result.bool && !game.online) {
@@ -5997,14 +6408,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         ) {
           info = get.info(
             event.result.skill ||
-              (Array.isArray(event.logSkill) ? event.logSkill[0] : event.logSkill),
+              (Array.isArray(event.logSkill)
+                ? event.logSkill[0]
+                : event.logSkill),
           )
           if (info.direct && !info.clearTime) {
             _status.noclearcountdown = "direct"
           }
         }
         if (event.logSkill) {
-          if (typeof event.logSkill == "string") {
+          if (typeof event.logSkill === "string") {
             player.logSkill(event.logSkill)
           } else if (Array.isArray(event.logSkill)) {
             player.logSkill.apply(player, event.logSkill)
@@ -6012,11 +6425,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         if (!event.result.card && event.result.skill) {
           event.result.used = event.result.skill
-          player.useSkill(event.result.skill, event.result.cards, event.result.targets)
+          player.useSkill(
+            event.result.skill,
+            event.result.cards,
+            event.result.targets,
+          )
         } else if (event.result?.cancel) {
           event.goto(0)
         } else {
-          if (info && info.prerespond) {
+          if (info?.prerespond) {
             info.prerespond(event.result, player)
           }
           const next = player.respond(
@@ -6029,7 +6446,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           if (event.result.noanimate) {
             next.animate = false
           }
-          if (event.parent.card && event.parent.type == "card") {
+          if (event.parent.card && event.parent.type === "card") {
             next.set("respondTo", [event.parent.player, event.parent.card])
           }
           if (event.noOrdering) {
@@ -6044,7 +6461,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       } else if (event._sendskill) {
         event.result._sendskill = event._sendskill
       }
-      if (event.dialog && event.dialog.close) {
+      if (event.dialog?.close) {
         event.dialog.close()
       }
       if (!_status.noclearcountdown) {
@@ -6079,8 +6496,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       const directFilter =
         event.forced &&
-        typeof event.filterOk != "function" &&
-        typeof event.selectCard != "function" &&
+        typeof event.filterOk !== "function" &&
+        typeof event.selectCard !== "function" &&
         !event.complexCard
       const cards = directFilter
         ? player
@@ -6101,16 +6518,20 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       } else if (event.isMine()) {
         game.check()
-        if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
+        if (
+          event.hsskill &&
+          !event.forced &&
+          _status.prehidden_skills.includes(event.hsskill)
+        ) {
           ui.click.cancel()
           return
         }
         game.pause()
-        if (range[1] > 1 && typeof event.selectCard != "function") {
+        if (range[1] > 1 && typeof event.selectCard !== "function") {
           ui.create.cardChooseAll()
           event.aiChoose = ui.create.control("AI代选", () => {
             ai.basic.chooseCard(event.ai)
-            if (typeof _status.event.custom?.add?.card == "function") {
+            if (typeof _status.event.custom?.add?.card === "function") {
               _status.event.custom.add.card()
             }
             ui.selected.cards.forEach((i) => i.updateTransform(true))
@@ -6120,20 +6541,25 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           event.dialog = ui.create.dialog.apply(this, event.dialog)
           event.dialog.open()
           event.dialog.classList.add("noselect")
-        } else if (event.prompt != false) {
+        } else if (event.prompt !== false) {
           let prompt
-          if (typeof event.prompt == "string") {
+          if (typeof event.prompt === "string") {
             prompt = event.prompt
           } else {
             let select
-            if (range[0] == range[1]) {
+            if (range[0] === range[1]) {
               select = get.cnNumber(range[0])
-            } else if (range[1] == Infinity) {
+            } else if (range[1] === Infinity) {
               select = `至少${get.cnNumber(range[0])}`
             } else {
               select = `${get.cnNumber(range[0])}至${get.cnNumber(range[1])}`
             }
-            const position = event.position == "h" ? "手" : event.position == "e" ? "装备" : ""
+            const position =
+              event.position === "h"
+                ? "手"
+                : event.position === "e"
+                  ? "装备"
+                  : ""
             prompt = `请交给${get.translation(target)}${select}张${position}牌`
           }
           event.dialog = ui.create.dialog(prompt)
@@ -6144,12 +6570,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             event.promptx.forEach((i) => event.dialog.add(i))
           }
           if (Array.isArray(event.selectCard)) {
-            event.promptbar = event.dialog.add(`0/${get.numStr(event.selectCard[1], "card")}`)
+            event.promptbar = event.dialog.add(
+              `0/${get.numStr(event.selectCard[1], "card")}`,
+            )
             event.custom.add.card = () => {
               _status.event.promptbar.innerHTML = `${ui.selected.cards.length}/${get.numStr(_status.event.selectCard[1], "card")}`
             }
           }
-        } else if (get.itemtype(event.dialog) == "dialog") {
+        } else if (get.itemtype(event.dialog) === "dialog") {
           event.dialog.style.display = ""
           event.dialog.open()
         }
@@ -6161,14 +6589,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const { forced } = event
-      if (event.result != "ai") {
+      if (event.result !== "ai") {
         return
       }
       if (event.processAI) {
         event.result = event.processAI()
       } else {
         game.check()
-        if ((ai.basic.chooseCard(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
+        if (
+          (ai.basic.chooseCard(event.ai) || forced) &&
+          (!event.filterOk || event.filterOk())
+        ) {
           ui.click.ok()
         } else if (event.skill) {
           ui.click.cancel()
@@ -6210,7 +6641,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
       if (event.autodelay && !event.isMine()) {
-        if (typeof event.autodelay == "number") {
+        if (typeof event.autodelay === "number") {
           game.delayx(event.autodelay)
         } else {
           game.delayx()
@@ -6263,7 +6694,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           rawcards: player.getCards(event.position),
         }
         for (let i = 0; i < event.result.cards.length; i++) {
-          if (!lib.filter.cardDiscardable(event.result.cards[i], player, event)) {
+          if (
+            !lib.filter.cardDiscardable(event.result.cards[i], player, event)
+          ) {
             event.result.cards.splice(i--, 1)
           }
         }
@@ -6281,8 +6714,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         const directFilter =
           event.forced &&
-          typeof event.filterOk != "function" &&
-          typeof event.selectCard != "function" &&
+          typeof event.filterOk !== "function" &&
+          typeof event.selectCard !== "function" &&
           !event.complexCard
         const cards = directFilter
           ? player
@@ -6308,16 +6741,20 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
         } else if (event.isMine()) {
           game.check()
-          if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
+          if (
+            event.hsskill &&
+            !event.forced &&
+            _status.prehidden_skills.includes(event.hsskill)
+          ) {
             ui.click.cancel()
             return
           }
           game.pause()
-          if (range[1] > 1 && typeof event.selectCard != "function") {
+          if (range[1] > 1 && typeof event.selectCard !== "function") {
             ui.create.cardChooseAll()
             event.promptdiscard = ui.create.control("AI代选", () => {
               ai.basic.chooseCard(event.ai)
-              if (typeof _status.event.custom?.add?.card == "function") {
+              if (typeof _status.event.custom?.add?.card === "function") {
                 _status.event.custom.add.card()
               }
               for (const card of ui.selected.cards) {
@@ -6329,24 +6766,24 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             event.dialog = ui.create.dialog.apply(this, event.dialog)
             event.dialog.open()
             event.dialog.classList.add("noselect")
-          } else if (event.prompt != false) {
+          } else if (event.prompt !== false) {
             let str
-            if (typeof event.prompt == "string") {
+            if (typeof event.prompt === "string") {
               str = event.prompt
             } else {
               str = "请弃置"
-              if (range[0] == range[1]) {
+              if (range[0] === range[1]) {
                 str += get.cnNumber(range[0])
-              } else if (range[1] == Infinity) {
+              } else if (range[1] === Infinity) {
                 str += `至少${get.cnNumber(range[0])}`
               } else {
                 str += `${get.cnNumber(range[0])}至${get.cnNumber(range[1])}`
               }
               str += "张"
-              if (event.position == "h" || event.position == undefined) {
+              if (event.position === "h" || event.position === undefined) {
                 str += "手"
               }
-              if (event.position == "e") {
+              if (event.position === "e") {
                 str += "装备"
               }
               str += "牌"
@@ -6356,12 +6793,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               event.dialog.addText(event.prompt2, event.prompt2.length <= 20)
             }
             if (Array.isArray(event.selectCard)) {
-              event.promptbar = event.dialog.add(`0/${get.numStr(event.selectCard[1], "card")}`)
+              event.promptbar = event.dialog.add(
+                `0/${get.numStr(event.selectCard[1], "card")}`,
+              )
               event.custom.add.card = () => {
                 _status.event.promptbar.innerHTML = `${ui.selected.cards.length}/${get.numStr(_status.event.selectCard[1], "card")}`
               }
             }
-          } else if (get.itemtype(event.dialog) == "dialog") {
+          } else if (get.itemtype(event.dialog) === "dialog") {
             event.dialog.style.display = ""
             event.dialog.open()
           }
@@ -6373,7 +6812,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
     },
     async (event, trigger, player) => {
-      if (event.result == "ai") {
+      if (event.result === "ai") {
         if (event.processAI) {
           event.result = event.processAI()
         } else {
@@ -6405,7 +6844,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (event.cardChooseAll) {
         event.cardChooseAll.close()
       }
-      if (typeof event.promptdiscard?.close == "function") {
+      if (typeof event.promptdiscard?.close === "function") {
         event.promptdiscard.close()
       }
       if (event.result) {
@@ -6414,7 +6853,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         if (event.result.skill) {
           const info = get.info(event.result.skill)
-          if (info && info.precontent && !game.online) {
+          if (info?.precontent && !game.online) {
             const next = game.createEvent(`pre_${event.result.skill}`)
             next.setContent(info.precontent)
             next.set("result", event.result)
@@ -6432,7 +6871,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.autodelay &&
         !event.isMine()
       ) {
-        if (typeof event.autodelay == "number") {
+        if (typeof event.autodelay === "number") {
           await game.delayx(event.autodelay)
         } else {
           await game.delayx()
@@ -6441,12 +6880,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       delete _status.noclearcountdown
-      if (typeof event.dialog?.close == "function") {
+      if (typeof event.dialog?.close === "function") {
         event.dialog.close()
       }
       if (!game.online && event.result.bool) {
         if (event.logSkill) {
-          if (typeof event.logSkill == "string") {
+          if (typeof event.logSkill === "string") {
             player.logSkill(event.logSkill)
           } else if (Array.isArray(event.logSkill)) {
             player.logSkill.apply(player, event.logSkill)
@@ -6454,7 +6893,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         if (!event.chooseonly) {
           const next = player.discard(event.result.cards)
-          if (typeof event.delay == "boolean") {
+          if (typeof event.delay === "boolean") {
             next.delay = event.delay
           }
           next.discarder = player
@@ -6472,7 +6911,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   async gaincardMultiple(event, trigger, player) {
     const { cards } = event
     event.type = "gain"
-    if (event.animate == "give" || event.animate == "gain2") {
+    if (event.animate === "give" || event.animate === "gain2") {
       event.visible = true
     }
     if (player && cards) {
@@ -6488,12 +6927,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     switch (event.animate) {
       case "draw":
         for (const pair of event.gain_list) {
-          if (get.itemtype(pair[1]) == "card") {
+          if (get.itemtype(pair[1]) === "card") {
             pair[1] = [pair[1]]
           }
           if (event._lose) {
             pair[1] = pair[1].filter(
-              (card) => !cards.includes(card) || !player.getCards("hejsx").includes(card),
+              (card) =>
+                !cards.includes(card) ||
+                !player.getCards("hejsx").includes(card),
             )
           }
           if (pair[1].length > 0) {
@@ -6504,12 +6945,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         break
       case "gain":
         for (const pair of event.gain_list) {
-          if (get.itemtype(pair[1]) == "card") {
+          if (get.itemtype(pair[1]) === "card") {
             pair[1] = [pair[1]]
           }
           if (event._lose) {
             pair[1] = pair[1].filter(
-              (card) => !cards.includes(card) || !player.getCards("hejsx").includes(card),
+              (card) =>
+                !cards.includes(card) ||
+                !player.getCards("hejsx").includes(card),
             )
           }
           if (pair[1].length > 0) {
@@ -6521,12 +6964,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       case "gain2":
       case "draw2":
         for (const pair of event.gain_list) {
-          if (get.itemtype(pair[1]) == "card") {
+          if (get.itemtype(pair[1]) === "card") {
             pair[1] = [pair[1]]
           }
           if (event._lose) {
             pair[1] = pair[1].filter(
-              (card) => !cards.includes(card) || !player.getCards("hejsx").includes(card),
+              (card) =>
+                !cards.includes(card) ||
+                !player.getCards("hejsx").includes(card),
             )
           }
           if (pair[1].length > 0) {
@@ -6542,17 +6987,19 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         const evt = event.getl(player)
         for (const pair of event.gain_list) {
-          if (get.itemtype(pair[1]) == "card") {
+          if (get.itemtype(pair[1]) === "card") {
             pair[1] = [pair[1]]
           }
           if (event._lose) {
             pair[1] = pair[1].filter(
-              (card) => !cards.includes(card) || !player.getCards("hejsx").includes(card),
+              (card) =>
+                !cards.includes(card) ||
+                !player.getCards("hejsx").includes(card),
             )
           }
           const shown = pair[1].slice(0)
           const hidden = []
-          if (event.animate == "giveAuto") {
+          if (event.animate === "giveAuto") {
             for (const card of pair[1]) {
               if (evt.hs.includes(card)) {
                 shown.remove(card)
@@ -6616,7 +7063,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
     const evt = event
     const { cards } = event
-    if (evt.animate != false) {
+    if (evt.animate !== false) {
       evt.discardid = lib.status.videoId++
       game.broadcastAll(
         (list, id, cards) => {
@@ -6643,12 +7090,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         evt.discardid,
         cards,
       )
-      if (lib.config.sync_speed && cards[0] && cards[0].clone) {
-        if (evt.delay != false) {
+      if (lib.config.sync_speed && cards[0]?.clone) {
+        if (evt.delay !== false) {
           const waitingForTransition = get.time()
           evt.waitingForTransition = waitingForTransition
           cards[0].clone.listenTransition(() => {
-            if (_status.waitingForTransition == waitingForTransition && _status.paused) {
+            if (
+              _status.waitingForTransition === waitingForTransition &&
+              _status.paused
+            ) {
               game.resume()
             }
             delete evt.waitingForTransition
@@ -6658,7 +7108,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           const waitingForTransition = get.time()
           evt.getParent().waitingForTransition = waitingForTransition
           cards[0].clone.listenTransition(() => {
-            if (_status.waitingForTransition == waitingForTransition && _status.paused) {
+            if (
+              _status.waitingForTransition === waitingForTransition &&
+              _status.paused
+            ) {
               game.resume()
             }
             delete evt.getParent().waitingForTransition
@@ -6669,7 +7122,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
     await Promise.all(events)
 
-    if (event.delay != false) {
+    if (event.delay !== false) {
       if (event.waitingForTransition) {
         _status.waitingForTransition = event.waitingForTransition
         await game.pause()
@@ -6680,7 +7133,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   },
   addToExpansionMultiple: [
     async (event, trigger, player) => {
-      if (event.animate == "give") {
+      if (event.animate === "give") {
         event.visible = true
       }
       event.type = "addToExpansion"
@@ -6699,7 +7152,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
           for (const i of cards) {
             const owner = get.owner(i, "judge")
-            if (owner && (owner != player || get.position(i) != "x")) {
+            if (owner && (owner !== player || get.position(i) !== "x")) {
               const id = owner.playerid
               if (!map[id]) {
                 map[id] = [[], [], []]
@@ -6707,12 +7160,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               map[id][0].push(i)
               map2[myId].push(i)
               const position = get.position(i)
-              if (position == "h") {
+              if (position === "h") {
                 map[id][1].push(i)
               } else {
                 map[id][2].push(i)
               }
-            } else if (!event.updatePile && get.position(i) == "c") {
+            } else if (!event.updatePile && get.position(i) === "c") {
               event.updatePile = true
             }
           }
@@ -6721,11 +7174,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.gaining_map = map2
         for (const i in map) {
           const owner = (_status.connectMode ? lib.playerOL : game.playerMap)[i]
-          const next = owner.lose(map[i][0], ui.special).set("forceDie", true).set("getlx", false)
+          const next = owner
+            .lose(map[i][0], ui.special)
+            .set("forceDie", true)
+            .set("getlx", false)
           next.set("relatedEvent", event.getParent())
           next.set("forceDie", true)
           next.set("getlx", false)
-          if (event.visible == true) {
+          if (event.visible === true) {
             next.set("visible", true)
           }
           await next
@@ -6751,7 +7207,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             } else if (event.losing_map) {
               for (const id in event.losing_map) {
                 if (event.losing_map[id][0].includes(cards[i])) {
-                  const source = (_status.connectMode ? lib.playerOL : game.playerMap)[id]
+                  const source = (
+                    _status.connectMode ? lib.playerOL : game.playerMap
+                  )[id]
                   const hs = source.getCards("hejsx")
                   if (hs.includes(cards[i])) {
                     cards.splice(i--, 1)
@@ -6763,7 +7221,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
         }
       }
-      if (cardsx.length == 0) {
+      if (cardsx.length === 0) {
         event.finish()
         return
       }
@@ -6772,7 +7230,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const { lose_list } = event
       for (const [source, cards] of lose_list) {
         for (const [key, value] of lib.commonArea) {
-          const list = (_status[value.areaStatusName] || []).filter((card) => cards.includes(card))
+          const list = (_status[value.areaStatusName] || []).filter((card) =>
+            cards.includes(card),
+          )
           if (event[value.fromName] || list.length) {
             const next = game.createEvent(`from_${value.fromName}`)
             next.setContent(value.removeHandeler)
@@ -6803,15 +7263,20 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             _status.discarded.remove(card)
           }
           for (let num2 = 0; num2 < card.vanishtag.length; num2++) {
-            if (card.vanishtag[num2][0] != "_") {
+            if (card.vanishtag[num2][0] !== "_") {
               card.vanishtag.splice(num2--, 1)
             }
           }
         }
-        if (event.animate == "draw") {
+        if (event.animate === "draw") {
           player.$draw(cards.length)
           if (event.log) {
-            game.log(player, "将", get.cnNumber(cards.length), "张牌置于了武将牌上")
+            game.log(
+              player,
+              "将",
+              get.cnNumber(cards.length),
+              "张牌置于了武将牌上",
+            )
           }
           game.pause()
           setTimeout(
@@ -6829,7 +7294,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             cards,
             loopedCount === mapLength,
           )
-        } else if (event.animate == "gain") {
+        } else if (event.animate === "gain") {
           player.$gain(cards, false)
           game.pause()
           setTimeout(
@@ -6847,9 +7312,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             cards,
             loopedCount === mapLength,
           )
-        } else if (event.animate == "gain2" || event.animate == "draw2") {
+        } else if (event.animate === "gain2" || event.animate === "draw2") {
           let gain2t = 300
-          if (player.$gain2(cards) && player == game.me) {
+          if (player.$gain2(cards) && player === game.me) {
             gain2t = 500
           }
           game.pause()
@@ -6868,13 +7333,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             cards,
             loopedCount === mapLength,
           )
-        } else if (event.animate == "give" || event.animate == "giveAuto") {
+        } else if (event.animate === "give" || event.animate === "giveAuto") {
           const evtmap = event.losing_map
-          const entries = Object.entries(evtmap).map((entry) => [entry[0], entry[1][0]])
+          const entries = Object.entries(evtmap).map((entry) => [
+            entry[0],
+            entry[1][0],
+          ])
           const getOwner = (card) => {
             const entry = entries.find((entry) => entry[1].includes(card))
             if (entry) {
-              return (_status.connectMode ? lib.playerOL : game.playerMap)[entry[0]]
+              return (_status.connectMode ? lib.playerOL : game.playerMap)[
+                entry[0]
+              ]
             }
             return null
           }
@@ -6889,9 +7359,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               gainmap[id].push(cardx)
             }
           }
-          if (event.animate == "give") {
+          if (event.animate === "give") {
             for (const i in gainmap) {
-              const source = (_status.connectMode ? lib.playerOL : game.playerMap)[i]
+              const source = (
+                _status.connectMode ? lib.playerOL : game.playerMap
+              )[i]
               source.$give(evtmap[i][0], player, false)
               if (event.log) {
                 game.log(player, "将", evtmap[i][0], "置于了武将牌上")
@@ -6899,11 +7371,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             }
           } else {
             for (const i in gainmap) {
-              const source = (_status.connectMode ? lib.playerOL : game.playerMap)[i]
+              const source = (
+                _status.connectMode ? lib.playerOL : game.playerMap
+              )[i]
               if (evtmap[i][1].length) {
                 source.$giveAuto(evtmap[i][1], player, false)
                 if (event.log) {
-                  game.log(player, "将", get.cnNumber(evtmap[i][1].length), "张牌置于了武将牌上")
+                  game.log(
+                    player,
+                    "将",
+                    get.cnNumber(evtmap[i][1].length),
+                    "张牌置于了武将牌上",
+                  )
                 }
               }
               if (evtmap[i][2].length) {
@@ -6930,7 +7409,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             cards,
             loopedCount === mapLength,
           )
-        } else if (typeof event.animate == "function") {
+        } else if (typeof event.animate === "function") {
           const time = event.animate(event)
           game.pause()
           setTimeout(
@@ -6975,14 +7454,19 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       event.cards = cards
       for (const [target, targetCards] of event.lose_list) {
         const next = target.lose(targetCards, event.position)
-        game.log(target, "将", targetCards, `置入了${lib.areaList.get(event.position.id)}`)
+        game.log(
+          target,
+          "将",
+          targetCards,
+          `置入了${lib.areaList.get(event.position.id)}`,
+        )
         next.animate = false
         next.delay = false
         cards.addArray(targetCards)
         next.getlx = false
       }
       const evt = event
-      if (evt.animate != false) {
+      if (evt.animate !== false) {
         evt.discardid = lib.status.videoId++
         game.broadcastAll(
           (list, id, cards) => {
@@ -7009,12 +7493,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           evt.discardid,
           cards,
         )
-        if (lib.config.sync_speed && cards[0] && cards[0].clone) {
-          if (evt.delay != false) {
+        if (lib.config.sync_speed && cards[0]?.clone) {
+          if (evt.delay !== false) {
             const waitingForTransition = get.time()
             evt.waitingForTransition = waitingForTransition
             cards[0].clone.listenTransition(() => {
-              if (_status.waitingForTransition == waitingForTransition && _status.paused) {
+              if (
+                _status.waitingForTransition === waitingForTransition &&
+                _status.paused
+              ) {
                 game.resume()
               }
               delete evt.waitingForTransition
@@ -7024,7 +7511,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             const waitingForTransition = get.time()
             evt.getParent().waitingForTransition = waitingForTransition
             cards[0].clone.listenTransition(() => {
-              if (_status.waitingForTransition == waitingForTransition && _status.paused) {
+              if (
+                _status.waitingForTransition === waitingForTransition &&
+                _status.paused
+              ) {
                 game.resume()
               }
               delete evt.getParent().waitingForTransition
@@ -7034,7 +7524,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
     },
     async (event, trigger, player) => {
-      if (event.delay != false) {
+      if (event.delay !== false) {
         if (event.waitingForTransition) {
           _status.waitingForTransition = event.waitingForTransition
           game.pause()
@@ -7058,8 +7548,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const targets = event.targets
       if (
-        player.countCards("h") == 0 &&
-        (!event.fixedResult || !event.fixedResult[player.playerid])
+        player.countCards("h") === 0 &&
+        !event.fixedResult?.[player.playerid]
       ) {
         event.result = { cancelled: true, bool: false }
         event.finish()
@@ -7067,8 +7557,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       for (const target of targets) {
         if (
-          target.countCards("h") == 0 &&
-          (!event.fixedResult || !event.fixedResult[target.playerid])
+          target.countCards("h") === 0 &&
+          !event.fixedResult?.[target.playerid]
         ) {
           event.result = { cancelled: true, bool: false }
           event.finish()
@@ -7085,9 +7575,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const targets = event.targets
       event._result = []
-      event.list = targets.filter((current) => !event.fixedResult?.[current.playerid])
-      if (event.list.length || !event.fixedResult || !event.fixedResult[player.playerid]) {
-        if (!event.fixedResult || !event.fixedResult[player.playerid]) {
+      event.list = targets.filter(
+        (current) => !event.fixedResult?.[current.playerid],
+      )
+      if (
+        event.list.length ||
+        !event.fixedResult ||
+        !event.fixedResult[player.playerid]
+      ) {
+        if (!event.fixedResult?.[player.playerid]) {
           event.list.unshift(player)
         }
         player
@@ -7110,7 +7606,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const lose_list = []
       if (event.fixedResult?.[player.playerid]) {
         event.list.unshift(player)
-        result.unshift({ bool: true, cards: [event.fixedResult[player.playerid]] })
+        result.unshift({
+          bool: true,
+          cards: [event.fixedResult[player.playerid]],
+        })
         lose_list.push([player, [event.fixedResult[player.playerid]]])
       } else {
         if (result[0].skill && lib.skill[result[0].skill]?.onCompare) {
@@ -7126,7 +7625,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           const i = event.list.indexOf(target)
           if (result[i].skill && lib.skill[result[i].skill]?.onCompare) {
             event.list[i].logSkill(result[i].skill)
-            result[i].cards = lib.skill[result[i].skill].onCompare(event.list[i])
+            result[i].cards = lib.skill[result[i].skill].onCompare(
+              event.list[i],
+            )
           } else {
             lose_list.push([target, result[i].cards])
           }
@@ -7146,7 +7647,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       event.lose_list = lose_list
       event.getNum = (card) => {
         for (const i of event.lose_list) {
-          if (i[1].includes && i[1].includes(card)) {
+          if (i[1].includes?.(card)) {
             return get.number(card, i[0])
           }
         }
@@ -7182,7 +7683,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       await game.doAsyncInOrder(event.cardlist, func, () => 1)
       player.addTempClass("target")
-      game.delay(0, lib.config.game_speed == "vvfast" ? 4000 : 1000)
+      game.delay(0, lib.config.game_speed === "vvfast" ? 4000 : 1000)
     },
     async (event, trigger, player) => {
       event.target = null
@@ -7214,7 +7715,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (i[1] > event.maxNum) {
           event.maxNum = i[1]
           event.winner = i[0]
-        } else if (event.winner && i[1] == event.maxNum && i[0] != event.winner) {
+        } else if (
+          event.winner &&
+          i[1] === event.maxNum &&
+          i[0] !== event.winner
+        ) {
           event.winner = null
         }
       }
@@ -7287,15 +7792,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   chooseToCompareMultiple: [
     async (event, trigger, player) => {
       const targets = event.targets
-      if (!event.fixedResult?.[player.playerid] && player.countCards("h") == 0) {
+      if (
+        !event.fixedResult?.[player.playerid] &&
+        player.countCards("h") === 0
+      ) {
         event.result = { cancelled: true, bool: false }
         event.finish()
         return
       }
       for (const target of targets) {
         if (
-          (!event.fixedResult || !event.fixedResult[target.playerid]) &&
-          target.countCards("h") == 0
+          !event.fixedResult?.[target.playerid] &&
+          target.countCards("h") === 0
         ) {
           event.result = { cancelled: true, bool: false }
           event.finish()
@@ -7311,7 +7819,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const targets = event.targets
       event._result = []
-      event.list = targets.filter((current) => !event.fixedResult?.[current.playerid])
+      event.list = targets.filter(
+        (current) => !event.fixedResult?.[current.playerid],
+      )
       if (event.list.length || !event.fixedResult?.[player.playerid]) {
         if (!event.fixedResult?.[player.playerid]) {
           event.list.unshift(player)
@@ -7336,7 +7846,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const lose_list = []
       if (event.fixedResult?.[player.playerid]) {
         event.list.unshift(player)
-        result.unshift({ bool: true, cards: [event.fixedResult[player.playerid]] })
+        result.unshift({
+          bool: true,
+          cards: [event.fixedResult[player.playerid]],
+        })
         lose_list.push([player, [event.fixedResult[player.playerid]]])
       } else {
         if (result[0].skill && lib.skill[result[0].skill]?.onCompare) {
@@ -7356,7 +7869,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             lib.skill[result[i].skill].onCompare
           ) {
             event.list[i].logSkill(result[i].skill)
-            result[i].cards = lib.skill[result[i].skill].onCompare(event.list[i])
+            result[i].cards = lib.skill[result[i].skill].onCompare(
+              event.list[i],
+            )
           } else {
             lose_list.push([target, result[i].cards])
           }
@@ -7376,7 +7891,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       event.lose_list = lose_list
       event.getNum = (card) => {
         for (const i of event.lose_list) {
-          if (i[1].includes && i[1].includes(card)) {
+          if (i[1].includes?.(card)) {
             return get.number(card, i[0])
           }
         }
@@ -7418,7 +7933,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
     },
     async (event, trigger, player) => {
-      await game.delay(0, lib.config.game_speed == "vvfast" ? 4000 : 1500)
+      await game.delay(0, lib.config.game_speed === "vvfast" ? 4000 : 1500)
       await event.trigger("compare")
     },
     async (event, trigger, player) => {
@@ -7440,7 +7955,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         target.popup("负")
       } else {
         event.str = `${get.translation(player)}拼点失败`
-        if (event.forceWinner !== target && event.num1 == event.num2) {
+        if (event.forceWinner !== target && event.num1 === event.num2) {
           player.popup("平")
           target.popup("平")
         } else {
@@ -7502,14 +8017,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.compareWithCardPile = true
         event.compareType ??= "top"
       }
-      if (!event.position || typeof event.position != "string") {
+      if (!event.position || typeof event.position !== "string") {
         event.position = "h"
       }
       if (
-        (!event.fixedResult?.[player.playerid] && player.countCards(event.position) == 0) ||
+        (!event.fixedResult?.[player.playerid] &&
+          player.countCards(event.position) === 0) ||
         (!event.compareWithCardPile &&
           !event.fixedResult?.[target.playerid] &&
-          target.countCards(event.position) == 0)
+          target.countCards(event.position) === 0)
       ) {
         event.result = { cancelled: true, bool: false }
         event.finish()
@@ -7528,7 +8044,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const target = event.target
       event.list = [player, target].filter(
-        (current) => get.itemtype(current) == "player" && !event.fixedResult?.[current.playerid],
+        (current) =>
+          get.itemtype(current) === "player" &&
+          !event.fixedResult?.[current.playerid],
       )
       if (event.list.length) {
         player
@@ -7567,14 +8085,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           result[index].cards = lib.skill[result[index].skill].onCompare(target)
         }
         lose_list.push([target, result[index].cards])
-      } else if (get.itemtype(target) == "player" && event.fixedResult?.[target.playerid]) {
+      } else if (
+        get.itemtype(target) === "player" &&
+        event.fixedResult?.[target.playerid]
+      ) {
         lose_list.push([target, [event.fixedResult[target.playerid]]])
       }
       let card2
       if (event.compareWithCardPile) {
-        if (event.compareType == "top") {
+        if (event.compareType === "top") {
           card2 = game.cardsGotoOrdering(get.cards()).cards[0]
-        } else if (event.compareType == "bottom") {
+        } else if (event.compareType === "bottom") {
           card2 = game.cardsGotoOrdering(get.bottomCards()).cards[0]
         }
       } else {
@@ -7586,7 +8107,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const target = event.target
       if (
-        get.itemtype(target) == "player" &&
+        get.itemtype(target) === "player" &&
         (event.card2.number >= 10 || event.card2.number <= 4)
       ) {
         if (target.countCards("h") > 2) {
@@ -7621,10 +8142,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             forceDie: true,
           })
           .filter(
-            (event, player) => event.name == "phase" || [player, target].includes(event.player),
+            (event, player) =>
+              event.name === "phase" || [player, target].includes(event.player),
           )
           .step(async (event, trigger, player) => {
-            if (cards?.some((card) => get.position(card) == "s")) {
+            if (cards?.some((card) => get.position(card) === "s")) {
               evt.isDestroyed = true
               await game.cardsGotoOrdering(cards)
               await game.cardsDiscard(cards)
@@ -7640,13 +8162,21 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const target = event.target
       game.broadcastAll(() => ui.arena.classList.add("thrownhighlight"))
       game.addVideo("thrownhighlight1")
-      player.$compare(event.card1, event.compareWithCardPile ? player : target, event.card2)
+      player.$compare(
+        event.card1,
+        event.compareWithCardPile ? player : target,
+        event.card2,
+      )
     },
     async (event, trigger, player) => {
       const target = event.target
       game.log(player, "的拼点牌为", event.card1)
       await player.showCards(event.card1).set("triggeronly", true)
-      game.log(event.compareWithCardPile ? "牌堆" : target, "的拼点牌为", event.card2)
+      game.log(
+        event.compareWithCardPile ? "牌堆" : target,
+        "的拼点牌为",
+        event.card2,
+      )
       if (event.compareWithCardPile) {
         await player.showCards(event.card2).set("triggeronly", true)
       } else {
@@ -7665,7 +8195,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       event.trigger("compare")
     },
     async (event, trigger, player) => {
-      game.delay(0, lib.config.game_speed == "vvfast" ? 4000 : 1500)
+      game.delay(0, lib.config.game_speed === "vvfast" ? 4000 : 1500)
     },
     async (event, trigger, player) => {
       event.result = {
@@ -7686,24 +8216,24 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.result.winner = player
         event.str = `${get.translation(player)}拼点成功`
         player.popup("胜")
-        if (get.itemtype(target) == "player") {
+        if (get.itemtype(target) === "player") {
           target.popup("负")
         }
       } else {
         event.result.bool = false
         event.str = `${get.translation(player)}拼点失败`
-        if (event.forceWinner !== target && event.num1 == event.num2) {
+        if (event.forceWinner !== target && event.num1 === event.num2) {
           event.result.tie = true
           player.popup("平")
-          if (get.itemtype(target) == "player") {
+          if (get.itemtype(target) === "player") {
             target.popup("平")
           }
         } else {
-          if (get.itemtype(target) == "player") {
+          if (get.itemtype(target) === "player") {
             event.result.winner = target
           }
           player.popup("负")
-          if (get.itemtype(target) == "player") {
+          if (get.itemtype(target) === "player") {
             target.popup("胜")
           }
         }
@@ -7720,8 +8250,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const target = event.target
       if (
-        get.itemtype(target) == "player" &&
-        typeof target.ai.shown == "number" &&
+        get.itemtype(target) === "player" &&
+        typeof target.ai.shown === "number" &&
         target.ai.shown <= 0.85 &&
         event.addToAI
       ) {
@@ -7732,11 +8262,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (event.clear !== false) {
         game.broadcastAll(ui.clear)
       }
-      if (typeof event.preserve == "function") {
+      if (typeof event.preserve === "function") {
         event.preserve = event.preserve(event.result)
-      } else if (event.preserve == "win") {
+      } else if (event.preserve === "win") {
         event.preserve = event.result.bool
-      } else if (event.preserve == "lose") {
+      } else if (event.preserve === "lose") {
         event.preserve = !event.result.bool
       }
     },
@@ -7793,7 +8323,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       await event.trigger("compare")
     },
     async (event, trigger, player) => {
-      await game.delay(0, lib.config.game_speed == "vvfast" ? 4000 : 1500)
+      await game.delay(0, lib.config.game_speed === "vvfast" ? 4000 : 1500)
     },
     async (event, trigger, player) => {
       event.result = {
@@ -7818,7 +8348,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       } else {
         event.result.bool = false
         event.str = `${get.translation(player)}拼点失败`
-        if (event.forceWinner !== target && event.num1 == event.num2) {
+        if (event.forceWinner !== target && event.num1 === event.num2) {
           event.result.tie = true
           player.popup("平")
           target.popup("平")
@@ -7839,7 +8369,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const target = event.target
-      if (typeof target.ai.shown == "number" && target.ai.shown <= 0.85 && event.addToAI) {
+      if (
+        typeof target.ai.shown === "number" &&
+        target.ai.shown <= 0.85 &&
+        event.addToAI
+      ) {
         target.ai.shown += 0.1
       }
       game.broadcastAll(() => ui.arena.classList.remove("thrownhighlight"))
@@ -7847,11 +8381,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (event.clear !== false) {
         game.broadcastAll(ui.clear)
       }
-      if (typeof event.preserve == "function") {
+      if (typeof event.preserve === "function") {
         event.preserve = event.preserve(event.result)
-      } else if (event.preserve == "win") {
+      } else if (event.preserve === "win") {
         event.preserve = event.result.bool
-      } else if (event.preserve == "lose") {
+      } else if (event.preserve === "lose") {
         event.preserve = !event.result.bool
       }
     },
@@ -7862,7 +8396,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   ],
   async chooseSkill(event, trigger, player) {
     let list
-    if (typeof event.target == "string") {
+    if (typeof event.target === "string") {
       list = get.gainableSkillsName(event.target, event.func)
     } else {
       list = event.target.getGainableSkills(event.func)
@@ -7885,7 +8419,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       for (const skill of list) {
         if (lib.translate[`${skill}_info`]) {
           let translation = get.translation(skill)
-          if (translation[0] == "新" && translation.length == 3) {
+          if (translation[0] === "新" && translation.length === 3) {
             translation = translation.slice(1, 3)
           } else {
             translation = translation.slice(0, 2)
@@ -7918,7 +8452,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     const { num = 3 } = event
 
     let choice
-    if (typeof event.list == "string" || typeof event.list == "function") {
+    if (typeof event.list === "string" || typeof event.list === "function") {
       choice = get.inpile(event.list).randomGets(num)
     } else if (Array.isArray(event.list)) {
       choice = event.list.randomGets(num)
@@ -7946,7 +8480,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (event.ai) {
         next.set("ai", event.ai)
       }
-    } else if (get.itemtype(choice[0]) == "card") {
+    } else if (get.itemtype(choice[0]) === "card") {
       next = player.chooseCardButton(choice, prompt, event.forced)
       if (event.ai) {
         next.set("ai", event.ai)
@@ -7965,7 +8499,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     if (result.bool && result.links.length) {
       const link = result.links[0]
       let togain = null
-      if (get.itemtype(link) == "card") {
+      if (get.itemtype(link) === "card") {
         event.result.card = link
         togain = link
       } else if (Array.isArray(link)) {
@@ -7984,7 +8518,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   },
   chooseButton: [
     async (event, trigger, player) => {
-      if (typeof event.dialog == "number") {
+      if (typeof event.dialog === "number") {
         event.dialog = get.idDialog(event.dialog)
       }
       if (event.createDialog && !event.dialog) {
@@ -7994,7 +8528,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         event.closeDialog = true
       }
-      if (event.dialog == undefined) {
+      if (event.dialog === undefined) {
         event.dialog = ui.dialog
       }
       if (event.isMine() || event.dialogdisplay) {
@@ -8014,10 +8548,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
       if (event.isMine()) {
-        if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
+        if (
+          event.hsskill &&
+          !event.forced &&
+          _status.prehidden_skills.includes(event.hsskill)
+        ) {
           ui.click.cancel()
           return
-        } else if ((event.direct && num == selectButton[0]) || event.forceDirect) {
+        }
+        if ((event.direct && num === selectButton[0]) || event.forceDirect) {
           const buttons = buttonsx.slice(0, num)
           event.result = {
             bool: true,
@@ -8031,7 +8570,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           game.pause()
         }
       } else if (event.isOnline()) {
-        if ((event.direct && num == 1) || event.forceDirect) {
+        if ((event.direct && num === 1) || event.forceDirect) {
           const buttons = buttonsx.slice(0, num)
           event.result = {
             bool: true,
@@ -8052,7 +8591,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const { forced } = event
-      if (event.result == "ai") {
+      if (event.result === "ai") {
         if (event.processAI) {
           event.result = event.processAI()
         } else {
@@ -8076,190 +8615,150 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       event.resume()
     },
   ],
-  chooseCardOL: [
-    async (event, trigger, player) => {
-      event.targets = event.list.slice(0)
-      if (!_status.connectMode) {
-        event.result = []
-        event.goto(7)
-      } else {
-        for (let i = 0; i < event.list.length; i++) {
-          const target = event.list[i]
-          target.wait()
-          if (target.isOnline()) {
-            target.send(
-              (args, set) => {
-                game.me.chooseCard.apply(game.me, args).set(set)
-                game.resume()
-              },
-              event._args,
-              event._set,
-            )
-            event.list.splice(i--, 1)
-          } else if (target == game.me) {
-            event.withme = true
-            event.list.splice(i--, 1)
+  async chooseCardOL(event, trigger, player) {
+    const targets: Player[] = event.list
+
+    type ChooseCardOLResult = Partial<Result> | "ai"
+    const chooseRemote = (args, set) => {
+      game.me.chooseCard(...args).set(set)
+      game.resume()
+    }
+    const chooseLocal = (current: Player) => {
+      return current.chooseCard(...event._args).set(event._set)
+    }
+    const choose = (current: Player) => {
+      return new Promise<ChooseCardOLResult>((resolve) => {
+        if (current.isOnline()) {
+          current.wait((result) => resolve(result ?? {}))
+          current.send(chooseRemote, event._args, event._set)
+          return
+        }
+        if (current === game.me) {
+          const next = chooseLocal(game.me)
+          game.me.wait((result) => resolve(result ?? {}))
+          next
+            .forResult()
+            .then((result) => game.me.unwait(result))
+            .catch(() => resolve({}))
+        } else {
+          const next = chooseLocal(current)
+          next
+            .forResult()
+            .then(resolve)
+            .catch(() => resolve({}))
+        }
+      })
+    }
+
+    let results: Partial<Result>[]
+    if (_status.connectMode) {
+      const events: Promise<Partial<Result>>[] = targets.map(async (target) => {
+        try {
+          const result = await choose(target)
+
+          if (result === "ai") {
+            return event.aiCard
+              ? event.aiCard(target)
+              : { bool: false, cards: [] }
           }
+          return result
+        } catch {
+          return {}
         }
+      })
+      results = await Promise.all(events)
+    } else {
+      results = []
+      for (const target of targets) {
+        results.push(
+          await chooseLocal(target)
+            .forResult()
+            .catch(() => ({})),
+        )
       }
-    },
-    async (event, trigger, player) => {
-      if (event.list.length) {
-        event.target = event.list.shift()
-        event.target.chooseCard.apply(event.target, event._args).set(event._set)
-      } else {
-        event.goto(3)
-      }
-    },
-    async (event, trigger, player, result) => {
-      event.target.unwait(result)
-      event.goto(1)
-    },
-    async (event, trigger, player) => {
-      if (event.withme) {
-        game.me.chooseCard.apply(game.me, event._args).set(event._set)
-      } else {
-        event.goto(5)
-      }
-    },
-    async (event, trigger, player, result) => {
-      game.me.unwait(result)
-    },
-    async (event, trigger, player) => {
-      if (!event.resultOL) {
-        game.pause()
-      }
-    },
-    async (event, trigger, player) => {
-      event.result = []
-      for (const [i, target] of event.targets.entries()) {
-        event.result.push(event.resultOL[target.playerid] || {})
-        if (event.result[i] == "ai" && event.aiCard) {
-          event.result[i] = event.aiCard(target)
-        }
-      }
-      event.finish()
-    },
-    async (event, trigger, player) => {
-      if (event.list.length) {
-        event.target = event.list.shift()
-        event.target.chooseCard.apply(event.target, event._args).set(event._set)
-      } else {
-        for (const [i] of event.targets.entries()) {
-          if (!event.result[i]) {
-            event.result[i] = {}
-          }
-        }
-        event.finish()
-      }
-    },
-    async (event, trigger, player, result) => {
-      event.result[event.targets.indexOf(event.target)] = result
-      event.goto(7)
-    },
-  ],
-  chooseButtonOL: [
-    async (event, trigger, player) => {
-      event.targets = event.list.slice()
-      if (!_status.connectMode) {
-        event.result = {}
-        event.goto(7)
-        return
-      }
-      //ui.arena.classList.add('markhidden');
-      for (let i = 0; i < event.list.length; i++) {
-        const current = event.list[i]
-        current[0].wait()
-        if (current[0].isOnline()) {
-          const target = current.shift()
-          target.send(
-            (args, callback, switchToAuto, processAI) => {
-              //ui.arena.classList.add('markhidden');
-              const next = game.me.chooseButton.apply(game.me, args)
-              next.callback = callback
-              next.switchToAuto = switchToAuto
-              next.processAI = processAI
-              next.complexSelect = true
-              game.resume()
-            },
-            current,
+    }
+
+    Reflect.set(event, "result", results)
+  },
+  async chooseButtonOL(event, trigger, player) {
+    const list: [Player, ...any[]][] = event.list
+
+    const chooseRemote = (args, callback, switchToAuto, processAI) => {
+      const next = game.me.chooseButton(...args)
+      next.callback = callback
+      next.switchToAuto = switchToAuto
+      next.processAI = processAI
+      next.complexSelect = true
+      game.resume()
+    }
+    const chooseLocal = (current: Player, args: any[]) => {
+      const next = current.chooseButton(...args)
+      next.callback = event.callback
+      next.switchToAuto = event.switchToAuto
+      next.processAI = event.processAI
+      return next
+    }
+    const choose = (current: Player, args: any[]) => {
+      return new Promise<Partial<Result>>((resolve) => {
+        if (current.isOnline()) {
+          current.wait((result) => resolve(result ?? {}))
+          current.send(
+            chooseRemote,
+            args,
             event.callback,
             event.switchToAuto,
             event.processAI,
           )
-          target._choose_button_ol = current
-          event.list.splice(i--, 1)
-        } else if (current[0] == game.me) {
-          event.last = current
-          event.last.shift()
-          event.list.splice(i--, 1)
+          return
         }
+        if (current === game.me) {
+          const next = chooseLocal(game.me, args)
+          game.me.wait((result) => resolve(result ?? {}))
+          next
+            .forResult()
+            .then((result) => game.me.unwait(result))
+            .catch(() => resolve({}))
+        } else {
+          const next = chooseLocal(current, args)
+          next
+            .forResult()
+            .then(resolve)
+            .catch(() => resolve({}))
+        }
+      })
+    }
+
+    let results: Record<string, Partial<Result>>
+    if (_status.connectMode) {
+      const events: Promise<[number, Partial<Result>]>[] = list.map(
+        async ([target, ...args]) => {
+          try {
+            const result = await choose(target, args)
+            return [target.playerid, result]
+          } catch {
+            return [target.playerid, {}]
+          }
+        },
+      )
+      results = Object.fromEntries(await Promise.all(events))
+    } else {
+      results = {}
+      for (const [target, ...args] of list) {
+        results[target.playerid] = await chooseLocal(target, args)
+          .forResult()
+          .catch(() => ({}))
       }
-    },
-    async (event, trigger, player) => {
-      if (event.list.length) {
-        const current = event.list.shift()
-        event.target = current.shift()
-        const next = event.target.chooseButton.apply(event.target, current)
-        next.callback = event.callback
-        next.switchToAuto = event.switchToAuto
-        next.processAI = event.processAI
-        return next.forResult()
-      } else {
-        event.goto(3)
-      }
-    },
-    async (event, trigger, player, result) => {
-      event.target.unwait(result)
-      event.goto(1)
-    },
-    async (event, trigger, player) => {
-      if (event.last) {
-        const next = game.me.chooseButton.apply(game.me, event.last)
-        next.callback = event.callback
-        next.switchToAuto = event.switchToAuto
-        next.processAI = event.processAI
-        return next.forResult()
-      } else {
-        event.goto(5)
-      }
-    },
-    async (event, trigger, player, result) => {
-      game.me.unwait(result)
-    },
-    async (event, trigger, player) => {
-      if (!event.resultOL) {
-        game.pause()
-      }
-    },
-    async (event, trigger, player) => {
-      event.result = event.resultOL
-      event.finish()
-    },
-    async (event, trigger, player) => {
-      if (event.list.length) {
-        const current = event.list.shift()
-        event.target = current.shift()
-        const next = event.target.chooseButton.apply(event.target, current)
-        next.callback = event.callback
-        next.switchToAuto = event.switchToAuto
-        next.processAI = event.processAI
-        return next.forResult()
-      }
-    },
-    async (event, trigger, player, result) => {
-      const { target } = event
-      event.result[target.playerid] = result
-      if (event.list.length) {
-        event.goto(7)
-      }
-    },
-  ],
+    }
+
+    Reflect.set(event, "result", results)
+  },
   async chooseAnyOL(event, trigger, player) {
     const { targets, func, args } = event
     const map = new Map()
     const locals = targets.slice()
-    const humans = targets.filter((current) => current === game.me || current.isOnline())
+    const humans = targets.filter(
+      (current) => current === game.me || current.isOnline(),
+    )
     //分别处理人类玩家和其他玩家
     locals.removeArray(humans)
     const eventId = get.id()
@@ -8271,8 +8770,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     //让读条不消失
     event._global_waiting = true
     let time = 10000
-    if (lib.configOL && lib.configOL.choose_timeout) {
-      time = parseInt(lib.configOL.choose_timeout) * 1000
+    if (lib.configOL?.choose_timeout) {
+      time = parseInt(lib.configOL.choose_timeout, 10) * 1000
     }
     targets.forEach((current) => current.showTimer(time))
     if (humans.length > 0) {
@@ -8347,7 +8846,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (event.isMine()) {
           game.check()
           game.pause()
-          if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
+          if (
+            event.hsskill &&
+            !event.forced &&
+            _status.prehidden_skills.includes(event.hsskill)
+          ) {
             ui.click.cancel()
             return
           }
@@ -8358,25 +8861,25 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             }
           }
           ui.create.cardChooseAll()
-          if (event.prompt != false) {
+          if (event.prompt !== false) {
             let str
-            if (typeof event.prompt == "string") {
+            if (typeof event.prompt === "string") {
               str = event.prompt
             } else {
               str = "请选择"
               const range = get.select(event.selectCard)
-              if (range[0] == range[1]) {
+              if (range[0] === range[1]) {
                 str += get.cnNumber(range[0])
-              } else if (range[1] == Infinity) {
+              } else if (range[1] === Infinity) {
                 str += `至少${get.cnNumber(range[0])}`
               } else {
                 str += `${get.cnNumber(range[0])}至${get.cnNumber(range[1])}`
               }
               str += "张"
-              if (event.position == "h" || event.position == undefined) {
+              if (event.position === "h" || event.position === undefined) {
                 str += "手"
               }
-              if (event.position == "e") {
+              if (event.position === "e") {
                 str += "装备"
               }
               str += "牌"
@@ -8391,7 +8894,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               }
             }
             if (Array.isArray(event.selectCard)) {
-              event.promptbar = event.dialog.add(`0/${get.numStr(event.selectCard[1], "card")}`)
+              event.promptbar = event.dialog.add(
+                `0/${get.numStr(event.selectCard[1], "card")}`,
+              )
               if (event.custom.add.card === undefined) {
                 event.custom.add.card = () => {
                   _status.event.promptbar.innerHTML = `${ui.selected.cards.length}/${get.numStr(_status.event.selectCard[1], "card")}`
@@ -8408,14 +8913,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const { forced } = event
-      if (event.result != "ai") {
+      if (event.result !== "ai") {
         return
       }
       if (event.processAI) {
         event.result = event.processAI()
       } else {
         game.check()
-        if ((ai.basic.chooseCard(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
+        if (
+          (ai.basic.chooseCard(event.ai) || forced) &&
+          (!event.filterOk || event.filterOk())
+        ) {
           ui.click.ok()
         } else if (event.skill) {
           const skill = event.skill
@@ -8454,24 +8962,32 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
       if (event.isMine()) {
-        if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
+        if (
+          event.hsskill &&
+          !event.forced &&
+          _status.prehidden_skills.includes(event.hsskill)
+        ) {
           ui.click.cancel()
           return
         }
         game.check()
         game.pause()
-        if (event.createDialog && !event.dialog && Array.isArray(event.createDialog)) {
+        if (
+          event.createDialog &&
+          !event.dialog &&
+          Array.isArray(event.createDialog)
+        ) {
           event.dialog = ui.create.dialog.apply(this, event.createDialog)
-        } else if (event.prompt != false) {
+        } else if (event.prompt !== false) {
           let str
-          if (typeof event.prompt == "string") {
+          if (typeof event.prompt === "string") {
             str = event.prompt
           } else {
             str = "请选择"
             const range = get.select(event.selectTarget)
-            if (range[0] == range[1]) {
+            if (range[0] === range[1]) {
               str += get.cnNumber(range[0])
-            } else if (range[1] == Infinity) {
+            } else if (range[1] === Infinity) {
               str += `至少${get.cnNumber(range[0])}`
             } else {
               str += `${get.cnNumber(range[0])}至${get.cnNumber(range[1])}`
@@ -8482,7 +8998,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           if (event.prompt2) {
             event.dialog.addText(event.prompt2, event.prompt2.length <= 20)
           }
-          if (event.promptbar != "none") {
+          if (event.promptbar !== "none") {
             event.promptbar = event.dialog.add(
               `0/${get.numStr(get.select(event.selectTarget)[1], "target")}`,
             )
@@ -8490,7 +9006,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               _status.event.promptbar.innerHTML = `${ui.selected.targets.length}/${get.numStr(get.select(event.selectTarget)[1], "target")}`
             }
           }
-        } else if (get.itemtype(event.dialog) == "dialog") {
+        } else if (get.itemtype(event.dialog) === "dialog") {
           event.dialog.open()
         }
       } else if (event.isOnline()) {
@@ -8501,7 +9017,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const { forced } = event
-      if (event.result == "ai") {
+      if (event.result === "ai") {
         if (event.processAI) {
           event.result = event.processAI()
         } else {
@@ -8530,7 +9046,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.onresult(event.result)
       }
       if (event.result.bool && event.autodelay && !event.isMine()) {
-        if (typeof event.autodelay == "number") {
+        if (typeof event.autodelay === "number") {
           await game.delayx(event.autodelay)
         } else {
           await game.delayx()
@@ -8541,14 +9057,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   chooseCardTarget: [
     async (event, trigger, player) => {
       if (event.isMine()) {
-        if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
+        if (
+          event.hsskill &&
+          !event.forced &&
+          _status.prehidden_skills.includes(event.hsskill)
+        ) {
           ui.click.cancel()
           return
         }
         ui.create.cardChooseAll()
         game.check()
         game.pause()
-        if (event.prompt != false) {
+        if (event.prompt !== false) {
           event.dialog = ui.create.dialog(event.prompt || "请选择卡牌和目标")
           if (event.prompt2) {
             event.dialog.addText(event.prompt2, event.prompt2.length <= 20)
@@ -8562,7 +9082,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const { forced } = event
-      if (event.result != "ai") {
+      if (event.result !== "ai") {
         return
       }
       if (event.processAI) {
@@ -8604,7 +9124,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   chooseButtonTarget: [
     async (event, _trigger, player) => {
       //根据player.chooseButtonTarget获取到的dialog信息创建对话框，也支持createDialog
-      if (typeof event.dialog == "number") {
+      if (typeof event.dialog === "number") {
         event.dialog = get.idDialog(event.dialog)
       }
       if (event.createDialog && !event.dialog) {
@@ -8614,7 +9134,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         event.closeDialog = true
       }
-      if (event.dialog == undefined) {
+      if (event.dialog === undefined) {
         event.dialog = ui.dialog
       }
       if (event.isMine() || event.dialogdisplay) {
@@ -8622,7 +9142,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.dialog.open()
       }
       if (event.isMine()) {
-        if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
+        if (
+          event.hsskill &&
+          !event.forced &&
+          _status.prehidden_skills.includes(event.hsskill)
+        ) {
           ui.click.cancel()
           return
         }
@@ -8644,7 +9168,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                   "stayleft",
                   (link) => {
                     const control = event.controls[0]
-                    if (event.dialog.style.display == "none") {
+                    if (event.dialog.style.display === "none") {
                       control.childNodes[0].innerHTML = "隐藏窗口"
                       event.dialog.style.display = ""
                     } else {
@@ -8661,7 +9185,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           } else if (event.isOnline()) {
             event.player.send(func, event)
           }
-          if (event.custom == undefined) {
+          if (event.custom === undefined) {
             event.custom = {
               add: {},
               replace: {},
@@ -8669,7 +9193,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
           const addConfirm = event.custom.add.confirm
           event.custom.add.confirm = (bool) => {
-            if (typeof bool != "boolean") {
+            if (typeof bool !== "boolean") {
               return
             }
             const event = get.event()
@@ -8679,7 +9203,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             if (ui.confirm) {
               ui.confirm.close()
             }
-            if (typeof addConfirm == "function") {
+            if (typeof addConfirm === "function") {
               addConfirm.call(this, bool)
             }
             game.uncheck()
@@ -8697,7 +9221,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, _trigger, player, result) => {
       //处理ai的选择结果
-      if (event.result != "ai") {
+      if (event.result !== "ai") {
         return
       }
 
@@ -8735,7 +9259,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   ],
   chooseControl: [
     async (event, trigger, player) => {
-      if (event.controls.length == 0) {
+      if (event.controls.length === 0) {
         if (event.sortcard) {
           let sortnum = 2
           if (event.sorttop) {
@@ -8752,7 +9276,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           event.finish()
           return
         }
-      } else if (event.choiceList && event.controls.length == 1 && event.controls[0] == "cancel2") {
+      } else if (
+        event.choiceList &&
+        event.controls.length === 1 &&
+        event.controls[0] === "cancel2"
+      ) {
         event.controls.shift()
         for (const [i] of event.choiceList.entries()) {
           event.controls.push(`选项${get.cnNumber(i + 1, true)}`)
@@ -8767,7 +9295,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           game.expandSkills(hidden)
           if (hidden.length) {
             for (const control of event.controls) {
-              if (_status.prehidden_skills.includes(control) && hidden.includes(control)) {
+              if (
+                _status.prehidden_skills.includes(control) &&
+                hidden.includes(control)
+              ) {
                 event.result = {
                   bool: true,
                   control,
@@ -8793,7 +9324,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             prompt += `放置${get.translation(event.tosort)}`
           }
           event.dialog = ui.create.dialog(prompt, "hidden")
-          if (event.sortcard && event.sortcard.length) {
+          if (event.sortcard?.length) {
             event.dialog.addSmall(event.sortcard)
           } else {
             event.dialog.buttons = []
@@ -8809,7 +9340,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             item.style.width = "50px"
             buttons.insertBefore(item, event.dialog.buttons[i])
             item.innerHTML = `<div style="font-family: xinwei;font-size: 25px;height: 75px;line-height: 25px;top: 8px;left: 10px;width: 30px;">第${get.cnNumber(i + 1, true)}张</div>`
-            if (i == event.dialog.buttons.length + 1) {
+            if (i === event.dialog.buttons.length + 1) {
               item.firstChild.innerHTML = "牌堆底"
             }
             item.link = get.cnNumber(i, true)
@@ -8832,7 +9363,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           event.dialog.classList.add("forcebutton")
           if (event.addDialog) {
             for (const dialog of event.addDialog) {
-              if (get.itemtype(dialog) == "cards") {
+              if (get.itemtype(dialog) === "cards") {
                 event.dialog.addSmall(dialog)
               } else {
                 event.dialog.add(dialog)
@@ -8845,22 +9376,21 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           if (event.seperate || lib.config.seperate_control) {
             const controls = event.controls.slice(0)
             controls.remove("cancel2")
-            if ((event.direct && controls.length == 1) || event.forceDirect) {
+            if ((event.direct && controls.length === 1) || event.forceDirect) {
               event.result = {
                 control: event.controls[0],
                 links: get.links([event.controls[0]]),
               }
               return
-            } else {
-              event.controlbars = []
-              for (const control of event.controls) {
-                event.controlbars.push(ui.create.control([control]))
-              }
+            }
+            event.controlbars = []
+            for (const control of event.controls) {
+              event.controlbars.push(ui.create.control([control]))
             }
           } else {
             const controls = event.controls.slice(0)
             controls.remove("cancel2")
-            if ((event.direct && controls.length == 1) || event.forceDirect) {
+            if ((event.direct && controls.length === 1) || event.forceDirect) {
               event.result = {
                 control: event.controls[0],
                 links: get.links([event.controls[0]]),
@@ -8875,7 +9405,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             }
             event.dialog.open()
           } else if (event.choiceList) {
-            event.dialog = ui.create.dialog(event.prompt || "选择一项", "hidden")
+            event.dialog = ui.create.dialog(
+              event.prompt || "选择一项",
+              "hidden",
+            )
             event.dialog.forcebutton = true
             event.dialog.open()
             for (const [i, choice] of event.choiceList.entries()) {
@@ -8903,11 +9436,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
     },
     async (event, trigger, player) => {
-      if (event.result == "ai") {
+      if (event.result === "ai") {
         event.result = {}
         if (event.ai) {
           const result = event.ai(event.getParent(), player)
-          if (typeof result == "number") {
+          if (typeof result === "number") {
             event.result.control = event.controls[result]
           } else {
             event.result.control = result
@@ -8919,7 +9452,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       event.result.index = event.controls.indexOf(event.result.control)
       event.choosing = false
       _status.imchoosing = false
-      if (event.dialog && event.dialog.close) {
+      if (event.dialog?.close) {
         event.dialog.close()
       }
       if (event.controlbar) {
@@ -8935,10 +9468,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   ],
   async chooseBool(event, trigger, player) {
     if (event.isMine()) {
-      if (event.frequentSkill && !lib.config.autoskilllist.includes(event.frequentSkill)) {
+      if (
+        event.frequentSkill &&
+        !lib.config.autoskilllist.includes(event.frequentSkill)
+      ) {
         ui.click.ok()
         return
-      } else if (event.hsskill && _status.prehidden_skills.includes(event.hsskill)) {
+      }
+      if (event.hsskill && _status.prehidden_skills.includes(event.hsskill)) {
         ui.click.cancel()
         return
       }
@@ -8971,7 +9508,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       event.result = "ai"
     }
 
-    if (event.result == "ai") {
+    if (event.result === "ai") {
       if (event.ai) {
         event.choice = event.ai(event.getParent(), player)
       }
@@ -8995,7 +9532,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       controls.push("cancel2")
     }
     let result
-    if (controls.length == 1) {
+    if (controls.length === 1) {
       result = { control: controls[0] }
     } else {
       const prompt =
@@ -9031,15 +9568,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             const att = get.attitude(player, target)
             const choices = get.event().controls.slice()
             const eff1 = get.recoverEffect(target, player, player)
-            const eff2 = get.effect(target, { name: "draw" }, player, player) * 2
+            const eff2 =
+              get.effect(target, { name: "draw" }, player, player) * 2
             if (
               choices.includes("recover_hp") &&
               eff1 > 0 &&
-              (target.hp == 1 ||
+              (target.hp === 1 ||
                 target.needsToDiscard() ||
                 target.hasSkillTag("maixie_hp") ||
                 num2 > num1 ||
-                (num2 == num1 && target.needsToDiscard(1)))
+                (num2 === num1 && target.needsToDiscard(1)))
             ) {
               return "recover_hp"
             }
@@ -9054,19 +9592,19 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       )
       result = await next.forResult()
     }
-    if (result?.control != "cancel2") {
+    if (result?.control !== "cancel2") {
       if (event.logSkill) {
-        if (typeof event.logSkill == "string") {
+        if (typeof event.logSkill === "string") {
           player.logSkill(event.logSkill)
         } else if (Array.isArray(event.logSkill)) {
           player.logSkill.apply(player, event.logSkill)
         }
       }
-      if (result?.control == "draw_card") {
+      if (result?.control === "draw_card") {
         const next = target.draw(event.num1)
         next.gaintag.addArray(event.gaintag)
         await next
-      } else if (result?.control == "recover_hp") {
+      } else if (result?.control === "recover_hp") {
         await target.recover(event.num2)
       }
     }
@@ -9082,20 +9620,20 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.dialog.style.display = "none"
       }
       const select = get.select(event.selectButton)
-      if (event.prompt == undefined) {
+      if (event.prompt === undefined) {
         let str = `请选择${get.translation(target)}的`
-        if (select[0] == select[1]) {
+        if (select[0] === select[1]) {
           str += get.cnNumber(select[0])
-        } else if (select[1] == Infinity) {
+        } else if (select[1] === Infinity) {
           str += `至少${get.cnNumber(select[0])}`
         } else {
           str += `${get.cnNumber(select[0])}至${get.cnNumber(select[1])}`
         }
         str += "张"
-        if (event.position == "h" || event.position == undefined) {
+        if (event.position === "h" || event.position === undefined) {
           str += "手"
         }
-        if (event.position == "e") {
+        if (event.position === "e") {
           str += "装备"
         }
         str += "牌"
@@ -9109,17 +9647,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const cs = target.getCards(event.position)
       const directFilter =
         event.forced &&
-        typeof event.filterOk != "function" &&
-        typeof event.selectButton != "function" &&
-        event.filterButton == lib.filter.all
+        typeof event.filterOk !== "function" &&
+        typeof event.selectButton !== "function" &&
+        event.filterButton === lib.filter.all
       let directh =
         !lib.config.unauto_choose &&
         !event.isOnline() &&
-        select[0] == select[1] &&
+        select[0] === select[1] &&
         (!event.complexSelect || select[1] === 1)
 
       for (const position of event.position) {
-        if (position == "h") {
+        if (position === "h") {
           const hs = target.getCards("h")
           if (hs.length) {
             expand_length += Math.ceil(hs.length / 6)
@@ -9161,7 +9699,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               }
             }
           }
-        } else if (position == "e") {
+        } else if (position === "e") {
           const es = target.getCards("e")
           if (es.length) {
             expand_length += Math.ceil(es.length / 6)
@@ -9173,7 +9711,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             event.dialog.add(es)
             directh = false
           }
-        } else if (position == "j") {
+        } else if (position === "j") {
           const js = target.getCards("j")
           if (js.length) {
             expand_length += Math.ceil(js.length / 6)
@@ -9185,7 +9723,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             const shown = js.filter((card) => {
               const name = card.viewAs || card.name
               const info = lib.card[name]
-              if (!info || !info.blankCard) {
+              if (!info?.blankCard) {
                 return true
               }
               return false
@@ -9214,7 +9752,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
         }
       }
-      if (event.dialog.buttons.length == 0) {
+      if (event.dialog.buttons.length === 0) {
         event.finish()
         return
       }
@@ -9235,7 +9773,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       } else {
         if (event.isMine()) {
-          if (event.hsskill && !event.forced && _status.prehidden_skills.includes(event.hsskill)) {
+          if (
+            event.hsskill &&
+            !event.forced &&
+            _status.prehidden_skills.includes(event.hsskill)
+          ) {
             ui.click.cancel()
             return
           }
@@ -9256,9 +9798,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const { forced } = event
-      if (event.result == "ai") {
+      if (event.result === "ai") {
         game.check()
-        if ((ai.basic.chooseButton(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
+        if (
+          (ai.basic.chooseButton(event.ai) || forced) &&
+          (!event.filterOk || event.filterOk())
+        ) {
           ui.click.ok()
         } else {
           ui.click.cancel()
@@ -9269,7 +9814,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.result.cards = event.result.links.slice(0)
       }
       event.resume()
-      delay(500).then(() => void ui.arena.classList.remove("choose-player-card"))
+      delay(500).then(
+        () => void ui.arena.classList.remove("choose-player-card"),
+      )
     },
   ],
   discardPlayerCard: [
@@ -9299,18 +9846,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (event.prompt == null) {
         let str = `弃置${get.translation(target)}`
         const range = get.select(event.selectButton)
-        if (range[0] == range[1]) {
+        if (range[0] === range[1]) {
           str += get.cnNumber(range[0])
-        } else if (range[1] == Infinity) {
+        } else if (range[1] === Infinity) {
           str += `至少${get.cnNumber(range[0])}`
         } else {
           str += `${get.cnNumber(range[0])}至${get.cnNumber(range[1])}`
         }
         str += "张"
-        if (event.position == "h" || event.position == undefined) {
+        if (event.position === "h" || event.position === undefined) {
           str += "手"
         }
-        if (event.position == "e") {
+        if (event.position === "e") {
           str += "装备"
         }
         str += "牌"
@@ -9328,17 +9875,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const select = get.select(event.selectButton)
       const directFilter =
         event.forced &&
-        typeof event.filterOk != "function" &&
-        typeof event.selectButton != "function" &&
-        event.filterButton == lib.filter.all
+        typeof event.filterOk !== "function" &&
+        typeof event.selectButton !== "function" &&
+        event.filterButton === lib.filter.all
       let directh =
         !lib.config.unauto_choose &&
         !event.isOnline() &&
-        select[0] == select[1] &&
+        select[0] === select[1] &&
         (!event.complexSelect || select[1] === 1)
 
       for (const position of event.position) {
-        if (position == "h") {
+        if (position === "h") {
           const hs = target.getDiscardableCards(player, "h")
           expand_length += Math.ceil(hs.length / 6)
           if (hs.length) {
@@ -9380,7 +9927,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               }
             }
           }
-        } else if (position == "e") {
+        } else if (position === "e") {
           const es = target.getDiscardableCards(player, "e")
           if (es.length) {
             expand_length += Math.ceil(es.length / 6)
@@ -9392,7 +9939,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             event.dialog.add(es)
             directh = false
           }
-        } else if (position == "j") {
+        } else if (position === "j") {
           const js = target.getDiscardableCards(player, "j")
           if (js.length) {
             expand_length += Math.ceil(js.length / 6)
@@ -9404,7 +9951,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             const shown = js.filter((card) => {
               const name = card.viewAs || card.name
               const info = lib.card[name]
-              if (!info || !info.blankCard) {
+              if (!info?.blankCard) {
                 return true
               }
               return false
@@ -9433,7 +9980,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
         }
       }
-      if (event.dialog.buttons.length == 0) {
+      if (event.dialog.buttons.length === 0) {
         event.result = {
           bool: false,
         }
@@ -9476,9 +10023,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const { forced } = event
-      if (event.result == "ai") {
+      if (event.result === "ai") {
         game.check()
-        if ((ai.basic.chooseButton(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
+        if (
+          (ai.basic.chooseButton(event.ai) || forced) &&
+          (!event.filterOk || event.filterOk())
+        ) {
           ui.click.ok()
         } else {
           ui.click.cancel()
@@ -9488,10 +10038,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       event.resume()
-      delay(500).then(() => void ui.arena.classList.remove("discard-player-card"))
+      delay(500).then(
+        () => void ui.arena.classList.remove("discard-player-card"),
+      )
       if (event.result.bool && event.result.links && !game.online) {
         if (event.logSkill) {
-          if (typeof event.logSkill == "string") {
+          if (typeof event.logSkill === "string") {
             player.logSkill(event.logSkill)
           } else if (Array.isArray(event.logSkill)) {
             player.logSkill.apply(player, event.logSkill)
@@ -9548,18 +10100,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (event.prompt == null) {
         let str = `获得${get.translation(target)}`
         const range = get.select(event.selectButton)
-        if (range[0] == range[1]) {
+        if (range[0] === range[1]) {
           str += get.cnNumber(range[0])
-        } else if (range[1] == Infinity) {
+        } else if (range[1] === Infinity) {
           str += `至少${get.cnNumber(range[0])}`
         } else {
           str += `${get.cnNumber(range[0])}至${get.cnNumber(range[1])}`
         }
         str += "张"
-        if (event.position == "h" || event.position == undefined) {
+        if (event.position === "h" || event.position === undefined) {
           str += "手"
         }
-        if (event.position == "e") {
+        if (event.position === "e") {
           str += "装备"
         }
         str += "牌"
@@ -9578,17 +10130,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const select = get.select(event.selectButton)
       const directFilter =
         event.forced &&
-        typeof event.filterOk != "function" &&
-        typeof event.selectButton != "function" &&
-        event.filterButton == lib.filter.all
+        typeof event.filterOk !== "function" &&
+        typeof event.selectButton !== "function" &&
+        event.filterButton === lib.filter.all
       let directh =
         !lib.config.unauto_choose &&
         !event.isOnline() &&
-        select[0] == select[1] &&
+        select[0] === select[1] &&
         (!event.complexSelect || select[1] === 1)
 
       for (const position of event.position) {
-        if (position == "h") {
+        if (position === "h") {
           const hs = target.getGainableCards(player, "h")
           if (hs.length) {
             expand_length += Math.ceil(hs.length / 6)
@@ -9630,7 +10182,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               }
             }
           }
-        } else if (position == "e") {
+        } else if (position === "e") {
           const es = target.getGainableCards(player, "e")
           if (es.length) {
             expand_length += Math.ceil(es.length / 6)
@@ -9642,7 +10194,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             event.dialog.add(es)
             directh = false
           }
-        } else if (position == "j") {
+        } else if (position === "j") {
           const js = target.getGainableCards(player, "j")
           if (js.length) {
             expand_length += Math.ceil(js.length / 6)
@@ -9654,7 +10206,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             const shown = js.filter((card) => {
               const name = card.viewAs || card.name
               const info = lib.card[name]
-              if (!info || !info.blankCard) {
+              if (!info?.blankCard) {
                 return true
               }
               return false
@@ -9684,7 +10236,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
 
-      if (event.dialog.buttons.length == 0) {
+      if (event.dialog.buttons.length === 0) {
         event.result = {
           bool: false,
         }
@@ -9727,9 +10279,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const { forced } = event
-      if (event.result == "ai") {
+      if (event.result === "ai") {
         game.check()
-        if ((ai.basic.chooseButton(event.ai) || forced) && (!event.filterOk || event.filterOk())) {
+        if (
+          (ai.basic.chooseButton(event.ai) || forced) &&
+          (!event.filterOk || event.filterOk())
+        ) {
           ui.click.ok()
         } else {
           ui.click.cancel()
@@ -9746,7 +10301,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       if (event.logSkill && event.result.bool && !game.online) {
-        if (typeof event.logSkill == "string") {
+        if (typeof event.logSkill === "string") {
           player.logSkill(event.logSkill)
         } else if (Array.isArray(event.logSkill)) {
           player.logSkill.apply(player, event.logSkill)
@@ -9795,7 +10350,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
    * @deprecated
    */
   async showHandcards(event, trigger, player) {
-    if (player.countCards("h") == 0) {
+    if (player.countCards("h") === 0) {
       return
     }
 
@@ -9804,7 +10359,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     next.setContent(() => {})
 
     let str = `${get.translation(player.name)}的手牌`
-    if (typeof event.prompt == "string") {
+    if (typeof event.prompt === "string") {
       str = event.prompt
     }
     event.dialog = ui.create.dialog(str, cards)
@@ -9826,8 +10381,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     event.dialog.close()
   },
   async showCards(event, trigger, player) {
-    const { cards, str, flashAnimation, triggeronly, isFlash, multipleShow } = event
-    if (get.itemtype(cards) != "cards") {
+    const { cards, str, flashAnimation, triggeronly, isFlash, multipleShow } =
+      event
+    if (get.itemtype(cards) !== "cards") {
       return event.finish()
     }
     //初始化show_map用来存储展示牌的位置和来源
@@ -9842,7 +10398,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     //触发展示牌时机该时机允许修改展示牌
     await event.trigger("showCards")
 
-    if (get.itemtype(cards) != "cards") {
+    if (get.itemtype(cards) !== "cards") {
       return
     }
 
@@ -9877,27 +10433,35 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       //给牌分区域处理，各回各家各找各妈
       if ("hejsx".includes(pos) && owner) {
         event.show_map.get(owner)[`${pos}s`].push(card)
-        event.show_map.get(owner)["cards"].push(card)
+        event.show_map.get(owner).cards.push(card)
         if ("he".includes(pos)) {
-          event.show_map.get(owner)["cards2"].push(card)
+          event.show_map.get(owner).cards2.push(card)
         }
         ownerLose.get(owner).push(card)
       } else if ("cds".includes(pos)) {
         directLose.push(card)
         event.show_map
           .get("others")
-          [["cardPile", "discardPile", "special"].find((i) => i.startsWith(pos))]?.push(card)
+          [
+            ["cardPile", "discardPile", "special"].find((i) =>
+              i.startsWith(pos),
+            )
+          ]?.push(card)
       } else {
         directLose.push(card)
         if ("cds".includes(card.original)) {
           //沟槽的get.cards
           event.show_map
             .get("others")
-            [["cardPile", "discardPile", "special"].find((i) => i.startsWith(pos))]?.push(card)
-        } else if (pos == "o") {
-          event.show_map.get("others")["ordering"].push(card)
+            [
+              ["cardPile", "discardPile", "special"].find((i) =>
+                i.startsWith(pos),
+              )
+            ]?.push(card)
+        } else if (pos === "o") {
+          event.show_map.get("others").ordering.push(card)
         } else {
-          event.show_map.get("others")["noPosition"].push(card)
+          event.show_map.get("others").noPosition.push(card)
         }
       }
     }
@@ -9931,7 +10495,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
     if (!flashAnimation) {
       //允许自定义dialog，类似chooseButton
-      if (typeof event.dialog == "number") {
+      if (typeof event.dialog === "number") {
         event.videoId = event.dialog
         event.dialog = get.idDialog(event.dialog)
       } else {
@@ -9951,7 +10515,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         //event.closeDialog = true;
       }
-      if (event.dialog == undefined) {
+      if (event.dialog === undefined) {
         game.broadcastAll(
           (id, str, cards) => {
             const dialog = ui.create.dialog(str, cards)
@@ -9978,7 +10542,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
         }
         //允许自定义展示牌时对话框里的按钮
-        if (typeof customButton == "function") {
+        if (typeof customButton === "function") {
           dialog.buttons.forEach((button) => customButton(button))
         }
         //dialog.style.display = "";
@@ -10000,7 +10564,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     } else {
       event.videoId = lib.status.videoId++
       for (const card of cards) {
-        game.addVideo("judge1", player, [get.cardInfo(card), event.str, event.videoId])
+        game.addVideo("judge1", player, [
+          get.cardInfo(card),
+          event.str,
+          event.videoId,
+        ])
       }
       //创建动画，其实就跟judge的类似
       game.broadcastAll(
@@ -10016,7 +10584,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             let node
             const cardid = cardids[index]
             if (game.chess) {
-              node = card.copy("thrown", "center", ui.arena).addTempClass("start")
+              node = card
+                .copy("thrown", "center", ui.arena)
+                .addTempClass("start")
             } else {
               node = player.$throwordered(card.copy(), true)
             }
@@ -10045,7 +10615,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     if (event.hiddencards && !isFlash) {
       cards2.removeArray(event.hiddencards)
     }
-    if (event.log != false) {
+    if (event.log !== false) {
       const str = isFlash ? "亮出了" : "展示了"
       //multipleShow属性是表示是否有多个展示牌的角色的意思
       if (multipleShow !== true) {
@@ -10054,14 +10624,20 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       } else {
         const targets = Array.from(ownerLose.keys())
         for (const target of targets.sortBySeat()) {
-          const cardsx = ownerLose.get(target)?.filter((card) => !event.hiddenCards?.includes(card))
+          const cardsx = ownerLose
+            .get(target)
+            ?.filter((card) => !event.hiddenCards?.includes(card))
           if (cardsx?.length) {
             const logList = event.log?.(cardsx, target) || [target, str, cardsx]
             game.log(...logList)
           }
         }
         if (directLose.length) {
-          const logList = event.log?.(directLose, player) || [player, str, directLose]
+          const logList = event.log?.(directLose, player) || [
+            player,
+            str,
+            directLose,
+          ]
           game.log(...logList)
         }
       }
@@ -10074,7 +10650,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 
     //关闭对话框，结束动画
     if (!flashAnimation) {
-      if (event.closeDialog != false) {
+      if (event.closeDialog !== false) {
         game.broadcastAll("closeDialog", event.videoId)
       }
     } else {
@@ -10111,7 +10687,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     game.addCardKnower(event.cards, player)
 
     let result: Partial<Result>
-    if (player == game.me) {
+    if (player === game.me) {
       event.dialog = ui.create.dialog(event.str, event.cards)
       if (event.isMine()) {
         game.countChoose()
@@ -10182,35 +10758,34 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
         }
         return false
-      } else {
-        if (!get.event().sourceTargets.includes(target)) {
+      }
+      if (!get.event().sourceTargets.includes(target)) {
+        return false
+      }
+      return game.hasPlayer((current) => {
+        if (!get.event().aimTargets.includes(current) || target === current) {
           return false
         }
-        return game.hasPlayer((current) => {
-          if (!get.event().aimTargets.includes(current) || target == current) {
-            return false
+        const js = target.getCards("j", filterCard)
+        for (const judgeCard of js) {
+          if (_status.event.nojudge) {
+            break
           }
-          const js = target.getCards("j", filterCard)
-          for (const judgeCard of js) {
-            if (_status.event.nojudge) {
-              break
-            }
-            if (current.canAddJudge(judgeCard)) {
-              return true
-            }
+          if (current.canAddJudge(judgeCard)) {
+            return true
           }
-          if (current.isMin()) {
-            return false
-          }
-          const es = target.getCards("e", filterCard)
-          for (const equipCard of es) {
-            if (current.canEquip(equipCard, _status.event.canReplace)) {
-              return true
-            }
-          }
+        }
+        if (current.isMin()) {
           return false
-        })
-      }
+        }
+        const es = target.getCards("e", filterCard)
+        for (const equipCard of es) {
+          if (current.canEquip(equipCard, _status.event.canReplace)) {
+            return true
+          }
+        }
+        return false
+      })
     })
     next.set("nojudge", event.nojudge || false)
     next.set("ai", (target) => {
@@ -10219,7 +10794,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const sgnatt = get.sgn(att)
       const aimTargets = get.event().aimTargets
       const filterCard = get.event().filter
-      if (ui.selected.targets.length == 0) {
+      if (ui.selected.targets.length === 0) {
         if (att > 0) {
           let noEffect = true
           if (
@@ -10236,7 +10811,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                   return false
                 }
                 return (
-                  current != target &&
+                  current !== target &&
                   current.canAddJudge(card) &&
                   get.attitude(player, current) < 0
                 )
@@ -10257,7 +10832,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                     return false
                   }
                   return (
-                    current != target &&
+                    current !== target &&
                     get.attitude(player, current) < 0 &&
                     current.canEquip(card, _status.event.canReplace) &&
                     get.effect(target, card, player, player) < 0
@@ -10271,14 +10846,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         } else if (att < 0) {
           if (
             game.hasPlayer((current) => {
-              if (current != target && get.attitude(player, current) > 0) {
+              if (current !== target && get.attitude(player, current) > 0) {
                 const es = target.getCards("e", filterCard)
                 for (const equipCard of es) {
                   if (
                     get.value(equipCard, target) > 0 &&
                     current.canEquip(equipCard, _status.event.canReplace) &&
                     get.effect(current, equipCard, player, player) >
-                      (_status.event.canReplace ? get.effect(target, equipCard, player, player) : 0)
+                      (_status.event.canReplace
+                        ? get.effect(target, equipCard, player, player)
+                        : 0)
                   ) {
                     return true
                   }
@@ -10302,10 +10879,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         const att3 = get.sgn(get.attitude(player, target))
         let val = get.effect(target, card, player, target)
-        if (att3 != get.sgn(val)) {
+        if (att3 !== get.sgn(val)) {
           continue
         }
-        if (att2 > 0 && get.position(card) == "e") {
+        if (att2 > 0 && get.position(card) === "e") {
           val /= 2
         }
         if (Math.abs(val) > maxEff) {
@@ -10315,7 +10892,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       return maxEff
     })
     next.set("multitarget", true)
-    next.set("targetprompt", _status.event.targetprompt || ["被移走", "移动目标"])
+    next.set(
+      "targetprompt",
+      _status.event.targetprompt || ["被移走", "移动目标"],
+    )
     next.set("prompt", event.prompt || "移动场上的一张牌")
     next.set("filter", event.filter)
     next.set("sourceTargets", event.sourceTargets || game.filterPlayer())
@@ -10336,7 +10916,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     }
 
     if (event.logSkill) {
-      if (typeof event.logSkill == "string") {
+      if (typeof event.logSkill === "string") {
         player.logSkill(event.logSkill, result.targets, false)
       } else if (Array.isArray(event.logSkill)) {
         if (event.logSkill.length >= 3) {
@@ -10352,15 +10932,19 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     await game.delay()
 
     const targets = result.targets
-    if (targets.length == 2) {
+    if (targets.length === 2) {
       const dialogArgs = ["请选择要移动的牌"]
       const es = targets[0].getCards(
         "e",
-        (card) => event.filter(card) && targets[1].canEquip(card, event.canReplace),
+        (card) =>
+          event.filter(card) && targets[1].canEquip(card, event.canReplace),
       )
       const js = event.nojudge
         ? []
-        : targets[0].getCards("j", (card) => event.filter(card) && targets[1].canAddJudge(card))
+        : targets[0].getCards(
+            "j",
+            (card) => event.filter(card) && targets[1].canAddJudge(card),
+          )
       if (es.length) {
         dialogArgs.push(`<div class="text center">装备区</div>`)
         dialogArgs.push([es, "vcard"])
@@ -10380,8 +10964,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             const player = _status.event.player
             const targets0 = _status.event.targets0
             const targets1 = _status.event.targets1
-            if (get.attitude(player, targets0) > 0 && get.attitude(player, targets1) < 0) {
-              if (get.position(button.link) == "j") {
+            if (
+              get.attitude(player, targets0) > 0 &&
+              get.attitude(player, targets1) < 0
+            ) {
+              if (get.position(button.link) === "j") {
                 return 12
               }
               if (
@@ -10391,31 +10978,19 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                 return 10
               }
               return 0
-            } else {
-              if (get.position(button.link) == "j") {
-                return -10
-              }
-              return get.value(button.link) * get.effect(targets1, button.link, player, targets1)
             }
+            if (get.position(button.link) === "j") {
+              return -10
+            }
+            return (
+              get.value(button.link) *
+              get.effect(targets1, button.link, player, targets1)
+            )
           })
           .set("target", targets[0])
           .set("nojudge", event.nojudge || false)
           .set("targets0", targets[0])
           .set("targets1", targets[1])
-          /*.set("filterButton", button => {
-				const targets1 = _status.event.targets1;
-				if (!get.event().filter(button.link)) {
-					return false;
-				}
-				if (get.position(button.link) == "j") {
-					if (_status.event.nojudge) {
-						return false;
-					}
-					return targets1.canAddJudge(button.link);
-				} else {
-					return targets1.canEquip(button.link, _status.event.canReplace);
-				}
-			})*/
           .set("filter", event.filter)
           .set("canReplace", event.canReplace)
           .set("custom", get.copy(event.custom))
@@ -10431,14 +11006,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       let waiting
       if (targets[0].getCards("e").includes(link)) {
         position = "e"
-        if (!link.cards?.length) {
-          targets[0].removeVirtualEquip(link)
-        }
         waiting = targets[1].equip(link)
       } else {
-        if (!link.cards?.length) {
-          targets[0].removeVirtualJudge(link)
-        }
         waiting = targets[1].addJudge(link, link?.cards)
       }
       if (link.cards?.length) {
@@ -10469,7 +11038,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (lib.skill[event.skill].audio) {
           cardaudio = false
         }
-        if (lib.skill[event.skill].log != false) {
+        if (lib.skill[event.skill].log !== false) {
           player.logSkill(event.skill, false, null, null, [event, event.player])
         }
         if (get.info(event.skill).popname) {
@@ -10477,7 +11046,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       } else if (!event.nopopup) {
         if (lib.translate[`${event.card.name}_pop`]) {
-          player.tryCardAnimate(event.card, lib.translate[`${event.card.name}_pop`], "metal")
+          player.tryCardAnimate(
+            event.card,
+            lib.translate[`${event.card.name}_pop`],
+            "metal",
+          )
         } else {
           player.tryCardAnimate(event.card, event.card.name, "metal")
         }
@@ -10501,13 +11074,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (!Array.isArray(event.directHit)) {
         event.directHit = []
       }
-      if (typeof event.customArgs != "object" || typeof event.customArgs.default != "object") {
+      if (
+        typeof event.customArgs !== "object" ||
+        typeof event.customArgs.default !== "object"
+      ) {
         event.customArgs = { default: {} }
       }
-      if (typeof event.baseDamage != "number") {
+      if (typeof event.baseDamage !== "number") {
         event.baseDamage = get.info(event.card, false).baseDamage || 1
       }
-      if (typeof event.effectCount != "number") {
+      if (typeof event.effectCount !== "number") {
         event.effectCount = get.info(event.card, false).effectCount || 1
       }
       event.effectedCount = 0
@@ -10517,21 +11093,28 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       player.actionHistory[player.actionHistory.length - 1].useCard.push(event)
       game.getGlobalHistory().useCard.push(event)
       if (event.addCount !== false) {
-        if (player.stat[player.stat.length - 1].card[event.card.name] == undefined) {
+        if (
+          player.stat[player.stat.length - 1].card[event.card.name] ===
+          undefined
+        ) {
           player.stat[player.stat.length - 1].card[event.card.name] = 1
         } else {
           player.stat[player.stat.length - 1].card[event.card.name]++
         }
       }
       if (event.skill && event.addSkillCount !== false) {
-        if (player.stat[player.stat.length - 1].skill[event.skill] == undefined) {
+        if (
+          player.stat[player.stat.length - 1].skill[event.skill] === undefined
+        ) {
           player.stat[player.stat.length - 1].skill[event.skill] = 1
         } else {
           player.stat[player.stat.length - 1].skill[event.skill]++
         }
         const sourceSkill = get.info(event.skill).sourceSkill
         if (sourceSkill) {
-          if (player.stat[player.stat.length - 1].skill[sourceSkill] == undefined) {
+          if (
+            player.stat[player.stat.length - 1].skill[sourceSkill] === undefined
+          ) {
             player.stat[player.stat.length - 1].skill[sourceSkill] = 1
           } else {
             player.stat[player.stat.length - 1].skill[sourceSkill]++
@@ -10547,10 +11130,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const owner = get.owner(cards_ow[0])
         if (owner) {
           const id = owner.playerid
-          const Cards_card = cards.filter((card) => get.owner(card) == owner)
+          const Cards_card = cards.filter((card) => get.owner(card) === owner)
           cards_ow.removeArray(Cards_card)
           owner.getCards("ej").forEach((card) => {
-            const cardsx = card?.[card.cardSymbol]?.cards?.filter((cardx) => cards.includes(cardx))
+            const cardsx = card?.[card.cardSymbol]?.cards?.filter((cardx) =>
+              cards.includes(cardx),
+            )
             if (!cardsx?.length) {
               return
             }
@@ -10564,16 +11149,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
       player.useCardAnimateBefore?.(event, trigger, player)
-      if (event.animate != false && event.throw !== false) {
+      if (event.animate !== false && event.throw !== false) {
         let throw_cards = event.cards
         let virtualCard_str = false
         for (const id in event.lose_map) {
-          if (id == "noowner") {
+          if (id === "noowner") {
             continue
           }
-          const owner = (_status.connectMode ? lib.playerOL : game.playerMap)[id]
+          const owner = (_status.connectMode ? lib.playerOL : game.playerMap)[
+            id
+          ]
           const throws = event.lose_map[id]
-          if (owner == player) {
+          if (owner === player) {
             if (!throw_cards.length && lib.config.card_animation_info) {
               const virtualCard = ui.create.card()
               virtualCard._destroy = true
@@ -10582,7 +11169,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               const number = card.number
               virtualCard.init([
                 get.suit(card),
-                typeof number == "number" ? number : "虚拟",
+                typeof number === "number" ? number : "虚拟",
                 card.name,
                 card.nature,
               ])
@@ -10609,7 +11196,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                   event = _status.event
                 }
                 if (game.chess) {
-                  event.node = card.copy("thrown", "center", ui.arena).addTempClass("start")
+                  event.node = card
+                    .copy("thrown", "center", ui.arena)
+                    .addTempClass("start")
                 } else {
                   event.node = player.$throwordered(card.copy(), true)
                 }
@@ -10643,8 +11232,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                 if (
                   cards.length > 1 ||
                   !card.isCard ||
-                  card.name != node.name ||
-                  card.nature != node.nature ||
+                  card.name !== node.name ||
+                  card.nature !== node.nature ||
                   !card.cards.length
                 ) {
                   ui.create.cardTempName(card, node)
@@ -10653,7 +11242,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                       0,
                       node._tempName.innerHTML.indexOf("<span", -1),
                     )
-                    node._tempName.innerHTML += "<span style='color:black'>虚拟</span></span>"
+                    node._tempName.innerHTML +=
+                      "<span style='color:black'>虚拟</span></span>"
                   }
                 }
               }
@@ -10664,11 +11254,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             virtualCard_str,
           )
         }
-        if (lib.config.sync_speed && throw_cards[0] && throw_cards[0].clone) {
+        if (lib.config.sync_speed && throw_cards[0]?.clone) {
           const waitingForTransition = get.time()
           event.waitingForTransition = waitingForTransition
           throw_cards[0].clone.listenTransition(() => {
-            if (_status.waitingForTransition == waitingForTransition && _status.paused) {
+            if (
+              _status.waitingForTransition === waitingForTransition &&
+              _status.paused
+            ) {
               game.resume()
             }
             delete event.waitingForTransition
@@ -10679,14 +11272,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const ownerCards = event.cards.filter((card) => get.owner(card))
         const directDiscard = event.cards.filter((card) => !get.owner(card))
         if (ownerCards.length) {
-          const ownerx = get.owner(cards.find((card) => get.owner(card) !== false))
+          const ownerx = get.owner(
+            cards.find((card) => get.owner(card) !== false),
+          )
           if (
             cards.some((card) => {
               const owner = get.owner(card)
               if (owner === false) {
                 return false
               }
-              return owner != ownerx
+              return owner !== ownerx
             })
           ) {
             await game
@@ -10700,7 +11295,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                     cards_noowner.add(cards.shift())
                   } else {
                     const id = owner.playerid
-                    const onLoseCards = cards.filter((card) => get.owner(card) == owner)
+                    const onLoseCards = cards.filter(
+                      (card) => get.owner(card) === owner,
+                    )
                     event.cards.removeArray(onLoseCards)
                     await owner
                       .lose(onLoseCards, "visible", ui.ordering)
@@ -10710,11 +11307,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                   }
                 }
                 if (cards_noowner.length) {
-                  await game.cardsGotoOrdering(cards_noowner).set("relatedEvent", event.getParent())
+                  await game
+                    .cardsGotoOrdering(cards_noowner)
+                    .set("relatedEvent", event.getParent())
                 }
               })
           } else {
-            await ownerx.lose(ownerCards, "visible", ui.ordering).set("type", "use")
+            await ownerx
+              .lose(ownerCards, "visible", ui.ordering)
+              .set("type", "use")
           }
         }
         if (directDiscard.length) {
@@ -10726,25 +11327,36 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const { cards, card, targets, num } = event
-      if (event.animate != false && event.line != false && !event.hideTargets) {
-        if (event.card.name == "wuxie" && event.getParent()._info_map) {
+      if (
+        event.animate !== false &&
+        event.line !== false &&
+        !event.hideTargets
+      ) {
+        if (event.card.name === "wuxie" && event.getParent()._info_map) {
           let evtmap = event.getParent()._info_map
           if (evtmap._source) {
             evtmap = evtmap._source
           }
-          const lining = (evtmap.multitarget ? evtmap.targets : evtmap.target) || event.player
-          if (Array.isArray(lining) && event.getTrigger().name == "jiedao") {
+          const lining =
+            (evtmap.multitarget ? evtmap.targets : evtmap.target) ||
+            event.player
+          if (Array.isArray(lining) && event.getTrigger().name === "jiedao") {
             player.line(lining[0], "green")
           } else {
             player.line(lining, "green")
           }
-        } else if (event.card.name == "youdishenru" && event.getParent().source) {
+        } else if (
+          event.card.name === "youdishenru" &&
+          event.getParent().source
+        ) {
           let lining =
-            event.getParent().sourcex || event.getParent().source2 || event.getParent().source
-          if (lining == player && event.getParent().sourcex2) {
+            event.getParent().sourcex ||
+            event.getParent().source2 ||
+            event.getParent().source
+          if (lining === player && event.getParent().sourcex2) {
             lining = event.getParent().sourcex2
           }
-          if (Array.isArray(lining) && event.getTrigger().name == "jiedao") {
+          if (Array.isArray(lining) && event.getTrigger().name === "jiedao") {
             player.line(lining[0], "green")
           } else {
             player.line(lining, "green")
@@ -10752,7 +11364,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         } else {
           const config = {}
           const nature = get.natureList(event.card)[0]
-          if (nature || (event.card.classList && event.card.classList.contains(nature))) {
+          if (nature || event.card.classList?.contains(nature)) {
             config.color = nature
           }
           if (event.addedTarget) {
@@ -10769,7 +11381,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
       if (targets.length && !event.hideTargets) {
-        const str = targets.length == 1 && targets[0] == player ? "#b自己" : targets.sortBySeat()
+        const str =
+          targets.length === 1 && targets[0] === player
+            ? "#b自己"
+            : targets.sortBySeat()
         if (cards.length && !event.card.isCard) {
           if (event.addedTarget) {
             game.log(
@@ -10789,7 +11404,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
         } else {
           if (event.addedTarget) {
-            game.log(player, "对", str, "使用了", event.card, "（指向", event.addedTargets, "）")
+            game.log(
+              player,
+              "对",
+              str,
+              "使用了",
+              event.card,
+              "（指向",
+              event.addedTargets,
+              "）",
+            )
           } else {
             game.log(player, "对", str, "使用了", event.card)
           }
@@ -10797,19 +11421,35 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       } else {
         if (cards.length && !event.card.isCard) {
           if (event.addedTarget) {
-            game.log(player, "使用了", event.card, "（", cards, "，指向", event.addedTargets, "）")
+            game.log(
+              player,
+              "使用了",
+              event.card,
+              "（",
+              cards,
+              "，指向",
+              event.addedTargets,
+              "）",
+            )
           } else {
             game.log(player, "使用了", event.card, "（", cards, "）")
           }
         } else {
           if (event.addedTarget) {
-            game.log(player, "使用了", event.card, "（指向", event.addedTargets, "）")
+            game.log(
+              player,
+              "使用了",
+              event.card,
+              "（指向",
+              event.addedTargets,
+              "）",
+            )
           } else {
             game.log(player, "使用了", event.card)
           }
         }
       }
-      if (event.card.name == "wuxie") {
+      if (event.card.name === "wuxie") {
         game.logv(player, [event.card, cards], [event.getTrigger().card])
       } else {
         game.logv(player, [event.card, cards], targets)
@@ -10829,7 +11469,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       await event.trigger("useCard")
       event._oncancel = () => {
         game.broadcastAll((id) => {
-          if (ui.tempnowuxie && ui.tempnowuxie._origin == id) {
+          if (ui.tempnowuxie && ui.tempnowuxie._origin === id) {
             ui.tempnowuxie.close()
             delete ui.tempnowuxie
           }
@@ -10840,7 +11480,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const { cards, card, targets, num } = event
       event.sortTarget = (animate, sort) => {
         const info = get.info(event.card, false)
-        if (num == 0 && targets.length > 1) {
+        if (num === 0 && targets.length > 1) {
           if (!info.multitarget) {
             if (!event.fixedSeat && !sort) {
               targets.sortBySeat(_status.currentPhase || player)
@@ -10937,7 +11577,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const { cards, card, targets, num } = event
       const info = get.info(event.card, false)
-      if (!info.nodelay && event.animate != false) {
+      if (!info.nodelay && event.animate !== false) {
         if (event.delayx !== false) {
           if (event.waitingForTransition) {
             _status.waitingForTransition = event.waitingForTransition
@@ -11010,7 +11650,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (event.forceDie) {
           next.forceDie = true
         }
-        if (targets.length == event.triggeredTargets4.length) {
+        if (targets.length === event.triggeredTargets4.length) {
           event.sortTarget()
         }
         await next
@@ -11080,22 +11720,21 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         return
       }
       const info = get.info(event.card, false)
-      if (num == 0 && targets.length > 1) {
+      if (num === 0 && targets.length > 1) {
         event.sortTarget(true, true)
       }
-      if (targets[num] && targets[num].isDead() && !info?.deadTarget) {
+      if (targets[num]?.isDead() && !info?.deadTarget) {
         return
       }
-      if (targets[num] && targets[num].isOut() && !info?.includeOut) {
+      if (targets[num]?.isOut() && !info?.includeOut) {
         return
       }
-      if (targets[num] && targets[num].removed) {
+      if (targets[num]?.removed) {
         return
       }
       if (
         targets[num] &&
-        info.ignoreTarget &&
-        info.ignoreTarget(event.card, player, targets[num])
+        info.ignoreTarget?.(event.card, player, targets[num])
       ) {
         const next = game.createEvent("useCardToIgnored", false)
         next.setContent("emptyEvent")
@@ -11108,7 +11747,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         await next
         return
       }
-      if (targets.length == 0 && !info.notarget) {
+      if (targets.length === 0 && !info.notarget) {
         return
       }
       if (targets[num] && event.excluded.includes(targets[num])) {
@@ -11160,7 +11799,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         next.directHit = true
       }
       if (next.target && !info.multitarget) {
-        if (num == 0 && targets.length > 1) {
+        if (num === 0 && targets.length > 1) {
           // const ttt=next.target;
           // setTimeout(() => { ttt.addTempClass('target'); },0.5*lib.config.duration);
         } else {
@@ -11216,7 +11855,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       if (event.effectedCount < event.effectCount) {
         if (document.getElementsByClassName("thrown").length) {
-          if (event.delayx !== false && get.info(event.card, false).finalDelay !== false) {
+          if (
+            event.delayx !== false &&
+            get.info(event.card, false).finalDelay !== false
+          ) {
             game.delayx()
           }
         }
@@ -11233,7 +11875,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       //delete player.using;
       if (document.getElementsByClassName("thrown").length) {
-        if (event.delayx !== false && get.info(event.card, false).finalDelay !== false) {
+        if (
+          event.delayx !== false &&
+          get.info(event.card, false).finalDelay !== false
+        ) {
           game.delayx()
         }
       } else {
@@ -11260,7 +11905,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const checkShow = player.checkShow(event.skill)
       const waitings = []
       let losecard = null
-      if (info.discard != false && info.lose != false && !info.viewAs) {
+      if (info.discard !== false && info.lose !== false && !info.viewAs) {
         const next = player.discard(cards)
         next.delay = false
         if (lib.config.low_performance) {
@@ -11268,8 +11913,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         waitings.push(next)
       } else {
-        if (info.lose != false) {
-          if (info.losetrigger == false) {
+        if (info.lose !== false) {
+          if (info.losetrigger === false) {
             losecard = player.lose(cards, ui.special)
             losecard._triggered = null
           } else {
@@ -11283,7 +11928,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             if (info.insert) {
               losecard.insert_card = true
             }
-            if (losecard.position == ui.special && info.toStorage) {
+            if (losecard.position === ui.special && info.toStorage) {
               losecard.toStorage = true
             }
           }
@@ -11293,11 +11938,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           if (losecard) {
             losecard.visible = true
           }
-          if (lib.config.sync_speed && cards[0] && cards[0].clone) {
+          if (lib.config.sync_speed && cards[0]?.clone) {
             const waitingForTransition = get.time()
             event.waitingForTransition = waitingForTransition
             cards[0].clone.listenTransition(() => {
-              if (_status.waitingForTransition == waitingForTransition && _status.paused) {
+              if (
+                _status.waitingForTransition === waitingForTransition &&
+                _status.paused
+              ) {
                 game.resume()
               }
               delete event.waitingForTransition
@@ -11308,15 +11956,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (losecard) {
         waitings.push(losecard)
       }
-      if (info.line != false && targets.length) {
+      if (info.line !== false && targets.length) {
         let config = {}
         if (get.is.object(info.line)) {
           config = info.line
-        } else if (info.line == "fire") {
+        } else if (info.line === "fire") {
           config.color = "fire"
-        } else if (info.line == "thunder") {
+        } else if (info.line === "thunder") {
           config.color = "thunder"
-        } else if (info.line === undefined || info.line == "green") {
+        } else if (info.line === undefined || info.line === "green") {
           config.color = "green"
         }
         if (info.multitarget && !info.multiline && targets.length > 1) {
@@ -11326,38 +11974,43 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
       let str = ""
-      if (targets && targets.length && info.log != "notarget") {
-        str += `对<span class="bluetext">${targets[0] == player ? "自己" : get.translation(targets[0])}`
+      if (targets?.length && info.log !== "notarget") {
+        str += `对<span class="bluetext">${targets[0] === player ? "自己" : get.translation(targets[0])}`
         for (const target of targets.slice(1)) {
-          str += `、${target == player ? "自己" : get.translation(target)}`
+          str += `、${target === player ? "自己" : get.translation(target)}`
         }
         str += "</span>"
       }
       str += "发动了"
       if (!info.direct && info.log !== false) {
-        game.trySkillAudio(event.skill, player, null, null, null, [event, event.player])
+        game.trySkillAudio(event.skill, player, null, null, null, [
+          event,
+          event.player,
+        ])
         game.log(player, str, `【${get.skillTranslation(skill, player)}】`)
         if (info.logv !== false) {
           game.logv(player, skill, targets)
         }
         player.trySkillAnimate(skill, skill, checkShow)
       }
-      if (event.addCount != false) {
-        if (player.stat[player.stat.length - 1].skill[skill] == undefined) {
+      if (event.addCount !== false) {
+        if (player.stat[player.stat.length - 1].skill[skill] === undefined) {
           player.stat[player.stat.length - 1].skill[skill] = 1
         } else {
           player.stat[player.stat.length - 1].skill[skill]++
         }
         const sourceSkill = get.info(skill).sourceSkill
         if (sourceSkill) {
-          if (player.stat[player.stat.length - 1].skill[sourceSkill] == undefined) {
+          if (
+            player.stat[player.stat.length - 1].skill[sourceSkill] === undefined
+          ) {
             player.stat[player.stat.length - 1].skill[sourceSkill] = 1
           } else {
             player.stat[player.stat.length - 1].skill[sourceSkill]++
           }
         }
       }
-      if (player.stat[player.stat.length - 1].allSkills == undefined) {
+      if (player.stat[player.stat.length - 1].allSkills === undefined) {
         player.stat[player.stat.length - 1].allSkills = 1
       } else {
         player.stat[player.stat.length - 1].allSkills++
@@ -11457,7 +12110,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const { cards, targets } = event
       const info = get.info(event.skill)
-      if (info && info.contentBefore) {
+      if (info?.contentBefore) {
         const next = game.createEvent(`${event.skill}ContentBefore`)
         next.setContent(info.contentBefore)
         next.targets = targets
@@ -11477,7 +12130,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const { num, cards, targets } = event
 
       if (!event.skill) {
-        console.log("error: no skill", get.translation(event.player), event.player.getSkills())
+        console.log(
+          "error: no skill",
+          get.translation(event.player),
+          event.player.getSkills(),
+        )
         if (event._skill) {
           event.skill = event._skill
           console.log(event._skill)
@@ -11490,9 +12147,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const info = get.info(event.skill)
 
       if (
-        (targets[num] && targets[num].isDead() && !info?.deadTarget) ||
-        (targets[num] && targets[num].isOut() && !info?.includeOut) ||
-        (targets[num] && targets[num].removed)
+        (targets[num]?.isDead() && !info?.deadTarget) ||
+        (targets[num]?.isOut() && !info?.includeOut) ||
+        targets[num]?.removed
       ) {
         if (!info.multitarget && num < targets.length - 1) {
           event.num++
@@ -11508,7 +12165,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       next.player = player
       next.num = num
       next.multitarget = info.multitarget
-      if (num == 0 && next.targets.length > 1) {
+      if (num === 0 && next.targets.length > 1) {
         if (!info.multitarget) {
           lib.tempSortSeat = player
           targets.sort(lib.sort.seat)
@@ -11526,15 +12183,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         next.includeOut = true
       }
       if (next.target && !info.multitarget) {
-        if (num == 0 && targets.length > 1) {
+        if (num === 0 && targets.length > 1) {
           // const ttt=next.target;
           // setTimeout(() => { ttt.addTempClass('target'); },0.5*lib.config.duration);
         } else {
           next.target.addTempClass("target")
         }
       }
-      if (num == 0) {
-        if (typeof info.delay == "number") {
+      if (num === 0) {
+        if (typeof info.delay === "number") {
           game.delay(info.delay)
         } else if (info.delay !== false && info.delay !== 0) {
           if (event.waitingForTransition) {
@@ -11555,7 +12212,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const { targets, cards } = event
       const info = get.info(event.skill)
-      if (info && info.contentAfter) {
+      if (info?.contentAfter) {
         const next = game.createEvent(`${event.skill}ContentAfter`)
         next.setContent(info.contentAfter)
         next.targets = targets
@@ -11602,7 +12259,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     //     }
     // });
     let { num } = event
-    if (typeof event.minnum == "number" && num < event.minnum) {
+    if (typeof event.minnum === "number" && num < event.minnum) {
       num = event.minnum
     }
     if (event.drawDeck) {
@@ -11612,7 +12269,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       num -= event.drawDeck
     }
     let logList
-    if (event.log != false) {
+    if (event.log !== false) {
       logList = [player]
       if (num > 0) {
         if (event.bottom) {
@@ -11643,9 +12300,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     if (event.drawDeck) {
       cards = cards.concat(player.getDeckCards(event.drawDeck))
     }
-    if (get.itemtype(cards) == "cards") {
+    if (get.itemtype(cards) === "cards") {
       let next
-      if (event.animate != false) {
+      if (event.animate !== false) {
         if (event.visible) {
           next = player.gain(cards, "gain2").set("log", false)
           logList.addArray(["（", cards, "）"])
@@ -11682,7 +12339,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   },
   async loseToDiscardpile(event, trigger, player) {
     const { cards } = event
-    if (event.log != false) {
+    if (event.log !== false) {
       game.log(player, "将", cards, "置入了弃牌堆")
     }
     const next = player.lose(cards, event.position)
@@ -11708,7 +12365,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (lib.skill[event.skill].audio) {
           cardaudio = false
         }
-        if (lib.skill[event.skill].log != false) {
+        if (lib.skill[event.skill].log !== false) {
           player.logSkill(event.skill, false, null, null, [event, event.player])
         }
         /*if (get.info(event.skill).popname) {
@@ -11721,7 +12378,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       } else if (!event.nopopup) {
         player.tryCardAnimate(event.card, event.card.name, "wood")
       }
-      if (cardaudio && event.getParent(3).name == "useCard") {
+      if (cardaudio && event.getParent(3).name === "useCard") {
         game.broadcastAll(
           (player, card) => {
             game.playCardAudio(card, player)
@@ -11731,21 +12388,28 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         )
       }
       if (event.skill && event.addSkillCount !== false) {
-        if (player.stat[player.stat.length - 1].skill[event.skill] == undefined) {
+        if (
+          player.stat[player.stat.length - 1].skill[event.skill] === undefined
+        ) {
           player.stat[player.stat.length - 1].skill[event.skill] = 1
         } else {
           player.stat[player.stat.length - 1].skill[event.skill]++
         }
         const sourceSkill = get.info(event.skill).sourceSkill
         if (sourceSkill) {
-          if (player.stat[player.stat.length - 1].skill[sourceSkill] == undefined) {
+          if (
+            player.stat[player.stat.length - 1].skill[sourceSkill] === undefined
+          ) {
             player.stat[player.stat.length - 1].skill[sourceSkill] = 1
           } else {
             player.stat[player.stat.length - 1].skill[sourceSkill]++
           }
         }
       }
-      if (cards.length && (cards.length > 1 || cards[0].name != event.card.name)) {
+      if (
+        cards.length &&
+        (cards.length > 1 || cards[0].name !== event.card.name)
+      ) {
         game.log(player, "打出了", event.card, "（", cards, "）")
       } else {
         game.log(player, "打出了", event.card)
@@ -11760,10 +12424,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const owner = get.owner(cards_ow[0])
         if (owner) {
           const id = owner.playerid
-          const Cards_card = cards.filter((card) => get.owner(card) == owner)
+          const Cards_card = cards.filter((card) => get.owner(card) === owner)
           cards_ow.removeArray(Cards_card)
           owner.getCards("ej").forEach((card) => {
-            const cardsx = card?.[card.cardSymbol]?.cards?.filter((cardx) => cards.includes(cardx))
+            const cardsx = card?.[card.cardSymbol]?.cards?.filter((cardx) =>
+              cards.includes(cardx),
+            )
             if (!cardsx?.length) {
               return
             }
@@ -11777,16 +12443,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
       player.respondAnimateBefore?.(event, trigger, player)
-      if (event.animate != false && event.throw !== false) {
+      if (event.animate !== false && event.throw !== false) {
         let throw_cards = cards
         let virtualCard_str = false
         for (const id in event.lose_map) {
-          if (id == "noowner") {
+          if (id === "noowner") {
             continue
           }
-          const owner = (_status.connectMode ? lib.playerOL : game.playerMap)[id]
+          const owner = (_status.connectMode ? lib.playerOL : game.playerMap)[
+            id
+          ]
           const throws = event.lose_map[id]
-          if (owner == player) {
+          if (owner === player) {
             if (!throw_cards.length && lib.config.card_animation_info) {
               const virtualCard = ui.create.card()
               virtualCard._destroy = true
@@ -11795,7 +12463,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               const number = card.number
               virtualCard.init([
                 get.suit(card),
-                typeof number == "number" ? number : "虚拟",
+                typeof number === "number" ? number : "虚拟",
                 card.name,
                 card.nature,
               ])
@@ -11822,7 +12490,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                   event = _status.event
                 }
                 if (game.chess) {
-                  event.node = card.copy("thrown", "center", ui.arena).addTempClass("start")
+                  event.node = card
+                    .copy("thrown", "center", ui.arena)
+                    .addTempClass("start")
                 } else {
                   event.node = player.$throwordered(card.copy(), true)
                 }
@@ -11856,8 +12526,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                 if (
                   (cards.length > 1 ||
                     !card.isCard ||
-                    card.name != node.name ||
-                    card.nature != node.nature ||
+                    card.name !== node.name ||
+                    card.nature !== node.nature ||
                     !card.cards.length) &&
                   !judgeing
                 ) {
@@ -11867,7 +12537,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                       0,
                       node._tempName.innerHTML.indexOf("<span", -1),
                     )
-                    node._tempName.innerHTML += "<span style='color:black'>虚拟</span></span>"
+                    node._tempName.innerHTML +=
+                      "<span style='color:black'>虚拟</span></span>"
                   }
                 }
               }
@@ -11899,14 +12570,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const ownerCards = cards.filter((card) => get.owner(card))
         const directDiscard = cards.filter((card) => !get.owner(card))
         if (ownerCards.length) {
-          const ownerx = get.owner(cards.find((card) => get.owner(card) !== false))
+          const ownerx = get.owner(
+            cards.find((card) => get.owner(card) !== false),
+          )
           if (
             cards.some((card) => {
               const owner = get.owner(card)
               if (owner === false) {
                 return false
               }
-              return owner != ownerx
+              return owner !== ownerx
             })
           ) {
             await game
@@ -11920,7 +12593,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                     cards_noowner.add(cards.shift())
                   } else {
                     const id = owner.playerid
-                    const onLoseCards = cards.filter((card) => get.owner(card) == owner)
+                    const onLoseCards = cards.filter(
+                      (card) => get.owner(card) === owner,
+                    )
                     event.cards.removeArray(onLoseCards)
                     await owner
                       .lose(onLoseCards, "visible", ui.ordering)
@@ -11930,11 +12605,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                   }
                 }
                 if (cards_noowner.length) {
-                  await game.cardsGotoOrdering(cards_noowner).set("relatedEvent", event.getParent())
+                  await game
+                    .cardsGotoOrdering(cards_noowner)
+                    .set("relatedEvent", event.getParent())
                 }
               })
           } else {
-            await ownerx.lose(ownerCards, "visible", ui.ordering).set("type", "use")
+            await ownerx
+              .lose(ownerCards, "visible", ui.ordering)
+              .set("type", "use")
           }
         }
         if (directDiscard.length) {
@@ -11982,7 +12661,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     const next1 = player.lose(cards, ui.ordering)
     next1.getlx = false
     next1.relatedEvent = event.getParent()
-    if (player == game.me) {
+    if (player === game.me) {
       delayed = true
     } else {
       next1.delay = false
@@ -11994,7 +12673,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     const next2 = target.lose(cards, ui.ordering)
     next2.getlx = false
     next2.relatedEvent = event.getParent()
-    if (target == game.me) {
+    if (target === game.me) {
       delayed = true
     } else {
       next2.delay = false
@@ -12035,26 +12714,30 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   gain: [
     async (event, trigger, player) => {
       const { cards } = event
-      if (event.animate == "give" || event.animate == "gain2" || event.animate == "draw2") {
+      if (
+        event.animate === "give" ||
+        event.animate === "gain2" ||
+        event.animate === "draw2"
+      ) {
         event.visible = true
       }
-      if (get.itemtype(cards) == "cards") {
+      if (get.itemtype(cards) === "cards") {
         const map = {}
         for (const i of cards) {
           const owner = get.owner(i, "judge")
-          if (owner && (owner != player || get.position(i) != "h")) {
+          if (owner && (owner !== player || get.position(i) !== "h")) {
             const id = owner.playerid
             if (!map[id]) {
               map[id] = [[], [], []]
             }
             map[id][0].push(i)
             const position = get.position(i)
-            if (position == "h") {
+            if (position === "h") {
               map[id][1].push(i)
             } else {
               map[id][2].push(i)
             }
-          } else if (!event.updatePile && get.position(i) == "c") {
+          } else if (!event.updatePile && get.position(i) === "c") {
             event.updatePile = true
           }
           if (event.visible) {
@@ -12069,7 +12752,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             .set("type", "gain")
             .set("forceDie", true)
             .set("getlx", false)
-          if (event.visible == true) {
+          if (event.visible === true) {
             next.visible = true
           }
           event.relatedLose = next
@@ -12082,7 +12765,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       let { cards } = event
-      event.cards = cards = cards.map((i) => (i.cards ? i.cards : [i])).flat()
+      event.cards = cards = cards.flatMap((i) => (i.cards ? i.cards : [i]))
       for (let i = 0; i < cards.length; i++) {
         if (cards[i].willBeDestroyed("handcard", player, event)) {
           cards[i].selfDestroy(event)
@@ -12090,7 +12773,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         } else if (event.losing_map) {
           for (const id in event.losing_map) {
             if (event.losing_map[id][0].includes(cards[i])) {
-              const source = (_status.connectMode ? lib.playerOL : game.playerMap)[id]
+              const source = (
+                _status.connectMode ? lib.playerOL : game.playerMap
+              )[id]
               const hs = source.getCards("hejsx")
               if (hs.includes(cards[i])) {
                 cards.splice(i--, 1)
@@ -12101,7 +12786,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
         }
       }
-      if (cards.length == 0) {
+      if (cards.length === 0) {
         event.finish()
         return
       }
@@ -12110,7 +12795,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const { cards } = event
-      if (player.getStat().gain == undefined) {
+      if (player.getStat().gain === undefined) {
         player.getStat().gain = cards.length
       } else {
         player.getStat().gain += cards.length
@@ -12119,7 +12804,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const { cards } = event
       for (const [key, value] of lib.commonArea) {
-        const list = (_status[value.areaStatusName] || []).filter((card) => cards.includes(card))
+        const list = (_status[value.areaStatusName] || []).filter((card) =>
+          cards.includes(card),
+        )
         if (event[value.fromName] || list.length) {
           const next = game.createEvent(`from_${value.fromName}`)
           next.setContent(value.removeHandeler)
@@ -12160,11 +12847,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
         // cards[num].vanishtag.length=0;
         for (let num2 = 0; num2 < card.vanishtag.length; num2++) {
-          if (card.vanishtag[num2][0] != "_") {
+          if (card.vanishtag[num2][0] !== "_") {
             card.vanishtag.splice(num2--, 1)
           }
         }
-        if (player == game.me) {
+        if (player === game.me) {
           card.classList.add("drawinghidden")
         }
         if (get.is.singleHandcard() || sort > 1) {
@@ -12174,7 +12861,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }
       }
       const addv = () => {
-        if (player == game.me) {
+        if (player === game.me) {
           game.addVideo("gain12", player, [
             get.cardsInfo(frag1.childNodes),
             get.cardsInfo(frag2.childNodes),
@@ -12194,16 +12881,22 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           event.gaintag,
         )
       }
-      if (event.animate == "draw") {
+      if (event.animate === "draw") {
         player.$draw(cards.length)
         game.pause()
         setTimeout(
           () => {
             addv()
-            player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild)
-            player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild)
+            player.node.handcards1.insertBefore(
+              frag1,
+              player.node.handcards1.firstChild,
+            )
+            player.node.handcards2.insertBefore(
+              frag2,
+              player.node.handcards2.firstChild,
+            )
             player.update()
-            if (player == game.me) {
+            if (player === game.me) {
               ui.updatehl()
             }
             broadcast()
@@ -12211,16 +12904,22 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           },
           get.delayx(500, 500),
         )
-      } else if (event.animate == "gain") {
+      } else if (event.animate === "gain") {
         player.$gain(cards, event.log)
         game.pause()
         setTimeout(
           () => {
             addv()
-            player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild)
-            player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild)
+            player.node.handcards1.insertBefore(
+              frag1,
+              player.node.handcards1.firstChild,
+            )
+            player.node.handcards2.insertBefore(
+              frag2,
+              player.node.handcards2.firstChild,
+            )
             player.update()
-            if (player == game.me) {
+            if (player === game.me) {
               ui.updatehl()
             }
             broadcast()
@@ -12228,19 +12927,25 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           },
           get.delayx(700, 700),
         )
-      } else if (event.animate == "gain2" || event.animate == "draw2") {
+      } else if (event.animate === "gain2" || event.animate === "draw2") {
         let gain2t = 300
-        if (player.$gain2(cards, event.log) && player == game.me) {
+        if (player.$gain2(cards, event.log) && player === game.me) {
           gain2t = 500
         }
         game.pause()
         setTimeout(
           () => {
             addv()
-            player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild)
-            player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild)
+            player.node.handcards1.insertBefore(
+              frag1,
+              player.node.handcards1.firstChild,
+            )
+            player.node.handcards2.insertBefore(
+              frag2,
+              player.node.handcards2.firstChild,
+            )
             player.update()
-            if (player == game.me) {
+            if (player === game.me) {
               ui.updatehl()
             }
             broadcast()
@@ -12248,16 +12953,20 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           },
           get.delayx(gain2t, gain2t),
         )
-      } else if (event.animate == "give" || event.animate == "giveAuto") {
+      } else if (event.animate === "give" || event.animate === "giveAuto") {
         const evtmap = event.losing_map
-        if (event.animate == "give") {
+        if (event.animate === "give") {
           for (const i in evtmap) {
-            const source = (_status.connectMode ? lib.playerOL : game.playerMap)[i]
+            const source = (
+              _status.connectMode ? lib.playerOL : game.playerMap
+            )[i]
             source.$give(evtmap[i][0], player, event.log)
           }
         } else {
           for (const i in evtmap) {
-            const source = (_status.connectMode ? lib.playerOL : game.playerMap)[i]
+            const source = (
+              _status.connectMode ? lib.playerOL : game.playerMap
+            )[i]
             if (evtmap[i][1].length) {
               source.$giveAuto(evtmap[i][1], player, event.log)
             }
@@ -12270,10 +12979,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         setTimeout(
           () => {
             addv()
-            player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild)
-            player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild)
+            player.node.handcards1.insertBefore(
+              frag1,
+              player.node.handcards1.firstChild,
+            )
+            player.node.handcards2.insertBefore(
+              frag2,
+              player.node.handcards2.firstChild,
+            )
             player.update()
-            if (player == game.me) {
+            if (player === game.me) {
               ui.updatehl()
             }
             broadcast()
@@ -12281,16 +12996,22 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           },
           get.delayx(500, 500),
         )
-      } else if (typeof event.animate == "function") {
+      } else if (typeof event.animate === "function") {
         const time = event.animate(event)
         game.pause()
         setTimeout(
           () => {
             addv()
-            player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild)
-            player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild)
+            player.node.handcards1.insertBefore(
+              frag1,
+              player.node.handcards1.firstChild,
+            )
+            player.node.handcards2.insertBefore(
+              frag2,
+              player.node.handcards2.firstChild,
+            )
             player.update()
-            if (player == game.me) {
+            if (player === game.me) {
               ui.updatehl()
             }
             broadcast()
@@ -12300,10 +13021,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         )
       } else {
         addv()
-        player.node.handcards1.insertBefore(frag1, player.node.handcards1.firstChild)
-        player.node.handcards2.insertBefore(frag2, player.node.handcards2.firstChild)
+        player.node.handcards1.insertBefore(
+          frag1,
+          player.node.handcards1.firstChild,
+        )
+        player.node.handcards2.insertBefore(
+          frag2,
+          player.node.handcards2.firstChild,
+        )
         player.update()
-        if (player == game.me) {
+        if (player === game.me) {
           ui.updatehl()
         }
         broadcast()
@@ -12320,26 +13047,26 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   addToExpansion: [
     async (event, trigger, player) => {
       const { cards } = event
-      if (event.animate == "give") {
+      if (event.animate === "give") {
         event.visible = true
       }
-      if (get.itemtype(cards) == "cards") {
+      if (get.itemtype(cards) === "cards") {
         const map = {}
         for (const i of cards) {
           const owner = get.owner(i, "judge")
-          if (owner && (owner != player || get.position(i) != "x")) {
+          if (owner && (owner !== player || get.position(i) !== "x")) {
             const id = owner.playerid
             if (!map[id]) {
               map[id] = [[], [], []]
             }
             map[id][0].push(i)
             const position = get.position(i)
-            if (position == "h") {
+            if (position === "h") {
               map[id][1].push(i)
             } else {
               map[id][2].push(i)
             }
-          } else if (!event.updatePile && get.position(i) == "c") {
+          } else if (!event.updatePile && get.position(i) === "c") {
             event.updatePile = true
           }
           if (event.visible) {
@@ -12354,7 +13081,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             .set("type", "loseToExpansion")
             .set("forceDie", true)
             .set("getlx", false)
-          if (event.visible == true) {
+          if (event.visible === true) {
             next.visible = true
           }
           event.relatedLose = next
@@ -12366,7 +13093,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       let { cards } = event
       const { source } = event
-      event.cards = cards = cards.map((i) => (i.cards ? i.cards : [i])).flat()
+      event.cards = cards = cards.flatMap((i) => (i.cards ? i.cards : [i]))
       for (let i = 0; i < cards.length; i++) {
         if (cards[i].willBeDestroyed("expansion", player, event)) {
           cards[i].selfDestroy(event)
@@ -12374,7 +13101,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         } else if (event.losing_map) {
           for (const id in event.losing_map) {
             if (event.losing_map[id][0].includes(cards[i])) {
-              const source = (_status.connectMode ? lib.playerOL : game.playerMap)[id]
+              const source = (
+                _status.connectMode ? lib.playerOL : game.playerMap
+              )[id]
               const hs = source.getCards("hejsx")
               if (hs.includes(cards[i])) {
                 cards.splice(i--, 1)
@@ -12385,7 +13114,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
         }
       }
-      if (cards.length == 0) {
+      if (cards.length === 0) {
         event.finish()
         return
       }
@@ -12393,7 +13122,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const { cards } = event
       for (const [key, value] of lib.commonArea) {
-        const list = (_status[value.areaStatusName] || []).filter((card) => cards.includes(card))
+        const list = (_status[value.areaStatusName] || []).filter((card) =>
+          cards.includes(card),
+        )
         if (event[value.fromName] || list.length) {
           const next = game.createEvent(`from_${value.fromName}`)
           next.setContent(value.removeHandeler)
@@ -12420,15 +13151,20 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           _status.discarded.remove(card)
         }
         for (let num2 = 0; num2 < card.vanishtag.length; num2++) {
-          if (card.vanishtag[num2][0] != "_") {
+          if (card.vanishtag[num2][0] !== "_") {
             card.vanishtag.splice(num2--, 1)
           }
         }
       }
-      if (event.animate == "draw") {
+      if (event.animate === "draw") {
         player.$draw(cards.length)
         if (event.log) {
-          game.log(player, "将", get.cnNumber(cards.length), "张牌置于了武将牌上")
+          game.log(
+            player,
+            "将",
+            get.cnNumber(cards.length),
+            "张牌置于了武将牌上",
+          )
         }
         game.pause()
         setTimeout(
@@ -12441,7 +13177,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           },
           get.delayx(500, 500),
         )
-      } else if (event.animate == "gain") {
+      } else if (event.animate === "gain") {
         player.$gain(cards, false)
         game.pause()
         setTimeout(
@@ -12454,9 +13190,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           },
           get.delayx(700, 700),
         )
-      } else if (event.animate == "gain2" || event.animate == "draw2") {
+      } else if (event.animate === "gain2" || event.animate === "draw2") {
         let gain2t = 300
-        if (player.$gain2(cards) && player == game.me) {
+        if (player.$gain2(cards) && player === game.me) {
           gain2t = 500
         }
         game.pause()
@@ -12470,11 +13206,13 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           },
           get.delayx(gain2t, gain2t),
         )
-      } else if (event.animate == "give" || event.animate == "giveAuto") {
+      } else if (event.animate === "give" || event.animate === "giveAuto") {
         const evtmap = event.losing_map
-        if (event.animate == "give") {
+        if (event.animate === "give") {
           for (const i in evtmap) {
-            const source = (_status.connectMode ? lib.playerOL : game.playerMap)[i]
+            const source = (
+              _status.connectMode ? lib.playerOL : game.playerMap
+            )[i]
             source.$give(evtmap[i][0], player, false)
             if (event.log) {
               game.log(player, "将", evtmap[i][0], "置于了武将牌上")
@@ -12482,11 +13220,18 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
         } else {
           for (const i in evtmap) {
-            const source = (_status.connectMode ? lib.playerOL : game.playerMap)[i]
+            const source = (
+              _status.connectMode ? lib.playerOL : game.playerMap
+            )[i]
             if (evtmap[i][1].length) {
               source.$giveAuto(evtmap[i][1], player, false)
               if (event.log) {
-                game.log(player, "将", get.cnNumber(evtmap[i][1].length), "张牌置于了武将牌上")
+                game.log(
+                  player,
+                  "将",
+                  get.cnNumber(evtmap[i][1].length),
+                  "张牌置于了武将牌上",
+                )
               }
             }
             if (evtmap[i][2].length) {
@@ -12508,7 +13253,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           },
           get.delayx(500, 500),
         )
-      } else if (typeof event.animate == "function") {
+      } else if (typeof event.animate === "function") {
         const time = event.animate(event)
         game.pause()
         setTimeout(
@@ -12541,8 +13286,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const { cards } = event
       const evt = event.getParent()
       if (
-        (evt.name != "discard" || event.type != "discard") &&
-        (evt.name != "loseToDiscardpile" || event.type != "loseToDiscardpile")
+        (evt.name !== "discard" || event.type !== "discard") &&
+        (evt.name !== "loseToDiscardpile" || event.type !== "loseToDiscardpile")
       ) {
         event.delay = false
         return
@@ -12550,14 +13295,13 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (evt.delay === false) {
         event.delay = false
       }
-      if (evt.animate != false) {
+      if (evt.animate !== false) {
         evt.discardid = lib.status.videoId++
         game.broadcastAll(
           (player, cards, id, visible) => {
             const cardx = cards
               .slice()
-              .map((i) => (i.cards ? i.cards : [i]))
-              .flat()
+              .flatMap((i) => (i.cards ? i.cards : [i]))
             player.$throw(cardx, null, "nobroadcast")
             const cardnodes = []
             cardnodes._discardtime = get.time()
@@ -12577,12 +13321,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           evt.discardid,
           event.visible,
         )
-        if (lib.config.sync_speed && cards[0] && cards[0].clone) {
-          if (evt.delay != false) {
+        if (lib.config.sync_speed && cards[0]?.clone) {
+          if (evt.delay !== false) {
             const waitingForTransition = get.time()
             evt.waitingForTransition = waitingForTransition
             cards[0].clone.listenTransition(() => {
-              if (_status.waitingForTransition == waitingForTransition && _status.paused) {
+              if (
+                _status.waitingForTransition === waitingForTransition &&
+                _status.paused
+              ) {
                 game.resume()
               }
               delete evt.waitingForTransition
@@ -12592,7 +13339,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             const waitingForTransition = get.time()
             evt.getParent().waitingForTransition = waitingForTransition
             cards[0].clone.listenTransition(() => {
-              if (_status.waitingForTransition == waitingForTransition && _status.paused) {
+              if (
+                _status.waitingForTransition === waitingForTransition &&
+                _status.paused
+              ) {
                 game.resume()
               }
               delete evt.getParent().waitingForTransition
@@ -12618,7 +13368,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const ss = []
       const xs = []
       const unmarks = []
-      if (event.insert_card && event.position == ui.cardPile) {
+      if (event.insert_card && event.position === ui.cardPile) {
         event.cards.reverse()
       }
       const hej = player.getCards("hejsx")
@@ -12628,7 +13378,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (!hej.includes(cards[i])) {
           cards.splice(i--, 1)
           continue
-        } else if (cards[i].parentNode) {
+        }
+        if (cards[i].parentNode) {
           if (cards[i].parentNode.classList.contains("equips")) {
             cards[i].original = "e"
             const VEquip = cards[i][cards[i].cardSymbol]
@@ -12643,11 +13394,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                   cardi.original = "e"
                   delete cardi.destiny
                   es.push(cardi)
-                  event.vcard_map.set(cardi, VEquip || get.autoViewAs(cards[i], void 0, false))
+                  event.vcard_map.set(
+                    cardi,
+                    VEquip || get.autoViewAs(cards[i], void 0, false),
+                  )
                 })
               } else {
                 es.push(cards[i])
-                event.vcard_map.set(cards[i], VEquip || get.autoViewAs(cards[i], void 0, false))
+                event.vcard_map.set(
+                  cards[i],
+                  VEquip || get.autoViewAs(cards[i], void 0, false),
+                )
                 event.vcard_cards.add(cards[i])
               }
               event.vcards.cards.push(cards[i])
@@ -12667,11 +13424,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
                   cardi.original = "j"
                   delete cardi.destiny
                   js.push(cardi)
-                  event.vcard_map.set(cardi, VJudge || get.autoViewAs(cards[i], void 0, false))
+                  event.vcard_map.set(
+                    cardi,
+                    VJudge || get.autoViewAs(cards[i], void 0, false),
+                  )
                 })
               } else {
                 js.push(cards[i])
-                event.vcard_map.set(cards[i], VJudge || get.autoViewAs(cards[i], void 0, false))
+                event.vcard_map.set(
+                  cards[i],
+                  VJudge || get.autoViewAs(cards[i], void 0, false),
+                )
                 event.vcard_cards.add(cards[i])
               }
               event.vcards.cards.push(cards[i])
@@ -12680,29 +13443,40 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           } else if (cards[i].parentNode.classList.contains("expansions")) {
             cards[i].original = "x"
             xs.push(cards[i])
-            event.vcard_map.set(cards[i], get.autoViewAs(cards[i], void 0, false))
-            if (cards[i].gaintag && cards[i].gaintag.length) {
+            event.vcard_map.set(
+              cards[i],
+              get.autoViewAs(cards[i], void 0, false),
+            )
+            if (cards[i].gaintag?.length) {
               unmarks.addArray(cards[i].gaintag)
             }
           } else if (cards[i].parentNode.classList.contains("handcards")) {
             if (cards[i].classList.contains("glows")) {
               cards[i].original = "s"
               ss.push(cards[i])
-              event.vcard_map.set(cards[i], get.autoViewAs(cards[i], void 0, false))
+              event.vcard_map.set(
+                cards[i],
+                get.autoViewAs(cards[i], void 0, false),
+              )
             } else {
               cards[i].original = "h"
               hs.push(cards[i])
-              event.vcard_map.set(cards[i], get.autoViewAs(cards[i], void 0, player))
+              event.vcard_map.set(
+                cards[i],
+                get.autoViewAs(cards[i], void 0, player),
+              )
             }
           } else {
             cards[i].original = null
           }
         }
         for (const card of cardx) {
-          if (card.gaintag && card.gaintag.length) {
+          if (card.gaintag?.length) {
             event.gaintag_map[card.cardid] = card.gaintag.slice(0)
             //仅移除非永久标记
-            const tags = card.gaintag.filter((tag) => !tag.startsWith("eternal_"))
+            const tags = card.gaintag.filter(
+              (tag) => !tag.startsWith("eternal_"),
+            )
             tags.forEach((tag) => card.removeGaintag(tag))
           }
 
@@ -12718,7 +13492,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               card.destroyed = card._destroy
               continue
             }
-          } else if (event.position && card.willBeDestroyed(event.position.id, null, event)) {
+          } else if (
+            event.position &&
+            card.willBeDestroyed(event.position.id, null, event)
+          ) {
             card.selfDestroy(event)
             continue
           } else if (info.destroy) {
@@ -12731,7 +13508,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
 					}*/
           if (event.position) {
             if (_status.discarded) {
-              if (event.position == ui.discardPile) {
+              if (event.position === ui.discardPile) {
                 _status.discarded.add(card)
               } else {
                 _status.discarded.remove(card)
@@ -12743,7 +13520,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             } else if (event.insert_card) {
               card.fix()
               event.position.insertBefore(card, event.position.firstChild)
-            } else if (event.position == ui.cardPile) {
+            } else if (event.position === ui.cardPile) {
               card.fix()
               event.position.appendChild(card)
             } else {
@@ -12755,7 +13532,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           //if(ss.includes(cardx[j])) cards.splice(i--,1);
         }
       }
-      if (player == game.me) {
+      if (player === game.me) {
         ui.updatehl()
       }
       ui.updatej(player)
@@ -12764,14 +13541,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           for (const card of cards) {
             //cards[i].removeGaintag(true);
             //仅移除非永久标记
-            const tags = card.gaintag.filter((tag) => !tag.startsWith("eternal_"))
+            const tags = card.gaintag.filter(
+              (tag) => !tag.startsWith("eternal_"),
+            )
             tags.forEach((tag) => card.removeGaintag(tag))
             card.classList.remove("glow")
             card.classList.remove("glows")
             card.fix()
             card.remove()
           }
-          if (player == game.me) {
+          if (player === game.me) {
             ui.updatehl()
           }
           ui.updatej(player)
@@ -12795,7 +13574,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       player.update()
       game.addVideo("loseAfter", player)
       event.num = 0
-      if (event.position == ui.ordering) {
+      if (event.position === ui.ordering) {
         const evt = event.relatedEvent || event.getParent()
         if (!evt.orderingCards) {
           evt.orderingCards = []
@@ -12811,13 +13590,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (!evt.noOrdering) {
           evt.orderingCards.addArray(cards)
         }
-      } else if (event.position == ui.cardPile) {
+      } else if (event.position === ui.cardPile) {
         game.updateRoundNumber()
       }
       if (unmarks.length) {
         for (const i of unmarks) {
           player[
-            (lib.skill[i] && lib.skill[i].mark) || player.hasCard((card) => card.hasGaintag(i), "x")
+            lib.skill[i]?.mark ||
+            player.hasCard((card) => card.hasGaintag(i), "x")
               ? "markSkill"
               : "unmarkSkill"
           ](i)
@@ -12840,19 +13620,24 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (num < event.vcards.cards.length) {
         if (event.vcards.es.includes(event.vcards.cards[num])) {
           event.loseEquip = true
-          const VEquip = event.vcards.cards[num][event.vcards.cards[num].cardSymbol]
+          const VEquip =
+            event.vcards.cards[num][event.vcards.cards[num].cardSymbol]
           if (VEquip) {
             player.removeVirtualEquip(VEquip)
             //player.removeEquipTrigger(cards[num]);
             const info = get.info(VEquip, false)
-            if (info.onLose && (!info.filterLose || info.filterLose(VEquip, player))) {
+            if (
+              info.onLose &&
+              (!info.filterLose || info.filterLose(VEquip, player))
+            ) {
               event.goto(3)
               event.currentVEquip = VEquip
               return
             }
           }
         } else if (event.vcards.js.includes(event.vcards.cards[num])) {
-          const VJudge = event.vcards.cards[num][event.vcards.cards[num].cardSymbol]
+          const VJudge =
+            event.vcards.cards[num][event.vcards.cards[num].cardSymbol]
           if (VJudge) {
             player.removeVirtualJudge(VJudge)
           }
@@ -12869,7 +13654,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const VEquip = event.currentVEquip
       const info = get.info(VEquip, false)
-      if (info.loseDelay != false && (player.isAlive() || info.forceDie)) {
+      if (info.loseDelay !== false && (player.isAlive() || info.forceDie)) {
         player.popup(VEquip.name)
         game.delayx()
       }
@@ -12899,7 +13684,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const { cards } = event
-      event.cards = cards.map((i) => (i.cards ? i.cards : [i])).flat()
+      event.cards = cards.flatMap((i) => (i.cards ? i.cards : [i]))
       for (const [key, value] of lib.commonArea) {
         if (event[value.toName]) {
           const next = game.createEvent(`lose_${value.toName}`)
@@ -12915,17 +13700,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     async (event, trigger, player) => {
       const evt = event.getParent()
       if (
-        evt.name != "discard" &&
-        event.type != "discard" &&
-        evt.name != "loseToDiscardpile" &&
-        event.type != "loseToDiscardpile"
+        evt.name !== "discard" &&
+        event.type !== "discard" &&
+        evt.name !== "loseToDiscardpile" &&
+        event.type !== "loseToDiscardpile"
       ) {
         return
       }
       if (event.animate === false || event.delay === false) {
         return
       }
-      if (evt.delay != false) {
+      if (evt.delay !== false) {
         if (evt.waitingForTransition) {
           _status.waitingForTransition = evt.waitingForTransition
           game.pause()
@@ -12960,11 +13745,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     },
     async (event, trigger, player) => {
       const { num, source } = event
-      if (player.hujia > 0 && !player.hasSkillTag("nohujia") && !event.nohujia) {
+      if (
+        player.hujia > 0 &&
+        !player.hasSkillTag("nohujia") &&
+        !event.nohujia
+      ) {
         let damageAudioInfo = lib.natureAudio.hujia_damage[event.nature]
-        if (!damageAudioInfo || damageAudioInfo == "normal") {
+        if (!damageAudioInfo || damageAudioInfo === "normal") {
           damageAudioInfo = `effect/hujia_damage${num > 1 ? "2" : ""}.mp3`
-        } else if (damageAudioInfo == "default") {
+        } else if (damageAudioInfo === "default") {
           damageAudioInfo = `effect/hujia_damage_${event.nature}${num > 1 ? "2" : ""}.mp3`
         } else {
           damageAudioInfo = damageAudioInfo[num > 1 ? 2 : 1]
@@ -12976,9 +13765,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         }, damageAudioInfo)
       } else {
         let damageAudioInfo = lib.natureAudio.damage[event.nature]
-        if (!damageAudioInfo || damageAudioInfo == "normal") {
+        if (!damageAudioInfo || damageAudioInfo === "normal") {
           damageAudioInfo = `effect/damage${num > 1 ? "2" : ""}.mp3`
-        } else if (damageAudioInfo == "default") {
+        } else if (damageAudioInfo === "default") {
           damageAudioInfo = `effect/damage_${event.nature}${num > 1 ? "2" : ""}.mp3`
         } else {
           damageAudioInfo = damageAudioInfo[num > 1 ? 2 : 1]
@@ -12991,7 +13780,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       let str = event.unreal ? "视为受到了" : "受到了"
       if (source) {
-        str += `来自<span class="bluetext">${source == player ? "自己" : get.translation(source)}</span>的`
+        str += `来自<span class="bluetext">${source === player ? "自己" : get.translation(source)}</span>的`
       }
       str += `${get.cnNumber(num)}点`
       if (event.nature) {
@@ -12999,14 +13788,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       str += "伤害"
       game.log(player, str)
-      if (player.stat[player.stat.length - 1].damaged == undefined) {
+      if (player.stat[player.stat.length - 1].damaged === undefined) {
         player.stat[player.stat.length - 1].damaged = num
       } else {
         player.stat[player.stat.length - 1].damaged += num
       }
       if (source) {
         source.getHistory("sourceDamage").push(event)
-        if (source.stat[source.stat.length - 1].damage == undefined) {
+        if (source.stat[source.stat.length - 1].damage === undefined) {
           source.stat[source.stat.length - 1].damage = num
         } else {
           source.stat[source.stat.length - 1].damage += num
@@ -13037,14 +13826,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           natures,
           player,
         )
-        const numx = player.hasSkillTag("nohujia") ? num : Math.max(0, num - player.hujia)
+        const numx = player.hasSkillTag("nohujia")
+          ? num
+          : Math.max(0, num - player.hujia)
         player.$damagepop(-numx, natures[0])
       }
       if (event.unreal) {
         event.goto(6)
       }
       if (!event.notrigger) {
-        if (num == 0) {
+        if (num === 0) {
           await event.trigger("damageZero")
           event._triggered = null
         } else {
@@ -13060,21 +13851,21 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event._dyinged = true
         next = player.dying(event)
       }
-      if (source && lib.config.border_style == "auto") {
+      if (source && lib.config.border_style === "auto") {
         let dnum = 0
         for (const stat of source.stat) {
-          if (stat.damage != undefined) {
+          if (stat.damage !== undefined) {
             dnum += stat.damage
           }
         }
         if (dnum >= 2) {
-          if (lib.config.autoborder_start == "silver") {
+          if (lib.config.autoborder_start === "silver") {
             dnum += 4
-          } else if (lib.config.autoborder_start == "gold") {
+          } else if (lib.config.autoborder_start === "gold") {
             dnum += 8
           }
         }
-        if (lib.config.autoborder_count == "damage") {
+        if (lib.config.autoborder_count === "damage") {
           source.node.framebg.dataset.decoration = ""
           if (dnum >= 10) {
             source.node.framebg.dataset.auto = "gold"
@@ -13095,7 +13886,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           if (dnum >= 2) {
             source.classList.add("topcount")
           }
-        } else if (lib.config.autoborder_count == "mix") {
+        } else if (lib.config.autoborder_count === "mix") {
           source.node.framebg.dataset.decoration = ""
           switch (source.node.framebg.dataset.auto) {
             case "bronze":
@@ -13199,7 +13990,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     event.originalHp = player.getHp()
     event.originalMaxHp = player.maxHp
     player.maxHp -= num
-    if (isNaN(player.maxHp)) {
+    if (Number.isNaN(player.maxHp)) {
       player.maxHp = 0
     }
     event.changedMaxHp = player.maxHp - event.originalMaxHp
@@ -13232,7 +14023,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     if (
       num < 0 &&
       player.hujia > 0 &&
-      event.getParent().name == "damage" &&
+      event.getParent().name === "damage" &&
       !player.hasSkillTag("nohujia") &&
       !event.getParent().nohujia
     ) {
@@ -13247,7 +14038,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     // 体力的变化值
     num = event.num
     player.hp += num
-    if (isNaN(player.hp)) {
+    if (Number.isNaN(player.hp)) {
       player.hp = 0
     }
     if (player.hp > player.maxHp) {
@@ -13267,11 +14058,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         _status.dying = list
       }, _status.dying)
       let evt = event.getParent("_save")
-      if (evt && evt.finish) {
+      if (evt?.finish) {
         evt.finish()
       }
       evt = event.getParent("dying")
-      if (evt && evt.finish) {
+      if (evt?.finish) {
         evt.finish()
       }
     }
@@ -13327,10 +14118,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         event.finish()
       } else if (!event.skipTao) {
         let start = false
-        const starts = [_status.currentPhase, event.source, event.player, game.me, game.players[0]]
+        const starts = [
+          _status.currentPhase,
+          event.source,
+          event.player,
+          game.me,
+          game.players[0],
+        ]
         for (const current of starts) {
           if (
-            get.itemtype(current) == "player" &&
+            get.itemtype(current) === "player" &&
             game.players.concat(game.dead).includes(current)
           ) {
             start = game.players
@@ -13368,10 +14165,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       const { reason, source } = event
       event.forceDie = true
       //只有真正死亡才会影响每轮起始的角色（注意：不是每个模式都有这个属性，只有个别几个模式有，身份22斗地主都是判断的onround来决定是否进入下一轮）
-      if (_status.roundStart == player && !event.reserveOut) {
+      if (_status.roundStart === player && !event.reserveOut) {
         _status.roundStart = player.next || player.getNext() || game.players[0]
       }
-      if (ui.land && ui.land.player == player) {
+      if (ui.land && ui.land.player === player) {
         game.addVideo("destroyLand")
         ui.land.destroy()
       }
@@ -13389,7 +14186,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       if (source) {
         game.log(player, "被", source, "杀害")
-        if (source.stat[source.stat.length - 1].kill == undefined) {
+        if (source.stat[source.stat.length - 1].kill === undefined) {
           source.stat[source.stat.length - 1].kill = 1
         } else {
           source.stat[source.stat.length - 1].kill++
@@ -13438,7 +14235,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       /*if (event.reserveOut && !game.countPlayer()) {
 				game.over();
 			} else */
-      if (player.hp != 0) {
+      if (player.hp !== 0) {
         await player.changeHp(0 - player.hp, false).set("forceDie", true)
       }
     },
@@ -13468,7 +14265,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
           let count = 1
           const list = Array.from(player.node.marks.childNodes)
-          count += exclude.filter((name) => list.some((i) => i.name == name)).length
+          count += exclude.filter((name) =>
+            list.some((i) => i.name === name),
+          ).length
           const func = (player, count, exclude) => {
             while (player.node.marks.childNodes.length > count) {
               let node = player.node.marks.lastChild
@@ -13544,15 +14343,30 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       if (!event.reserveOut) {
         //真正的死亡才会显示再战那些按钮，以及隐藏一些按钮什么的
         game.broadcastAll((player) => {
-          if (game.online && player == game.me && !_status.over && !game.controlOver && !ui.exit) {
+          if (
+            game.online &&
+            player === game.me &&
+            !_status.over &&
+            !game.controlOver &&
+            !ui.exit
+          ) {
             if (lib.mode[lib.configOL.mode].config.dierestart) {
               ui.create.exit()
             }
           }
         }, player)
-        if (!_status.connectMode && player == game.me && !_status.over && !game.controlOver) {
+        if (
+          !_status.connectMode &&
+          player === game.me &&
+          !_status.over &&
+          !game.controlOver
+        ) {
           ui.control.show()
-          if (get.config("revive") && lib.mode[lib.config.mode].config.revive && !ui.revive) {
+          if (
+            get.config("revive") &&
+            lib.mode[lib.config.mode].config.revive &&
+            !ui.revive
+          ) {
             ui.revive = ui.create.control("revive", ui.click.dierevive)
           }
           if (
@@ -13573,7 +14387,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
         }
 
-        if (!_status.connectMode && player == game.me && !game.modeSwapPlayer) {
+        if (
+          !_status.connectMode &&
+          player === game.me &&
+          !game.modeSwapPlayer
+        ) {
           // _status.auto=false;
           if (ui.auto) {
             // ui.auto.classList.remove('glow');
@@ -13584,16 +14402,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
         }
 
-        if (typeof _status.coin == "number" && source && !_status.auto) {
-          if (source == game.me || source.isUnderControl()) {
+        if (typeof _status.coin === "number" && source && !_status.auto) {
+          if (source === game.me || source.isUnderControl()) {
             _status.coin += 10
           }
         }
       }
       if (
         source &&
-        lib.config.border_style == "auto" &&
-        (lib.config.autoborder_count == "kill" || lib.config.autoborder_count == "mix")
+        lib.config.border_style === "auto" &&
+        (lib.config.autoborder_count === "kill" ||
+          lib.config.autoborder_count === "mix")
       ) {
         switch (source.node.framebg.dataset.auto) {
           case "gold":
@@ -13604,14 +14423,16 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             source.node.framebg.dataset.auto = "silver"
             break
           default:
-            source.node.framebg.dataset.auto = lib.config.autoborder_start || "bronze"
+            source.node.framebg.dataset.auto =
+              lib.config.autoborder_start || "bronze"
         }
-        if (lib.config.autoborder_count == "kill") {
-          source.node.framebg.dataset.decoration = source.node.framebg.dataset.auto
+        if (lib.config.autoborder_count === "kill") {
+          source.node.framebg.dataset.decoration =
+            source.node.framebg.dataset.auto
         } else {
           let dnum = 0
           for (const stat of source.stat) {
-            if (stat.damage != undefined) {
+            if (stat.damage !== undefined) {
               dnum += stat.damage
             }
           }
@@ -13744,7 +14565,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         player.next = playerx
         game.players.add(player)
         game.dead.remove(player)
-        if (player == game.me) {
+        if (player === game.me) {
           if (ui.auto) {
             ui.auto.show()
           }
@@ -13786,7 +14607,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
   async addJudge(event, trigger, player) {
     let card
     let cardName
-    if (typeof event.card == "string") {
+    if (typeof event.card === "string") {
       cardName = event.card
       card = get.autoViewAs({ name: cardName }, event.cards)
       event.card = card
@@ -13833,12 +14654,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }
           map[id][0].push(i)
           const position = get.position(i)
-          if (position == "h") {
+          if (position === "h") {
             map[id][1].push(i)
           } else {
             map[id][2].push(i)
           }
-        } else if (!event.updatePile && get.position(i) == "c") {
+        } else if (!event.updatePile && get.position(i) === "c") {
           event.updatePile = true
         }
         if (event.visible) {
@@ -13853,7 +14674,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           .set("type", "addJudge")
           .set("forceDie", true)
           .set("getlx", false)
-        if (event.visible == true) {
+        if (event.visible === true) {
           // @ts-expect-error ignore
           next.visible = true
         }
@@ -13862,7 +14683,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }
       let stop = false
       const list = []
-      for (const cardx of loseCards) {
+      for (const cardx of event.cards) {
         if (cardx.willBeDestroyed("judge", player, event)) {
           cardx.selfDestroy(event)
           stop = true
@@ -13890,8 +14711,8 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         const cardsCloned = cards.filter(
           (card) =>
             cards[0].clone &&
-            (cards[0].clone.parentNode == player.parentNode ||
-              cards[0].clone.parentNode == ui.arena),
+            (cards[0].clone.parentNode === player.parentNode ||
+              cards[0].clone.parentNode === ui.arena),
         )
         if (cardsCloned.length) {
           cardsCloned.forEach((card) => {
@@ -13905,10 +14726,14 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       loseCards,
     )
     player.addVirtualJudge(event.card, event.cards)
-    const isViewAsCard = cards?.length !== 1 || cards[0].name !== card.name || !card.isCard
+    const isViewAsCard =
+      cards?.length !== 1 || cards[0].name !== card.name || !card.isCard
     if (isViewAsCard && cards?.length) {
       if (cardInfo.blankCard) {
-        game.log(player, `被扣置了<span class="yellowtext">${get.translation(cardName)}</span>`)
+        game.log(
+          player,
+          `被扣置了<span class="yellowtext">${get.translation(cardName)}</span>`,
+        )
       } else {
         game.log(
           player,
@@ -13920,7 +14745,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     } else {
       game.log(player, "被贴上了", card)
     }
-    if (get.itemtype(event.card) == "card") {
+    if (get.itemtype(event.card) === "card") {
       event.card = event.card[event.card.cardSymbol]
     }
   },
@@ -13946,13 +14771,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         waiting = owner.lose(cardj, "visible", ui.ordering)
       } else {
         const nextj = game.cardsGotoOrdering(cardj)
-        if (event.position != ui.discardPile) {
+        if (event.position !== ui.discardPile) {
           nextj.noOrdering = true
         }
         waiting = nextj
       }
       player.judging.unshift(cardj)
-      game.addVideo("judge1", player, [get.cardInfo(player.judging[0]), judgestr, event.videoId])
+      game.addVideo("judge1", player, [
+        get.cardInfo(player.judging[0]),
+        judgestr,
+        event.videoId,
+      ])
       game.broadcastAll(
         (player, card, str, id, cardid) => {
           let event
@@ -13962,7 +14791,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             event = _status.event
           }
           if (game.chess) {
-            event.node = card.copy("thrown", "center", ui.arena).addTempClass("start")
+            event.node = card
+              .copy("thrown", "center", ui.arena)
+              .addTempClass("start")
           } else {
             event.node = player.$throwordered(card.copy(), true)
           }
@@ -13983,7 +14814,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         get.id(),
       )
 
-      game.log(player, `进行${event.judgestr}判定，亮出的判定牌为`, player.judging[0])
+      game.log(
+        player,
+        `进行${event.judgestr}判定，亮出的判定牌为`,
+        player.judging[0],
+      )
       await game.delay(2)
       if (!event.noJudgeTrigger) {
         await event.trigger("judge")
@@ -14016,11 +14851,11 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       game.checkMod(player, event.result, "judge", player)
       if (event.judge2) {
         const judge2 = event.judge2(event.result)
-        if (typeof judge2 == "boolean") {
+        if (typeof judge2 === "boolean") {
           player.tryJudgeAnimate(judge2)
         }
       }
-      if (event.clearArena != false) {
+      if (event.clearArena !== false) {
         game.broadcastAll(ui.clear)
       }
       game.broadcast((id) => {
@@ -14045,7 +14880,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         callback = next
       } else {
         if (!get.owner(event.result.card)) {
-          if (event.position != ui.discardPile) {
+          if (event.position !== ui.discardPile) {
             event.position.appendChild(event.result.card)
           }
         }
@@ -14095,7 +14930,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         let target = _status.currentPhase || player
         const name = _status.event.getTrigger()?.name
         const countWuxie = (current) => {
-          let num = current.getKnownCards(player, (card) => get.name(card, current) === "wuxie")
+          let num = current.getKnownCards(
+            player,
+            (card) => get.name(card, current) === "wuxie",
+          )
           if (num && current !== player) {
             return num
           }
@@ -14106,14 +14944,21 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             if (!ifo) {
               continue
             }
-            if (ifo.viewAs && typeof ifo.viewAs != "function" && ifo.viewAs.name == "wuxie") {
+            if (
+              ifo.viewAs &&
+              typeof ifo.viewAs !== "function" &&
+              ifo.viewAs.name === "wuxie"
+            ) {
               if (!ifo.viewAsFilter || ifo.viewAsFilter(current)) {
                 num++
                 break
               }
             } else {
               const hiddenCard = ifo.hiddenCard
-              if (typeof hiddenCard == "function" && hiddenCard(current, "wuxie")) {
+              if (
+                typeof hiddenCard === "function" &&
+                hiddenCard(current, "wuxie")
+              ) {
                 num++
                 break
               }
@@ -14131,9 +14976,15 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             const judges = target.getCards("j")
             let needs = 0
             let wuxie = countWuxie(target)
-            for (let i = Math.min(cards.length, judges.length) - 1; i >= 0; i--) {
+            for (
+              let i = Math.min(cards.length, judges.length) - 1;
+              i >= 0;
+              i--
+            ) {
               const j = judges[i]
-              const cardj = j.viewAs ? { name: j.viewAs, cards: j.cards || [j] } : j
+              const cardj = j.viewAs
+                ? { name: j.viewAs, cards: j.cards || [j] }
+                : j
               if (wuxie > 0 && get.effect(target, j, target, target) < 0) {
                 wuxie--
                 continue
@@ -14143,19 +14994,20 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
               if (judge(cards[0]) * att < 0) {
                 needs++
                 continue
-              } else {
-                top.unshift(cards.shift())
               }
+              top.unshift(cards.shift())
             }
             if (needs > 0 && needs >= judges.length) {
               return [top, cards]
             }
-            cards.sort((a, b) => (get.value(b, target) - get.value(a, target)) * att)
+            cards.sort(
+              (a, b) => (get.value(b, target) - get.value(a, target)) * att,
+            )
             while (needs--) {
               top.unshift(cards.shift())
             }
             while (cards.length) {
-              if (get.value(cards[0], target) > 6 == att > 0) {
+              if (get.value(cards[0], target) > 6 === att > 0) {
                 top.push(cards.shift())
               } else {
                 break
@@ -14179,19 +15031,25 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     const top = result?.moved?.[0] || []
     const bottom = result?.moved?.[1] || []
     top.reverse()
-    await game.cardsGotoPile(top.concat(bottom), ["top_cards", top], (event, card) => {
-      if (event.top_cards.includes(card)) {
-        return ui.cardPile.firstChild
-      }
-      return null
-    })
+    await game.cardsGotoPile(
+      top.concat(bottom),
+      ["top_cards", top],
+      (event, card) => {
+        if (event.top_cards.includes(card)) {
+          return ui.cardPile.firstChild
+        }
+        return null
+      },
+    )
     game.addCardKnower(top, player)
     game.addCardKnower(bottom, player)
     event.result = {
       bool: true,
       moved: [top, bottom],
     }
-    player.popup(`${get.cnNumber(top.length)}上${get.cnNumber(bottom.length)}下`)
+    player.popup(
+      `${get.cnNumber(top.length)}上${get.cnNumber(bottom.length)}下`,
+    )
     game.log(player, `将${get.cnNumber(top.length)}张牌置于牌堆顶`)
     await game.delayx()
   },
@@ -14259,7 +15117,9 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           }, 0),
         }).map((_, i) => {
           const num = 2 * (i + 1)
-          return Array.from(event.dialog.itemContainers[num].children).map((e) => e.link)
+          return Array.from(event.dialog.itemContainers[num].children).map(
+            (e) => e.link,
+          )
         })
         if (event.filterOk(event.moved)) {
           ui.create.confirm("o")
@@ -14282,10 +15142,12 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
             event.filterMove(event.dialog.selectedCard, card, event.moved)
           ) {
             event.dialog.isBusy = true
-            game.$swapElement(card, event.dialog.selectedCard, animationDuration).then(() => {
-              event.dialog.isBusy = false
-              updateButtons()
-            })
+            game
+              .$swapElement(card, event.dialog.selectedCard, animationDuration)
+              .then(() => {
+                event.dialog.isBusy = false
+                updateButtons()
+              })
           }
           event.dialog.selectedCard.classList.remove("selected")
           event.dialog.selectedCard = null
@@ -14302,11 +15164,17 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
         if (itemContainer.contains(event.dialog.selectedCard)) {
           return
         }
-        const index = Array.from(event.dialog.itemContainers).indexOf(itemContainer) / 2 - 1
+        const index =
+          Array.from(event.dialog.itemContainers).indexOf(itemContainer) / 2 - 1
         if (event.filterMove(event.dialog.selectedCard, index, event.moved)) {
           event.dialog.isBusy = true
           game
-            .$elementGoto(event.dialog.selectedCard, itemContainer, undefined, animationDuration)
+            .$elementGoto(
+              event.dialog.selectedCard,
+              itemContainer,
+              undefined,
+              animationDuration,
+            )
             .then(() => {
               event.dialog.isBusy = false
               updateButtons()
@@ -14326,26 +15194,23 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
           currentList = [currentList]
         }
         event.dialog.addNewRow(
-          ...currentList
-            .slice()
-            .map((listx) => [
-              { item: listx[0], ratio: 1 },
-              listx[1]?.length
-                ? {
-                    item: listx[1],
-                    ratio: 6 / currentList.length,
-                    itemContainerCss,
-                    clickItem,
-                    clickItemContainer,
-                  }
-                : {
-                    item: listx[1],
-                    ratio: 6 / currentList.length,
-                    itemContainerCss,
-                    clickItemContainer,
-                  },
-            ])
-            .flat(),
+          ...currentList.slice().flatMap((listx) => [
+            { item: listx[0], ratio: 1 },
+            listx[1]?.length
+              ? {
+                  item: listx[1],
+                  ratio: 6 / currentList.length,
+                  itemContainerCss,
+                  clickItem,
+                  clickItemContainer,
+                }
+              : {
+                  item: listx[1],
+                  ratio: 6 / currentList.length,
+                  itemContainerCss,
+                  clickItemContainer,
+                },
+          ]),
         )
       }
       event.dialog.open()
@@ -14387,7 +15252,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       }, event.time)
     }
     //结果获取
-    if ((!result || result == "ai" || (event.forced && !result.bool)) && event.processAI) {
+    if (
+      (!result || result === "ai" || (event.forced && !result.bool)) &&
+      event.processAI
+    ) {
       const moved = event.processAI(event.list)
       if (moved) {
         result = {

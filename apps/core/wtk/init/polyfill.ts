@@ -1,4 +1,5 @@
-import { lib, game, get, _status, ui } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
+
 /**
  * 为元素添加右击或长按弹出的提示信息
  * @param {string} title 标题
@@ -28,7 +29,7 @@ HTMLElement.prototype.setNodeIntro = function (title, content) {
  */
 HTMLDivElement.prototype.addTempClass = function (name, time = 1000) {
   // @ts-expect-error ignore
-  let that = get.is.mobileMe(this) && name === "target" ? ui.mebg : this
+  const that = get.is.mobileMe(this) && name === "target" ? ui.mebg : this
   that.classList.add(name)
   setTimeout(() => {
     that.classList.remove(name)
@@ -79,7 +80,7 @@ HTMLDivElement.prototype.delete = function (time = 500, callback) {
     delete this.timeout
   }
   if (!this._listeningEnd || this._transitionEnded) {
-    if (typeof time != "number") {
+    if (typeof time !== "number") {
       time = 500
     }
     this.classList.add("removing")
@@ -87,7 +88,7 @@ HTMLDivElement.prototype.delete = function (time = 500, callback) {
     this.timeout = setTimeout(() => {
       this.remove()
       this.classList.remove("removing")
-      if (typeof callback == "function") {
+      if (typeof callback === "function") {
         callback()
       }
     }, time)
@@ -105,7 +106,7 @@ HTMLDivElement.prototype.goto = function (position, time) {
     clearTimeout(this.timeout)
     delete this.timeout
   }
-  if (typeof time != "number") {
+  if (typeof time !== "number") {
     time = 500
   }
   this.classList.add("removing")
@@ -157,15 +158,17 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
       const mode = get.mode()
       if (type === "character") {
         nameinfo = get.character(name)
-        if (lib.characterPack[`mode_${mode}`] && lib.characterPack[`mode_${mode}`][name]) {
+        if (
+          lib.characterPack[`mode_${mode}`] &&
+          lib.characterPack[`mode_${mode}`][name]
+        ) {
           if (mode === "guozhan") {
             if (name.startsWith("gz_shibing")) {
               name = name.slice(3, 11)
             } else {
               if (
                 lib.config.mode_config.guozhan.guozhanSkin &&
-                nameinfo &&
-                nameinfo.hasSkinInGuozhan
+                nameinfo?.hasSkinInGuozhan
               ) {
                 gzbool = true
               }
@@ -189,13 +192,16 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
             if (value.startsWith("img:")) {
               imgPrefixUrl = value.slice(4)
               break
-            } else if (value.startsWith("db:")) {
+            }
+            if (value.startsWith("db:")) {
               dbimage = value
               break
-            } else if (value.startsWith("mode:")) {
+            }
+            if (value.startsWith("mode:")) {
               modeimage = value.slice(5)
               break
-            } else if (value.startsWith("character:")) {
+            }
+            if (value.startsWith("character:")) {
               name = value.slice(10)
               break
             }
@@ -224,8 +230,13 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
     if (type === "character") {
       const nameinfo = get.character(name)
       const sex =
-        nameinfo && ["male", "female", "double"].includes(nameinfo[0]) ? nameinfo[0] : "male"
-      this.setBackgroundImage([src, `${lib.characterDefaultPicturePath}${sex}${ext}`])
+        nameinfo && ["male", "female", "double"].includes(nameinfo[0])
+          ? nameinfo[0]
+          : "male"
+      this.setBackgroundImage([
+        src,
+        `${lib.characterDefaultPicturePath}${sex}${ext}`,
+      ])
     } else {
       this.setBackgroundImage(src)
     }
@@ -237,7 +248,7 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
  * @type { typeof HTMLDivElement['prototype']['setBackgroundDB'] }
  */
 HTMLDivElement.prototype.setBackgroundDB = async function (img) {
-  let src = await game.getDB("image", img)
+  const src = await game.getDB("image", img)
   this.style.backgroundImage = `url('${src}')`
   this.style.backgroundSize = "cover"
   return this
@@ -287,7 +298,11 @@ HTMLDivElement.prototype.listen = function (this: HTMLDivElement, func) {
  * @this HTMLDivElement
  * @type { typeof HTMLDivElement['prototype']['listenTransition'] }
  */
-HTMLDivElement.prototype.listenTransition = function (this: HTMLDivElement, func, time) {
+HTMLDivElement.prototype.listenTransition = function (
+  this: HTMLDivElement,
+  func,
+  time,
+) {
   let done = false
   const callback = () => {
     if (!done) {
@@ -309,7 +324,10 @@ HTMLDivElement.prototype.listenTransition = function (this: HTMLDivElement, func
   - 将条件运算符的结果直接嵌入到模板字符串中，取代了之前使用字符串拼接的方式喵。
   //最后，宝贝看一下我的理解有问题吗？🥺
  */
-HTMLDivElement.prototype.setPosition = function (this: HTMLDivElement, ...args) {
+HTMLDivElement.prototype.setPosition = function (
+  this: HTMLDivElement,
+  ...args
+) {
   let position
   if (args.length === 4) {
     position = args
@@ -335,8 +353,8 @@ HTMLDivElement.prototype.setPosition = function (this: HTMLDivElement, ...args) 
  */
 HTMLElement.prototype.css = function (style) {
   for (const i in style) {
-    if (i === "innerHTML" && typeof style["innerHTML"] == "string") {
-      this.innerHTML = style["innerHTML"]
+    if (i === "innerHTML" && typeof style.innerHTML === "string") {
+      this.innerHTML = style.innerHTML
     } else {
       this.style[i] = style[i]
     }
@@ -351,7 +369,9 @@ HTMLElement.prototype.css = function (style) {
  */
 HTMLTableElement.prototype.get = function (this: HTMLTableElement, row, col) {
   if (row < this.childNodes.length) {
-    return /** @type {HTMLElement | void} */ this.childNodes[row].childNodes[col]
+    return /** @type {HTMLElement | void} */ this.childNodes[row].childNodes[
+      col
+    ]
   }
 }
 
@@ -364,7 +384,7 @@ Object.defineProperty(Array.prototype, "filterInD", {
    * @type { typeof Array['prototype']['filterInD'] }
    */
   value(this: Card[], pos = "o") {
-    if (typeof pos != "string") {
+    if (typeof pos !== "string") {
       pos = "o"
     }
     return this.filter((card) => pos.includes(get.position(card, true)))
@@ -379,7 +399,7 @@ Object.defineProperty(Array.prototype, "someInD", {
    * @type { typeof Array['prototype']['someInD'] }
    */
   value(this: Card[], pos = "o") {
-    if (typeof pos != "string") {
+    if (typeof pos !== "string") {
       pos = "o"
     }
     return this.some((card) => pos.includes(get.position(card, true)))
@@ -394,7 +414,7 @@ Object.defineProperty(Array.prototype, "everyInD", {
    * @type { typeof Array['prototype']['everyInD'] }
    */
   value(this: Card[], pos = "o") {
-    if (typeof pos != "string") {
+    if (typeof pos !== "string") {
       pos = "o"
     }
     return this.every((card) => pos.includes(get.position(card, true)))
@@ -473,8 +493,8 @@ Object.defineProperty(Array.prototype, "remove", {
     for (const item of args) {
       let pos
 
-      if (typeof item == "number" && isNaN(item)) {
-        pos = this.findIndex((v) => isNaN(v as number))
+      if (typeof item === "number" && Number.isNaN(item)) {
+        pos = this.findIndex((v) => Number.isNaN(v as number))
       } else {
         pos = this.indexOf(item)
       }
@@ -508,7 +528,7 @@ Object.defineProperty(Array.prototype, "unique", {
   enumerable: false,
   writable: true,
   value<T>(this: T[]) {
-    let uniqueArray = [...new Set(this)]
+    const uniqueArray = [...new Set(this)]
     this.length = uniqueArray.length
     for (let i = 0; i < uniqueArray.length; i++) {
       this[i] = uniqueArray[i]
@@ -555,8 +575,8 @@ Object.defineProperty(Array.prototype, "randomGets", {
     if (num > this.length) {
       num = this.length
     }
-    let arr = this.slice(0)
-    let list: (T | undefined)[] = []
+    const arr = this.slice(0)
+    const list: (T | undefined)[] = []
     for (let i = 0; i < num; i++) {
       list.push(arr.splice(Math.floor(Math.random() * arr.length), 1)[0])
     }
@@ -568,8 +588,8 @@ Object.defineProperty(Array.prototype, "randomRemove", {
   enumerable: false,
   writable: true,
   value<T>(this: T[], num?: number) {
-    if (typeof num == "number") {
-      let list: (T | undefined)[] = []
+    if (typeof num === "number") {
+      const list: (T | undefined)[] = []
       for (let i = 0; i < num; i++) {
         if (!this.length) {
           break
@@ -623,8 +643,8 @@ Object.defineProperty(Array.prototype, "maxBy", {
    * @type { typeof Array['prototype']['maxBy'] }
    */
   value<T>(this: T[], sortBy, filter) {
-    let list = this.filter(filter || (() => true))
-    if (sortBy && typeof sortBy == "function") {
+    const list = this.filter(filter || (() => true))
+    if (sortBy && typeof sortBy === "function") {
       list.sort((a, b) => sortBy(a) - sortBy(b))
     } else {
       list.sort()
@@ -641,8 +661,8 @@ Object.defineProperty(Array.prototype, "minBy", {
    * @type { typeof Array['prototype']['minBy'] }
    */
   value<T>(this: T[], sortBy, filter) {
-    let list = this.filter(filter || (() => true))
-    if (sortBy && typeof sortBy == "function") {
+    const list = this.filter(filter || (() => true))
+    if (sortBy && typeof sortBy === "function") {
       list.sort((a, b) => sortBy(a) - sortBy(b))
     } else {
       list.sort()

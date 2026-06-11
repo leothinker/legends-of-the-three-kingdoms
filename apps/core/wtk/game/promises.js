@@ -1,4 +1,4 @@
-import { lib, _status, game } from "wtk"
+import { _status, game, lib } from "wtk"
 
 export class GamePromises {
   /**
@@ -91,7 +91,11 @@ export class GamePromises {
   getFileList(dir) {
     return new Promise((resolve, reject) => {
       // @ts-expect-error ignore
-      game.getFileList(dir, (folders, files) => resolve([folders, files]), reject)
+      game.getFileList(
+        dir,
+        (folders, files) => resolve([folders, files]),
+        reject,
+      )
     })
   }
 

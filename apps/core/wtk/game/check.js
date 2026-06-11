@@ -1,4 +1,4 @@
-import { _status, get, lib, game, ui } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
 
 export class Check {
   processSelection({ type, items, event, useCache, isSelectable }) {
@@ -93,7 +93,7 @@ export class Check {
       ok = false
     }
 
-    if (typeof event.custom?.add?.[type] == "function") {
+    if (typeof event.custom?.add?.[type] === "function") {
       event.custom.add[type]()
     }
 
@@ -197,7 +197,9 @@ export class Check {
         .filter((skill) => lib.filter.filterEnable(event, player, skill))
     }
 
-    const skills = event._skillChoice.filter((i) => event.isMine() || !event._aiexclude.includes(i))
+    const skills = event._skillChoice.filter(
+      (i) => event.isMine() || !event._aiexclude.includes(i),
+    )
     const globallist = game.expandSkills(lib.skill.global.slice())
     const ownedlist = game.expandSkills(player.getSkills("invisible", false))
 
@@ -230,7 +232,7 @@ export class Check {
       event.filterTarget &&
       (!event.filterCard ||
         !event.position ||
-        (typeof event.position == "string" && !event.position.includes("e")))
+        (typeof event.position === "string" && !event.position.includes("e")))
     ) {
       ui.arena.classList.add("tempnoe")
     }

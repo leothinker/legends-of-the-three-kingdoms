@@ -24,15 +24,24 @@ export class Button extends HTMLDivElement {
       // @ts-expect-error ignore
       ;[item, type, position, noClick, button] = other._args
     }
-    if (typeof type == "function") {
+    if (typeof type === "function") {
       button = type(item, type, position, noClick, button)
     } else if (ui.create.buttonPresets[type]) {
-      button = ui.create.buttonPresets[type](item, type, position, noClick, button)
+      button = ui.create.buttonPresets[type](
+        item,
+        type,
+        position,
+        noClick,
+        button,
+      )
     }
     if (button) {
       Object.setPrototypeOf(button, (lib.element.Button || Button).prototype)
       if (!noClick) {
-        button.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.button)
+        button.addEventListener(
+          lib.config.touchscreen ? "touchend" : "click",
+          ui.click.button,
+        )
       } else {
         button.classList.add("noclick")
         const intro = button.querySelector(".intro")
@@ -46,13 +55,12 @@ export class Button extends HTMLDivElement {
       // @ts-expect-error ignore
       button._args = [item, type, position, noClick, button]
       return button
-    } else {
-      console.error([item, type, position, noClick, button])
-      throw new Error("button不合法")
     }
+    console.error([item, type, position, noClick, button])
+    throw new Error("button不合法")
   }
   exclude() {
-    if (_status.event.excludeButton == undefined) {
+    if (_status.event.excludeButton === undefined) {
       _status.event.excludeButton = []
     }
     _status.event.excludeButton.add(this)

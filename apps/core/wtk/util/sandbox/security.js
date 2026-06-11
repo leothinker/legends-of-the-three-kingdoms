@@ -236,7 +236,7 @@ function readStorage(key) {
 
   const mayArray = JSON.parse(value)
 
-  if (!mayArray || typeof mayArray != "object") {
+  if (!mayArray || typeof mayArray !== "object") {
     return {}
   }
 
@@ -296,7 +296,7 @@ function requireSandboxOn(ip) {
     isTrusted = TRUSTED_IPS.includes(ip)
 
     if (!isTrusted && TRUSTED_IP_MD5.length > 0) {
-      const md5 = MD5("wtk_server" + ip).toString()
+      const md5 = MD5(`wtk_server${ip}`).toString()
       isTrusted = TRUSTED_IP_MD5.includes(md5)
     }
 
@@ -310,7 +310,7 @@ function requireSandboxOn(ip) {
     return
   }
 
-  if (SANDBOX_FORCED && topVariables.game && topVariables.game.ws) {
+  if (SANDBOX_FORCED && topVariables.game?.ws) {
     const match = WSURL_FOR_IP.exec(topVariables.game.ws.url)
 
     if (match && match[1] === ip) {
@@ -367,7 +367,7 @@ function _eval(x) {
   if (!SANDBOX_ENABLED || !sandBoxRequired) {
     new Function(x)
     const topVars = Object.assign({}, topVariables)
-    const vars = "_" + Math.random().toString(36).slice(2)
+    const vars = `_${Math.random().toString(36).slice(2)}`
     return new Function(vars, `with(${vars}){${x}}`)(topVars)
   }
 
@@ -394,9 +394,12 @@ function _exec(x, scope = {}) {
     // 如果没有沙盒，则进行简单模拟
     new Function(x)
     const topVars = Object.assign({}, topVariables)
-    const vars = "__vars_" + Math.random().toString(36).slice(2)
-    const name = "__scope_" + Math.random().toString(36).slice(2)
-    return new Function(vars, name, `with(${vars}){with(${name}){${x}}}`)(topVars, scope)
+    const vars = `__vars_${Math.random().toString(36).slice(2)}`
+    const name = `__scope_${Math.random().toString(36).slice(2)}`
+    return new Function(vars, name, `with(${vars}){with(${name}){${x}}}`)(
+      topVars,
+      scope,
+    )
   }
 
   return defaultSandbox.exec(x, scope)
@@ -428,7 +431,7 @@ function _exec(x, scope = {}) {
  * @returns {Object}
  */
 function _exec2(x, scope = {}) {
-  if (scope == "window") {
+  if (scope === "window") {
     scope = {}
     scope.window = scope
   } else if (isPrimitive(scope)) {
@@ -451,14 +454,21 @@ function _exec2(x, scope = {}) {
           throw new ReferenceError(`"${String(prop)}" is not defined`)
         }
 
-        return Reflect.get(target, prop, receiver) || topVariables[prop] || window[prop]
+        return (
+          Reflect.get(target, prop, receiver) ||
+          topVariables[prop] ||
+          window[prop]
+        )
       },
       has(target, prop) {
         return true
       },
     })
 
-    const result = new Function("_", `with(_){return(()=>{"use strict";\n${x}})()}`)(intercepter)
+    const result = new Function(
+      "_",
+      `with(_){return(()=>{"use strict";\n${x}})()}`,
+    )(intercepter)
     scope.return = result
     return scope
   }
@@ -555,7 +565,7 @@ async function initSecurity({ lib, game, ui, get, ai, _status }) {
 
   // 为所有Event类型应用上面的规则
   Reflect.ownKeys(globalThis)
-    .filter((key) => typeof key == "string")
+    .filter((key) => typeof key === "string")
     .filter((key) => /^\w*?Event$/.test(key))
     .map((key) => globalThis[key])
     .forEach((o) => Marshal.setRule(o, exposedClassRule))
@@ -607,7 +617,9 @@ async function initSecurity({ lib, game, ui, get, ai, _status }) {
     .require("property", "ws", "sandbox")
     // 抛出异常
     .then((access, nameds, control) => {
-      throw new Error(`有不信任的代码修改 \`game.${String(nameds.property)}\` 属性`)
+      throw new Error(
+        `有不信任的代码修改 \`game.${String(nameds.property)}\` 属性`,
+      )
     })
     // 让 Monitor 开始工作
     .start() // 差点忘记启动了喵
@@ -640,7 +652,7 @@ async function initSecurity({ lib, game, ui, get, ai, _status }) {
       lib.videos = []
     }
 
-    game.over = function (...args) {
+    game.over = (...args) => {
       if (_status.over) {
         return
       }
@@ -651,10 +663,13 @@ async function initSecurity({ lib, game, ui, get, ai, _status }) {
             return
           }
 
-          const count = parseInt(localStorage.getItem("__sandboxTestCount") || "0")
+          const count = parseInt(
+            localStorage.getItem("__sandboxTestCount") || "0",
+            10,
+          )
           localStorage.setItem("__sandboxTestCount", String(count + 1))
 
-          localStorage.setItem(lib.configprefix + "directstart", "true")
+          localStorage.setItem(`${lib.configprefix}directstart`, "true")
           game.reload()
         },
         SANDBOX_AUTOTEST_NODELAY ? 5000 : 1000,
@@ -771,7 +786,12 @@ function getIsolatedsFrom(item) {
     return getIsolateds(box)
   }
 
-  return [ModFunction, ModGeneratorFunction, ModAsyncFunction, ModAsyncGeneratorFunction]
+  return [
+    ModFunction,
+    ModGeneratorFunction,
+    ModAsyncFunction,
+    ModAsyncGeneratorFunction,
+  ]
 }
 
 /**
@@ -808,13 +828,13 @@ function importSandbox() {
 // 原本的Function类型记录
 /** @type {typeof Function} */
 // @ts-expect-error Make the type right
-const defaultFunction = function () {}.constructor
+const defaultFunction = (() => {}).constructor
 /** @type {typeof Function} */
 // @ts-expect-error Make the type right
 const defaultGeneratorFunction = function* () {}.constructor
 /** @type {typeof Function} */
 // @ts-expect-error Make the type right
-const defaultAsyncFunction = async function () {}.constructor
+const defaultAsyncFunction = (async () => {}).constructor
 /** @type {typeof Function} */
 // @ts-expect-error Make the type right
 const defaultAsyncGeneratorFunction = async function* () {}.constructor
@@ -914,11 +934,10 @@ function initIsolatedEnvironment() {
   })
 
   function rewriteCtor(prototype, newCtor) {
-    const descriptor = Object.getOwnPropertyDescriptor(prototype, "constructor") || {
-      configurable: true,
-      writable: true,
-      enumerable: false,
-    }
+    const descriptor = Object.getOwnPropertyDescriptor(
+      prototype,
+      "constructor",
+    ) || { configurable: true, writable: true, enumerable: false }
     if (!descriptor.configurable) {
       throw new TypeError("无法覆盖不可配置的构造函数")
     }
@@ -931,7 +950,10 @@ function initIsolatedEnvironment() {
   rewriteCtor(defaultFunction.prototype, ModFunction)
   rewriteCtor(defaultGeneratorFunction.prototype, ModGeneratorFunction)
   rewriteCtor(defaultAsyncFunction.prototype, ModAsyncFunction)
-  rewriteCtor(defaultAsyncGeneratorFunction.prototype, ModAsyncGeneratorFunction)
+  rewriteCtor(
+    defaultAsyncGeneratorFunction.prototype,
+    ModAsyncGeneratorFunction,
+  )
 }
 
 /**
@@ -975,13 +997,22 @@ function initSerializeNeeded() {
  */
 function loadPolyfills() {
   function isNativeDescriptor(descriptor) {
-    if (typeof descriptor.value == "function" && !nativePattern.test(descriptor.value.toString())) {
+    if (
+      typeof descriptor.value === "function" &&
+      !nativePattern.test(descriptor.value.toString())
+    ) {
       return false
     }
-    if (typeof descriptor.get == "function" && !nativePattern.test(descriptor.get.toString())) {
+    if (
+      typeof descriptor.get === "function" &&
+      !nativePattern.test(descriptor.get.toString())
+    ) {
       return false
     }
-    if (typeof descriptor.set == "function" && !nativePattern.test(descriptor.set.toString())) {
+    if (
+      typeof descriptor.set === "function" &&
+      !nativePattern.test(descriptor.set.toString())
+    ) {
       return false
     }
 
@@ -1009,7 +1040,7 @@ function loadPolyfills() {
   for (const key of pfPrototypes) {
     const top = window[key]
 
-    if (!top || !top.prototype) {
+    if (!top?.prototype) {
       continue
     }
 

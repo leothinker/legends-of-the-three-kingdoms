@@ -98,7 +98,7 @@
 								if (typeof column === "string") column = Number(column);
 								// @ts-ignore
 								window.onerror(error.message, src, line, column, error);
-							} catch (_e) {
+							} catch (e) {
 								window.onerror(error.message, "", 0, 0, error);
 							}
 						}

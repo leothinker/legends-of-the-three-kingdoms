@@ -1,13 +1,38 @@
 const translates = {
+  old_liubei: "刘备",
+  oldrende: "仁德",
+  oldrende_info:
+    "出牌阶段限一次，你可以将任意张手牌交给其他角色，若你给出的牌数大于1，你回复1点体力。",
+
+  old_huangyueying: "黄月英",
+  oldjizhi: "集智",
+  oldjizhi_info:
+    "当你使用非转化的锦囊牌时，你可以展示牌堆顶的一张牌，若此牌：为基本牌，你将之置入弃牌堆或将一张手牌与之交换；不为基本牌，你获得之。",
+  oldqicai: "奇才",
+  oldqicai_info:
+    "锁定技，你使用锦囊牌无距离限制；其他角色不能弃置你装备区里除坐骑牌外的牌。",
+
+  old_diaochan: "貂蝉",
+
+  old_yuanshu: "袁术",
+  wangzun: "妄尊",
+  wangzun2: "妄尊",
+  wangzun_info: "主公的准备阶段，你可以摸一张牌，然后主公本回合手牌上限-1。",
+  tongji: "同疾",
+  tongji_info:
+    "锁定技，若你的手牌数大于体力值，攻击范围含有你的角色使用【杀】只能以你为目标。",
+
   old_caocao: "界曹操",
   old_caocao_prefix: "界",
   oldjianxiong: "奸雄",
-  oldjianxiong_info: "当你受到伤害后，你可以选择一项：1.摸一张牌；2.获得对你造成伤害的牌。",
+  oldjianxiong_info:
+    "当你受到伤害后，你可以选择一项：1.摸一张牌；2.获得对你造成伤害的牌。",
 
   old_xiahoudun: "界夏侯惇",
   old_xiahoudun_prefix: "界",
   oldqingjian: "清俭",
-  oldqingjian_info: "当你于摸牌阶段外获得牌后，你可以将其中任意张牌交给其他角色。",
+  oldqingjian_info:
+    "当你于摸牌阶段外获得牌后，你可以将其中任意张牌交给其他角色。",
 
   old_zhangliao: "界张辽",
   old_zhangliao_prefix: "界",
@@ -36,12 +61,6 @@ const translates = {
   wangxi_info:
     "当你对其他角色造成1点伤害后，或当你受到其他角色造成的1点伤害后，你可以与其各摸一张牌。",
 
-  old_liubei: "界刘备",
-  old_liubei_prefix: "界",
-  oldrende: "仁德",
-  oldrende_info:
-    "出牌阶段限一次，你可以将任意张手牌交给其他角色，若你给出的牌数大于1，你回复1点体力。",
-
   old_guanyu: "界关羽",
   old_guanyu_prefix: "界",
   oldyijue: "义绝",
@@ -62,29 +81,16 @@ const translates = {
   oldyajiao_info:
     "当你于回合外使用或打出手牌时，你可以展示牌堆顶的一张牌。若这两张牌的类别：相同，你可以将此牌交给一名角色；不同，你可以将此牌置入弃牌堆。",
 
-  old_huangyueying: "界黄月英",
-  old_huangyueying_prefix: "界",
-  oldjizhi: "集智",
-  oldjizhi_info:
-    "当你使用非转化的锦囊牌时，你可以展示牌堆顶的一张牌，若此牌：为基本牌，你将之置入弃牌堆或将一张手牌与之交换；不为基本牌，你获得之。",
-  oldqicai: "奇才",
-  oldqicai_info: "锁定技，你使用锦囊牌无距离限制；其他角色不能弃置你装备区里除坐骑牌外的牌。",
-
   xushu: "徐庶",
   zhuhai: "诛害",
-  zhuhai_info: "其他角色的结束阶段，若其本回合造成过伤害，你可以对其使用一张【杀】。",
+  zhuhai_info:
+    "其他角色的结束阶段，若其本回合造成过伤害，你可以对其使用一张【杀】。",
   qianxin: "潜心",
-  qianxin_info: "觉醒技，当你造成伤害后，若你已受伤，你减1点体力上限，然后获得技能〖荐言〗。",
+  qianxin_info:
+    "觉醒技，当你造成伤害后，若你已受伤，你减1点体力上限，然后获得技能〖荐言〗。",
   jianyan: "荐言",
   jianyan_info:
     "出牌阶段限一次，你可以声明一种牌的类别或颜色，然后连续亮出牌堆顶的牌，直到亮出符合你声明的牌为止。最后你令一名男性角色获得此牌。",
-
-  old_yuanshu: "袁术",
-  wangzun: "妄尊",
-  wangzun2: "妄尊",
-  wangzun_info: "主公的准备阶段，你可以摸一张牌，然后主公本回合手牌上限-1。",
-  tongji: "同疾",
-  tongji_info: "锁定技，若你的手牌数大于体力值，攻击范围含有你的角色使用【杀】只能以你为目标。",
 }
 
 export default translates

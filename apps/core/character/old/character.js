@@ -1,4 +1,34 @@
 const characters = {
+  old_liubei: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["oldrende", "jijiang"],
+    isZhugong: true,
+    img: "image/character/re_liubei.jpg",
+    dieAudios: ["re_liubei"],
+  },
+  old_huangyueying: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["oldjizhi", "oldqicai"],
+    img: "image/character/re_huangyueying.jpg",
+    dieAudios: ["re_huangyueying"],
+  },
+  old_diaochan: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["relijian", "biyue"],
+    names: "null|null",
+  },
+  old_yuanshu: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["wangzun", "tongji"],
+  },
   old_caocao: {
     sex: "male",
     group: "wei",
@@ -47,15 +77,6 @@ const characters = {
     hp: 3,
     skills: ["xunxun", "wangxi"],
   },
-  old_liubei: {
-    sex: "male",
-    group: "shu",
-    hp: 4,
-    skills: ["oldrende", "jijiang"],
-    isZhugong: true,
-    img: "image/character/re_liubei.jpg",
-    dieAudios: ["re_liubei"],
-  },
   old_guanyu: {
     sex: "male",
     group: "shu",
@@ -80,25 +101,11 @@ const characters = {
     img: "image/character/re_zhaoyun.jpg",
     dieAudios: ["re_zhaoyun"],
   },
-  old_huangyueying: {
-    sex: "female",
-    group: "shu",
-    hp: 3,
-    skills: ["oldjizhi", "oldqicai"],
-    img: "image/character/re_huangyueying.jpg",
-    dieAudios: ["re_huangyueying"],
-  },
   xushu: {
     sex: "male",
     group: "shu",
     hp: 4,
     skills: ["zhuhai", "qianxin"],
-  },
-  old_yuanshu: {
-    sex: "male",
-    group: "qun",
-    hp: 4,
-    skills: ["wangzun", "tongji"],
   },
 }
 

@@ -1,4 +1,16 @@
 export default {
+  "#lijian_old_diaochan1": "嗯哼~",
+  "#lijian_old_diaochan2": "夫君，你要替妾身做主啊！",
+  "#biyue_old_diaochan1": "失礼啦~",
+  "#biyue_old_diaochan2": "羡慕吧~",
+  "#old_diaochan:die": "父亲大人，对不起……",
+
+  "#wangzun1": "真命天子，八方拜服。",
+  "#wangzun2": "归顺于我，封爵赏地。",
+  "#tongji1": "弑君之罪，当诛九族。",
+  "#tongji2": "你，你这是反啦。",
+  "#old_yuanshu:die": "把玉玺，还给我……",
+
   "#xunxun1": "众将死战，非吾之功。",
   "#xunxun2": "爱兵如子，胜乃可全。",
   "#wangxi1": "大丈夫，何拘小节。",
@@ -12,10 +24,4 @@ export default {
   "#jianyan1": "如此如此，敌军自破！",
   "#jianyan2": "开言纳谏，社稷之福！",
   "#xushu:die": "母亲……孩儿……尽孝来了。",
-
-  "#wangzun1": "真命天子，八方拜服。",
-  "#wangzun2": "归顺于我，封爵赏地。",
-  "#tongji1": "弑君之罪，当诛九族。",
-  "#tongji2": "你，你这是反啦。",
-  "#old_yuanshu:die": "把玉玺，还给我……",
 }

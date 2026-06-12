@@ -938,6 +938,7 @@ const skills = {
   // 离间
   relijian: {
     audio: "lijian",
+    audioname:['old_diaochan'],
     enable: "phaseUse",
     usable: 1,
     filter(event, player) {

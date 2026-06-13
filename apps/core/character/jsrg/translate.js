@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { get } from "wtk"
 
 const translates = {
   //江山如故·起
@@ -124,7 +124,8 @@ const translates = {
   jsrgshelun_info:
     "出牌阶段限一次，若你有手牌，你可以选择一名其他角色，然后令除其外所有手牌数不大于你的角色议事。若结果为：红色，你弃置其两张牌；黑色，你对其造成2点伤害。",
   jsrgfayi: "伐异",
-  jsrgfayi_info: "当你议事结算结束后，你可以对任意名意见与你不同的角色造成1点伤害。",
+  jsrgfayi_info:
+    "当你议事结算结束后，你可以对任意名意见与你不同的角色造成1点伤害。",
   jsrg_liuyan: "起刘焉",
   jsrg_liuyan_prefix: "起",
   jsrgtushe: "图射",
@@ -229,7 +230,8 @@ const translates = {
   jsrglunshi_info:
     "出牌阶段限一次。你可以令一名角色摸等同于其攻击范围内角色数的牌（至多摸至五张），然后其弃置等同于攻击范围内含有其的角色数的牌。",
   jsrgguitu: "诡图",
-  jsrgguitu_info: "准备阶段，你可以交换场上的两张武器牌，然后攻击范围以此法减少的角色回复1点体力。",
+  jsrgguitu_info:
+    "准备阶段，你可以交换场上的两张武器牌，然后攻击范围以此法减少的角色回复1点体力。",
   jsrg_zhenji: "承甄宓",
   jsrg_zhenji_prefix: "承",
   jsrgjixiang: "济乡",
@@ -282,7 +284,8 @@ const translates = {
   jsrgbaohe_info:
     "一名角色的出牌阶段结束时，你可以弃置两张牌，然后视为你对攻击范围内包含其的所有角色使用一张【杀】。当一名角色使用牌响应此【杀】后，此【杀】对后续目标角色造成的伤害+1。",
   jsrgxushi: "虚势",
-  jsrgxushi_info: "出牌阶段限一次。你可以交给任意名角色各一张牌，然后你获得两倍数量的【影】。",
+  jsrgxushi_info:
+    "出牌阶段限一次。你可以交给任意名角色各一张牌，然后你获得两倍数量的【影】。",
   jsrg_machao: "转马超",
   jsrg_machao_prefix: "转",
   jsrgzhuiming: "追命",
@@ -339,9 +342,11 @@ const translates = {
   jsrgniluan_info:
     "准备阶段，你可以选择任意项：1.弃置一张牌，对一名未对你造成过伤害的角色造成1点伤害；2.令一名对你造成过伤害的角色摸两张牌。",
   jsrghuchou: "互雠",
-  jsrghuchou_info: "锁定技。当你对最后对你使用伤害类牌的角色造成伤害时，此伤害+1。",
+  jsrghuchou_info:
+    "锁定技。当你对最后对你使用伤害类牌的角色造成伤害时，此伤害+1。",
   jsrgjiemeng: "皆盟",
-  jsrgjiemeng_info: "主公技，锁定技。所有群势力角色至其他角色的距离-X（X为群势力角色数）。",
+  jsrgjiemeng_info:
+    "主公技，锁定技。所有群势力角色至其他角色的距离-X（X为群势力角色数）。",
   jsrg_zhangchu: "转张楚",
   jsrg_zhangchu_prefix: "转",
   jsrghuozhong: "惑众",
@@ -384,7 +389,8 @@ const translates = {
   jsrgfumou_info:
     "魏势力技。当你议事结算结束后，与你意见不同的角色本回合不能使用或打出与其意见颜色相同的牌，你可以将一张【影】当【出其不意】对一名与你意见不同的角色使用。",
   jsrgxuanfeng: "选锋",
-  jsrgxuanfeng_info: "蜀势力技。你可以将一张【影】当无距离和次数限制的刺【杀】使用。",
+  jsrgxuanfeng_info:
+    "蜀势力技。你可以将一张【影】当无距离和次数限制的刺【杀】使用。",
   jsrg_luxun: "合陆逊",
   jsrg_luxun_prefix: "合",
   jsrgyoujin: "诱进",
@@ -445,7 +451,8 @@ const translates = {
   jsrgyaoyan_info:
     "准备阶段，你可以令所有角色依次选择是否于回合结束时议事，若议事结果为：红色，你获得任意名未议事的角色各一张手牌；黑色，你可以对一名议事的角色造成2点伤害。",
   jsrgbazheng: "霸政",
-  jsrgbazheng_info: "当你参与的议事展示意见时，本回合受到过你伤害的角色意见视为与你相同。",
+  jsrgbazheng_info:
+    "当你参与的议事展示意见时，本回合受到过你伤害的角色意见视为与你相同。",
   jsrg_liuyong: "合刘永",
   jsrg_liuyong_prefix: "合",
   jsrgdanxin: "丹心",
@@ -559,7 +566,8 @@ const translates = {
     "一名角色的回合结束时，若你于本回合内失去过牌，则你可以选择弃牌堆中本回合置入的点数唯一最大的牌，并对本回合失去过此牌的一名角色造成1点伤害。",
   jsrgyangge: "扬戈",
   jsrgyangge_mizhao: "密诏",
-  jsrgyangge_info: "每轮限一次。体力值最低的其他角色可以于其出牌阶段内对你发动〖密诏〗。",
+  jsrgyangge_info:
+    "每轮限一次。体力值最低的其他角色可以于其出牌阶段内对你发动〖密诏〗。",
   jsrg_liubiao: "衰刘表",
   jsrg_liubiao_prefix: "衰",
   jsrgyansha: "宴杀",
@@ -599,9 +607,11 @@ const translates = {
   jsrgshanzheng_info:
     "出牌阶段限一次，你可以与任意名角色议事，若结果为：红色，你可对一名未参加议事的角色造成1点伤害；黑色，你获得所有意见牌。",
   jsrgxiongbao: "凶暴",
-  jsrgxiongbao_info: "你参与议事时，可以额外展示一张手牌，若如此做，其他角色改为随机展示手牌。",
+  jsrgxiongbao_info:
+    "你参与议事时，可以额外展示一张手牌，若如此做，其他角色改为随机展示手牌。",
   jsrgliedu: "烈妒",
-  jsrgliedu_info: "锁定技，其他女性角色和手牌数大于你的角色不能响应你使用的牌。",
+  jsrgliedu_info:
+    "锁定技，其他女性角色和手牌数大于你的角色不能响应你使用的牌。",
   jsrg_wenyang: "兴文鸯",
   jsrg_wenyang_prefix: "兴",
   jsrg_zhugedan: "兴诸葛诞",
@@ -617,7 +627,8 @@ const translates = {
   jsrgbeizhi_info:
     "出牌阶段限一次，你可以与一名角色拼点，赢的角色需视为对包含没赢角色在内的三名角色使用一张【决斗】（不足则全选），此牌造成伤害后，伤害来源获得受伤角色的一张牌。",
   jsrgshenji: "深忌",
-  jsrgshenji_info: "锁定技，以你为目标的牌若有其他目标，则你最后结算此牌的效果。",
+  jsrgshenji_info:
+    "锁定技，以你为目标的牌若有其他目标，则你最后结算此牌的效果。",
   jsrgzuozhan: "坐瞻",
   jsrgzuozhan_info:
     "游戏开始时，你选择你与至多两名其他角色，你的攻击范围+X（X为选择角色中最高的体力值且至多为5）。一名“坐瞻”角色死亡后，你令一名存活的“坐瞻”角色从弃牌堆获得至多X张牌名各不相同的基本牌。",
@@ -674,7 +685,8 @@ const translates = {
     "锁定技，当你使用【杀】指定唯一目标后/成为【杀】的唯一目标后，你与目标角色/此牌使用者议事，若结果为黑色，则双方各减1点体力上限；否则意见为黑色的角色摸两张牌。",
   jsrgzuwang: "族望",
   jsrgzuwang_info: "锁定技，准备阶段和结束阶段，你将手牌数摸至体力上限。",
-  jsrgzuwang_append: '<span style="font-family: yuanli">“公何不讨人而惧为人所讨！”——何勖</span>',
+  jsrgzuwang_append:
+    '<span style="font-family: yuanli">“公何不讨人而惧为人所讨！”——何勖</span>',
   jsrg_tufashujineng: "兴秃发树机能",
   jsrg_tufashujineng_prefix: "兴",
   jsrgqinrao: "侵扰",

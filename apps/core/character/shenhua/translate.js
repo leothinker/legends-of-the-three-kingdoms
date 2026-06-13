@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { get } from "wtk"
 
 const translates = {
   caoren: "曹仁",
@@ -19,7 +19,8 @@ const translates = {
 
   weiyan: "魏延",
   kuanggu: "狂骨",
-  kuanggu_info: "锁定技，当你对距离小于2的一名角色造成1点伤害后，你回复1点体力。",
+  kuanggu_info:
+    "锁定技，当你对距离小于2的一名角色造成1点伤害后，你回复1点体力。",
 
   xiaoqiao: "小乔",
   tianxiang: "天香",
@@ -41,7 +42,8 @@ const translates = {
   guidao_info: "当一名角色的判定牌生效前，你可以打出一张黑色牌替换之。",
   huangtian: "黄天",
   huangtian2: "黄天",
-  huangtian_info: "主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或【闪电】。",
+  huangtian_info:
+    "主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或【闪电】。",
 
   yuji: "于吉",
   guhuo: "蛊惑",
@@ -62,11 +64,13 @@ const translates = {
   quhu_info:
     "出牌阶段限一次，你可以与一名体力值大于你的角色拼点。若你：赢，其对其攻击范围内你指定的另一名角色造成1点伤害；没赢，其对你造成1点伤害。",
   jieming: "节命",
-  jieming_info: "当你受到1点伤害后，你可以令一名角色将手牌摸至X张（X为其体力上限且至多为5）。",
+  jieming_info:
+    "当你受到1点伤害后，你可以令一名角色将手牌摸至X张（X为其体力上限且至多为5）。",
 
   sp_zhugeliang: "卧龙诸葛",
   bazhen: "八阵",
-  bazhen_info: "锁定技，若你的装备区里没有防具牌且你的防具栏未被废除，你视为装备着【八卦阵】。",
+  bazhen_info:
+    "锁定技，若你的装备区里没有防具牌且你的防具栏未被废除，你视为装备着【八卦阵】。",
   huoji: "火计",
   huoji_info: "你可以将一张红色手牌当【火攻】使用。",
   kanpo: "看破",
@@ -86,7 +90,8 @@ const translates = {
 
   pangde: "庞德",
   mengjin: "猛进",
-  mengjin_info: "当你使用的【杀】被一名角色使用的【闪】抵消后，你可以弃置其一张牌。",
+  mengjin_info:
+    "当你使用的【杀】被一名角色使用的【闪】抵消后，你可以弃置其一张牌。",
 
   yanwen: "颜良文丑",
   shuangxiong: "双雄",
@@ -109,10 +114,12 @@ const translates = {
   xingshang: "行殇",
   xingshang_info: "其他角色死亡时，你可以获得该角色的所有牌。",
   fangzhu: "放逐",
-  fangzhu_info: "当你受到伤害后，你可以令一名其他角色翻面，然后其摸X张牌（X为你已损失的体力值）。",
+  fangzhu_info:
+    "当你受到伤害后，你可以令一名其他角色翻面，然后其摸X张牌（X为你已损失的体力值）。",
   songwei: "颂威",
   songwei2: "颂威",
-  songwei_info: "主公技，其他魏势力角色的黑色判定牌生效后，其可以令你摸一张牌。",
+  songwei_info:
+    "主公技，其他魏势力角色的黑色判定牌生效后，其可以令你摸一张牌。",
 
   sunjian: "孙坚",
   yinghun: "英魂",
@@ -126,18 +133,22 @@ const translates = {
   roulin_info:
     "锁定技，你对女性角色使用的【杀】、女性角色对你使用的【杀】均需使用两张【闪】才能抵消。",
   benghuai: "崩坏",
-  benghuai_info: "锁定技，结束阶段，若你不是体力最小的角色，你失去1点体力或减少1点体力上限。",
+  benghuai_info:
+    "锁定技，结束阶段，若你不是体力最小的角色，你失去1点体力或减少1点体力上限。",
   baonue: "暴虐",
   baonue2: "暴虐",
-  baonue_info: "主公技，其他群势力角色造成伤害后，其可以进行判定，若结果为♠，你回复1点体力。",
+  baonue_info:
+    "主公技，其他群势力角色造成伤害后，其可以进行判定，若结果为♠，你回复1点体力。",
 
   zhurong: "祝融",
   juxiang: "巨象",
   juxiang1: "巨象",
   juxiang2: "巨象",
-  juxiang_info: "锁定技，【南蛮入侵】对你无效；其他角色使用的【南蛮入侵】结算完成后，你获得之。",
+  juxiang_info:
+    "锁定技，【南蛮入侵】对你无效；其他角色使用的【南蛮入侵】结算完成后，你获得之。",
   lieren: "烈刃",
-  lieren_info: "当你使用【杀】对目标角色造成伤害后，你可以与其拼点：若你赢，你获得其一张牌。",
+  lieren_info:
+    "当你使用【杀】对目标角色造成伤害后，你可以与其拼点：若你赢，你获得其一张牌。",
 
   menghuo: "孟获",
   huoshou: "祸首",
@@ -189,7 +200,8 @@ const translates = {
 
   liushan: "刘禅",
   xiangle: "享乐",
-  xiangle_info: "锁定技，当你成为【杀】的目标后，使用者需弃置一张基本牌，否则此【杀】对你无效。",
+  xiangle_info:
+    "锁定技，当你成为【杀】的目标后，使用者需弃置一张基本牌，否则此【杀】对你无效。",
   fangquan: "放权",
   fangquan_info:
     "你可以跳过出牌阶段，然后此回合结束后，你可以弃置一张手牌并令一名其他角色获得一个额外的回合。",
@@ -208,7 +220,8 @@ const translates = {
 
   zhangzhang: "张昭张纮",
   zhijian: "直谏",
-  zhijian_info: "出牌阶段，你可以将手牌中的一张装备牌置入一名其他角色的装备区，然后摸一张牌。",
+  zhijian_info:
+    "出牌阶段，你可以将手牌中的一张装备牌置入一名其他角色的装备区，然后摸一张牌。",
   guzheng: "固政",
   guzheng_info:
     "其他角色的弃牌阶段结束时，你可以将该角色此阶段弃置的一张手牌交给该角色，然后你可以获得其余此阶段弃置的牌。",
@@ -238,7 +251,8 @@ const translates = {
   shen_lvmeng: "神吕蒙",
   shen_lvmeng_prefix: "神",
   shelie: "涉猎",
-  shelie_info: "摸牌阶段，你可以改为展示牌堆顶的五张牌，然后获得其中每种花色的牌各一张。",
+  shelie_info:
+    "摸牌阶段，你可以改为展示牌堆顶的五张牌，然后获得其中每种花色的牌各一张。",
   gongxin: "攻心",
   gongxin_info:
     "出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以展示其中的一张红桃牌并选择一项：1.弃置此牌；2.将此牌置于牌堆顶。",
@@ -272,7 +286,8 @@ const translates = {
   shen_caocao: "神曹操",
   shen_caocao_prefix: "神",
   guixin: "归心",
-  guixin_info: "当你受到1点伤害后，你可以获得每名其他角色区域里的一张牌，然后翻面。",
+  guixin_info:
+    "当你受到1点伤害后，你可以获得每名其他角色区域里的一张牌，然后翻面。",
   feiying: "飞影",
   feiying_info: "锁定技，其他角色与你的距离+1。",
 
@@ -293,7 +308,8 @@ const translates = {
   shen_zhaoyun: "神赵云",
   shen_zhaoyun_prefix: "神",
   juejing: "绝境",
-  juejing_info: "锁定技，摸牌阶段，你摸牌的数量改为你已损失的体力值+2；你的手牌上限+2。",
+  juejing_info:
+    "锁定技，摸牌阶段，你摸牌的数量改为你已损失的体力值+2；你的手牌上限+2。",
   longhun: "龙魂",
   longhun1: "龙魂♥︎",
   longhun2: "龙魂♦︎",
@@ -306,7 +322,8 @@ const translates = {
   shen_simayi_prefix: "神",
   renjie: "忍戒",
   renjie2: "忍戒",
-  renjie_info: "锁定技，当你受到1点伤害或于弃牌阶段弃置一张手牌后，你获得1枚“忍”标记。",
+  renjie_info:
+    "锁定技，当你受到1点伤害或于弃牌阶段弃置一张手牌后，你获得1枚“忍”标记。",
   sbaiyin: "拜印",
   sbaiyin_info: `觉醒技，准备阶段，若“忍”的数量大于3，你减少1点体力上限并获得${get.poptip("jilue")}。`,
   jilue: "极略",
@@ -326,7 +343,8 @@ const translates = {
   jilue_jizhi_info:
     "当你使用锦囊牌时，你可以摸一张牌。若此牌为基本牌，则你可以弃置之，然后令本回合手牌上限+1。",
   lianpo: "连破",
-  lianpo_info: "每回合结束后，若你本回合杀死过其他角色，你可以执行一个额外的回合。",
+  lianpo_info:
+    "每回合结束后，若你本回合杀死过其他角色，你可以执行一个额外的回合。",
 }
 
 export default translates

@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { get } from "wtk"
 
 const translates = {
   le_diaochan: "神貂蝉",
@@ -14,7 +14,8 @@ const translates = {
   le_dianwei: "神典韦",
   le_dianwei_prefix: "神",
   juanjia: "捐甲",
-  juanjia_info: "锁定技，游戏开始时，废除你的防具栏，然后你获得一个额外的武器栏。",
+  juanjia_info:
+    "锁定技，游戏开始时，废除你的防具栏，然后你获得一个额外的武器栏。",
   qiexie: "挈挟",
   qiexie_info: `锁定技，准备阶段，你在剩余武将牌堆中随机观看五张武将牌，然后选择其中任意张当${get.poptip(
     {
@@ -83,9 +84,11 @@ const translates = {
   oltianhou_spade_info:
     "锁定技，防止其他角色造成的火焰伤害。当一名角色受到雷电伤害后，其相邻角色失去1点体力。",
   oltianhou_heart: "烈暑",
-  oltianhou_heart_info: "锁定技，其他角色的结束阶段，若其体力值全场最大，其失去1点体力。",
+  oltianhou_heart_info:
+    "锁定技，其他角色的结束阶段，若其体力值全场最大，其失去1点体力。",
   oltianhou_club: "严霜",
-  oltianhou_club_info: "锁定技，其他角色结束阶段，若其体力值全场最小，其失去1点体力。",
+  oltianhou_club_info:
+    "锁定技，其他角色结束阶段，若其体力值全场最小，其失去1点体力。",
   oltianhou_diamond: "凝雾",
   oltianhou_diamond_info:
     "锁定技，当其他角色使用【杀】指定非相邻角色为唯一目标时，其判定，若结果点数大于此【杀】，此【杀】无效。",

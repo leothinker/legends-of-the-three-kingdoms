@@ -13,13 +13,13 @@ const skills = {
         .chooseTarget(
           get.prompt("sxrmmieguo"),
           "获得一名其他角色的至多3张牌",
-          function (card, player, target) {
-            return target != player && target.countCards("he")
-          },
+          (card, player, target) =>
+            target !== player && target.countCards("he"),
         )
         .set("ai", (target) => {
           const player = get.player()
-          if (get.attitude(player, target) > 0 && target.countCards("he") >= 4) return 10
+          if (get.attitude(player, target) > 0 && target.countCards("he") >= 4)
+            return 10
           if (get.attitude(player, target) < 0) return 5
           return -1
         })
@@ -33,11 +33,10 @@ const skills = {
           const player = get.player()
           if (ui.selected.buttons?.length) return -1
           if (get.attitude(player, target) > 0) {
-            if (get.position(button.link) == "h") return 5
-            return 1
-          } else {
+            if (get.position(button.link) === "h") return 5
             return 1
           }
+          return 1
         })
         .forResult("cards")
       if (!cards?.length) {
@@ -56,7 +55,7 @@ const skills = {
                 num,
               )
               .set("ai", (target) => {
-                if (target == get.player) return 5
+                if (target === get.player) return 5
                 return 1
               })
               .forResult("targets")
@@ -78,15 +77,15 @@ const skills = {
         intro: {
           content(storage) {
             if (!storage?.length) return ""
-            let list = []
-            for (let i of storage) {
+            const list = []
+            for (const i of storage) {
               list.push(get.translation(i))
             }
-            return "不能对" + list.join("、") + "使用牌"
+            return `不能对${list.join("、")}使用牌`
           },
         },
         mod: {
-          playerEnabled: function (card, player, target) {
+          playerEnabled: (card, player, target) => {
             if (player.getStorage("sxrmmieguo_ban")?.includes(target)) {
               return false
             }
@@ -96,7 +95,7 @@ const skills = {
           player: "phaseJieshuBegin",
         },
         filter(event, player) {
-          return event.getParent("phase").skill == "sxrmmieguo"
+          return event.getParent("phase").skill === "sxrmmieguo"
         },
         async content(event, trigger, player) {
           player.removeSkill(event.name)

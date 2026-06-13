@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { get } from "wtk"
 
 const translates = {
   ylyg_xiaoqiao: "界小乔",
@@ -28,9 +28,11 @@ const translates = {
   xiangxing: "相形",
   xiangxing_info: `锁定技，其他角色视为拥有${get.poptip("xiangxing_yingzi")}${get.poptip("xiangxing_biyue")}。`,
   xiangxing_yingzi: "英姿",
-  xiangxing_yingzi_info: "锁定技，摸牌阶段摸牌时，你额外摸一张牌；你的手牌上限为你的体力上限。",
+  xiangxing_yingzi_info:
+    "锁定技，摸牌阶段摸牌时，你额外摸一张牌；你的手牌上限为你的体力上限。",
   xiangxing_biyue: "闭月",
-  xiangxing_biyue_info: "结束阶段，你可以摸一张牌，若你没有手牌，则改为摸两张牌。",
+  xiangxing_biyue_info:
+    "结束阶段，你可以摸一张牌，若你没有手牌，则改为摸两张牌。",
   ylyglianhuan: "连环",
   ylyglianhuan_info:
     "出牌阶段限X次，你可以将一张牌当【铁索连环】使用，结算后两名目标随机均分手牌（无法均分的手牌交给你，X为洗牌的次数+1）。",

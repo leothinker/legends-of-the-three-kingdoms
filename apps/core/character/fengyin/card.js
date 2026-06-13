@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { get } from "wtk"
 
 const cards = {
   xuanhuafu: {
@@ -16,10 +16,11 @@ const cards = {
     },
     enable: true,
     selectTarget: -1,
-    filterTarget: (card, player, target) => player == target && target.canEquip(card, true),
+    filterTarget: (card, player, target) =>
+      player === target && target.canEquip(card, true),
     modTarget: true,
     allowMultiple: false,
-    content: function () {
+    content: () => {
       if (
         !card?.cards.some((card) => {
           return get.position(card, true) !== "o"
@@ -45,10 +46,11 @@ const cards = {
     },
     enable: true,
     selectTarget: -1,
-    filterTarget: (card, player, target) => player == target && target.canEquip(card, true),
+    filterTarget: (card, player, target) =>
+      player === target && target.canEquip(card, true),
     modTarget: true,
     allowMultiple: false,
-    content: function () {
+    content: () => {
       if (
         !card?.cards.some((card) => {
           return get.position(card, true) !== "o"

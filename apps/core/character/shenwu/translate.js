@@ -1,6 +1,3 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
-import { old } from "../../mode/guozhan/src/info/pile"
-
 const translates = {
   ol_caocao: "界曹操",
   ol_caocao_prefix: "界",
@@ -41,7 +38,8 @@ const translates = {
   olpaoxiao_info:
     "锁定技，你使用【杀】无次数限制；当你使用的【杀】被抵消后，你本回合下一次造成【杀】的伤害时，此伤害+1。",
   retishen: "替身",
-  retishen_info: "限定技，准备阶段，你可以将体力回复至上限，然后摸X张牌（X为你本次回复的体力值）。",
+  retishen_info:
+    "限定技，准备阶段，你可以将体力回复至上限，然后摸X张牌（X为你本次回复的体力值）。",
 
   ol_zhaoyun: "界赵云",
   ol_zhaoyun_prefix: "界",
@@ -94,7 +92,8 @@ const translates = {
   olyaowu_info:
     "锁定技，当你受到伤害时，若对你造成伤害的牌：为红色，伤害来源摸一张牌；不为红色，你摸一张牌。",
   shizhan: "势斩",
-  shizhan_info: "出牌阶段限两次，你可以令一名其他角色视为对你使用一张【决斗】。",
+  shizhan_info:
+    "出牌阶段限两次，你可以令一名其他角色视为对你使用一张【决斗】。",
 
   ol_gongsunzan: "界公孙瓒",
   ol_gongsunzan_prefix: "界",
@@ -157,7 +156,8 @@ const translates = {
     "当一名角色的判定牌生效前，你可以用一张黑色牌替换之。若此牌为黑桃2-9，你摸一张牌。",
   rehuangtian: "黄天",
   rehuangtian2: "黄天",
-  rehuangtian_info: "主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或黑桃手牌。",
+  rehuangtian_info:
+    "主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或黑桃手牌。",
 
   ol_yuji: "界于吉",
   ol_yuji_prefix: "界",
@@ -165,7 +165,8 @@ const translates = {
   olguhuo_info:
     "每回合限一次，你可以扣置一张手牌，将此牌当任意一张基本牌或普通锦囊牌使用或打出且其他角色可以进行质疑。若有其他角色质疑则翻开此牌，若为假，则此牌作废且质疑者各摸一张牌，否则质疑者各弃置一张牌或失去1点体力，然后获得〖缠怨〗。",
   rechanyuan: "缠怨",
-  rechanyuan_info: "锁定技，你不能质疑〖蛊惑〗；若你的体力值小于等于1，你的其他技能失效。",
+  rechanyuan_info:
+    "锁定技，你不能质疑〖蛊惑〗；若你的体力值小于等于1，你的其他技能失效。",
 
   ol_dianwei: "界典韦",
   ol_dianwei_prefix: "界",
@@ -188,7 +189,8 @@ const translates = {
   olhuoji_info:
     "你可以将一张红色牌当【火攻】使用；你的【火攻】改为展示目标角色一张手牌，你弃置与其展示牌颜色相同的手牌以造成伤害。",
   olkanpo: "看破",
-  olkanpo_info: "你可以将一张黑色牌当【无懈可击】使用；你的【无懈可击】不能被响应。",
+  olkanpo_info:
+    "你可以将一张黑色牌当【无懈可击】使用；你的【无懈可击】不能被响应。",
   cangzhuo: "藏拙",
   cangzhuo_info:
     "弃牌阶段开始时，若你本回合未使用过锦囊牌，你可以展示任意张锦囊牌，令这些牌此阶段不计入手牌上限。",

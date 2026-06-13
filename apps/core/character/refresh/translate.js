@@ -1,5 +1,3 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
-
 const translates = {
   re_caocao: "界曹操",
   re_caocao_prefix: "界",
@@ -41,7 +39,8 @@ const translates = {
   re_guojia_prefix: "界",
   reyiji: "遗计",
   reyiji_tag: "已分配",
-  reyiji_info: "当你受到1点伤害后，你可以摸两张牌，然后可以将至多两张手牌交给其他角色。",
+  reyiji_info:
+    "当你受到1点伤害后，你可以摸两张牌，然后可以将至多两张手牌交给其他角色。",
 
   re_zhenji: "界甄姬",
   re_zhenji_prefix: "界",
@@ -57,7 +56,8 @@ const translates = {
   re_guanyu: "界关羽",
   re_guanyu_prefix: "界",
   rewusheng: "武圣",
-  rewusheng_info: "你可以将一张红色牌当【杀】使用或打出；你使用方块【杀】无距离限制。",
+  rewusheng_info:
+    "你可以将一张红色牌当【杀】使用或打出；你使用方块【杀】无距离限制。",
   yijue: "义绝",
   yijue_info:
     "出牌阶段限一次，你可以弃置一张牌，然后令一名其他角色展示一张手牌，若此牌为：黑色，直到回合结束，其不能使用或打出手牌且所有非锁定技失效，你对其使用红桃【杀】造成的伤害+1；红色，你获得之，然后你可以令其回复1点体力。",
@@ -71,7 +71,6 @@ const translates = {
   tishen_info:
     "出牌阶段结束时，你可以展示所有牌并弃置其中所有锦囊牌和坐骑牌，然后直到你的下回合开始，你获得所有以你为目标且未对你造成伤害的【杀】。",
   tishen2: "替身",
-  tishen2_info: "",
 
   re_zhugeliang: "界诸葛亮",
   re_zhugeliang_prefix: "界",
@@ -97,7 +96,8 @@ const translates = {
   rejizhi_info:
     "当你使用非转化的普通锦囊牌时，你可以摸一张牌。若此牌为基本牌，你可以弃置此牌，然后本回合手牌上限+1。",
   reqicai: "奇才",
-  reqicai_info: "锁定技，你使用锦囊牌无距离限制；其他角色不能弃置你装备区里的防具牌与宝物牌。",
+  reqicai_info:
+    "锁定技，你使用锦囊牌无距离限制；其他角色不能弃置你装备区里的防具牌与宝物牌。",
 
   re_sunquan: "界孙权",
   re_sunquan_prefix: "界",
@@ -111,7 +111,8 @@ const translates = {
   re_ganning: "界甘宁",
   re_ganning_prefix: "界",
   fenwei: "奋威",
-  fenwei_info: "限定技，当一张锦囊牌指定多个目标后，你可以令此牌对其中任意个目标无效。",
+  fenwei_info:
+    "限定技，当一张锦囊牌指定多个目标后，你可以令此牌对其中任意个目标无效。",
 
   re_lvmeng: "界吕蒙",
   re_lvmeng_prefix: "界",
@@ -130,7 +131,8 @@ const translates = {
   re_zhouyu: "界周瑜",
   re_zhouyu_prefix: "界",
   reyingzi: "英姿",
-  reyingzi_info: "锁定技，摸牌阶段，你多摸一张牌；你的手牌上限等于你的体力上限。",
+  reyingzi_info:
+    "锁定技，摸牌阶段，你多摸一张牌；你的手牌上限等于你的体力上限。",
   refanjian: "反间",
   refanjian_card: "弃牌",
   refanjian_hp: "失去体力",
@@ -176,7 +178,8 @@ const translates = {
   re_diaochan: "界貂蝉",
   re_diaochan_prefix: "界",
   rebiyue: "闭月",
-  rebiyue_info: "结束阶段，若你：有手牌，你可以摸一张牌；没有手牌，你可以摸两张牌。",
+  rebiyue_info:
+    "结束阶段，若你：有手牌，你可以摸一张牌；没有手牌，你可以摸两张牌。",
 
   re_huaxiong: "界华雄",
   re_huaxiong_prefix: "界",
@@ -197,9 +200,11 @@ const translates = {
 
   re_yiji: "伊籍",
   jijie: "机捷",
-  jijie_info: "出牌阶段限一次，你可以观看牌堆底的一张牌，然后将之交给一名角色。",
+  jijie_info:
+    "出牌阶段限一次，你可以观看牌堆底的一张牌，然后将之交给一名角色。",
   jiyuan: "急援",
-  jiyuan_info: "当一名角色进入濒死状态或你交给一名其他角色牌时，你可以令该角色摸一张牌。",
+  jiyuan_info:
+    "当一名角色进入濒死状态或你交给一名其他角色牌时，你可以令该角色摸一张牌。",
 }
 
 export default translates

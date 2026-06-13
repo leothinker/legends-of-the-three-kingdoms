@@ -1,5 +1,3 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
-
 const dynamicTranslates = {
   jsrgshichong(player) {
     const bool = player.storage.jsrgshichong
@@ -10,7 +8,7 @@ const dynamicTranslates = {
     } else {
       yang = `<span class='firetext'>${yang}</span>`
     }
-    let start = "转换技。当你使用牌指定其他角色为唯一目标后，",
+    const start = "转换技。当你使用牌指定其他角色为唯一目标后，",
       end = "。"
     return `${start}阳：${yang}；阴：${yin}${end}`
   },
@@ -23,7 +21,7 @@ const dynamicTranslates = {
     } else {
       yang = `<span class='firetext'>${yang}</span>`
     }
-    let start = "转换技。",
+    const start = "转换技。",
       end = "。"
     return `${start}阳：${yang}；阴：${yin}${end}`
   },

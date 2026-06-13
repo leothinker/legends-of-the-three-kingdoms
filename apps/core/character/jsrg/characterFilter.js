@@ -1,11 +1,9 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
-
 const characterFilters = {
   jsrg_caocao(mode) {
-    return mode != "chess" && mode != "tafang"
+    return mode !== "chess" && mode !== "tafang"
   },
   jsrg_xushao(mode) {
-    return mode != "guozhan"
+    return mode !== "guozhan"
   },
   jsrg_jiangwei(mode) {
     return mode !== "guozhan"

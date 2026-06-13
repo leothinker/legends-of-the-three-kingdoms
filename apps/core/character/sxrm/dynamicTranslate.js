@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { get, lib } from "wtk"
 
 const dynamicTranslates = {
   sxrmcongfeng(player, skill) {
@@ -10,35 +10,35 @@ const dynamicTranslates = {
     } else {
       yang = `<span class='firetext'>${yang}</span>`
     }
-    let start = "转换技，你使用牌或成为牌的目标后，你可以",
+    const start = "转换技，你使用牌或成为牌的目标后，你可以",
       end = "。"
     return `${start}阳：${yang}；阴：${yin}${end}`
   },
   sxrmweiwo_rende(player, skill) {
     const targets = player.getStorage(skill)
-    let info = lib.translate[`${skill}_info`]
+    const info = lib.translate[`${skill}_info`]
     if (!targets?.length) {
       return info
     }
-    let str = `${get.translation(targets)}${targets.length > 1 ? "中的一人" : ""}`
+    const str = `${get.translation(targets)}${targets.length > 1 ? "中的一人" : ""}`
     return info.replace("其他角色", str)
   },
   sxrmweiwo_qingnang(player, skill) {
     const targets = player.getStorage(skill)
-    let info = lib.translate[`${skill}_info`]
+    const info = lib.translate[`${skill}_info`]
     if (!targets?.length) {
       return info
     }
-    let str = `${get.translation(targets)}${targets.length > 1 ? "中的一人" : ""}`
+    const str = `${get.translation(targets)}${targets.length > 1 ? "中的一人" : ""}`
     return info.replace("一名角色", str)
   },
   sxrmweiwo_longyin(player, skill) {
     const targets = player.getStorage(skill)
-    let info = lib.translate[`${skill}_info`]
+    const info = lib.translate[`${skill}_info`]
     if (!targets?.length) {
       return info
     }
-    let str = `${get.translation(targets)}${targets.length > 1 ? "中的一人" : ""}`
+    const str = `${get.translation(targets)}${targets.length > 1 ? "中的一人" : ""}`
     return info.replace("一名角色", str)
   },
 }

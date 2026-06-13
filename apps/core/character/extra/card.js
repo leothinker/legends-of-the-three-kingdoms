@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { _status, game, get } from "wtk"
 
 const cards = {
   hun_zhuge: {
@@ -16,15 +16,14 @@ const cards = {
           return 1
         }
         player._zhuge_temp = true
-        var result = (function () {
+        var result = (() => {
           if (
-            !game.hasPlayer(function (current) {
-              return (
+            !game.hasPlayer(
+              (current) =>
                 get.distance(player, current) <= 1 &&
                 player.canUse("sha", current) &&
-                get.effect(current, { name: "sha" }, player, player) > 0
-              )
-            })
+                get.effect(current, { name: "sha" }, player, player) > 0,
+            )
           ) {
             return 1.5
           }
@@ -76,9 +75,10 @@ const cards = {
     ai: {
       value(card, player) {
         if (
-          !game.hasPlayer(function (current) {
-            return get.damageEffect(current, player, player, "thunder") > 0
-          })
+          !game.hasPlayer(
+            (current) =>
+              get.damageEffect(current, player, player, "thunder") > 0,
+          )
         ) {
           return 0
         }
@@ -86,9 +86,10 @@ const cards = {
       },
       equipValue(card, player) {
         if (
-          !game.hasPlayer(function (current) {
-            return get.damageEffect(current, player, player, "thunder") > 0
-          })
+          !game.hasPlayer(
+            (current) =>
+              get.damageEffect(current, player, player, "thunder") > 0,
+          )
         ) {
           return 0
         }

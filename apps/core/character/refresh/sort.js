@@ -32,7 +32,13 @@ const characterSort = {
     "re_diaochan",
     "re_huaxiong",
   ],
-  refresh_2019: ["re_zhenji", "re_zhangfei", "re_huangyueying", "caozhang", "re_yiji"],
+  refresh_2019: [
+    "re_zhenji",
+    "re_zhangfei",
+    "re_huangyueying",
+    "caozhang",
+    "re_yiji",
+  ],
   refresh_2021: ["re_sunshangxiang"],
 }
 

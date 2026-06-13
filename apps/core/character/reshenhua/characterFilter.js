@@ -1,8 +1,6 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
-
 const characterFilters = {
   re_zuoci(mode) {
-    return mode != "guozhan"
+    return mode !== "guozhan"
   },
 }
 

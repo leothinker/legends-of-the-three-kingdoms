@@ -1,25 +1,23 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
-import characters from "./character.js"
+import { game } from "wtk"
 import cards from "./card.js"
-import skills from "./skill.js"
-import translates from "./translate.js"
+import characters from "./character.js"
 import characterTitles from "./characterTitle.js"
 import characterIntros from "./intro.js"
-import voices from "./voices.js"
+import skills from "./skill.js"
 import { characterSort, characterSortTranslate } from "./sort.js"
+import translates from "./translate.js"
+import voices from "./voices.js"
 
-game.import("character", function () {
-  return {
-    name: "jiangxing",
-    connect: true,
-    character: { ...characters },
-    characterSort: {
-      jiangxing: characterSort,
-    },
-    characterTitle: { ...characterTitles },
-    characterIntro: { ...characterIntros },
-    card: { ...cards },
-    skill: { ...skills },
-    translate: { ...translates, ...voices, ...characterSortTranslate },
-  }
-})
+game.import("character", () => ({
+  name: "jiangxing",
+  connect: true,
+  character: { ...characters },
+  characterSort: {
+    jiangxing: characterSort,
+  },
+  characterTitle: { ...characterTitles },
+  characterIntro: { ...characterIntros },
+  card: { ...cards },
+  skill: { ...skills },
+  translate: { ...translates, ...voices, ...characterSortTranslate },
+}))

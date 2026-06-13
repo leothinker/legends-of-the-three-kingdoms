@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { get } from "wtk"
 
 const translates = {
   xushao: "许劭",
@@ -15,12 +15,14 @@ const translates = {
   dili: "帝力",
   dili_info: `觉醒技，当你的技能数大于你的体力上限后，你减1点体力上限，失去任意个其他技能并获得技能${get.poptip("shengzhi")}、${get.poptip("quandao")}、${get.poptip("chigang")}中的前等量个技能。`,
   shengzhi: "圣质",
-  shengzhi_info: "锁定技，当你发动非锁定技后，你本回合使用的下一张牌无距离和次数限制。",
+  shengzhi_info:
+    "锁定技，当你发动非锁定技后，你本回合使用的下一张牌无距离和次数限制。",
   quandao: "权道",
   quandao_info:
     "锁定技，当你使用【杀】或普通锦囊牌时，你展示手牌，将手牌中两者数量弃至相同并摸一张牌。",
   chigang: "持纲",
-  chigang_info: "转换技，锁定技，①你的判定阶段改为摸牌阶段；②你的判定阶段改为出牌阶段。",
+  chigang_info:
+    "转换技，锁定技，①你的判定阶段改为摸牌阶段；②你的判定阶段改为出牌阶段。",
 
   jx_zhiheng: "制衡",
   jx_zhiheng_info:
@@ -44,7 +46,8 @@ const translates = {
   xiashu_info:
     "出牌阶段开始时，你可以交给一名其他角色所有手牌，然后其展示任意张手牌，你选择获得其：1.以此法展示的牌；2.未以此法展示的手牌。",
   hongyuan: "弘援",
-  hongyuan_info: "每阶段限一次，当你一次获得至少两张牌后，你可以交给至多两名其他角色各一张牌。",
+  hongyuan_info:
+    "每阶段限一次，当你一次获得至少两张牌后，你可以交给至多两名其他角色各一张牌。",
   anxu: "安恤",
   anxu_info:
     "出牌阶段限一次，你可以令一名其他角色展示并获得另一名手牌数大于其的其他角色一张手牌，若不为♠，你摸一张牌。",
@@ -63,7 +66,8 @@ const translates = {
   shenxing: "慎行",
   shenxing_info: "出牌阶段，你可以弃置两张牌，然后摸一张牌。",
   xingxue: "兴学",
-  xingxue_info: "结束阶段，你可以令至多X名角色依次摸一张牌并将一张牌置于牌堆顶（X为你的体力值）。",
+  xingxue_info:
+    "结束阶段，你可以令至多X名角色依次摸一张牌并将一张牌置于牌堆顶（X为你的体力值）。",
 }
 
 export default translates

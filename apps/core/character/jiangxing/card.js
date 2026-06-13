@@ -1,5 +1,3 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
-
 const cards = {
   suits_spade: {
     fullskin: true,

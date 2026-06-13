@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { game, get } from "wtk"
 
 const cards = {
   xumou_jsrg: {
@@ -19,7 +19,10 @@ const cards = {
         )
         .forResult()
       if (!result.bool) {
-        const cards = player.getCards("j", (card) => (card.viewAs || card.name) == "xumou_jsrg")
+        const cards = player.getCards(
+          "j",
+          (card) => (card.viewAs || card.name) === "xumou_jsrg",
+        )
         if (cards.length > 0) {
           await player.loseToDiscardpile(cards)
         }
@@ -38,11 +41,11 @@ const cards = {
     destroy: "discardPile",
     getYing(count) {
       var cards = []
-      if (typeof count != "number") {
+      if (typeof count !== "number") {
         count = 1
       }
       while (count--) {
-        let card = game.createCard("ying", "spade", 1)
+        const card = game.createCard("ying", "spade", 1)
         cards.push(card)
       }
       return cards

@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { get } from "wtk"
 
 const translates = {
   sxrm: "蚀心入魔",
@@ -50,7 +50,8 @@ const translates = {
   sxrmyihe_info:
     "锁定技，你的回合内各限一次，一名角色受到伤害时，若其与伤害来源的手牌数与体力值大小关系：相同，其与伤害来源各摸两张牌；不同，此伤害+1。",
   sxrmjizhi: "赍志",
-  sxrmjizhi_info: "锁定技，其他角色不能对你使用【桃】；你每回合首次进入濒死时，回复1点体力。",
+  sxrmjizhi_info:
+    "锁定技，其他角色不能对你使用【桃】；你每回合首次进入濒死时，回复1点体力。",
   sxrm_caopi: "疑曹丕",
   sxrm_caopi_prefix: "疑",
   sxrmzhengsi: "争嗣",

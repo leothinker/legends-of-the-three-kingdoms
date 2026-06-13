@@ -487,7 +487,7 @@ const skills = {
                 }
                 return att - 4
               },
-              prompt: "请选择要扣置的手牌",
+              prompt: "在至多两名其他角色的武将牌旁分别扣置至多两张手牌",
             })
             .forResult()
 
@@ -695,7 +695,7 @@ const skills = {
       }
       if (target.hp < target.maxHp) {
         result = await player
-          .chooseBool("是否让目标回复1点体力？")
+          .chooseBool("是否令其回复1点体力？")
           .set("ai", () => get.recoverEffect(target, player, player) > 0)
           .forResult()
       } else {
@@ -786,9 +786,9 @@ const skills = {
           return
         }
         if (typeof player.storage.oldtishen2 !== "number") {
-          return "上回合体力：无"
+          return "上回合结束后的体力：无"
         }
-        return `上回合体力：${player.storage.oldtishen2}`
+        return `上回合结束后的体力：${player.storage.oldtishen2}`
       },
       content: "limited",
     },
@@ -814,7 +814,7 @@ const skills = {
         if (player.storage.oldtishen) {
           return
         }
-        return `上回合体力：${storage}`
+        return `上回合结束后的体力：${storage}`
       },
     },
   },
@@ -849,7 +849,7 @@ const skills = {
 
       if (get.type(event.card, "trick") === get.type(trigger.card, "trick")) {
         result = await player
-          .chooseTarget("选择获得此牌的角色")
+          .chooseTarget("将此牌交给一名角色")
           .set("ai", (target) => {
             var att = get.attitude(_status.event.player, target)
             if (_status.event.du) {
@@ -867,7 +867,7 @@ const skills = {
           .forResult()
       } else {
         result = await player
-          .chooseBool(`是否弃置${get.translation(event.card)}？`)
+          .chooseBool(`是否将${get.translation(event.card)}置入弃牌堆？`)
           .forResult()
         event.disbool = true
       }
@@ -1021,9 +1021,13 @@ const skills = {
         .forResult()
 
       // step 1
-      const discards = []
-      while (ui.cardPile.hasChildNodes()) {
+      while (true) {
         const next = get.cards()[0]
+        await player.showCards(
+          next,
+          `${get.translation(player)}发动了【荐言】`,
+          true,
+        )
         if (
           get.color(next) === result.control ||
           get.type(next, "trick") === result.control
@@ -1031,11 +1035,16 @@ const skills = {
           event.card = next
           break
         }
-        discards.push(next)
-        await player.showCards([next])
-      }
-      if (!event.card) {
-        return
+        if (
+          !ui.cardPile.hasChildNodes() &&
+          !get.discardPile(
+            (card) =>
+              get.color(card) === result.control ||
+              get.type(card, "trick") === result.control,
+          )
+        ) {
+          return
+        }
       }
       await player.showCards([event.card])
 
@@ -1043,7 +1052,7 @@ const skills = {
       result = await player
         .chooseTarget(
           true,
-          `选择一名男性角色获得${get.translation(event.card)}`,
+          `令一名男性角色获得${get.translation(event.card)}`,
           (card, player, target) => target.hasSex("male"),
         )
         .set("ai", (target) => {
@@ -1059,7 +1068,6 @@ const skills = {
       // step 3
       player.line(result.targets, "green")
       await result.targets[0].gain(event.card, "gain2")
-      await game.cardsDiscard(discards)
     },
     ai: {
       order: 9,

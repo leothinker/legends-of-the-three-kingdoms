@@ -2021,6 +2021,7 @@ const skills = {
   wushuang: {
     audio: 2,
     audioname: ["re_lvbu", "shen_lvbu"],
+    audioname2: { old_lvbu: "wushuang_re_lvbu" },
     forced: true,
     locked: true,
     group: ["wushuang1", "wushuang2"],
@@ -2029,6 +2030,7 @@ const skills = {
   wushuang1: {
     audio: "wushuang",
     audioname: ["re_lvbu", "shen_lvbu"],
+    audioname2: { old_lvbu: "wushuang_re_lvbu" },
     trigger: { player: "useCardToPlayered" },
     forced: true,
     sourceSkill: "wushuang",
@@ -2066,6 +2068,7 @@ const skills = {
   wushuang2: {
     audio: "wushuang",
     audioname: ["re_lvbu", "shen_lvbu"],
+    audioname2: { old_lvbu: "wushuang_re_lvbu" },
     trigger: { player: "useCardToPlayered", target: "useCardToTargeted" },
     forced: true,
     sourceSkill: "wushuang",
@@ -2107,6 +2110,7 @@ const skills = {
       },
     },
   },
+  wushuang_re_lvbu: { audio: 2 },
   // 貂蝉
   // 离间
   lijian: {

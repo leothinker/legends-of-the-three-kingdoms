@@ -18,6 +18,8 @@ const characterSort = {
     "old_zhangfei",
     "old_zhaoyun",
     "xushu",
+
+    "old_lvbu",
   ],
 }
 

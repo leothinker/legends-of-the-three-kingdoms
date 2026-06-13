@@ -919,8 +919,7 @@ const skills = {
         },
         charlotte: true,
         onremove: true,
-        audio: "rezhaxiang",
-        audioname2: { ol_sb_jiangwei: "rezhaxiang_ol_sb_jiangwei" },
+        audio: "zhaxiang",
         trigger: { player: "useCard" },
         sourceSkill: "rezhaxiang",
         filter(event, player) {
@@ -1019,14 +1018,16 @@ const skills = {
     selectTarget: 2,
     multitarget: true,
     async content(event, trigger, player) {
-      const useCardEvent = event.targets[1].useCard(
-        { name: "juedou", isCard: true },
-        "nowuxie",
-        event.targets[0],
-        "noai",
-      )
-      useCardEvent.animate = false
+      const next = event.targets[1]
+        .useCard({
+          card: get.autoViewAs({ name: "juedou", isCard: true }),
+          targets: [event.targets[0]],
+          nowuxie: true,
+          noai: true,
+        })
+        .set("animate", false)
       await game.delay(0.5)
+      return next
     },
     ai: {
       order: 8,

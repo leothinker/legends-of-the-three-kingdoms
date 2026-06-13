@@ -15,4 +15,6 @@ export default {
   old_zhangfei: "万夫不当",
   old_zhaoyun: "虎威将军",
   xushu: "化剑为犁",
+
+  old_lvbu: "武的化身",
 }

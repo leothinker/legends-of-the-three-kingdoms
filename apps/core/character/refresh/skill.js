@@ -1760,7 +1760,6 @@ const skills = {
   // 诈降
   zhaxiang: {
     audio: 2,
-    audioname2: { ol_sb_jiangwei: "zhaxiang_ol_sb_jiangwei" },
     trigger: { player: "loseHpEnd" },
     filter(event, player) {
       return player.isIn() && event.num > 0
@@ -1791,7 +1790,6 @@ const skills = {
         charlotte: true,
         onremove: true,
         audio: "zhaxiang",
-        audioname2: { ol_sb_jiangwei: "zhaxiang_ol_sb_jiangwei" },
         trigger: { player: "useCard" },
         sourceSkill: "zhaxiang",
         filter(event, player) {
@@ -1859,14 +1857,7 @@ const skills = {
   // 英姿
   reyingzi: {
     audio: 2,
-    audioname: ["sunce", "re_sunben", "re_sunce"],
-    audioname2: {
-      gexuan: "reyingzi_gexuan",
-      re_sunyi: "reyingzi_re_sunyi",
-      heqi: "reyingzi_heqi",
-      re_heqi: "reyingzi_heqi",
-      boss_sunce: "reyingzi_sunce",
-    },
+    audioname: ["re_sunce"],
     trigger: { player: "phaseDrawBegin2" },
     forced: true,
     preHidden: true,
@@ -2266,7 +2257,7 @@ const skills = {
         result = await player
           .chooseControl()
           .set("choiceList", [
-            `将${get.translation(cards[0])}置入${get.translation(target)}的装备区`,
+            `将${get.translation(cards[0])}置入${get.translation(target)}装备区`,
             `弃置${get.translation(cards[0])}`,
           ])
           .set("ai", () => 1)
@@ -2345,7 +2336,6 @@ const skills = {
   // 枭姬
   rexiaoji: {
     audio: 2,
-    audioname: ["sp_sunshangxiang"],
     trigger: {
       player: "loseAfter",
       global: [
@@ -2359,10 +2349,10 @@ const skills = {
     frequent: true,
     filter(event, player) {
       const evt = event.getl(player)
-      return evt && evt.player === player && evt.es && evt.es.length > 0
+      return evt?.player === player && evt.es && evt.es.length > 0
     },
     async content(event, trigger, player) {
-      player.draw(2)
+      await player.draw(2)
     },
     ai: {
       noe: true,
@@ -2439,7 +2429,7 @@ const skills = {
     },
   },
   // 界吕布
-  // 无双
+  // 利驭
   liyu: {
     audio: 2,
     trigger: {
@@ -2545,7 +2535,7 @@ const skills = {
               target !== _status.event.player
             )
           },
-          `请选择一名角色，视为${get.translation(player)}对其使用【决斗】`,
+          `${get.translation(player)}视为对你选择的另一名角色使用一张【决斗】`,
         )
         .set("ai", (target) => {
           const evt = _status.event.getParent()

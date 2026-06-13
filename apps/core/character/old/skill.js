@@ -1087,6 +1087,71 @@ const skills = {
       threaten: 1.2,
     },
   },
+  // 界吕布
+  // 利驭
+  oldliyu: {
+    audio: "liyu",
+    trigger: { source: "damageSource" },
+    forced: true,
+    filter(event, player) {
+      if (event._notrigger.includes(event.player)) {
+        return false
+      }
+      return (
+        event.card &&
+        event.card.name === "sha" &&
+        event.player.isIn() &&
+        event.player.countGainableCards(player, "he") > 0
+      )
+    },
+    check() {
+      return false
+    },
+    async content(event, trigger, player) {
+      // step 0
+      const result = await trigger.player
+        .chooseTarget((card, player, target) => {
+          var evt = _status.event.getParent()
+          return (
+            evt.player.canUse({ name: "juedou" }, target) &&
+            target !== _status.event.player
+          )
+        }, get.prompt("oldliyu"))
+        .set("ai", (target) => {
+          var evt = _status.event.getParent()
+          return (
+            get.effect(
+              target,
+              { name: "juedou" },
+              evt.player,
+              _status.event.player,
+            ) - 2
+          )
+        })
+        .forResult()
+
+      // step 1
+      if (result.bool) {
+        await player.gainPlayerCard(trigger.player, "he", true)
+        event.target = result.targets[0]
+        trigger.player.line(player, "green")
+      } else {
+        return
+      }
+
+      // step 2
+      if (event.target) {
+        await player.useCard(
+          { name: "juedou", isCard: true },
+          event.target,
+          "noai",
+        )
+      }
+    },
+    ai: {
+      halfneg: true,
+    },
+  },
 }
 
 export default skills

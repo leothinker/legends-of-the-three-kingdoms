@@ -91,6 +91,12 @@ const translates = {
   jianyan: "荐言",
   jianyan_info:
     "出牌阶段限一次，你可以声明一种牌的类别或颜色，然后连续亮出牌堆顶的牌，直到亮出符合你声明的牌为止。最后你令一名男性角色获得此牌。",
+
+  old_lvbu: "界吕布",
+  old_lvbu_prefix: "界",
+  oldliyu: "利驭",
+  oldliyu_info:
+    "当你使用【杀】对一名其他角色造成伤害后，其可以令你获得其一张牌，然后你视为对其选择的另一名角色使用一张【决斗】。",
 }
 
 export default translates

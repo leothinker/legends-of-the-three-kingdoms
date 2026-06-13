@@ -107,6 +107,14 @@ const characters = {
     hp: 4,
     skills: ["zhuhai", "qianxin"],
   },
+  old_lvbu: {
+    sex: "male",
+    group: "qun",
+    hp: 5,
+    skills: ["wushuang", "oldliyu"],
+    img: "image/character/re_lvbu.jpg",
+    dieAudios: ["re_lvbu"],
+  },
 }
 
 export default characters

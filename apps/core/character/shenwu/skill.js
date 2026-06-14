@@ -1163,9 +1163,9 @@ const skills = {
       event.result = await player
         .chooseTarget(
           get.prompt("reqiaomeng"),
-          "选择一名不为自己的目标角色，然后弃置其一张牌。若以此法弃置的牌为：装备牌，你获得此牌；锦囊牌，你令" +
+          "弃置其中一个目标一张牌。若此牌为：装备牌，你获得之；锦囊牌，此" +
             get.translation(trigger.card) +
-            "不可被响应。",
+            "无法被响应。",
           (card, player, target) =>
             target !== player &&
             _status.event.getTrigger().targets.includes(target) &&

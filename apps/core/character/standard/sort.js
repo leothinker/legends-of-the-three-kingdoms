@@ -31,7 +31,8 @@ const characterSort = {
   ],
   standard_2013: ["huaxiong"],
   standard_2019: ["gongsunzan"],
-  standard_2023: ["yuejin", "ganfuren", "panfeng"],
+  standard_2023: ["yuejin", "panfeng"],
+  standard_2026: ["kongrong"],
 }
 
 const characterSortTranslate = {
@@ -39,6 +40,7 @@ const characterSortTranslate = {
   standard_2013: "标准版2013",
   standard_2019: "标准版2019",
   standard_2023: "标准版2023",
+  standard_2026: "标准版2026",
 }
 
 export { characterSort, characterSortTranslate }

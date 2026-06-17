@@ -22,6 +22,14 @@ const translates = {
   tongji_info:
     "锁定技，若你的手牌数大于体力值，攻击范围含有你的角色使用【杀】只能以你为目标。",
 
+  ganfuren: "甘夫人",
+  shenzhi: "神智",
+  shenzhi_info:
+    "准备阶段，你可以弃置所有手牌，若你以此法弃置的手牌数大于X（X为你的体力值），你回复1点体力。",
+  shushen: "淑慎",
+  shushen_info:
+    "当你回复1点体力后，你可以令一名其他角色摸一张牌，若其没有手牌，改为摸两张牌。",
+
   old_caocao: "界曹操",
   old_caocao_prefix: "界",
   oldjianxiong: "奸雄",

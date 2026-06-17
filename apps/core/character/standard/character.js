@@ -177,18 +177,17 @@ const characters = {
     hp: 4,
     skills: ["xiaoguo"],
   },
-  ganfuren: {
-    sex: "female",
-    group: "shu",
-    hp: 3,
-    skills: ["shenzhi", "shushen"],
-    names: "甘|null",
-  },
   panfeng: {
     sex: "male",
     group: "qun",
     hp: 4,
     skills: ["kuangfu"],
+  },
+  kongrong: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["cirang", "liaoliao"],
   },
 }
 

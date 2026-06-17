@@ -11,7 +11,7 @@ window.wtk_package = {
     // jsrg: "江山如故",
     // tianshui: "天水濯名",
     // sxrm: "蚀心入魔",
-    // yanling: "雁翎耀光",
+    yanling: "雁翎耀光",
   },
   card: {
     standard: "标准版",

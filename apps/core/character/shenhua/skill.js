@@ -19,13 +19,11 @@ const skills = {
   // 神速
   shensu: {
     audio: 2,
-    audioname: ["xiahouba"],
     group: ["shensu1", "shensu2"],
     preHidden: ["shensu1", "shensu2"],
   },
   shensu1: {
     audio: "shensu",
-    audioname: ["xiahouba"],
     trigger: { player: "phaseJudgeBefore" },
     sourceSkill: "shensu",
     async cost(event, trigger, player) {
@@ -62,7 +60,6 @@ const skills = {
   },
   shensu2: {
     audio: "shensu",
-    audioname: ["xiahouba"],
     trigger: { player: "phaseUseBefore" },
     sourceSkill: "shensu",
     filter(event, player) {
@@ -181,7 +178,6 @@ const skills = {
   // 天香
   tianxiang: {
     audio: 2,
-    audioname: ["daxiaoqiao"],
     trigger: { player: "damageBegin3" },
     filter(event, player) {
       return player.countCards("h", { suit: "heart" }) > 0 && event.num > 0
@@ -606,12 +602,6 @@ const skills = {
   huangtian: {
     audio: 2,
     audioname: ["re_zhangjiao"],
-    audioname2: {
-      pe_jun_zhangjiao: [
-        "xinhuangtian2_re_zhangjiao1.mp3",
-        "xinhuangtian2_re_zhangjiao2.mp3",
-      ],
-    },
     global: "huangtian2",
     zhuSkill: true,
   },

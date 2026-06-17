@@ -213,6 +213,68 @@ const skills = {
       },
     },
   },
+  // 甘夫人
+  // 神智
+  shenzhi: {
+    audio: 2,
+    trigger: { player: "phaseZhunbeiBegin" },
+    check(event, player) {
+      if (player.hp > 2) {
+        return false
+      }
+      var cards = player.getCards("h")
+      if (cards.length <= player.hp) {
+        return false
+      }
+      if (cards.length > 3) {
+        return false
+      }
+      for (var i = 0; i < cards.length; i++) {
+        if (get.value(cards[i]) > 7 || get.tag(cards[i], "recover") >= 1) {
+          return false
+        }
+      }
+      return true
+    },
+    filter(event, player) {
+      return player.countCards("h") > 0
+    },
+    preHidden: true,
+    content() {
+      "step 0"
+      var cards = player.getCards("h")
+      event.bool = cards.length > player.hp
+      player.discard(cards)
+      ;("step 1")
+      if (event.bool) {
+        player.recover()
+      }
+    },
+  },
+  // 淑慎
+  shushen: {
+    audio: 2,
+    trigger: { player: "recoverEnd" },
+    getIndex(event) {
+      return event.num || 1
+    },
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseTarget({
+          prompt: get.prompt2(event.skill),
+          filterTarget: lib.filter.notMe,
+          ai(target) {
+            return get.attitude(get.player(), target)
+          },
+        })
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      const target = event.targets[0]
+      await target.draw(target.hasCards("h") ? 1 : 2)
+    },
+    ai: { threaten: 0.8, expose: 0.1 },
+  },
   // 界曹操
   // 奸雄
   oldjianxiong: {
@@ -275,7 +337,7 @@ const skills = {
   // 清俭
   oldqingjian: {
     audio: "qingjian",
-    trigger: { player: "gainAfter" },
+    trigger: { player: "gainAfter", global: "loseAsyncAfter" },
     direct: true,
     filter(event, player) {
       var evt = event.getParent("phaseDraw")
@@ -329,15 +391,14 @@ const skills = {
               }
               return att - 4
             },
-            prompt: "请选择要送人的卡牌",
+            prompt: "将其中任意张牌交给其他角色",
           })
           .forResult()
 
         // step 2
         if (result.bool) {
-          player.storage.oldqingjian++
           player.logSkill("oldqingjian", result.targets)
-          await result.targets[0].gain(result.cards, player, "give")
+          await player.give(result.cards, result.targets[0])
           for (var i = 0; i < result.cards.length; i++) {
             event.cards.remove(result.cards[i])
           }
@@ -346,7 +407,6 @@ const skills = {
           }
           break
         }
-        player.storage.counttrigger.oldqingjian--
         break
       }
     },

@@ -4,6 +4,7 @@ const characters = {
     group: "wu",
     hp: 3,
     skills: ["ylygtianxiang", "ylyghongyan"],
+    names: "桥|null",
     dieAudios: ["re_xiaoqiao"],
   },
   ylyg_yuji: {

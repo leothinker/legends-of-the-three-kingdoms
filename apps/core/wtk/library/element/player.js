@@ -187,6 +187,8 @@ export class Player extends HTMLDivElement {
       equips: [],
       judges: [],
     }
+    //添加updates
+    player.updates = []
   }
   buildEventListener(noclick) {
     const node = this.node
@@ -201,7 +203,7 @@ export class Player extends HTMLDivElement {
         lib.config.touchscreen ? "touchend" : "click",
         ui.click.identity,
       )
-      //node.count.addEventListener("pointerdown", ui.click.countOpen);
+      node.count.addEventListener("pointerdown", ui.click.count)
 
       if (lib.config.touchscreen) {
         this.addEventListener("touchstart", ui.click.playertouchstart)
@@ -415,6 +417,11 @@ export class Player extends HTMLDivElement {
    * @type { import("./client.js").Client | undefined }
    */
   ws
+  /**
+   * $update里面用到的钩子
+   * @type { ((player: Player) => void)[] }
+   */
+  updates
 
   /**
    * 添加视为装备

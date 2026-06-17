@@ -5736,11 +5736,7 @@ export class Game {
         var x1 = p2[0]
         var y1 = p2[1]
         div.style.transition = "all 0s"
-        div.style.transform =
-          "rotate(" +
-          getAngle(x0, y0, x1, y1, true) +
-          "deg)" +
-          (x0 > x1 ? "" : " rotateY(180deg)")
+        div.style.transform = `rotate(${getAngle(x0, y0, x1, y1, true)}deg)${x0 > x1 ? "" : " rotateY(180deg)"}`
         div.style["transform-origin"] = "0 50%"
         var div2 = ui.create.div()
         div2.style.zIndex = 1000
@@ -5761,24 +5757,13 @@ export class Game {
         }
         setTimeout(() => {
           div.style.transition = `all ${(timeS * 4) / 3}s`
-          div.style.transform +=
-            " translateX(" +
-            -(((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5 + 2) +
-            "px)"
+          div.style.transform += ` translateX(${-(((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5 + 2)}px)`
           div2.style.transform = `rotate(${getAngle(x0, y0, x1, y1)}deg) scaleX(1)`
         }, 50)
         setTimeout(
           () => {
             div2.style.transition = `all ${(timeS * 2) / 3}s`
-            div2.style.transform =
-              "rotate(" +
-              getAngle(x0, y0, x1, y1) +
-              "deg) translateX(" +
-              (((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5 +
-                2 -
-                ((div.offsetHeight / 2) ** 2 + (div.offsetWidth / 2) ** 2) **
-                  0.5) +
-              "px) scaleX(0.01)"
+            div2.style.transform = `rotate(${getAngle(x0, y0, x1, y1)}deg) translateX(${((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5 + 2 - ((div.offsetHeight / 2) ** 2 + (div.offsetWidth / 2) ** 2) ** 0.5}px) scaleX(0.01)`
           },
           50 + ((timeS * 4) / 3) * 1000,
         )
@@ -5964,12 +5949,7 @@ export class Game {
     const drawfunc = (time, ctx) => {
       let current
       if (time < total / 3) {
-        ctx.strokeStyle =
-          "rgba(" +
-          color.toString() +
-          "," +
-          opacity * (time / (total / 3)) +
-          ")"
+        ctx.strokeStyle = `rgba(${color.toString()},${opacity * (time / (total / 3))})`
         current = [
           from[0] + ((to[0] - from[0]) * time) / (total / 3),
           from[1] + ((to[1] - from[1]) * time) / (total / 3),
@@ -5977,12 +5957,7 @@ export class Game {
       } else if (time <= total) {
         current = to
         if (time > total / 1.5) {
-          ctx.strokeStyle =
-            "rgba(" +
-            color.toString() +
-            "," +
-            opacity * (1 - (time - total / 1.5) / (total - total / 1.5)) +
-            ")"
+          ctx.strokeStyle = `rgba(${color.toString()},${opacity * (1 - (time - total / 1.5) / (total - total / 1.5))})`
         } else {
           ctx.strokeStyle = `rgba(${color.toString()},${opacity})`
         }
@@ -6892,8 +6867,7 @@ export class Game {
         if (_status.mode === "standard" || _status.mode === "three") {
           ui.create.control("再战", () => {
             game.saveConfig(
-              "continue_name_versus" +
-                (_status.mode === "three" ? "_three" : ""),
+              `continue_name_versus${_status.mode === "three" ? "_three" : ""}`,
               {
                 friend: _status.friendBackup,
                 enemy: _status.enemyBackup,
@@ -7995,11 +7969,7 @@ export class Game {
             const str = `px,${event.margin / 2 - event.height * 0.5}px)`
             for (let i = 0; i < event.friendlist.length; i++) {
               event.friendlist[i].style.transform =
-                "scale(1.2) translate(" +
-                ((-(event.width + 14) * event.friendlist.length) / 2 +
-                  7 +
-                  i * (event.width + 14)) +
-                str
+                `scale(1.2) translate(${(-(event.width + 14) * event.friendlist.length) / 2 + 7 + i * (event.width + 14)}${str}`
             }
           }
         }
@@ -8031,11 +8001,7 @@ export class Game {
             const str = `px,${event.margin / 2 - event.height * 0.5}px)`
             for (let i = 0; i < event.friendlist.length; i++) {
               event.friendlist[i].style.transform =
-                "scale(1.2) translate(" +
-                ((-(event.width + 14) * event.friendlist.length) / 2 +
-                  7 +
-                  i * (event.width + 14)) +
-                str
+                `scale(1.2) translate(${(-(event.width + 14) * event.friendlist.length) / 2 + 7 + i * (event.width + 14)}${str}`
             }
           } else {
             if (!event.imchoosing) {

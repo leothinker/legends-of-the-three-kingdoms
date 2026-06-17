@@ -4,6 +4,7 @@ const characterSort = {
     "old_huangyueying",
     "old_diaochan",
     "old_yuanshu",
+    "ganfuren",
   ],
   old_shenhua: [],
   old_refresh: [

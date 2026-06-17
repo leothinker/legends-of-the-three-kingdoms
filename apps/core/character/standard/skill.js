@@ -1378,7 +1378,7 @@ const skills = {
     frequent: true,
     preHidden: true,
     filter(event) {
-      return get.type(event.card) === "trick" && event.card.isCard
+      return get.type(event.card) === "trick"
     },
     async content(event, trigger, player) {
       await player.draw({ nodelay: true })
@@ -2320,68 +2320,6 @@ const skills = {
       }
     },
   },
-  // 甘夫人
-  // 神智
-  shenzhi: {
-    audio: 2,
-    trigger: { player: "phaseZhunbeiBegin" },
-    check(event, player) {
-      if (player.hp > 2) {
-        return false
-      }
-      var cards = player.getCards("h")
-      if (cards.length <= player.hp) {
-        return false
-      }
-      if (cards.length > 3) {
-        return false
-      }
-      for (var i = 0; i < cards.length; i++) {
-        if (get.value(cards[i]) > 7 || get.tag(cards[i], "recover") >= 1) {
-          return false
-        }
-      }
-      return true
-    },
-    filter(event, player) {
-      return player.countCards("h") > 0
-    },
-    preHidden: true,
-    content() {
-      "step 0"
-      var cards = player.getCards("h")
-      event.bool = cards.length > player.hp
-      player.discard(cards)
-      ;("step 1")
-      if (event.bool) {
-        player.recover()
-      }
-    },
-  },
-  // 淑慎
-  shushen: {
-    audio: 2,
-    trigger: { player: "recoverEnd" },
-    getIndex(event) {
-      return event.num || 1
-    },
-    async cost(event, trigger, player) {
-      event.result = await player
-        .chooseTarget({
-          prompt: get.prompt2(event.skill),
-          filterTarget: lib.filter.notMe,
-          ai(target) {
-            return get.attitude(get.player(), target)
-          },
-        })
-        .forResult()
-    },
-    async content(event, trigger, player) {
-      const target = event.targets[0]
-      await target.draw(target.hasCards("h") ? 1 : 2)
-    },
-    ai: { threaten: 0.8, expose: 0.1 },
-  },
   // 潘凤
   // 狂斧
   kuangfu: {
@@ -2414,6 +2352,192 @@ const skills = {
     subSkill: {
       used: {
         charlotte: true,
+      },
+    },
+  },
+  // 孔融
+  // 辞让
+  cirang: {
+    audio: 2,
+    trigger: { player: "gainAfter", global: "loseAsyncAfter" },
+    usable: 1,
+    check(event, player) {
+      return game.hasPlayer(
+        (current) => current !== player && get.attitude(player, current) > 0,
+      )
+    },
+    filter(event, player) {
+      return event.getg(player).length >= 2
+    },
+    async content(event, trigger, player) {
+      let result
+
+      // step 0
+      if (_status.connectMode) {
+        game.broadcastAll(() => {
+          _status.noclearcountdown = true
+        })
+      }
+      event.given_map = {}
+      event.cards = trigger.getg(player)
+      await player.showCards(event.cards)
+      const maxNum = Math.max(...event.cards.map((card) => get.number(card)))
+      let gaveMax = false
+      let first = true
+
+      // step 1..2 (loop until all cards assigned or player cancels)
+      while (event.cards.length > 0) {
+        result = await player
+          .chooseCardTarget({
+            filterCard(card) {
+              return get.itemtype(card) === "card" && event.cards.includes(card)
+            },
+            filterTarget: lib.filter.notMe,
+            selectCard: [1, event.cards.length],
+            prompt: "将其中任意张牌交给其他角色",
+            forced: first,
+            ai1(card) {
+              if (ui.selected.cards.length > 0) {
+                return -1
+              }
+              if (card.name === "du") {
+                return 20
+              }
+              if (!gaveMax && get.number(card) === maxNum) {
+                return 20 - get.value(card)
+              }
+              const player = _status.event.player
+              if (player.countCards() > player.getHandcardLimit())
+                return 10 - get.value(card)
+              return -1
+            },
+            allowChooseAll: true,
+            ai2(target) {
+              const player = get.player()
+              const att = get.attitude(player, target)
+              if (
+                ui.selected.cards.length &&
+                ui.selected.cards[0].name === "du"
+              ) {
+                if (target.hasSkillTag("nodu")) {
+                  return 0
+                }
+                return 1 - att
+              }
+              if (target.countCards("h") > player.countCards("h")) {
+                return 0
+              }
+              return att - 4
+            },
+          })
+          .forResult()
+
+        if (result.bool) {
+          const res = result.cards
+          const targetId = result.targets[0].playerid
+          event.cards.removeArray(res)
+          if (!event.given_map[targetId]) event.given_map[targetId] = []
+          event.given_map[targetId].addArray(res)
+          if (res?.some((card) => get.number(card) === maxNum)) gaveMax = true
+          first = false
+          // continue loop if still cards to give
+          continue
+        }
+
+        // otherwise break and proceed to distribution
+        break
+      }
+
+      // step 3 cleanup for connect mode
+      if (_status.connectMode) {
+        game.broadcastAll(() => {
+          delete _status.noclearcountdown
+          game.stopCountChoose()
+        })
+      }
+
+      // prepare gain map & cards list
+      const map = []
+      const cards = []
+      for (const id of Object.keys(event.given_map)) {
+        const source = (_status.connectMode ? lib.playerOL : game.playerMap)[id]
+        player.line(source, "green")
+        if (
+          player !== source &&
+          (get.mode() !== "identity" || player.identity !== "nei")
+        ) {
+          player.addExpose(0.18)
+        }
+        map.push([source, event.given_map[id]])
+        cards.addArray(event.given_map[id])
+      }
+
+      // perform the async give
+      await game
+        .loseAsync({
+          gain_list: map,
+          player,
+          cards,
+          giver: player,
+          animate: "giveAuto",
+        })
+        .setContent("gaincardMultiple")
+      if (gaveMax) await player.draw()
+    },
+  },
+  // 了了
+  liaoliao: {
+    audio: 2,
+    trigger: { global: "phaseBegin" },
+    logTarget: "player",
+    filter(event, player) {
+      return (
+        event.player.isIn() && event.player !== player && player.hasCards("he")
+      )
+    },
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseToDiscard({
+          prompt: get.prompt(event.skill),
+          position: "he",
+          filterCard: lib.filter.cardDiscardable,
+          ai(card) {
+            const event = get.event()
+            if (!event.att) return 0
+            const useful = get.useful(card)
+            const num = get.number(card)
+            if (event.exceed || useful < 5 || (num < 5 && useful < 7)) {
+              return 13 - num
+            }
+            return 0
+          },
+        })
+        .set("att", get.attitude(player, trigger.player) < -2)
+        .set("exceed", player.countCards() > player.getHandcardLimit())
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      await player.discard({
+        cards: event.cards,
+        discarder: player,
+      })
+      player.addTempSkill("liaoliao_block")
+      player.addMark("liaoliao_block", get.number(event.cards[0]), false)
+    },
+    subSkill: {
+      block: {
+        mark: true,
+        intro: { content: "不能成为点数大于#的牌的目标" },
+        mod: {
+          targetEnabled: (card, player, target) => {
+            if (typeof get.number(card) === "number") {
+              if (get.number(card) > target.countMark("liaoliao_block"))
+                return false
+            }
+          },
+        },
+        charlotte: true,
+        onremove: true,
       },
     },
   },

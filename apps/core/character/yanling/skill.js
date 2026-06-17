@@ -5,7 +5,7 @@ const skills = {
   // 界小乔
   // 天香
   ylygtianxiang: {
-    audio: "jx_tianxiang",
+    audio: "retianxiang",
     trigger: {
       player: "damageBegin4",
     },
@@ -82,7 +82,7 @@ const skills = {
           event.result = await player
             .chooseTarget(lib.filter.notMe)
             .set("createDialog", [
-              `###${get.prompt(event.skill)}###将这些牌交给一名其他角色，其于此回合结束时失去1点体力（不叠加）`,
+              `###${get.prompt(event.skill)}###将之交给一名其他角色，其于本回合结束时失去1点体力（不叠加）`,
               cards,
               [
                 (dialog) =>
@@ -122,7 +122,7 @@ const skills = {
         popup: false,
         mark: true,
         intro: {
-          content: "回合结束时失去一点体力",
+          content: "回合结束时失去1点体力",
         },
         trigger: { global: "phaseEnd" },
         async content(event, trigger, player) {
@@ -212,15 +212,13 @@ const skills = {
             await player.addSkills(links)
           }
         }
-      } else {
-        player.chat("你走了，我们吃什么啊")
       }
     },
   },
   // 界于吉
   // 蛊惑
   ylygguhuo: {
-    audio: "jx_guhuo",
+    audio: "reguhuo",
     derivation: ["huinu"],
     getList(event, player) {
       return get.inpileVCardList((info) => {
@@ -447,7 +445,7 @@ const skills = {
             }
             const { links } = await target
               .chooseButton(
-                [prompt, [["jx_guhuo_ally", "jx_guhuo_betray"], "vcard"]],
+                [prompt, [["guhuo_ally", "guhuo_betray"], "vcard"]],
                 true,
               )
               .set("ai", (button) => {
@@ -462,7 +460,7 @@ const skills = {
                   nature: evtx.card.nature,
                   isCard: true,
                 }
-                const ally = button.link[2] === "jx_guhuo_ally"
+                const ally = button.link[2] === "guhuo_ally"
                 if (
                   ally &&
                   (player.hp <= 1 || get.attitude(player, evt.player) >= 0)
@@ -498,7 +496,7 @@ const skills = {
                 return Math.random()
               })
               .forResult()
-            if (links[0][2] === "jx_guhuo_betray") {
+            if (links[0][2] === "guhuo_betray") {
               target.addExpose(0.2)
               game.log(target, "#y质疑")
               target.popup("质疑！", "fire")

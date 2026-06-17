@@ -29,6 +29,13 @@ const characters = {
     hp: 4,
     skills: ["wangzun", "tongji"],
   },
+  ganfuren: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["shenzhi", "shushen"],
+    names: "甘|null",
+  },
   old_caocao: {
     sex: "male",
     group: "wei",

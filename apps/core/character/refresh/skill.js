@@ -2349,7 +2349,7 @@ const skills = {
     frequent: true,
     filter(event, player) {
       const evt = event.getl(player)
-      return evt?.player === player && evt.es && evt.es.length > 0
+      return evt?.player === player && evt.es?.length > 0
     },
     async content(event, trigger, player) {
       await player.draw(2)
@@ -2713,13 +2713,13 @@ const skills = {
       const { control } = event.cost_data
 
       if (control === "弃牌") {
-        player.addTempSkill("jiangchi2", "phaseUseEnd")
+        player.addTempSkill("jiangchi2")
         await player.chooseToDiscard({
           position: "he",
           forced: true,
         })
       } else if (control === "摸牌") {
-        player.addTempSkill("jiangchi3", "phaseEnd")
+        player.addTempSkill("jiangchi3")
         await player.draw()
       }
     },

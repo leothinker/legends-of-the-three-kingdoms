@@ -11,6 +11,12 @@ export default {
   "#tongji2": "你，你这是反啦。",
   "#old_yuanshu:die": "把玉玺，还给我……",
 
+  "#shenzhi1": "子龙将军，一切都托付给你了。",
+  "#shenzhi2": "阿斗，相信妈妈，没事的。",
+  "#shushen1": "船到桥头自然直。",
+  "#shushen2": "妾身无恙，相公请安心征战。",
+  "#ganfuren:die": "请替我照顾好阿斗……",
+
   "#xunxun1": "众将死战，非吾之功。",
   "#xunxun2": "爱兵如子，胜乃可全。",
   "#wangxi1": "大丈夫，何拘小节。",

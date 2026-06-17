@@ -83,7 +83,7 @@ const skills = {
   // 神速
   reshensu: {
     audio: 2,
-    audioname: ["xiahouba", "ol_xiahouyuan"],
+    audioname: ["ol_xiahouyuan"],
     group: ["reshensu_1", "reshensu_2", "shensu4"],
     preHidden: ["reshensu_1", "reshensu_2", "shensu4"],
     subSkill: {
@@ -101,7 +101,6 @@ const skills = {
   },
   shensu4: {
     audio: "reshensu",
-    audioname: ["xiahouba"],
     trigger: { player: "phaseDiscardBefore" },
     sourceSkill: "reshensu",
     async cost(event, trigger, player) {
@@ -267,7 +266,7 @@ const skills = {
         choice = "draw_card"
       }
       const next = player.chooseDrawRecover(
-        `###${get.prompt(event.skill)}###摸一张牌或回复1点体力`,
+        `###${get.prompt(event.skill)}###回复1点体力或摸一张牌`,
       )
       next.set("choice", choice)
       next.set("ai", () => _status.event.getParent().choice)
@@ -378,7 +377,6 @@ const skills = {
   // 天香
   retianxiang: {
     audio: 2,
-    audioname: ["daxiaoqiao"],
     trigger: { player: "damageBegin4" },
     preHidden: true,
     filter(event, player) {
@@ -454,10 +452,8 @@ const skills = {
             return 1
           },
           [
-            "令" +
-              get.translation(target) +
-              "受到伤害来源对其造成的1点伤害，然后摸X张牌（X为其已损失体力值且至多为5）",
-            `令${get.translation(target)}失去1点体力，然后获得${get.translation(event.cards)}`,
+            `令来源对${get.translation(target)}造成1点伤害，然后其摸X张牌（X为其已损失的体力值且至多为5）`,
+            `令${get.translation(target)}失去1点体力，然后其获得${get.translation(event.cards)}`,
           ],
         )
         .set("target", target)
@@ -496,7 +492,6 @@ const skills = {
   // 不屈
   rebuqu: {
     audio: 2,
-    audioname: ["key_yuri"],
     trigger: { player: "chooseToUseBefore" },
     forced: true,
     preHidden: true,
@@ -602,7 +597,6 @@ const skills = {
   // 雷击
   releiji: {
     audio: 2,
-    audioname: ["boss_qinglong"],
     trigger: { player: ["useCard", "respond"] },
     filter(event, player) {
       return event.card.name === "shan"

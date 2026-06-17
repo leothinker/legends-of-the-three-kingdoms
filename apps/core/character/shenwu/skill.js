@@ -655,11 +655,11 @@ const skills = {
       },
     },
   },
+  // 界黄月英
+  // 集智
   oljizhi: {
     audio: "rejizhi",
-    locked: false,
-    trigger: { player: "useCard" },
-    frequent: true,
+    inherit: "rejizhi",
     filter(event) {
       return get.type(event.card, "trick") === "trick" && event.card.isCard
     },
@@ -705,17 +705,10 @@ const skills = {
         }
       }
     },
-    ai: {
-      threaten: 1.4,
-      noautowuxie: true,
-    },
     mod: {
       maxHandcard(player, num) {
         return num + player.storage.oljizhi
       },
-    },
-    intro: {
-      content: "本回合手牌上限+#",
     },
     group: "oljizhi_clear",
     subSkill: {
@@ -772,13 +765,9 @@ const skills = {
   // 界吕蒙
   // 勤学
   reqinxue: {
-    skillAnimation: true,
-    animationColor: "wood",
     audio: "qinxue",
-    juexingji: true,
-    derivation: "gongxin",
+    inherit: "qinxue",
     trigger: { player: ["phaseZhunbeiBegin", "phaseJieshuBegin"] },
-    forced: true,
     filter(event, player) {
       if (player.countCards("h") >= player.hp + 2) {
         return true
@@ -890,12 +879,7 @@ const skills = {
   // 诈降
   rezhaxiang: {
     audio: "zhaxiang",
-    trigger: { player: "loseHpEnd" },
-    filter(event, player) {
-      return player.isIn() && event.num > 0
-    },
-    getIndex: (event) => event.num,
-    forced: true,
+    inherit: "zhaxiang",
     async content(event, trigger, player) {
       await player.draw(3)
       if (player.isPhaseUsing()) {
@@ -905,6 +889,7 @@ const skills = {
     },
     subSkill: {
       effect: {
+        inherit: "zhaxiang_effect",
         mod: {
           targetInRange(card, player, target, now) {
             if (card.name === "sha" && get.color(card) === "red") {
@@ -917,69 +902,7 @@ const skills = {
             }
           },
         },
-        charlotte: true,
-        onremove: true,
-        audio: "zhaxiang",
-        trigger: { player: "useCard" },
         sourceSkill: "rezhaxiang",
-        filter(event, player) {
-          return event.card?.name === "sha" && get.color(event.card) === "red"
-        },
-        forced: true,
-        async content(event, trigger, player) {
-          trigger.directHit.addArray(game.players)
-        },
-        intro: {
-          content:
-            "<li>使用【杀】的次数上限+#<br><li>使用红色【杀】无距离限制且不能被【闪】响应",
-        },
-        ai: {
-          directHit_ai: true,
-          skillTagFilter(player, tag, arg) {
-            return arg?.card?.name === "sha" && get.color(arg.card) === "red"
-          },
-        },
-      },
-    },
-    ai: {
-      maihp: true,
-      effect: {
-        target(card, player, target) {
-          if (get.tag(card, "damage")) {
-            if (player.hasSkillTag("jueqing", false, target)) {
-              return [1, 1]
-            }
-            return 1.2
-          }
-          if (get.tag(card, "loseHp")) {
-            if (target.hp <= 1) {
-              return
-            }
-            var using = target.isPhaseUsing()
-            if (target.hp <= 2) {
-              return [1, player.countCards("h") <= 1 && using ? 3 : 0]
-            }
-            if (
-              using &&
-              target.countCards("h", { name: "sha", color: "red" })
-            ) {
-              return [1, 3]
-            }
-            return [
-              1,
-              target.countCards("h") <= target.hp ||
-              (using &&
-                game.hasPlayer(
-                  (current) =>
-                    current !== player &&
-                    get.attitude(player, current) < 0 &&
-                    player.inRange(current),
-                ))
-                ? 3
-                : 2,
-            ]
-          }
-        },
       },
     },
   },
@@ -988,35 +911,7 @@ const skills = {
   relijian: {
     audio: "lijian",
     audioname: ["old_diaochan"],
-    enable: "phaseUse",
-    usable: 1,
-    filter(event, player) {
-      return (
-        game.countPlayer(
-          (current) => current !== player && current.hasSex("male"),
-        ) > 1
-      )
-    },
-    check(card) {
-      return 10 - get.value(card)
-    },
-    filterCard: true,
-    position: "he",
-    filterTarget(card, player, target) {
-      if (player === target) {
-        return false
-      }
-      if (!target.hasSex("male")) {
-        return false
-      }
-      if (ui.selected.targets.length === 1) {
-        return target.canUse({ name: "juedou" }, ui.selected.targets[0])
-      }
-      return true
-    },
-    targetprompt: ["先出杀", "后出杀"],
-    selectTarget: 2,
-    multitarget: true,
+    inherit: "lijian",
     async content(event, trigger, player) {
       const next = event.targets[1]
         .useCard({
@@ -1028,24 +923,6 @@ const skills = {
         .set("animate", false)
       await game.delay(0.5)
       return next
-    },
-    ai: {
-      order: 8,
-      result: {
-        target(player, target) {
-          if (ui.selected.targets.length === 0) {
-            return -3
-          }
-          return get.effect(
-            target,
-            { name: "juedou" },
-            ui.selected.targets[0],
-            target,
-          )
-        },
-      },
-      expose: 0.4,
-      threaten: 3,
     },
   },
   // 界华雄
@@ -1206,29 +1083,11 @@ const skills = {
   // 解围
   rejiewei: {
     audio: "jiewei",
-    enable: "chooseToUse",
-    filterCard: true,
-    position: "e",
-    viewAs: { name: "wuxie" },
-    filter(event, player) {
-      return player.countCards("e") > 0
-    },
-    viewAsFilter(player) {
-      return player.countCards("e") > 0
-    },
-    prompt: "将装备区里的一张牌当【无懈可击】使用",
-    check(card) {
-      return 8 - get.equipValue(card)
-    },
-    threaten: 1.2,
+    inherit: "jiewei",
     group: "rejiewei_move",
     subSkill: {
       move: {
-        trigger: { player: "turnOverEnd" },
-        audio: "jiewei",
-        filter(event, player) {
-          return !player.isTurnedOver() && player.canMoveCard()
-        },
+        inherit: "jiewei_move",
         async cost(event, trigger, player) {
           event.result = await player
             .chooseToDiscard(
@@ -1245,9 +1104,6 @@ const skills = {
             })
             .set("check", player.canMoveCard(true))
             .forResult()
-        },
-        async content(event, trigger, player) {
-          await player.moveCard()
         },
       },
     },
@@ -1276,27 +1132,11 @@ const skills = {
           return num + 6
         }
       },
-      targetInRange(card, player) {
+      targetInRange(card) {
         if (card.name === "sha") {
           return true
         }
       },
-    },
-    targetprompt2: (target) => {
-      const player = get.player(),
-        card = get.card(),
-        list = []
-      if (card?.name !== "sha" || !target.classList.contains("selectable")) {
-        return list
-      }
-      const num = card.cards?.length ?? 0
-      if (target.countCards("h") <= player.countCards("h") - num) {
-        list.add("不可响应")
-      }
-      if (target.hp >= player.hp) {
-        list.add("加伤")
-      }
-      return list
     },
     onChooseToUse(event) {
       event.targetprompt2.add(lib.skill.olliegong.targetprompt2)
@@ -1305,59 +1145,7 @@ const skills = {
       event.targetprompt2.add(lib.skill.olliegong.targetprompt2)
     },
     audio: 2,
-    trigger: { player: "useCardToTargeted" },
-    logTarget: "target",
-    locked: false,
-    check(event, player) {
-      return get.attitude(player, event.target) <= 0
-    },
-    filter(event, player) {
-      if (event.card.name !== "sha") {
-        return false
-      }
-      if (event.target.countCards("h") <= player.countCards("h")) {
-        return true
-      }
-      if (event.target.hp >= player.hp) {
-        return true
-      }
-      return false
-    },
-    async content(event, trigger, player) {
-      if (trigger.target.countCards("h") <= player.countCards("h")) {
-        trigger.getParent().directHit.push(trigger.target)
-      }
-      if (trigger.target.hp >= player.hp) {
-        const id = trigger.target.playerid
-        const map = trigger.getParent().customArgs
-        if (!map[id]) {
-          map[id] = {}
-        }
-        if (typeof map[id].extraDamage !== "number") {
-          map[id].extraDamage = 0
-        }
-        map[id].extraDamage++
-      }
-    },
-    ai: {
-      threaten: 0.5,
-      directHit_ai: true,
-      skillTagFilter(player, tag, arg) {
-        if (
-          arg?.target &&
-          arg?.card &&
-          get.attitude(player, arg.target) <= 0 &&
-          arg.card.name === "sha" &&
-          player.countCards(
-            "h",
-            (card) => card !== arg.card && !arg.card.cards?.includes(card),
-          ) >= arg.target.countCards("h")
-        ) {
-          return true
-        }
-        return false
-      },
-    },
+    inherit: "reliegong",
   },
   // 界魏延
   // 奇谋
@@ -1372,7 +1160,7 @@ const skills = {
       const result = await player
         .chooseNumbers(
           get.prompt(event.name),
-          [{ prompt: "请选择你要失去的体力值", min: 1, max: player.getHp() }],
+          [{ prompt: "失去任意点体力", min: 1, max: player.getHp() }],
           true,
         )
         .set("processAI", () => {
@@ -1440,7 +1228,6 @@ const skills = {
   // 天香
   oltianxiang: {
     audio: 2,
-    audioname: ["daxiaoqiao"],
     trigger: { player: "damageBegin4" },
     direct: true,
     filter(event, player) {
@@ -1517,13 +1304,8 @@ const skills = {
               return 1
             },
             [
-              "令" +
-                get.translation(target) +
-                "受到伤害来源对其造成的1点伤害，然后摸X张牌（X为其已损失体力值且至多为5）",
-              "令" +
-                get.translation(target) +
-                "失去1点体力，然后获得" +
-                get.translation(result.cards),
+              `令来源对${get.translation(target)}造成1点伤害，然后其摸X张牌（X为其已损失的体力值且至多为5）`,
+              `令${get.translation(target)}失去1点体力，然后其获得${get.translation(result.cards)}`,
             ],
           )
           .set("target", target)
@@ -1605,7 +1387,7 @@ const skills = {
         if (get.position(card, true) === "d") {
           const result2 = await player
             .chooseTarget(
-              `飘零：令一名角色获得${get.translation(card)}，或点【取消】将其置于牌堆顶`,
+              `飘零：将${get.translation(card)}交给一名角色，或点【取消】将其置于牌堆顶`,
             )
             .set("ai", (target) => {
               var player = _status.event.player
@@ -1665,8 +1447,8 @@ const skills = {
     },
     async content(event, trigger, player) {
       const [target] = event.targets
-      player.markAuto(`${event.name}_used`, target)
       player.addTempSkill(`${event.name}_used`)
+      player.markAuto(`${event.name}_used`, target)
       await player.loseHp()
       await target.draw(2)
     },
@@ -1682,7 +1464,6 @@ const skills = {
   olleiji: {
     group: "olleiji_misa",
     audio: 2,
-    audioname: ["boss_qinglong"],
     trigger: { player: ["useCard", "respond"] },
     filter(event, player) {
       return (
@@ -1908,14 +1689,13 @@ const skills = {
     locked: false,
     trigger: { global: "judge" },
     filter(event, player) {
-      return player.countCards("hes", { color: "black" }) > 0
+      return player.hasCards("hes", { color: "black" })
     },
     async cost(event, trigger, player) {
       event.result = await player
-        .chooseCard(
-          `${get.translation(trigger.player)}的${trigger.judgestr || ""}判定为${get.translation(trigger.player.judging[0])}，${get.prompt(event.skill)}`,
-          "hes",
-          (card) => {
+        .chooseCard({
+          prompt: `${get.translation(trigger.player)}的${trigger.judgestr || ""}判定为${get.translation(trigger.player.judging[0])}，${get.prompt(event.skill)}`,
+          filterCard(card) {
             const player = get.player()
             if (get.color(card) !== "black") {
               return false
@@ -1942,53 +1722,54 @@ const skills = {
             }
             return true
           },
-        )
-        .set("ai", (card) => {
-          const trigger = get.event().getTrigger()
-          const { player, judging } = get.event()
-          const result = trigger.judge(card) - trigger.judge(judging)
-          const attitude = get.attitude(player, trigger.player)
-          if (attitude === 0 || result === 0) {
-            if (trigger.player !== player) {
+          position: "hes",
+          ai(card) {
+            const trigger = get.event().getTrigger()
+            const { player, judging } = get.event()
+            const result = trigger.judge(card) - trigger.judge(judging)
+            const attitude = get.attitude(player, trigger.player)
+            if (attitude === 0 || result === 0) {
+              if (trigger.player !== player) {
+                return 0
+              }
+              if (
+                game.hasPlayer((current) => get.attitude(player, current) < 0)
+              ) {
+                const checkx =
+                  lib.skill.xinleiji.judgeCheck(card, true) -
+                  lib.skill.xinleiji.judgeCheck(judging)
+                if (checkx > 0) {
+                  return checkx
+                }
+              }
               return 0
             }
-            if (
-              game.hasPlayer((current) => get.attitude(player, current) < 0)
-            ) {
-              var checkx =
-                lib.skill.olleiji.judgeCheck(card, true) -
-                lib.skill.olleiji.judgeCheck(judging)
-              if (checkx > 0) {
-                return checkx
-              }
+            let val = get.value(card)
+            if (get.subtype(card) === "equip2") {
+              val /= 2
+            } else {
+              val /= 7
             }
-            return 0
-          }
-          let val = get.value(card)
-          if (get.subtype(card) === "equip2") {
-            val /= 2
-          } else {
-            val /= 7
-          }
-          if (attitude === 0 || result === 0) {
-            return 0
-          }
-          if (attitude > 0) {
-            return result - val
-          }
-          return -result - val
+            if (attitude === 0 || result === 0) {
+              return 0
+            }
+            if (attitude > 0) {
+              return result - val
+            }
+            return -result - val
+          },
         })
         .set("judging", trigger.player.judging[0])
         .forResult()
     },
     popup: false,
     async content(event, trigger, player) {
-      const next = player.respond(
-        event.cards,
-        event.name,
-        "highlight",
-        "noOrdering",
-      )
+      const next = player.respond({
+        cards: event.cards,
+        skill: event.name,
+        highlight: true,
+        noOrdering: true,
+      })
       await next
       const { cards } = next
       if (cards?.length) {
@@ -2016,7 +1797,6 @@ const skills = {
   // 黄天
   rehuangtian: {
     audio: 2,
-    audioname: ["zhangjiao", "re_zhangjiao"],
     global: "rehuangtian2",
     zhuSkill: true,
   },

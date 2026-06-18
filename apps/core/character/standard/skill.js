@@ -935,6 +935,14 @@ const skills = {
       threaten: 0.8,
     },
   },
+  rende1: {
+    trigger: { player: "phaseUseBegin" },
+    silent: true,
+    sourceSkill: "rende",
+    async content(event, trigger, player) {
+      player.storage.rende = 0
+    },
+  },
   // 激将
   jijiang: {
     audio: 2,

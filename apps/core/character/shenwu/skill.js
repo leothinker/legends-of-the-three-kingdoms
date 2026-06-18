@@ -1416,21 +1416,86 @@ const skills = {
     },
   },
   // 界周泰
+  // 不屈
+  olbuqu: {
+    audio: "rebuqu",
+    trigger: { player: "dying" },
+    forced: true,
+    filter(event, player) {
+      if (event.getParent("olbuqu")?.player === player) return false
+      return player.isDying()
+    },
+    async content(event, trigger, player) {
+      trigger.cancel()
+      trigger.result = { bool: true }
+      if (player.hp <= 0) {
+        await player.recover(1 - player.hp)
+      }
+      player.removeSkill("refenji_used")
+      const [card] = get.cards()
+      const next = player.addToExpansion(card, "gain2")
+      next.gaintag.add("olbuqu")
+      await next
+      const cards = player.getExpansions("olbuqu"),
+        num = get.number(card)
+      player.showCards(cards, "不屈")
+      for (let i = 0; i < cards.length; i++) {
+        if (cards[i] !== card && get.number(cards[i]) === num) {
+          await player.loseToDiscardpile(card)
+          await player.loseHp()
+          return
+        }
+      }
+    },
+    mod: {
+      maxHandcardBase(player, num) {
+        return num + player.getExpansions("olbuqu").length
+      },
+    },
+    ai: {
+      save: true,
+      skillTagFilter(player, tag, target) {
+        if (player !== target) {
+          return false
+        }
+      },
+      effect: {
+        target(card, player, target) {
+          if (get.tag(card, "damage") || get.tag(card, "loseHp")) {
+            const num = target.getExpansions("olbuqu").length || target.getHp()
+            return (num + 1) / 5
+          }
+        },
+      },
+    },
+    onremove(player, skill) {
+      const cards = player.getExpansions(skill)
+      if (cards.length) {
+        player.loseToDiscardpile(cards)
+        player.loseHp(cards.length)
+      }
+    },
+    intro: {
+      content: "expansion",
+      markcount: "expansion",
+    },
+  },
   // 奋激
   refenji: {
     audio: "fenji",
     trigger: { global: ["gainAfter", "loseAfter", "loseAsyncAfter"] },
     filter(event, player) {
-      return event.player.isIn()
+      return !["useCard", "respond"].includes(event.getParent().name)
     },
     getIndex(event, player) {
-      if (event.type === "use" || event.type === "respond") {
-        return []
-      }
-      const storage = player.getStorage("refenji_used")
+      const used = player.getStorage("refenji_used")
       return game
         .filterPlayer((current) => {
-          return event.getl(current).hs.length > 0 && !storage.includes(current)
+          return (
+            event.getl(current).hs.length > 0 &&
+            !used.includes(current) &&
+            current.isIn()
+          )
         })
         .sortBySeat()
     },
@@ -1447,8 +1512,8 @@ const skills = {
     },
     async content(event, trigger, player) {
       const [target] = event.targets
-      player.addTempSkill(`${event.name}_used`)
-      player.markAuto(`${event.name}_used`, target)
+      player.addTempSkill("refenji_used")
+      player.markAuto("refenji_used", target)
       await player.loseHp()
       await target.draw(2)
     },

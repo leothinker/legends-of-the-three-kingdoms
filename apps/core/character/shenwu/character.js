@@ -237,7 +237,7 @@ const characters = {
     sex: "male",
     group: "wu",
     hp: 4,
-    skills: ["rebuqu", "refenji"],
+    skills: ["olbuqu", "refenji"],
     img: "image/character/re_zhoutai.jpg",
     dieAudios: ["re_zhoutai"],
   },

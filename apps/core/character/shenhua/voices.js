@@ -36,6 +36,18 @@ export default {
   "#guhuo2": "猜猜看哪~",
   "#yuji:die": "竟然……被猜到了……",
 
+  "#wushen1": "取汝狗头，犹如探囊取物。",
+  "#wushen2": "还不速速领死！",
+  "#wuhun1": "拿命来！",
+  "#wuhun2": "谁来与我同去？！",
+  "#shen_guanyu:die": "大仇得报，可以离开了……",
+
+  "#shelie1": "略懂，略懂。",
+  "#shelie2": "什么都略懂一点，生活更多彩一些。",
+  "#gongxin1": "我替施主把把脉。",
+  "#gongxin2": "攻城为下，攻心为上。",
+  "#shen_lvmeng:die": "劫数难逃，我们别无选择……",
+
   "#qiangxi1": "看我三步之内取你小命！",
   "#qiangxi2": "吃我一戟！",
   "#dianwei:die": "主公，快走！",

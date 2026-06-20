@@ -54,6 +54,23 @@ const translates = {
   guhuo_ally_bg: "真",
   guhuo_betray_bg: "假",
 
+  shen_guanyu: "神关羽",
+  shen_guanyu_prefix: "神",
+  wushen: "武神",
+  wushen_info: "锁定技，你的红桃手牌视为【杀】；你使用红桃【杀】无距离限制。",
+  wuhun: "武魂",
+  wuhun_info:
+    "锁定技，当你受到1点伤害后，你令伤害来源获得1枚“梦魇”；当你死亡时，你令拥有最多“梦魇”的一名其他角色进行判定：若结果不为【桃】或【桃园结义】，其死亡。",
+
+  shen_lvmeng: "神吕蒙",
+  shen_lvmeng_prefix: "神",
+  shelie: "涉猎",
+  shelie_info:
+    "摸牌阶段，你可以改为展示牌堆顶的五张牌，然后获得其中每种花色的牌各一张。",
+  gongxin: "攻心",
+  gongxin_info:
+    "出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以展示其中的一张红桃牌并选择一项：1.弃置此牌；2.将此牌置于牌堆顶。",
+
   dianwei: "典韦",
   qiangxi: "强袭",
   qiangxi_info:
@@ -239,23 +256,6 @@ const translates = {
     "一名角色受到【杀】造成的伤害后，你可以弃置一张牌，然后令其进行判定：♥，受伤角色回复1点体力；♦︎，受伤角色摸两张牌；♠，伤害来源翻面；♣，伤害来源弃置两张牌。",
   duanchang: "断肠",
   duanchang_info: "锁定技，当你死亡时，杀死你的角色失去所有武将技能。",
-
-  shen_guanyu: "神关羽",
-  shen_guanyu_prefix: "神",
-  wushen: "武神",
-  wushen_info: "锁定技，你的♥手牌均视为【杀】；你使用♥【杀】无距离限制。",
-  wuhun: "武魂",
-  wuhun_info:
-    "锁定技，当你受到1点伤害后，伤害来源获得1枚“梦魇”标记；当你死亡时，你令场上“梦魇”标记数最多的一名其他角色进行判定，若结果不为【桃】或【桃园结义】，其死亡。",
-
-  shen_lvmeng: "神吕蒙",
-  shen_lvmeng_prefix: "神",
-  shelie: "涉猎",
-  shelie_info:
-    "摸牌阶段，你可以改为展示牌堆顶的五张牌，然后获得其中每种花色的牌各一张。",
-  gongxin: "攻心",
-  gongxin_info:
-    "出牌阶段限一次，你可以观看一名其他角色的手牌，然后你可以展示其中的一张红桃牌并选择一项：1.弃置此牌；2.将此牌置于牌堆顶。",
 
   shen_zhouyu: "神周瑜",
   shen_zhouyu_prefix: "神",

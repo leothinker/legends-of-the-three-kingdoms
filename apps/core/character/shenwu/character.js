@@ -254,6 +254,15 @@ const characters = {
     hp: 3,
     skills: ["olguhuo"],
   },
+  ol_shen_guanyu: {
+    sex: "male",
+    group: "shen",
+    hp: 5,
+    skills: ["rewushen", "wuhun"],
+    groupInGuozhan: "shu",
+    img: "image/character/shen_guanyu.jpg",
+    dieAudios: ["shen_guanyu"],
+  },
   ol_dianwei: {
     sex: "male",
     group: "wei",

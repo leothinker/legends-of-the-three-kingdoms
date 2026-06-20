@@ -40,7 +40,7 @@ const characterSort = {
     "ol_zhoutai",
     "ol_zhangjiao",
     "ol_yuji",
-    "shen_guanyu",
+    "ol_shen_guanyu",
     "shen_lvmeng",
   ],
   refresh_huo: [

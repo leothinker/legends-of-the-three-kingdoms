@@ -2332,6 +2332,64 @@ const skills = {
     forced: true,
     async content(event, trigger, player) {},
   },
+  // 神关羽
+  // 武神
+  olwushen: {
+    mod: {
+      cardname(card, player, name) {
+        if (get.suit(card) === "heart") {
+          return "sha"
+        }
+      },
+      cardnature(card, player) {
+        if (get.suit(card) === "heart") {
+          return false
+        }
+      },
+      targetInRange(card) {
+        if (card.name === "sha") {
+          const suit = get.suit(card)
+          if (suit === "heart" || suit === "unsure") {
+            return true
+          }
+        }
+      },
+      cardUsable(card) {
+        if (card.name === "sha") {
+          const suit = get.suit(card)
+          if (suit === "heart" || suit === "unsure") {
+            return Infinity
+          }
+        }
+      },
+    },
+    audio: "wushen",
+    trigger: { player: "useCard" },
+    forced: true,
+    filter(event, player) {
+      return event.card.name === "sha" && get.suit(event.card) === "heart"
+    },
+    async content(event, trigger, player) {
+      if (trigger.addCount !== false) {
+        trigger.addCount = false
+        if (player.stat[player.stat.length - 1].card.sha > 0) {
+          player.stat[player.stat.length - 1].card.sha--
+        }
+      }
+    },
+    ai: {
+      effect: {
+        target(card, player, target, current) {
+          if (get.tag(card, "respondSha") && current < 0) {
+            return 0.6
+          }
+        },
+      },
+      skillTagFilter(player, tag, arg) {
+        return arg.card.name === "sha" && get.suit(arg.card) === "heart"
+      },
+    },
+  },
   // 界典韦
   // 强袭
   olqiangxi: {

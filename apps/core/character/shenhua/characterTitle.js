@@ -7,6 +7,8 @@ export default {
   zhoutai: "历战之躯",
   zhangjiao: "天公将军",
   yuji: "太平道人",
+  shen_guanyu: "鬼神再临",
+  shen_lvmeng: "圣光之国士",
 
   dianwei: "古之恶来",
   xunyu: "王佐之才",

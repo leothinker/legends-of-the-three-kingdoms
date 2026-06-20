@@ -26,6 +26,7 @@ export default {
   ol_zhoutai: "历战之躯",
   ol_zhangjiao: "天公将军",
   ol_yuji: "太平道人",
+  ol_shen_guanyu: "鬼神再临",
 
   ol_dianwei: "古之恶来",
   ol_xunyu: "王佐之才",

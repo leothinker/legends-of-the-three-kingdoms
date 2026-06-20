@@ -50,6 +50,20 @@ const characters = {
     hp: 3,
     skills: ["guhuo"],
   },
+  shen_guanyu: {
+    sex: "male",
+    group: "shen",
+    hp: 5,
+    skills: ["wushen", "wuhun"],
+    groupInGuozhan: "shu",
+  },
+  shen_lvmeng: {
+    sex: "male",
+    group: "shen",
+    hp: 3,
+    skills: ["shelie", "gongxin"],
+    groupInGuozhan: "wu",
+  },
   dianwei: {
     sex: "male",
     group: "wei",
@@ -205,20 +219,6 @@ const characters = {
   //   group: "qun",
   //   hp: 3,
   //   skills: ["beige", "duanchang"],
-  // },
-  // shen_guanyu: {
-  //   sex: "male",
-  //   group: "shen",
-  //   hp: 5,
-  //   skills: ["wushen", "new_wuhun"],
-  //   groupInGuozhan: "shu",
-  // },
-  // shen_lvmeng: {
-  //   sex: "male",
-  //   group: "shen",
-  //   hp: 3,
-  //   skills: ["shelie", "gongxin"],
-  //   groupInGuozhan: "wu",
   // },
   // shen_zhouyu: {
   //   sex: "male",

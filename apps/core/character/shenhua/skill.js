@@ -5028,7 +5028,7 @@ const skills = {
             .chooseTarget(
               true,
               "请选择【武魂】的目标",
-              "令其进行判定，若判定结果不为【桃】或【桃园结义】，则其死亡",
+              "令其进行判定：若结果不为【桃】或【桃园结义】，其死亡",
               (card, player, target) => {
                 return (
                   target !== player &&
@@ -5083,7 +5083,7 @@ const skills = {
       const list = cards.map((card) => get.suit(card)).unique()
       const result = await player
         .chooseCardButton(
-          `涉猎：获取花色各不相同的牌`,
+          `涉猎：获得其中每种花色的牌各一张`,
           cards,
           list.length,
           true,
@@ -5113,7 +5113,7 @@ const skills = {
   gongxin: {
     audio: 2,
     audioname: ["re_lvmeng"],
-    audioname2: { ol_lvmeng: "gongxin_re_lvmeng", gexuan: "gongxin_gexuan" },
+    audioname2: { ol_lvmeng: "gongxin_re_lvmeng" },
     enable: "phaseUse",
     usable: 1,
     filterTarget(card, player, target) {

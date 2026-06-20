@@ -2952,14 +2952,11 @@ const skills = {
         trigger.fixedResult = {}
       }
       for (const target of targets) {
-        const hs = target.getCards("h")
-        if (hs.length) {
-          const result = await player
-            .choosePlayerCard(target, "h", true)
-            .forResult()
-          if (result.bool) {
-            trigger.fixedResult[target.playerid] = result.cards[0]
-          }
+        const result = await player
+          .choosePlayerCard(target, "h", true)
+          .forResult()
+        if (result.bool) {
+          trigger.fixedResult[target.playerid] = result.cards[0]
         }
       }
     },

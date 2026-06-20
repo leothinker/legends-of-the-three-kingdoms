@@ -94,9 +94,8 @@ const characters = {
     sex: "male",
     group: "wu",
     hp: 4,
-    skills: ["retianyi", "redangmo"],
+    skills: ["retianyi", "dangmo"],
     names: "太史|慈",
-    dieAudios: ["ol_taishici"],
   },
   re_pangde: {
     sex: "male",

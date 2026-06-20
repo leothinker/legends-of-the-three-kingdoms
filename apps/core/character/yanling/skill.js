@@ -727,7 +727,7 @@ const skills = {
     global: ["xiangxing_yingzi", "xiangxing_biyue"],
   },
   xiangxing_yingzi: {
-    audio:"reyingzi",
+    audio: "reyingzi",
     forceaudio: true,
     inherit: "reyingzi",
     filter(event, player) {
@@ -750,7 +750,7 @@ const skills = {
     },
   },
   xiangxing_biyue: {
-    audio:"rebiyue",
+    audio: "rebiyue",
     forceaudio: true,
     inherit: "rebiyue",
     frequent: false,

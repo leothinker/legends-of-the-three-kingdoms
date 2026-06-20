@@ -1525,7 +1525,7 @@ const skills = {
         marktext: "天义",
         intro: {
           name: "天义",
-          content: "本回合使用【杀】次数上限+1、目标上限+1、无距离限制",
+          content: "本回合使用【杀】无距离限制、次数上限和目标上限均+1",
         },
         mod: {
           cardUsable(card, player, num) {
@@ -1584,15 +1584,15 @@ const skills = {
     },
   },
   // 荡魔
-  redangmo: {
-    audio: "dangmo",
+  dangmo: {
+    audio: 2,
     trigger: { player: "useCardAfter" },
     filter(event, player) {
       const evts = player.getHistory("useCard")
       if (evts.length < 2) {
         return false
       }
-      const targets = get.info("redangmo").logTarget(event, player)
+      const targets = get.info("dangmo").logTarget(event, player)
       return targets?.length
     },
     logTarget(event, player) {
@@ -1613,7 +1613,7 @@ const skills = {
       return olds.filter((current) => current?.isIn() && nows.includes(current))
     },
     check(event, player) {
-      const targets = get.info("redangmo").logTarget(event, player)
+      const targets = get.info("dangmo").logTarget(event, player)
       return (
         targets.reduce((total, target) => {
           return total + get.damageEffect(target, player, player)
@@ -1626,6 +1626,7 @@ const skills = {
         async (target) => await target.damage(),
       )
     },
+    locked: false,
     mod: {
       aiOrder(player, card, num) {
         const num1 = get.info(card).selectTarget ?? 0,
@@ -1645,7 +1646,7 @@ const skills = {
           if (
             !player.getHistory("useCard", (evt) => evt.targets.length > 0)
               .length &&
-            player.hasSkill("zc26_tianyi_effct") &&
+            player.hasSkill("retianyi_effct") &&
             ui.selected.targets.length > 0
           ) {
             return 0
@@ -1655,7 +1656,6 @@ const skills = {
       },
     },
   },
-  dangmo: { audio: 2 },
   // 界庞德
   // 鞬出
   jianchu: {

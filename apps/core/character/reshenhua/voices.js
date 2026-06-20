@@ -67,8 +67,11 @@ export default {
   "#reniepan2": "九天之志，展翅翱翔。",
   "#re_pangtong:die": "落……凤……坡……",
 
+  "#retianyi1": "天降大任，速战解围！",
+  "#retianyi2": "义不从之，天必不佑！",
   "#dangmo1": "魔高一尺，道高一丈！",
   "#dangmo2": "天魔祸世，吾自荡而除之！",
+  "#re_taishici:die": "无妄之灾，难以避免……",
 
   "#jianchu1": "来呀，冲杀出去，杀他个片甲不留。",
   "#jianchu2": "一人一骑，横扫千军。",

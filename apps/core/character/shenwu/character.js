@@ -302,6 +302,7 @@ const characters = {
     hp: 4,
     skills: ["tianyi", "hanzhan"],
     names: "太史|慈",
+    dieAudios: ["re_taishici"],
   },
   ol_pangde: {
     sex: "male",

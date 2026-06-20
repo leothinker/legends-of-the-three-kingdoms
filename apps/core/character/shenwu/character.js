@@ -263,6 +263,13 @@ const characters = {
     img: "image/character/shen_guanyu.jpg",
     dieAudios: ["shen_guanyu"],
   },
+  shen_lvmeng: {
+    sex: "male",
+    group: "shen",
+    hp: 3,
+    skills: ["shelie", "gongxin"],
+    groupInGuozhan: "wu",
+  },
   ol_dianwei: {
     sex: "male",
     group: "wei",

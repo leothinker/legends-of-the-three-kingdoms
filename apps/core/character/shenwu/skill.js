@@ -2327,7 +2327,7 @@ const skills = {
   },
   // 神关羽
   // 武神
-  olwushen: {
+  rewushen: {
     mod: {
       cardname(card, player, name) {
         if (get.suit(card) === "heart") {

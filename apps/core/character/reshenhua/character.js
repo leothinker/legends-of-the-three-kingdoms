@@ -50,6 +50,20 @@ const characters = {
     hp: 3,
     skills: ["reguhuo"],
   },
+  shen_guanyu: {
+    sex: "male",
+    group: "shen",
+    hp: 5,
+    skills: ["wushen", "wuhun"],
+    groupInGuozhan: "shu",
+  },
+  shen_lvmeng: {
+    sex: "male",
+    group: "shen",
+    hp: 3,
+    skills: ["shelie", "gongxin"],
+    groupInGuozhan: "wu",
+  },
   re_dianwei: {
     sex: "male",
     group: "wei",
@@ -306,20 +320,6 @@ const characters = {
   //   hp: 4,
   //   skills: ["yongsi", "weidi"],
   //   isZhugong: true,
-  // },
-  // shen_guanyu: {
-  //   sex: "male",
-  //   group: "shen",
-  //   hp: 5,
-  //   skills: ["wushen", "wuhun"],
-  //   groupInGuozhan: "shu",
-  // },
-  // shen_lvmeng: {
-  //   sex: "male",
-  //   group: "shen",
-  //   hp: 3,
-  //   skills: ["shelie", "gongxin"],
-  //   groupInGuozhan: "wu",
   // },
   // shen_zhouyu: {
   //   sex: "male",

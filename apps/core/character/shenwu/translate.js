@@ -173,8 +173,8 @@ const translates = {
 
   ol_shen_guanyu: "神关羽",
   ol_shen_guanyu_prefix: "神",
-  olwushen: "武神",
-  olwushen_info:
+  rewushen: "武神",
+  rewushen_info:
     "锁定技，你的红桃手牌视为【杀】；你使用红桃【杀】无距离和次数限制。",
 
   ol_dianwei: "界典韦",

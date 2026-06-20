@@ -322,7 +322,7 @@ const skills = {
         }
       },
       prompt(links, player) {
-        return `扣置一张手牌当作${get.translation(links[0][3]) || ""}【${get.translation(links[0][2])}】使用`
+        return `扣置一张手牌，将此牌当${get.translation(links[0][3]) || ""}【${get.translation(links[0][2])}】使用`
       },
     },
     ai: {
@@ -392,48 +392,48 @@ const skills = {
           const acceptor = []
           game.broadcastAll(
             (card, player) => {
-              _status.guhuoNode = card.copy("thrown")
+              _status.ylygguhuoNode = card.copy("thrown")
               if (lib.config.cardback_style !== "default") {
-                _status.guhuoNode.style.transitionProperty = "none"
-                ui.refresh(_status.guhuoNode)
-                _status.guhuoNode.classList.add("infohidden")
-                ui.refresh(_status.guhuoNode)
-                _status.guhuoNode.style.transitionProperty = ""
+                _status.ylygguhuoNode.style.transitionProperty = "none"
+                ui.refresh(_status.ylygguhuoNode)
+                _status.ylygguhuoNode.classList.add("infohidden")
+                ui.refresh(_status.ylygguhuoNode)
+                _status.ylygguhuoNode.style.transitionProperty = ""
               } else {
-                _status.guhuoNode.classList.add("infohidden")
+                _status.ylygguhuoNode.classList.add("infohidden")
               }
-              _status.guhuoNode.style.transform =
+              _status.ylygguhuoNode.style.transform =
                 "perspective(600px) rotateY(180deg) translateX(0)"
-              player.$throwordered2(_status.guhuoNode)
+              player.$throwordered2(_status.ylygguhuoNode)
             },
             trigger.cards[0],
             player,
           )
           event.onEnd01 = () => {
-            _status.guhuoNode.removeEventListener(
+            _status.ylygguhuoNode.removeEventListener(
               "webkitTransitionEnd",
               _status.event.onEnd01,
             )
             setTimeout(() => {
-              _status.guhuoNode.style.transition = "all ease-in 0.3s"
-              _status.guhuoNode.style.transform =
+              _status.ylygguhuoNode.style.transition = "all ease-in 0.3s"
+              _status.ylygguhuoNode.style.transform =
                 "perspective(600px) rotateY(270deg)"
               const onEnd = () => {
-                _status.guhuoNode.classList.remove("infohidden")
-                _status.guhuoNode.style.transition = "all 0s"
-                ui.refresh(_status.guhuoNode)
-                _status.guhuoNode.style.transform =
+                _status.ylygguhuoNode.classList.remove("infohidden")
+                _status.ylygguhuoNode.style.transition = "all 0s"
+                ui.refresh(_status.ylygguhuoNode)
+                _status.ylygguhuoNode.style.transform =
                   "perspective(600px) rotateY(-90deg)"
-                ui.refresh(_status.guhuoNode)
-                _status.guhuoNode.style.transition = ""
-                ui.refresh(_status.guhuoNode)
-                _status.guhuoNode.style.transform = ""
-                _status.guhuoNode.removeEventListener(
+                ui.refresh(_status.ylygguhuoNode)
+                _status.ylygguhuoNode.style.transition = ""
+                ui.refresh(_status.ylygguhuoNode)
+                _status.ylygguhuoNode.style.transform = ""
+                _status.ylygguhuoNode.removeEventListener(
                   "webkitTransitionEnd",
                   onEnd,
                 )
               }
-              _status.guhuoNode.listenTransition(onEnd)
+              _status.ylygguhuoNode.listenTransition(onEnd)
             }, 300)
           }
           const prompt = `${get.translation(player)}声明${trigger.targets?.length ? `对${get.translation(trigger.targets)}` : ""}使用${get.translation(trigger.card)}，是否质疑？`
@@ -510,8 +510,8 @@ const skills = {
           await game.delayx()
           game.broadcastAll((onEnd) => {
             _status.event.onEnd01 = onEnd
-            if (_status.guhuoNode) {
-              _status.guhuoNode.listenTransition(onEnd, 300)
+            if (_status.ylygguhuoNode) {
+              _status.ylygguhuoNode.listenTransition(onEnd, 300)
             }
           }, event.onEnd01)
           await game.delay(2)
@@ -559,6 +559,7 @@ const skills = {
   },
   // 恚怒
   huinu: {
+    audio: "chanyuan",
     locked: true,
     mark: true,
     intro: {

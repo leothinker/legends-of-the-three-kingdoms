@@ -659,7 +659,7 @@ const skills = {
     //usable:1,
     //forceaudio:true,
     async content(event, trigger, player) {
-      await player.give(event.cards, event.target)
+      await player.give(event.cards, event.target, true)
       event.target.addTempSkill("huangtian3", "phaseUseEnd")
     },
     ai: {
@@ -857,11 +857,7 @@ const skills = {
         }
       },
       prompt(links, player) {
-        return (
-          "将一张手牌当做" +
-          get.translation(links[0][2]) +
-          (_status.event.name === "chooseToRespond" ? "打出" : "使用")
-        )
+        return `将一张手牌当做${get.translation(links[0][2])}${_status.event.name === "chooseToRespond" ? "打出" : "使用"}`
       },
     },
     ai: {
@@ -918,16 +914,7 @@ const skills = {
             trigger.name === "useCard" ? "使用" : "打出",
             trigger.card,
           )
-          event.prompt =
-            get.translation(player) +
-            "声明" +
-            (trigger.targets?.length
-              ? `对${get.translation(trigger.targets)}`
-              : "") +
-            (trigger.name === "useCard" ? "使用" : "打出") +
-            (get.translation(trigger.card.nature) || "") +
-            get.translation(trigger.card.name) +
-            "，是否质疑？"
+          event.prompt = `${get.translation(player)}声明${trigger.targets?.length ? `对${get.translation(trigger.targets)}` : ""}${trigger.name === "useCard" ? "使用" : "打出"}${get.translation(trigger.card.nature) || ""}${get.translation(trigger.card.name)}，是否质疑？`
           event.targets = game
             .filterPlayer((current) => current !== player && current.hp !== 0)
             .sortBySeat(_status.currentPhase)

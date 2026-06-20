@@ -1426,8 +1426,6 @@ const skills = {
       return player.isDying()
     },
     async content(event, trigger, player) {
-      trigger.cancel()
-      trigger.result = { bool: true }
       if (player.hp <= 0) {
         await player.recover(1 - player.hp)
       }
@@ -1924,7 +1922,7 @@ const skills = {
     //forceaudio:true,
     async content(event, trigger, player) {
       const { cards, target } = event
-      await player.give(cards, target)
+      await player.give(cards, target, true)
       target.addTempSkill("rehuangtian3", "phaseUseEnd")
     },
     ai: {
@@ -2101,12 +2099,7 @@ const skills = {
         }
       },
       prompt(links) {
-        return (
-          "将一张手牌当做" +
-          (get.translation(links[0][3]) || "") +
-          get.translation(links[0][2]) +
-          "使用"
-        )
+        return `将一张手牌当做${get.translation(links[0][3]) || ""}${get.translation(links[0][2])}使用`
       },
     },
     ai: {

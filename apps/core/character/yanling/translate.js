@@ -15,7 +15,7 @@ const translates = {
   ylygguhuo: "蛊惑",
   ylygguhuo_info: `每回合每种类别限一次，你可以扣置一张手牌当任意基本牌或普通锦囊牌使用，手牌数大于你的角色依次选择是否质疑，然后翻开此牌：若为假，此牌作废、选择不质疑的角色各交给你一张手牌；若为真，质疑的角色依次失去1点体力并获得${get.poptip("huinu")}。`,
   huinu: "恚怒",
-  huinu_info: `锁定技，你必须质疑${get.poptip("yl_guhuo")}。`,
+  huinu_info: `锁定技，你必须质疑${get.poptip("ylygguhuo")}。`,
 
   ylyg_dianwei: "界典韦",
   ylyg_dianwei_prefix: "界",

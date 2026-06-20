@@ -916,11 +916,7 @@ const skills = {
         }
       },
       prompt(links, player) {
-        return (
-          "将一张手牌当做" +
-          get.translation(links[0][2]) +
-          (_status.event.name === "chooseToRespond" ? "打出" : "使用")
-        )
+        return `将一张手牌当做${get.translation(links[0][2])}${_status.event.name === "chooseToRespond" ? "打出" : "使用"}`
       },
     },
     ai: {
@@ -949,11 +945,7 @@ const skills = {
     firstDo: true,
     charlotte: true,
     filter(event, player) {
-      return (
-        event.skill &&
-        (event.skill.indexOf("reguhuo_") === 0 ||
-          event.skill.indexOf("reguhuo_") === 0)
-      )
+      return event.skill && event.skill.indexOf("reguhuo_") === 0
     },
     async content(event, trigger, player) {
       player.addTempSkill("reguhuo_phase")
@@ -981,16 +973,7 @@ const skills = {
         trigger.name === "useCard" ? "使用" : "打出",
         trigger.card,
       )
-      event.prompt =
-        get.translation(player) +
-        "声明" +
-        (trigger.targets?.length
-          ? `对${get.translation(trigger.targets)}`
-          : "") +
-        (trigger.name === "useCard" ? "使用" : "打出") +
-        (get.translation(trigger.card.nature) || "") +
-        get.translation(trigger.card.name) +
-        "，是否质疑？"
+      event.prompt = `${get.translation(player)}声明${trigger.targets?.length ? `对${get.translation(trigger.targets)}` : ""}${trigger.name === "useCard" ? "使用" : "打出"}${get.translation(trigger.card.nature) || ""}${get.translation(trigger.card.name)}，是否质疑？`
       event.targets = game
         .filterPlayer(
           (current) => current !== player && !current.hasSkill("chanyuan"),

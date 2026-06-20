@@ -212,6 +212,8 @@ const skills = {
             await player.addSkills(links)
           }
         }
+      } else {
+        player.chat("你走了，我们吃什么啊")
       }
     },
   },
@@ -568,8 +570,9 @@ const skills = {
     },
   },
   // 界典韦
+  // 强袭
   ylygqiangxi: {
-    audio: "jx_qiangxi",
+    audio: "reqiangxi",
     enable: "phaseUse",
     onChooseToUse(event) {
       if (
@@ -720,11 +723,13 @@ const skills = {
   // 界庞统
   xiangxing: {
     locked: true,
-    derivation: ["jx_yingzi", "jx_biyue"],
+    derivation: ["reyingzi", "rebiyue"],
     global: ["xiangxing_yingzi", "xiangxing_biyue"],
   },
   xiangxing_yingzi: {
-    inherit: "jx_yingzi",
+    audio:"reyingzi",
+    forceaudio: true,
+    inherit: "reyingzi",
     filter(event, player) {
       return (
         game.hasPlayer(
@@ -745,7 +750,9 @@ const skills = {
     },
   },
   xiangxing_biyue: {
-    inherit: "jx_biyue",
+    audio:"rebiyue",
+    forceaudio: true,
+    inherit: "rebiyue",
     frequent: false,
     filter(event, player) {
       return game.hasPlayer(
@@ -754,7 +761,7 @@ const skills = {
     },
   },
   ylyglianhuan: {
-    audio: "jx_lianhuan",
+    audio: "relianhuan",
     enable: "phaseUse",
     filterCard: true,
     viewAsFilter(player) {
@@ -837,7 +844,7 @@ const skills = {
     },
   },
   ylygniepan: {
-    audio: "jx_niepan",
+    audio: "reniepan",
     enable: "chooseToUse",
     limited: true,
     skillAnimation: true,

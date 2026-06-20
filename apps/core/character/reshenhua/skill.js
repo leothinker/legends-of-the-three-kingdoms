@@ -1411,7 +1411,7 @@ const skills = {
           player
             .chooseTarget(
               get.prompt("relianhuan"),
-              `为${get.translation(trigger.card)}额外指定一个目标`,
+              `为${get.translation(trigger.card)}多指定一名角色为目标`,
               (card, player, target) => {
                 return (
                   !_status.event.sourcex.includes(target) &&
@@ -1447,7 +1447,6 @@ const skills = {
   // 涅槃
   reniepan: {
     audio: 2,
-    audioname2: { sb_pangtong: "sbniepan" },
     enable: "chooseToUse",
     limited: true,
     skillAnimation: true,

@@ -1,8 +1,8 @@
 const characterSort = {
-  yanling_fengdong: ["yl_xiaoqiao"],
-  yanling_fengzhi: ["yl_yuji"],
-  yanling_chihuo: ["yl_dianwei"],
-  yanling_yunhuo: ["yl_pangtong"],
+  yanling_fengdong: ["ylyg_xiaoqiao"],
+  yanling_fengzhi: ["ylyg_yuji"],
+  yanling_chihuo: ["ylyg_dianwei"],
+  yanling_yunhuo: ["ylyg_pangtong"],
 }
 
 const characterSortTranslate = {

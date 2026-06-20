@@ -1102,13 +1102,316 @@ const skills = {
       },
     },
   },
+  // 神关羽
+  // 武神
+  wushen: {
+    mod: {
+      cardname(card, player, name) {
+        if (get.suit(card) === "heart") {
+          return "sha"
+        }
+      },
+      cardnature(card, player) {
+        if (get.suit(card) === "heart") {
+          return false
+        }
+      },
+      targetInRange(card) {
+        if (card.name === "sha") {
+          const suit = get.suit(card)
+          if (suit === "heart" || suit === "unsure") {
+            return true
+          }
+        }
+      },
+    },
+    audio: 2,
+    trigger: {
+      player: "useCard",
+    },
+    forced: true,
+    filter(event, player) {
+      return (
+        !event.audioed &&
+        event.card.name === "sha" &&
+        get.suit(event.card) === "heart"
+      )
+    },
+    async content(event, trigger, player) {
+      trigger.audioed = true
+    },
+    ai: {
+      effect: {
+        target(card, player, target, current) {
+          if (get.tag(card, "respondSha") && current < 0) {
+            return 0.6
+          }
+        },
+      },
+    },
+  },
+  // 武魂
+  wuhun: {
+    audio: 2,
+    trigger: { player: "damageEnd" },
+    filter(event, player) {
+      return event.source?.isIn()
+    },
+    forced: true,
+    logTarget: "source",
+    async content(event, trigger, player) {
+      trigger.source.addMark("wuhun", trigger.num)
+    },
+    group: "wuhun_die",
+    ai: {
+      notemp: true,
+      effect: {
+        target: (card, player, target) => {
+          if (!target.hasFriend()) {
+            return
+          }
+          const rec = get.tag(card, "recover"),
+            damage = get.tag(card, "damage")
+          if (!rec && !damage) {
+            return
+          }
+          if (damage && player.hasSkillTag("jueqing", false, target)) {
+            return 1.7
+          }
+          let die = [null, 1],
+            temp
+          game.filterPlayer((i) => {
+            temp = i.countMark("wuhun")
+            if (i === player && target.hp + target.hujia > 1) {
+              temp++
+            }
+            if (temp > die[1]) {
+              die = [i, temp]
+            } else if (temp === die[1]) {
+              if (!die[0]) {
+                die = [i, temp]
+              } else if (
+                get.attitude(target, i) < get.attitude(target, die[0])
+              ) {
+                die = [i, temp]
+              }
+            }
+          })
+          if (die[0]) {
+            if (damage) {
+              return [
+                1,
+                0,
+                1,
+                (-6 * get.sgnAttitude(player, die[0])) / Math.max(1, target.hp),
+              ]
+            }
+            return [
+              1,
+              (6 * get.sgnAttitude(player, die[0])) / Math.max(1, target.hp),
+            ]
+          }
+        },
+      },
+    },
+    marktext: "魇",
+    intro: {
+      name: "梦魇",
+      content: "mark",
+      onunmark: true,
+    },
+    subSkill: {
+      die: {
+        audio: "wuhun",
+        trigger: { player: "die" },
+        filter(event, player) {
+          return game.hasPlayer(
+            (current) => current !== player && current.hasMark("wuhun"),
+          )
+        },
+        forced: true,
+        direct: true,
+        forceDie: true,
+        skillAnimation: true,
+        animationColor: "soil",
+        async content(event, trigger, player) {
+          let maxNum = 0
+          for (const current of game.players) {
+            if (current === player) {
+              continue
+            }
+
+            const markNum = current.countMark("wuhun")
+            maxNum = Math.max(maxNum, markNum)
+          }
+          const num = maxNum
+          let result = await player
+            .chooseTarget(
+              true,
+              "请选择【武魂】的目标",
+              "令其进行判定：若结果不为【桃】或【桃园结义】，其死亡",
+              (card, player, target) => {
+                return (
+                  target !== player &&
+                  target.countMark("wuhun") === _status.event.num
+                )
+              },
+            )
+            .set("ai", (target) => -get.attitude(_status.event.player, target))
+            .set("forceDie", true)
+            .set("num", num)
+            .forResult()
+          if (!result.bool) {
+            return
+          }
+
+          const target = result.targets[0]
+          event.target = target
+          player.logSkill("wuhun_die", target)
+          player.line(target, { color: [255, 255, 0] })
+          await game.delay(2)
+          result = await target
+            .judge((card) =>
+              ["tao", "taoyuan"].includes(card.name) ? 10 : -10,
+            )
+            .set("judge2", (result) => !result.bool)
+            .forResult()
+          if (!result.bool) {
+            await target.die()
+          }
+        },
+      },
+    },
+  },
+  // 神吕蒙
+  // 涉猎
+  shelie: {
+    audio: 2,
+    trigger: { player: "phaseDrawBegin1" },
+    filter(event, player) {
+      return !event.numFixed
+    },
+    async content(event, trigger, player) {
+      trigger.changeToZero()
+      const cards = get.cards(5, true)
+      await player
+        .showCards(
+          cards,
+          `${get.translation(player)}发动了【${get.translation(event.name)}】`,
+          true,
+        )
+        .set("clearArena", false)
+      const list = cards.map((card) => get.suit(card)).unique()
+      const result = await player
+        .chooseCardButton(
+          `涉猎：获得其中每种花色的牌各一张`,
+          cards,
+          list.length,
+          true,
+        )
+        .set("filterButton", (button) => {
+          for (let i = 0; i < ui.selected.buttons.length; i++) {
+            if (
+              get.suit(ui.selected.buttons[i].link) === get.suit(button.link)
+            ) {
+              return false
+            }
+          }
+          return true
+        })
+        .set("ai", (button) => get.value(button.link, _status.event.player))
+        .forResult()
+      game.broadcastAll(ui.clear)
+      if (result?.links?.length) {
+        await player.gain(result.links, "gain2")
+      }
+    },
+    ai: {
+      threaten: 1.2,
+    },
+  },
+  // 攻心
+  gongxin: {
+    audio: 2,
+    audioname: ["re_lvmeng"],
+    audioname2: { ol_lvmeng: "gongxin_re_lvmeng" },
+    enable: "phaseUse",
+    usable: 1,
+    filterTarget(card, player, target) {
+      return target !== player && target.countCards("h")
+    },
+    async content(event, trigger, player) {
+      const { target } = event
+      const cards = target.getCards("h")
+      const result = await player
+        .chooseToMove_new("攻心")
+        .set("list", [
+          [`${get.translation(target)}的手牌`, cards],
+          [["弃置"], ["置于牌堆顶"]],
+        ])
+        .set("filterOk", (moved) => {
+          return (
+            moved[1]
+              .slice()
+              .concat(moved[2])
+              .filter((card) => get.suit(card) === "heart").length === 1
+          )
+        })
+        .set("filterMove", (from, to, moved) => {
+          if (
+            moved[0].includes(from.link) &&
+            moved[1].length + moved[2].length >= 1 &&
+            [1, 2].includes(to)
+          ) {
+            return false
+          }
+          return get.suit(from) === "heart"
+        })
+        .set("processAI", (list) => {
+          const card = list[0][1]
+            .slice()
+            .filter((card) => {
+              return get.suit(card) === "heart"
+            })
+            .sort((a, b) => {
+              return get.value(b) - get.value(a)
+            })[0]
+          if (!card) {
+            return false
+          }
+          return [list[0][1].slice().remove(card), [card], []]
+        })
+        .forResult()
+      if (result.bool) {
+        if (result.moved[1].length) {
+          await target.discard(result.moved[1])
+        } else {
+          await player.showCards(
+            result.moved[2],
+            `${get.translation(player)}对${get.translation(target)}发动了【攻心】`,
+          )
+          await target.lose(result.moved[2], ui.cardPile, "visible", "insert")
+        }
+      }
+    },
+    ai: {
+      threaten: 1.5,
+      result: {
+        target(player, target) {
+          return -target.countCards("h")
+        },
+      },
+      order: 10,
+      expose: 0.4,
+    },
+  },
+  gongxin_re_lvmeng: { audio: 2 },
   // 典韦
   // 强袭
   qiangxi: {
     audio: 2,
     enable: "phaseUse",
     usable: 1,
-    audioname: ["boss_lvbu3"],
     filterCard(card) {
       return get.subtype(card) === "equip1"
     },
@@ -1683,7 +1986,6 @@ const skills = {
   // 涅槃
   niepan: {
     audio: 2,
-    audioname2: { sb_pangtong: "sbniepan" },
     enable: "chooseToUse",
     skillAnimation: true,
     limited: true,
@@ -4868,310 +5170,6 @@ const skills = {
       },
     },
   },
-  // 神关羽
-  // 武神
-  wushen: {
-    mod: {
-      cardname(card, player, name) {
-        if (get.suit(card) === "heart") {
-          return "sha"
-        }
-      },
-      cardnature(card, player) {
-        if (get.suit(card) === "heart") {
-          return false
-        }
-      },
-      targetInRange(card) {
-        if (card.name === "sha") {
-          const suit = get.suit(card)
-          if (suit === "heart" || suit === "unsure") {
-            return true
-          }
-        }
-      },
-    },
-    audio: 2,
-    trigger: {
-      player: "useCard",
-    },
-    forced: true,
-    filter(event, player) {
-      return (
-        !event.audioed &&
-        event.card.name === "sha" &&
-        get.suit(event.card) === "heart"
-      )
-    },
-    async content(event, trigger, player) {
-      trigger.audioed = true
-    },
-    ai: {
-      effect: {
-        target(card, player, target, current) {
-          if (get.tag(card, "respondSha") && current < 0) {
-            return 0.6
-          }
-        },
-      },
-    },
-  },
-  // 武魂
-  wuhun: {
-    audio: 2,
-    trigger: { player: "damageEnd" },
-    filter(event, player) {
-      return event.source?.isIn()
-    },
-    forced: true,
-    logTarget: "source",
-    async content(event, trigger, player) {
-      trigger.source.addMark("wuhun", trigger.num)
-    },
-    group: "wuhun_die",
-    ai: {
-      notemp: true,
-      effect: {
-        target: (card, player, target) => {
-          if (!target.hasFriend()) {
-            return
-          }
-          const rec = get.tag(card, "recover"),
-            damage = get.tag(card, "damage")
-          if (!rec && !damage) {
-            return
-          }
-          if (damage && player.hasSkillTag("jueqing", false, target)) {
-            return 1.7
-          }
-          let die = [null, 1],
-            temp
-          game.filterPlayer((i) => {
-            temp = i.countMark("wuhun")
-            if (i === player && target.hp + target.hujia > 1) {
-              temp++
-            }
-            if (temp > die[1]) {
-              die = [i, temp]
-            } else if (temp === die[1]) {
-              if (!die[0]) {
-                die = [i, temp]
-              } else if (
-                get.attitude(target, i) < get.attitude(target, die[0])
-              ) {
-                die = [i, temp]
-              }
-            }
-          })
-          if (die[0]) {
-            if (damage) {
-              return [
-                1,
-                0,
-                1,
-                (-6 * get.sgnAttitude(player, die[0])) / Math.max(1, target.hp),
-              ]
-            }
-            return [
-              1,
-              (6 * get.sgnAttitude(player, die[0])) / Math.max(1, target.hp),
-            ]
-          }
-        },
-      },
-    },
-    marktext: "魇",
-    intro: {
-      name: "梦魇",
-      content: "mark",
-      onunmark: true,
-    },
-    subSkill: {
-      die: {
-        audio: "wuhun",
-        trigger: { player: "die" },
-        filter(event, player) {
-          return game.hasPlayer(
-            (current) => current !== player && current.hasMark("wuhun"),
-          )
-        },
-        forced: true,
-        direct: true,
-        forceDie: true,
-        skillAnimation: true,
-        animationColor: "soil",
-        async content(event, trigger, player) {
-          let maxNum = 0
-          for (const current of game.players) {
-            if (current === player) {
-              continue
-            }
-
-            const markNum = current.countMark("wuhun")
-            maxNum = Math.max(maxNum, markNum)
-          }
-          const num = maxNum
-          let result = await player
-            .chooseTarget(
-              true,
-              "请选择【武魂】的目标",
-              "令其进行判定：若结果不为【桃】或【桃园结义】，其死亡",
-              (card, player, target) => {
-                return (
-                  target !== player &&
-                  target.countMark("wuhun") === _status.event.num
-                )
-              },
-            )
-            .set("ai", (target) => -get.attitude(_status.event.player, target))
-            .set("forceDie", true)
-            .set("num", num)
-            .forResult()
-          if (!result.bool) {
-            return
-          }
-
-          const target = result.targets[0]
-          event.target = target
-          player.logSkill("wuhun_die", target)
-          player.line(target, { color: [255, 255, 0] })
-          await game.delay(2)
-          result = await target
-            .judge((card) =>
-              ["tao", "taoyuan"].includes(card.name) ? 10 : -10,
-            )
-            .set("judge2", (result) => !result.bool)
-            .forResult()
-          if (!result.bool) {
-            await target.die()
-          }
-        },
-      },
-    },
-  },
-  // 神吕蒙
-  // 涉猎
-  shelie: {
-    audio: 2,
-    trigger: { player: "phaseDrawBegin1" },
-    filter(event, player) {
-      return !event.numFixed
-    },
-    async content(event, trigger, player) {
-      trigger.changeToZero()
-      const cards = get.cards(5, true)
-      await player
-        .showCards(
-          cards,
-          `${get.translation(player)}发动了【${get.translation(event.name)}】`,
-          true,
-        )
-        .set("clearArena", false)
-      const list = cards.map((card) => get.suit(card)).unique()
-      const result = await player
-        .chooseCardButton(
-          `涉猎：获得其中每种花色的牌各一张`,
-          cards,
-          list.length,
-          true,
-        )
-        .set("filterButton", (button) => {
-          for (let i = 0; i < ui.selected.buttons.length; i++) {
-            if (
-              get.suit(ui.selected.buttons[i].link) === get.suit(button.link)
-            ) {
-              return false
-            }
-          }
-          return true
-        })
-        .set("ai", (button) => get.value(button.link, _status.event.player))
-        .forResult()
-      game.broadcastAll(ui.clear)
-      if (result?.links?.length) {
-        await player.gain(result.links, "gain2")
-      }
-    },
-    ai: {
-      threaten: 1.2,
-    },
-  },
-  // 攻心
-  gongxin: {
-    audio: 2,
-    audioname: ["re_lvmeng"],
-    audioname2: { ol_lvmeng: "gongxin_re_lvmeng" },
-    enable: "phaseUse",
-    usable: 1,
-    filterTarget(card, player, target) {
-      return target !== player && target.countCards("h")
-    },
-    async content(event, trigger, player) {
-      const { target } = event
-      const cards = target.getCards("h")
-      const result = await player
-        .chooseToMove_new("攻心")
-        .set("list", [
-          [`${get.translation(target)}的手牌`, cards],
-          [["弃置"], ["置于牌堆顶"]],
-        ])
-        .set("filterOk", (moved) => {
-          return (
-            moved[1]
-              .slice()
-              .concat(moved[2])
-              .filter((card) => get.suit(card) === "heart").length === 1
-          )
-        })
-        .set("filterMove", (from, to, moved) => {
-          if (
-            moved[0].includes(from.link) &&
-            moved[1].length + moved[2].length >= 1 &&
-            [1, 2].includes(to)
-          ) {
-            return false
-          }
-          return get.suit(from) === "heart"
-        })
-        .set("processAI", (list) => {
-          const card = list[0][1]
-            .slice()
-            .filter((card) => {
-              return get.suit(card) === "heart"
-            })
-            .sort((a, b) => {
-              return get.value(b) - get.value(a)
-            })[0]
-          if (!card) {
-            return false
-          }
-          return [list[0][1].slice().remove(card), [card], []]
-        })
-        .forResult()
-      if (result.bool) {
-        if (result.moved[1].length) {
-          await target.discard(result.moved[1])
-        } else {
-          await player.showCards(
-            result.moved[2],
-            `${get.translation(player)}对${get.translation(target)}发动了【攻心】`,
-          )
-          await target.lose(result.moved[2], ui.cardPile, "visible", "insert")
-        }
-      }
-    },
-    ai: {
-      threaten: 1.5,
-      result: {
-        target(player, target) {
-          return -target.countCards("h")
-        },
-      },
-      order: 10,
-      expose: 0.4,
-    },
-  },
-  gongxin_re_lvmeng: { audio: 2 },
   // 神周瑜
   // 琴音
   qinyin: {

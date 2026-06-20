@@ -2387,7 +2387,6 @@ const skills = {
   // 强袭
   olqiangxi: {
     audio: 2,
-    audioname: ["boss_lvbu3"],
     enable: "phaseUse",
     usable: 2,
     filter(event, player) {
@@ -2486,7 +2485,6 @@ const skills = {
   // 节命
   oljieming: {
     audio: 2,
-    audioname2: { sxrm_caocao: "oljieming_sxrm_caocao" },
     trigger: { player: ["damageEnd", "die"] },
     forceDie: true,
     filter(event, player) {
@@ -2593,9 +2591,9 @@ const skills = {
     async content(event, trigger, player) {
       trigger.set("chooseToShow", async (event, player, target) => {
         const { showPosition = "h" } = event
-        const cards = (
-          await player.choosePlayerCard(target, showPosition, true).forResult()
-        ).cards
+        const { cards } = await player
+          .choosePlayerCard(target, showPosition, true)
+          .forResult()
         return { bool: true, cards: cards }
       })
       trigger.set("filterDiscard", (card) => {
@@ -2608,9 +2606,9 @@ const skills = {
       if (target.countCards("h") === 0) {
         return
       }
-      const cards = (
-          await player.choosePlayerCard(target, "h", true).forResult()
-        ).cards,
+      const { cards } = await player
+          .choosePlayerCard(target, "h", true)
+          .forResult(),
         card = cards[0]
       await target.showCards(cards).setContent(() => {})
       event.dialog = ui.create.dialog(
@@ -2687,13 +2685,19 @@ const skills = {
     },
     async content(event, trigger, player) {
       const result = await player
-        .chooseCard(
-          "h",
-          [1, Infinity],
-          "展示任意张锦囊牌，令这些牌此阶段不计入手牌上限",
-          (card) => get.type(card, "trick") === "trick",
-          "allowChooseAll",
-        )
+        .chooseCard({
+          prompt: "展示任意张锦囊牌，令这些牌此阶段不计入手牌上限",
+          filterCard(card) {
+            return get.type(card, "trick") === "trick"
+          },
+          selectCard: [1, Infinity],
+          position: "h",
+          allowChooseAll: true,
+          ai(card) {
+            const { player, tricks } = get.event()
+            return tricks.includes(card) ? 10 - get.value(card, player) : 0
+          },
+        })
         .set(
           "tricks",
           player
@@ -2704,15 +2708,11 @@ const skills = {
               Math.max(0, player.countCards("h") - player.getHandcardLimit()),
             ),
         )
-        .set("ai", (card) => {
-          const { player, tricks } = get.event()
-          return tricks.includes(card) ? 10 - get.value(card, player) : 0
-        })
         .forResult()
       if (result.bool) {
+        player.showCards(result.cards, "藏拙")
         player.addGaintag(result.cards, "cangzhuo")
         player.addTempSkill("cangzhuo2")
-        player.showCards(result.cards, "藏拙")
       }
     },
   },
@@ -2753,7 +2753,7 @@ const skills = {
       )
     },
     position: "hes",
-    inherit: "relianhuan",
+    inherit: "lianhuan",
     group: "ollianhuan_add",
     subSkill: {
       add: {
@@ -2798,7 +2798,7 @@ const skills = {
             })
             .set(
               "prompt2",
-              `为${get.translation(trigger.card)}额外指定一个目标`,
+              `为${get.translation(trigger.card)}多指定一名角色为目标`,
             )
             .set("sourcex", trigger.targets)
             .set("ai", (target) => {
@@ -2854,7 +2854,7 @@ const skills = {
       // step 5
       const result = await player
         .chooseControl("bazhen", "olhuoji", "olkanpo")
-        .set("prompt", "选择获得一个技能")
+        .set("prompt", "选择下列一个技能并获得之")
         .set("ai", () => {
           const player = get.event().player,
             threaten = get.threaten(player)

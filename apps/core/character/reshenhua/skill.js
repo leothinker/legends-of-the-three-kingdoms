@@ -1875,7 +1875,7 @@ const skills = {
           return !event.numFixed
         },
         prompt2() {
-          return "放弃摸牌，然后亮出牌堆顶的两张牌并选择获得其中的一张。本回合内可以将与此牌颜色不同的一张手牌当做【决斗】使用"
+          return "改为亮出牌堆顶的两张牌，你获得其中一张牌，然后本回合你可以将与此牌颜色不同的一张手牌当【决斗】使用"
         },
         async content(event, trigger, player) {
           // step 0
@@ -1886,7 +1886,7 @@ const skills = {
             (player, id, cards) => {
               const str =
                 player === game.me && !_status.auto
-                  ? "【双雄】选择获得其中一张牌"
+                  ? "【双雄】获得其中一张牌"
                   : "双雄"
               const dialog = ui.create.dialog(str, cards)
               dialog.videoId = id
@@ -1980,7 +1980,7 @@ const skills = {
         charlotte: true,
         onremove: true,
         audio: "reshuangxiong",
-        logAudio: () => "reshuangxiong2.mp3",
+        logAudio: () => "reshuangxiong1.mp3",
         enable: "chooseToUse",
         viewAs: { name: "juedou" },
         position: "hs",
@@ -2010,7 +2010,7 @@ const skills = {
             str += "不为"
             str += get.translation(colors[i])
           }
-          str += "的手牌当做【决斗】使用"
+          str += "的手牌当【决斗】使用"
           return str
         },
         check(card) {

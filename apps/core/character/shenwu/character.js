@@ -314,7 +314,7 @@ const characters = {
     sex: "male",
     group: "qun",
     hp: 4,
-    skills: ["olluanji", "olxueyi"],
+    skills: ["olluanji", "rexueyi"],
     isZhugong: true,
   },
   ol_yanwen: {

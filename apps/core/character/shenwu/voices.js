@@ -89,8 +89,8 @@ export default {
 
   "#olluanji1": "我的箭支，准备颇多！",
   "#olluanji2": "谁都挡不住我的箭阵！",
-  "#olxueyi1": "高贵名门，族裔盛名。",
-  "#olxueyi2": "贵裔之脉，后起之秀！",
+  "#rexueyi1": "高贵名门，族裔盛名。",
+  "#rexueyi2": "贵裔之脉，后起之秀！",
   "#ol_yuanshao:die": "孟德此计，防不胜防……",
 
   "#olshuangxiong1": "兄弟协力，定可于乱世纵横。",

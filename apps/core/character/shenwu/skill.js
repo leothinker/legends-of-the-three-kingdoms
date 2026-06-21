@@ -3158,7 +3158,6 @@ const skills = {
   // 乱击
   olluanji: {
     inherit: "luanji",
-    audioname2: { shen_caopi: "olluanji_shen_caopi" },
     audio: 2,
     line: false,
     group: "olluanji_remove",
@@ -3179,7 +3178,7 @@ const skills = {
       const result = await player
         .chooseTarget(
           get.prompt("olluanji"),
-          `为${get.translation(trigger.card)}减少一个目标`,
+          `取消${get.translation(trigger.card)}中一个目标`,
           (card, player, target) => _status.event.targets.includes(target),
         )
         .set("targets", trigger.targets)
@@ -3201,7 +3200,7 @@ const skills = {
     },
   },
   // 血裔
-  olxueyi: {
+  rexueyi: {
     audio: 2,
     trigger: { global: "phaseBefore", player: "enterGame" },
     forced: true,
@@ -3209,13 +3208,13 @@ const skills = {
     filter(event, player) {
       return (
         (event.name !== "phase" || game.phaseNumber === 0) &&
-        player.hasZhuSkill("olxueyi")
+        player.hasZhuSkill("rexueyi")
       )
     },
     async content(event, trigger, player) {
       const num = game.countPlayer((current) => current.group === "qun")
       if (num) {
-        player.addMark("olxueyi", num * 2)
+        player.addMark("rexueyi", num * 2)
       }
     },
     marktext: "裔",
@@ -3225,25 +3224,25 @@ const skills = {
     },
     mod: {
       maxHandcard(player, num) {
-        if (player.hasZhuSkill("olxueyi")) {
-          return num + player.countMark("olxueyi")
+        if (player.hasZhuSkill("rexueyi")) {
+          return num + player.countMark("rexueyi")
         }
       },
     },
-    group: "olxueyi_draw",
+    group: "rexueyi_draw",
     subSkill: {
       draw: {
-        audio: "olxueyi",
+        audio: "rexueyi",
         trigger: { player: "phaseUseBegin" },
-        prompt2: "弃置一枚「裔」标记，然后摸一张牌",
+        prompt2: "弃1枚“裔”，然后摸一张牌",
         check(event, player) {
           return player.getUseValue("wanjian") > 0 || !player.needsToDiscard()
         },
         filter(event, player) {
-          return player.hasZhuSkill("olxueyi") && player.hasMark("olxueyi")
+          return player.hasZhuSkill("rexueyi") && player.hasMark("rexueyi")
         },
         async content(event, trigger, player) {
-          player.removeMark("olxueyi", 1)
+          player.removeMark("rexueyi", 1)
           await player.draw()
         },
       },
@@ -3260,7 +3259,7 @@ const skills = {
         .chooseToDiscard(
           "he",
           get.prompt("olshuangxiong"),
-          "弃置一张牌，然后你本回合内可以将一张与此牌颜色不同的牌当做【决斗】使用",
+          "弃置一张牌，然后本回合你可以将一张与之颜色不同的牌当【决斗】使用",
           "chooseonly",
         )
         .set("ai", (card) => {
@@ -3346,7 +3345,7 @@ const skills = {
             str += "不为"
             str += get.translation(colors[i])
           }
-          str += "的牌当做【决斗】使用"
+          str += "的牌当【决斗】使用"
           return str
         },
         check(card) {

@@ -2238,6 +2238,97 @@ const skills = {
       await player.draw()
     },
   },
+
+  // 界姜维
+  // 挑衅
+  retiaoxin: {
+    audio: 2,
+    enable: "phaseUse",
+    usable: 1,
+    filterTarget(card, player, target) {
+      return target !== player && target.countCards("he")
+    },
+    content() {
+      "step 0"
+      target
+        .chooseToUse(
+          function (card, player, event) {
+            if (get.name(card) !== "sha") {
+              return false
+            }
+            return lib.filter.filterCard.apply(this, arguments)
+          },
+          `挑衅：对${get.translation(player)}使用一张【杀】（须合法），否则其弃置你一张牌`,
+        )
+        .set("targetRequired", true)
+        .set("complexSelect", true)
+        .set("complexTarget", true)
+        .set("filterTarget", function (card, player, target) {
+          if (
+            target !== _status.event.sourcex &&
+            !ui.selected.targets.includes(_status.event.sourcex)
+          ) {
+            return false
+          }
+          return lib.filter.filterTarget.apply(this, arguments)
+        })
+        .set("sourcex", player)
+      ;("step 1")
+      if (result.bool === false && target.countCards("he") > 0) {
+        player.discardPlayerCard(target, "he", true)
+      } else {
+        event.finish()
+      }
+    },
+    ai: {
+      order: 4,
+      expose: 0.2,
+      result: {
+        target: -1,
+        player(player, target) {
+          if (!target.canUse("sha", player)) {
+            return 0
+          }
+          if (target.countCards("h") === 0) {
+            return 0
+          }
+          if (target.countCards("h") === 1) {
+            return -0.1
+          }
+          if (player.hp <= 2) {
+            return -2
+          }
+          if (player.countCards("h", "shan") === 0) {
+            return -1
+          }
+          return -0.5
+        },
+      },
+      threaten: 1.1,
+    },
+  },
+  // 志继
+  rezhiji: {
+    skillAnimation: true,
+    animationColor: "fire",
+    audio: 2,
+    juexingji: true,
+    derivation: "reguanxing",
+    trigger: { player: "phaseZhunbeiBegin" },
+    forced: true,
+    filter(event, player) {
+      if (player.storage.rezhiji) {
+        return false
+      }
+      return player.countCards("h") === 0
+    },
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      await player.chooseDrawRecover(2, true)
+      await player.loseMaxHp()
+      await player.addSkills("reguanxing")
+    },
+  },
 }
 
 export default skills

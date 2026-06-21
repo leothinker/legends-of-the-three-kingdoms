@@ -211,13 +211,13 @@ const translates = {
   jixi: "急袭",
   jixi_info: "你可以将一张“田”当【顺手牵羊】使用。",
 
-  jx_jiangwei: "界姜维",
-  jx_jiangwei_prefix: "界",
-  jx_tiaoxin: "挑衅",
-  jx_tiaoxin_info:
-    "出牌阶段限一次，你可以选择一名其他角色，然后除非其对你使用一张【杀】，否则你弃置其一张牌。",
-  jx_zhiji: "志继",
-  jx_zhiji_info: `觉醒技，准备阶段，若你没有手牌，你回复1点体力或摸两张牌，减1点体力上限，然后获得${get.poptip("jx_guanxing")}。`,
+  re_jiangwei: "界姜维",
+  re_jiangwei_prefix: "界",
+  retiaoxin: "挑衅",
+  retiaoxin_info:
+    "出牌阶段限一次，你可以选择一名其他角色，然后除非其对你使用一张【杀】（须合法），否则你弃置其一张牌。",
+  rezhiji: "志继",
+  rezhiji_info: `觉醒技，准备阶段，若你没有手牌，你回复1点体力或摸两张牌，减1点体力上限，然后获得${get.poptip("reguanxing")}。`,
 
   jx_caiwenji: "界蔡文姬",
   jx_caiwenji_prefix: "界",

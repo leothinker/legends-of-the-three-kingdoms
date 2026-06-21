@@ -35,25 +35,25 @@ const characterSort = {
     //   "shen_lvbu",
     //   "shen_caocao",
   ],
-  // shenhua_shan: [
-  //   "dengai",
-  //   "zhanghe",
-  //   "jiangwei",
-  //   "liushan",
-  //   "sunce",
-  //   "zhangzhang",
-  //   "zuoci",
-  //   "caiwenji",
-  //   "shen_simayi",
-  //   "shen_zhaoyun",
-  // ],
+  shenhua_shan: [
+    //   "dengai",
+    //   "zhanghe",
+    "jiangwei",
+    //   "liushan",
+    //   "sunce",
+    //   "zhangzhang",
+    //   "zuoci",
+    //   "caiwenji",
+    //   "shen_simayi",
+    //   "shen_zhaoyun",
+  ],
 }
 
 const characterSortTranslate = {
   shenhua_feng: "神话再临·风",
   shenhua_huo: "神话再临·火",
   shenhua_lin: "神话再临·林",
-  // shenhua_shan: "神话再临·山",
+  shenhua_shan: "神话再临·山",
 }
 
 export { characterSort, characterSortTranslate }

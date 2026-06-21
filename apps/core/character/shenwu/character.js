@@ -352,6 +352,13 @@ const characters = {
     hp: 4,
     skills: ["olduanliang", "rejiezi"],
   },
+
+  ol_jiangwei: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["oltiaoxin", "olzhiji"],
+  },
 }
 
 export default characters

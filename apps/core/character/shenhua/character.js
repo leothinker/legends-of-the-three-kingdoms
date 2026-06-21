@@ -146,6 +146,14 @@ const characters = {
     hp: 4,
     skills: ["duanliang"],
   },
+
+  jiangwei: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["tiaoxin", "zhiji"],
+  },
+
   // zhurong: {
   //   sex: "female",
   //   group: "shu",
@@ -195,12 +203,6 @@ const characters = {
   //   group: "wei",
   //   hp: 4,
   //   skills: ["qiaobian"],
-  // },
-  // jiangwei: {
-  //   sex: "male",
-  //   group: "shu",
-  //   hp: 4,
-  //   skills: ["tiaoxin", "zhiji"],
   // },
   // liushan: {
   //   sex: "male",

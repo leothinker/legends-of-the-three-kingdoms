@@ -102,4 +102,12 @@ export default {
   "#rejiezi1": "剪径截辎，惠泽同袍。",
   "#rejiezi2": "截敌粮草，以资袍泽。",
   "#ol_xuhuang:die": "亚夫易老，李广难封。",
+
+  "#oltiaoxin1": "宜乘其衅会，以挑敌将。",
+  "#oltiaoxin2": "会闻用师，观衅而动。",
+  "#olzhiji1": "丞相遗志，不死不休！",
+  "#olzhiji2": "大业未成，矢志不渝！",
+  "#reguanxing_ol_jiangwei1": "星之分野，各有所属。",
+  "#reguanxing_ol_jiangwei2": "星象相衔，此乃吉兆！",
+  "#ol_jiangwei:die": "星散流离……",
 }

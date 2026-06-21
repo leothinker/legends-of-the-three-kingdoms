@@ -4480,13 +4480,7 @@ const skills = {
   // 挑衅
   tiaoxin: {
     audio: 2,
-    audioname: [
-      "sp_jiangwei",
-      "xiahouba",
-      "re_jiangwei",
-      "gz_jiangwei",
-      "ol_jiangwei",
-    ],
+    audioname: ["sp_jiangwei"],
     enable: "phaseUse",
     usable: 1,
     filterTarget(card, player, target) {
@@ -4506,7 +4500,7 @@ const skills = {
             }
             return lib.filter.filterCard.apply(this, arguments)
           },
-          `挑衅：对${get.translation(player)}使用一张杀，或令其弃置你的一张牌`,
+          `挑衅：对${get.translation(player)}使用一张【杀】，否则其弃置你一张牌`,
         )
         .set("targetRequired", true)
         .set("complexSelect", true)
@@ -4550,13 +4544,11 @@ const skills = {
       threaten: 1.1,
     },
   },
-  tiaoxin_xiahouba: { audio: 2 },
   // 志继
   zhiji: {
     skillAnimation: true,
     animationColor: "fire",
     audio: 2,
-    audioname: ["re_jiangwei"],
     juexingji: true,
     derivation: "guanxing",
     trigger: { player: "phaseZhunbeiBegin" },

@@ -115,4 +115,12 @@ export default {
   "#duanliang1": "人是铁，饭是钢。",
   "#duanliang2": "截其源，断其粮，贼可擒也。",
   "#xuhuang:die": "一顿不吃饿得慌。",
+
+  "#tiaoxin1": "汝等小儿，可敢杀我？",
+  "#tiaoxin2": "贼将早降，可免一死。",
+  "#zhiji1": "先帝之志，丞相之托，不可忘也！",
+  "#zhiji2": "丞相厚恩，维万死不能相报。",
+  "#guanxing_jiangwei1": "克复中原，指日可待！",
+  "#guanxing_jiangwei2": "继丞相之遗志，讨篡汉之逆贼！",
+  "#jiangwei:die": "我计不成，乃天命也……",
 }

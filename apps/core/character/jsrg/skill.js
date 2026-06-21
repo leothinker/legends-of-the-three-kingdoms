@@ -33,7 +33,7 @@ const skills = {
             if (opinion === color) {
               const result = await player
                 .chooseTarget(
-                  "是否令至多两名参与议事的角色将手牌摸至体力上限？",
+                  "是否令其中至多两名角色将手牌摸至体力上限？",
                   [1, 2],
                   (card, player, target) => {
                     return get.event().targets.includes(target)
@@ -260,7 +260,7 @@ const skills = {
         return false
       }
     },
-    prompt: "将一张【影】当无距离和次数限制的刺【杀】使用",
+    prompt: "将一张【影】当无距离次数限制的刺【杀】使用",
     check(card) {
       const val = get.value(card)
       return 5 - val

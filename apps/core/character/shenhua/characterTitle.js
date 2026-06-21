@@ -23,7 +23,8 @@ export default {
 
   caopi: "霸业的继承者",
   xuhuang: "周亚夫之风",
-  // jiangwei: "龙的衣钵",
+
+  jiangwei: "龙的衣钵",
   // liushan: "无为的真命主",
   // zhanghe: "料敌机先",
   // dengai: "矫然的壮士",

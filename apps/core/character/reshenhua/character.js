@@ -188,12 +188,12 @@ const characters = {
   //   hp: 4,
   //   skills: ["retuntian", "zaoxian"],
   // },
-  // re_jiangwei: {
-  //   sex: "male",
-  //   group: "shu",
-  //   hp: 4,
-  //   skills: ["retiaoxin", "rezhiji"],
-  // },
+  re_jiangwei: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["retiaoxin", "rezhiji"],
+  },
   // re_caiwenji: {
   //   sex: "female",
   //   group: "qun",

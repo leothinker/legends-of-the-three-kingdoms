@@ -100,4 +100,12 @@ export default {
   "#jiezi1": "因粮于敌，敌军食可足也。",
   "#jiezi2": "食敌一钟，当吾二十钟。",
   "#re_xuhuang:die": "敌军防备周全，是吾轻敌……",
+
+  "#retiaoxin1": "黄口竖子，何必上阵送命？",
+  "#retiaoxin2": "汝如欲大败而归，则可进军一战！",
+  "#rezhiji1": "维定当奋身以复汉室。",
+  "#rezhiji2": "丞相之志，维必竭力而为。",
+  "#reguanxing_re_jiangwei1": "知天易则观之，逆天难亦行之。",
+  "#reguanxing_re_jiangwei2": "欲尽人事，亦先听天命。",
+  "#re_jiangwei:die": "可惜大计未成，吾已身陨。",
 }

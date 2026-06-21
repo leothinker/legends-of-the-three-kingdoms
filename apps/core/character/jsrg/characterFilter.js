@@ -1,7 +1,4 @@
 const characterFilters = {
-  jsrg_caocao(mode) {
-    return mode !== "chess" && mode !== "tafang"
-  },
   jsrg_xushao(mode) {
     return mode !== "guozhan"
   },

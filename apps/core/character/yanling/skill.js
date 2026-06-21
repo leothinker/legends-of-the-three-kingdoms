@@ -518,17 +518,13 @@ const skills = {
           }, event.onEnd01)
           await game.delay(2)
           if (isFake) {
-            if (doubter.length) {
+            if (targets.length) {
               doubter.forEach((target) => target.popup("质疑正确", "wood"))
               game.log(player, "声明的", trigger.card, "作废了")
               trigger.cancel()
               trigger.getParent().goto(0)
               trigger.line = false
-              const giver = acceptor.concat(
-                game.filterPlayer(
-                  (target) => target !== player && !targets.includes(target),
-                ),
-              )
+              const giver = acceptor
               if (giver.length) {
                 player.line(giver, "yellow")
                 await game.doAsyncInOrder(giver, async (target) =>

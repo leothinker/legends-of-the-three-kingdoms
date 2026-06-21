@@ -4512,7 +4512,7 @@ export class Library {
         },
         connect_choice_zhu: {
           name: "主公候选武将数",
-          init: 2,
+          init: 3,
           input: true,
           restart: true,
           onblur(e) {
@@ -4529,7 +4529,7 @@ export class Library {
         },
         connect_limit_zhu: {
           name: "常备主候选武将数",
-          init: "3",
+          init: "5",
           restart: true,
           item: {
             off: "不限制",
@@ -4570,7 +4570,7 @@ export class Library {
         },
         connect_choice_zhong: {
           name: "忠臣候选武将数",
-          init: 3,
+          init: 5,
           input: true,
           restart: true,
           onblur(e) {
@@ -4593,7 +4593,7 @@ export class Library {
         },
         connect_choice_fan: {
           name: "反贼候选武将数",
-          init: 3,
+          init: 5,
           input: true,
           restart: true,
           onblur(e) {
@@ -4610,7 +4610,7 @@ export class Library {
         },
         connect_choice_nei: {
           name: "内奸候选武将数",
-          init: 3,
+          init: 5,
           input: true,
           restart: true,
           onblur(e) {
@@ -4645,7 +4645,7 @@ export class Library {
         },
         connect_choice_commoner: {
           name: "平民候选武将数",
-          init: 3,
+          init: 5,
           input: true,
           restart: true,
           onblur(e) {
@@ -5192,7 +5192,7 @@ export class Library {
         },
         choice_zhu: {
           name: "主公候选武将数",
-          init: 2,
+          init: 3,
           input: true,
           restart: true,
           onblur(e) {
@@ -5209,7 +5209,7 @@ export class Library {
         },
         limit_zhu: {
           name: "常备主候选武将数",
-          init: "3",
+          init: "5",
           restart: true,
           item: {
             off: "不限制",
@@ -5246,7 +5246,7 @@ export class Library {
         },
         choice_zhong: {
           name: "忠臣候选武将数",
-          init: 3,
+          init: 5,
           input: true,
           restart: true,
           onblur(e) {
@@ -5263,7 +5263,7 @@ export class Library {
         },
         choice_nei: {
           name: "内奸候选武将数",
-          init: 3,
+          init: 5,
           input: true,
           restart: true,
           onblur(e) {
@@ -5280,7 +5280,7 @@ export class Library {
         },
         choice_fan: {
           name: "反贼候选武将数",
-          init: 3,
+          init: 5,
           input: true,
           restart: true,
           onblur(e) {
@@ -5305,7 +5305,7 @@ export class Library {
         },
         choice_commoner: {
           name: "平民候选武将数",
-          init: 3,
+          init: 5,
           input: true,
           restart: true,
           onblur(e) {
@@ -6505,7 +6505,7 @@ export class Library {
         },
         connect_choice_zhu: {
           name: "地主候选武将数",
-          init: 5,
+          init: 8,
           input: true,
           restart: true,
           onblur(e) {
@@ -6522,7 +6522,7 @@ export class Library {
         },
         connect_choice_fan: {
           name: "农民候选武将数",
-          init: 3,
+          init: 5,
           input: true,
           restart: true,
           onblur(e) {
@@ -6634,7 +6634,7 @@ export class Library {
         },
         choice_zhu: {
           name: "地主候选武将数",
-          init: 5,
+          init: 8,
           input: true,
           restart: true,
           onblur(e) {
@@ -6651,7 +6651,7 @@ export class Library {
         },
         choice_fan: {
           name: "农民候选武将数",
-          init: 3,
+          init: 5,
           input: true,
           restart: true,
           onblur(e) {

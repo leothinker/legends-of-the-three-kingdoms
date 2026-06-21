@@ -8,7 +8,7 @@ window.wtk_package = {
     old: "往昔龙吟",
     // jiangxing: "将星",
     // extra: "珍藏版",
-    // jsrg: "江山如故",
+    jsrg: "江山如故",
     // tianshui: "天水濯名",
     // sxrm: "蚀心入魔",
     yanling: "雁翎耀光",

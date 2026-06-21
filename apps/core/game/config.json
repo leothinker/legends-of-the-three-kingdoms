@@ -161,8 +161,17 @@
     "old"
   ],
   "moderned_modes": ["guozhan"],
-  "connect_characters": ["refresh", "reshenhua", "yanling"],
-  "connect_cards": ["standard", "extra", "refresh"],
+  "connect_characters": ["standard", "shenhua", "shenwu", "old"],
+  "connect_cards": [
+    "sixiang",
+    "sp",
+    "wangzhe",
+    "guozhan",
+    "yingbian",
+    "simplify",
+    "yongjian",
+    "zhulu"
+  ],
   "plays": [],
   "banned": [],
   "bannedcards": [],

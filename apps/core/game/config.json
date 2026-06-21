@@ -151,7 +151,7 @@
   "right_click": "pause",
   "sort": "type_sort",
   "cards": ["standard", "extra", "refresh"],
-  "characters": ["refresh", "reshenhua"],
+  "characters": ["refresh", "reshenhua", "yanling"],
   "moderned_characters": [
     "standard",
     "shenhua",
@@ -161,16 +161,8 @@
     "old"
   ],
   "moderned_modes": ["guozhan"],
-  "connect_characters": ["diy"],
-  "connect_cards": [
-    "huodong",
-    "guozhan",
-    "sp",
-    "zhulu",
-    "yingbian",
-    "yongjian",
-    "xianxia"
-  ],
+  "connect_characters": ["refresh", "reshenhua", "yanling"],
+  "connect_cards": ["standard", "extra", "refresh"],
   "plays": [],
   "banned": [],
   "bannedcards": [],

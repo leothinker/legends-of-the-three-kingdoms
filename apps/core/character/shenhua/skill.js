@@ -2331,6 +2331,704 @@ const skills = {
       re_yanwen2: { audio: true },
     },
   },
+  // 神周瑜
+  // 琴音
+  qinyin: {
+    audio: 2,
+    trigger: { player: "phaseDiscardEnd" },
+    direct: true,
+    logAudio: (index) => (typeof index === "number" ? `qinyin${index}.mp3` : 2),
+    logAudio2: {
+      mb_zhouyu: (index) =>
+        typeof index === "number" ? `qinyin_mb_zhouyu${index}.mp3` : 2,
+    },
+    filter(event, player) {
+      var cards = []
+      player.getHistory("lose", (evt) => {
+        if (evt.type === "discard" && evt.getParent("phaseDiscard") === event) {
+          cards.addArray(evt.cards2)
+        }
+      })
+      return cards.length > 1
+    },
+    async content(event, trigger, player) {
+      event.forceDie = true
+      if (typeof event.count !== "number") {
+        event.count = 1
+      }
+
+      for (let time = event.count; time > 0; time--) {
+        let recover = 0
+        let lose = 0
+        const players = game.filterPlayer()
+        for (const current of players) {
+          if (current.hp < current.maxHp) {
+            if (get.attitude(player, current) > 0) {
+              if (current.hp < 2) {
+                lose--
+                recover += 0.5
+              }
+              lose--
+              recover++
+            } else if (get.attitude(player, current) < 0) {
+              if (current.hp < 2) {
+                lose++
+                recover -= 0.5
+              }
+              lose++
+              recover--
+            }
+          } else {
+            if (get.attitude(player, current) > 0) {
+              lose--
+            } else if (get.attitude(player, current) < 0) {
+              lose++
+            }
+          }
+        }
+
+        const prompt = `${get.prompt("qinyin")}（剩余${get.cnNumber(time)}次）`
+        const next = player.chooseControl(
+          "失去体力",
+          "回复体力",
+          "cancel2",
+          ui.create.dialog(get.prompt("qinyin"), "hidden"),
+        )
+        next.set("ai", () => {
+          if (lose > recover && lose > 0) {
+            return 0
+          }
+          if (lose < recover && recover > 0) {
+            return 1
+          }
+          return 2
+        })
+
+        const result = await next.forResult()
+        if (result.control === "cancel2") {
+          return
+        }
+
+        player.logSkill("qinyin", null, null, null, [
+          result.control === "回复体力" ? 2 : 1,
+        ])
+        const bool = result.control === "回复体力"
+        await game.doAsyncInOrder(game.filterPlayer(), async (target) => {
+          if (bool) {
+            await target.recover()
+          } else {
+            await target.loseHp()
+          }
+        })
+      }
+    },
+    ai: {
+      expose: 0.1,
+      threaten: 2,
+    },
+  },
+  // 业炎
+  yeyan: {
+    limited: true,
+    audio: 2,
+    enable: "phaseUse",
+    filterCard(card, player) {
+      return !ui.selected.cards.some(
+        (cardx) => get.suit(cardx, player) === get.suit(card, player),
+      )
+    },
+    selectCard: [0, 4],
+    filterTarget(card, player, target) {
+      var length = ui.selected.cards.length
+      return length === 0 || length === 4
+    },
+    selectTarget() {
+      if (ui.selected.cards.length === 4) {
+        return [1, 2]
+      }
+      if (ui.selected.cards.length === 0) {
+        return [1, 3]
+      }
+      game.uncheck("target")
+      return [1, 3]
+    },
+    complexCard: true,
+    complexSelect: true,
+    line: "fire",
+    forceDie: true,
+    animationColor: "metal",
+    skillAnimation: "legend",
+    check(card) {
+      if (!lib.skill.yeyan.getBigFire(get.event().player)) {
+        return -1
+      }
+      return 1 / (get.value(card) || 0.5)
+    },
+    multitarget: true,
+    multiline: true,
+    async contentBefore(event, trigger, player) {
+      player.awakenSkill(event.skill)
+    },
+    async content(event, trigger, player) {
+      const { cards, targets } = event
+
+      if (cards.length !== 4) {
+        await game.doAsyncInOrder(targets, (target) =>
+          target.damage({
+            num: 1,
+            nature: "fire",
+            nocard: true,
+          }),
+        )
+        return
+      }
+
+      await player.loseHp(3)
+
+      if (targets.length === 1) {
+        const result = await player
+          .chooseControl("2点", "3点")
+          .set("prompt", "请选择伤害点数")
+          .set("ai", () => "3点")
+          .set("forceDie", true)
+          .forResult()
+
+        await targets[0].damage({
+          num: result.control === "2点" ? 2 : 3,
+          nature: "fire",
+          nocard: true,
+        })
+      } else {
+        const result = await player
+          .chooseTarget(
+            "请选择受到2点伤害的角色",
+            true,
+            (card, player, target) => {
+              return get.event().targets.includes(target)
+            },
+          )
+          .set("ai", () => 1)
+          .set("forceDie", true)
+          .set("targets", targets)
+          .forResult()
+
+        const target2 = result.targets[0]
+        targets.sortBySeat()
+        for (const target of targets) {
+          let damageNum = 1
+          if (target === target2) {
+            damageNum = 2
+          }
+          await target.damage({
+            num: damageNum,
+            nature: "fire",
+            nocard: true,
+          })
+        }
+      }
+    },
+    ai: {
+      order(item, player) {
+        return lib.skill.yeyan.getBigFire(player) ? 10 : 1
+      },
+      fireAttack: true,
+      result: {
+        target(player, target) {
+          if (player.hasUnknown()) {
+            return 0
+          }
+          const att = get.sgn(get.attitude(player, target))
+          const targets = game.filterPlayer(
+            (target) =>
+              get.damageEffect(target, player, player, "fire") &&
+              (!lib.skill.yeyan.getBigFire(player) ||
+                (target.hp <= 3 &&
+                  !target.hasSkillTag("filterDamage", null, {
+                    player: player,
+                  }))),
+          )
+          if (!targets.includes(target)) {
+            return 0
+          }
+          if (lib.skill.yeyan.getBigFire(player)) {
+            if (ui.selected.targets.length) {
+              return 0
+            }
+            if (
+              !(
+                targets.length === 1 ||
+                (att < 0 &&
+                  target.identity &&
+                  target.identity.indexOf("zhu") !== -1)
+              )
+            ) {
+              return 0
+            }
+          }
+          return att * get.damageEffect(target, player, player, "fire")
+        },
+      },
+    },
+    getBigFire(player) {
+      if (
+        player
+          .getDiscardableCards(player, "h")
+          .reduce((list, card) => list.add(get.suit(card, player)), []).length <
+        4
+      ) {
+        return false
+      }
+      const targets = game.filterPlayer(
+        (target) =>
+          get.damageEffect(target, player, player, "fire") &&
+          target.hp <= 3 &&
+          !target.hasSkillTag("filterDamage", null, { player: player }),
+      )
+      if (!targets.length) {
+        return false
+      }
+      if (
+        targets.length === 1 ||
+        targets.some(
+          (target) =>
+            get.attitude(player, target) < 0 &&
+            target.identity &&
+            target.identity.indexOf("zhu") !== -1,
+        )
+      ) {
+        const suits = player
+            .getDiscardableCards(player, "h")
+            .reduce((map, card) => {
+              const suit = get.suit(card, player)
+              if (!map[suit]) {
+                map[suit] = []
+              }
+              return map
+            }, {}),
+          cards = []
+        Object.keys(suits).forEach((i) => {
+          suits[i].addArray(
+            player
+              .getDiscardableCards(player, "h")
+              .filter((card) => get.suit(card) === i),
+          )
+          cards.add(suits[i].sort((a, b) => get.value(a) - get.value(b))[0])
+        })
+        return (
+          player.hp +
+            player.countCards(
+              "h",
+              (card) =>
+                !cards.includes(card) && player.canSaveCard(card, player),
+            ) -
+            3 >
+          0
+        )
+      }
+      return false
+    },
+  },
+  // 神诸葛亮
+  // 七星
+  qixing: {
+    audio: 2,
+    trigger: {
+      global: "phaseBefore",
+      player: "enterGame",
+    },
+    forced: true,
+    locked: false,
+    filter(event, player) {
+      return event.name !== "phase" || game.phaseNumber === 0
+    },
+    async content(event, trigger, player) {
+      const getStars = player.addToExpansion(get.cards(7), "draw")
+      getStars.gaintag.add("qixing")
+      await getStars
+
+      // 下面内容直接复制的qixing2，仅ai做了改变
+      const expansions = player.getExpansions("qixing")
+      const cards = player.getCards("h")
+      if (!expansions.length || !cards.length) {
+        return
+      }
+
+      const next = player.chooseToMove("七星：是否用任意张手牌替换等量的“星”？")
+      next.set("list", [
+        [`${get.translation(player)}（你）的星`, expansions],
+        ["手牌区", cards],
+      ])
+      next.set("filterMove", (from, to) => typeof to !== "number")
+      next.set("processAI", processAI)
+
+      const result = await next.forResult()
+      if (result.bool) {
+        const pushs = result.moved[0]
+        const gains = result.moved[1]
+        pushs.removeArray(expansions)
+        gains.removeArray(cards)
+        if (!pushs.length || pushs.length !== gains.length) {
+          return
+        }
+        player.logSkill("qixing2")
+        const addStars = player.addToExpansion(pushs, player, "giveAuto")
+        addStars.gaintag.add("qixing")
+        await addStars
+        await player.gain(gains, "draw")
+      }
+
+      return
+
+      /**
+       * @typedef {[string, Card[]]} MoveItem
+       * @typedef {MoveItem[]} MoveList
+       * @param {MoveList} list
+       * @return {[Card[], Card[]]}
+       */
+      function processAI(list) {
+        const player = get.player()
+
+        const cards = list[0][1]
+          .concat(list[1][1])
+          .sort((a, b) => get.useful(a) - get.useful(b))
+        const cards2 = cards.splice(0, player.getExpansions("qixing").length)
+        return [cards2, cards]
+      }
+    },
+    intro: {
+      markcount: "expansion",
+      mark(dialog, content, player) {
+        var content = player.getExpansions("qixing")
+        if (content?.length) {
+          if (player === game.me || player.isUnderControl()) {
+            dialog.addAuto(content)
+          } else {
+            return `共有${get.cnNumber(content.length)}张星`
+          }
+        }
+      },
+      content(content, player) {
+        var content = player.getExpansions("qixing")
+        if (content?.length) {
+          if (player === game.me || player.isUnderControl()) {
+            return get.translation(content)
+          }
+          return `共有${get.cnNumber(content.length)}张星`
+        }
+      },
+    },
+    group: ["qixing2"],
+    ai: {
+      notemp: true,
+    },
+  },
+  qixing2: {
+    trigger: { player: "phaseDrawAfter" },
+    direct: true,
+    sourceSkill: "qixing",
+    filter(event, player) {
+      return (
+        player.getExpansions("qixing").length > 0 && player.countCards("h") > 0
+      )
+    },
+    async content(event, trigger, player) {
+      const expansions = player.getExpansions("qixing")
+      const cards = player.getCards("h")
+      if (!expansions.length || !cards.length) {
+        return
+      }
+
+      const next = player.chooseToMove("七星：是否用任意张手牌替换等量的“星”？")
+      next.set("list", [
+        [`${get.translation(player)}（你）的星`, expansions],
+        ["手牌区", cards],
+      ])
+      next.set("filterMove", (from, to) => typeof to !== "number")
+      next.set("processAI", processAI)
+
+      const result = await next.forResult()
+      if (result.bool) {
+        const pushs = result.moved[0]
+        const gains = result.moved[1]
+        pushs.removeArray(expansions)
+        gains.removeArray(cards)
+        if (!pushs.length || pushs.length !== gains.length) {
+          return
+        }
+        player.logSkill("qixing2")
+        const addStars = player.addToExpansion(pushs, player, "giveAuto")
+        addStars.gaintag.add("qixing")
+        await addStars
+        await player.gain(gains, "draw")
+      }
+
+      return
+
+      /**
+       * @typedef {[string, Card[]]} MoveItem
+       * @typedef {MoveItem[]} MoveList
+       * @param {MoveList} list
+       * @return {[Card[], Card[]]}
+       */
+      function processAI(list) {
+        const player = get.player()
+
+        const cards = list[0][1]
+          .concat(list[1][1])
+          .sort((a, b) => get.value(a) - get.value(b))
+        const cards2 = cards.splice(0, player.getExpansions("qixing").length)
+        return [cards2, cards]
+      }
+    },
+  },
+  // 狂风
+  kuangfeng: {
+    audio: 2,
+    trigger: { player: "phaseJieshuBegin" },
+    filter(event, player) {
+      return player.getExpansions("qixing").length
+    },
+    async cost(event, trigger, player) {
+      const {
+        bool,
+        targets,
+        links: cost_data,
+      } = await player
+        .chooseButtonTarget({
+          createDialog: [
+            get.prompt2(event.skill),
+            player.getExpansions("qixing"),
+          ],
+          selectButton: 1,
+          filterTarget: true,
+          ai1(button) {
+            if (
+              game.hasPlayer((target) => {
+                return get.attitude(get.player(), target) < 0
+              })
+            ) {
+              return 1
+            }
+            return 0
+          },
+          ai2(target) {
+            return -get.attitude(get.player(), target)
+          },
+        })
+        .forResult()
+      event.result = {
+        bool: bool,
+        targets: targets?.sortBySeat(),
+        cost_data: cost_data,
+      }
+    },
+    async content(event, trigger, player) {
+      const { targets, cost_data: cards } = event
+      targets.forEach((target) => {
+        target.addAdditionalSkill(`kuangfeng_${player.playerid}`, "kuangfeng2")
+        target.markAuto("kuangfeng2", [player])
+      })
+      player.addTempSkill("kuangfeng3", { player: "phaseBeginStart" })
+      await player.loseToDiscardpile(cards)
+    },
+    ai: {
+      combo: "qixing",
+    },
+  },
+  kuangfeng2: {
+    charlotte: true,
+    intro: {
+      content(storage) {
+        return `共有${storage.length}枚标记`
+      },
+    },
+    ai: {
+      effect: {
+        target(card, player, target, current) {
+          if (get.tag(card, "fireDamage") && current < 0) {
+            return 1.5
+          }
+        },
+      },
+    },
+  },
+  kuangfeng3: {
+    trigger: { global: "damageBegin3" },
+    sourceSkill: "kuangfeng",
+    filter(event, player) {
+      return (
+        event.hasNature("fire") &&
+        event.player.getStorage("kuangfeng2").includes(player)
+      )
+    },
+    charlotte: true,
+    forced: true,
+    logTarget: "player",
+    async content(event, trigger, player) {
+      trigger.num++
+    },
+    onremove(player) {
+      game.countPlayer2((current) => {
+        if (current.getStorage("kuangfeng2").includes(player)) {
+          current.unmarkAuto("kuangfeng2", player)
+          current.removeAdditionalSkill(`kuangfeng_${player.playerid}`)
+        }
+      }, true)
+    },
+  },
+  // 大雾
+  dawu: {
+    trigger: { player: "phaseJieshuBegin" },
+    filter(event, player) {
+      return player.getExpansions("qixing").length
+    },
+    audio: 2,
+    async cost(event, trigger, player) {
+      const {
+        bool,
+        targets,
+        links: cost_data,
+      } = await player
+        .chooseButtonTarget({
+          createDialog: [
+            get.prompt2(event.skill),
+            player.getExpansions("qixing"),
+          ],
+          selectButton: [1, game.countPlayer()],
+          filterTarget: true,
+          selectTarget() {
+            return ui.selected.buttons.length
+          },
+          complexSelect: true,
+          ai1(button) {
+            const { player, allUse } = get.event()
+            const targets = game.filterPlayer((target) => {
+              if (
+                target.isMin() ||
+                target.hasSkill("biantian2") ||
+                target.hasSkill("dawu2")
+              ) {
+                return false
+              }
+              const att = get.attitude(player, target)
+              if (att >= 4) {
+                if (
+                  target.hp > 2 &&
+                  (target.isHealthy() || target.hasSkillTag("maixie"))
+                ) {
+                  return false
+                }
+                if (allUse || target.hp === 1) {
+                  return true
+                }
+                if (target.hp === 2 && target.countCards("he") <= 2) {
+                  return true
+                }
+              }
+              return false
+            })
+            if (ui.selected.buttons.length < targets.length) {
+              return 1
+            }
+            return 0
+          },
+          ai2(target) {
+            const { player, allUse } = get.event()
+            if (
+              target.isMin() ||
+              target.hasSkill("biantian2") ||
+              target.hasSkill("dawu2")
+            ) {
+              return 0
+            }
+            const att = get.attitude(player, target)
+            if (att >= 4) {
+              if (
+                target.hp > 2 &&
+                (target.isHealthy() || target.hasSkillTag("maixie"))
+              ) {
+                return 0
+              }
+              if (allUse || target.hp === 1) {
+                return att
+              }
+              if (target.hp === 2 && target.countCards("he") <= 2) {
+                return att * 0.7
+              }
+              return 0
+            }
+            return -1
+          },
+        })
+        .set(
+          "allUse",
+          player.getExpansions("qixing").length >=
+            game.countPlayer((current) => get.attitude(player, current) > 4) *
+              2,
+        )
+        .forResult()
+      event.result = {
+        bool: bool,
+        targets: targets?.sortBySeat(),
+        cost_data: cost_data,
+      }
+    },
+    async content(event, trigger, player) {
+      const { targets, cost_data: cards } = event
+      targets.forEach((target) => {
+        target.addAdditionalSkill(`dawu_${player.playerid}`, "dawu2")
+        target.markAuto("dawu2", [player])
+      })
+      player.addTempSkill("dawu3", { player: "phaseBeginStart" })
+      await player.loseToDiscardpile(cards)
+    },
+    ai: {
+      combo: "qixing",
+    },
+  },
+  dawu2: {
+    charlotte: true,
+    ai: {
+      nofire: true,
+      nodamage: true,
+      effect: {
+        target(card, player, target, current) {
+          if (get.tag(card, "damage") && !get.tag(card, "thunderDamage")) {
+            return "zeroplayertarget"
+          }
+        },
+      },
+    },
+    intro: {
+      content(storage) {
+        return `共有${storage.length}枚标记`
+      },
+    },
+  },
+  dawu3: {
+    trigger: { global: "damageBegin4" },
+    sourceSkill: "dawu",
+    filter(event, player) {
+      return (
+        !event.hasNature("thunder") &&
+        event.player.getStorage("dawu2").includes(player)
+      )
+    },
+    forced: true,
+    charlotte: true,
+    logTarget: "player",
+    async content(event, trigger, player) {
+      trigger.cancel()
+    },
+    onremove(player) {
+      game.countPlayer2((current) => {
+        if (current.getStorage("dawu2").includes(player)) {
+          current.unmarkAuto("dawu2", [player])
+          current.removeAdditionalSkill(`dawu_${player.playerid}`)
+        }
+      }, true)
+    },
+  },
   // 徐晃
   // 断粮
   duanliang: {
@@ -5168,705 +5866,6 @@ const skills = {
           }
         },
       },
-    },
-  },
-  // 神周瑜
-  // 琴音
-  qinyin: {
-    audio: 2,
-    audioname: ["mb_zhouyu"],
-    trigger: { player: "phaseDiscardEnd" },
-    direct: true,
-    logAudio: (index) => (typeof index === "number" ? `qinyin${index}.mp3` : 2),
-    logAudio2: {
-      mb_zhouyu: (index) =>
-        typeof index === "number" ? `qinyin_mb_zhouyu${index}.mp3` : 2,
-    },
-    filter(event, player) {
-      var cards = []
-      player.getHistory("lose", (evt) => {
-        if (evt.type === "discard" && evt.getParent("phaseDiscard") === event) {
-          cards.addArray(evt.cards2)
-        }
-      })
-      return cards.length > 1
-    },
-    async content(event, trigger, player) {
-      event.forceDie = true
-      if (typeof event.count !== "number") {
-        event.count = 1
-      }
-
-      for (let time = event.count; time > 0; time--) {
-        let recover = 0
-        let lose = 0
-        const players = game.filterPlayer()
-        for (const current of players) {
-          if (current.hp < current.maxHp) {
-            if (get.attitude(player, current) > 0) {
-              if (current.hp < 2) {
-                lose--
-                recover += 0.5
-              }
-              lose--
-              recover++
-            } else if (get.attitude(player, current) < 0) {
-              if (current.hp < 2) {
-                lose++
-                recover -= 0.5
-              }
-              lose++
-              recover--
-            }
-          } else {
-            if (get.attitude(player, current) > 0) {
-              lose--
-            } else if (get.attitude(player, current) < 0) {
-              lose++
-            }
-          }
-        }
-
-        const prompt = `${get.prompt("qinyin")}（剩余${get.cnNumber(time)}次）`
-        const next = player.chooseControl(
-          "失去体力",
-          "回复体力",
-          "cancel2",
-          ui.create.dialog(get.prompt("qinyin"), "hidden"),
-        )
-        next.set("ai", () => {
-          if (lose > recover && lose > 0) {
-            return 0
-          }
-          if (lose < recover && recover > 0) {
-            return 1
-          }
-          return 2
-        })
-
-        const result = await next.forResult()
-        if (result.control === "cancel2") {
-          return
-        }
-
-        player.logSkill("qinyin", null, null, null, [
-          result.control === "回复体力" ? 2 : 1,
-        ])
-        const bool = result.control === "回复体力"
-        await game.doAsyncInOrder(game.filterPlayer(), async (target) => {
-          if (bool) {
-            await target.recover()
-          } else {
-            await target.loseHp()
-          }
-        })
-      }
-    },
-    ai: {
-      expose: 0.1,
-      threaten: 2,
-    },
-  },
-  // 业炎
-  yeyan: {
-    limited: true,
-    audio: 2,
-    enable: "phaseUse",
-    filterCard(card, player) {
-      return !ui.selected.cards.some(
-        (cardx) => get.suit(cardx, player) === get.suit(card, player),
-      )
-    },
-    selectCard: [0, 4],
-    filterTarget(card, player, target) {
-      var length = ui.selected.cards.length
-      return length === 0 || length === 4
-    },
-    selectTarget() {
-      if (ui.selected.cards.length === 4) {
-        return [1, 2]
-      }
-      if (ui.selected.cards.length === 0) {
-        return [1, 3]
-      }
-      game.uncheck("target")
-      return [1, 3]
-    },
-    complexCard: true,
-    complexSelect: true,
-    line: "fire",
-    forceDie: true,
-    animationColor: "metal",
-    skillAnimation: "legend",
-    check(card) {
-      if (!lib.skill.yeyan.getBigFire(get.event().player)) {
-        return -1
-      }
-      return 1 / (get.value(card) || 0.5)
-    },
-    multitarget: true,
-    multiline: true,
-    async contentBefore(event, trigger, player) {
-      player.awakenSkill(event.skill)
-    },
-    async content(event, trigger, player) {
-      const { cards, targets } = event
-
-      if (cards.length !== 4) {
-        await game.doAsyncInOrder(targets, (target) =>
-          target.damage({
-            num: 1,
-            nature: "fire",
-            nocard: true,
-          }),
-        )
-        return
-      }
-
-      await player.loseHp(3)
-
-      if (targets.length === 1) {
-        const result = await player
-          .chooseControl("2点", "3点")
-          .set("prompt", "请选择伤害点数")
-          .set("ai", () => "3点")
-          .set("forceDie", true)
-          .forResult()
-
-        await targets[0].damage({
-          num: result.control === "2点" ? 2 : 3,
-          nature: "fire",
-          nocard: true,
-        })
-      } else {
-        const result = await player
-          .chooseTarget(
-            "请选择受到2点伤害的角色",
-            true,
-            (card, player, target) => {
-              return get.event().targets.includes(target)
-            },
-          )
-          .set("ai", () => 1)
-          .set("forceDie", true)
-          .set("targets", targets)
-          .forResult()
-
-        const target2 = result.targets[0]
-        targets.sortBySeat()
-        for (const target of targets) {
-          let damageNum = 1
-          if (target === target2) {
-            damageNum = 2
-          }
-          await target.damage({
-            num: damageNum,
-            nature: "fire",
-            nocard: true,
-          })
-        }
-      }
-    },
-    ai: {
-      order(item, player) {
-        return lib.skill.yeyan.getBigFire(player) ? 10 : 1
-      },
-      fireAttack: true,
-      result: {
-        target(player, target) {
-          if (player.hasUnknown()) {
-            return 0
-          }
-          const att = get.sgn(get.attitude(player, target))
-          const targets = game.filterPlayer(
-            (target) =>
-              get.damageEffect(target, player, player, "fire") &&
-              (!lib.skill.yeyan.getBigFire(player) ||
-                (target.hp <= 3 &&
-                  !target.hasSkillTag("filterDamage", null, {
-                    player: player,
-                  }))),
-          )
-          if (!targets.includes(target)) {
-            return 0
-          }
-          if (lib.skill.yeyan.getBigFire(player)) {
-            if (ui.selected.targets.length) {
-              return 0
-            }
-            if (
-              !(
-                targets.length === 1 ||
-                (att < 0 &&
-                  target.identity &&
-                  target.identity.indexOf("zhu") !== -1)
-              )
-            ) {
-              return 0
-            }
-          }
-          return att * get.damageEffect(target, player, player, "fire")
-        },
-      },
-    },
-    getBigFire(player) {
-      if (
-        player
-          .getDiscardableCards(player, "h")
-          .reduce((list, card) => list.add(get.suit(card, player)), []).length <
-        4
-      ) {
-        return false
-      }
-      const targets = game.filterPlayer(
-        (target) =>
-          get.damageEffect(target, player, player, "fire") &&
-          target.hp <= 3 &&
-          !target.hasSkillTag("filterDamage", null, { player: player }),
-      )
-      if (!targets.length) {
-        return false
-      }
-      if (
-        targets.length === 1 ||
-        targets.some(
-          (target) =>
-            get.attitude(player, target) < 0 &&
-            target.identity &&
-            target.identity.indexOf("zhu") !== -1,
-        )
-      ) {
-        const suits = player
-            .getDiscardableCards(player, "h")
-            .reduce((map, card) => {
-              const suit = get.suit(card, player)
-              if (!map[suit]) {
-                map[suit] = []
-              }
-              return map
-            }, {}),
-          cards = []
-        Object.keys(suits).forEach((i) => {
-          suits[i].addArray(
-            player
-              .getDiscardableCards(player, "h")
-              .filter((card) => get.suit(card) === i),
-          )
-          cards.add(suits[i].sort((a, b) => get.value(a) - get.value(b))[0])
-        })
-        return (
-          player.hp +
-            player.countCards(
-              "h",
-              (card) =>
-                !cards.includes(card) && player.canSaveCard(card, player),
-            ) -
-            3 >
-          0
-        )
-      }
-      return false
-    },
-  },
-  // 神诸葛亮
-  // 七星
-  qixing: {
-    audio: 2,
-    trigger: {
-      global: "phaseBefore",
-      player: "enterGame",
-    },
-    forced: true,
-    locked: false,
-    filter(event, player) {
-      return event.name !== "phase" || game.phaseNumber === 0
-    },
-    async content(event, trigger, player) {
-      const getStars = player.addToExpansion(get.cards(7), "draw")
-      getStars.gaintag.add("qixing")
-      await getStars
-
-      // 下面内容直接复制的qixing2，仅ai做了改变
-      const expansions = player.getExpansions("qixing")
-      const cards = player.getCards("h")
-      if (!expansions.length || !cards.length) {
-        return
-      }
-
-      const next = player.chooseToMove("七星：是否交换“星”和手牌？")
-      next.set("list", [
-        [`${get.translation(player)}（你）的星`, expansions],
-        ["手牌区", cards],
-      ])
-      next.set("filterMove", (from, to) => typeof to !== "number")
-      next.set("processAI", processAI)
-
-      const result = await next.forResult()
-      if (result.bool) {
-        const pushs = result.moved[0]
-        const gains = result.moved[1]
-        pushs.removeArray(expansions)
-        gains.removeArray(cards)
-        if (!pushs.length || pushs.length !== gains.length) {
-          return
-        }
-        player.logSkill("qixing2")
-        const addStars = player.addToExpansion(pushs, player, "giveAuto")
-        addStars.gaintag.add("qixing")
-        await addStars
-        await player.gain(gains, "draw")
-      }
-
-      return
-
-      /**
-       * @typedef {[string, Card[]]} MoveItem
-       * @typedef {MoveItem[]} MoveList
-       * @param {MoveList} list
-       * @return {[Card[], Card[]]}
-       */
-      function processAI(list) {
-        const player = get.player()
-
-        const cards = list[0][1]
-          .concat(list[1][1])
-          .sort((a, b) => get.useful(a) - get.useful(b))
-        const cards2 = cards.splice(0, player.getExpansions("qixing").length)
-        return [cards2, cards]
-      }
-    },
-    intro: {
-      markcount: "expansion",
-      mark(dialog, content, player) {
-        var content = player.getExpansions("qixing")
-        if (content?.length) {
-          if (player === game.me || player.isUnderControl()) {
-            dialog.addAuto(content)
-          } else {
-            return `共有${get.cnNumber(content.length)}张星`
-          }
-        }
-      },
-      content(content, player) {
-        var content = player.getExpansions("qixing")
-        if (content?.length) {
-          if (player === game.me || player.isUnderControl()) {
-            return get.translation(content)
-          }
-          return `共有${get.cnNumber(content.length)}张星`
-        }
-      },
-    },
-    group: ["qixing2"],
-    ai: {
-      notemp: true,
-    },
-  },
-  qixing2: {
-    trigger: { player: "phaseDrawAfter" },
-    direct: true,
-    sourceSkill: "qixing",
-    filter(event, player) {
-      return (
-        player.getExpansions("qixing").length > 0 && player.countCards("h") > 0
-      )
-    },
-    async content(event, trigger, player) {
-      const expansions = player.getExpansions("qixing")
-      const cards = player.getCards("h")
-      if (!expansions.length || !cards.length) {
-        return
-      }
-
-      const next = player.chooseToMove("七星：是否交换“星”和手牌？")
-      next.set("list", [
-        [`${get.translation(player)}（你）的星`, expansions],
-        ["手牌区", cards],
-      ])
-      next.set("filterMove", (from, to) => typeof to !== "number")
-      next.set("processAI", processAI)
-
-      const result = await next.forResult()
-      if (result.bool) {
-        const pushs = result.moved[0]
-        const gains = result.moved[1]
-        pushs.removeArray(expansions)
-        gains.removeArray(cards)
-        if (!pushs.length || pushs.length !== gains.length) {
-          return
-        }
-        player.logSkill("qixing2")
-        const addStars = player.addToExpansion(pushs, player, "giveAuto")
-        addStars.gaintag.add("qixing")
-        await addStars
-        await player.gain(gains, "draw")
-      }
-
-      return
-
-      /**
-       * @typedef {[string, Card[]]} MoveItem
-       * @typedef {MoveItem[]} MoveList
-       * @param {MoveList} list
-       * @return {[Card[], Card[]]}
-       */
-      function processAI(list) {
-        const player = get.player()
-
-        const cards = list[0][1]
-          .concat(list[1][1])
-          .sort((a, b) => get.value(a) - get.value(b))
-        const cards2 = cards.splice(0, player.getExpansions("qixing").length)
-        return [cards2, cards]
-      }
-    },
-  },
-  // 狂风
-  kuangfeng: {
-    audio: 2,
-    trigger: { player: "phaseJieshuBegin" },
-    filter(event, player) {
-      return player.getExpansions("qixing").length
-    },
-    async cost(event, trigger, player) {
-      const {
-        bool,
-        targets,
-        links: cost_data,
-      } = await player
-        .chooseButtonTarget({
-          createDialog: [
-            get.prompt2(event.skill),
-            player.getExpansions("qixing"),
-          ],
-          selectButton: 1,
-          filterTarget: true,
-          ai1(button) {
-            if (
-              game.hasPlayer((target) => {
-                return get.attitude(get.player(), target) < 0
-              })
-            ) {
-              return 1
-            }
-            return 0
-          },
-          ai2(target) {
-            return -get.attitude(get.player(), target)
-          },
-        })
-        .forResult()
-      event.result = {
-        bool: bool,
-        targets: targets?.sortBySeat(),
-        cost_data: cost_data,
-      }
-    },
-    async content(event, trigger, player) {
-      const { targets, cost_data: cards } = event
-      targets.forEach((target) => {
-        target.addAdditionalSkill(`kuangfeng_${player.playerid}`, "kuangfeng2")
-        target.markAuto("kuangfeng2", [player])
-      })
-      player.addTempSkill("kuangfeng3", { player: "phaseBeginStart" })
-      await player.loseToDiscardpile(cards)
-    },
-    ai: {
-      combo: "qixing",
-    },
-  },
-  kuangfeng2: {
-    charlotte: true,
-    intro: {
-      content(storage) {
-        return `共有${storage.length}枚标记`
-      },
-    },
-    ai: {
-      effect: {
-        target(card, player, target, current) {
-          if (get.tag(card, "fireDamage") && current < 0) {
-            return 1.5
-          }
-        },
-      },
-    },
-  },
-  kuangfeng3: {
-    trigger: { global: "damageBegin3" },
-    sourceSkill: "kuangfeng",
-    filter(event, player) {
-      return (
-        event.hasNature("fire") &&
-        event.player.getStorage("kuangfeng2").includes(player)
-      )
-    },
-    charlotte: true,
-    forced: true,
-    logTarget: "player",
-    async content(event, trigger, player) {
-      trigger.num++
-    },
-    onremove(player) {
-      game.countPlayer2((current) => {
-        if (current.getStorage("kuangfeng2").includes(player)) {
-          current.unmarkAuto("kuangfeng2", player)
-          current.removeAdditionalSkill(`kuangfeng_${player.playerid}`)
-        }
-      }, true)
-    },
-  },
-  // 大雾
-  dawu: {
-    trigger: { player: "phaseJieshuBegin" },
-    filter(event, player) {
-      return player.getExpansions("qixing").length
-    },
-    audio: 2,
-    async cost(event, trigger, player) {
-      const {
-        bool,
-        targets,
-        links: cost_data,
-      } = await player
-        .chooseButtonTarget({
-          createDialog: [
-            get.prompt2(event.skill),
-            player.getExpansions("qixing"),
-          ],
-          selectButton: [1, game.countPlayer()],
-          filterTarget: true,
-          selectTarget() {
-            return ui.selected.buttons.length
-          },
-          complexSelect: true,
-          ai1(button) {
-            const { player, allUse } = get.event()
-            const targets = game.filterPlayer((target) => {
-              if (
-                target.isMin() ||
-                target.hasSkill("biantian2") ||
-                target.hasSkill("dawu2")
-              ) {
-                return false
-              }
-              const att = get.attitude(player, target)
-              if (att >= 4) {
-                if (
-                  target.hp > 2 &&
-                  (target.isHealthy() || target.hasSkillTag("maixie"))
-                ) {
-                  return false
-                }
-                if (allUse || target.hp === 1) {
-                  return true
-                }
-                if (target.hp === 2 && target.countCards("he") <= 2) {
-                  return true
-                }
-              }
-              return false
-            })
-            if (ui.selected.buttons.length < targets.length) {
-              return 1
-            }
-            return 0
-          },
-          ai2(target) {
-            const { player, allUse } = get.event()
-            if (
-              target.isMin() ||
-              target.hasSkill("biantian2") ||
-              target.hasSkill("dawu2")
-            ) {
-              return 0
-            }
-            const att = get.attitude(player, target)
-            if (att >= 4) {
-              if (
-                target.hp > 2 &&
-                (target.isHealthy() || target.hasSkillTag("maixie"))
-              ) {
-                return 0
-              }
-              if (allUse || target.hp === 1) {
-                return att
-              }
-              if (target.hp === 2 && target.countCards("he") <= 2) {
-                return att * 0.7
-              }
-              return 0
-            }
-            return -1
-          },
-        })
-        .set(
-          "allUse",
-          player.getExpansions("qixing").length >=
-            game.countPlayer((current) => get.attitude(player, current) > 4) *
-              2,
-        )
-        .forResult()
-      event.result = {
-        bool: bool,
-        targets: targets?.sortBySeat(),
-        cost_data: cost_data,
-      }
-    },
-    async content(event, trigger, player) {
-      const { targets, cost_data: cards } = event
-      targets.forEach((target) => {
-        target.addAdditionalSkill(`dawu_${player.playerid}`, "dawu2")
-        target.markAuto("dawu2", [player])
-      })
-      player.addTempSkill("dawu3", { player: "phaseBeginStart" })
-      await player.loseToDiscardpile(cards)
-    },
-    ai: {
-      combo: "qixing",
-    },
-  },
-  dawu2: {
-    charlotte: true,
-    ai: {
-      nofire: true,
-      nodamage: true,
-      effect: {
-        target(card, player, target, current) {
-          if (get.tag(card, "damage") && !get.tag(card, "thunderDamage")) {
-            return "zeroplayertarget"
-          }
-        },
-      },
-    },
-    intro: {
-      content(storage) {
-        return `共有${storage.length}枚标记`
-      },
-    },
-  },
-  dawu3: {
-    trigger: { global: "damageBegin4" },
-    sourceSkill: "dawu",
-    filter(event, player) {
-      return (
-        !event.hasNature("thunder") &&
-        event.player.getStorage("dawu2").includes(player)
-      )
-    },
-    forced: true,
-    charlotte: true,
-    logTarget: "player",
-    async content(event, trigger, player) {
-      trigger.cancel()
-    },
-    onremove(player) {
-      game.countPlayer2((current) => {
-        if (current.getStorage("dawu2").includes(player)) {
-          current.unmarkAuto("dawu2", [player])
-          current.removeAdditionalSkill(`dawu_${player.playerid}`)
-        }
-      }, true)
     },
   },
   // 神曹操

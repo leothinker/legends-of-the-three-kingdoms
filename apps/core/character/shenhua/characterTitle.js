@@ -18,6 +18,8 @@ export default {
   pangde: "人马一体",
   yuanshao: "高贵的名门",
   yanwen: "虎狼兄弟",
+  shen_zhouyu: "赤壁的火神",
+  shen_zhugeliang: "赤壁的妖术师",
 
   // jiangwei: "龙的衣钵",
   // liushan: "无为的真命主",

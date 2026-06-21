@@ -324,6 +324,21 @@ const characters = {
     skills: ["olshuangxiong"],
     names: "颜|良-文|丑",
   },
+  shen_zhouyu: {
+    sex: "male",
+    group: "shen",
+    hp: 4,
+    skills: ["qinyin", "yeyan"],
+    groupInGuozhan: "wu",
+  },
+  shen_zhugeliang: {
+    sex: "male",
+    group: "shen",
+    hp: 3,
+    skills: ["qixing", "kuangfeng", "dawu"],
+    groupInGuozhan: "shu",
+    names: "诸葛|亮",
+  },
 }
 
 export default characters

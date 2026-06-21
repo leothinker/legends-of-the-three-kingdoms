@@ -3029,59 +3029,10 @@ const skills = {
       }, true)
     },
   },
-  // 徐晃
-  // 断粮
-  duanliang: {
-    audio: 2,
-    audioname: ["re_xuhuang"],
-    group: ["duanliang1", "duanliang2"],
-    ai: {
-      threaten: 1.2,
-    },
-  },
-  duanliang1: {
-    audio: "duanliang",
-    audioname: ["re_xuhuang"],
-    enable: "chooseToUse",
-    sourceSkill: "duanliang",
-    filterCard(card) {
-      if (get.type(card) !== "basic" && get.type(card) !== "equip") {
-        return false
-      }
-      return get.color(card) === "black"
-    },
-    filter(event, player) {
-      return player.countCards("hes", {
-        type: ["basic", "equip"],
-        color: "black",
-      })
-    },
-    position: "hes",
-    viewAs: { name: "bingliang" },
-    prompt: "将一黑色的基本牌或装备牌当兵粮寸断使用",
-    check(card) {
-      return 6 - get.value(card)
-    },
-    ai: {
-      order: 9,
-    },
-  },
-  duanliang2: {
-    mod: {
-      targetInRange(card, player, target) {
-        if (card.name === "bingliang") {
-          if (get.distance(player, target) <= 2) {
-            return true
-          }
-        }
-      },
-    },
-  },
   // 曹丕
   // 行殇
   xingshang: {
     audio: 2,
-    audioname2: { caoying: "lingren_xingshang" },
     trigger: { global: "die" },
     preHidden: true,
     filter(event) {
@@ -3095,7 +3046,6 @@ const skills = {
   // 放逐
   fangzhu: {
     audio: 2,
-    audioname2: { new_simayi: "fangzhu_new_simayi" },
     trigger: { player: "damageEnd" },
     preHidden: true,
     async cost(event, trigger, player) {
@@ -3219,9 +3169,6 @@ const skills = {
   songwei2: {
     audio: "songwei",
     audioname: ["re_caopi"],
-    audioname2: {
-      pe_jun_caopi: "sbsongwei",
-    },
     forceaudio: true,
     trigger: { global: "judgeEnd" },
     sourceSkill: "songwei",
@@ -3243,6 +3190,54 @@ const skills = {
     async content(event, trigger, player) {
       trigger.player.line(player, "green")
       player.draw()
+    },
+  },
+  // 徐晃
+  // 断粮
+  duanliang: {
+    audio: 2,
+    audioname: ["re_xuhuang"],
+    group: ["duanliang1", "duanliang2"],
+    ai: {
+      threaten: 1.2,
+    },
+  },
+  duanliang1: {
+    audio: "duanliang",
+    audioname: ["re_xuhuang"],
+    enable: "chooseToUse",
+    sourceSkill: "duanliang",
+    filterCard(card) {
+      if (get.type(card) !== "basic" && get.type(card) !== "equip") {
+        return false
+      }
+      return get.color(card) === "black"
+    },
+    filter(event, player) {
+      return player.countCards("hes", {
+        type: ["basic", "equip"],
+        color: "black",
+      })
+    },
+    position: "hes",
+    viewAs: { name: "bingliang" },
+    prompt: "将一黑色的基本牌或装备牌当兵粮寸断使用",
+    check(card) {
+      return 6 - get.value(card)
+    },
+    ai: {
+      order: 9,
+    },
+  },
+  duanliang2: {
+    mod: {
+      targetInRange(card, player, target) {
+        if (card.name === "bingliang") {
+          if (get.distance(player, target) <= 2) {
+            return true
+          }
+        }
+      },
     },
   },
   // 孙坚

@@ -86,4 +86,12 @@ export default {
   "#reshuangxiong1": "此战，如有你我一人在此，何惧华雄？定叫他有去无回！",
   "#reshuangxiong2": "哥哥，且看我与赵云一战。且与他战个五十回合！",
   "#re_yanwen:die": "不是叫你看好我身后吗？",
+
+  "#rexingshang1": "群燕辞归鹄南翔，念君客游思断肠。",
+  "#rexingshang2": "霜露纷兮交下，木叶落兮凄凄。",
+  "#refangzhu1": "国法不可废耳，汝先退去。",
+  "#refangzhu2": "将军征战辛苦，孤当赠以良宅。",
+  "#songwei_re_caopi1": "藩屏大宗，御侮厌难。",
+  "#songwei_re_caopi2": "朕承符运，受终革命。",
+  "#re_caopi:die": "建平所言八十，谓昼夜也，吾其决矣……",
 }

@@ -21,6 +21,7 @@ export default {
   shen_zhouyu: "赤壁的火神",
   shen_zhugeliang: "赤壁的妖术师",
 
+  caopi: "霸业的继承者",
   // jiangwei: "龙的衣钵",
   // liushan: "无为的真命主",
   // zhanghe: "料敌机先",
@@ -32,7 +33,7 @@ export default {
   // zuoci: "迷之仙人",
   // zhurong: "野性的女王",
   // menghuo: "南蛮王",
-  // caopi: "霸业的继承者",
+
   // re_xuhuang: "周亚夫之风",
   // lusu: "当世入杰",
   // sunjian: "武烈帝",

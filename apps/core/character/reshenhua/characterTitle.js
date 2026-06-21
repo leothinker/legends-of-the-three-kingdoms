@@ -16,4 +16,6 @@ export default {
   re_pangde: "人马一体",
   re_yuanshao: "高贵的名门",
   re_yanwen: "虎狼兄弟",
+
+  re_caopi: "霸业的继承者",
 }

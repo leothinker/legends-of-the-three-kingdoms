@@ -147,22 +147,22 @@ const translates = {
   dawu_info:
     "结束阶段，你可以移去任意张“星”并选择等量的角色，然后直到你的下回合开始之前，当这些角色受到非雷电伤害时，防止此伤害。",
 
+  caopi: "曹丕",
+  xingshang: "行殇",
+  xingshang_info: "当其他角色死亡时，你可以获得其所有牌。",
+  fangzhu: "放逐",
+  fangzhu_info:
+    "当你受到伤害后，你可以令一名其他角色翻面并摸X张牌（X为你已损失的体力值）。",
+  songwei: "颂威",
+  songwei2: "颂威",
+  songwei_info:
+    "主公技，当其他魏势力角色的黑色判定牌生效后，其可以令你摸一张牌。",
+
   xuhuang: "徐晃",
   duanliang: "断粮",
   duanliang1: "断粮",
   duanliang_info:
     "你可以将一张黑色基本牌或黑色装备牌当【兵粮寸断】使用；你可以对距离为2的角色使用【兵粮寸断】。",
-
-  caopi: "曹丕",
-  xingshang: "行殇",
-  xingshang_info: "其他角色死亡时，你可以获得该角色的所有牌。",
-  fangzhu: "放逐",
-  fangzhu_info:
-    "当你受到伤害后，你可以令一名其他角色翻面，然后其摸X张牌（X为你已损失的体力值）。",
-  songwei: "颂威",
-  songwei2: "颂威",
-  songwei_info:
-    "主公技，其他魏势力角色的黑色判定牌生效后，其可以令你摸一张牌。",
 
   sunjian: "孙坚",
   yinghun: "英魂",

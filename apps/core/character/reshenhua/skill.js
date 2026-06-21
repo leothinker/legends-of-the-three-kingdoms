@@ -2025,6 +2025,187 @@ const skills = {
       },
     },
   },
+  // 界曹丕
+  // 行殇
+  rexingshang: {
+    audio: 2,
+    trigger: { global: "die" },
+    filter(event, player) {
+      return player.isDamaged() || event.player.countCards("he") > 0
+    },
+    direct: true,
+    async content(event, trigger, player) {
+      let result
+
+      // step 0
+      const choice = []
+      if (player.isDamaged()) {
+        choice.push("回复体力")
+      }
+      if (trigger.player.countCards("he")) {
+        choice.push("获得牌")
+      }
+      choice.push("cancel2")
+
+      result = await player
+        .chooseControl(choice)
+        .set("prompt", get.prompt2("rexingshang"))
+        .set("ai", () => {
+          if (choice.length === 2) {
+            return 0
+          }
+          if (get.value(trigger.player.getCards("he")) > 8) {
+            return 1
+          }
+          return 0
+        })
+        .forResult()
+
+      // step 1
+      if (result.control !== "cancel2") {
+        player.logSkill(event.name, trigger.player)
+        if (result.control === "获得牌") {
+          const togain = trigger.player.getCards("he")
+          await player.gain(togain, trigger.player, "giveAuto", "bySelf")
+        } else {
+          await player.recover()
+        }
+      }
+    },
+  },
+  // 放逐
+  refangzhu: {
+    audio: 2,
+    trigger: {
+      player: "damageEnd",
+    },
+    direct: true,
+    async content(event, trigger, player) {
+      let result
+      // step 0
+      const next = player.chooseTarget(
+        get.prompt2("refangzhu"),
+        (card, player, target) => player !== target,
+      )
+      next.ai = (target) => {
+        if (target.hasSkillTag("noturn")) {
+          return 0
+        }
+        var player = _status.event.player
+        if (get.attitude(_status.event.player, target) === 0) {
+          return 0
+        }
+        if (get.attitude(_status.event.player, target) > 0) {
+          if (target.classList.contains("turnedover")) {
+            return 1000 - target.countCards("h")
+          }
+          if (player.getDamagedHp() < 3) {
+            return -1
+          }
+          return 100 - target.countCards("h")
+        }
+        if (target.classList.contains("turnedover")) {
+          return -1
+        }
+        if (player.getDamagedHp() >= 3) {
+          return -1
+        }
+        return 1 + target.countCards("h")
+      }
+      result = await next.forResult()
+
+      // step 1
+      if (result.bool) {
+        player.logSkill("refangzhu", result.targets)
+        event.target = result.targets[0]
+        if (player.isHealthy()) {
+          result = { bool: false }
+        } else {
+          const next2 = event.target.chooseToDiscard(
+            "he",
+            player.getDamagedHp(),
+          )
+          next2.set("ai", (card) => {
+            var player = _status.event.player
+            if (
+              player.isTurnedOver() ||
+              _status.event.getTrigger().player.getDamagedHp() > 2
+            ) {
+              return -1
+            }
+            return player.hp * player.hp - get.value(card)
+          })
+          next2.set(
+            "prompt",
+            "弃置" +
+              get.cnNumber(player.getDamagedHp()) +
+              "张牌并失去1点体力；或选择不弃置，将武将牌翻面并摸" +
+              get.cnNumber(player.getDamagedHp()) +
+              "张牌。",
+          )
+          result = await next2.forResult()
+        }
+      } else {
+        return
+      }
+
+      // step 2
+      if (result.bool) {
+        await event.target.loseHp()
+      } else {
+        if (player.isDamaged()) {
+          await event.target.draw(player.getDamagedHp()).forResult()
+        }
+        await event.target.turnOver().forResult()
+      }
+    },
+    ai: {
+      maixie: true,
+      maixie_hp: true,
+      effect: {
+        target(card, player, target) {
+          if (get.tag(card, "damage")) {
+            if (player.hasSkillTag("jueqing", false, target)) {
+              return [1, -1.5]
+            }
+            if (target.hp <= 1) {
+              return
+            }
+            if (!target.hasFriend()) {
+              return
+            }
+            var hastarget = false
+            var turnfriend = false
+            var players = game.filterPlayer()
+            for (var i = 0; i < players.length; i++) {
+              if (
+                get.attitude(target, players[i]) < 0 &&
+                !players[i].isTurnedOver()
+              ) {
+                hastarget = true
+              }
+              if (
+                get.attitude(target, players[i]) > 0 &&
+                players[i].isTurnedOver()
+              ) {
+                hastarget = true
+                turnfriend = true
+              }
+            }
+            if (get.attitude(player, target) > 0 && !hastarget) {
+              return
+            }
+            if (turnfriend || target.hp === target.maxHp) {
+              return [0.5, 1]
+            }
+            if (target.hp > 1) {
+              return [1, 0.5]
+            }
+          }
+        },
+      },
+    },
+  },
 }
 
 export default skills

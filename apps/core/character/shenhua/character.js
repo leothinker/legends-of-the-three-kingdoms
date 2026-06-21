@@ -133,13 +133,13 @@ const characters = {
     groupInGuozhan: "shu",
     names: "诸葛|亮",
   },
-  // caopi: {
-  //   sex: "male",
-  //   group: "wei",
-  //   hp: 3,
-  //   skills: ["xingshang", "fangzhu", "songwei"],
-  //   isZhugong: true,
-  // },
+  caopi: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["xingshang", "fangzhu", "songwei"],
+    isZhugong: true,
+  },
   // xuhuang: {
   //   sex: "male",
   //   group: "wei",

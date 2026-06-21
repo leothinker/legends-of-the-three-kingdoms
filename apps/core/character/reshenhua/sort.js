@@ -24,10 +24,10 @@ const characterSort = {
     "shen_zhugeliang",
   ],
   reshenhua_lin: [
+    "re_caopi",
     "re_xuhuang",
     "re_menghuo",
     "re_zhurong",
-    "re_caopi",
     "re_sunjian",
     "re_dongzhuo",
     "re_lusu",

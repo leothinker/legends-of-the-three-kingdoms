@@ -117,6 +117,15 @@ const translates = {
   reshuangxiong_info:
     "摸牌阶段，你可以改为亮出牌堆顶的两张牌，你获得其中一张牌，然后本回合你可以将与此牌颜色不同的一张手牌当【决斗】使用；当你因【决斗】受到伤害后，你可以获得此次【决斗】中其他角色打出的【杀】。",
 
+  re_caopi: "界曹丕",
+  re_caopi_prefix: "界",
+  rexingshang: "行殇",
+  rexingshang_info:
+    "当其他角色死亡时，你可以选择一项：1.获得其所有牌；2.回复1点体力。",
+  refangzhu: "放逐",
+  refangzhu_info:
+    "当你受到伤害后，你可以令一名其他角色选择一项：1.弃置X张牌并失去1点体力；2.摸X张牌并翻面（X为你已损失的体力值）。",
+
   jx_xuhuang: "界徐晃",
   jx_xuhuang_prefix: "界",
   jx_duanliang: "断粮",
@@ -148,19 +157,6 @@ const translates = {
   jx_lieren: "烈刃",
   jx_lieren_info:
     "当你使用【杀】指定目标后，你可以与目标角色拼点，若你赢，你获得其一张牌；若你没赢，你与其各收回对方此次拼点的牌。",
-
-  jx_caopi: "界曹丕",
-  jx_caopi_prefix: "界",
-  jx_xingshang: "行殇",
-  jx_xingshang_info:
-    "当其他角色死亡时，你可以选择一项：1.获得其所有牌；2.回复1点体力。",
-  jx_fangzhu: "放逐",
-  jx_fangzhu_info:
-    "当你受到伤害后，你可以令一名其他角色选择一项：1.摸X张牌，然后将武将牌翻面；2.弃置X张牌，然后失去1点体力。（X为你已损失的体力值）",
-  songwei: "颂威",
-  songwei2: "颂威",
-  songwei_info:
-    "主公技，其他魏势力角色的黑色判定牌生效后，其可以令你摸一张牌。",
 
   jx_sunjian: "界孙坚",
   jx_sunjian_prefix: "界",

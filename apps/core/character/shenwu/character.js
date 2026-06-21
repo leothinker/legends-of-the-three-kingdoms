@@ -339,6 +339,13 @@ const characters = {
     groupInGuozhan: "shu",
     names: "诸葛|亮",
   },
+  re_caopi: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["rexingshang", "refangzhu", "songwei"],
+    isZhugong: true,
+  },
 }
 
 export default characters

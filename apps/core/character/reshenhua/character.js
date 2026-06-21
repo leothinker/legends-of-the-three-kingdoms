@@ -132,6 +132,13 @@ const characters = {
     groupInGuozhan: "shu",
     names: "诸葛|亮",
   },
+  re_caopi: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["rexingshang", "refangzhu", "songwei"],
+    isZhugong: true,
+  },
   // re_xuhuang: {
   //   sex: "male",
   //   group: "wei",
@@ -149,13 +156,6 @@ const characters = {
   //   group: "shu",
   //   hp: 4,
   //   skills: ["juxiang", "relieren"],
-  // },
-  // re_caopi: {
-  //   sex: "male",
-  //   group: "wei",
-  //   hp: 3,
-  //   skills: ["rexingshang", "refangzhu", "songwei"],
-  //   isZhugong: true,
   // },
   // re_sunjian: {
   //   sex: "male",

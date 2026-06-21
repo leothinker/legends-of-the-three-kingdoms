@@ -56,9 +56,9 @@ const characterSort = {
     "shen_zhugeliang",
   ],
   refresh_lin: [
+    "re_caopi",
     "re_menghuo",
     "ol_sunjian",
-    "re_caopi",
     "ol_xuhuang",
     "ol_dongzhuo",
     "ol_zhurong",

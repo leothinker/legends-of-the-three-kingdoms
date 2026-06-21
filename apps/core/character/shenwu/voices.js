@@ -96,4 +96,10 @@ export default {
   "#olshuangxiong1": "兄弟协力，定可于乱世纵横。",
   "#olshuangxiong2": "吾执矛，汝执槊，此天下可有挡我者。",
   "#ol_yanwen:die": "双雄皆陨，徒隆武圣之名……",
+
+  "#olduanliang1": "焚其粮营，断其粮道。",
+  "#olduanliang2": "兵行无常，计行断粮。",
+  "#rejiezi1": "剪径截辎，惠泽同袍。",
+  "#rejiezi2": "截敌粮草，以资袍泽。",
+  "#ol_xuhuang:die": "亚夫易老，李广难封。",
 }

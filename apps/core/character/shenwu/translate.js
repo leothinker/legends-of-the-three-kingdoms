@@ -240,6 +240,15 @@ const translates = {
   olshuangxiong: "双雄",
   olshuangxiong_info:
     "摸牌阶段结束时，你可以弃置一张牌，然后本回合你可以将一张与之颜色不同的牌当【决斗】使用。结束阶段，你获得本回合对你造成伤害的牌。",
+
+  ol_xuhuang: "界徐晃",
+  ol_xuhuang_prefix: "界",
+  olduanliang: "断粮",
+  olduanliang_info:
+    "你可以将一张黑色非锦囊牌当【兵粮寸断】使用；若你本回合未造成过伤害，你使用【兵粮寸断】无距离限制。",
+  rejiezi: "截辎",
+  rejiezi_info:
+    "当一名角色跳过摸牌阶段后，你可以选择一名角色，若其手牌数为全场最少且没有“辎”，其获得“辎”，否则其摸一张牌。有“辎”的角色摸牌阶段结束时，其弃其“辎”，执行一个额外的摸牌阶段。",
 }
 
 export default translates

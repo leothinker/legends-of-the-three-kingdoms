@@ -22,6 +22,7 @@ export default {
   shen_zhugeliang: "赤壁的妖术师",
 
   caopi: "霸业的继承者",
+  xuhuang: "周亚夫之风",
   // jiangwei: "龙的衣钵",
   // liushan: "无为的真命主",
   // zhanghe: "料敌机先",
@@ -34,12 +35,10 @@ export default {
   // zhurong: "野性的女王",
   // menghuo: "南蛮王",
 
-  // re_xuhuang: "周亚夫之风",
   // lusu: "当世入杰",
   // sunjian: "武烈帝",
   // dongzhuo: "魔王",
   // jiaxu: "冷酷的毒士",
-  // xuhuang: "周亚夫之风",
   // re_lusu: "独断外交家",
   // wangji: "经行合一",
   // kuailiangkuaiyue: "雍论臼谋",

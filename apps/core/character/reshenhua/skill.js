@@ -2206,6 +2206,38 @@ const skills = {
       },
     },
   },
+  // 界徐晃
+  // 断粮
+  reduanliang: {
+    audio: 2,
+    group: ["duanliang1", "duanliang3"],
+    ai: {
+      threaten: 1.2,
+    },
+  },
+  duanliang3: {
+    mod: {
+      targetInRange(card, player, target) {
+        if (card.name === "bingliang") {
+          if (target.countCards("h") >= player.countCards("h")) {
+            return true
+          }
+        }
+      },
+    },
+  },
+  // 截辎
+  jiezi: {
+    trigger: { global: ["phaseDrawSkipped", "phaseDrawCancelled"] },
+    audio: 2,
+    forced: true,
+    filter(event, player) {
+      return event.player !== player
+    },
+    async content(event, trigger, player) {
+      await player.draw()
+    },
+  },
 }
 
 export default skills

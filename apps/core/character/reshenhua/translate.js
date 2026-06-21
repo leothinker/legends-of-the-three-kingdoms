@@ -126,15 +126,13 @@ const translates = {
   refangzhu_info:
     "当你受到伤害后，你可以令一名其他角色选择一项：1.弃置X张牌并失去1点体力；2.摸X张牌并翻面（X为你已损失的体力值）。",
 
-  jx_xuhuang: "界徐晃",
-  jx_xuhuang_prefix: "界",
-  jx_duanliang: "断粮",
-  jx_duanliang1: "断粮",
-  jx_duanliang_info:
-    "你可以将一张黑色基本牌或黑色装备牌当【兵粮寸断】使用；你对手牌数不小于你的角色使用【兵粮寸断】无距离限制。",
+  re_xuhuang: "界徐晃",
+  re_xuhuang_prefix: "界",
+  reduanliang: "断粮",
+  reduanliang_info:
+    "你可以将一张黑色非锦囊牌当【兵粮寸断】使用；你对手牌数不小于你的角色使用【兵粮寸断】无距离限制。",
   jiezi: "截辎",
-  jiezi_info:
-    "锁定技，若其他角色已跳过其此回合的摸牌阶段，其下一个任意阶段开始前，你摸一张牌。",
+  jiezi_info: "锁定技，当其他角色跳过摸牌阶段后，你摸一张牌。",
 
   jx_menghuo: "界孟获",
   jx_menghuo_prefix: "界",

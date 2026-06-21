@@ -3394,6 +3394,94 @@ const skills = {
       },
     },
   },
+  // 界徐晃
+  olduanliang: {
+    audio: 2,
+    locked: false,
+    enable: "chooseToUse",
+    filterCard(card) {
+      return get.type2(card) !== "trick" && get.color(card) === "black"
+    },
+    filter(event, player) {
+      return player.hasCard(
+        (card) => get.type2(card) !== "trick" && get.color(card) === "black",
+        "hes",
+      )
+    },
+    position: "hes",
+    viewAs: { name: "bingliang" },
+    prompt: "将一张黑色非锦囊牌当【兵粮寸断】使用",
+    check(card) {
+      return 6 - get.value(card)
+    },
+    ai: {
+      order: 9,
+    },
+    mod: {
+      targetInRange(card, player, target) {
+        if (card.name === "bingliang" && !player.getStat("damage")) {
+          return true
+        }
+      },
+    },
+  },
+  rejiezi: {
+    audio: 2,
+    trigger: { global: ["phaseDrawSkipped", "phaseDrawCancelled"] },
+    direct: true,
+    async content(event, trigger, player) {
+      const result = await player
+        .chooseTarget(
+          get.prompt("rejiezi"),
+          "你可以选择一名角色，若其手牌数为全场最少且没有“辎”，其获得“辎”，否则其摸一张牌。",
+        )
+        .set("ai", (target) => {
+          var att = get.attitude(_status.event.player, target)
+          if (!target.hasMark("rejiezi") && target.isMinHandcard()) {
+            att *= 2
+          }
+          return att
+        })
+        .forResult()
+      if (result.bool) {
+        var target = result.targets[0]
+        player.logSkill("rejiezi", target)
+        if (!target.hasMark("rejiezi") && target.isMinHandcard()) {
+          target.addMark("rejiezi", 1)
+        } else {
+          target.draw()
+        }
+      }
+    },
+    marktext: "辎",
+    intro: {
+      name2: "辎",
+      content: "mark",
+      onunmark: true,
+    },
+    group: "rejiezi_extra",
+    subSkill: {
+      extra: {
+        audio: "rejiezi",
+        trigger: { global: "phaseDrawAfter" },
+        forced: true,
+        filter(event, player) {
+          return event.player.hasMark("rejiezi")
+        },
+        logTarget: "player",
+        async content(event, trigger, player) {
+          const evt = trigger.getParent("phase", true, true)
+          if (evt?.phaseList) {
+            evt.phaseList.splice(evt.num + 1, 0, "phaseDraw|rejiezi")
+          }
+          trigger.player.removeMark(
+            "rejiezi",
+            trigger.player.countMark("rejiezi"),
+          )
+        },
+      },
+    },
+  },
 }
 
 export default skills

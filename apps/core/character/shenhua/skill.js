@@ -3196,7 +3196,6 @@ const skills = {
   // 断粮
   duanliang: {
     audio: 2,
-    audioname: ["re_xuhuang"],
     group: ["duanliang1", "duanliang2"],
     ai: {
       threaten: 1.2,
@@ -3204,7 +3203,7 @@ const skills = {
   },
   duanliang1: {
     audio: "duanliang",
-    audioname: ["re_xuhuang"],
+    audioname2: { re_xuhuang: "reduanliang" },
     enable: "chooseToUse",
     sourceSkill: "duanliang",
     filterCard(card) {
@@ -3221,7 +3220,7 @@ const skills = {
     },
     position: "hes",
     viewAs: { name: "bingliang" },
-    prompt: "将一黑色的基本牌或装备牌当兵粮寸断使用",
+    prompt: "将一张黑色非锦囊牌当【兵粮寸断】使用",
     check(card) {
       return 6 - get.value(card)
     },

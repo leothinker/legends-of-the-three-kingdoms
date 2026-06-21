@@ -94,4 +94,10 @@ export default {
   "#songwei_re_caopi1": "藩屏大宗，御侮厌难。",
   "#songwei_re_caopi2": "朕承符运，受终革命。",
   "#re_caopi:die": "建平所言八十，谓昼夜也，吾其决矣……",
+
+  "#reduanliang1": "粮不三载，敌军已犯行军大忌。",
+  "#reduanliang2": "断敌粮秣，此战可胜。",
+  "#jiezi1": "因粮于敌，敌军食可足也。",
+  "#jiezi2": "食敌一钟，当吾二十钟。",
+  "#re_xuhuang:die": "敌军防备周全，是吾轻敌……",
 }

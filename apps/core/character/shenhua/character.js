@@ -140,12 +140,12 @@ const characters = {
     skills: ["xingshang", "fangzhu", "songwei"],
     isZhugong: true,
   },
-  // xuhuang: {
-  //   sex: "male",
-  //   group: "wei",
-  //   hp: 4,
-  //   skills: ["duanliang"],
-  // },
+  xuhuang: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["duanliang"],
+  },
   // zhurong: {
   //   sex: "female",
   //   group: "shu",

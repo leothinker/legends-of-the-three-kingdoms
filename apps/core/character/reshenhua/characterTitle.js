@@ -18,4 +18,5 @@ export default {
   re_yanwen: "虎狼兄弟",
 
   re_caopi: "霸业的继承者",
+  re_xuhuang: "周亚夫之风",
 }

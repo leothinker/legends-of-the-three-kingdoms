@@ -36,4 +36,6 @@ export default {
   ol_pangde: "人马一体",
   ol_yuanshao: "高贵的名门",
   ol_yanwen: "虎狼兄弟",
+
+  ol_xuhuang: "周亚夫之风",
 }

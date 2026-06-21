@@ -25,7 +25,7 @@ const characterSort = {
   ],
   shenhua_lin: [
     "caopi",
-    //   "xuhuang",
+    "xuhuang",
     //   "zhurong",
     //   "menghuo",
     //   "lusu",

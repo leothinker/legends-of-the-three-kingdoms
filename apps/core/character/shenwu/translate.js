@@ -250,6 +250,18 @@ const translates = {
   rejiezi_info:
     "当一名角色跳过摸牌阶段后，你可以选择一名角色，若其手牌数为全场最少且没有“辎”，其获得“辎”，否则其摸一张牌。有“辎”的角色摸牌阶段结束时，其弃其“辎”，执行一个额外的摸牌阶段。",
 
+  ol_zhurong: "界祝融",
+  ol_zhurong_prefix: "界",
+  changbiao: "长标",
+  changbiao_info:
+    "出牌阶段限一次，你可以将任意张手牌当一张无距离限制的【杀】使用。若此【杀】对目标角色造成伤害，出牌阶段结束时，你摸等量的牌。",
+
+  ol_menghuo: "界孟获",
+  ol_menghuo_prefix: "界",
+  olzaiqi: "再起",
+  olzaiqi_info:
+    "结束阶段，你可以令至多X名角色各选择一项（X为本回合置入弃牌堆的红色牌数）：1.摸一张牌；2.令你回复1点体力。",
+
   ol_jiangwei: "界姜维",
   ol_jiangwei_prefix: "界",
   oltiaoxin: "挑衅",

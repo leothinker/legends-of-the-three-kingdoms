@@ -14,6 +14,13 @@ const skills = {
     lose: false,
     delay: false,
     check() {
+      if (
+        game.filterPlayer((current) => {
+          return current.maxHp <= player.maxHp
+        }).length < 2
+      ) {
+        return false
+      }
       return 1 + Math.random()
     },
     async content(event, trigger, player) {

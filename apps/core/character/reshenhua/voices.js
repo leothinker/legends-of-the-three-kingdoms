@@ -101,6 +101,18 @@ export default {
   "#jiezi2": "食敌一钟，当吾二十钟。",
   "#re_xuhuang:die": "敌军防备周全，是吾轻敌……",
 
+  "#juxiang_re_zhurong1": "今日就让这群汉人长长见识。",
+  "#juxiang_re_zhurong2": "我的大象终于有了用武之地。",
+  "#relieren1": "有我手中飞刀在，何惧蜀军！",
+  "#relieren2": "长矛，飞刀，烈火，都来吧！",
+  "#re_zhurong:die": "这群汉人使诈……",
+
+  "#huoshou_re_menghuo1": "汉人，岂是我等的对手。",
+  "#huoshou_re_menghuo2": "定叫你们有来无回！",
+  "#rezaiqi1": "胜败乃常事，无妨！",
+  "#rezaiqi2": "汉人奸诈，还是不服，再战！",
+  "#re_menghuo:die": "我一定要赢，要赢啊……",
+
   "#retiaoxin1": "黄口竖子，何必上阵送命？",
   "#retiaoxin2": "汝如欲大败而归，则可进军一战！",
   "#rezhiji1": "维定当奋身以复汉室。",

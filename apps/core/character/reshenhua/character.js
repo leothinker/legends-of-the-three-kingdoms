@@ -145,18 +145,19 @@ const characters = {
     hp: 4,
     skills: ["reduanliang", "jiezi"],
   },
-  // re_menghuo: {
-  //   sex: "male",
-  //   group: "shu",
-  //   hp: 4,
-  //   skills: ["huoshou", "rezaiqi"],
-  // },
-  // re_zhurong: {
-  //   sex: "female",
-  //   group: "shu",
-  //   hp: 4,
-  //   skills: ["juxiang", "relieren"],
-  // },
+  re_zhurong: {
+    sex: "female",
+    group: "shu",
+    hp: 4,
+    skills: ["juxiang", "relieren"],
+    names: "null|null",
+  },
+  re_menghuo: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["huoshou", "rezaiqi"],
+  },
   // re_sunjian: {
   //   sex: "male",
   //   group: "wu",

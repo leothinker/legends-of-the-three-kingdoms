@@ -146,6 +146,19 @@ const characters = {
     hp: 4,
     skills: ["duanliang"],
   },
+  zhurong: {
+    sex: "female",
+    group: "shu",
+    hp: 4,
+    skills: ["juxiang", "lieren"],
+    names: "null|null",
+  },
+  menghuo: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["huoshou", "zaiqixx"],
+  },
 
   jiangwei: {
     sex: "male",
@@ -154,19 +167,6 @@ const characters = {
     skills: ["tiaoxin", "zhiji"],
   },
 
-  // zhurong: {
-  //   sex: "female",
-  //   group: "shu",
-  //   hp: 4,
-  //   skills: ["juxiang", "lieren"],
-  //   names: "null|null",
-  // },
-  // menghuo: {
-  //   sex: "male",
-  //   group: "shu",
-  //   hp: 4,
-  //   skills: ["huoshou", "zaiqi"],
-  // },
   // lusu: {
   //   sex: "male",
   //   group: "wu",

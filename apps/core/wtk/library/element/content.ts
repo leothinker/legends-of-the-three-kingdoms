@@ -1365,7 +1365,7 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
     let targets: Player[] = list.filter((target) => target.hasCards("h"))
 
     let result: Partial<Result> | Partial<Result>[]
-    if (targets.length) {
+    if (targets.length >= 2) {
       if (event.fixedResult) {
         targets = targets.removeArray(event.fixedResult.map((i) => i[0]))
       }

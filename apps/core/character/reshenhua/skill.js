@@ -1,6 +1,6 @@
 import { _status, game, get, lib, ui } from "wtk"
 
-/** @type { importCharacterConfig['skill'] } */
+/** @type { importCharacterConfig["skill"] } */
 const skills = {
   // 界曹仁
   // 据守
@@ -2238,6 +2238,70 @@ const skills = {
       await player.draw()
     },
   },
+  // 界孟获
+  // 再起
+  rezaiqi: {
+    audio: 2,
+    direct: true,
+    filter(event, player) {
+      return lib.skill.rezaiqi.count() > 0
+    },
+    trigger: {
+      player: "phaseDiscardEnd",
+    },
+    async content(event, trigger, player) {
+      let result
+
+      // step 0
+      result = await player
+        .chooseTarget([1, lib.skill.rezaiqi.count()], get.prompt2("rezaiqi"))
+        .set("ai", (target) => get.attitude(_status.event.player, target))
+        .forResult()
+
+      // step 1
+      if (result.bool) {
+        var targets = result.targets
+        targets.sortBySeat()
+        player.line(targets, "fire")
+        player.logSkill("rezaiqi", targets)
+        event.targets = targets
+      } else {
+        return
+      }
+
+      // step 2 & 3 (loop through targets)
+      while (event.targets.length) {
+        event.current = event.targets.shift()
+        if (player.isHealthy()) {
+          result = { index: 0 }
+        } else {
+          result = await event.current
+            .chooseControl()
+            .set("choiceList", [
+              "摸一张牌",
+              `令${get.translation(player)}回复1点体力`,
+            ])
+            .set("ai", () => {
+              if (get.attitude(event.current, player) > 0) {
+                return 1
+              }
+              return 0
+            })
+            .forResult()
+        }
+
+        if (result.index === 1) {
+          event.current.line(player)
+          await player.recover(event.current)
+        } else {
+          await event.current.draw()
+        }
+        await game.delay()
+      }
+    },
+    count: () =>
+      get.discarded().filter((card) => get.color(card) === "red").length,
+  },
 
   // 界姜维
   // 挑衅
@@ -2248,9 +2312,9 @@ const skills = {
     filterTarget(card, player, target) {
       return target !== player && target.countCards("he")
     },
-    content() {
-      "step 0"
-      target
+    async content(event, trigger, player) {
+      const target = event.target
+      const result = await target
         .chooseToUse(
           function (card, player, event) {
             if (get.name(card) !== "sha") {
@@ -2273,11 +2337,9 @@ const skills = {
           return lib.filter.filterTarget.apply(this, arguments)
         })
         .set("sourcex", player)
-      ;("step 1")
+        .forResult()
       if (result.bool === false && target.countCards("he") > 0) {
         player.discardPlayerCard(target, "he", true)
-      } else {
-        event.finish()
       }
     },
     ai: {

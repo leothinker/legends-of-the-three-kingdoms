@@ -1,6 +1,6 @@
 import { _status, game, get, lib, ui } from "wtk"
 
-/** @type { importCharacterConfig['skill'] } */
+/** @type { importCharacterConfig["skill"] } */
 const skills = {
   // 曹仁
   // 据守
@@ -3239,6 +3239,192 @@ const skills = {
       },
     },
   },
+  // 祝融
+  // 巨象
+  juxiang: {
+    //unique:true,
+    locked: true,
+    audio: 2,
+    audioname: ["re_zhurong", "ol_zhurong"],
+    group: ["juxiang1", "juxiang2"],
+    preHidden: ["juxiang1", "juxiang2"],
+    ai: {
+      effect: {
+        target(card) {
+          if (card.name === "nanman") {
+            return [0, 1, 0, 0]
+          }
+        },
+      },
+    },
+  },
+  juxiang1: {
+    audio: "juxiang",
+    audioname: ["re_zhurong", "ol_zhurong"],
+    trigger: { target: "useCardToBefore" },
+    forced: true,
+    priority: 15,
+    sourceSkill: "juxiang",
+    filter(event, player) {
+      return event.card.name === "nanman"
+    },
+    async content(event, trigger, player) {
+      trigger.cancel()
+    },
+  },
+  juxiang2: {
+    audio: "juxiang",
+    audioname: ["re_zhurong", "ol_zhurong"],
+    trigger: { global: "useCardAfter" },
+    forced: true,
+    sourceSkill: "juxiang",
+    filter(event, player) {
+      return (
+        event.card.name === "nanman" &&
+        event.player !== player &&
+        event.cards.someInD()
+      )
+    },
+    async content(event, trigger, player) {
+      await player.gain(trigger.cards.filterInD(), "gain2")
+    },
+  },
+  // 烈刃
+  lieren: {
+    audio: 2,
+    audioname: ["ol_zhurong"],
+    trigger: { source: "damageSource" },
+    filter(event, player) {
+      if (event._notrigger.includes(event.player)) {
+        return false
+      }
+      return (
+        event.card &&
+        event.card.name === "sha" &&
+        event.getParent().name === "sha" &&
+        event.player.isIn() &&
+        player.canCompare(event.player)
+      )
+    },
+    check(event, player) {
+      return (
+        get.attitude(player, event.player) < 0 && player.countCards("h") > 1
+      )
+    },
+    //priority:5,
+    async content(event, trigger, player) {
+      const result = await player.chooseToCompare(trigger.player).forResult()
+      if (result.bool && trigger.player.countGainableCards(player, "he")) {
+        await player.gainPlayerCard(trigger.player, true, "he")
+      }
+    },
+  },
+  // 孟获
+  // 祸首
+  huoshou: {
+    audio: 2,
+    audioname: ["re_menghuo", "ol_menghuo"],
+    locked: true,
+    group: ["huoshou1", "huoshou2"],
+    preHidden: ["huoshou1", "huoshou2"],
+    ai: {
+      halfneg: true,
+      effect: {
+        target(card, player, target) {
+          if (card.name === "nanman") {
+            return "zeroplayertarget"
+          }
+        },
+      },
+    },
+  },
+  huoshou1: {
+    audio: "huoshou",
+    audioname: ["re_menghuo", "ol_menghuo"],
+    trigger: { target: "useCardToBefore" },
+    forced: true,
+    priority: 15,
+    sourceSkill: "huoshou",
+    filter(event, player) {
+      return event.card.name === "nanman"
+    },
+    async content(event, trigger, player) {
+      trigger.cancel()
+    },
+  },
+  huoshou2: {
+    audio: "huoshou",
+    audioname: ["re_menghuo", "ol_menghuo"],
+    trigger: { global: "useCard" },
+    forced: true,
+    sourceSkill: "huoshou",
+    filter(event, player) {
+      return (
+        event.card && event.card.name === "nanman" && event.player !== player
+      )
+    },
+    async content(event, trigger, player) {
+      trigger.customArgs.default.customSource = player
+    },
+  },
+  // 再起
+  zaiqi: {
+    audio: 2,
+    trigger: { player: "phaseDrawBegin1" },
+    filter(event, player) {
+      return !event.numFixed && player.isDamaged()
+    },
+    check(event, player) {
+      if (player.getDamagedHp() < 2) {
+        return false
+      }
+      if (player.getDamagedHp() === 2) {
+        return player.countCards("h") >= 2
+      }
+      return true
+    },
+    async content(event, trigger, player) {
+      trigger.changeToZero()
+      let cards = get.cards(
+        player.getDamagedHp() + (event.name === "zaiqi" ? 0 : 1),
+        true,
+      )
+      cards = (
+        await player
+          .showCards(
+            cards,
+            `${get.translation(player)}发动了〖${get.translation(event.name)}〗`,
+            true,
+          )
+          .set("delay_time", Math.min(4, cards.length))
+          .forResult()
+      ).cards
+      let num = 0
+      for (let i = 0; i < cards.length; i++) {
+        if (get.suit(cards[i]) === "heart") {
+          num++
+          cards.splice(i--, 1)
+        }
+      }
+      if (num) {
+        await player.recover(num)
+      }
+      if (cards.length) {
+        await player.gain(cards, "gain2")
+      }
+    },
+    ai: {
+      threaten(player, target) {
+        if (target.hp === 1) {
+          return 2
+        }
+        if (target.hp === 2) {
+          return 1.5
+        }
+        return 1
+      },
+    },
+  },
   // 孙坚
   yinghun: {
     audio: "yinghun",
@@ -3497,192 +3683,6 @@ const skills = {
       if (result.suit === "spade") {
         await player.recover()
       }
-    },
-  },
-  // 祝融
-  // 巨象
-  juxiang: {
-    //unique:true,
-    locked: true,
-    audio: 2,
-    audioname: ["re_zhurong", "ol_zhurong"],
-    group: ["juxiang1", "juxiang2"],
-    preHidden: ["juxiang1", "juxiang2"],
-    ai: {
-      effect: {
-        target(card) {
-          if (card.name === "nanman") {
-            return [0, 1, 0, 0]
-          }
-        },
-      },
-    },
-  },
-  juxiang1: {
-    audio: "juxiang",
-    audioname: ["re_zhurong", "ol_zhurong"],
-    trigger: { target: "useCardToBefore" },
-    forced: true,
-    priority: 15,
-    sourceSkill: "juxiang",
-    filter(event, player) {
-      return event.card.name === "nanman"
-    },
-    async content(event, trigger, player) {
-      trigger.cancel()
-    },
-  },
-  juxiang2: {
-    audio: "juxiang",
-    audioname: ["re_zhurong", "ol_zhurong"],
-    trigger: { global: "useCardAfter" },
-    forced: true,
-    sourceSkill: "juxiang",
-    filter(event, player) {
-      return (
-        event.card.name === "nanman" &&
-        event.player !== player &&
-        event.cards.someInD()
-      )
-    },
-    async content(event, trigger, player) {
-      await player.gain(trigger.cards.filterInD(), "gain2")
-    },
-  },
-  // 烈刃
-  lieren: {
-    audio: 2,
-    audioname: ["boss_lvbu3", "ol_zhurong"],
-    trigger: { source: "damageSource" },
-    filter(event, player) {
-      if (event._notrigger.includes(event.player)) {
-        return false
-      }
-      return (
-        event.card &&
-        event.card.name === "sha" &&
-        event.getParent().name === "sha" &&
-        event.player.isIn() &&
-        player.canCompare(event.player)
-      )
-    },
-    check(event, player) {
-      return (
-        get.attitude(player, event.player) < 0 && player.countCards("h") > 1
-      )
-    },
-    //priority:5,
-    async content(event, trigger, player) {
-      const result = await player.chooseToCompare(trigger.player).forResult()
-      if (result.bool && trigger.player.countGainableCards(player, "he")) {
-        await player.gainPlayerCard(trigger.player, true, "he")
-      }
-    },
-  },
-  // 孟获
-  // 祸首
-  huoshou: {
-    audio: 2,
-    audioname: ["re_menghuo"],
-    locked: true,
-    group: ["huoshou1", "huoshou2"],
-    preHidden: ["huoshou1", "huoshou2"],
-    ai: {
-      halfneg: true,
-      effect: {
-        target(card, player, target) {
-          if (card.name === "nanman") {
-            return "zeroplayertarget"
-          }
-        },
-      },
-    },
-  },
-  huoshou1: {
-    audio: "huoshou",
-    audioname: ["re_menghuo"],
-    trigger: { target: "useCardToBefore" },
-    forced: true,
-    priority: 15,
-    sourceSkill: "huoshou",
-    filter(event, player) {
-      return event.card.name === "nanman"
-    },
-    async content(event, trigger, player) {
-      trigger.cancel()
-    },
-  },
-  huoshou2: {
-    audio: "huoshou",
-    audioname: ["re_menghuo"],
-    trigger: { global: "useCard" },
-    forced: true,
-    sourceSkill: "huoshou",
-    filter(event, player) {
-      return (
-        event.card && event.card.name === "nanman" && event.player !== player
-      )
-    },
-    async content(event, trigger, player) {
-      trigger.customArgs.default.customSource = player
-    },
-  },
-  // 再起
-  zaiqi: {
-    audio: 2,
-    trigger: { player: "phaseDrawBegin1" },
-    filter(event, player) {
-      return !event.numFixed && player.isDamaged()
-    },
-    check(event, player) {
-      if (player.getDamagedHp() < 2) {
-        return false
-      }
-      if (player.getDamagedHp() === 2) {
-        return player.countCards("h") >= 2
-      }
-      return true
-    },
-    async content(event, trigger, player) {
-      trigger.changeToZero()
-      let cards = get.cards(
-        player.getDamagedHp() + (event.name === "zaiqi" ? 0 : 1),
-        true,
-      )
-      cards = (
-        await player
-          .showCards(
-            cards,
-            `${get.translation(player)}发动了〖${get.translation(event.name)}〗`,
-            true,
-          )
-          .set("delay_time", Math.min(4, cards.length))
-          .forResult()
-      ).cards
-      let num = 0
-      for (let i = 0; i < cards.length; i++) {
-        if (get.suit(cards[i]) === "heart") {
-          num++
-          cards.splice(i--, 1)
-        }
-      }
-      if (num) {
-        await player.recover(num)
-      }
-      if (cards.length) {
-        await player.gain(cards, "gain2")
-      }
-    },
-    ai: {
-      threaten(player, target) {
-        if (target.hp === 1) {
-          return 2
-        }
-        if (target.hp === 2) {
-          return 1.5
-        }
-        return 1
-      },
     },
   },
   // 贾诩

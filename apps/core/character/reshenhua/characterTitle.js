@@ -19,6 +19,8 @@ export default {
 
   re_caopi: "霸业的继承者",
   re_xuhuang: "周亚夫之风",
+  re_zhurong: "野性的女王",
+  re_menghuo: "南蛮王",
 
   re_jiangwei: "龙的衣钵",
 }

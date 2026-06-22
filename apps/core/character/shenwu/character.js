@@ -352,6 +352,19 @@ const characters = {
     hp: 4,
     skills: ["olduanliang", "rejiezi"],
   },
+  ol_zhurong: {
+    sex: "female",
+    group: "shu",
+    hp: 4,
+    skills: ["juxiang", "lieren", "changbiao"],
+    names: "null|null",
+  },
+  ol_menghuo: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["huoshou", "olzaiqi"],
+  },
 
   ol_jiangwei: {
     sex: "male",

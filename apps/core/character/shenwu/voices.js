@@ -103,6 +103,20 @@ export default {
   "#rejiezi2": "截敌粮草，以资袍泽。",
   "#ol_xuhuang:die": "亚夫易老，李广难封。",
 
+  "#juxiang_ol_zhurong1": "南兵象阵，刀枪不入！",
+  "#juxiang_ol_zhurong2": "巨象冲锋，踏平敌阵！",
+  "#lieren_ol_zhurong1": "烈火飞刃，例无虚发！",
+  "#lieren_ol_zhurong2": "烈刃一出，谁与争锋？",
+  "#changbiao1": "长标如虹，以伐蜀汉！",
+  "#changbiao2": "长标在此，谁敢拦我？",
+  "#ol_zhurong:die": "这汉人，竟……如此厉害……",
+
+  "#huoshou_ol_menghuo1": "坐据三山，蛮霸四野！",
+  "#huoshou_ol_menghuo2": "啸据哀牢，闻祸而喜！",
+  "#olzaiqi1": "挫而弥坚，战而弥勇！",
+  "#olzaiqi2": "蛮人骨硬，其势复来！",
+  "#ol_menghuo:die": "勿再放我，但求速死……",
+
   "#oltiaoxin1": "宜乘其衅会，以挑敌将。",
   "#oltiaoxin2": "会闻用师，观衅而动。",
   "#olzhiji1": "丞相遗志，不死不休！",

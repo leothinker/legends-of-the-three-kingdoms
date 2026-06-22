@@ -26,11 +26,11 @@ const characterSort = {
   reshenhua_lin: [
     "re_caopi",
     "re_xuhuang",
-    "re_menghuo",
     "re_zhurong",
+    "re_menghuo",
+    "re_lusu",
     "re_sunjian",
     "re_dongzhuo",
-    "re_lusu",
     "re_jiaxu",
     "shen_caocao",
     "shen_lvbu",

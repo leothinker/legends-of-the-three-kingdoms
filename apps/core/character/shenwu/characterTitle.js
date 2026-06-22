@@ -38,6 +38,8 @@ export default {
   ol_yanwen: "虎狼兄弟",
 
   ol_xuhuang: "周亚夫之风",
+  ol_zhurong: "野性的女王",
+  ol_menghuo: "南蛮王",
 
   ol_jiangwei: "龙的衣钵",
 }

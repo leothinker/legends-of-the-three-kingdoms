@@ -134,27 +134,17 @@ const translates = {
   jiezi: "截辎",
   jiezi_info: "锁定技，当其他角色跳过摸牌阶段后，你摸一张牌。",
 
-  jx_menghuo: "界孟获",
-  jx_menghuo_prefix: "界",
-  huoshou: "祸首",
-  huoshou1: "祸首",
-  huoshou2: "祸首",
-  huoshou_info:
-    "锁定技，【南蛮入侵】对你无效。当其他角色使用【南蛮入侵】指定目标后，你代替其成为此牌造成伤害的来源。",
-  jx_zaiqi: "再起",
-  jx_zaiqi_info:
-    "弃牌阶段结束时，你可以令至多X名角色各选择一项（X为此回合内你放入弃牌堆的红色牌数量）：1.摸一张牌；2.令你回复1点体力。",
+  re_zhurong: "界祝融",
+  re_zhurong_prefix: "界",
+  relieren: "烈刃",
+  relieren_info:
+    "当你使用【杀】指定一名角色为目标后，你可以与其拼点，若你：赢，你获得其一张牌；没赢，你获得其拼点的牌，其获得你拼点的牌。",
 
-  jx_zhurong: "界祝融",
-  jx_zhurong_prefix: "界",
-  juxiang: "巨象",
-  juxiang1: "巨象",
-  juxiang2: "巨象",
-  juxiang_info:
-    "锁定技，【南蛮入侵】对你无效；当其他角色使用的【南蛮入侵】结算结束后，你获得之。",
-  jx_lieren: "烈刃",
-  jx_lieren_info:
-    "当你使用【杀】指定目标后，你可以与目标角色拼点，若你赢，你获得其一张牌；若你没赢，你与其各收回对方此次拼点的牌。",
+  re_menghuo: "界孟获",
+  re_menghuo_prefix: "界",
+  rezaiqi: "再起",
+  rezaiqi_info:
+    "弃牌阶段结束时，你可以令至多X名角色各选择一项（X为本回合置入弃牌堆的红色牌数）：1.摸一张牌；2.令你回复1点体力。",
 
   jx_sunjian: "界孙坚",
   jx_sunjian_prefix: "界",

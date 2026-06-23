@@ -2802,7 +2802,7 @@ export class Create {
 
     let zoom = Number.parseInt(lib.config.ui_zoom, 10)
     if (Number.isNaN(zoom) || zoom < 50 || zoom > 300) {
-      zoom = 100
+      zoom = get.is.phoneLayout() ? 100 : 135
       game.saveConfig("ui_zoom", `${zoom}%`)
     }
 

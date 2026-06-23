@@ -1,4 +1,4 @@
-.player {
+﻿.player {
   width: 150px;
   height: 180px;
 }
@@ -1001,5 +1001,19 @@
     margin-top: -12px;
     margin-bottom: -12px;
     transform: scale(0) rotate(90deg);
+  }
+}
+
+/* ===== Desktop 135% / Mobile 100% ===== */
+#window:not(.mobile):not(.phone):not(.ipad) {
+  zoom: 1.35;
+}
+
+@supports not (zoom: 1) {
+  #window:not(.mobile):not(.phone):not(.ipad) {
+    transform: scale(1.35);
+    transform-origin: top left;
+    width: calc(100% / 1.35);
+    height: calc(100% / 1.35);
   }
 }

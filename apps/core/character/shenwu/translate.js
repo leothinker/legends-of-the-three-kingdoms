@@ -171,8 +171,8 @@ const translates = {
   rechanyuan_info:
     "锁定技，你不能质疑〖蛊惑〗；若你的体力值小于等于1，你的其他技能失效。",
 
-  ol_shen_guanyu: "神关羽",
-  ol_shen_guanyu_prefix: "神",
+  re_shen_guanyu: "神关羽",
+  re_shen_guanyu_prefix: "神",
   rewushen: "武神",
   rewushen_info:
     "锁定技，你的红桃手牌视为【杀】；你使用红桃【杀】无距离和次数限制。",
@@ -261,6 +261,22 @@ const translates = {
   olzaiqi: "再起",
   olzaiqi_info:
     "结束阶段，你可以令至多X名角色各选择一项（X为本回合置入弃牌堆的红色牌数）：1.摸一张牌；2.令你回复1点体力。",
+
+  ol_lusu: "界鲁肃",
+  ol_lusu_prefix: "界",
+  olhaoshi: "好施",
+  olhaoshi_info:
+    "摸牌阶段，你可以多摸两张牌，然后若你的手牌数大于5，你将半数（向下取整）手牌交给手牌最少的一名其他角色。若如此做，直到你下回合开始，当你成为【杀】或普通锦囊牌的目标后，其可以交给你一张手牌。",
+  oldimeng: "缔盟",
+  oldimeng_info:
+    "出牌阶段限一次，你可以令两名手牌数之差不大于你的牌数的其他角色交换手牌，然后此阶段结束时，你弃置X张牌（X为这两名角色手牌数之差）。",
+
+  ol_sunjian: "界孙坚",
+  ol_sunjian_prefix: "界",
+  wulie: "武烈",
+  wulie2: "武烈",
+  wulie_info:
+    "限定技，结束阶段，你可以失去任意点体力，令等量名其他角色各获得“烈”；有“烈”的角色受到伤害时，弃其“烈”并防止此伤害。",
 
   ol_jiangwei: "界姜维",
   ol_jiangwei_prefix: "界",

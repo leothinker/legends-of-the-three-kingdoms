@@ -254,7 +254,7 @@ const characters = {
     hp: 3,
     skills: ["olguhuo"],
   },
-  ol_shen_guanyu: {
+  re_shen_guanyu: {
     sex: "male",
     group: "shen",
     hp: 5,
@@ -302,7 +302,6 @@ const characters = {
     hp: 4,
     skills: ["tianyi", "hanzhan"],
     names: "太史|慈",
-    dieAudios: ["re_taishici"],
   },
   ol_pangde: {
     sex: "male",
@@ -364,6 +363,19 @@ const characters = {
     group: "shu",
     hp: 4,
     skills: ["huoshou", "olzaiqi"],
+  },
+  ol_lusu: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["olhaoshi", "oldimeng"],
+  },
+  ol_sunjian: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    maxHp: 5,
+    skills: ["yinghun", "wulie"],
   },
 
   ol_jiangwei: {

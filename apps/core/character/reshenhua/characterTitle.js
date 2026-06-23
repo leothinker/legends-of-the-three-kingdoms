@@ -21,6 +21,8 @@ export default {
   re_xuhuang: "周亚夫之风",
   re_zhurong: "野性的女王",
   re_menghuo: "南蛮王",
+  re_lusu: "荷檐吐奇",
+  re_sunjian: "武烈帝",
 
   re_jiangwei: "龙的衣钵",
 }

@@ -2335,6 +2335,210 @@ const skills = {
     count: () =>
       get.discarded().filter((card) => get.color(card) === "red").length,
   },
+  // 界鲁肃
+  // 好施
+  rehaoshi: {
+    audio: "olhaoshi",
+    trigger: { player: "phaseDrawBegin2" },
+    filter(event, player) {
+      return !event.numFixed
+    },
+    check(event, player) {
+      const maxList = game.filterPlayer().map((current) => {
+          let num = current.countCards("h")
+          if (current === player) {
+            num += event.num + 2
+          }
+          return num
+        }),
+        minList = game.filterPlayer((current) => current.isMinHandcard())
+      let max = Math.max(...maxList)
+      if (maxList.filter((i) => i === max).length > 1) {
+        max = null
+      }
+      if (!max) {
+        return true
+      }
+      if (minList.some((min) => get.attitude(player, min) > 0)) {
+        return true
+      }
+      return false
+    },
+    async content(event, trigger, player) {
+      trigger.num += 2
+      player
+        .when({ player: "phaseDrawEnd" })
+        .filter((evt) => evt === trigger)
+        .step(async (event, trigger, player) => {
+          const max = game.findPlayer((current) => current.isMaxHandcard(true)),
+            minList = game.filterPlayer((current) => current.isMinHandcard())
+          if (!max) {
+            return
+          }
+          let targets
+          if (minList.length === 1) {
+            targets = minList
+          } else {
+            targets = (
+              await player
+                .chooseTarget(
+                  true,
+                  `好施：${get.translation(max)}将半数（向下取整）手牌交给你选择的一名手牌最少的角色`,
+                )
+                .set("filterTarget", (_, player, target) =>
+                  target.isMinHandcard(),
+                )
+                .set(
+                  "ai",
+                  (target) =>
+                    get.attitude(get.player(), target) *
+                    (target.getDamagedHp() + 1),
+                )
+                .forResult()
+            ).targets
+          }
+          if (targets?.length) {
+            const min = targets[0]
+            if (
+              max.countGainableCards(min, "h") &&
+              Math.floor(max.countCards("h") / 2)
+            ) {
+              await max.chooseToGive(
+                true,
+                min,
+                Math.floor(max.countCards("h") / 2),
+              )
+            }
+          }
+        })
+    },
+  },
+  // 缔盟
+  redimeng: {
+    audio: "oldimeng",
+    usable: 1,
+    enable: "phaseUse",
+    filter(event, player) {
+      return game.hasPlayer((current) => {
+        if (current === player) {
+          return false
+        }
+        const num = current.countCards("h")
+        return game.hasPlayer((current2) => {
+          if (current2 === current || current2 === player) {
+            return false
+          }
+          return Math.abs(num - current2.countCards("h")) < 3
+        })
+      })
+    },
+    selectTarget: 2,
+    complexTarget: true,
+    filterTarget(_, player, target) {
+      if (target === player) {
+        return false
+      }
+      if (!ui.selected.targets.length) {
+        return true
+      }
+      return (
+        Math.abs(
+          ui.selected.targets[0].countCards("h") - target.countCards("h"),
+        ) < 3
+      )
+    },
+    multitarget: true,
+    multiline: true,
+    async content(event, trigger, player) {
+      const targets = event.targets.slice().sortBySeat(_status.currentPhase)
+      while (targets.length) {
+        let num = 3
+        const target = targets.shift()
+        while (num > 0) {
+          num--
+          if (!target.isIn()) {
+            break
+          }
+          const result = await target
+            .chooseToUse()
+            .set("filterCard", (card, player, event) => {
+              if (get.position(card) !== "h") {
+                return false
+              }
+              return lib.filter.filterCard.apply(this, [card, player, event])
+            })
+            .forResult()
+          if (!result?.bool) {
+            break
+          }
+        }
+      }
+      if (event.targets.every((target) => target.isIn())) {
+        await event.targets[0].swapHandcards(event.targets[1])
+      }
+    },
+    ai: {
+      order: 10,
+      threaten: 3,
+      expose: 0.9,
+      result: {
+        target(player, target) {
+          //只考虑队内流通牌
+          if (get.attitude(player, target) < 0) {
+            return 0
+          }
+          return (target.countCards("h") + 1) * get.sgnAttitude(player, target)
+        },
+      },
+    },
+  },
+  // 界孙坚
+  // 破虏
+  polu: {
+    audio: 1,
+    trigger: {
+      source: "dieAfter",
+      player: "die",
+    },
+    forceDie: true,
+    filter(event, player, name) {
+      return name === "die" || player.isIn()
+    },
+    direct: true,
+    async content(event, trigger, player) {
+      let result
+
+      // step 0
+      if (!player.storage.polu) {
+        player.storage.polu = 0
+      }
+      event.num = player.storage.polu + 1
+      result = await player
+        .chooseTarget(
+          [1, Infinity],
+          get.prompt("polu"),
+          `令任意名角色各摸${get.cnNumber(event.num)}张牌`,
+        )
+        .set("forceDie", true)
+        .set("ai", (target) => {
+          return get.attitude(_status.event.player, target)
+        })
+        .forResult()
+
+      // step 1
+      if (result.bool) {
+        player.storage.polu++
+        result.targets.sortBySeat()
+        player.logSkill("polu", result.targets)
+        await game.asyncDraw(result.targets, event.num)
+      } else {
+        return
+      }
+
+      // step 2
+      await game.delay()
+    },
+  },
 
   // 界姜维
   // 挑衅

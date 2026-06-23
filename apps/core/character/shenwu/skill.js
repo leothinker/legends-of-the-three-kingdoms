@@ -3711,6 +3711,357 @@ const skills = {
     count: () =>
       get.discarded().filter((card) => get.color(card) === "red").length,
   },
+  // 界鲁肃
+  // 好施
+  olhaoshi: {
+    audio: 2,
+    trigger: { player: "phaseDrawBegin2" },
+    filter(event, player) {
+      return !event.numFixed
+    },
+    check(event, player) {
+      return (
+        player.countCards("h") + 2 + event.num <= 5 ||
+        game.hasPlayer(
+          (target) =>
+            player !== target &&
+            !game.hasPlayer(
+              (current) =>
+                current !== player &&
+                current !== target &&
+                current.countCards("h") < target.countCards("h"),
+            ) &&
+            get.attitude(player, target) > 0,
+        )
+      )
+    },
+    async content(event, trigger, player) {
+      trigger.num += 2
+      player.addTempSkill("olhaoshi_give", "phaseDrawAfter")
+    },
+    subSkill: {
+      give: {
+        trigger: { player: "phaseDrawEnd" },
+        forced: true,
+        charlotte: true,
+        popup: false,
+        filter(event, player) {
+          return player.countCards("h") > 5
+        },
+        async content(event, trigger, player) {
+          let result
+
+          // step 0
+          var targets = game.filterPlayer(
+              (target) =>
+                target !== player &&
+                !game.hasPlayer(
+                  (current) =>
+                    current !== player &&
+                    current !== target &&
+                    current.countCards("h") < target.countCards("h"),
+                ),
+            ),
+            num = Math.floor(player.countCards("h") / 2)
+          result = await player
+            .chooseCardTarget({
+              position: "h",
+              filterCard: true,
+              filterTarget(card, player, target) {
+                return _status.event.targets.includes(target)
+              },
+              targets: targets,
+              selectTarget: targets.length === 1 ? -1 : 1,
+              selectCard: num,
+              prompt: `将${get.cnNumber(num)}张手牌交给手牌最少的一名其他角色`,
+              forced: true,
+              ai1(card) {
+                var goon = false,
+                  player = _status.event.player
+                for (var i of _status.event.targets) {
+                  if (
+                    get.attitude(i, player) > 0 &&
+                    get.attitude(player, i) > 0
+                  ) {
+                    goon = true
+                  }
+                  break
+                }
+                if (goon) {
+                  if (
+                    !player.hasValueTarget(card) ||
+                    (card.name === "sha" &&
+                      player.countCards(
+                        "h",
+                        (cardx) =>
+                          cardx.name === "sha" &&
+                          !ui.selected.cards.includes(cardx),
+                      ) > player.getCardUsable("sha"))
+                  ) {
+                    return 2
+                  }
+                  return Math.max(2, get.value(card) / 4)
+                }
+                return 1 / Math.max(1, get.value(card))
+              },
+              ai2(target) {
+                return get.attitude(_status.event.player, target)
+              },
+            })
+            .forResult()
+
+          // step 1
+          if (result.bool) {
+            var target = result.targets[0]
+            player.line(target, "green")
+            player.give(result.cards, target)
+            player.markAuto("olhaoshi_help", [target])
+            player.addTempSkill("olhaoshi_help", { player: "phaseBeginStart" })
+          }
+        },
+      },
+      help: {
+        trigger: { target: "useCardToTargeted" },
+        direct: true,
+        charlotte: true,
+        onremove: true,
+        filter(event, player) {
+          if (!player.storage.olhaoshi_help?.length) {
+            return false
+          }
+          if (event.card.name !== "sha" && get.type(event.card) !== "trick") {
+            return false
+          }
+          for (var i of player.storage.olhaoshi_help) {
+            if (i.countCards("h") > 0) {
+              return true
+            }
+          }
+          return false
+        },
+        async content(event, trigger, player) {
+          let result
+          let targets = event.targets
+          let target = event.target
+
+          while (true) {
+            // step 0
+            if (!targets) {
+              targets = player.storage.olhaoshi_help.slice(0).sortBySeat()
+            }
+            if (!targets.length) break
+
+            target = targets.shift()
+            result = await target
+              .chooseCard(
+                "h",
+                `好施：是否交给${get.translation(player)}一张手牌？`,
+              )
+              .set("ai", (card) => {
+                var player = _status.event.player,
+                  target = _status.event.getTrigger().player
+                if (!_status.event.goon) {
+                  if (
+                    get.value(card, player) < 0 ||
+                    get.value(card, target) < 0
+                  ) {
+                    return 1
+                  }
+                  return 0
+                }
+                var cardx = _status.event.getTrigger().card
+                if (
+                  card.name === "shan" &&
+                  get.tag(cardx, "respondShan") &&
+                  target.countCards("h", "shan") <
+                    player.countCards("h", "shan")
+                ) {
+                  return 2
+                }
+                if (
+                  card.name === "sha" &&
+                  (cardx.name === "juedou" ||
+                    (get.tag(card, "respondSha") &&
+                      target.countCards("h", "sha") <
+                        player.countCards("h", "sha")))
+                ) {
+                  return 2
+                }
+                if (
+                  get.value(card, target) > get.value(card, player) ||
+                  target.getUseValue(card) > player.getUseValue(card)
+                ) {
+                  return 1
+                }
+                if (player.hasSkillTag("noh")) {
+                  return 0.5 / Math.max(1, get.value(card, player))
+                }
+                return 0
+              })
+              .set("goon", get.attitude(target, player) > 0)
+              .forResult()
+
+            // step 1
+            if (result.bool) {
+              target.logSkill("olhaoshi_help", player)
+              target.give(result.cards, player)
+            }
+          }
+        },
+      },
+    },
+  },
+  // 缔盟
+  oldimeng: {
+    audio: 2,
+    enable: "phaseUse",
+    usable: 1,
+    filter(event, player) {
+      return game.hasPlayer((current) =>
+        lib.skill.oldimeng.filterTarget(null, player, current),
+      )
+    },
+    selectTarget: 2,
+    complexTarget: true,
+    filterTarget(card, player, target) {
+      if (target === player) {
+        return false
+      }
+      var ps = player.countCards("he")
+      if (!ui.selected.targets.length) {
+        var hs = target.countCards("h")
+        return game.hasPlayer((current) => {
+          if (current === player || current === target) {
+            return false
+          }
+          var cs = current.countCards("h")
+          return (hs > 0 || cs > 0) && Math.abs(hs - cs) <= ps
+        })
+      }
+      var current = ui.selected.targets[0],
+        hs = target.countCards("h"),
+        cs = current.countCards("h")
+      return (hs > 0 || cs > 0) && Math.abs(hs - cs) <= ps
+    },
+    multitarget: true,
+    multiline: true,
+    async content(event, trigger, player) {
+      const { targets } = event
+      await targets[0].swapHandcards(targets[1])
+      player.addTempSkill("oldimeng_discard", "phaseUseAfter")
+      player.markAuto("oldimeng_discard", [targets])
+    },
+    ai: {
+      threaten: 4.5,
+      pretao: true,
+      nokeep: true,
+      order: 1,
+      expose: 0.2,
+      result: {
+        target(player, target) {
+          if (!ui.selected.targets.length) {
+            return -Math.sqrt(target.countCards("h"))
+          }
+          var h1 = ui.selected.targets[0].getCards("h"),
+            h2 = target.getCards("h")
+          if (h2.length > h1.length) {
+            return 0
+          }
+          var delval =
+            get.value(h2, target) - get.value(h1, ui.selected.targets[0])
+          if (delval >= 0) {
+            return 0
+          }
+          return -delval * (h1.length - h2.length)
+        },
+      },
+    },
+    subSkill: {
+      discard: {
+        audio: "oldimeng",
+        trigger: { player: "phaseUseEnd" },
+        forced: true,
+        charlotte: true,
+        onremove: true,
+        filter(event, player) {
+          return player.countCards("he") > 0
+        },
+        async content(event, trigger, player) {
+          for (const targets of player.getStorage("oldimeng_discard")) {
+            if (targets.length < 2) {
+              continue
+            }
+            const num = Math.abs(
+              targets[0].countCards("h") - targets[1].countCards("h"),
+            )
+            if (num > 0 && player.countCards("he") > 0) {
+              await player.chooseToDiscard("he", true, num)
+            }
+          }
+        },
+      },
+    },
+  },
+  // 界孙坚
+  // 武烈
+  wulie: {
+    trigger: { player: "phaseJieshuBegin" },
+    audio: 2,
+    direct: true,
+    limited: true,
+    skillAnimation: true,
+    animationColor: "wood",
+    filter(event, player) {
+      return player.hp > 0
+    },
+    async content(event, trigger, player) {
+      // step 0
+      const result = await player
+        .chooseTarget([1, player.hp], get.prompt2("wulie"), lib.filter.notMe)
+        .set("ai", (target) => {
+          var player = _status.event.player
+          if (player.hasUnknown()) {
+            return 0
+          }
+          if (
+            player.hp - ui.selected.targets.length >
+            1 +
+              player.countCards("hs", (card) =>
+                player.canSaveCard(card, player),
+              )
+          ) {
+            return get.attitude(player, target)
+          }
+          return 0
+        })
+        .forResult()
+      // step 1
+      if (result.bool) {
+        var targets = result.targets.sortBySeat()
+        player.logSkill("wulie", targets)
+        player.awakenSkill(event.name)
+        await player.loseHp(targets.length)
+        while (targets.length) {
+          targets[0].addSkill("wulie2")
+          targets.shift().addMark("wulie2")
+        }
+      }
+    },
+  },
+  wulie2: {
+    marktext: "烈",
+    intro: { name2: "烈", content: "mark" },
+    trigger: { player: "damageBegin3" },
+    forced: true,
+    sourceSkill: "wulie",
+    async content(event, trigger, player) {
+      trigger.cancel()
+      player.removeMark("wulie2", 1)
+      if (!player.storage.wulie2) {
+        player.removeSkill("wulie2")
+      }
+    },
+  },
 
   // 界姜维
   // 挑衅

@@ -96,6 +96,7 @@ const characters = {
     hp: 4,
     skills: ["retianyi", "dangmo"],
     names: "太史|慈",
+    dieAudios: ["ol_taishici"],
   },
   re_pangde: {
     sex: "male",
@@ -158,24 +159,25 @@ const characters = {
     hp: 4,
     skills: ["huoshou", "rezaiqi"],
   },
-  // re_sunjian: {
-  //   sex: "male",
-  //   group: "wu",
-  //   hp: 4,
-  //   skills: ["yinghun", "polu"],
-  // },
+  re_lusu: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["rehaoshi", "redimeng"],
+    dieAudios: ["ol_lusu"],
+  },
+  re_sunjian: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["yinghun", "polu"],
+  },
   // re_dongzhuo: {
   //   sex: "male",
   //   group: "qun",
   //   hp: 8,
   //   skills: ["rejiuchi", "roulin", "benghuai", "baonue"],
   //   isZhugong: true,
-  // },
-  // re_lusu: {
-  //   sex: "male",
-  //   group: "wu",
-  //   hp: 3,
-  //   skills: ["rehaoshi", "redimeng"],
   // },
   // re_jiaxu: {
   //   sex: "male",

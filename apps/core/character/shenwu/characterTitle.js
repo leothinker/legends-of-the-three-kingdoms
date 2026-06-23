@@ -26,7 +26,7 @@ export default {
   ol_zhoutai: "历战之躯",
   ol_zhangjiao: "天公将军",
   ol_yuji: "太平道人",
-  ol_shen_guanyu: "鬼神再临",
+  re_shen_guanyu: "鬼神再临",
 
   ol_dianwei: "古之恶来",
   ol_xunyu: "王佐之才",
@@ -40,6 +40,8 @@ export default {
   ol_xuhuang: "周亚夫之风",
   ol_zhurong: "野性的女王",
   ol_menghuo: "南蛮王",
+  ol_lusu: "独断的外交家",
+  ol_sunjian: "武烈帝",
 
   ol_jiangwei: "龙的衣钵",
 }

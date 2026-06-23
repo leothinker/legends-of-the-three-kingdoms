@@ -80,8 +80,11 @@ export default {
   "#olkanpo_ol_pangtong2": "这些小伎俩，逃不出我的眼睛！",
   "#ol_pangtong:die": "骥飞羽落，坡道归尘。",
 
+  "#retianyi1": "天降大任，速战解围！",
+  "#retianyi2": "义不从之，天必不佑！",
   "#hanzhan1": "伯符，且与我一战！",
   "#hanzhan2": "与君酣战，快哉快哉！",
+  "#re_taishici:die": "无妄之灾，难以避免……",
 
   "#rejianchu1": "你这身躯，怎么能快过我？",
   "#rejianchu2": "这些怎么能挡住我的威力！",
@@ -116,6 +119,18 @@ export default {
   "#olzaiqi1": "挫而弥坚，战而弥勇！",
   "#olzaiqi2": "蛮人骨硬，其势复来！",
   "#ol_menghuo:die": "勿再放我，但求速死……",
+
+  "#olhaoshi1": "仗义疏财，深得人心。",
+  "#olhaoshi2": "招聚少年，给其衣食。",
+  "#oldimeng1": "深知其奇，相与亲结。",
+  "#oldimeng2": "同盟之人，言归于好。",
+  "#ol_lusu:die": "一生为国，纵死无憾！",
+
+  "#yinghun_ol_sunjian1": "提刀奔走，灭敌不休。",
+  "#yinghun_ol_sunjian2": "贼寇草莽，我且出战。",
+  "#wulie1": "孙武之后，英烈勇战。",
+  "#wulie2": "兴义之中，忠烈之名。",
+  "#ol_sunjian:die": "袁术之辈，不可共谋！",
 
   "#oltiaoxin1": "宜乘其衅会，以挑敌将。",
   "#oltiaoxin2": "会闻用师，观衅而动。",

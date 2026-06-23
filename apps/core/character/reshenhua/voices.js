@@ -67,11 +67,8 @@ export default {
   "#reniepan2": "九天之志，展翅翱翔。",
   "#re_pangtong:die": "落……凤……坡……",
 
-  "#retianyi1": "天降大任，速战解围！",
-  "#retianyi2": "义不从之，天必不佑！",
   "#dangmo1": "魔高一尺，道高一丈！",
   "#dangmo2": "天魔祸世，吾自荡而除之！",
-  "#re_taishici:die": "无妄之灾，难以避免……",
 
   "#jianchu1": "来呀，冲杀出去，杀他个片甲不留。",
   "#jianchu2": "一人一骑，横扫千军。",
@@ -112,6 +109,11 @@ export default {
   "#rezaiqi1": "胜败乃常事，无妨！",
   "#rezaiqi2": "汉人奸诈，还是不服，再战！",
   "#re_menghuo:die": "我一定要赢，要赢啊……",
+
+  "#yinghun_re_sunjian1": "义定四野，武匡海内。",
+  "#yinghun_re_sunjian2": "江东男儿，皆胸怀匡扶天下之志。",
+  "#polu1": "斩敌复城，扬我江东军威！",
+  "#re_sunjian:die": "吾身虽死，忠勇须传。",
 
   "#retiaoxin1": "黄口竖子，何必上阵送命？",
   "#retiaoxin2": "汝如欲大败而归，则可进军一战！",

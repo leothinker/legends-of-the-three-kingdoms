@@ -161,15 +161,7 @@
     "old"
   ],
   "moderned_modes": ["guozhan"],
-  "connect_characters": [
-    "standard",
-    "shenhua",
-    "refresh",
-    "reshenhua",
-    "sp",
-    "old",
-    "yanling"
-  ],
+  "connect_characters": ["standard", "shenhua", "refresh", "reshenhua", "old"],
   "connect_cards": [
     "sixiang",
     "sp",

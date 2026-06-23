@@ -151,7 +151,7 @@
   "right_click": "pause",
   "sort": "type_sort",
   "cards": ["standard", "extra", "refresh"],
-  "characters": ["refresh", "reshenhua", "yanling"],
+  "characters": ["refresh", "reshenhua", "sp", "yanling"],
   "moderned_characters": [
     "standard",
     "shenhua",
@@ -161,7 +161,15 @@
     "old"
   ],
   "moderned_modes": ["guozhan"],
-  "connect_characters": ["standard", "shenhua", "shenwu", "old"],
+  "connect_characters": [
+    "standard",
+    "shenhua",
+    "refresh",
+    "reshenhua",
+    "sp",
+    "old",
+    "yanling"
+  ],
   "connect_cards": [
     "sixiang",
     "sp",

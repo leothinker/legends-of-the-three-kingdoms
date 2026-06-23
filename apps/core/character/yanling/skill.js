@@ -1,6 +1,6 @@
 import { _status, game, get, lib, ui } from "wtk"
 
-/** @type { importCharacterConfig['skill'] } */
+/** @type { importCharacterConfig["skill"] } */
 const skills = {
   // 界小乔
   // 天香
@@ -717,6 +717,7 @@ const skills = {
     },
   },
   // 界庞统
+  // 相形
   xiangxing: {
     locked: true,
     derivation: ["reyingzi", "rebiyue"],
@@ -756,6 +757,7 @@ const skills = {
       )
     },
   },
+  // 连环
   ylyglianhuan: {
     audio: "relianhuan",
     enable: "phaseUse",
@@ -839,6 +841,7 @@ const skills = {
       },
     },
   },
+  // 涅槃
   ylygniepan: {
     audio: "reniepan",
     enable: "chooseToUse",
@@ -898,6 +901,327 @@ const skills = {
         async content(event, trigger, player) {
           player.removeSkill(event.name)
           player.refreshSkill("ylygniepan")
+        },
+      },
+    },
+  },
+  // 界徐晃
+  // 断粮
+  ylygduanliang: {
+    audio: "reduanliang",
+    enable: "chooseToUse",
+    filterCard(card) {
+      return get.type2(card) !== "trick" && get.color(card) === "black"
+    },
+    filter(event, player) {
+      return player.hasCard(
+        (card) => get.type2(card) !== "trick" && get.color(card) === "black",
+        "hes",
+      )
+    },
+    position: "hes",
+    viewAs: {
+      name: "bingliang",
+    },
+    filterTarget(card, player, target) {
+      return lib.filter.targetEnabled.call(this, card, player, target)
+    },
+    prompt: "将一张黑色非锦囊牌当无距离限制的【兵粮寸断】使用",
+    check(card) {
+      return 6 - get.value(card)
+    },
+    onuse(result, player) {
+      player.addTempSkill(`${result.skill}_draw`)
+    },
+    subSkill: {
+      draw: {
+        charlotte: true,
+        forced: true,
+        trigger: {
+          player: "useCardAfter",
+        },
+        filter(event, player) {
+          return (
+            event.skill === "ylygduanliang" &&
+            event.targets[0].countCards("h") > player.countCards("h")
+          )
+        },
+        async content(event, trigger, player) {
+          await player.draw()
+        },
+      },
+    },
+  },
+  // 辎饵
+  ylygzier: {
+    audio: "jiezi",
+    trigger: {
+      global: "phaseBegin",
+    },
+    round: 1,
+    filter(event, player) {
+      return event.phaseList?.length && player.getStorage("ylygzier").length > 0
+    },
+    async cost(event, trigger, player) {
+      const target = trigger.player
+      const result = await player
+        .chooseButton({
+          createDialog: [
+            get.prompt2(event.skill, target),
+            `<div class="text center">${get.translation(target)}本回合的阶段</div>`,
+            [
+              trigger.phaseList.map((name, index) => [
+                index + 1,
+                "",
+                `lusu_${name.split("|")[0]}`,
+              ]),
+              "vcard",
+            ],
+            `<div class="text center">你本轮记录的阶段</div>`,
+            [
+              player
+                .getStorage(event.skill)
+                .map((name) => ["", "", `lusu_${name.split("|")[0]}`]),
+              "vcard",
+            ],
+          ],
+          filterButton(button) {
+            if (!ui.selected.buttons?.length) {
+              return typeof button.link[0] === "number"
+            }
+            return typeof button.link[0] !== "number"
+          },
+          selectButton: 2,
+          att: get.attitude(player, target),
+          target,
+          ai(button) {
+            const { att, target } = get.event()
+            const { link } = button
+            if (!ui.selected.buttons?.length) {
+              if (att > 0) {
+                if (link[2].includes("phaseDiscard")) {
+                  return 5
+                }
+                if (link[2].includes("phaseJudge") && target.hasCards("j")) {
+                  return 4
+                }
+              }
+              if (att < 0) {
+                if (link[2].includes("phaseUse")) {
+                  return 5
+                }
+                if (link[2].includes("phaseDraw")) {
+                  return 4
+                }
+              }
+              return 0
+            }
+            if (att > 0) {
+              if (link[2].includes("phaseUse")) {
+                return 5
+              }
+              if (link[2].includes("phaseDraw")) {
+                return 4 + (target.countCards("h") < 3 ? 2 : 0)
+              }
+            }
+            if (att < 0) {
+              if (!["phaseUse", "phaseDraw"].some((i) => link[2].includes(i))) {
+                return 5
+              }
+            }
+            return 0
+          },
+        })
+        .forResult()
+      if (result?.bool) {
+        result.links?.forEach((i) => (i[2] = i[2].slice(5)))
+        event.result = {
+          bool: true,
+          cost_data: result.links,
+        }
+      }
+    },
+    logTarget: "player",
+    async content(event, trigger, player) {
+      const {
+        cost_data: [prev, cur],
+      } = event
+      game.log(
+        event.targets[0],
+        "的",
+        `#g${get.translation(prev[2])}`,
+        "改为了",
+        `#g${get.translation(cur[2])}`,
+      )
+      trigger.phaseList[prev[0] - 1] = `${cur[2]}|${event.name}`
+    },
+    intro: {
+      content: "已记录：$",
+    },
+    group: "ylygzier_record",
+    subSkill: {
+      record: {
+        audio: "jiezi",
+        trigger: {
+          global: ["phaseAnyCancelled", "phaseAnySkipped"],
+        },
+        filter(event, player) {
+          return !player.getStorage("ylygzier").includes(event.name)
+        },
+        prompt2(event, player) {
+          return `记录${get.translation(event.name)}`
+        },
+        async content(event, trigger, player) {
+          player.markAuto("ylygzier", trigger.name)
+          player.addTempSkill("ylygzier_clear", "roundStart")
+        },
+      },
+      clear: {
+        charlotte: true,
+        onremove(player, skill) {
+          player.setStorage("ylygzier", [], true)
+        },
+      },
+    },
+  },
+  // 界祝融
+  // 烈刃
+  ylyglieren: {
+    audio: "relieren",
+    trigger: {
+      player: "useCardToPlayered",
+    },
+    filter(event, player) {
+      if (get.name(event.card) !== "sha" || event.targets?.length !== 1) {
+        return false
+      }
+      return (
+        player
+          .getHistory("useCard", (evt) => get.name(evt.card) === "sha")
+          .indexOf(event.getParent()) === 0 && player.canCompare(event.target)
+      )
+    },
+    logTarget: "target",
+    check(event, player) {
+      const { target } = event
+      if (get.attitude(player, target) > 0) {
+        return false
+      }
+      let maxnum = 0
+      const cards2 = target.getCards("h")
+      for (let i = 0; i < cards2.length; i++) {
+        if (get.number(cards2[i]) > maxnum) {
+          maxnum = get.number(cards2[i])
+        }
+      }
+      if (maxnum > 10) {
+        maxnum = 10
+      }
+      if (maxnum < 5 && cards2.length > 1) {
+        maxnum = 5
+      }
+      const cards = player.getCards("h")
+      for (let i = 0; i < cards.length; i++) {
+        if (get.number(cards[i]) < maxnum) {
+          return true
+        }
+      }
+      return false
+    },
+    async content(event, trigger, player) {
+      const {
+        targets: [target],
+      } = event
+      const result = await player
+        .chooseToCompare(target)
+        .set("small", get.attitude(player, target) < 0)
+        .forResult()
+      if (result.winner?.isIn()) {
+        const { winner } = result
+        winner
+          .when({ global: "useCardAfter" })
+          .filter((evt) => evt.card === trigger.card)
+          .then(async (event, trigger, player) => {
+            const hs = player.getCards("h")
+            if (!hs.length) {
+              return
+            }
+            const vcard = get.autoViewAs({ name: "nanman" }, hs)
+            if (player.hasUseTarget(vcard)) {
+              await player.chooseUseTarget({
+                card: vcard,
+                cards: hs,
+                forced: true,
+              })
+            }
+          })
+      }
+    },
+  },
+  // 巨象
+  ylygjuxiang: {
+    audio: "juxiang_re_zhurong",
+    trigger: {
+      global: "useCard",
+    },
+    filter(event, player) {
+      return event.card.name === "nanman"
+    },
+    async cost(event, trigger, player) {
+      if (trigger.player === player) {
+        event.result = await player
+          .chooseBool({
+            prompt: get.prompt(event.skill),
+            prompt2: `令${get.translation(trigger.card)}对体力值大于你的角色造成的伤害+1`,
+            choice: (() => {
+              const { targets, card } = trigger
+              let eff = 0
+              for (let i = 0; i < targets.length; i++) {
+                eff += get.effect(targets[i], card, player, player)
+              }
+              return eff > 0
+            })(),
+          })
+          .forResult()
+      } else {
+        event.result = { bool: true }
+      }
+    },
+    async content(event, trigger, player) {
+      if (trigger.player === player) {
+        player.addTempSkill(`${event.name}_damage`)
+        player.markAuto(`${event.name}_damage`, trigger.card)
+      } else {
+        trigger.excluded.add(player)
+        player
+          .when({ global: "useCardAfter" })
+          .filter((evt) => evt.card === trigger.card)
+          .then(async (event, trigger, player) => {
+            const { cards } = trigger
+            if (cards.someInD()) {
+              await player.gain({ cards: cards.filterInD(), animate: "gain2" })
+            }
+          })
+      }
+    },
+    subSkill: {
+      damage: {
+        audio: "juxiang_re_zhurong",
+        charlotte: true,
+        onremove: true,
+        forced: true,
+        popup: false,
+        trigger: {
+          source: "damageBegin1",
+        },
+        filter(event, player) {
+          return (
+            player.getStorage("ylygjuxiang_damage").includes(event.card) &&
+            event.player.getHp() > player.getHp()
+          )
+        },
+        async content(event, trigger, player) {
+          trigger.num++
         },
       },
     },

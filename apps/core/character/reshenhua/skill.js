@@ -2238,6 +2238,39 @@ const skills = {
       await player.draw()
     },
   },
+  // 界祝融
+  // 烈刃
+  relieren: {
+    audio: 2,
+    trigger: { player: "useCardToPlayered" },
+    filter(event, player) {
+      return event.card.name === "sha" && player.canCompare(event.target)
+    },
+    check(event, player) {
+      return get.attitude(player, event.target) < 0
+    },
+    //priority:5,
+    content() {
+      "step 0"
+      player.chooseToCompare(trigger.target).clear = false
+      ;("step 1")
+      if (result.bool) {
+        if (trigger.target.countGainableCards(player, "he")) {
+          player.gainPlayerCard(trigger.target, true, "he")
+        }
+        ui.clear()
+      } else {
+        var card1 = result.player
+        var card2 = result.target
+        if (get.position(card1) === "d") {
+          trigger.target.gain(card1, "gain2")
+        }
+        if (get.position(card2) === "d") {
+          player.gain(card2, "gain2")
+        }
+      }
+    },
+  },
   // 界孟获
   // 再起
   rezaiqi: {

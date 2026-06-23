@@ -28,6 +28,21 @@ const characters = {
     skills: ["xiangxing", "ylyglianhuan", "ylygniepan"],
     dieAudios: ["re_pangtong"],
   },
+  ylyg_xuhuang: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["ylygduanliang", "ylygzier"],
+    dieAudios: ["re_xuhuang"],
+  },
+  ylyg_zhurong: {
+    sex: "female",
+    group: "shu",
+    hp: 4,
+    skills: ["ylyglieren", "ylygjuxiang"],
+    names: "null|null",
+    dieAudios: ["re_zhurong"],
+  },
 }
 
 export default characters

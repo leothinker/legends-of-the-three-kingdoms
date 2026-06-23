@@ -3,6 +3,8 @@ const characterSort = {
   yanling_fengzhi: ["ylyg_yuji"],
   yanling_chihuo: ["ylyg_dianwei"],
   yanling_yunhuo: ["ylyg_pangtong"],
+  yanling_fanlin: ["ylyg_xuhuang"],
+  yanling_elin: ["ylyg_zhurong"],
 }
 
 const characterSortTranslate = {
@@ -10,6 +12,8 @@ const characterSortTranslate = {
   yanling_fengzhi: "雁翎耀光·风止",
   yanling_chihuo: "雁翎耀光·炽火",
   yanling_yunhuo: "雁翎耀光·煴火",
+  yanling_fanlin: "雁翎耀光·繁林",
+  yanling_elin: "雁翎耀光·恶林",
 }
 
 export { characterSort, characterSortTranslate }

@@ -3289,6 +3289,7 @@ const skills = {
       await player.gain(trigger.cards.filterInD(), "gain2")
     },
   },
+  juxiang_re_zhurong: { audio: 2 },
   // 烈刃
   lieren: {
     audio: 2,

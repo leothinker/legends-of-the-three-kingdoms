@@ -14,13 +14,6 @@ const skills = {
     lose: false,
     delay: false,
     check() {
-      if (
-        game.filterPlayer((current) => {
-          return current.maxHp <= player.maxHp
-        }).length < 2
-      ) {
-        return false
-      }
       return 1 + Math.random()
     },
     async content(event, trigger, player) {
@@ -118,6 +111,13 @@ const skills = {
     },
     ai: {
       order(item, player) {
+        if (
+          !game.hasPlayer((current) => {
+            return current !== player && current.maxHp <= player.maxHp
+          })
+        ) {
+          return 0
+        }
         if (player.countCards("h") === 1) {
           return 10
         }

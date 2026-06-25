@@ -1,4 +1,29 @@
 const characters = {
+  yuji: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["guhuo"],
+  },
+  zhangjiao: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["leiji", "guidao", "huangtian"],
+    isZhugong: true,
+  },
+  weiyan: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["kuanggu"],
+  },
+  huangzhong: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["liegong"],
+  },
   caoren: {
     sex: "male",
     group: "wei",
@@ -12,17 +37,11 @@ const characters = {
     skills: ["shensu"],
     names: "夏侯|渊",
   },
-  huangzhong: {
+  zhoutai: {
     sex: "male",
-    group: "shu",
+    group: "wu",
     hp: 4,
-    skills: ["liegong"],
-  },
-  weiyan: {
-    sex: "male",
-    group: "shu",
-    hp: 4,
-    skills: ["kuanggu"],
+    skills: ["buqu"],
   },
   xiaoqiao: {
     sex: "female",
@@ -30,25 +49,6 @@ const characters = {
     hp: 3,
     skills: ["tianxiang", "hongyan"],
     names: "桥|null",
-  },
-  zhoutai: {
-    sex: "male",
-    group: "wu",
-    hp: 4,
-    skills: ["buqu"],
-  },
-  zhangjiao: {
-    sex: "male",
-    group: "qun",
-    hp: 3,
-    skills: ["leiji", "guidao", "huangtian"],
-    isZhugong: true,
-  },
-  yuji: {
-    sex: "male",
-    group: "qun",
-    hp: 3,
-    skills: ["guhuo"],
   },
   shen_guanyu: {
     sex: "male",
@@ -77,19 +77,6 @@ const characters = {
     skills: ["quhu", "jieming"],
     clans: ["颍川荀氏"],
   },
-  sp_zhugeliang: {
-    sex: "male",
-    group: "shu",
-    hp: 3,
-    skills: ["bazhen", "huoji", "kanpo"],
-    names: "诸葛|亮",
-  },
-  pangtong: {
-    sex: "male",
-    group: "shu",
-    hp: 3,
-    skills: ["lianhuan", "niepan"],
-  },
   taishici: {
     sex: "male",
     group: "wu",
@@ -103,14 +90,6 @@ const characters = {
     hp: 4,
     skills: ["mashu", "mengjin"],
   },
-
-  yuanshao: {
-    sex: "male",
-    group: "qun",
-    hp: 4,
-    skills: ["luanji", "xueyi"],
-    isZhugong: true,
-  },
   yanwen: {
     sex: "male",
     group: "qun",
@@ -118,12 +97,25 @@ const characters = {
     skills: ["shuangxiong"],
     names: "颜|良-文|丑",
   },
-  shen_zhouyu: {
+  yuanshao: {
     sex: "male",
-    group: "shen",
+    group: "qun",
     hp: 4,
-    skills: ["qinyin", "yeyan"],
-    groupInGuozhan: "wu",
+    skills: ["luanji", "xueyi"],
+    isZhugong: true,
+  },
+  pangtong: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["lianhuan", "niepan"],
+  },
+  sp_zhugeliang: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["bazhen", "huoji", "kanpo"],
+    names: "诸葛|亮",
   },
   shen_zhugeliang: {
     sex: "male",
@@ -132,6 +124,51 @@ const characters = {
     skills: ["qixing", "kuangfeng", "dawu"],
     groupInGuozhan: "shu",
     names: "诸葛|亮",
+  },
+  shen_zhouyu: {
+    sex: "male",
+    group: "shen",
+    hp: 4,
+    skills: ["qinyin", "yeyan"],
+    groupInGuozhan: "wu",
+  },
+  lusu: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["haoshi", "dimeng"],
+  },
+  sunjian: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["yinghun"],
+  },
+  dongzhuo: {
+    sex: "male",
+    group: "qun",
+    hp: 8,
+    skills: ["jiuchi", "roulin", "benghuai", "baonue"],
+    isZhugong: true,
+  },
+  jiaxu: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["wansha", "luanwu", "weimu"],
+  },
+  menghuo: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["huoshou", "zaiqi"],
+  },
+  zhurong: {
+    sex: "female",
+    group: "shu",
+    hp: 4,
+    skills: ["juxiang", "lieren"],
+    names: "null|null",
   },
   caopi: {
     sex: "male",
@@ -146,31 +183,6 @@ const characters = {
     hp: 4,
     skills: ["duanliang"],
   },
-  zhurong: {
-    sex: "female",
-    group: "shu",
-    hp: 4,
-    skills: ["juxiang", "lieren"],
-    names: "null|null",
-  },
-  menghuo: {
-    sex: "male",
-    group: "shu",
-    hp: 4,
-    skills: ["huoshou", "zaiqi"],
-  },
-  lusu: {
-    sex: "male",
-    group: "wu",
-    hp: 3,
-    skills: ["haoshi", "dimeng"],
-  },
-  sunjian: {
-    sex: "male",
-    group: "wu",
-    hp: 4,
-    skills: ["yinghun"],
-  },
 
   jiangwei: {
     sex: "male",
@@ -179,19 +191,6 @@ const characters = {
     skills: ["tiaoxin", "zhiji"],
   },
 
-  // dongzhuo: {
-  //   sex: "male",
-  //   group: "qun",
-  //   hp: 8,
-  //   skills: ["jiuchi", "roulin", "benghuai", "baonue"],
-  //   isZhugong: true,
-  // },
-  // jiaxu: {
-  //   sex: "male",
-  //   group: "qun",
-  //   hp: 3,
-  //   skills: ["luanwu", "wansha", "weimu"],
-  // },
   // dengai: {
   //   sex: "male",
   //   group: "wei",

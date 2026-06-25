@@ -598,7 +598,7 @@ export interface EventRespondParams {
 export interface EventGainParams {
   cards?: Card[]
   source?: Player
-  animate?: string
+  animate?: GainAnimate
   gaintag?: string[]
   log?: boolean
   areaNames?: string[]
@@ -611,7 +611,7 @@ export interface EventAddToExpansionParams {
   cards?: Card[]
   source?: Player
   gaintag?: string[]
-  animate?: string
+  animate?: GainAnimate
   fromStorage?: boolean
   areaNames?: string[]
   log?: boolean
@@ -672,10 +672,24 @@ export interface EventJudgeParams {
   judge2?(result: Partial<Result>): boolean | undefined
 }
 
-// 一些不暴露的类型
+// 一些内部类型
 
-interface ChooseNumbersObject {
+export interface ChooseNumbersObject {
   prompt: string
   min: number
   max: number
 }
+
+/**
+ * 获取牌时可用的动画
+ *
+ * TODO: 补充每个动画的说明
+ */
+export type GainAnimate =
+  | "draw"
+  | "gain"
+  | "gain2"
+  | "draw2"
+  | "give"
+  | "giveAuto"
+  | ((event: GameEvent) => number | Promise<void>)

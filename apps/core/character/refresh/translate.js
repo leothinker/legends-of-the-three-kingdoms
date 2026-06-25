@@ -1,52 +1,4 @@
 const translates = {
-  re_caocao: "界曹操",
-  re_caocao_prefix: "界",
-  rejianxiong: "奸雄",
-  rejianxiong_info: "当你受到伤害后，你可以获得对你造成伤害的牌，摸一张牌。",
-
-  re_simayi: "界司马懿",
-  re_simayi_prefix: "界",
-  refankui: "反馈",
-  refankui_info: "当你受到1点伤害后，你可以获得伤害来源的一张牌。",
-  reguicai: "鬼才",
-  reguicai_info: "当一名角色的判定牌生效前，你可以打出一张牌代替之。",
-
-  re_xiahoudun: "界夏侯惇",
-  re_xiahoudun_prefix: "界",
-  reganglie: "刚烈",
-  reganglie_info:
-    "当你受到1点伤害后，你可以进行判定，若结果为：红色，你对伤害来源造成1点伤害；黑色，你弃置其一张牌。",
-  reganglie_info_guozhan:
-    "当你受到伤害后，你可以进行判定，若结果为：红色，你对伤害来源造成1点伤害；黑色，你弃置其一张牌。",
-  qingjian: "清俭",
-  qingjian_info:
-    "每回合限一次，当你于摸牌阶段外获得牌后，你可以展示任意张牌并将这些牌交给一名其他角色，然后当前回合角色本回合手牌上限+X（X为你以此法展示的牌包含的类别数）。",
-  qingjian_add: "清俭",
-
-  re_zhangliao: "界张辽",
-  re_zhangliao_prefix: "界",
-  retuxi: "突袭",
-  retuxi_info: "摸牌阶段，你可以少摸任意张牌并获得等量其他角色的各一张手牌。",
-
-  re_xuzhu: "界许褚",
-  re_xuzhu_prefix: "界",
-  reluoyi: "裸衣",
-  reluoyi2: "裸衣",
-  reluoyi_info:
-    "摸牌阶段开始时，你亮出牌堆顶的三张牌，然后你可以获得其中的基本牌、武器牌和【决斗】。若如此做，你放弃摸牌，且直到你的下个回合开始，你为伤害来源的【杀】或【决斗】造成的伤害+1。",
-
-  re_guojia: "界郭嘉",
-  re_guojia_prefix: "界",
-  reyiji: "遗计",
-  reyiji_tag: "已分配",
-  reyiji_info:
-    "当你受到1点伤害后，你可以摸两张牌，然后可以将至多两张手牌交给其他角色。",
-
-  re_zhenji: "界甄姬",
-  re_zhenji_prefix: "界",
-  reqingguo: "倾国",
-  reqingguo_info: "你可以将一张黑色牌当【闪】使用或打出。",
-
   re_liubei: "界刘备",
   re_liubei_prefix: "界",
   rerende: "仁德",
@@ -162,6 +114,54 @@ const translates = {
     "出牌阶段限一次，你可以选择一名其他男性角色并弃置一张手牌或将一张装备牌置入其装备区。然后你与其体力值较高的角色摸一张牌，体力值较低的角色回复1点体力。",
   rexiaoji: "枭姬",
   rexiaoji_info: "当你失去装备区里的牌后，你可以摸两张牌。",
+
+  re_caocao: "界曹操",
+  re_caocao_prefix: "界",
+  rejianxiong: "奸雄",
+  rejianxiong_info: "当你受到伤害后，你可以获得对你造成伤害的牌，摸一张牌。",
+
+  re_simayi: "界司马懿",
+  re_simayi_prefix: "界",
+  refankui: "反馈",
+  refankui_info: "当你受到1点伤害后，你可以获得伤害来源的一张牌。",
+  reguicai: "鬼才",
+  reguicai_info: "当一名角色的判定牌生效前，你可以打出一张牌代替之。",
+
+  re_xiahoudun: "界夏侯惇",
+  re_xiahoudun_prefix: "界",
+  reganglie: "刚烈",
+  reganglie_info:
+    "当你受到1点伤害后，你可以进行判定，若结果为：红色，你对伤害来源造成1点伤害；黑色，你弃置其一张牌。",
+  reganglie_info_guozhan:
+    "当你受到伤害后，你可以进行判定，若结果为：红色，你对伤害来源造成1点伤害；黑色，你弃置其一张牌。",
+  qingjian: "清俭",
+  qingjian_info:
+    "每回合限一次，当你于摸牌阶段外获得牌后，你可以展示任意张牌并将这些牌交给一名其他角色，然后当前回合角色本回合手牌上限+X（X为你以此法展示的牌包含的类别数）。",
+  qingjian_add: "清俭",
+
+  re_zhangliao: "界张辽",
+  re_zhangliao_prefix: "界",
+  retuxi: "突袭",
+  retuxi_info: "摸牌阶段，你可以少摸任意张牌并获得等量其他角色的各一张手牌。",
+
+  re_xuzhu: "界许褚",
+  re_xuzhu_prefix: "界",
+  reluoyi: "裸衣",
+  reluoyi2: "裸衣",
+  reluoyi_info:
+    "摸牌阶段开始时，你亮出牌堆顶的三张牌，然后你可以获得其中的基本牌、武器牌和【决斗】。若如此做，你放弃摸牌，且直到你的下个回合开始，你为伤害来源的【杀】或【决斗】造成的伤害+1。",
+
+  re_guojia: "界郭嘉",
+  re_guojia_prefix: "界",
+  reyiji: "遗计",
+  reyiji_tag: "已分配",
+  reyiji_info:
+    "当你受到1点伤害后，你可以摸两张牌，然后可以将至多两张手牌交给其他角色。",
+
+  re_zhenji: "界甄姬",
+  re_zhenji_prefix: "界",
+  reqingguo: "倾国",
+  reqingguo_info: "你可以将一张黑色牌当【闪】使用或打出。",
 
   re_huatuo: "界华佗",
   re_huatuo_prefix: "界",

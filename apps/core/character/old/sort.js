@@ -1,24 +1,26 @@
 const characterSort = {
   old_standard: [
+    "old_diaochan",
+
     "old_liubei",
     "old_huangyueying",
-    "old_diaochan",
     "old_yuanshu",
+
     "ganfuren",
   ],
   old_shenhua: [],
   old_refresh: [
+    "old_guanyu",
+    "old_zhangfei",
+    "old_zhaoyun",
+    "xushu",
+
     "old_caocao",
     "old_xiahoudun",
     "old_zhangliao",
     "old_xuzhu",
     "old_guojia",
     "lidian",
-
-    "old_guanyu",
-    "old_zhangfei",
-    "old_zhaoyun",
-    "xushu",
 
     "old_lvbu",
   ],

@@ -153,7 +153,6 @@ export const characterPackMenu = (connectMenu) => {
           }
         }
       }
-      list.sort(lib.sort.character)
       var list2 = list.slice(0)
       var cfgnode = createConfig({
         name: "开启",

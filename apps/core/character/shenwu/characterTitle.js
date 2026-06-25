@@ -1,13 +1,13 @@
 export default {
-  ol_caocao: "魏武帝",
-  ol_xiahoudun: "独眼的罗刹",
-  ol_xuzhu: "虎痴",
-  ol_zhenji: "薄幸的美人",
-
   ol_liubei: "乱世的枭雄",
   ol_zhangfei: "万夫不当",
   ol_zhaoyun: "虎威将军",
   ol_huangyueying: "归隐的杰女",
+
+  ol_caocao: "魏武帝",
+  ol_xiahoudun: "独眼的罗刹",
+  ol_xuzhu: "虎痴",
+  ol_zhenji: "薄幸的美人",
 
   ol_sunquan: "年轻的贤君",
   ol_lvmeng: "士别三日",
@@ -15,8 +15,8 @@ export default {
   ol_sunshangxiang: "弓腰姬",
 
   ol_diaochan: "绝世的舞姬",
-  ol_huaxiong: "飞扬跋扈",
   ol_gongsunzan: "白马将军",
+  ol_huaxiong: "飞扬跋扈",
 
   ol_caoren: "大将军",
   ol_xiahouyuan: "疾行的猎豹",

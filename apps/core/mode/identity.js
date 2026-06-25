@@ -1,3 +1,4 @@
+import html from "dedent"
 import { _status, game, get, lib, ui } from "wtk"
 export const type = "mode"
 /**
@@ -202,7 +203,16 @@ export default () => {
           ui.control.style.top = ""
 
           clear()
-          ui.create.dialog("如果还有其它问题，欢迎来到百度三国杀吧进行交流")
+          ui.create.dialog("如果还有问题，欢迎来到无名杀仓库交流")
+          ui.dialog.add(html`
+						<div class="text center">
+							无名杀仓库地址: https://github.com/libnoname/noname
+							<br />
+							提交BUG/发表意见: https://github.com/libnoname/noname/issues
+							<br />
+							讨论/提问/吹水: https://github.com/libnoname/noname/discussions
+						</div>
+					`)
           await new Promise((resolve) => ui.create.control("完成", resolve))
         }
 
@@ -638,14 +648,12 @@ export default () => {
        */
       getRoomInfo(uiintro) {
         uiintro.add(
-          '<div class="text chat">游戏模式：' +
-            (lib.configOL.identity_mode === "zhong" ? "明忠" : "标准"),
+          `<div class="text chat">游戏模式：${lib.configOL.identity_mode === "zhong" ? "明忠" : "标准"}`,
         )
         if (lib.configOL.identity_mode !== "zhong") {
           if (lib.configOL.identity_mode === "stratagem") {
             uiintro.add(
-              '<div class="text chat">首轮强化：' +
-                (lib.configOL.round_one_use_fury ? "开启" : "关闭"),
+              `<div class="text chat">首轮强化：${lib.configOL.round_one_use_fury ? "开启" : "关闭"}`,
             )
           } else if (lib.configOL.identity_mode !== "purple") {
             uiintro.add(
@@ -665,13 +673,11 @@ export default () => {
                 })()}`,
               )
               uiintro.add(
-                '<div class="text chat">平民身份：' +
-                  (lib.configOL.enable_commoner ? "开启" : "关闭"),
+                `<div class="text chat">平民身份：${lib.configOL.enable_commoner ? "开启" : "关闭"}`,
               )
             }
             uiintro.add(
-              '<div class="text chat">年机制：' +
-                (lib.configOL.enable_year_limit ? "开启" : "关闭"),
+              `<div class="text chat">年机制：${lib.configOL.enable_year_limit ? "开启" : "关闭"}`,
             )
           }
         } else {
@@ -854,28 +860,16 @@ export default () => {
         } else {
           switch (_status.mode) {
             case "purple":
-              str2 =
-                "3v3v2 - " +
-                (game.me.identity.indexOf("r") === 0 ? "暖色" : "冷色") +
-                lib.translate[`${game.me.identity}2`]
+              str2 = `3v3v2 - ${game.me.identity.indexOf("r") === 0 ? "暖色" : "冷色"}${lib.translate[`${game.me.identity}2`]}`
               break
             case "zhong":
               str2 = `忠胆英杰 - ${lib.translate[`${game.me.identity}2`]}`
               break
             case "stratagem":
-              str2 =
-                get.cnNumber(get.playerNumber()) +
-                "人谋攻" +
-                "-" +
-                lib.translate[`${game.me.identity}2`]
+              str2 = `${get.cnNumber(get.playerNumber())}人谋攻-${lib.translate[`${game.me.identity}2`]}`
               break
             default:
-              str2 =
-                get.cnNumber(get.playerNumber()) +
-                "人" +
-                get.translation(lib.config.mode) +
-                " - " +
-                lib.translate[`${game.me.identity}2`]
+              str2 = `${get.cnNumber(get.playerNumber())}人${get.translation(lib.config.mode)} - ${lib.translate[`${game.me.identity}2`]}`
           }
         }
         return [str, str2]
@@ -905,14 +899,7 @@ export default () => {
           let str = ""
           for (const identity of identities) {
             if (data[identity]) {
-              str +=
-                lib.translate[`${identity}2`] +
-                "：" +
-                data[identity][0] +
-                "胜" +
-                " " +
-                data[identity][1] +
-                "负<br>"
+              str += `${lib.translate[`${identity}2`]}：${data[identity][0]}胜 ${data[identity][1]}负<br>`
             }
           }
           lib.config.gameRecord.identity.str = str
@@ -6241,7 +6228,7 @@ export default () => {
         "<li>胜负判定<br>冷色主帅，先锋和暖色细作在所有野心家和对方主帅全部阵亡后视为胜利，在冷色主帅阵亡后视为游戏失败。<br>暖色主帅，先锋和冷色细作在所有野心家和对方主帅阵亡后视为胜利，在暖色主帅阵亡后视为失败。<br>野心家在所有不为野心家的角色阵亡后视为胜利，在双方主帅全部阵亡而有非野心家角色存活时失败。<br>当有角色阵亡后，若有角色满足胜利条件，游戏结束。若所有角色均满足失败条件，则游戏平局。若一名角色满足失败条件，即使其满足胜利条件，也视为游戏失败。<br>" +
         "<li>游戏流程<br>在「游戏准备」中的工作完成后，冷色主帅选择一个势力，然后暖色主帅选择一个其他势力，作为双方各自的势力将池。<br>双方主帅从各自的势力将池中获得两张常备主公武将牌和四张非常备主公武将牌，然后选择一张作为武将牌，将其他的武将牌放回势力将池并洗混。然后双方的其他玩家从各自的势力将池中随机获得五张武将牌，选择一张作为自己的武将牌。<br>暖色主帅成为游戏的一号位，双方主帅各加1点体力和体力上限。七号位和八号位的起始手牌+1。<br>当场上第一次有玩家死亡时，野心家确认彼此的身份牌，然后获得技能〖野心毕露〗：出牌阶段，你可以明置身份牌，加1点体力上限和体力值。若如此做，所有的野心家失去技能〖野心毕露〗<br>" +
         "<li>击杀奖惩<br>杀死颜色不同的主帅的角色回复1点体力，杀死颜色不同的先锋的角色摸两张牌，杀死颜色相同的细作的角色摸三张牌，杀死颜色相同的先锋的主帅弃置所有手牌。<br>" +
-        "<li>制作团队<br>游戏出品：紫星居<br>游戏设计：食茸貳拾肆<br>游戏开发：食茸貳拾肆、紫髯的小乔、聆星Mine、空城琴音依旧弥漫、丽景原同志、雪之彩翼、拉普拉斯、明月照沟渠<br>程序化：三国杀<br>鸣谢：荆哲、魔风、萨巴鲁酱、这就是秋夜</ul></ul>",
+        "<li>制作团队<br>游戏出品：紫星居<br>游戏设计：食茸貳拾肆<br>游戏开发：食茸貳拾肆、紫髯的小乔、聆星Mine、空城琴音依旧弥漫、丽景原同志、雪之彩翼、拉普拉斯、明月照沟渠<br>程序化：无名杀<br>鸣谢：荆哲、魔风、萨巴鲁酱、这就是秋夜</ul></ul>",
     },
   }
 }

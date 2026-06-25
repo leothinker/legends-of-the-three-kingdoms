@@ -1,12 +1,4 @@
 export default {
-  re_caocao: "魏武帝",
-  re_simayi: "狼顾之鬼",
-  re_xiahoudun: "独眼的罗刹",
-  re_zhangliao: "前将军",
-  re_xuzhu: "虎痴",
-  re_guojia: "早终的先知",
-  re_zhenji: "薄幸的美人",
-
   re_liubei: "乱世的枭雄",
   re_guanyu: "美髯公",
   re_zhangfei: "万夫不当",
@@ -24,12 +16,20 @@ export default {
   re_luxun: "儒生雄才",
   re_sunshangxiang: "弓腰姬",
 
+  re_caocao: "魏武帝",
+  re_simayi: "狼顾之鬼",
+  re_xiahoudun: "独眼的罗刹",
+  re_zhangliao: "前将军",
+  re_xuzhu: "虎痴",
+  re_guojia: "早终的先知",
+  re_zhenji: "薄幸的美人",
+
   re_huatuo: "神医",
   re_lvbu: "武的化身",
   re_diaochan: "绝世的舞姬",
   re_huaxiong: "飞扬跋扈",
   re_gongsunzan: "白马将军",
 
-  caozhang: "黄须儿",
   re_yiji: "礼仁同渡",
+  caozhang: "黄须儿",
 }

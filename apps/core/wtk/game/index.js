@@ -2960,11 +2960,6 @@ export class Game {
           audioInfo[2],
           `${card.name}_${sex}.${audioInfo[3] || "mp3"}`,
         )
-      } else if (audio.startsWith("ext:")) {
-        game.playAudio(
-          `${audioInfo[0]}:${audioInfo[1]}`,
-          `${card.name}_${sex}.${audioInfo[2] || "mp3"}`,
-        )
       } else {
         game.playAudio("card", sex, `${audioInfo[0]}.${audioInfo[1] || "mp3"}`)
       }
@@ -8455,9 +8450,9 @@ export class Game {
     }
   }
   finishSkill(skillId, sub) {
-    const mode = get.mode(),
-      info = lib.skill[skillId],
-      iInfo = `${skillId}_info`
+    const mode = get.mode()
+    const info = lib.skill[skillId]
+    const iInfo = `${skillId}_info`
     if (_status.mode && lib.translate[`${iInfo}_${mode}_${_status.mode}`]) {
       lib.translate[iInfo] = lib.translate[`${iInfo}_${mode}_${_status.mode}`]
     } else if (lib.translate[`${iInfo}_${mode}`]) {
@@ -8481,7 +8476,7 @@ export class Game {
       const skill = lib.skill[info.inherit]
       if (skill) {
         Object.keys(skill).forEach((value) => {
-          if (info[value] === undefined) {
+          if (info[value] == null) {
             if (
               value === "audio" &&
               (typeof info[value] === "number" ||
@@ -8489,7 +8484,11 @@ export class Game {
             ) {
               info[value] = info.inherit
             } else {
-              info[value] = skill[value]
+              if (typeof skill[value] === "object") {
+                info[value] = get.copy(skill[value])
+              } else {
+                info[value] = skill[value]
+              }
             }
           }
         })
@@ -8515,18 +8514,22 @@ export class Game {
         deleteSkill(skillId, iInfo)
         return
       }
-      if (info.ai === undefined) {
+      if (info.ai == null) {
         info.ai = {}
       }
-      const skill = info.ai,
-        card = lib.card[info.viewAs.name].ai
+      const skill = info.ai
+      const card = lib.card[info.viewAs.name].ai
       if (card) {
         Object.keys(card).forEach((value) => {
-          if (skill[value] === undefined) {
-            skill[value] = card[value]
+          if (skill[value] == null) {
+            if (typeof card[value] === "object") {
+              skill[value] = get.copy(card[value])
+            } else {
+              skill[value] = card[value]
+            }
           } else if (typeof skill[value] === "object") {
             Object.keys(card[value]).forEach((element) => {
-              if (skill[value][element] === undefined) {
+              if (skill[value][element] == null) {
                 skill[value][element] = card[value][element]
               }
             })
@@ -8580,7 +8583,7 @@ export class Game {
           }
         },
         intro: {
-          content: (storage, player) => {
+          content(storage, player) {
             let str = ""
             const info = get.info(name.slice(0, name.indexOf("_roundcount")))
             if (info?.addintro) {
@@ -8601,7 +8604,7 @@ export class Game {
         forced: true,
         popup: false,
         silent: true,
-        content: async (event, trigger, player) => {
+        async content(event, trigger, player) {
           if (
             lib.skill[event.name.slice(0, event.name.indexOf("_roundcount"))]
               .round -

@@ -1,4 +1,6 @@
 const translates = {
+  old_diaochan: "貂蝉",
+
   old_liubei: "刘备",
   oldrende: "仁德",
   oldrende_info:
@@ -11,8 +13,6 @@ const translates = {
   oldqicai: "奇才",
   oldqicai_info:
     "锁定技，你使用锦囊牌无距离限制；其他角色不能弃置你装备区里除坐骑牌外的牌。",
-
-  old_diaochan: "貂蝉",
 
   old_yuanshu: "袁术",
   wangzun: "妄尊",
@@ -29,6 +29,38 @@ const translates = {
   shushen: "淑慎",
   shushen_info:
     "当你回复1点体力后，你可以令一名其他角色摸一张牌，若其没有手牌，改为摸两张牌。",
+
+  old_guanyu: "界关羽",
+  old_guanyu_prefix: "界",
+  oldyijue: "义绝",
+  oldyijue2: "义绝",
+  oldyijue_info:
+    "出牌阶段限一次，你可以与一名角色拼点，若你：赢，直到回合结束，其不能使用或打出手牌且所有非锁定技失效；没赢，你可以令其回复1点体力。",
+
+  old_zhangfei: "界张飞",
+  old_zhangfei_prefix: "界",
+  oldtishen: "替身",
+  oldtishen2: "替身",
+  oldtishen_info:
+    "限定技，准备阶段，你可以将体力回复至等同于你上回合结束后的体力，然后摸X张牌（X为你本次回复的体力值）。",
+
+  old_zhaoyun: "界赵云",
+  old_zhaoyun_prefix: "界",
+  oldyajiao: "涯角",
+  oldyajiao_info:
+    "当你于回合外使用或打出手牌时，你可以展示牌堆顶的一张牌。若这两张牌的类别：相同，你可以将此牌交给一名角色；不同，你可以将此牌置入弃牌堆。",
+
+  xushu: "SP徐庶",
+  xushu_prefix: "SP",
+  zhuhai: "诛害",
+  zhuhai_info:
+    "其他角色的结束阶段，若其本回合造成过伤害，你可以对其使用一张【杀】。",
+  qianxin: "潜心",
+  qianxin_info:
+    "觉醒技，当你造成伤害后，若你已受伤，你减1点体力上限，然后获得技能〖荐言〗。",
+  jianyan: "荐言",
+  jianyan_info:
+    "出牌阶段限一次，你可以声明一种牌的类别或颜色，然后连续亮出牌堆顶的牌，直到亮出符合你声明的牌为止。最后你令一名男性角色获得此牌。",
 
   old_caocao: "界曹操",
   old_caocao_prefix: "界",
@@ -68,37 +100,6 @@ const translates = {
   wangxi: "忘隙",
   wangxi_info:
     "当你对其他角色造成1点伤害后，或当你受到其他角色造成的1点伤害后，你可以与其各摸一张牌。",
-
-  old_guanyu: "界关羽",
-  old_guanyu_prefix: "界",
-  oldyijue: "义绝",
-  oldyijue2: "义绝",
-  oldyijue_info:
-    "出牌阶段限一次，你可以与一名角色拼点，若你：赢，直到回合结束，其不能使用或打出手牌且所有非锁定技失效；没赢，你可以令其回复1点体力。",
-
-  old_zhangfei: "界张飞",
-  old_zhangfei_prefix: "界",
-  oldtishen: "替身",
-  oldtishen2: "替身",
-  oldtishen_info:
-    "限定技，准备阶段，你可以将体力回复至等同于你上回合结束后的体力，然后摸X张牌（X为你本次回复的体力值）。",
-
-  old_zhaoyun: "界赵云",
-  old_zhaoyun_prefix: "界",
-  oldyajiao: "涯角",
-  oldyajiao_info:
-    "当你于回合外使用或打出手牌时，你可以展示牌堆顶的一张牌。若这两张牌的类别：相同，你可以将此牌交给一名角色；不同，你可以将此牌置入弃牌堆。",
-
-  xushu: "徐庶",
-  zhuhai: "诛害",
-  zhuhai_info:
-    "其他角色的结束阶段，若其本回合造成过伤害，你可以对其使用一张【杀】。",
-  qianxin: "潜心",
-  qianxin_info:
-    "觉醒技，当你造成伤害后，若你已受伤，你减1点体力上限，然后获得技能〖荐言〗。",
-  jianyan: "荐言",
-  jianyan_info:
-    "出牌阶段限一次，你可以声明一种牌的类别或颜色，然后连续亮出牌堆顶的牌，直到亮出符合你声明的牌为止。最后你令一名男性角色获得此牌。",
 
   old_lvbu: "界吕布",
   old_lvbu_prefix: "界",

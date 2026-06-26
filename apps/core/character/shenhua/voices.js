@@ -120,8 +120,8 @@ export default {
   "#roulin2": "食色，性也~~",
   "#benghuai1": "我是不是该减肥了？",
   "#benghuai2": "呃……",
-  "#baonue21": "顺我者昌，逆我者亡！",
-  "#baonue22": "哈哈哈哈……",
+  "#baonue1": "顺我者昌，逆我者亡！",
+  "#baonue2": "哈哈哈哈……",
   "#dongzhuo:die": "汉室衰落，非我一人之罪。",
 
   "#wansha1": "我要你三更死，谁敢留你到五更？",

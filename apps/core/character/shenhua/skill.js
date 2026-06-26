@@ -3534,18 +3534,18 @@ const skills = {
     },
     async content(event, trigger, player) {
       const { control } = await player
-        .chooseControl("baonue_hp", "baonue_maxHp", (event, player) => {
+        .chooseControl("benghuai_hp", "benghuai_maxHp", (event, player) => {
           if (player.hp === player.maxHp) {
-            return "baonue_hp"
+            return "benghuai_hp"
           }
           if (player.hp < player.maxHp - 1 || player.hp <= 2) {
-            return "baonue_maxHp"
+            return "benghuai_maxHp"
           }
-          return "baonue_hp"
+          return "benghuai_hp"
         })
         .set("prompt", "崩坏：减1点体力上限或失去1点体力")
         .forResult()
-      if (control === "baonue_hp") {
+      if (control === "benghuai_hp") {
         await player.loseHp()
       } else {
         await player.loseMaxHp(true)
@@ -3648,7 +3648,7 @@ const skills = {
   // 乱武
   luanwu: {
     audio: 2,
-    audioname: ["re_jiaxu"],
+    audioname2: { re_jiaxu: "olluanwu" },
     enable: "phaseUse",
     filter(event, player) {
       return game.hasPlayer((current) => player !== current)

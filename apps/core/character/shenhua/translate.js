@@ -170,6 +170,8 @@ const translates = {
   roulin_info:
     "锁定技，你对女性角色使用【杀】或女性角色对你使用【杀】均需两张【闪】才能抵消。",
   benghuai: "崩坏",
+  benghuai_hp: "体力",
+  benghuai_maxHp: "体力上限",
   benghuai_info:
     "锁定技，结束阶段，若你不是体力值最低的角色，你减1点体力上限或失去1点体力。",
   baonue: "暴虐",
@@ -179,8 +181,7 @@ const translates = {
 
   jiaxu: "贾诩",
   wansha: "完杀",
-  wansha_info:
-    "锁定技，你的回合内，若有角色处于濒死状态，只有你和处于濒死状态的角色才能使用【桃】。",
+  wansha_info: "锁定技，你的回合内，只有你和处于濒死状态的角色才能使用【桃】。",
   luanwu: "乱武",
   luanwu_info:
     "限定技，出牌阶段，你可以令所有其他角色依次选择一项：1.对距离最近的另一名角色使用【杀】；2.失去1点体力。",

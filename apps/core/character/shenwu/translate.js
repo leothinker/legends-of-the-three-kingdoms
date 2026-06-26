@@ -104,49 +104,14 @@ const translates = {
   shizhan_info:
     "出牌阶段限两次，你可以令一名其他角色视为对你使用一张【决斗】。",
 
-  ol_caoren: "界曹仁",
-  ol_caoren_prefix: "界",
-  rejiewei: "解围",
-  rejiewei_info:
-    "你可以将装备区里的一张牌当【无懈可击】使用；当你翻面至正面朝上时，你可以弃置一张牌，然后可以移动场上的一张牌。",
-
-  ol_xiahouyuan: "界夏侯渊",
-  ol_xiahouyuan_prefix: "界",
-  shebian: "设变",
-  shebian_info: "当你翻面时，你可以移动场上的一张装备牌。",
-
-  ol_huangzhong: "界黄忠",
-  ol_huangzhong_prefix: "界",
-  olliegong: "烈弓",
-  olliegong_info:
-    "你使用【杀】无距离限制。当你使用【杀】指定一名角色为目标后，你可以根据下列条件执行相应的效果：1.其手牌数不大于你的手牌数，其不能使用【闪】响应此【杀】；2.其体力值不小于你的体力值，此【杀】伤害+1。",
-
-  ol_weiyan: "界魏延",
-  ol_weiyan_prefix: "界",
-  reqimou: "奇谋",
-  reqimou_info:
-    "限定技，出牌阶段，你可以失去任意点体力，摸X张牌，然后直到回合结束，你计算与其他角色的距离-X，且你可以多使用X张【杀】（X为你以此法失去的体力值）。",
-
-  ol_xiaoqiao: "界小乔",
-  ol_xiaoqiao_prefix: "界",
-  oltianxiang: "天香",
-  oltianxiang_info:
-    "当你受到伤害时，你可以弃置一张红桃牌并选择一名其他角色，然后防止此伤害并选择一项：1.令来源对其造成1点伤害，然后其摸X张牌（X为其已损失的体力值且至多为5）；2.令其失去1点体力，然后其获得你弃置的牌。",
-  rehongyan: "红颜",
-  rehongyan_info:
-    "锁定技，你的黑桃牌和你的黑桃判定牌视为红桃牌。若你的装备区里有红桃牌，你的手牌上限等于体力上限。",
-  piaoling: "飘零",
-  piaoling_info:
-    "结束阶段，你可以进行一次判定，若结果为红桃，你将判定牌置于牌堆顶或交给一名角色，若其为你，你弃置一张牌。",
-
-  ol_zhoutai: "界周泰",
-  ol_zhoutai_prefix: "界",
-  olbuqu: "不屈",
-  olbuqu_info:
-    "锁定技，当你非因〖不屈〗进入濒死状态时，你将体力回复至1点并重置〖奋激〗，然后将牌堆顶的一张牌置于你的武将牌上，称为“创”，若与另一张“创”点数相同，移去此“创”；当你移去“创”时，你失去等量的体力；你的手牌上限+X（X为“创”的数量）。",
-  refenji: "奋激",
-  refenji_info:
-    "每回合每名角色限一次，当一名角色非因使用或打出而失去手牌后，你可以失去1点体力，然后失去手牌的角色摸两张牌。",
+  ol_yuji: "界于吉",
+  ol_yuji_prefix: "界",
+  olguhuo: "蛊惑",
+  olguhuo_info:
+    "每回合限一次，你可以扣置一张手牌，将此牌当任意一张基本牌或普通锦囊牌使用或打出且其他角色可以进行质疑。若有其他角色质疑则翻开此牌，若为假，则此牌作废且质疑者各摸一张牌，否则质疑者各弃置一张牌或失去1点体力，然后获得〖缠怨〗。",
+  rechanyuan: "缠怨",
+  rechanyuan_info:
+    "锁定技，你不能质疑〖蛊惑〗；若你的体力值小于等于1，你的其他技能失效。",
 
   ol_zhangjiao: "界张角",
   ol_zhangjiao_prefix: "界",
@@ -162,20 +127,62 @@ const translates = {
   rehuangtian_info:
     "主公技，其他群势力角色的出牌阶段限一次，其可以交给你一张【闪】或黑桃手牌。",
 
-  ol_yuji: "界于吉",
-  ol_yuji_prefix: "界",
-  olguhuo: "蛊惑",
-  olguhuo_info:
-    "每回合限一次，你可以扣置一张手牌，将此牌当任意一张基本牌或普通锦囊牌使用或打出且其他角色可以进行质疑。若有其他角色质疑则翻开此牌，若为假，则此牌作废且质疑者各摸一张牌，否则质疑者各弃置一张牌或失去1点体力，然后获得〖缠怨〗。",
-  rechanyuan: "缠怨",
-  rechanyuan_info:
-    "锁定技，你不能质疑〖蛊惑〗；若你的体力值小于等于1，你的其他技能失效。",
+  ol_zhoutai: "界周泰",
+  ol_zhoutai_prefix: "界",
+  olbuqu: "不屈",
+  olbuqu_info:
+    "锁定技，当你非因〖不屈〗进入濒死状态时，你将体力回复至1点并重置〖奋激〗，然后将牌堆顶的一张牌置于你的武将牌上，称为“创”，若与另一张“创”点数相同，移去此“创”；当你移去“创”时，你失去等量的体力；你的手牌上限+X（X为“创”的数量）。",
+  refenji: "奋激",
+  refenji_info:
+    "每回合每名角色限一次，当一名角色非因使用或打出而失去手牌后，你可以失去1点体力，然后失去手牌的角色摸两张牌。",
+
+  ol_xiaoqiao: "界小乔",
+  ol_xiaoqiao_prefix: "界",
+  oltianxiang: "天香",
+  oltianxiang_info:
+    "当你受到伤害时，你可以弃置一张红桃牌并选择一名其他角色，然后防止此伤害并选择一项：1.令来源对其造成1点伤害，然后其摸X张牌（X为其已损失的体力值且至多为5）；2.令其失去1点体力，然后其获得你弃置的牌。",
+  rehongyan: "红颜",
+  rehongyan_info:
+    "锁定技，你的黑桃牌和你的黑桃判定牌视为红桃牌。若你的装备区里有红桃牌，你的手牌上限等于体力上限。",
+  piaoling: "飘零",
+  piaoling_info:
+    "结束阶段，你可以进行一次判定，若结果为红桃，你将判定牌置于牌堆顶或交给一名角色，若其为你，你弃置一张牌。",
+
+  ol_huangzhong: "界黄忠",
+  ol_huangzhong_prefix: "界",
+  olliegong: "烈弓",
+  olliegong_info:
+    "你使用【杀】无距离限制。当你使用【杀】指定一名角色为目标后，你可以根据下列条件执行相应的效果：1.其手牌数不大于你的手牌数，其不能使用【闪】响应此【杀】；2.其体力值不小于你的体力值，此【杀】伤害+1。",
+
+  ol_weiyan: "界魏延",
+  ol_weiyan_prefix: "界",
+  reqimou: "奇谋",
+  reqimou_info:
+    "限定技，出牌阶段，你可以失去任意点体力，摸X张牌，然后直到回合结束，你计算与其他角色的距离-X，且你可以多使用X张【杀】（X为你以此法失去的体力值）。",
+
+  ol_caoren: "界曹仁",
+  ol_caoren_prefix: "界",
+  rejiewei: "解围",
+  rejiewei_info:
+    "你可以将装备区里的一张牌当【无懈可击】使用；当你翻面至正面朝上时，你可以弃置一张牌，然后可以移动场上的一张牌。",
+
+  ol_xiahouyuan: "界夏侯渊",
+  ol_xiahouyuan_prefix: "界",
+  shebian: "设变",
+  shebian_info: "当你翻面时，你可以移动场上的一张装备牌。",
 
   re_shen_guanyu: "神关羽",
   re_shen_guanyu_prefix: "神",
   rewushen: "武神",
   rewushen_info:
     "锁定技，你的红桃手牌视为【杀】；你使用红桃【杀】无距离和次数限制。",
+
+  ol_taishici: "界太史慈",
+  ol_taishici_prefix: "界",
+  hanzhan: "酣战",
+  hanzhan_gain: "酣战",
+  hanzhan_info:
+    "当你与其他角色拼点或其他角色与你拼点时，你可以选择其一张手牌，其用此牌与你拼点。当你拼点后，你可以获得其中点数最大的【杀】。",
 
   ol_dianwei: "界典韦",
   ol_dianwei_prefix: "界",
@@ -192,6 +199,36 @@ const translates = {
   oljieming_info:
     "当你受到1点伤害后或死亡时，你可以令一名角色摸X张牌，然后将手牌弃置至X张（X为其体力上限且至多为5）。",
 
+  ol_pangde: "界庞德",
+  ol_pangde_prefix: "界",
+  rejianchu: "鞬出",
+  rejianchu_info:
+    "当你使用【杀】指定一名角色为目标后，你可以弃置其一张牌，若弃置的牌：为基本牌，其获得此【杀】；不为基本牌，其不能使用【闪】且你本回合可以多使用一张【杀】。",
+
+  ol_yanwen: "界颜良文丑",
+  ol_yanwen_prefix: "界",
+  olshuangxiong: "双雄",
+  olshuangxiong_info:
+    "摸牌阶段结束时，你可以弃置一张牌，然后本回合你可以将一张与之颜色不同的牌当【决斗】使用。结束阶段，你获得本回合对你造成伤害的牌。",
+
+  ol_yuanshao: "界袁绍",
+  ol_yuanshao_prefix: "界",
+  olluanji: "乱击",
+  olluanji_info:
+    "你可以将两张花色相同的手牌当【万箭齐发】使用。你使用【万箭齐发】可以少选择一个目标。",
+  rexueyi: "血裔",
+  rexueyi_info:
+    "主公技，游戏开始时，你获得2X枚“裔”（X为群势力角色数）。出牌阶段开始时，你可以弃1枚“裔”，然后摸一张牌。每有1枚“裔”，你的手牌上限便+1。",
+
+  ol_pangtong: "界庞统",
+  ol_pangtong_prefix: "界",
+  ollianhuan: "连环",
+  ollianhuan_info:
+    "你可以将一张梅花牌当【铁索连环】使用或重铸；你使用【铁索连环】可以多指定一名角色为目标。",
+  olniepan: "涅槃",
+  olniepan_info:
+    "限定技，当你处于濒死状态时，你可以弃置区域里的所有牌，复原武将牌，然后摸三张牌并将体力回复至3点，选择下列一个技能并获得之：〖八阵〗、〖火计〗或〖看破〗。",
+
   ol_sp_zhugeliang: "界卧龙诸葛",
   ol_sp_zhugeliang_prefix: "界",
   olhuoji: "火计",
@@ -203,64 +240,6 @@ const translates = {
   cangzhuo: "藏拙",
   cangzhuo_info:
     "弃牌阶段开始时，若你本回合未使用过锦囊牌，你可以展示任意张锦囊牌，令这些牌此阶段不计入手牌上限。",
-
-  ol_pangtong: "界庞统",
-  ol_pangtong_prefix: "界",
-  ollianhuan: "连环",
-  ollianhuan_info:
-    "你可以将一张梅花牌当【铁索连环】使用或重铸；你使用【铁索连环】可以多指定一名角色为目标。",
-  olniepan: "涅槃",
-  olniepan_info:
-    "限定技，当你处于濒死状态时，你可以弃置区域里的所有牌，复原武将牌，然后摸三张牌并将体力回复至3点，选择下列一个技能并获得之：〖八阵〗、〖火计〗或〖看破〗。",
-
-  ol_taishici: "界太史慈",
-  ol_taishici_prefix: "界",
-  hanzhan: "酣战",
-  hanzhan_gain: "酣战",
-  hanzhan_info:
-    "当你与其他角色拼点或其他角色与你拼点时，你可以选择其一张手牌，其用此牌与你拼点。当你拼点后，你可以获得其中点数最大的【杀】。",
-
-  ol_pangde: "界庞德",
-  ol_pangde_prefix: "界",
-  rejianchu: "鞬出",
-  rejianchu_info:
-    "当你使用【杀】指定一名角色为目标后，你可以弃置其一张牌，若弃置的牌：为基本牌，其获得此【杀】；不为基本牌，其不能使用【闪】且你本回合可以多使用一张【杀】。",
-
-  ol_yuanshao: "界袁绍",
-  ol_yuanshao_prefix: "界",
-  olluanji: "乱击",
-  olluanji_info:
-    "你可以将两张花色相同的手牌当【万箭齐发】使用。你使用【万箭齐发】可以少选择一个目标。",
-  rexueyi: "血裔",
-  rexueyi_info:
-    "主公技，游戏开始时，你获得2X枚“裔”（X为群势力角色数）。出牌阶段开始时，你可以弃1枚“裔”，然后摸一张牌。每有1枚“裔”，你的手牌上限便+1。",
-
-  ol_yanwen: "界颜良文丑",
-  ol_yanwen_prefix: "界",
-  olshuangxiong: "双雄",
-  olshuangxiong_info:
-    "摸牌阶段结束时，你可以弃置一张牌，然后本回合你可以将一张与之颜色不同的牌当【决斗】使用。结束阶段，你获得本回合对你造成伤害的牌。",
-
-  ol_xuhuang: "界徐晃",
-  ol_xuhuang_prefix: "界",
-  olduanliang: "断粮",
-  olduanliang_info:
-    "你可以将一张黑色非锦囊牌当【兵粮寸断】使用；若你本回合未造成过伤害，你使用【兵粮寸断】无距离限制。",
-  rejiezi: "截辎",
-  rejiezi_info:
-    "当一名角色跳过摸牌阶段后，你可以选择一名角色，若其手牌数为全场最少且没有“辎”，其获得“辎”，否则其摸一张牌。有“辎”的角色摸牌阶段结束时，其弃其“辎”，执行一个额外的摸牌阶段。",
-
-  ol_zhurong: "界祝融",
-  ol_zhurong_prefix: "界",
-  changbiao: "长标",
-  changbiao_info:
-    "出牌阶段限一次，你可以将任意张手牌当一张无距离限制的【杀】使用。若此【杀】对目标角色造成伤害，出牌阶段结束时，你摸等量的牌。",
-
-  ol_menghuo: "界孟获",
-  ol_menghuo_prefix: "界",
-  olzaiqi: "再起",
-  olzaiqi_info:
-    "结束阶段，你可以令至多X名角色各选择一项（X为本回合置入弃牌堆的红色牌数）：1.摸一张牌；2.令你回复1点体力。",
 
   ol_lusu: "界鲁肃",
   ol_lusu_prefix: "界",
@@ -277,6 +256,48 @@ const translates = {
   wulie2: "武烈",
   wulie_info:
     "限定技，结束阶段，你可以失去任意点体力，令等量名其他角色各获得“烈”；有“烈”的角色受到伤害时，弃其“烈”并防止此伤害。",
+
+  ol_dongzhuo: "界董卓",
+  ol_dongzhuo_prefix: "界",
+  oljiuchi: "酒池",
+  oljiuchi_info:
+    "你可以将一张黑桃手牌当【酒】使用。你使用【酒】无次数限制。当你使用【酒】【杀】造成伤害后，本回合〖崩坏〗失效。",
+  olbaonue: "暴虐",
+  olbaonue_info:
+    "主公技，当其他群势力角色造成伤害后，你可以进行判定，若结果为黑桃，你回复1点体力并获得此判定牌。",
+
+  ol_jiaxu: "界贾诩",
+  ol_jiaxu_prefix: "界",
+  olweimu: "帷幕",
+  olweimu_info:
+    "锁定技，你不能成为黑色锦囊牌的目标。你防止于回合内受到的伤害并摸两倍伤害数的牌。",
+  olwansha: "完杀",
+  olwansha_info:
+    "锁定技，你的回合内：若有角色处于濒死状态，只有你和处于濒死状态的角色才能使用【桃】；任意角色的濒死结算中，除处于濒死状态的角色外的其他角色非锁定技失效。",
+  olluanwu: "乱武",
+  olluanwu_info:
+    "限定技，出牌阶段，你可以令所有其他角色依次选择一项：1.对距离最近的另一名角色使用【杀】；2.失去1点体力。然后你可以视为使用一张无距离限制的【杀】。",
+
+  ol_menghuo: "界孟获",
+  ol_menghuo_prefix: "界",
+  olzaiqi: "再起",
+  olzaiqi_info:
+    "结束阶段，你可以令至多X名角色各选择一项（X为本回合置入弃牌堆的红色牌数）：1.摸一张牌；2.令你回复1点体力。",
+
+  ol_zhurong: "界祝融",
+  ol_zhurong_prefix: "界",
+  changbiao: "长标",
+  changbiao_info:
+    "出牌阶段限一次，你可以将任意张手牌当一张无距离限制的【杀】使用。若此【杀】对目标角色造成伤害，出牌阶段结束时，你摸等量的牌。",
+
+  ol_xuhuang: "界徐晃",
+  ol_xuhuang_prefix: "界",
+  olduanliang: "断粮",
+  olduanliang_info:
+    "你可以将一张黑色非锦囊牌当【兵粮寸断】使用；若你本回合未造成过伤害，你使用【兵粮寸断】无距离限制。",
+  rejiezi: "截辎",
+  rejiezi_info:
+    "当一名角色跳过摸牌阶段后，你可以选择一名角色，若其手牌数为全场最少且没有“辎”，其获得“辎”，否则其摸一张牌。有“辎”的角色摸牌阶段结束时，其弃其“辎”，执行一个额外的摸牌阶段。",
 
   ol_jiangwei: "界姜维",
   ol_jiangwei_prefix: "界",

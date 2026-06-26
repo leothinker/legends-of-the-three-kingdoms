@@ -1,14 +1,4 @@
 export default {
-  "#rejushou1": "坚守此地，不退半步。",
-  "#rejushou2": "兵精粮足，守土一方。",
-  "#jiewei1": "坚壁清野，以挫敌锐。",
-  "#jiewei2": "化守为攻，出奇制胜。",
-  "#re_caoren:die": "长江以南，再无王土矣！",
-
-  "#reshensu1": "吾等无需恋战。",
-  "#reshensu2": "吾自当以一当十，速战速决。",
-  "#re_xiahouyuan:die": "吾命休矣，遂成竖子之名。",
-
   "#reliegong1": "弓不离手，自有转机。",
   "#reliegong2": "箭阵开道，所向无敌。",
   "#re_huangzhong:die": "把我的弓，拿来，呃。",
@@ -19,15 +9,19 @@ export default {
   "#qimou2": "且不要因为暂时的得失而胆怯。",
   "#re_weiyan:die": "奸贼害我……",
 
+  "#reshensu1": "吾等无需恋战。",
+  "#reshensu2": "吾自当以一当十，速战速决。",
+  "#re_xiahouyuan:die": "吾命休矣，遂成竖子之名。",
+
+  "#rejushou1": "坚守此地，不退半步。",
+  "#rejushou2": "兵精粮足，守土一方。",
+  "#jiewei1": "坚壁清野，以挫敌锐。",
+  "#jiewei2": "化守为攻，出奇制胜。",
+  "#re_caoren:die": "长江以南，再无王土矣！",
+
   "#retianxiang1": "盈盈一笑，娇花照水。",
   "#retianxiang2": "月容花貌难自弃。",
   "#re_xiaoqiao:die": "周郎，等我！",
-
-  "#rebuqu1": "战如熊虎，不惜躯命。",
-  "#rebuqu2": "哼，这点小伤算什么。",
-  "#fenji1": "百战之身，奋勇驱前。",
-  "#fenji2": "两肋插刀，愿赴此躯。",
-  "#re_zhoutai:die": "敌众我寡，无力回天。",
 
   "#releiji1": "成为黄天之世的祭品吧。",
   "#releiji2": "呼风唤雨，驱雷策电。",
@@ -35,7 +29,13 @@ export default {
   "#guidao_re_zhangjiao2": "哼哼，天意如此。",
   "#huangtian_re_zhangjiao1": "苍天不覆，黄天交替。",
   "#huangtian_re_zhangjiao2": "黄天立，民心顺，天下平。",
-  "#zhangjiao:die": "黄天既覆，苍生何存……",
+  "#re_zhangjiao:die": "黄天既覆，苍生何存……",
+
+  "#rebuqu1": "战如熊虎，不惜躯命。",
+  "#rebuqu2": "哼，这点小伤算什么。",
+  "#fenji1": "百战之身，奋勇驱前。",
+  "#fenji2": "两肋插刀，愿赴此躯。",
+  "#re_zhoutai:die": "敌众我寡，无力回天。",
 
   "#reguhuo1": "道法玄机，变幻莫测。",
   "#reguhuo2": "如真似幻，扑朔迷离。",
@@ -53,6 +53,12 @@ export default {
   "#rejieming2": "杀身成仁，不负皇恩。",
   "#re_xunyu:die": "命不由人，徒叹奈何……",
 
+  "#relianhuan1": "将多兵众，不可以敌，使其自累，以杀其势。",
+  "#relianhuan2": "善用兵者，运巧必防损，立谋虑中变。",
+  "#reniepan1": "凤凰折翅，涅槃再生。",
+  "#reniepan2": "九天之志，展翅翱翔。",
+  "#re_pangtong:die": "落……凤……坡……",
+
   "#bazhen_re_sp_zhugeliang1": "你可识得此阵？",
   "#bazhen_re_sp_zhugeliang2": "太极生两仪，两仪生四象，四象生八卦。",
   "#rehuoji1": "燃烧吧！",
@@ -61,12 +67,6 @@ export default {
   "#rekanpo2": "你的计谋被识破了！",
   "#re_sp_zhugeliang:die": "我的计谋竟被……",
 
-  "#relianhuan1": "将多兵众，不可以敌，使其自累，以杀其势。",
-  "#relianhuan2": "善用兵者，运巧必防损，立谋虑中变。",
-  "#reniepan1": "凤凰折翅，涅槃再生。",
-  "#reniepan2": "九天之志，展翅翱翔。",
-  "#re_pangtong:die": "落……凤……坡……",
-
   "#dangmo1": "魔高一尺，道高一丈！",
   "#dangmo2": "天魔祸世，吾自荡而除之！",
 
@@ -74,15 +74,21 @@ export default {
   "#jianchu2": "一人一骑，横扫千军。",
   "#re_pangde:die": "我宁为国家鬼，不为贼将也。",
 
+  "#reshuangxiong1": "此战，如有你我一人在此，何惧华雄？定叫他有去无回！",
+  "#reshuangxiong2": "哥哥，且看我与赵云一战。且与他战个五十回合！",
+  "#re_yanwen:die": "不是叫你看好我身后吗？",
+
   "#reluanji1": "万箭穿心，灭其士气。",
   "#reluanji2": "卿当与本公同心戮力，共安社稷。",
   "#xueyi_re_yuanshao1": "名门士胄，朝野敬仰。",
   "#xueyi_re_yuanshao2": "吾乃名门望族，岂能与汝等为伍？",
   "#re_yuanshao:die": "袁门不幸啊……",
 
-  "#reshuangxiong1": "此战，如有你我一人在此，何惧华雄？定叫他有去无回！",
-  "#reshuangxiong2": "哥哥，且看我与赵云一战。且与他战个五十回合！",
-  "#re_yanwen:die": "不是叫你看好我身后吗？",
+  "#reduanliang1": "粮不三载，敌军已犯行军大忌。",
+  "#reduanliang2": "断敌粮秣，此战可胜。",
+  "#jiezi1": "因粮于敌，敌军食可足也。",
+  "#jiezi2": "食敌一钟，当吾二十钟。",
+  "#re_xuhuang:die": "敌军防备周全，是吾轻敌……",
 
   "#rexingshang1": "群燕辞归鹄南翔，念君客游思断肠。",
   "#rexingshang2": "霜露纷兮交下，木叶落兮凄凄。",
@@ -92,11 +98,20 @@ export default {
   "#songwei_re_caopi2": "朕承符运，受终革命。",
   "#re_caopi:die": "建平所言八十，谓昼夜也，吾其决矣……",
 
-  "#reduanliang1": "粮不三载，敌军已犯行军大忌。",
-  "#reduanliang2": "断敌粮秣，此战可胜。",
-  "#jiezi1": "因粮于敌，敌军食可足也。",
-  "#jiezi2": "食敌一钟，当吾二十钟。",
-  "#re_xuhuang:die": "敌军防备周全，是吾轻敌……",
+  "#yinghun_re_sunjian1": "义定四野，武匡海内。",
+  "#yinghun_re_sunjian2": "江东男儿，皆胸怀匡扶天下之志。",
+  "#polu1": "斩敌复城，扬我江东军威！",
+  "#re_sunjian:die": "吾身虽死，忠勇须传。",
+
+  "#rejiuchi1": "无酒不欢，来来来，再饮，再饮！",
+  "#rejiuchi2": "黄金美酒夜光杯，舍我其谁啊，哈哈哈哈哈哈！",
+  "#roulin_re_dongzhuo1": "美女，美酒，美食，嘿嘿，尽我享用！",
+  "#roulin_re_dongzhuo2": "嗯啊，尽享天下美味，哼哼哼哼哈哈哈哈！",
+  "#benghuai_re_dongzhuo1": "什么礼制纲常，我说的就是纲常！",
+  "#benghuai_re_dongzhuo2": "谁有权力，谁掌生死！",
+  "#rebaonue1": "不施严法，怎治乱民，休得啰嗦！",
+  "#rebaonue2": "天子在我手里，我怕谁！",
+  "#re_dongzhuo:die": "竖子，竟敢反我！",
 
   "#juxiang_re_zhurong1": "今日就让这群汉人长长见识。",
   "#juxiang_re_zhurong2": "我的大象终于有了用武之地。",
@@ -109,11 +124,6 @@ export default {
   "#rezaiqi1": "胜败乃常事，无妨！",
   "#rezaiqi2": "汉人奸诈，还是不服，再战！",
   "#re_menghuo:die": "我一定要赢，要赢啊……",
-
-  "#yinghun_re_sunjian1": "义定四野，武匡海内。",
-  "#yinghun_re_sunjian2": "江东男儿，皆胸怀匡扶天下之志。",
-  "#polu1": "斩敌复城，扬我江东军威！",
-  "#re_sunjian:die": "吾身虽死，忠勇须传。",
 
   "#retiaoxin1": "黄口竖子，何必上阵送命？",
   "#retiaoxin2": "汝如欲大败而归，则可进军一战！",

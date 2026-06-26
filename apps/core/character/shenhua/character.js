@@ -183,6 +183,20 @@ const characters = {
     hp: 4,
     skills: ["duanliang"],
   },
+  shen_lvbu: {
+    sex: "male",
+    group: "shen",
+    hp: 5,
+    skills: ["kuangbao", "wumou", "wuqian", "shenfen"],
+    groupInGuozhan: "qun",
+  },
+  shen_caocao: {
+    sex: "male",
+    group: "shen",
+    hp: 3,
+    skills: ["guixin", "feiying"],
+    groupInGuozhan: "wei",
+  },
 
   jiangwei: {
     sex: "male",
@@ -235,20 +249,6 @@ const characters = {
   //   group: "qun",
   //   hp: 3,
   //   skills: ["beige", "duanchang"],
-  // },
-  // shen_lvbu: {
-  //   sex: "male",
-  //   group: "shen",
-  //   hp: 5,
-  //   skills: ["baonu", "wumou", "ol_wuqian", "ol_shenfen"],
-  //   groupInGuozhan: "qun",
-  // },
-  // shen_caocao: {
-  //   sex: "male",
-  //   group: "shen",
-  //   hp: 3,
-  //   skills: ["new_guixin", "feiying"],
-  //   groupInGuozhan: "wei",
   // },
   // shen_simayi: {
   //   sex: "male",

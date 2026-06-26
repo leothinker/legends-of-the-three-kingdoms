@@ -2028,7 +2028,7 @@ const skills = {
   // 无双
   wushuang: {
     audio: 2,
-    audioname: ["re_lvbu", "shen_lvbu"],
+    audioname: ["shen_lvbu", "re_lvbu"],
     audioname2: { old_lvbu: "wushuang_re_lvbu" },
     forced: true,
     locked: true,
@@ -2037,7 +2037,7 @@ const skills = {
   },
   wushuang1: {
     audio: "wushuang",
-    audioname: ["re_lvbu", "shen_lvbu"],
+    audioname: ["shen_lvbu", "re_lvbu"],
     audioname2: { old_lvbu: "wushuang_re_lvbu" },
     trigger: { player: "useCardToPlayered" },
     forced: true,
@@ -2075,7 +2075,7 @@ const skills = {
   },
   wushuang2: {
     audio: "wushuang",
-    audioname: ["re_lvbu", "shen_lvbu"],
+    audioname: ["shen_lvbu", "re_lvbu"],
     audioname2: { old_lvbu: "wushuang_re_lvbu" },
     trigger: { player: "useCardToPlayered", target: "useCardToTargeted" },
     forced: true,

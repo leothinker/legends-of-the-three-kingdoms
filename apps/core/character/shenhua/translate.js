@@ -225,6 +225,29 @@ const translates = {
   duanliang_info:
     "你可以将一张黑色非锦囊牌当【兵粮寸断】使用；你可以对距离为2的角色使用【兵粮寸断】。",
 
+  shen_lvbu: "神吕布",
+  shen_lvbu_prefix: "神",
+  kuangbao: "狂暴",
+  kuangbao_bg: "暴",
+  kuangbao_info:
+    "锁定技，游戏开始时，你获得2枚“暴怒”；当你造成或受到1点伤害后，你获得1枚“暴怒”。",
+  wumou: "无谋",
+  wumou_info:
+    "锁定技，当你使用普通锦囊牌时，你选择一项：1.弃1枚“暴怒”；2.失去1点体力。",
+  wuqian: "无前",
+  wuqian_info: `出牌阶段，你可以弃2枚“暴怒”并选择一名角色，直到回合结束，你拥有${get.poptip("wushuang")}且该角色的防具技能无效。`,
+  shenfen: "神愤",
+  shenfen_info:
+    "出牌阶段限一次，你可以弃6枚“暴怒”并选择所有其他角色，对这些角色各造成1点伤害，然后这些角色先各弃置其装备区里的所有牌，再各弃置四张手牌，最后你翻面。",
+
+  shen_caocao: "神曹操",
+  shen_caocao_prefix: "神",
+  guixin: "归心",
+  guixin_info:
+    "当你受到1点伤害后，你可以获得每名其他角色区域里的一张牌，然后你翻面。",
+  feiying: "飞影",
+  feiying_info: "锁定技，其他角色计算与你的距离+1。",
+
   zhanghe: "张郃",
   qiaobian: "巧变",
   qiaobian_info:
@@ -287,28 +310,6 @@ const translates = {
     "一名角色受到【杀】造成的伤害后，你可以弃置一张牌，然后令其进行判定：♥，受伤角色回复1点体力；♦︎，受伤角色摸两张牌；♠，伤害来源翻面；♣，伤害来源弃置两张牌。",
   duanchang: "断肠",
   duanchang_info: "锁定技，当你死亡时，杀死你的角色失去所有武将技能。",
-
-  shen_caocao: "神曹操",
-  shen_caocao_prefix: "神",
-  guixin: "归心",
-  guixin_info:
-    "当你受到1点伤害后，你可以获得每名其他角色区域里的一张牌，然后翻面。",
-  feiying: "飞影",
-  feiying_info: "锁定技，其他角色与你的距离+1。",
-
-  shen_lvbu: "神吕布",
-  shen_lvbu_prefix: "神",
-  kuangbao: "狂暴",
-  kuangbao_bg: "暴",
-  kuangbao_info:
-    "锁定技，游戏开始时，你获得2枚“暴怒”标记；当你造成或受到1点伤害后，你获得1枚“暴怒”。",
-  wumou: "无谋",
-  wumou_info: "锁定技，当你使用普通锦囊牌时，你失去1点体力或移去1枚“暴怒”。",
-  wuqian: "无前",
-  wuqian_info: `出牌阶段，你可以移去2枚“暴怒”并选择一名其他角色，本回合你获得${get.poptip("wushuang")}，其防具无效。`,
-  shenfen: "神愤",
-  shenfen_info:
-    "出牌阶段限一次，你可以移去6枚“暴怒”并对所有其他角色各造成1点伤害，这些角色弃置装备区里的所有牌，再依次弃置四张手牌，所有结算完成后，你翻面。",
 
   shen_zhaoyun: "神赵云",
   shen_zhaoyun_prefix: "神",

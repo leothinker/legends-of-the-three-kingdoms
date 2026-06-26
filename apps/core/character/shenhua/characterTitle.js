@@ -29,6 +29,8 @@ export default {
   zhurong: "野性的女王",
   caopi: "霸业的继承者",
   xuhuang: "周亚夫之风",
+  shen_lvbu: "修罗之道",
+  shen_caocao: "超世之英杰",
 
   jiangwei: "龙的衣钵",
   // liushan: "无为的真命主",

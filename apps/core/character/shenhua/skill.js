@@ -4177,6 +4177,329 @@ const skills = {
       },
     },
   },
+  // 神吕布
+  // 狂暴
+  kuangbao: {
+    audio: 2,
+    marktext: "暴",
+    trigger: {
+      source: "damageSource",
+      player: ["damageEnd", "enterGame"],
+      global: "phaseBefore",
+    },
+    forced: true,
+    filter(event) {
+      return (
+        (event.name !== "damage" &&
+          (event.name !== "phase" || game.phaseNumber === 0)) ||
+        event.num > 0
+      )
+    },
+    async content(event, trigger, player) {
+      player.addMark("baonu", trigger.name === "damage" ? trigger.num : 2)
+    },
+    intro: {
+      name: "暴怒",
+      content: "mark",
+    },
+    ai: {
+      combo: "shenfen",
+      maixie: true,
+      maixie_hp: true,
+    },
+  },
+  // 无谋
+  wumou: {
+    audio: 2,
+    trigger: { player: "useCard" },
+    forced: true,
+    filter(event) {
+      return get.type(event.card) === "trick"
+    },
+    async content(event, trigger, player) {
+      if (!player.hasMark("baonu")) {
+        await player.loseHp()
+        return
+      }
+
+      const result = await player
+        .chooseControlList(["弃1枚“暴怒”", "失去1点体力"], true)
+        .set("ai", (event, player) => {
+          if (get.effect(player, { name: "losehp" }, player, player) >= 0) {
+            return 1
+          }
+          if (player.storage.baonu > 6) {
+            return 0
+          }
+          if (player.hp + player.countCards("h", "tao") > 3) {
+            return 1
+          }
+          return 0
+        })
+        .forResult()
+
+      if (result.index === 0) {
+        player.removeMark("baonu", 1)
+      } else {
+        await player.loseHp()
+      }
+    },
+    ai: {
+      effect: {
+        player_use(card, player) {
+          if (get.type(card) === "trick" && get.value(card) < 6) {
+            return [0, -2]
+          }
+        },
+      },
+      neg: true,
+    },
+  },
+  // 无前
+  wuqian: {
+    audio: 2,
+    enable: "phaseUse",
+    derivation: "wushuang",
+    filter(event, player) {
+      return (
+        player.countMark("baonu") >= 2 &&
+        game.hasPlayer((target) =>
+          lib.skill.wuqian.filterTarget(null, player, target),
+        )
+      )
+    },
+    filterTarget(card, player, target) {
+      return target !== player && !target.hasSkill("wuqian_targeted")
+    },
+    async content(event, trigger, player) {
+      const { target } = event
+      player.removeMark("baonu", 2)
+      await player.addTempSkills("wushuang")
+      player.popup("无双")
+      // game.log(player,'获得了技能','#g【无双】');
+      target.addTempSkill("wuqian_targeted")
+    },
+    ai: {
+      order: 9,
+      result: {
+        target(player, target) {
+          if (
+            player.countCards("hs", (card) => {
+              if (!player.getCardUsable({ name: card.name })) {
+                return false
+              }
+              if (!player.canUse(card, target)) {
+                return false
+              }
+              var eff1 = get.effect(target, card, player, player)
+              _status.baonuCheck = true
+              var eff2 = get.effect(target, card, player, player)
+              delete _status.baonuCheck
+              return eff2 > Math.max(0, eff1)
+            })
+          ) {
+            return -1
+          }
+          return 0
+        },
+      },
+      combo: "kuangbao",
+    },
+    global: "wuqian_ai",
+    subSkill: {
+      targeted: {
+        charlotte: true,
+        ai: { unequip2: true },
+      },
+      ai: {
+        ai: {
+          unequip2: true,
+          skillTagFilter(player) {
+            if (!_status.baonuCheck) {
+              return false
+            }
+          },
+        },
+      },
+    },
+  },
+  // 神愤
+  shenfen: {
+    audio: 2,
+    enable: "phaseUse",
+    filter(event, player) {
+      return player.countMark("baonu") >= 6
+    },
+    usable: 1,
+    skillAnimation: true,
+    animationColor: "metal",
+    async content(event, trigger, player) {
+      player.removeMark("baonu", 6)
+      const targets = game.filterPlayer((target) => target !== player)
+      player.line(targets, "green")
+
+      await game.doAsyncInOrder(targets, (target) => target.damage("nocard"))
+      await game.doAsyncInOrder(targets, async (target) => {
+        const cards = target.getCards("e")
+        await target.discard(cards).set("delay", false)
+        if (cards.length) {
+          await game.delay(0.5)
+        }
+      })
+      await game.doAsyncInOrder(targets, async (target) => {
+        const num = target.countCards("h")
+        await target.chooseToDiscard(4, "h", true).set("delay", false)
+        if (num > 0) {
+          await game.delay(0.5)
+        }
+      })
+      await player.turnOver()
+    },
+    ai: {
+      combo: "kuangbao",
+      order: 10,
+      result: {
+        player(player) {
+          return game.countPlayer((current) => {
+            if (current !== player) {
+              return get.sgn(get.damageEffect(current, player, player))
+            }
+          })
+        },
+      },
+    },
+  },
+  // 神曹操
+  // 归心
+  guixin: {
+    audio: 2,
+    trigger: { player: "damageEnd" },
+    filter(event, player) {
+      return game.hasPlayer((cur) => {
+        return cur !== player && cur.countCards("hej") > 0
+      })
+    },
+    check(event, player) {
+      if (player.isTurnedOver() || event.num > 1) {
+        return true
+      }
+      var num = game.countPlayer((current) => {
+        if (
+          current.countCards("he") &&
+          current !== player &&
+          get.attitude(player, current) <= 0
+        ) {
+          return true
+        }
+        if (
+          current.countCards("j") &&
+          current !== player &&
+          get.attitude(player, current) > 0
+        ) {
+          return true
+        }
+      })
+      return num >= 2
+    },
+    getIndex(event, player) {
+      return event.num
+    },
+    async content(event, trigger, player) {
+      const targets = game
+        .filterPlayer((current) => current !== player)
+        .sortBySeat()
+      player.line(targets, "green")
+      await player.gainMultiple(targets, "hej")
+      await player.turnOver()
+    },
+    ai: {
+      maixie: true,
+      maixie_hp: true,
+      threaten(player, target) {
+        if (target.hp === 1) {
+          return 2.5
+        }
+        return 0.5
+      },
+      effect: {
+        target(card, player, target) {
+          if (
+            !target._guixin_eff &&
+            get.tag(card, "damage") &&
+            target.hp >
+              (player.hasSkillTag("damageBonus", true, {
+                card: card,
+                target: target,
+              })
+                ? 2
+                : 1)
+          ) {
+            if (player.hasSkillTag("jueqing", false, target)) {
+              return [1, -2]
+            }
+            target._guixin_eff = true
+            let gain = game.countPlayer((current) => {
+              if (target === current) {
+                return 0
+              }
+              if (get.attitude(target, current) > 0) {
+                if (
+                  current.hasCard(
+                    (cardx) =>
+                      lib.filter.canBeGained(
+                        cardx,
+                        target,
+                        current,
+                        "guixin",
+                      ) && get.effect(current, cardx, current, current) < 0,
+                    "ej",
+                  )
+                ) {
+                  return 1.3
+                }
+                return 0
+              }
+              if (
+                current.hasCard(
+                  (cardx) =>
+                    lib.filter.canBeGained(cardx, target, current, "guixin") &&
+                    get.effect(current, cardx, current, current) > 0,
+                  "ej",
+                )
+              ) {
+                return 1.1
+              }
+              if (
+                current.hasCard(
+                  (cardx) =>
+                    lib.filter.canBeGained(cardx, target, current, "guixin"),
+                  "h",
+                )
+              ) {
+                return 0.9
+              }
+              return 0
+            })
+            if (target.isTurnedOver()) {
+              gain += 2.3
+            } else {
+              gain -= 2.3
+            }
+            delete target._guixin_eff
+            return [1, Math.max(0, gain)]
+          }
+        },
+      },
+    },
+  },
+  // 飞影
+  feiying: {
+    mod: {
+      globalTo(from, to, distance) {
+        return distance + 1
+      },
+    },
+  },
   // 张郃
   // 巧变
   qiaobian: {
@@ -5938,329 +6261,6 @@ const skills = {
             }
             return [1, 0, 0, -3 * get.threaten(player)]
           }
-        },
-      },
-    },
-  },
-  // 神曹操
-  // 归心
-  guixin: {
-    audio: 2,
-    trigger: { player: "damageEnd" },
-    filter(event, player) {
-      return game.hasPlayer((cur) => {
-        return cur !== player && cur.countCards("hej") > 0
-      })
-    },
-    check(event, player) {
-      if (player.isTurnedOver() || event.num > 1) {
-        return true
-      }
-      var num = game.countPlayer((current) => {
-        if (
-          current.countCards("he") &&
-          current !== player &&
-          get.attitude(player, current) <= 0
-        ) {
-          return true
-        }
-        if (
-          current.countCards("j") &&
-          current !== player &&
-          get.attitude(player, current) > 0
-        ) {
-          return true
-        }
-      })
-      return num >= 2
-    },
-    getIndex(event, player) {
-      return event.num
-    },
-    async content(event, trigger, player) {
-      const targets = game
-        .filterPlayer((current) => current !== player)
-        .sortBySeat()
-      player.line(targets, "green")
-      await player.gainMultiple(targets, "hej")
-      await player.turnOver()
-    },
-    ai: {
-      maixie: true,
-      maixie_hp: true,
-      threaten(player, target) {
-        if (target.hp === 1) {
-          return 2.5
-        }
-        return 0.5
-      },
-      effect: {
-        target(card, player, target) {
-          if (
-            !target._guixin_eff &&
-            get.tag(card, "damage") &&
-            target.hp >
-              (player.hasSkillTag("damageBonus", true, {
-                card: card,
-                target: target,
-              })
-                ? 2
-                : 1)
-          ) {
-            if (player.hasSkillTag("jueqing", false, target)) {
-              return [1, -2]
-            }
-            target._guixin_eff = true
-            let gain = game.countPlayer((current) => {
-              if (target === current) {
-                return 0
-              }
-              if (get.attitude(target, current) > 0) {
-                if (
-                  current.hasCard(
-                    (cardx) =>
-                      lib.filter.canBeGained(
-                        cardx,
-                        target,
-                        current,
-                        "guixin",
-                      ) && get.effect(current, cardx, current, current) < 0,
-                    "ej",
-                  )
-                ) {
-                  return 1.3
-                }
-                return 0
-              }
-              if (
-                current.hasCard(
-                  (cardx) =>
-                    lib.filter.canBeGained(cardx, target, current, "guixin") &&
-                    get.effect(current, cardx, current, current) > 0,
-                  "ej",
-                )
-              ) {
-                return 1.1
-              }
-              if (
-                current.hasCard(
-                  (cardx) =>
-                    lib.filter.canBeGained(cardx, target, current, "guixin"),
-                  "h",
-                )
-              ) {
-                return 0.9
-              }
-              return 0
-            })
-            if (target.isTurnedOver()) {
-              gain += 2.3
-            } else {
-              gain -= 2.3
-            }
-            delete target._guixin_eff
-            return [1, Math.max(0, gain)]
-          }
-        },
-      },
-    },
-  },
-  // 飞影
-  feiying: {
-    mod: {
-      globalTo(from, to, distance) {
-        return distance + 1
-      },
-    },
-  },
-  // 神吕布
-  // 狂暴
-  kuangbao: {
-    audio: 2,
-    marktext: "暴",
-    trigger: {
-      source: "damageSource",
-      player: ["damageEnd", "enterGame"],
-      global: "phaseBefore",
-    },
-    forced: true,
-    filter(event) {
-      return (
-        (event.name !== "damage" &&
-          (event.name !== "phase" || game.phaseNumber === 0)) ||
-        event.num > 0
-      )
-    },
-    async content(event, trigger, player) {
-      player.addMark("kuangbao", trigger.name === "damage" ? trigger.num : 2)
-    },
-    intro: {
-      name: "暴怒",
-      content: "mark",
-    },
-    ai: {
-      combo: "shenfen",
-      maixie: true,
-      maixie_hp: true,
-    },
-  },
-  // 无谋
-  wumou: {
-    audio: 2,
-    trigger: { player: "useCard" },
-    forced: true,
-    filter(event) {
-      return get.type(event.card) === "trick"
-    },
-    async content(event, trigger, player) {
-      if (!player.hasMark("kuangbao")) {
-        await player.loseHp()
-        return
-      }
-
-      const result = await player
-        .chooseControlList(["移去一枚【暴怒】标记", "失去1点体力"], true)
-        .set("ai", (event, player) => {
-          if (get.effect(player, { name: "losehp" }, player, player) >= 0) {
-            return 1
-          }
-          if (player.storage.kuangbao > 6) {
-            return 0
-          }
-          if (player.hp + player.countCards("h", "tao") > 3) {
-            return 1
-          }
-          return 0
-        })
-        .forResult()
-
-      if (result.index === 0) {
-        player.removeMark("kuangbao", 1)
-      } else {
-        await player.loseHp()
-      }
-    },
-    ai: {
-      effect: {
-        player_use(card, player) {
-          if (get.type(card) === "trick" && get.value(card) < 6) {
-            return [0, -2]
-          }
-        },
-      },
-      neg: true,
-    },
-  },
-  // 无前
-  wuqian: {
-    audio: 2,
-    enable: "phaseUse",
-    derivation: "wushuang",
-    filter(event, player) {
-      return (
-        player.countMark("kuangbao") >= 2 &&
-        game.hasPlayer((target) =>
-          lib.skill.wuqian.filterTarget(null, player, target),
-        )
-      )
-    },
-    filterTarget(card, player, target) {
-      return target !== player && !target.hasSkill("wuqian_targeted")
-    },
-    async content(event, trigger, player) {
-      const { target } = event
-      player.removeMark("kuangbao", 2)
-      await player.addTempSkills("wushuang")
-      player.popup("无双")
-      // game.log(player,'获得了技能','#g【无双】');
-      target.addTempSkill("wuqian_targeted")
-    },
-    ai: {
-      order: 9,
-      result: {
-        target(player, target) {
-          if (
-            player.countCards("hs", (card) => {
-              if (!player.getCardUsable({ name: card.name })) {
-                return false
-              }
-              if (!player.canUse(card, target)) {
-                return false
-              }
-              var eff1 = get.effect(target, card, player, player)
-              _status.baonuCheck = true
-              var eff2 = get.effect(target, card, player, player)
-              delete _status.baonuCheck
-              return eff2 > Math.max(0, eff1)
-            })
-          ) {
-            return -1
-          }
-          return 0
-        },
-      },
-      combo: "kuangbao",
-    },
-    global: "wuqian_ai",
-    subSkill: {
-      targeted: {
-        charlotte: true,
-        ai: { unequip2: true },
-      },
-      ai: {
-        ai: {
-          unequip2: true,
-          skillTagFilter(player) {
-            if (!_status.baonuCheck) {
-              return false
-            }
-          },
-        },
-      },
-    },
-  },
-  // 神愤
-  shenfen: {
-    audio: 2,
-    enable: "phaseUse",
-    filter(event, player) {
-      return player.countMark("kuangbao") >= 6
-    },
-    usable: 1,
-    skillAnimation: true,
-    animationColor: "metal",
-    async content(event, trigger, player) {
-      player.removeMark("kuangbao", 6)
-      const targets = game.filterPlayer((target) => target !== player)
-      player.line(targets, "green")
-
-      await game.doAsyncInOrder(targets, (target) => target.damage("nocard"))
-      await game.doAsyncInOrder(targets, async (target) => {
-        const cards = target.getCards("e")
-        await target.discard(cards).set("delay", false)
-        if (cards.length) {
-          await game.delay(0.5)
-        }
-      })
-      await game.doAsyncInOrder(targets, async (target) => {
-        const num = target.countCards("h")
-        await target.chooseToDiscard(4, "h", true).set("delay", false)
-        if (num > 0) {
-          await game.delay(0.5)
-        }
-      })
-      await player.turnOver()
-    },
-    ai: {
-      combo: "kuangbao",
-      order: 10,
-      result: {
-        player(player) {
-          return game.countPlayer((current) => {
-            if (current !== player) {
-              return get.sgn(get.damageEffect(current, player, player))
-            }
-          })
         },
       },
     },

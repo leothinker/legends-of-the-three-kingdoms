@@ -156,6 +156,22 @@ export default {
   "#duanliang2": "截其源，断其粮，贼可擒也。",
   "#xuhuang:die": "一顿不吃饿得慌。",
 
+  "#kuangbao1": "哼！",
+  "#kuangbao2": "啊……",
+  "#wumou1": "不管这些啦！",
+  "#wumou2": "哪个说我有勇无谋？",
+  "#wuqian1": "天王老子也保不住你！",
+  "#wuqian2": "看我神威，无坚不摧！",
+  "#shenfen1": "凡人们，颤抖吧！这是神之怒火！",
+  "#shenfen2": "这，才是活生生的地狱！",
+  "#wushuang_shen_lvbu1": "燎原千里，凶名远扬！",
+  "#wushuang_shen_lvbu2": "铁蹄奋进，所向披靡！",
+  "#shen_lvbu:die": "我在修罗炼狱，等着你们，呃哈哈哈哈哈~",
+
+  "#guixin1": "山不厌高，海不厌深。",
+  "#guixin2": "周公吐哺，天下归心。",
+  "#shen_caocao:die": "腾蛇乘雾，终为土灰。",
+
   "#tiaoxin1": "汝等小儿，可敢杀我？",
   "#tiaoxin2": "贼将早降，可免一死。",
   "#zhiji1": "先帝之志，丞相之托，不可忘也！",

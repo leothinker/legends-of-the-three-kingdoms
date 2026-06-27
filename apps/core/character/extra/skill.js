@@ -740,7 +740,7 @@ const skills = {
 
           const cards = [list, createCard]
           const title =
-            '###炼魄：请选择一个身份###<div class="text center">你选择的身份对应的阵营角色数于本轮内视为+1</div>'
+            '###炼魄：请展示一张未加入游戏或死亡角色的身份牌###<div class="text center">本轮该阵营角色数视为+1</div>'
           const next = player.chooseButton([title, cards], true)
 
           const result = await next.forResult()
@@ -941,7 +941,7 @@ const skills = {
           var bodies = _status.event.player
             .getStorage("zhaoluan_effect")
             .filter((i) => i.isIn())
-          return `选择一名角色，你令${get.translation(bodies)}${bodies.length > 1 ? "中的一人" : ""}减1点体力上限，然后你对选择的角色造成1点伤害。`
+          return `你可以令${get.translation(bodies)}${bodies.length > 1 ? "中的一人" : ""}减1点体力上限并对一名你选择的角色造成1点伤害。`
         },
         delay: false,
         async content(event, trigger, player) {
@@ -1021,6 +1021,7 @@ const skills = {
     },
   },
   //神黄月英
+  // 藏巧
   cangqiao: {
     audio: 2,
     trigger: {
@@ -1083,6 +1084,7 @@ const skills = {
       }
     },
   },
+  // 神机
   shenji: {
     audio: 2,
     usable: 1,
@@ -1157,7 +1159,7 @@ const skills = {
       const result = await player
         .choosePlayerCard(
           target,
-          `###神械###将${get.translation(target)}场上的一张牌当作延时锦囊牌使用`,
+          `###神械###将${get.translation(target)}场上一张装备牌当未以此法使用过的延时锦囊牌使用（均使用过后重置）`,
           "ej",
           true,
         )
@@ -1232,7 +1234,7 @@ const skills = {
         .getParent(2)
         .huaxiu.map((name) => [get.type(name), "", name])
       const result = await player
-        .chooseButton(true, ["化朽", "选择要升级的装备", [list, "vcard"]])
+        .chooseButton(true, ["化朽", "选择要修改一种“藏巧”装备牌", [list, "vcard"]])
         .set("ai", (button) => {
           const player = get.player(),
             name = button.link[2]
@@ -1509,7 +1511,7 @@ const skills = {
       } else {
         event.result = await player
           .chooseTarget(
-            `###${get.prompt(event.skill)}###令任意名死亡角色依次观看${get.translation(trigger.target)}手牌并可以重铸其中一张牌`,
+            `###${get.prompt(event.skill)}###令任意名死亡角色依次观看${get.translation(trigger.target)}的手牌并可以重铸其中一张牌`,
             [1, game.dead.length],
           )
           .set("filterTarget", (_, player, target) => target.isDead())
@@ -1536,7 +1538,7 @@ const skills = {
           }
           const result = await current
             .chooseCardButton(
-              `请选择重铸${get.translation(trigger.target)}的一张手牌`,
+              `请选择重铸${get.translation(trigger.target)}的一张牌`,
               cards,
             )
             .set("ai", ({ link }) => {
@@ -1750,7 +1752,7 @@ const skills = {
     async content(event, trigger, player) {
       if (trigger.name === "phaseZhunbei") {
         const { targets } = await player
-          .chooseTarget(`軨軨：选择一名角色对其造成1点雷电伤害`, true)
+          .chooseTarget(`軨軨：选择对一名角色造成1点雷电伤害`, true)
           .set("ai", (target) =>
             get.damageEffect(target, get.player(), get.player(), "thunder"),
           )
@@ -1831,7 +1833,7 @@ const skills = {
     chooseControl(player, source, card, eventId) {
       return player
         .chooseControl(["上家", "下家"])
-        .set("prompt", "軨軨：秘密选择一个方向")
+        .set("prompt", "軨軨：秘密选择上家或下家")
         .set(
           "prompt2",
           `令${get.translation(source)}的${get.translation(card)}移动至其上家或下家`,

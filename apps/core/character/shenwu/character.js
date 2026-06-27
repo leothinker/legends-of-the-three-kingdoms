@@ -390,6 +390,20 @@ const characters = {
     skills: ["rexingshang", "refangzhu", "songwei"],
     isZhugong: true,
   },
+  shen_caocao: {
+    sex: "male",
+    group: "shen",
+    hp: 3,
+    skills: ["guixin", "feiying"],
+    groupInGuozhan: "wei",
+  },
+  shen_lvbu: {
+    sex: "male",
+    group: "shen",
+    hp: 5,
+    skills: ["kuangbao", "wumou", "wuqian", "shenfen"],
+    groupInGuozhan: "qun",
+  },
 
   ol_jiangwei: {
     sex: "male",

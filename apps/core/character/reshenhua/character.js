@@ -186,6 +186,20 @@ const characters = {
     skills: ["rehaoshi", "redimeng"],
     dieAudios: ["ol_lusu"],
   },
+  shen_caocao: {
+    sex: "male",
+    group: "shen",
+    hp: 3,
+    skills: ["guixin", "feiying"],
+    groupInGuozhan: "wei",
+  },
+  shen_lvbu: {
+    sex: "male",
+    group: "shen",
+    hp: 5,
+    skills: ["kuangbao", "wumou", "wuqian", "shenfen"],
+    groupInGuozhan: "qun",
+  },
   // re_dengai: {
   //   sex: "male",
   //   group: "wei",

@@ -3446,7 +3446,6 @@ const skills = {
   // 酒池
   jiuchi: {
     audio: 2,
-    audioname: ["re_dongzhuo"],
     enable: "chooseToUse",
     filterCard(card) {
       return get.suit(card) === "spade"
@@ -3520,10 +3519,6 @@ const skills = {
   benghuai: {
     audio: 2,
     audioname: ["re_dongzhuo", "ol_dongzhuo"],
-    audioname2: {
-      zhugedan: "benghuai_zhugedan",
-      re_zhugedan: "benghuai_re_zhugedan",
-    },
     trigger: { player: "phaseJieshuBegin" },
     forced: true,
     check() {
@@ -3559,13 +3554,11 @@ const skills = {
   // 暴虐
   baonue: {
     group: "baonue2",
-    audioname: ["re_dongzhuo"],
     audio: 2,
     zhuSkill: true,
   },
   baonue2: {
     audio: "baonue",
-    audioname: ["re_dongzhuo"],
     //forceaudio:true,
     trigger: { global: "damageSource" },
     sourceSkill: "baonue",
@@ -4196,7 +4189,7 @@ const skills = {
       )
     },
     async content(event, trigger, player) {
-      player.addMark("baonu", trigger.name === "damage" ? trigger.num : 2)
+      player.addMark("kuangbao", trigger.name === "damage" ? trigger.num : 2)
     },
     intro: {
       name: "暴怒",
@@ -4217,7 +4210,7 @@ const skills = {
       return get.type(event.card) === "trick"
     },
     async content(event, trigger, player) {
-      if (!player.hasMark("baonu")) {
+      if (!player.hasMark("kuangbao")) {
         await player.loseHp()
         return
       }
@@ -4228,7 +4221,7 @@ const skills = {
           if (get.effect(player, { name: "losehp" }, player, player) >= 0) {
             return 1
           }
-          if (player.storage.baonu > 6) {
+          if (player.storage.kuangbao > 6) {
             return 0
           }
           if (player.hp + player.countCards("h", "tao") > 3) {
@@ -4239,7 +4232,7 @@ const skills = {
         .forResult()
 
       if (result.index === 0) {
-        player.removeMark("baonu", 1)
+        player.removeMark("kuangbao", 1)
       } else {
         await player.loseHp()
       }
@@ -4262,7 +4255,7 @@ const skills = {
     derivation: "wushuang",
     filter(event, player) {
       return (
-        player.countMark("baonu") >= 2 &&
+        player.countMark("kuangbao") >= 2 &&
         game.hasPlayer((target) =>
           lib.skill.wuqian.filterTarget(null, player, target),
         )
@@ -4273,7 +4266,7 @@ const skills = {
     },
     async content(event, trigger, player) {
       const { target } = event
-      player.removeMark("baonu", 2)
+      player.removeMark("kuangbao", 2)
       await player.addTempSkills("wushuang")
       player.popup("无双")
       // game.log(player,'获得了技能','#g【无双】');
@@ -4328,13 +4321,13 @@ const skills = {
     audio: 2,
     enable: "phaseUse",
     filter(event, player) {
-      return player.countMark("baonu") >= 6
+      return player.countMark("kuangbao") >= 6
     },
     usable: 1,
     skillAnimation: true,
     animationColor: "metal",
     async content(event, trigger, player) {
-      player.removeMark("baonu", 6)
+      player.removeMark("kuangbao", 6)
       const targets = game.filterPlayer((target) => target !== player)
       player.line(targets, "green")
 

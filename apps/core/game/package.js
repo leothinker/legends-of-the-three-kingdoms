@@ -8,7 +8,7 @@ window.wtk_package = {
     shenwu: "神武再世",
     old: "往昔龙吟",
     // jiangxing: "将星",
-    // extra: "珍藏版",
+    extra: "神将",
     sbfm: "上兵伐谋",
     jsrg: "江山如故",
     // tianshui: "天水濯名",

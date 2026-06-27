@@ -1,13 +1,15 @@
 const characterSort = {
-  zhencang_22: ["le_diaochan"],
-  zhencang_24: ["le_dianwei", "le_jiaxu"],
-  zhencang_26: ["le_huangyueying"],
+  extra_zc22: ["shen_diaochan"],
+  extra_zc24: ["shen_dianwei", "shen_jiaxu"],
+  extra_zc26: ["shen_huangyueying"],
+  extra_demonized: ["dm_diaochan"],
 }
 
 const characterSortTranslate = {
-  extra_zc22: "珍藏版（2022）",
-  extra_zc24: "珍藏版（2024）",
-  extra_zc26: "珍藏版（2026）",
+  extra_zc22: "珍藏版2022",
+  extra_zc24: "珍藏版2024",
+  extra_zc26: "珍藏版2026",
+  extra_demonized: "魔",
 }
 
 export { characterSort, characterSortTranslate }

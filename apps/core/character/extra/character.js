@@ -1,37 +1,39 @@
 const characters = {
-  le_diaochan: {
+  shen_diaochan: {
     sex: "female",
     group: "shen",
     hp: 3,
     skills: ["meihun", "huoxin"],
     groupInGuozhan: "qun",
+    names: "null|null",
   },
-  le_dianwei: {
+  shen_dianwei: {
     sex: "male",
     group: "shen",
     hp: 4,
     skills: ["juanjia", "qiexie", "cuijue"],
     groupInGuozhan: "wei",
   },
-  le_jiaxu: {
+  shen_jiaxu: {
     sex: "male",
     group: "shen",
     hp: 4,
-    skills: ["zclianpo", "zhaoluan"],
+    skills: ["jxlianpo", "zhaoluan"],
     groupInGuozhan: "qun",
   },
-  le_huangyueying: {
+  shen_huangyueying: {
     sex: "female",
     group: "shen",
     hp: 3,
     skills: ["cangqiao", "shenji", "huaxiu"],
     groupInGuozhan: "shu",
   },
-  de_diaochan: {
+  dm_diaochan: {
     sex: "female",
     group: "qun",
     hp: 3,
-    skills: ["huanhuo", "de_qingshi"],
+    skills: ["huanhuo", "olqingshi"],
+    names: "null|null",
   },
 }
 

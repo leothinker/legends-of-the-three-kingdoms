@@ -5,7 +5,7 @@ const cards = {
     fullskin: true,
     type: "equip",
     subtype: "equip1",
-    derivation: "le_huangyueying",
+    derivation: "shen_huangyueying",
     skills: ["hun_zhuge_skill"],
     ai: {
       order() {
@@ -56,7 +56,7 @@ const cards = {
     fullskin: true,
     type: "equip",
     subtype: "equip2",
-    derivation: "le_huangyueying",
+    derivation: "shen_huangyueying",
     skills: ["hun_bagua_skill"],
     ai: {
       basic: {
@@ -69,7 +69,7 @@ const cards = {
     fullskin: true,
     type: "equip",
     subtype: "equip4",
-    derivation: "le_huangyueying",
+    derivation: "shen_huangyueying",
     skills: ["lingling_skill"],
     distance: { globalFrom: -2 },
     ai: {

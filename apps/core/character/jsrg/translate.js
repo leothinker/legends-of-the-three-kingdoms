@@ -705,19 +705,19 @@ const translates = {
   fennan: "奋难",
   fennan_info:
     "出牌阶段限两次，你可以令一名角色选择一项：1.令你翻面，然后你移动其场上一张本回合未移动过的牌；2.令你观看其手牌并重铸其中至多三张。",
-  jsrgxunji: "勋济",
-  jsrgxunji_info:
-    "结束阶段，若你本回合对本回合使用牌指定过的其他角色均造成过伤害，则你可以将本回合造成过伤害的牌对应的位于弃牌堆的实体牌分配给任意角色各一张。",
+  xunji: "勋济",
+  xunji_info:
+    "结束阶段，若你本回合对本回合你使用牌指定过的其他角色均造成过伤害，你可以将弃牌堆中本回合造成过伤害的牌交给你选择的角色各一张。",
 
   jiananfeng: "贾南风",
-  jsrgshanzheng: "擅政",
-  jsrgshanzheng_info:
+  shanzheng: "擅政",
+  shanzheng_info:
     "出牌阶段限一次，你可以与任意名角色议事，若结果为：红色，你对一名未参与议事的角色造成1点伤害；黑色，你获得所有意见牌。",
-  jsrgxiongbao: "凶暴",
-  jsrgxiongbao_info:
+  xiongbao: "凶暴",
+  xiongbao_info:
     "当你参与议事时，你可以额外展示一张手牌，若如此做，其他角色改为随机展示手牌。",
-  jsrgliedu: "烈妒",
-  jsrgliedu_info: "锁定技，女性角色和手牌数大于你的角色不能响应你使用的牌。",
+  liedu: "烈妒",
+  liedu_info: "锁定技，女性角色和手牌数大于你的角色不能响应你使用的牌。",
 }
 
 export default translates

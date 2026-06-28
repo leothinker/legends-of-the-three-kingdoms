@@ -109,8 +109,8 @@ const characterSortTranslate = {
   jiangshanrugu_cheng: "江山如故·承",
   jiangshanrugu_zhuan: "江山如故·转",
   jiangshanrugu_he: "江山如故·合",
-  jiangshanrugu_shuai: "江山如故·衰",
-  jiangshanrugu_xing: "江山如故·兴",
+  jiangshanrugu_shuai: "江山如故·兴衰上",
+  jiangshanrugu_xing: "江山如故·兴衰下",
 }
 
 export { characterSort, characterSortTranslate }

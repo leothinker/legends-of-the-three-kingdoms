@@ -5210,16 +5210,16 @@ const skills = {
     },
     async cost(event, trigger, player) {
       const { source: target } = trigger
-
-      const result = await player
+      event.result = await player
         .chooseToDiscard({
-          prompt: get.prompt("jsrgdingce", target),
+          prompt: get.prompt(event.skill, target),
           prompt2:
             "弃置你与其的各一张手牌。若这两张牌颜色相同，你视为使用一张【洞烛先机】。",
           ai(card) {
             return _status.event.goon ? 6 - get.value(card) : 0
           },
         })
+        .set("chooseonly", true)
         .set(
           "goon",
           get.attitude(player, target) < 0 ||
@@ -5229,19 +5229,12 @@ const skills = {
               .filter((card) => get.value(card) < 5.5).length >= 2,
         )
         .forResult()
-
-      event.result = {
-        bool: result.bool,
-        cards: result.cards,
-        targets: result.targets,
-      }
     },
-    logTarget: "targets",
     async content(event, trigger, player) {
       const { source: target } = trigger
-
+      await player.discard(event.cards)
       const card = event.cards[0]
-      if (!target.countDiscardableCards(player, "h")) {
+      if (!target.hasDiscardableCards(player, "h")) {
         return
       }
 
@@ -5262,11 +5255,11 @@ const skills = {
       }
       const result = await next.forResult()
 
-      if (!result.bool || !result.cards?.length) {
+      if (!result?.bool || !result.cards?.length) {
         return
       }
       const discardedCard = result.cards[0]
-      if (get.color(event.card, false) === get.color(discardedCard, false)) {
+      if (get.color(card, false) === get.color(discardedCard, false)) {
         await game.delayex()
         await player.chooseUseTarget({
           card: get.autoViewAs({ name: "dongzhuxianji", isCard: true }),
@@ -8043,7 +8036,13 @@ const skills = {
         const names = list.map((i) => `【${get.translation(i)}】`).join("或")
         const next = target.chooseToRespond({
           prompt: `是否替${get.translation(player)}打出一张${names}？`,
-          card: get.autoViewAs({ name: list }),
+          filterCard: (card, player) => {
+            if (!get.event().namex.includes(get.name(card))) {
+              return false
+            }
+            return lib.filter.cardRespondable(card, player)
+          },
+          namex: list,
         })
         next.set("ai", () => {
           const event = _status.event
@@ -15717,8 +15716,9 @@ const skills = {
       },
     },
   },
-  //马隆
-  jsrgfennan: {
+  // 马隆
+  // 奋难
+  fennan: {
     audio: 2,
     enable: "phaseUse",
     usable(skill, player) {
@@ -15726,11 +15726,11 @@ const skills = {
     },
     filter(event, player) {
       return game.hasPlayer((target) => {
-        return event.jsrgfennan?.includes(target) || target.countCards("h")
+        return event.fennan?.includes(target) || target.countCards("h")
       })
     },
     onChooseToUse(event) {
-      if (!game.online && !event.jsrgfennan) {
+      if (!game.online && !event.fennan) {
         const list = game.filterPlayer((target) => {
           return event.player.canMoveCard(null, null, target, (card) => {
             return !game.getGlobalHistory("everything", (evt) => {
@@ -15748,12 +15748,12 @@ const skills = {
             }).length
           })
         })
-        event.set("jsrgfennan", list)
+        event.set("fennan", list)
       }
     },
     filterTarget(card, player, target) {
       const event = _status.event
-      return event.jsrgfennan?.includes(target) || target.countCards("h")
+      return event.fennan?.includes(target) || target.countCards("h")
     },
     async content(event, trigger, player) {
       const target = event.target,
@@ -15761,7 +15761,7 @@ const skills = {
       const num = 3
       let result,
         str = get.translation(player)
-      if (!evt.jsrgfennan?.includes(target)) {
+      if (!evt.fennan?.includes(target)) {
         result = { index: 1 }
       } else if (!target.countCards("h")) {
         result = { index: 0 }
@@ -15769,8 +15769,8 @@ const skills = {
         result = await target
           .chooseControl()
           .set("choiceList", [
-            `令${str}翻面，然后其移动你场上的一张本回合未被移动过的牌`,
-            `令${str}观看你的手牌并重铸其中至多${get.cnNumber(num)}张牌`,
+            `令${str}翻面，然后其移动你场上一张本回合未移动过的牌`,
+            `令${str}观看你手牌并重铸其中至多三张`,
           ])
           .set("ai", () => {
             const player = get.player(),
@@ -15813,7 +15813,7 @@ const skills = {
             "h",
             "visible",
             [1, num],
-            `是否重铸其至多${get.cnNumber(num)}张牌？`,
+            `是否重铸其中至多三张牌？`,
           )
           .set("filterButton", (button) => {
             const player = get.event().getParent().target
@@ -15842,7 +15842,8 @@ const skills = {
       },
     },
   },
-  jsrgxunji: {
+  // 勋济
+  xunji: {
     audio: 2,
     trigger: { player: "phaseJieshuBegin" },
     filter(event, player) {
@@ -15881,7 +15882,7 @@ const skills = {
         .reduce((sum, evtx) => {
           return sum.addArray(evtx.getParent("useCard").cards.filterInD("d"))
         }, [])
-      return `将${get.translation(cards)}分配给任意名角色各一张`
+      return `将${get.translation(cards)}交给你选择的角色各一张`
     },
     async content(event, trigger, player) {
       const cards = player
@@ -15976,10 +15977,10 @@ const skills = {
   },
   // 贾南风
   // 擅政
-  jsrgshanzheng: {
+  shanzheng: {
     audio: 4,
     logAudio: (index) =>
-      typeof index === "number" ? `jsrgshanzheng${index}.mp3` : 2,
+      typeof index === "number" ? `shanzheng${index}.mp3` : 2,
     enable: "phaseUse",
     usable: 1,
     filter(event, player) {
@@ -15996,7 +15997,7 @@ const skills = {
             return current === player || event.targets.includes(current)
           }),
         )
-        .set("callback", lib.skill.jsrgshanzheng.callback)
+        .set("callback", lib.skill.shanzheng.callback)
     },
     async callback(event, trigger, player) {
       const result = event.debateResult
@@ -16023,7 +16024,7 @@ const skills = {
             })
             .forResult()
           if (resultx?.bool) {
-            player.logSkill("jsrgshanzheng", resultx.targets, null, null, [3])
+            player.logSkill("shanzheng", resultx.targets, null, null, [3])
             player.line(resultx.targets.sortBySeat(), "green")
             for (const target of resultx.targets.sortBySeat()) {
               await target.damage()
@@ -16043,7 +16044,7 @@ const skills = {
             }
           }
           targets.remove(player)
-          player.logSkill("jsrgshanzheng", targets, null, null, [4])
+          player.logSkill("shanzheng", targets, null, null, [4])
           if (cards.length) {
             await player.gain(cards, "give")
           }
@@ -16060,7 +16061,7 @@ const skills = {
     },
   },
   // 凶暴
-  jsrgxiongbao: {
+  xiongbao: {
     audio: 2,
     trigger: { global: "chooseToDebateBegin" },
     filter(event, player) {
@@ -16112,7 +16113,7 @@ const skills = {
     },
   },
   // 烈妒
-  jsrgliedu: {
+  liedu: {
     audio: 2,
     forced: true,
     trigger: {

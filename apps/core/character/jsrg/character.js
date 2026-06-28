@@ -529,13 +529,13 @@ const characters = {
     sex: "male",
     group: "jin",
     hp: 4,
-    skills: ["jsrgfennan", "jsrgxunji"],
+    skills: ["fennan", "xunji"],
   },
   jiananfeng: {
     sex: "female",
     group: "jin",
     hp: 3,
-    skills: ["jsrgshanzheng", "jsrgxiongbao", "jsrgliedu"],
+    skills: ["shanzheng", "xiongbao", "liedu"],
   },
 }
 

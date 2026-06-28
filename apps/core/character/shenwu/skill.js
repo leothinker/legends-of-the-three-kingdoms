@@ -62,8 +62,13 @@ const skills = {
         if (current.group === "shu") {
           var next = current.chooseToRespond(
             `是否替${get.translation(player)}使用或打出【杀】？`,
-            { name: "sha" },
           )
+          next.set("filterCard", (card, player) => {
+            if (get.name(card) !== "sha") {
+              return false
+            }
+            return lib.filter.cardRespondable(card, player)
+          })
           next.set("ai", () => {
             var event = _status.event
             return get.attitude(event.player, event.source) - 2

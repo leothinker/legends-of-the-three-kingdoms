@@ -6942,16 +6942,15 @@ const skills = {
       source: "damageSource",
     },
     usable: 1,
-    content() {
-      "step 0"
-      player.draw(2)
-      ;("step 1")
-      if (Array.isArray(result) && result.length > 1) {
-        var color = get.color(result[0], player)
-        for (var i = 1; i < result.length; i++) {
-          if (get.color(result[i], player) !== color) {
-            if (player.countCards("h")) {
-              player.chooseToDiscard("h", true)
+    async content(event, trigger, player) {
+      const result = await player.draw(2).forResult()
+      if (get.itemtype(result?.cards) === "cards" && result.cards.length > 1) {
+        const { cards } = result
+        const color = get.color(cards[0], player)
+        for (let i = 1; i < cards.length; i++) {
+          if (get.color(cards[i], player) !== color) {
+            if (player.hasCards("h")) {
+              await player.chooseToDiscard("h", true)
             }
             break
           }
@@ -18202,7 +18201,7 @@ const skills = {
               .set("res", get.damageEffect(target, player, target, "fire"))
               .forResult()
 
-            if (!result.bool) {
+            if (!result?.bool) {
               await target.damage(2, "fire")
               num = 1
             } else {

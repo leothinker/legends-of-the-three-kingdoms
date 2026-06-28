@@ -151,7 +151,17 @@
   "right_click": "pause",
   "sort": "type_sort",
   "cards": ["standard", "extra", "refresh"],
-  "characters": ["refresh", "reshenhua", "sp", "yanling"],
+  "characters": [
+    "refresh",
+    "reshenhua",
+    "sp",
+    "extra",
+    "jsrg",
+    "sxrm",
+    "sb",
+    "tianshui",
+    "yanling"
+  ],
   "moderned_characters": [
     "standard",
     "shenhua",

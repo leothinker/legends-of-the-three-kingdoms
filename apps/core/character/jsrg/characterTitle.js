@@ -74,7 +74,7 @@ export default {
   jsrg_simaliang: "冲粹的蒲牢",
   jsrg_tufashujineng: "朔西扰攘",
   jsrg_lukang: "架海金梁",
-  jsrg_malong: "困局诡阵",
 
+  malong: "困局诡阵",
   jiananfeng: "凤啸峻峕",
 }

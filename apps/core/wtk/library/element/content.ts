@@ -12682,7 +12682,10 @@ export const Content: Record<string, ContentFuncByAll | ContentFuncsByAll> = {
       ) {
         event.visible = true
       }
-      if (get.itemtype(cards) === "cards") {
+      if (
+        Array.isArray(cards) &&
+        !cards.some((card) => get.itemtype(card) !== "card")
+      ) {
         const map = {}
         for (const i of cards) {
           const owner = get.owner(i, "judge")

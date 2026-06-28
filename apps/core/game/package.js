@@ -22,11 +22,11 @@ window.wtk_package = {
     clan: "门阀士族",
     sbfm: "上兵伐谋",
 
-    yanling: "雁翎耀光",
     tianshui: "天水濯名",
+    yanling: "雁翎耀光",
     // jiangxing: "将星归汉",
 
-    sixiang: "四象封印",
+    // sixiang: "四象封印",
 
     old: "往昔龙吟",
   },

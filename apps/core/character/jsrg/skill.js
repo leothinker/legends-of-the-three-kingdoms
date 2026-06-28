@@ -13716,120 +13716,6 @@ const skills = {
     ai: { threaten: 2.8 },
   },
   //江山如故·兴
-  //文鸯
-  jsrgfuzhen: {
-    audio: 4,
-    trigger: {
-      player: "phaseZhunbeiBegin",
-    },
-    filter(event, player) {
-      return game.hasPlayer((current) =>
-        player.canUse(
-          { name: "sha", nature: "thunder", isCard: true },
-          current,
-          false,
-        ),
-      )
-    },
-    async cost(event, trigger, player) {
-      const result = await player
-        .chooseTarget(
-          get.prompt(event.skill),
-          "视为对至多三名其他角色使用一张雷【杀】（选择的第一名目标为秘密目标）",
-        )
-        .set("filterTarget", (card, player, target) =>
-          player.canUse(
-            { name: "sha", nature: "thunder", isCard: true },
-            target,
-            false,
-          ),
-        )
-        .set("selectTarget", [1, 3])
-        .set("complexTarget", true)
-        .set("ai", (target) => {
-          const player = get.player()
-          if (player.hp <= 1) {
-            return 0
-          }
-          let eff = get.effect(
-            target,
-            { name: "sha", nature: "thunder", isCard: true },
-            player,
-            player,
-          )
-          if (
-            !ui.selected.targets.length &&
-            !target.mayHaveShan(player, "use")
-          ) {
-            eff *= 2
-          }
-          return eff
-        })
-        .set("targetprompt", ["秘密目标", "出杀目标"])
-        .forResult()
-      if (result.bool) {
-        event.result = {
-          bool: true,
-          cost_data: result.targets[0],
-          targets: result.targets.sortBySeat(),
-        }
-      } else {
-        event.result = { bool: false }
-      }
-    },
-    logAudio: (index) =>
-      typeof index === "number" ? `jsrgfuzhen${index}.mp3` : 2,
-    async content(event, trigger, player) {
-      const targets = event.targets,
-        silentTarget = event.cost_data
-      await player.loseHp()
-      const card = get.autoViewAs({
-        name: "sha",
-        nature: "thunder",
-        isCard: true,
-      })
-      player
-        .when("useCardAfter")
-        .filter((evt) => evt.getParent() === event)
-        .step(async (event, trigger, player) => {
-          player.logSkill("jsrgfuzhen", null, null, null, [get.rand(3, 4)])
-          const sum = player
-            .getHistory(
-              "sourceDamage",
-              (evt) => evt.card && evt.card === trigger.card,
-            )
-            .reduce((num, evt) => {
-              return num + evt.num
-            }, 0)
-          if (sum) {
-            await player.draw(sum)
-          }
-          player.line(silentTarget, "green")
-          game.log(player, "选择的秘密目标是", silentTarget)
-          await game.delay()
-          if (
-            silentTarget &&
-            !silentTarget.getHistory(
-              "damage",
-              (evt) => evt.card === trigger.card,
-            ).length
-          ) {
-            const cardx = get.autoViewAs({
-              name: "sha",
-              nature: "thunder",
-              isCard: true,
-            })
-            const targetx = targets.filter(
-              (target) => target.isIn() && player.canUse(cardx, target, false),
-            )
-            if (targetx.length) {
-              await player.useCard(cardx, targets)
-            }
-          }
-        })
-      await player.useCard(card, targets).set("forceDie", true)
-    },
-  },
   //诞神
   jsrgbeizhi: {
     enable: "phaseUse",
@@ -15233,59 +15119,6 @@ const skills = {
       content: "本回合对$使用杀造成伤害+1",
     },
   },
-  //司马亮
-  jsrgsheju: {
-    trigger: {
-      player: "useCardToPlayered",
-      target: "useCardToTargeted",
-    },
-    filter(event, player) {
-      if (
-        [event.player, event.target].some((target) => {
-          return !target?.isIn() || !target.countCards("h")
-        })
-      ) {
-        return false
-      }
-      return event.card.name === "sha" && event.targets.length === 1
-    },
-    forced: true,
-    logTarget(event, player) {
-      return event.player === player ? event.target : event.player
-    },
-    async content(event, trigger, player) {
-      await player
-        .chooseToDebate({ list: [player, event.targets[0]] })
-        .set("callback", async (event) => {
-          const result = event.debateResult
-          if (result?.bool) {
-            if (result.opinion === "black") {
-              for (const i of result.targets) {
-                await i.loseMaxHp()
-              }
-            } else if (result.black.length) {
-              const targets = result.black.map((i) => i[0])
-              if (targets.length === 1) {
-                await targets[0].draw(2)
-              } else {
-                await game.asyncDraw(targets, 2)
-                await game.delayx()
-              }
-            }
-          }
-        })
-    },
-  },
-  jsrgzuwang: {
-    trigger: { player: ["phaseZhunbeiBegin", "phaseJieshuBegin"] },
-    filter(event, player) {
-      return player.countCards("h") < player.maxHp
-    },
-    forced: true,
-    async content(event, trigger, player) {
-      await player.drawTo(player.maxHp)
-    },
-  },
   //秃发树机能
   jsrgqinrao: {
     trigger: { global: "phaseUseBegin" },
@@ -15716,6 +15549,176 @@ const skills = {
       },
     },
   },
+  // 兴文鸯
+  // 覆阵
+  jsrgfuzhen: {
+    audio: 4,
+    trigger: {
+      player: "phaseZhunbeiBegin",
+    },
+    filter(event, player) {
+      return game.hasPlayer((current) =>
+        player.canUse(
+          { name: "sha", nature: "thunder", isCard: true },
+          current,
+          false,
+        ),
+      )
+    },
+    async cost(event, trigger, player) {
+      const result = await player
+        .chooseTarget(
+          get.prompt(event.skill),
+          "视为使用一张无距离限制的雷【杀】，此【杀】可以多指定至多两个目标，然后你秘密选择其中一名目标角色",
+        )
+        .set("filterTarget", (card, player, target) =>
+          player.canUse(
+            { name: "sha", nature: "thunder", isCard: true },
+            target,
+            false,
+          ),
+        )
+        .set("selectTarget", [1, 3])
+        .set("complexTarget", true)
+        .set("ai", (target) => {
+          const player = get.player()
+          if (player.hp <= 1) {
+            return 0
+          }
+          let eff = get.effect(
+            target,
+            { name: "sha", nature: "thunder", isCard: true },
+            player,
+            player,
+          )
+          if (
+            !ui.selected.targets.length &&
+            !target.mayHaveShan(player, "use")
+          ) {
+            eff *= 2
+          }
+          return eff
+        })
+        .set("targetprompt", ["秘密目标", "出杀目标"])
+        .forResult()
+      if (result.bool) {
+        event.result = {
+          bool: true,
+          cost_data: result.targets[0],
+          targets: result.targets.sortBySeat(),
+        }
+      } else {
+        event.result = { bool: false }
+      }
+    },
+    logAudio: (index) =>
+      typeof index === "number" ? `jsrgfuzhen${index}.mp3` : 2,
+    async content(event, trigger, player) {
+      const targets = event.targets,
+        silentTarget = event.cost_data
+      await player.loseHp()
+      const card = get.autoViewAs({
+        name: "sha",
+        nature: "thunder",
+        isCard: true,
+      })
+      player
+        .when("useCardAfter")
+        .filter((evt) => evt.getParent() === event)
+        .step(async (event, trigger, player) => {
+          player.logSkill("jsrgfuzhen", null, null, null, [get.rand(3, 4)])
+          const sum = player
+            .getHistory(
+              "sourceDamage",
+              (evt) => evt.card && evt.card === trigger.card,
+            )
+            .reduce((num, evt) => {
+              return num + evt.num
+            }, 0)
+          if (sum) {
+            await player.draw(sum)
+          }
+          player.line(silentTarget, "green")
+          game.log(player, "选择的秘密目标是", silentTarget)
+          await game.delay()
+          if (
+            silentTarget &&
+            !silentTarget.getHistory(
+              "damage",
+              (evt) => evt.card === trigger.card,
+            ).length
+          ) {
+            const cardx = get.autoViewAs({
+              name: "sha",
+              nature: "thunder",
+              isCard: true,
+            })
+            const targetx = targets.filter(
+              (target) => target.isIn() && player.canUse(cardx, target, false),
+            )
+            if (targetx.length) {
+              await player.useCard(cardx, targets)
+            }
+          }
+        })
+      await player.useCard(card, targets).set("forceDie", true)
+    },
+  },
+  // 司马亮
+  // 慑惧
+  sheju: {
+    trigger: {
+      player: "useCardToPlayered",
+      target: "useCardToTargeted",
+    },
+    filter(event, player) {
+      if (
+        [event.player, event.target].some((target) => {
+          return !target?.isIn() || !target.countCards("h")
+        })
+      ) {
+        return false
+      }
+      return event.card.name === "sha" && event.targets.length === 1
+    },
+    forced: true,
+    logTarget(event, player) {
+      return event.player === player ? event.target : event.player
+    },
+    async content(event, trigger, player) {
+      await player
+        .chooseToDebate({ list: [player, event.targets[0]] })
+        .set("callback", async (event) => {
+          const result = event.debateResult
+          if (result?.bool) {
+            if (result.opinion === "black") {
+              for (const i of result.targets) {
+                await i.loseMaxHp()
+              }
+            } else if (result.black.length) {
+              const targets = result.black.map((i) => i[0])
+              if (targets.length === 1) {
+                await targets[0].draw(2)
+              } else {
+                await game.asyncDraw(targets, 2)
+                await game.delayx()
+              }
+            }
+          }
+        })
+    },
+  },
+  // 族望
+  zuwang: {
+    trigger: { player: ["phaseZhunbeiBegin", "phaseJieshuBegin"] },
+    filter(event, player) {
+      return player.countCards("h") < player.maxHp
+    },
+    forced: true,
+    async content(event, trigger, player) {
+      await player.drawTo(player.maxHp)
+    },
+  },
   // 马隆
   // 奋难
   fennan: {
@@ -15943,7 +15946,6 @@ const skills = {
             (card, player, target) => {
               return !get.event().map[target.playerid]
             },
-            true,
           )
           .set("map", map)
           .set("ai", (target) => {

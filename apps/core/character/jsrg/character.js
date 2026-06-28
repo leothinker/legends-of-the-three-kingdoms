@@ -517,12 +517,12 @@ const characters = {
     hp: 4,
     skills: ["jsrgfuzhen"],
   },
-  jsrg_simaliang: {
+  simaliang: {
     sex: "male",
     group: "jin",
     hp: 3,
     maxHp: 4,
-    skills: ["jsrgsheju", "jsrgzuwang"],
+    skills: ["sheju", "zuwang"],
     names: "司马|亮",
   },
   malong: {

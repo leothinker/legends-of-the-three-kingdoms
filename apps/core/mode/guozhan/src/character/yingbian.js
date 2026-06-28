@@ -17,7 +17,7 @@ export default {
     hp: 4,
     maxHp: 4,
     skills: ["gz_gongzhi", "gz_sheju"],
-    img: "image/character/jsrg_simaliang.jpg",
+    img: "image/character/simaliang.jpg",
   }),
   gz_wangjun: new Character({
     sex: "male",

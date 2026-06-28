@@ -98,7 +98,7 @@ const characterSort = {
     "jsrg_zhugedan",
     "jsrg_lukang",
     "jsrg_wenyang",
-    "jsrg_simaliang",
+    "simaliang",
     "malong",
     "jiananfeng",
   ],

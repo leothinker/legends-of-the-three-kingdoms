@@ -609,17 +609,12 @@ const translates = {
     "出牌阶段限一次。若你的装备区内有武器牌，则你可以视为使用一张【借刀杀人】。然后此牌的目标角色可以视为对你使用一张【借刀杀人】。",
 
   // 江山如故·兴
-  jsrg_wenyang: "兴文鸯",
-  jsrg_wenyang_prefix: "兴",
   jsrg_zhugedan: "兴诸葛诞",
   jsrg_zhugedan_prefix: "兴",
   jsrg_wangjun: "兴王濬",
   jsrg_wangjun_prefix: "兴",
   jsrg_limi: "兴李密",
   jsrg_limi_prefix: "兴",
-  jsrgfuzhen: "覆阵",
-  jsrgfuzhen_info:
-    "准备阶段，你可秘密选择一名其他角色，然后失去1点体力并视为对其在内的至多三名角色使用一张雷【杀】。此牌结算完成后，你摸此牌造成伤害值张牌，若未对秘密选择的角色造成伤害，你视为对这些角色再使用一张雷【杀】。",
   jsrgbeizhi: "悖志",
   jsrgbeizhi_info:
     "出牌阶段限一次，你可以与一名角色拼点，赢的角色需视为对包含没赢角色在内的三名角色使用一张【决斗】（不足则全选），此牌造成伤害后，伤害来源获得受伤角色的一张牌。",
@@ -675,15 +670,6 @@ const translates = {
   jsrgzhoulin: "骤临",
   jsrgzhoulin_info:
     "你使用【杀】对一名角色造成伤害时，若本回合开始时其不在你攻击范围内，此伤害+1。",
-  jsrg_simaliang: "兴司马亮",
-  jsrg_simaliang_prefix: "兴",
-  jsrgsheju: "慑惧",
-  jsrgsheju_info:
-    "锁定技，当你使用【杀】指定唯一目标后/成为【杀】的唯一目标后，你与目标角色/此牌使用者议事，若结果为黑色，则双方各减1点体力上限；否则意见为黑色的角色摸两张牌。",
-  jsrgzuwang: "族望",
-  jsrgzuwang_info: "锁定技，准备阶段和结束阶段，你将手牌数摸至体力上限。",
-  jsrgzuwang_append:
-    '<span style="font-family: yuanli">“公何不讨人而惧为人所讨！”——何勖</span>',
   jsrg_tufashujineng: "兴秃发树机能",
   jsrg_tufashujineng_prefix: "兴",
   jsrgqinrao: "侵扰",
@@ -700,6 +686,19 @@ const translates = {
   jsrgkuangjian: "匡谏",
   jsrgkuangjian_info:
     "你可以将一张装备牌当作任意基本牌使用（无次数限制但不可指定自己为目标），然后目标角色使用此装备牌。",
+
+  jsrg_wenyang: "兴文鸯",
+  jsrg_wenyang_prefix: "兴",
+  jsrgfuzhen: "覆阵",
+  jsrgfuzhen_info:
+    "准备阶段，你可以失去1点体力并视为使用一张无距离限制的雷【杀】，此【杀】可以多指定至多两个目标，然后你秘密选择其中一名目标角色。此【杀】结算结束后：你摸造成伤害值张牌；若未对秘密选择的角色造成伤害，你视为对所有目标再使用一张雷【杀】。",
+
+  simaliang: "司马亮",
+  sheju: "慑惧",
+  sheju_info:
+    "锁定技，当你使用【杀】指定唯一目标后或成为【杀】的唯一目标后，你与对方议事：若结果为黑色，双方各减1点体力上限；否则意见为黑色的角色摸两张牌。",
+  zuwang: "族望",
+  zuwang_info: "锁定技，准备阶段和结束阶段，你将手牌摸至体力上限。",
 
   malong: "马隆",
   fennan: "奋难",

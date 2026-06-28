@@ -678,14 +678,15 @@ const translates = {
   jsrgfuran: "复燃",
   jsrgfuran_info:
     "当你受到有来源造成的伤害后，若你不在其攻击范围内，则你可以于本回合结束时回复1点体力。",
+
   jsrg_lukang: "兴陆抗",
   jsrg_lukang_prefix: "兴",
   jsrgzhuwei: "筑围",
   jsrgzhuwei_info:
-    "出牌阶段限一次，你可以移动场上的一张装备牌，然后你可以令一名攻击范围内因此没有角色的角色失去2点体力。",
+    "出牌阶段限一次，你可以移动场上一张装备牌，然后你可以令一名攻击范围内的角色数变为0的角色失去2点体力。",
   jsrgkuangjian: "匡谏",
   jsrgkuangjian_info:
-    "你可以将一张装备牌当作任意基本牌使用（无次数限制但不可指定自己为目标），然后目标角色使用此装备牌。",
+    "你可以将一张装备牌当任意基本牌使用（目标不能为你且无次数限制），结算后目标角色使用此装备牌。",
 
   jsrg_wenyang: "兴文鸯",
   jsrg_wenyang_prefix: "兴",

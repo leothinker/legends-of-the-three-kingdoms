@@ -71,8 +71,8 @@ export default {
   jin_jsrg_simazhao: "独祅吞天",
   jsrg_dengai: "策袭鼎迁",
   jsrg_tufashujineng: "朔西扰攘",
-  jsrg_lukang: "架海金梁",
 
+  jsrg_lukang: "架海金梁",
   jsrg_wenyang: "貔貅若拒",
   simaliang: "冲粹的蒲牢",
   malong: "困局诡阵",

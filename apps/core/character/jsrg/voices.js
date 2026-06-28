@@ -120,6 +120,12 @@ export default {
   "#jsrgxuanfeng2": "武侯遗志，绝不可成泡影！",
   "#jsrg_jiangwei:die": "国亡之日，当有忠士随赴黄泉。",
 
+  "#jsrgzhuwei1": "背水一战，只为破敌。",
+  "#jsrgzhuwei2": "全线并进，连战克晋。",
+  "#jsrgkuangjian1": "仁以待民，自处不败之势。",
+  "#jsrgkuangjian2": "宽济百姓，则得战前养备之机。",
+  "#jsrg_lukang:die": "抗仅以君子之交待叔子，未有半分背国之念啊……",
+
   "#jsrgfuzhen1": "虽为败势，鸯亦有险中取胜之法！",
   "#jsrgfuzhen2": "若不拼死一战，何以诛此国贼！",
   "#jsrgfuzhen3": "一鼓乱其心，后必破之！",

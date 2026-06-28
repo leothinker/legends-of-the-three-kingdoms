@@ -15243,8 +15243,10 @@ const skills = {
       },
     },
   },
-  //陆抗
+  // 兴陆抗
+  // 筑围
   jsrgzhuwei: {
+    audio: 2,
     enable: "phaseUse",
     filter(event, player) {
       return player.canMoveCard(null, true)
@@ -15278,7 +15280,7 @@ const skills = {
       if (targets.length) {
         const result = await player
           .chooseTarget(
-            "是否令一名攻击范围内变为没有角色的角色失去2点体力？",
+            "是否令一名攻击范围内的角色数变为0的角色失去2点体力？",
             (card, player, target) => {
               return get.event().targets.includes(target)
             },
@@ -15305,7 +15307,9 @@ const skills = {
       },
     },
   },
+  // 匡谏
   jsrgkuangjian: {
+    audio: 2,
     enable: "chooseToUse",
     filter(event, player) {
       return get
@@ -15397,7 +15401,7 @@ const skills = {
         }
       },
       prompt(links, player) {
-        return `###匡谏###将一张装备牌当作${get.translation(links[0][3]) || ""}【${get.translation(links[0][2])}】使用`
+        return `###匡谏###将一张装备牌当${get.translation(links[0][3]) || ""}【${get.translation(links[0][2])}】使用`
       },
     },
     mod: {

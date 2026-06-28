@@ -1,5 +1,5 @@
 const characterSort = {
-  refresh_standard: [
+  shenwu_standard: [
     "ol_liubei",
     "re_guanyu",
     "ol_zhangfei",
@@ -31,7 +31,7 @@ const characterSort = {
     "ol_gongsunzan",
     "ol_huaxiong",
   ],
-  refresh_feng: [
+  shenwu_feng: [
     "ol_yuji",
     "ol_zhangjiao",
     "ol_zhoutai",
@@ -43,7 +43,7 @@ const characterSort = {
     "re_shen_guanyu",
     "shen_lvmeng",
   ],
-  refresh_huo: [
+  shenwu_huo: [
     "ol_taishici",
     "ol_dianwei",
     "ol_xunyu",
@@ -55,7 +55,7 @@ const characterSort = {
     "shen_zhouyu",
     "shen_zhugeliang",
   ],
-  refresh_lin: [
+  shenwu_lin: [
     "ol_lusu",
     "ol_sunjian",
     "ol_dongzhuo",
@@ -67,7 +67,7 @@ const characterSort = {
     "shen_caocao",
     "shen_lvbu",
   ],
-  refresh_shan: [
+  shenwu_shan: [
     "ol_caiwenji",
     "re_zuoci",
     "ol_jiangwei",
@@ -77,7 +77,7 @@ const characterSort = {
     "re_zhanghe",
     "ol_zhangzhang",
   ],
-  refresh_yin: [
+  shenwu_yin: [
     "xuyou",
     "luzhi",
     "wangji",
@@ -89,7 +89,7 @@ const characterSort = {
     "le_liubei",
     "le_luxun",
   ],
-  refresh_lei: [
+  shenwu_lei: [
     "zhangxiu",
     "yuanshu",
     "guanqiujian",
@@ -104,11 +104,11 @@ const characterSort = {
 }
 
 const characterSortTranslate = {
-  refresh_standard: "界限突破·标",
-  refresh_feng: "界限突破·风",
-  refresh_huo: "界限突破·火",
-  refresh_lin: "界限突破·林",
-  refresh_shan: "界限突破·山",
+  shenwu_standard: "神武再世·标",
+  shenwu_feng: "神武再世·风",
+  shenwu_huo: "神武再世·火",
+  shenwu_lin: "神武再世·林",
+  shenwu_shan: "神武再世·山",
 }
 
 export { characterSort, characterSortTranslate }

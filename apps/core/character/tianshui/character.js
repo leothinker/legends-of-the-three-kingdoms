@@ -5,7 +5,7 @@ const characters = {
     hp: 4,
     skills: ["pingjian"],
   },
-  le_sunquan: {
+  shen_sunquan: {
     sex: "male",
     group: "shen",
     hp: 4,

@@ -154,7 +154,7 @@ const skills = {
       )
       const map = new Map()
       game
-        .filterPlayer((target) => target !== player && target.sex === "male")
+        .filterPlayer((target) => target !== player && target.hasSex("male"))
         .forEach((target) => {
           map.set(target, [])
           const skills = target

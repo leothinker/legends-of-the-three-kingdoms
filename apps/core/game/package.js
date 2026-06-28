@@ -2,18 +2,33 @@ window.wtk_package = {
   character: {
     standard: "标准版",
     shenhua: "神话再临",
+
     refresh: "界限突破",
     reshenhua: "界神话再临",
-    sp: "将星",
-    shenwu: "神武再世",
-    old: "往昔龙吟",
-    // jiangxing: "将星",
-    extra: "神将",
-    sbfm: "上兵伐谋",
+    sp: "璀璨将星",
+    extra: "珍藏版",
+
     jsrg: "江山如故",
-    // tianshui: "天水濯名",
-    // sxrm: "蚀心入魔",
+    sxrm: "蚀心入魔",
+
+    sb: "谋攻篇",
+    shiji: "始计篇",
+
+    yijiang: "一将成名",
+    mouding: "谋定天下",
+
+    shenwu: "神武再世",
+    yingbian: "文德武备",
+    clan: "门阀士族",
+    sbfm: "上兵伐谋",
+
     yanling: "雁翎耀光",
+    tianshui: "天水濯名",
+    // jiangxing: "将星归汉",
+
+    sixiang: "四象封印",
+
+    old: "往昔龙吟",
   },
   card: {
     standard: "标准版",

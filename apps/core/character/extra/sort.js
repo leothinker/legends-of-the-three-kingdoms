@@ -6,9 +6,9 @@ const characterSort = {
 }
 
 const characterSortTranslate = {
-  extra_zc22: "珍藏版2022",
-  extra_zc24: "珍藏版2024",
-  extra_zc26: "珍藏版2026",
+  extra_zc22: "珍藏版（2022）",
+  extra_zc24: "珍藏版（2024）",
+  extra_zc26: "珍藏版（2026）",
   extra_demonized: "魔",
 }
 

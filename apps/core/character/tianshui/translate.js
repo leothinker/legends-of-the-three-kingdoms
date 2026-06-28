@@ -7,8 +7,8 @@ const translates = {
   pingjian_info:
     "你可以于以下时机发动“评荐”：1.出牌阶段限一次；2.结束阶段开始时；3.当你受到伤害后（从你对应的技能库中随机抽取三个，你选择其中一个并发动。每个技能只能发动一次）。",
 
-  le_sunquan: "神孙权",
-  le_sunquan_prefix: "神",
+  shen_sunquan: "神孙权",
+  shen_sunquan_prefix: "神",
   yuheng: "驭衡",
   yuheng_info:
     "锁定技，回合开始时，你弃置任意张花色各不同的牌，随机获得等量吴势力武将的技能。回合结束时，你失去以此法获得的技能，然后摸等量的牌。",

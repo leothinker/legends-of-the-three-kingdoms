@@ -1234,7 +1234,11 @@ const skills = {
         .getParent(2)
         .huaxiu.map((name) => [get.type(name), "", name])
       const result = await player
-        .chooseButton(true, ["化朽", "选择要修改一种“藏巧”装备牌", [list, "vcard"]])
+        .chooseButton(true, [
+          "化朽",
+          "选择要修改一种“藏巧”装备牌",
+          [list, "vcard"],
+        ])
         .set("ai", (button) => {
           const player = get.player(),
             name = button.link[2]

@@ -261,14 +261,7 @@ export default () => {
           var str = ""
           for (var i = 0; i < list.length; i++) {
             if (data[list[i]]) {
-              str +=
-                lib.translate[`${list[i]}2`] +
-                "：" +
-                data[list[i]][0] +
-                "胜" +
-                " " +
-                data[list[i]][1] +
-                "负<br>"
+              str += `${lib.translate[`${list[i]}2`]}：${data[list[i]][0]}胜 ${data[list[i]][1]}负<br>`
             }
           }
           lib.config.gameRecord.doudizhu.str = str
@@ -2934,7 +2927,7 @@ export default () => {
           let num = result.cards.length,
             hs = player.getCards("he"),
             resultx
-          if (hs.length) {
+          if (hs.length && target?.isIn()) {
             if (hs.length <= num) {
               resultx = { bool: true, cards: hs }
             } else {
@@ -3402,13 +3395,7 @@ export default () => {
             }
           },
           prompt(links, player) {
-            return (
-              "将一张牌当作" +
-              get.translation(links[0][3] || "") +
-              "【" +
-              get.translation(links[0][2]) +
-              "】使用"
-            )
+            return `将一张牌当作${get.translation(links[0][3] || "")}【${get.translation(links[0][2])}】使用`
           },
         },
         locked: false,
@@ -3482,7 +3469,7 @@ export default () => {
             return event.finish()
           }
           const hs = player.getCards("h")
-          if (hs.length) {
+          if (hs.length && target?.isIn()) {
             let resultx
             if (hs.length === 1) {
               resultx = { bool: true, cards: hs }
@@ -3521,13 +3508,7 @@ export default () => {
           return event.num >= Math.min(player.hp, 2)
         },
         prompt2(event, player) {
-          return (
-            "弃置" +
-            get.translation(player.getEquip("diqi")) +
-            "并防止即将受到的" +
-            get.cnNumber(event.num) +
-            "点伤害"
-          )
+          return `弃置${get.translation(player.getEquip("diqi"))}并防止即将受到的${get.cnNumber(event.num)}点伤害`
         },
         content() {
           player.discard(player.getEquip("diqi"))
@@ -3623,11 +3604,7 @@ export default () => {
           player
             .chooseToDiscard(
               "是否响应【聚众】？",
-              get.translation(trigger.player) +
-                "使用了" +
-                get.translation(trigger.card) +
-                "。你可弃置一张名称相同的牌，令" +
-                lib.skill.online_juzhong.infos[trigger.card.name][0],
+              `${get.translation(trigger.player)}使用了${get.translation(trigger.card)}。你可弃置一张名称相同的牌，令${lib.skill.online_juzhong.infos[trigger.card.name][0]}`,
               (card, player) =>
                 get.name(card, player) === _status.event.getTrigger().card.name,
             )

@@ -12,13 +12,13 @@ window.wtk_package = {
     sxrm: "蚀心入魔",
 
     sb: "谋攻篇",
-    shiji: "始计篇",
+    // shiji: "始计篇",
 
-    yijiang: "一将成名",
-    mouding: "谋定天下",
+    // yijiang: "一将成名",
+    // mouding: "谋定天下",
 
     shenwu: "神武再世",
-    yingbian: "文德武备",
+    // yingbian: "文德武备",
     clan: "门阀士族",
     sbfm: "上兵伐谋",
 

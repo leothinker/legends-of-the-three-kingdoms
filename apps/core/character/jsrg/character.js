@@ -44,6 +44,7 @@ const characters = {
     group: "qun",
     hp: 3,
     skills: ["jsrgshichong", "jsrg_new_lianzhu"],
+    img: "image/character/dongbai.jpg",
   },
   jsrg_nanhualaoxian: {
     sex: "male",
@@ -51,6 +52,7 @@ const characters = {
     hp: 3,
     names: "庄|周",
     skills: ["jsrgshoushu", "jsrgxundao", "jsrglinghua"],
+    img: "image/character/nanhualaoxian.jpg",
   },
   jsrg_yangbiao: {
     sex: "male",
@@ -58,6 +60,7 @@ const characters = {
     hp: 3,
     maxHp: 4,
     skills: ["jsrgzhaohan", "jsrgrangjie", "jsrgyizheng"],
+    img: "image/character/yangbiao.jpg",
     dieAudios: ["yangbiao"],
     clans: ["弘农杨氏"],
   },
@@ -66,6 +69,7 @@ const characters = {
     group: "qun",
     hp: 3,
     skills: ["jsrg_new_lirang", "jsrg_new_zhengyi"],
+    img: "image/character/sp_xugong.jpg",
     dieAudios: ["kongrong"],
   },
   ol_wangrong: {
@@ -173,6 +177,7 @@ const characters = {
     group: "qun",
     hp: 4,
     skills: ["jsrgcangchu", "jsrgshishou"],
+    img: "image/character/re_chunyuqiong.jpg",
     dieAudios: ["re_chunyuqiong"],
     names: "淳于|琼",
   },
@@ -181,6 +186,7 @@ const characters = {
     group: "wu",
     hp: 3,
     skills: ["jsrgbiaozhao", "jsrgyechou"],
+    img: "image/character/re_xugong.jpg",
   },
   jsrg_sunce: {
     sex: "male",
@@ -245,6 +251,7 @@ const characters = {
     hp: 4,
     skills: ["jsrgniluan", "jsrghuchou", "jsrgjiemeng"],
     isZhugong: true,
+    img: "image/character/xin_hansui.jpg",
   },
   jsrg_zhangchu: {
     sex: "female",
@@ -274,6 +281,7 @@ const characters = {
     hp: 5,
     names: "范|强-张|达",
     skills: ["jsrgfushan"],
+    img: "image/character/fanjiangzhangda.jpg",
   },
   // 合
   jsrg_zhugeliang: {
@@ -357,6 +365,7 @@ const characters = {
     hp: 4,
     names: "卫|温-诸葛|直",
     skills: ["jsrgfuhai"],
+    img: "image/character/re_weiwenzhugezhi.jpg",
     dieAudios: ["weiwenzhugezhi"],
   },
   jsrg_zhangxuan: {
@@ -364,6 +373,7 @@ const characters = {
     group: "wu",
     hp: 4,
     skills: ["jsrgtongli", "jsrgshezang"],
+    img: "image/character/zhangxuan.jpg",
     dieAudios: ["zhangxuan"],
   },
   jsrg_guozhao: {
@@ -371,6 +381,7 @@ const characters = {
     group: "wei",
     hp: 3,
     skills: ["jsrgpianchong", "jsrgzunwei"],
+    img: "image/character/guozhao.jpg",
     dieAudios: ["guozhao"],
   },
   // 衰
@@ -514,7 +525,7 @@ const characters = {
     skills: ["jsrgsheju", "jsrgzuwang"],
     names: "司马|亮",
   },
-  jsrg_malong: {
+  malong: {
     sex: "male",
     group: "jin",
     hp: 4,

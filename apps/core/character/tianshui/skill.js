@@ -1,6 +1,6 @@
 import { _status, game, get, lib, ui } from "wtk"
 
-/** @type { importCharacterConfig['skill'] } */
+/** @type { importCharacterConfig["skill"] } */
 const skills = {
   // 许劭
   // 评荐
@@ -155,7 +155,10 @@ const skills = {
         event.list = list
         player
           .chooseControl(skills)
-          .set("dialog", ["评鉴：请选择尝试发动的技能", [list, "character"]])
+          .set("dialog", [
+            "评鉴：选择并视为拥有其中一个技能",
+            [list, "character"],
+          ])
       } else {
         event.finish()
       }
@@ -350,7 +353,10 @@ const skills = {
         event.list = list
         player
           .chooseControl(skills)
-          .set("dialog", ["评鉴：请选择尝试发动的技能", [list, "character"]])
+          .set("dialog", [
+            "评鉴：选择并视为拥有其中一个技能",
+            [list, "character"],
+          ])
       } else {
         event.finish()
       }

@@ -212,12 +212,12 @@ const characters = {
     hp: 4,
     skills: ["retiaoxin", "rezhiji"],
   },
-  // re_caiwenji: {
-  //   sex: "female",
-  //   group: "qun",
-  //   hp: 3,
-  //   skills: ["rebeige", "duanchang"],
-  // },
+  re_caiwenji: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["rebeige", "duanchang"],
+  },
   // re_zuoci: {
   //   sex: "male",
   //   group: "qun",

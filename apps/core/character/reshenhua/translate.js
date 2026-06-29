@@ -198,13 +198,11 @@ const translates = {
   rezhiji: "志继",
   rezhiji_info: `觉醒技，准备阶段，若你没有手牌，你回复1点体力或摸两张牌，减1点体力上限，然后获得${get.poptip("reguanxing")}。`,
 
-  jx_caiwenji: "界蔡文姬",
-  jx_caiwenji_prefix: "界",
-  jx_beige: "悲歌",
-  jx_beige_info:
-    "当一名角色受到【杀】造成的伤害后，你可以弃置一张牌，然后令其进行判定，若结果为：♥，其回复X点体力（X为其本次受到伤害值）；♦︎，其摸三张牌；♣，伤害来源弃置两张牌；♠，伤害来源翻面。",
-  duanchang: "断肠",
-  duanchang_info: "锁定技，当你死亡时，杀死你的角色失去所有武将技能。",
+  re_caiwenji: "界蔡文姬",
+  re_caiwenji_prefix: "界",
+  rebeige: "悲歌",
+  rebeige_info:
+    "当一名角色受到【杀】造成的伤害后，你可以弃置一张牌，然后令其进行判定，若结果为：红桃，其回复X点体力（X为其本次受到的伤害值）；方块，其摸三张牌；梅花，伤害来源弃置两张牌；黑桃，伤害来源翻面。",
 
   jx_zuoci: "界左慈",
   jx_zuoci_prefix: "界",

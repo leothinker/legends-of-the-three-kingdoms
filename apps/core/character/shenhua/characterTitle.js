@@ -32,6 +32,7 @@ export default {
   shen_lvbu: "修罗之道",
   shen_caocao: "超世之英杰",
 
+  caiwenji: "异乡的孤女",
   jiangwei: "龙的衣钵",
   // liushan: "无为的真命主",
   // zhanghe: "料敌机先",
@@ -39,7 +40,6 @@ export default {
   // old_dengai: "武将列传",
   // sunce: "江东的小霸王",
   // zhangzhang: "经天纬地",
-  // caiwenji: "异乡的孤女",
   // zuoci: "迷之仙人",
 
   // re_lusu: "独断外交家",

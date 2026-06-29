@@ -150,6 +150,12 @@ export default {
   "#rejiezi2": "截敌粮草，以资袍泽。",
   "#ol_xuhuang:die": "亚夫易老，李广难封。",
 
+  "#olbeige1": "箜篌鸣九霄，闻者心俱伤。",
+  "#olbeige2": " 琴弹十八拍，听此双泪流。",
+  "#duanchang_ol_caiwenji1": "红颜留塞外，愁思欲断肠。",
+  "#duanchang_ol_caiwenji2": "莫吟苦辛曲，此生谁忍闻。",
+  "#ol_caiwenji:die": "飘飘外域里，何日能归乡？",
+
   "#oltiaoxin1": "宜乘其衅会，以挑敌将。",
   "#oltiaoxin2": "会闻用师，观衅而动。",
   "#olzhiji1": "丞相遗志，不死不休！",

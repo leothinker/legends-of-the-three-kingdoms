@@ -4493,6 +4493,103 @@ const skills = {
       },
     },
   },
+  // 蔡文姬
+  // 悲歌
+  beige: {
+    audio: 2,
+    trigger: { global: "damageEnd" },
+    filter(event, player) {
+      return (
+        event.card &&
+        event.card.name === "sha" &&
+        event.source &&
+        event.player.isIn() &&
+        player.countCards("he")
+      )
+    },
+    checkx(event, player) {
+      const att1 = get.attitude(player, event.player)
+      const att2 = get.attitude(player, event.source)
+      return att1 > 0 && att2 <= 0
+    },
+    preHidden: true,
+    async cost(event, trigger, player) {
+      const next = player.chooseToDiscard(
+        "he",
+        get.prompt2(event.skill, trigger.player),
+      )
+      const check = lib.skill.beige.checkx(trigger, player)
+      next.set("ai", (card) => {
+        if (_status.event.goon) {
+          return 8 - get.value(card)
+        }
+        return 0
+      })
+      next.set("goon", check)
+      next.setHiddenSkill(event.skill)
+      event.result = await next.forResult()
+    },
+    async content(event, trigger, player) {
+      const result = await trigger.player.judge().forResult()
+      switch (result.suit) {
+        case "heart":
+          await trigger.player.recover()
+          break
+        case "diamond":
+          await trigger.player.draw(2)
+          break
+        case "club":
+          await trigger.source.chooseToDiscard("he", 2, true)
+          break
+        case "spade":
+          await trigger.source.turnOver()
+          break
+      }
+    },
+    ai: {
+      expose: 0.3,
+    },
+  },
+  // 断肠
+  duanchang: {
+    audio: 2,
+    audioname: ["re_caiwenji", "ol_caiwenji"],
+    forbid: ["boss"],
+    trigger: { player: "die" },
+    forced: true,
+    forceDie: true,
+    skillAnimation: true,
+    animationColor: "gray",
+    filter(event) {
+      return event.source?.isIn()
+    },
+    async content(event, trigger, player) {
+      trigger.source.clearSkills()
+    },
+    logTarget: "source",
+    ai: {
+      maixie_defend: true,
+      threaten(player, target) {
+        if (target.hp === 1) {
+          return 0.2
+        }
+        return 1.5
+      },
+      effect: {
+        target(card, player, target, current) {
+          if (!target.hasFriend()) {
+            return
+          }
+          if (target.hp <= 1 && get.tag(card, "damage")) {
+            if (player.hasSkillTag("jueqing", false, target)) {
+              return 3
+            }
+            return [1, 0, 0, -3 * get.threaten(player)]
+          }
+        },
+      },
+    },
+  },
   // 张郃
   // 巧变
   qiaobian: {
@@ -6158,104 +6255,6 @@ const skills = {
         await player.addAdditionalSkills("huashen", skill)
         // lib.skill.jx_huashen.createAudio(character,skill,'zuoci');
       }
-    },
-  },
-  // 蔡文姬
-  // 悲歌
-  beige: {
-    audio: 2,
-    audioname: ["re_caiwenji", "ol_caiwenji"],
-    trigger: { global: "damageEnd" },
-    filter(event, player) {
-      return (
-        event.card &&
-        event.card.name === "sha" &&
-        event.source &&
-        event.player.isIn() &&
-        player.countCards("he")
-      )
-    },
-    checkx(event, player) {
-      const att1 = get.attitude(player, event.player)
-      const att2 = get.attitude(player, event.source)
-      return att1 > 0 && att2 <= 0
-    },
-    preHidden: true,
-    async cost(event, trigger, player) {
-      const next = player.chooseToDiscard(
-        "he",
-        get.prompt2(event.skill, trigger.player),
-      )
-      const check = lib.skill.beige.checkx(trigger, player)
-      next.set("ai", (card) => {
-        if (_status.event.goon) {
-          return 8 - get.value(card)
-        }
-        return 0
-      })
-      next.set("goon", check)
-      next.setHiddenSkill(event.skill)
-      event.result = await next.forResult()
-    },
-    async content(event, trigger, player) {
-      const result = await trigger.player.judge().forResult()
-      switch (result.suit) {
-        case "heart":
-          await trigger.player.recover()
-          break
-        case "diamond":
-          await trigger.player.draw(2)
-          break
-        case "club":
-          await trigger.source.chooseToDiscard("he", 2, true)
-          break
-        case "spade":
-          await trigger.source.turnOver()
-          break
-      }
-    },
-    ai: {
-      expose: 0.3,
-    },
-  },
-  // 断肠
-  duanchang: {
-    audio: 2,
-    audioname: ["re_caiwenji", "ol_caiwenji"],
-    forbid: ["boss"],
-    trigger: { player: "die" },
-    forced: true,
-    forceDie: true,
-    skillAnimation: true,
-    animationColor: "gray",
-    filter(event) {
-      return event.source?.isIn()
-    },
-    async content(event, trigger, player) {
-      trigger.source.clearSkills()
-    },
-    logTarget: "source",
-    ai: {
-      maixie_defend: true,
-      threaten(player, target) {
-        if (target.hp === 1) {
-          return 0.2
-        }
-        return 1.5
-      },
-      effect: {
-        target(card, player, target, current) {
-          if (!target.hasFriend()) {
-            return
-          }
-          if (target.hp <= 1 && get.tag(card, "damage")) {
-            if (player.hasSkillTag("jueqing", false, target)) {
-              return 3
-            }
-            return [1, 0, 0, -3 * get.threaten(player)]
-          }
-        },
-      },
     },
   },
   // 神赵云

@@ -45,5 +45,6 @@ export default {
   ol_zhurong: "野性的女王",
   ol_xuhuang: "周亚夫之风",
 
+  ol_caiwenji: "异乡的孤女",
   ol_jiangwei: "龙的衣钵",
 }

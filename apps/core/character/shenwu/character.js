@@ -404,6 +404,12 @@ const characters = {
     skills: ["kuangbao", "wumou", "wuqian", "shenfen"],
     groupInGuozhan: "qun",
   },
+  ol_caiwenji: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["olbeige", "duanchang"],
+  },
 
   ol_jiangwei: {
     sex: "male",

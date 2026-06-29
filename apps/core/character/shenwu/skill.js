@@ -4338,6 +4338,160 @@ const skills = {
       },
     },
   },
+  // 界蔡文姬
+  // 悲歌
+  olbeige: {
+    audio: 2,
+    trigger: { global: "damageEnd" },
+    logTarget: "player",
+    filter(event, player) {
+      return (
+        event.card &&
+        event.card.name === "sha" &&
+        event.player.isIn() &&
+        player.countCards("he") > 0
+      )
+    },
+    check(event, player) {
+      let att = get.attitude(player, event.player)
+      if (event.player.hasSkill("xinleiji")) {
+        return att > 0
+      }
+      if (att > 0 || event.player.isHealthy()) {
+        return true
+      }
+      if (!event.source) {
+        return true
+      }
+      att = get.attitude(player, event.source)
+      return att <= 0 || event.source.isTurnedOver()
+    },
+    prompt2: "令其进行判定，然后你可以弃置一张牌，根据结果执行对应效果。",
+    async content(event, trigger, player) {
+      const target = trigger.player
+      const source = trigger.source
+      let result
+
+      // step 0
+      result = await trigger.player.judge().forResult()
+
+      // step 1
+      const judgeResult = get.copy(result)
+      let str = "是否弃置一张牌",
+        strt = get.translation(target),
+        strs = get.translation(source),
+        goon = 0
+      switch (result.suit) {
+        case "heart":
+          if (target.isIn() && target.isDamaged()) {
+            str += `，令${strt}回复1点体力`
+            goon = get.recoverEffect(target, player, player)
+          }
+          break
+        case "diamond":
+          if (target.isIn()) {
+            str += `，令${strt}摸两张牌`
+            goon = 2 * get.effect(target, { name: "draw" }, player, player)
+          }
+          break
+        case "spade":
+          if (source?.isIn()) {
+            str += `，令${strs}翻${source.isTurnedOver() ? "回正" : ""}面`
+            goon =
+              get.attitude(player, source) * (source.isTurnedOver() ? 2 : -2)
+          }
+          break
+        case "club":
+          if (source?.isIn()) {
+            str += `，令${strs}弃置两张牌`
+            var cards = source
+              .getCards("he")
+              .sort((a, b) => get.value(a, source) - get.value(b, source))
+              .slice(0, 2)
+            for (var i of cards) {
+              goon += get.value(i, source)
+            }
+            goon *= -get.sgn(get.attitude(player, source))
+          }
+          break
+      }
+      str += "？"
+      var str2 = `若弃置点数为${get.strNumber(result.number)}的牌则获得你弃置的牌`
+      if (get.position(result.card, true) === "d") {
+        str2 += `；若弃置花色为${get.translation(result.suit)}的牌则获得${get.translation(result.card)}`
+      }
+      result = await player
+        .chooseToDiscard({
+          position: "he",
+          prompt: str,
+          prompt2: str2,
+        })
+        .set("goon", goon)
+        .set("ai", (card) => {
+          const { result, goon, player } = get.event()
+          let eff = Math.min(7, goon)
+          if (eff <= 0) {
+            return 0
+          }
+          if (get.suit(card, player) === result.suit) {
+            eff += get.value(result.card, player)
+          }
+          if (get.number(card, player) === result.number) {
+            return eff
+          }
+          return eff - get.value(card)
+        })
+        .set("result", judgeResult)
+        .forResult()
+
+      // step 2
+      if (result.bool) {
+        const card = result.cards[0]
+        switch (judgeResult.suit) {
+          case "heart":
+            if (target.isIn() && target.isDamaged()) {
+              await target.recover().forResult()
+            }
+            break
+          case "diamond":
+            if (target.isIn()) {
+              await target.draw(2).forResult()
+            }
+            break
+          case "spade":
+            if (source?.isIn()) {
+              await source.turnOver().forResult()
+            }
+            player.addExpose(0.1)
+            break
+          case "club":
+            if (source?.isIn() && source.countCards("he") > 0) {
+              await source.chooseToDiscard(2, "he", true).forResult()
+            }
+            player.addExpose(0.1)
+            break
+        }
+
+        // step 3
+        var gains = []
+        if (
+          get.position(judgeResult.card, true) === "d" &&
+          get.suit(card, player) === judgeResult.suit
+        ) {
+          gains.push(judgeResult.card)
+        }
+        if (
+          get.position(card, true) === "d" &&
+          get.number(card, player) === judgeResult.number
+        ) {
+          gains.push(card)
+        }
+        if (gains.length) {
+          player.gain(gains, "gain2")
+        }
+      }
+    },
+  },
 
   // 界姜维
   // 挑衅

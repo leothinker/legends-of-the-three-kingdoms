@@ -132,4 +132,10 @@ export default {
   "#reguanxing_re_jiangwei1": "知天易则观之，逆天难亦行之。",
   "#reguanxing_re_jiangwei2": "欲尽人事，亦先听天命。",
   "#re_jiangwei:die": "可惜大计未成，吾已身陨。",
+
+  "#rebeige1": "人多暴猛兮如虺蛇，控弦披甲兮为骄奢。",
+  "#rebeige2": "两拍张弦兮弦欲绝，志摧心折兮自悲嗟。",
+  "#duanchang_re_caiwenji1": "雁高飞兮邈难寻，空断肠兮思愔愔。",
+  "#duanchang_re_caiwenji2": "为天有眼兮，为何使我独飘流？",
+  "#re_caiwenji:die": "今别子兮归故乡，旧怨平兮新怨长！",
 }

@@ -197,6 +197,12 @@ const characters = {
     skills: ["guixin", "feiying"],
     groupInGuozhan: "wei",
   },
+  caiwenji: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["beige", "duanchang"],
+  },
 
   jiangwei: {
     sex: "male",
@@ -243,12 +249,6 @@ const characters = {
   //   group: "qun",
   //   hp: 3,
   //   skills: ["huashen", "xinsheng"],
-  // },
-  // caiwenji: {
-  //   sex: "female",
-  //   group: "qun",
-  //   hp: 3,
-  //   skills: ["beige", "duanchang"],
   // },
   // shen_simayi: {
   //   sex: "male",

@@ -2811,6 +2811,72 @@ const skills = {
       await player.addSkills("reguanxing")
     },
   },
+  // 界蔡文姬
+  // 悲歌
+  rebeige: {
+    audio: 2,
+    trigger: { global: "damageEnd" },
+    filter(event, player) {
+      return (
+        event.card &&
+        event.card.name === "sha" &&
+        event.source &&
+        event.player.classList.contains("dead") === false &&
+        player.countCards("he")
+      )
+    },
+    direct: true,
+    checkx(event, player) {
+      var att1 = get.attitude(player, event.player)
+      var att2 = get.attitude(player, event.source)
+      return att1 > 0 && att2 <= 0
+    },
+    async content(event, trigger, player) {
+      let result
+
+      // step 0
+      const next = player.chooseToDiscard(
+        "he",
+        get.prompt2("rebeige", trigger.player),
+      )
+      const check = lib.skill.beige.checkx(trigger, player)
+      next.set("ai", (card) => {
+        if (_status.event.goon) {
+          return 8 - get.value(card)
+        }
+        return 0
+      })
+      next.set("logSkill", "rebeige")
+      next.set("goon", check)
+      result = await next.forResult()
+
+      // step 1
+      if (result.bool) {
+        result = await trigger.player.judge().forResult()
+      } else {
+        return
+      }
+
+      // step 2
+      switch (result.suit) {
+        case "heart":
+          trigger.player.recover(trigger.num)
+          break
+        case "diamond":
+          trigger.player.draw(3)
+          break
+        case "club":
+          await trigger.source.chooseToDiscard("he", 2, true)
+          break
+        case "spade":
+          trigger.source.turnOver()
+          break
+      }
+    },
+    ai: {
+      expose: 0.3,
+    },
+  },
 }
 
 export default skills

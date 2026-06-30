@@ -2679,9 +2679,8 @@ const skills = {
         },
       },
     },
-    derivation: ["mark_shouli_jun", "mark_shouli_li"],
     group: "mark_shouli_init",
-    global: "mark_shouli_effect",
+    global: ["mark_shouli_effect", "mark_shouli_noequip"],
     subSkill: {
       effect: {
         trigger: {
@@ -2690,7 +2689,6 @@ const skills = {
             "useCardToPlayer",
             "damageBegin3",
             "damageBegin4",
-            "equipBefore",
           ],
           source: "damageBegin1",
         },
@@ -2721,18 +2719,6 @@ const skills = {
           }
           if (event.name === "damage") {
             return li > 2
-          }
-          if (name === "equipBefore") {
-            if (get.type(event.card) !== "equip") {
-              return false
-            }
-            if (get.is.attackingMount(event.card)) {
-              return jun > 0
-            }
-            if (get.is.defendingMount(event.card)) {
-              return li > 0
-            }
-            return false
           }
           return (jun > 1 || li > 1) && !event.numFixed
         },
@@ -2780,10 +2766,6 @@ const skills = {
               }
               break
             }
-            case "equipBefore": {
-              trigger.cancel()
-              break
-            }
             default: {
               if (
                 jun > 0 &&
@@ -2827,18 +2809,62 @@ const skills = {
             )
             return distance + num
           },
-          targetEnabled(card, player, target) {
-            if (get.type(card) !== "equip") {
-              return
+        },
+      },
+      noequip: {
+        trigger: {
+          player: "equipBefore",
+        },
+        filter(event, player) {
+          return (
+            (get.is.attackingMount(event.card) &&
+              player.countMark("mark_shouli_jun")) ||
+            (get.is.defendingMount(event.card) &&
+              player.countMark("mark_shouli_li"))
+          )
+        },
+        forced: true,
+        async content(event, trigger, player) {
+          trigger.cancel()
+          if (trigger.cards?.length) {
+            const map = new Map(),
+              targets = []
+            for (const card of trigger.cards) {
+              const owner = get.owner(card)
+              if (owner) {
+                targets.add(owner)
+                map.set(owner, (map.get(owner) ?? []).concat([card]))
+              }
             }
-            if (get.is.attackingMount(card)) {
-              if (target.countMark("mark_shouli_jun")) {
-                return false
-              }
-            } else if (get.is.defendingMount(card)) {
-              if (target.countMark("mark_shouli_li")) {
-                return false
-              }
+            if (targets.length) {
+              await game
+                .loseAsync({
+                  map: map,
+                  targets: targets,
+                  cards: trigger.cards,
+                })
+                .setContent(async (event, trigger, player) => {
+                  const { map, targets, cards } = event
+                  for (const target of targets) {
+                    const lose = map.get(target)
+                    const next = target.lose(lose, ui.discardPile)
+                    next.getlx = false
+                    await next
+                  }
+                  game.log(cards, "进入了弃牌堆")
+                })
+            }
+          }
+        },
+        mod: {
+          targetEnabled(card, player, target) {
+            if (
+              (get.is.attackingMount(card) &&
+                target.countMark("mark_shouli_jun")) ||
+              (get.is.defendingMount(card) &&
+                target.countMark("mark_shouli_li"))
+            ) {
+              return false
             }
           },
         },

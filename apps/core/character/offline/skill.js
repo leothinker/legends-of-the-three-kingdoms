@@ -2431,7 +2431,7 @@ const skills = {
   // 神马超
   // 狩骊
   mark_shouli: {
-    audio: "shouli",
+    audio: 2,
     addMark(player, name) {
       const next = game.createEvent("gainShouli", false)
       next.player = player
@@ -2965,7 +2965,7 @@ const skills = {
   },
   // 横骛
   mark_hengwu: {
-    audio: "hengwu",
+    audio: 2,
     trigger: {
       global: "gainShouli",
     },

@@ -41,7 +41,6 @@ const characters = {
     hp: 4,
     skills: ["mark_shouli", "mark_hengwu"],
     groupInGuozhan: "shu",
-    dieAudios: ["shen_machao"],
   },
   dm_diaochan: {
     sex: "female",

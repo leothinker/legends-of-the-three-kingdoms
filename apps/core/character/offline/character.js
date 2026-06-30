@@ -28,6 +28,21 @@ const characters = {
     skills: ["cangqiao", "shenji", "huaxiu"],
     groupInGuozhan: "shu",
   },
+  shen_machao: {
+    sex: "male",
+    group: "shen",
+    hp: 4,
+    skills: ["shouli", "hengwu"],
+    groupInGuozhan: "shu",
+  },
+  mark_shen_machao: {
+    sex: "male",
+    group: "shen",
+    hp: 4,
+    skills: ["mark_shouli", "mark_hengwu"],
+    groupInGuozhan: "shu",
+    dieAudios: ["shen_machao"],
+  },
   dm_diaochan: {
     sex: "female",
     group: "qun",

@@ -50,7 +50,7 @@ export default {
   "#retianyi2": "义不从之，天必不佑！",
   "#hanzhan1": "伯符，且与我一战！",
   "#hanzhan2": "与君酣战，快哉快哉！",
-  "#re_taishici:die": "无妄之灾，难以避免……",
+  "#ol_taishici:die": "无妄之灾，难以避免……",
 
   "#olqiangxi1": "典韦来也，谁敢一战！",
   "#olqiangxi2": "双戟青罡，百死无生。",

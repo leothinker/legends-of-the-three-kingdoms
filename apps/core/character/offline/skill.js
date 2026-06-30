@@ -1908,6 +1908,1054 @@ const skills = {
       unequip2: true,
     },
   },
+  // 神马超
+  // 狩骊
+  shouli: {
+    audio: 2,
+    mod: {
+      cardUsable(card) {
+        if (card.storage?.shouli) {
+          return Infinity
+        }
+      },
+    },
+    enable: ["chooseToUse", "chooseToRespond"],
+    hiddenCard(player, name) {
+      if (
+        player !== _status.currentPhase &&
+        (name === "sha" || name === "shan")
+      ) {
+        return true
+      }
+    },
+    filter(event, player) {
+      if (event.responded || event.shouli || event.type === "wuxie") {
+        return false
+      }
+      if (
+        game.hasPlayer(
+          (current) =>
+            current.getCards("e", (card) => get.is.attackingMount(card))
+              .length > 0,
+        ) &&
+        event.filterCard(
+          get.autoViewAs(
+            {
+              name: "sha",
+              storage: { shouli: true },
+            },
+            "unsure",
+          ),
+          player,
+          event,
+        )
+      ) {
+        return true
+      }
+      if (
+        game.hasPlayer(
+          (current) =>
+            current.getCards("e", (card) => get.is.defendingMount(card))
+              .length > 0,
+        ) &&
+        event.filterCard(
+          get.autoViewAs(
+            {
+              name: "shan",
+              storage: { shouli: true },
+            },
+            "unsure",
+          ),
+          player,
+          event,
+        )
+      ) {
+        return true
+      }
+      return false
+    },
+    delay: false,
+    locked: false,
+    filterTarget(card, player, target) {
+      var event = _status.event,
+        evt = event
+      if (event._backup) {
+        evt = event._backup
+      }
+      var equip3 = target.getCards("e", (card) =>
+        get.is.defendingMount(card, false),
+      )
+      var equip4 = target.getCards("e", (card) =>
+        get.is.attackingMount(card, false),
+      )
+      if (
+        equip3.length &&
+        equip3.some((card) =>
+          evt.filterCard(
+            get.autoViewAs(
+              {
+                name: "shan",
+                storage: { shouli: true },
+              },
+              [card],
+            ),
+            player,
+            event,
+          ),
+        )
+      ) {
+        return true
+      }
+      return equip4.some((card) => {
+        var sha = get.autoViewAs(
+          {
+            name: "sha",
+            storage: { shouli: true },
+          },
+          [card],
+        )
+        if (evt.filterCard(sha, player, event)) {
+          if (!evt.filterTarget) {
+            return true
+          }
+          return game.hasPlayer((current) =>
+            evt.filterTarget(sha, player, current),
+          )
+        }
+      })
+    },
+    prompt: "将场上的一张坐骑牌当做【杀】或【闪】使用或打出",
+    async content(event, trigger, player) {
+      /** @type {GameEvent} */
+      // @ts-expect-error 类型必然存在
+      const evt = event.getParent(2)
+      evt.set("shouli", true)
+
+      const equip3 = event.target.getCards("e", (card) =>
+        get.is.defendingMount(card, false),
+      )
+      const equip4 = event.target.getCards("e", (card) =>
+        get.is.attackingMount(card, false),
+      )
+
+      const cardsCanUse = []
+      const backupx = _status.event
+      _status.event = evt
+      try {
+        if (
+          equip3.length &&
+          equip3.some((card) => {
+            var shan = get.autoViewAs(
+              {
+                name: "shan",
+                storage: { shouli: true },
+              },
+              [card],
+            )
+            if (evt.filterCard(shan, player, event)) {
+              return true
+            }
+            return false
+          })
+        ) {
+          cardsCanUse.push("shan")
+        }
+        if (
+          equip4.length &&
+          equip4.some((card) => {
+            var sha = get.autoViewAs(
+              {
+                name: "sha",
+                storage: { shouli: true },
+              },
+              [card],
+            )
+            if (
+              evt.filterCard(sha, player, evt) &&
+              (!evt.filterTarget ||
+                game.hasPlayer((current) => {
+                  return evt.filterTarget(sha, player, current)
+                }))
+            ) {
+              return true
+            }
+            return false
+          })
+        ) {
+          cardsCanUse.push("sha")
+        }
+      } catch (e) {
+        game.print(e)
+      }
+      _status.event = backupx
+
+      let result
+      if (cardsCanUse.length === 1) {
+        event.cardName = cardsCanUse[0]
+        const cards = cardsCanUse[0] === "shan" ? equip3 : equip4
+        if (cards.length === 1) {
+          result = {
+            bool: true,
+            links: [cards[0]],
+          }
+        } else {
+          result = await player
+            .choosePlayerCard(true, event.target, "e")
+            .set("filterButton", (button) => {
+              return _status.event.cards.includes(button.link)
+            })
+            .set("cards", cards)
+            .forResult()
+        }
+      } else {
+        result = await player
+          .choosePlayerCard(true, event.target, "e")
+          .set("filterButton", (button) => {
+            const card = button.link
+            return get.is.attackingMount(card) || get.is.defendingMount(card)
+          })
+          .forResult()
+      }
+
+      if (result.bool && result.links?.length) {
+        const name =
+          event.cardName ||
+          (get.is.attackingMount(result.links[0]) ? "sha" : "shan")
+        if (evt.name === "chooseToUse") {
+          game.broadcastAll(
+            (result, name) => {
+              lib.skill.shouli_backup.viewAs = {
+                name: name,
+                cards: [result],
+                storage: { shouli: true },
+              }
+              lib.skill.shouli_backup.prompt = `选择${get.translation(name)}（${get.translation(result)}）的目标`
+            },
+            result.links[0],
+            name,
+          )
+          evt.set("_backupevent", "shouli_backup")
+          evt.backup("shouli_backup")
+          evt.set(
+            "openskilldialog",
+            `选择${get.translation(name)}（${get.translation(result.links[0])}）的目标`,
+          )
+          evt.set("norestore", true)
+          evt.set("custom", {
+            add: {},
+            replace: { window() {} },
+          })
+        } else {
+          delete evt.result.used
+          delete evt.result.skill
+          evt.result.card = get.autoViewAs(
+            {
+              name: name,
+              cards: [result.links[0]],
+              storage: { shouli: true },
+            },
+            result.links,
+          )
+          evt.result.cards = [result.links[0]]
+          event.target.$give(result.links[0], player, false)
+          if (player !== event.target) {
+            event.target.addTempSkill("fengyin")
+          }
+          event.target.addTempSkill("shouli_thunder")
+          player.addTempSkill("shouli_thunder")
+          evt.redo()
+          return
+        }
+      }
+      evt.goto(0)
+    },
+    ai: {
+      respondSha: true,
+      respondShan: true,
+      skillTagFilter(player, tag) {
+        var func =
+          get.is[tag === "respondSha" ? "attackingMount" : "defendingMount"]
+        return game.hasPlayer((current) =>
+          current.hasCard((card) => func(card, false), "e"),
+        )
+      },
+      order: 2,
+      result: {
+        player(player, target) {
+          var att = Math.max(8, get.attitude(player, target))
+          if (_status.event.type !== "phase") {
+            return 9 - att
+          }
+          if (!player.hasValueTarget({ name: "sha" })) {
+            return 0
+          }
+          return 9 - att
+        },
+      },
+    },
+    group: "shouli_init",
+    subSkill: {
+      thunder: {
+        charlotte: true,
+        trigger: { player: "damageBegin1" },
+        forced: true,
+        mark: true,
+        async content(event, trigger, player) {
+          trigger.num++
+          game.setNature(trigger, "thunder")
+        },
+        marktext: "⚡",
+        intro: { content: "受到的伤害+1且视为雷电伤害" },
+        ai: {
+          effect: {
+            target: (card, player, target) => {
+              if (!get.tag(card, "damage")) {
+                return
+              }
+              if (
+                target.hasSkillTag("nodamage", null, {
+                  natures: ["thunder"],
+                }) ||
+                target.hasSkillTag("nothunder")
+              ) {
+                return "zeroplayertarget"
+              }
+              if (
+                target.hasSkillTag("filterDamage", null, {
+                  player: player,
+                  card: new lib.element.VCard(
+                    {
+                      name: card.name,
+                      nature: "thunder",
+                    },
+                    [card],
+                  ),
+                })
+              ) {
+                return
+              }
+              return 2
+            },
+          },
+        },
+      },
+      init: {
+        audio: "shouli",
+        trigger: {
+          global: "phaseBefore",
+          player: "enterGame",
+        },
+        forced: true,
+        locked: false,
+        filter(event, player) {
+          return event.name !== "phase" || game.phaseNumber === 0
+        },
+        logTarget: () => game.filterPlayer(),
+        equips: [
+          ["spade", 13, "dayuan"],
+          ["heart", 5, "chitu"],
+          ["diamond", 13, "zixing"],
+          ["spade", 5, "jueying"],
+          ["heart", 13, "zhuahuang"],
+          ["club", 5, "dilu"],
+          ["diamond", 13, "hualiu"],
+        ],
+        async content(event, trigger, player) {
+          // @ts-expect-error player.getNext()
+          const targets = game.filterPlayer().sortBySeat(player.getNext())
+          event.targets = targets
+
+          for (const target of targets) {
+            if (target.isIn()) {
+              let cardx = lib.skill.shouli_init.equips.randomRemove()
+              if (!cardx) {
+                return
+              }
+              cardx = {
+                suit: cardx[0],
+                number: cardx[1],
+                name: cardx[2],
+              }
+              const card = game.createCard(cardx)
+              if (!_status.shouli_equips) {
+                _status.shouli_equips = []
+              }
+              _status.shouli_equips.push(card.cardid)
+              if (card) {
+                await target.chooseUseTarget(card, "nopopup", "noanimate", true)
+                player.addSkill("shouli_remove")
+              }
+            }
+          }
+        },
+      },
+      remove: {
+        trigger: {
+          global: [
+            "loseAfter",
+            "loseAsyncAfter",
+            "cardsDiscardAfter",
+            "equipAfter",
+          ],
+        },
+        forced: true,
+        charlotte: true,
+        popup: false,
+        firstDo: true,
+        forceDie: true,
+        filter(event, player) {
+          if (!_status.shouli_equips?.length) {
+            return false
+          }
+          var cards = event.getd()
+          return cards.filter((i) => _status.shouli_equips.includes(i.cardid))
+            .length
+        },
+        content() {
+          var cards = trigger.getd(),
+            remove = []
+          for (var card of cards) {
+            if (_status.shouli_equips.includes(card.cardid)) {
+              _status.shouli_equips.remove(card.cardid)
+              remove.push(card)
+            }
+          }
+          if (remove.length) {
+            game.cardsGotoSpecial(remove)
+            lib.skill.shouli_init.equips.addArray(
+              remove.map((i) => [i.suit, i.number, i.name]),
+            )
+            game.log("坐骑牌", remove, "被移出了游戏")
+          }
+        },
+      },
+      backup: {
+        async precontent(event, trigger, player) {
+          const cards = event.result.card?.cards
+          event.result.cards = cards
+          event.result._apply_args = { addSkillCount: false }
+          const owner = get.owner(cards[0])
+          event.target = owner
+          owner.$give(cards[0], player, false)
+          player.popup(event.result.card.name, "metal")
+          await game.delayx()
+          event.getParent().addCount = false
+          if (player !== event.target) {
+            event.target.addTempSkill("fengyin")
+          }
+          event.target.addTempSkill("shouli_thunder")
+          player.addTempSkill("shouli_thunder")
+        },
+        filterCard: () => false,
+        prompt: "请选择【杀】的目标",
+        selectCard: -1,
+        log: false,
+      },
+    },
+  },
+  // 横骛
+  hengwu: {
+    audio: 2,
+    trigger: { player: ["useCard", "respond"] },
+    filter(event, player) {
+      var suit = get.suit(event.card)
+      if (
+        !lib.suit.includes(suit) ||
+        player.hasCard((card) => get.suit(card, player) === suit, "h")
+      ) {
+        return false
+      }
+      return game.hasPlayer((current) =>
+        current.hasCard((card) => get.suit(card, current) === suit, "e"),
+      )
+    },
+    async content(event, trigger, player) {
+      await player.showHandcards()
+      const suit = get.suit(trigger.card)
+
+      const num = game.countPlayer((current) => {
+        return current.countCards(
+          "e",
+          (card) => get.suit(card, current) === suit,
+        )
+      })
+      await player.draw(num)
+    },
+    ai: {
+      effect: {
+        player_use(card, player, target) {
+          if (typeof card !== "object") {
+            return
+          }
+          const suit = get.suit(card)
+          if (
+            !lib.suit.includes(suit) ||
+            player.hasCard((i) => get.suit(i, player) === suit, "h")
+          ) {
+            return
+          }
+          return [
+            1,
+            0.8 *
+              game.countPlayer((current) => {
+                return current.countCards("e", (card) => {
+                  return get.suit(card, current) === suit
+                })
+              }),
+          ]
+        },
+        target: (card, player, target) => {
+          if (
+            card.name === "sha" &&
+            !player.hasSkillTag(
+              "directHit_ai",
+              true,
+              {
+                target: target,
+                card: card,
+              },
+              true,
+            ) &&
+            game.hasPlayer((current) => {
+              return current.hasCard((cardx) => {
+                return get.subtype(cardx) === "equip3"
+              }, "e")
+            })
+          ) {
+            return [0, -0.5]
+          }
+        },
+      },
+    },
+  },
+  // 神马超
+  // 狩骊
+  mark_shouli: {
+    audio: "shouli",
+    addMark(player, name) {
+      const next = game.createEvent("gainShouli", false)
+      next.player = player
+      next.num = 1
+      next.mark = name
+      next.setContent("emptyEvent")
+      if (player.countMark(name)) {
+        next.hasMark = true
+      }
+      player.addMark(name, 1)
+      return next
+    },
+    changeMark(player, target, name) {
+      const num = player.countMark(name)
+      const next = game.createEvent("gainShouli", false)
+      next.player = target
+      next.num = num
+      next.mark = name
+      next.setContent("emptyEvent")
+      if (target.countMark(name)) {
+        next.hasMark = true
+      }
+      player.removeMark(name, num, false)
+      target.addMark(name, num, false)
+      game.log(
+        player,
+        "的",
+        `#g“${get.translation(name)}”`,
+        "被移动给了",
+        target,
+      )
+      return next
+    },
+    enable: ["chooseToUse", "chooseToRespond"],
+    hiddenCard(player, name) {
+      if (name !== "sha" && name !== "shan") {
+        return false
+      }
+      return (
+        !player.getStorage("mark_shouli_used").includes(name) &&
+        game.hasPlayer((current) => {
+          return (
+            current !== player &&
+            current.hasMark(`mark_shouli_${name === "sha" ? "jun" : "li"}`)
+          )
+        })
+      )
+    },
+    filter(event, player) {
+      if (event.responded || event.mark_shouli || event.type === "wuxie") {
+        return false
+      }
+      return ["sha", "shan"].some((name) => {
+        if (
+          !game.hasPlayer((current) => {
+            return (
+              current !== player &&
+              current.hasMark(`mark_shouli_${name === "sha" ? "jun" : "li"}`)
+            )
+          })
+        ) {
+          return false
+        }
+        if (player.getStorage("mark_shouli_used").includes(name)) {
+          return false
+        }
+        return event.filterCard(
+          get.autoViewAs(
+            { name: name, storage: { mark_shouli: true }, isCard: true },
+            "unsure",
+          ),
+          player,
+          event,
+        )
+      })
+    },
+    filterTarget(card, player, target) {
+      if (ui.selected.targets?.length) {
+        const owner = ui.selected.targets[0]
+        return target === owner.getNext() || target === owner.getPrevious()
+      }
+      if (target === player) {
+        return false
+      }
+      let event = _status.event,
+        evt = event
+      if (event._backup) {
+        evt = event._backup
+      }
+      return ["sha", "shan"].some((name) => {
+        const card = get.autoViewAs(
+            { name: name, storage: { mark_shouli: true }, isCard: true },
+            "unsure",
+          ),
+          mark = `mark_shouli_${name === "sha" ? "jun" : "li"}`
+        if (
+          !target.hasMark(mark) ||
+          player.getStorage("mark_shouli_used").includes(name)
+        ) {
+          return false
+        }
+        if (!evt.filterCard(card, player, event)) {
+          return false
+        }
+        if (name === "sha") {
+          return (
+            !evt.filterTarget ||
+            game.hasPlayer((current) => evt.filterTarget(card, player, current))
+          )
+        }
+        return true
+      })
+    },
+    selectTarget: 2,
+    complexTarget: true,
+    multitarget: true,
+    delay: false,
+    locked: false,
+    prompt:
+      "移动一名其他角色的所有“骏”/“骊”至其上家或下家，并视为使用或打出一张【杀】/【闪】",
+    async content(event, trigger, player) {
+      const evt = event.getParent(2)
+      evt.set("mark_shouli", true)
+      const list = []
+      const backupx = _status.event
+      _status.event = evt
+      ;["sha", "shan"].forEach((name) => {
+        const card = get.autoViewAs(
+            { name: name, storage: { mark_shouli: true }, isCard: true },
+            "unsure",
+          ),
+          mark = `mark_shouli_${name === "sha" ? "jun" : "li"}`
+        if (
+          !event.targets[0].hasMark(mark) ||
+          player.getStorage("mark_shouli_used").includes(name)
+        ) {
+          return false
+        }
+        if (name === "sha") {
+          if (!evt.filterCard(card, player, evt)) {
+            return false
+          }
+          if (
+            evt.filterTarget &&
+            !game.hasPlayer((current) =>
+              evt.filterTarget(card, player, current),
+            )
+          ) {
+            return false
+          }
+        } else if (!evt.filterCard(card, player, event)) {
+          return false
+        }
+        list.push(["", "", name])
+      })
+      _status.event = backupx
+      const result =
+        list.length > 1
+          ? await player
+              .chooseButton(
+                ["狩骊：选择你要视为使用或打出的牌", [list, "vcard"]],
+                true,
+              )
+              .set("ai", (button) => {
+                return Math.random()
+              })
+              .forResult()
+          : {
+              bool: true,
+              links: list,
+            }
+      if (!result?.bool) {
+        return
+      }
+      const name = result.links[0][2],
+        mark = `mark_shouli_${name === "sha" ? "jun" : "li"}`
+      get.info(event.name).changeMark(...event.targets, mark)
+      player.addTempSkill("mark_shouli_used")
+      player.markAuto("mark_shouli_used", name)
+      if (evt.name === "chooseToUse") {
+        game.broadcastAll((name) => {
+          lib.skill.mark_shouli_backup.viewAs = {
+            name: name,
+            storage: { mark_shouli: true },
+            isCard: true,
+          }
+          lib.skill.mark_shouli_backup.prompt = `选择${get.translation(name)}的目标`
+        }, name)
+        evt.set("_backupevent", "mark_shouli_backup")
+        evt.backup("mark_shouli_backup")
+        evt.set("openskilldialog", `选择${get.translation(name)}的目标`)
+        evt.set("norestore", true)
+        evt.set("custom", {
+          add: {},
+          replace: { window() {} },
+        })
+      } else {
+        delete evt.result.used
+        delete evt.result.skill
+        evt.result.card = get.autoViewAs({
+          name: name,
+          storage: { mark_shouli: true },
+          isCard: true,
+        })
+        evt.result.cards = []
+        evt.redo()
+        return
+      }
+      evt.goto(0)
+    },
+    mod: {
+      targetInRange(card, player) {
+        if (card?.storage?.mark_shouli) {
+          return true
+        }
+      },
+      cardUsable(card, player) {
+        if (card?.storage?.mark_shouli) {
+          return Infinity
+        }
+      },
+    },
+    ai: {
+      respondSha: true,
+      respondShan: true,
+      skillTagFilter(player, tag) {
+        return get
+          .info("mark_shouli")
+          .hiddenCard(player, tag === "respondSha" ? "sha" : "shan")
+      },
+      order: 2,
+      result: {
+        player(player, target) {
+          var att = Math.max(8, get.attitude(player, target))
+          if (ui.selected.targets?.length) {
+            return 10 + att
+          }
+          if (_status.event.type !== "phase") {
+            return 9 - att
+          }
+          if (!player.hasValueTarget({ name: "sha" }, false)) {
+            return 0
+          }
+          return 9 - att
+        },
+      },
+    },
+    derivation: ["mark_shouli_jun", "mark_shouli_li"],
+    group: "mark_shouli_init",
+    global: "mark_shouli_effect",
+    subSkill: {
+      effect: {
+        trigger: {
+          player: [
+            "phaseDrawBegin2",
+            "useCardToPlayer",
+            "damageBegin3",
+            "damageBegin4",
+            "equipBefore",
+          ],
+          source: "damageBegin1",
+        },
+        filter(event, player, name) {
+          const target = name === "damageBegin1" ? event.source : event.player
+          if (
+            !target?.isIn() ||
+            !game.hasPlayer((current) => current.hasSkill("mark_shouli"))
+          ) {
+            return false
+          }
+          const jun = target.countMark("mark_shouli_jun"),
+            li = target.countMark("mark_shouli_li")
+          if (name === "damageBegin4") {
+            if (jun + li <= 0) {
+              return false
+            }
+            if (event.hasNature()) {
+              return true
+            }
+            return (
+              event.card?.name &&
+              ["wanjian", "nanman"].includes(event.card.name)
+            )
+          }
+          if (name === "useCardToPlayer") {
+            return event.card?.name === "sha" && jun > 2
+          }
+          if (event.name === "damage") {
+            return li > 2
+          }
+          if (name === "equipBefore") {
+            if (get.type(event.card) !== "equip") {
+              return false
+            }
+            if (get.is.attackingMount(event.card)) {
+              return jun > 0
+            }
+            if (get.is.defendingMount(event.card)) {
+              return li > 0
+            }
+            return false
+          }
+          return (jun > 1 || li > 1) && !event.numFixed
+        },
+        async cost(event, trigger, player) {
+          event.result = {
+            bool: true,
+            skill_popup: false,
+          }
+        },
+        async content(event, trigger, player) {
+          const name = event.triggername,
+            target = trigger[name === "damageBegin1" ? "source" : "player"],
+            jun = target.countMark("mark_shouli_jun"),
+            li = target.countMark("mark_shouli_li"),
+            num = game.countPlayer((current) => current.hasSkill("mark_shouli"))
+          switch (name) {
+            case "phaseDrawBegin2": {
+              if (jun > 1) {
+                trigger.num += num
+              }
+              if (li > 1) {
+                trigger.num += num
+              }
+              break
+            }
+            case "useCardToPlayer": {
+              trigger.target.addTempSkill("fengyin")
+              break
+            }
+            case "damageBegin1": {
+              if (li > 2) {
+                game.setNature(trigger, "thunder")
+              }
+              if (li > 3) {
+                trigger.num += num
+              }
+              break
+            }
+            case "damageBegin3": {
+              if (li > 2) {
+                game.setNature(trigger, "thunder")
+              }
+              if (li > 3) {
+                trigger.num += num
+              }
+              break
+            }
+            case "equipBefore": {
+              trigger.cancel()
+              break
+            }
+            default: {
+              if (
+                jun > 0 &&
+                target.getPrevious()?.isIn() &&
+                target.getPrevious() !== target
+              ) {
+                get
+                  .info("mark_shouli")
+                  .changeMark(target, target.getPrevious(), "mark_shouli_jun")
+              }
+              if (
+                li > 0 &&
+                target.getNext()?.isIn() &&
+                target.getNext() !== target
+              ) {
+                get
+                  .info("mark_shouli")
+                  .changeMark(target, target.getNext(), "mark_shouli_li")
+              }
+              break
+            }
+          }
+        },
+        locked: false,
+        mod: {
+          globalFrom(from, to, distance) {
+            if (!from.countMark("mark_shouli_jun")) {
+              return
+            }
+            const num = game.countPlayer((current) =>
+              current.hasSkill("mark_shouli"),
+            )
+            return distance - num
+          },
+          globalTo(from, to, distance) {
+            if (!to.countMark("mark_shouli_li")) {
+              return
+            }
+            const num = game.countPlayer((current) =>
+              current.hasSkill("mark_shouli"),
+            )
+            return distance + num
+          },
+          targetEnabled(card, player, target) {
+            if (get.type(card) !== "equip") {
+              return
+            }
+            if (get.is.attackingMount(card)) {
+              if (target.countMark("mark_shouli_jun")) {
+                return false
+              }
+            } else if (get.is.defendingMount(card)) {
+              if (target.countMark("mark_shouli_li")) {
+                return false
+              }
+            }
+          },
+        },
+      },
+      used: {
+        charlotte: true,
+        onremove: true,
+      },
+      backup: {
+        async precontent(event, trigger, player) {
+          event.result._apply_args = { addSkillCount: false }
+          player.popup(event.result.card.name, "metal")
+          await game.delayx()
+          event.getParent().addCount = false
+        },
+        filterCard: () => false,
+        prompt: "请选择【杀】的目标",
+        selectCard: -1,
+        log: false,
+      },
+      init: {
+        audio: "mark_shouli",
+        trigger: {
+          player: "enterGame",
+          global: "phaseBefore",
+        },
+        filter(event, player) {
+          if (!game.hasPlayer((current) => current !== player)) {
+            return false
+          }
+          return event.name !== "phase" || game.phaseNumber === 0
+        },
+        async cost(event, trigger, player) {
+          event.result = {
+            bool: true,
+            targets: game.filterPlayer((current) => current !== player),
+          }
+        },
+        async content(event, trigger, player) {
+          const marks = []
+          for (let i = 0; i < 4; i++) {
+            marks.push("mark_shouli_li")
+            if (i < 3) {
+              marks.push("mark_shouli_jun")
+            }
+          }
+          for (const target of event.targets) {
+            if (!marks.length) {
+              break
+            }
+            const mark = marks.randomRemove()
+            await get.info("mark_shouli").addMark(target, mark)
+          }
+        },
+      },
+      jun: {
+        markimage2: "image/card/chitu.png",
+        nopop: true,
+        intro: {
+          name: "骏",
+          content(storage, player) {
+            const list = [
+              "⚡你与其他角色的距离-1",
+              "⚡摸牌阶段，你多摸一张牌",
+              "⚡当你使用【杀】指定目标后，该角色本回合非锁定技失效",
+            ]
+            const str =
+              "⚡当你受到属性伤害或【南蛮入侵】、【万箭齐发】造成的伤害时，你的所有“骏”移动至你上家<br>⚡有“骏”的角色装备区里不能置入进攻坐骑牌"
+            if (typeof storage !== "number" || storage <= 0) {
+              return str
+            }
+            return `${list.slice(0, storage).join("<br>")}<br>${str}`
+          },
+        },
+      },
+      li: {
+        markimage2: "image/card/dilu.png",
+        nopop: true,
+        intro: {
+          name: "骊",
+          content(storage, player) {
+            const list = [
+              "⚡其他角色与你的距离+1",
+              "⚡摸牌阶段，你多摸一张牌",
+              "⚡你造成或受到的伤害均视为雷电伤害",
+              "⚡你造成或受到的伤害+1",
+            ]
+            const str =
+              "⚡当你受到属性伤害或【南蛮入侵】、【万箭齐发】造成的伤害时，你的所有“骊”移动至你下家<br>⚡有“骊”的角色装备区里不能置入防御坐骑牌"
+            if (typeof storage !== "number" || storage <= 0) {
+              return str
+            }
+            return `${list.slice(0, storage).join("<br>")}<br>${str}`
+          },
+        },
+      },
+    },
+  },
+  // 横骛
+  mark_hengwu: {
+    audio: "hengwu",
+    trigger: {
+      global: "gainShouli",
+    },
+    filter(event, player) {
+      const mark = event.mark
+      return event.hasMark && event.player.countMark(mark)
+    },
+    forced: true,
+    logTarget: "player",
+    async content(event, trigger, player) {
+      await player.draw(trigger.player.countMark(trigger.mark))
+    },
+    ai: {
+      combo: "mark_shouli",
+    },
+  },
   // 魔貂蝉
   // 幻惑
   huanhuo: {

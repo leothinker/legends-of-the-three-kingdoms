@@ -28,7 +28,7 @@ import skills from "./skill.js"
 export class Library {
   configprefix = "wtk_0.9_"
   versionOL = 27
-	hallURL = "wss://wtk.leothinker.dpdns.org/ws";
+  hallURL = "wss://wtk.leothinker.dpdns.org/ws"
   assetURL = assetURL
   userAgent = userAgentLowerCase
   characterDefaultPicturePath = characterDefaultPicturePath

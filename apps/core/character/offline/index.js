@@ -12,11 +12,11 @@ import translates from "./translate.js"
 import voices from "./voices.js"
 
 game.import("character", () => ({
-  name: "extra",
+  name: "offline",
   connect: true,
   character: { ...characters },
   characterSort: {
-    extra: characterSort,
+    offline: characterSort,
   },
   characterFilter: { ...characterFilters },
   characterTitle: { ...characterTitles },

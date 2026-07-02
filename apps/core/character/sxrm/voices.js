@@ -31,5 +31,13 @@ const voices = {
   "#chouce_sxrm_caocao1": "志才许孤山河功业，然竟殒身负孤！",
   "#wuhun_sxrm_caocao1": "孤独不疑云长之忠义，只恨公忠不在孤！",
   "#sxrm_caocao:die": "吾尝疑有生之荣，未尝疑有死之哀……",
+
+  "#jiehuo1": "红莲业火，焚汝残躯！",
+  "#jiehuo2": "神火天降，樯橹灰飞烟灭！",
+  "#xianger1": "刀光剑影，杀人无形！",
+  "#xianger2": "曲高和寡，可有知我者？",
+  "#mieguo1": "宫商角徵，琴音箜篌！",
+  "#mieguo2": "雄姿英发，天不薄我！",
+  "#sxrm_zhouyu:die": "弦断人陨，环佩空鸣。",
 }
 export default voices

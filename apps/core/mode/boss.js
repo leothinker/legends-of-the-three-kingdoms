@@ -2108,7 +2108,11 @@ export default () => {
         next.showConfig = true
         next.customreplacetarget = func
         next.ai = (player, list) => {
-          player.init(list[0])
+          if (get.config("double_character")) {
+            player.init(list[0], list[1])
+          } else {
+            player.init(list[0])
+          }
         }
         next.setContent(() => {
           "step 0"

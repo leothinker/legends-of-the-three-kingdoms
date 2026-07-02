@@ -1,6 +1,4 @@
 export default {
-  sxrm_zhouyu: "哀弦万耳惊",
-
   sxrm_guanyu: "四海仰鼻息",
   sxrm_guanyinping: "天骄虎女",
   sxrm_yujin: "立地成佛",
@@ -20,4 +18,6 @@ export default {
   sxrm_xunyu: "末路见疑",
   sxrm_caopi: "兄友弟恭",
   sxrm_wanghou: "一刀斩讫",
+
+  sxrm_zhouyu: "哀弦万耳惊",
 }

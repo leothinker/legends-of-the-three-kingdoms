@@ -181,7 +181,6 @@ const characters = {
     hp: 3,
     skills: ["relijian", "rebiyue"],
     names: "null|null",
-    img: "image/character/diaochan.jpg",
     dieAudios: ["diaochan"],
   },
   ol_gongsunzan: {

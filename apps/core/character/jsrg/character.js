@@ -69,7 +69,6 @@ const characters = {
     group: "qun",
     hp: 3,
     skills: ["jsrg_new_lirang", "jsrg_new_zhengyi"],
-    img: "image/character/sp_xugong.jpg",
     dieAudios: ["kongrong"],
   },
   ol_wangrong: {

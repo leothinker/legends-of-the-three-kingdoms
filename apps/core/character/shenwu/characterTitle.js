@@ -46,5 +46,6 @@ export default {
   ol_xuhuang: "周亚夫之风",
 
   ol_caiwenji: "异乡的孤女",
+  ol_zuoci: "迷之仙人",
   ol_jiangwei: "龙的衣钵",
 }

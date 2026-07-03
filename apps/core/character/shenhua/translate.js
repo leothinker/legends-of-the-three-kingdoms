@@ -255,6 +255,13 @@ const translates = {
   duanchang: "断肠",
   duanchang_info: "锁定技，当你死亡时，杀死你的角色失去所有武将技能。",
 
+  zuoci: "左慈",
+  huashen: "化身",
+  huashen_info:
+    "游戏开始时，你获得两张武将牌作为“化身”牌，然后亮出其中一张，你获得亮出“化身”牌的一个技能（限定技、觉醒技、主公技除外），且性别和势力视为与之相同；回合开始或结束时，你可以更改亮出的“化身”牌。",
+  xinsheng: "新生",
+  xinsheng_info: "当你受到1点伤害后，你可以获得一张新的“化身”牌。",
+
   zhanghe: "张郃",
   qiaobian: "巧变",
   qiaobian_info:
@@ -303,13 +310,6 @@ const translates = {
   guzheng: "固政",
   guzheng_info:
     "其他角色的弃牌阶段结束时，你可以将该角色此阶段弃置的一张手牌交给该角色，然后你可以获得其余此阶段弃置的牌。",
-
-  zuoci: "左慈",
-  xinsheng: "新生",
-  xinsheng_info: "当你受到1点伤害后，你获得一张新的化身牌。",
-  huashen: "化身",
-  huashen_info:
-    "游戏开始时，你随机获得两张武将牌作为化身牌，然后亮出其中一张，你获得亮出化身牌的一个技能（主公技、觉醒技、限定技除外），且性别和势力视为与化身牌相同。回合开始时或结束时，你可以更改亮出的化身牌。",
 
   shen_zhaoyun: "神赵云",
   shen_zhaoyun_prefix: "神",

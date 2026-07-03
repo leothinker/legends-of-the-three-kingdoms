@@ -218,12 +218,12 @@ const characters = {
     hp: 3,
     skills: ["rebeige", "duanchang"],
   },
-  // re_zuoci: {
-  //   sex: "male",
-  //   group: "qun",
-  //   hp: 3,
-  //   skills: ["rehuashen", "rexinsheng"],
-  // },
+  re_zuoci: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["rehuashen", "rexinsheng"],
+  },
   // re_sunce: {
   //   sex: "male",
   //   group: "wu",

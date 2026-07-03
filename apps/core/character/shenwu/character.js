@@ -409,6 +409,12 @@ const characters = {
     hp: 3,
     skills: ["olbeige", "duanchang"],
   },
+  ol_zuoci: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["olhuashen", "olxinsheng"],
+  },
 
   ol_jiangwei: {
     sex: "male",

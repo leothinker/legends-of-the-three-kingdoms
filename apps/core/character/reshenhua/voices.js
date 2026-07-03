@@ -133,6 +133,12 @@ export default {
   "#reguanxing_re_jiangwei2": "欲尽人事，亦先听天命。",
   "#re_jiangwei:die": "可惜大计未成，吾已身陨。",
 
+  "#rehuashen1": "世间万物，贫道皆可化为其形。",
+  "#rehuashen2": "尘身土塑，唯魂魄难得。",
+  "#rexinsheng1": "大成若缺，损亦无妨。",
+  "#rexinsheng2": "大盈若冲，新神自现。",
+  "#re_zuoci:die": "仙人之逝，魂归九天。",
+
   "#rebeige1": "人多暴猛兮如虺蛇，控弦披甲兮为骄奢。",
   "#rebeige2": "两拍张弦兮弦欲绝，志摧心折兮自悲嗟。",
   "#duanchang_re_caiwenji1": "雁高飞兮邈难寻，空断肠兮思愔愔。",

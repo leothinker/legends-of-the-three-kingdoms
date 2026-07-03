@@ -69,7 +69,7 @@ const characterSort = {
   ],
   shenwu_shan: [
     "ol_caiwenji",
-    "re_zuoci",
+    "ol_zuoci",
     "ol_jiangwei",
     "ol_liushan",
     "re_sunce",

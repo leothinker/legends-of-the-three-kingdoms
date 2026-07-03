@@ -156,6 +156,12 @@ export default {
   "#duanchang_ol_caiwenji2": "莫吟苦辛曲，此生谁忍闻。",
   "#ol_caiwenji:die": "飘飘外域里，何日能归乡？",
 
+  "#olhuashen1": "容貌发肤，不过浮尘。",
+  "#olhuashen2": "皮囊万千，吾皆可化。",
+  "#olxinsheng1": "枯木发荣，朽木逢春。",
+  "#olxinsheng2": "风靡云涌，万丈光芒。",
+  "#ol_zuoci:die": "红尘看破，驾鹤仙升。",
+
   "#oltiaoxin1": "宜乘其衅会，以挑敌将。",
   "#oltiaoxin2": "会闻用师，观衅而动。",
   "#olzhiji1": "丞相遗志，不死不休！",

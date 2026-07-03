@@ -28,4 +28,5 @@ export default {
 
   re_jiangwei: "龙的衣钵",
   re_caiwenji: "异乡的孤女",
+  re_zuoci: "迷之仙人",
 }

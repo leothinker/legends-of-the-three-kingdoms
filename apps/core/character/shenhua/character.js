@@ -203,6 +203,12 @@ const characters = {
     hp: 3,
     skills: ["beige", "duanchang"],
   },
+  zuoci: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["huashen", "xinsheng"],
+  },
 
   jiangwei: {
     sex: "male",
@@ -243,12 +249,6 @@ const characters = {
   //   hp: 3,
   //   skills: ["zhijian", "guzheng"],
   //   names: "张|昭-张|纮",
-  // },
-  // zuoci: {
-  //   sex: "male",
-  //   group: "qun",
-  //   hp: 3,
-  //   skills: ["huashen", "xinsheng"],
   // },
   // shen_simayi: {
   //   sex: "male",

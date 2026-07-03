@@ -2811,6 +2811,65 @@ const skills = {
       await player.addSkills("reguanxing")
     },
   },
+  // 界刘禅
+  // 放权
+  refangquan: {
+    audio: 2,
+    trigger: { player: "phaseUseBefore" },
+    filter(event, player) {
+      return player.countCards("h") > 0 && !player.hasSkill("fangquan3")
+    },
+    direct: true,
+    async content(event, trigger, player) {
+      let result
+
+      // step 0
+      var fang =
+        player.countMark("fangquan2") === 0 &&
+        player.hp >= 2 &&
+        player.countCards("h") <= player.maxHp + 1
+      result = await player
+        .chooseBool(get.prompt2("refangquan"))
+        .set("ai", () => {
+          if (!_status.event.fang) {
+            return false
+          }
+          return game.hasPlayer((target) => {
+            if (target.hasJudge("lebu") || target === player) {
+              return false
+            }
+            if (get.attitude(player, target) > 4) {
+              return (
+                get.threaten(target) /
+                  Math.sqrt(target.hp + 1) /
+                  Math.sqrt(target.countCards("h") + 1) >
+                0
+              )
+            }
+            return false
+          })
+        })
+        .set("fang", fang)
+        .forResult()
+
+      // step 1
+      if (result.bool) {
+        player.logSkill("refangquan")
+        trigger.cancel()
+        player.addTempSkill("fangquan2", "phaseAfter")
+        player.addMark("fangquan2", 1, false)
+        player.addTempSkill("refangquan2")
+        //player.storage.fangquan=result.targets[0];
+      }
+    },
+  },
+  refangquan2: {
+    mod: {
+      maxHandcardBase(player, num) {
+        return player.maxHp
+      },
+    },
+  },
   // 界左慈
   // 化身
   rehuashen: {

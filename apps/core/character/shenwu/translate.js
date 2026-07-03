@@ -321,6 +321,18 @@ const translates = {
   olzhiji: "志继",
   olzhiji_info:
     "觉醒技，准备阶段或结束阶段，若你没有手牌，你回复1点体力或摸两张牌，减1点体力上限，然后获得〖观星〗。",
+
+  ol_liushan: "界刘禅",
+  ol_liushan_prefix: "界",
+  olfangquan: "放权",
+  olfangquan_info:
+    "你可以跳过出牌阶段，然后弃牌阶段开始时，你可以弃置一张手牌，令一名其他角色于回合结束时执行一个额外的回合。",
+  olruoyu: "若愚",
+  olruoyu_info:
+    "主公技，觉醒技，准备阶段，若你是体力值最小的角色，你加1点体力上限并回复体力至3点，然后获得〖激将〗和〖思蜀〗。",
+  sishu: "思蜀",
+  sishu_info:
+    "出牌阶段开始时，你可以选择一名角色，其本局游戏【乐不思蜀】的判定结果反转。",
 }
 
 export default translates

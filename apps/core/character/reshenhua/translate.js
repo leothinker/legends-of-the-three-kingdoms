@@ -198,6 +198,12 @@ const translates = {
   rezhiji: "志继",
   rezhiji_info: `觉醒技，准备阶段，若你没有手牌，你回复1点体力或摸两张牌，减1点体力上限，然后获得${get.poptip("reguanxing")}。`,
 
+  re_liushan: "界刘禅",
+  re_liushan_prefix: "界",
+  refangquan: "放权",
+  refangquan_info:
+    "你可以跳过出牌阶段，令你本回合的手牌上限等于体力上限。若如此做，本回合结束时，你可以弃置一张手牌，令一名其他角色执行一个额外的回合。",
+
   re_zuoci: "界左慈",
   re_zuoci_prefix: "界",
   rehuashen: "化身",
@@ -232,17 +238,6 @@ const translates = {
   guzheng: "固政",
   guzheng_info:
     "其他角色的弃牌阶段结束时，你可以将弃牌堆里该角色此阶段内弃置的一张手牌返还给其，然后你可以获得弃牌堆里所有其余于此阶段内弃置的牌。",
-
-  jx_liushan: "界刘禅",
-  jx_liushan_prefix: "界",
-  xiangle: "享乐",
-  xiangle_info:
-    "锁定技，当你成为一名角色【杀】的目标后，除非该角色弃置一张基本牌，否则此【杀】对你无效。",
-  jx_fangquan: "放权",
-  jx_fangquan_info:
-    "出牌阶段开始前，若你未跳过此阶段，你可以跳过出牌阶段，然后此回合你的手牌上限等于你的体力上限值，且此回合结束时，你可以弃置一张手牌，令一名其他角色执行一个额外的回合。",
-  ruoyu: "若愚",
-  ruoyu_info: `主公技，觉醒技，准备阶段，若你是体力值最小的角色，你加1点体力上限，回复1点体力，然后获得${get.poptip("jijiang")}。`,
 
   jx_zhanghe: "界张郃",
   jx_zhanghe_prefix: "界",

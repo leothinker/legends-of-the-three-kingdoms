@@ -27,6 +27,7 @@ export default {
   re_lusu: "荷檐吐奇",
 
   re_jiangwei: "龙的衣钵",
+  re_liushan: "无为的真命主",
   re_caiwenji: "异乡的孤女",
   re_zuoci: "迷之仙人",
 }

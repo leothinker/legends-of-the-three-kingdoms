@@ -209,12 +209,18 @@ const characters = {
     hp: 3,
     skills: ["huashen", "xinsheng"],
   },
-
   jiangwei: {
     sex: "male",
     group: "shu",
     hp: 4,
     skills: ["tiaoxin", "zhiji"],
+  },
+  liushan: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["xiangle", "fangquan", "ruoyu"],
+    isZhugong: true,
   },
 
   // dengai: {
@@ -228,13 +234,6 @@ const characters = {
   //   group: "wei",
   //   hp: 4,
   //   skills: ["qiaobian"],
-  // },
-  // liushan: {
-  //   sex: "male",
-  //   group: "shu",
-  //   hp: 3,
-  //   skills: ["xiangle", "fangquan", "ruoyu"],
-  //   isZhugong: true,
   // },
   // sunce: {
   //   sex: "male",

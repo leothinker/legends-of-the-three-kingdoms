@@ -5679,7 +5679,7 @@ const skills = {
       )
       const result = await trigger.player
         .chooseToDiscard(
-          `享乐：弃置一张基本牌，否则杀对${get.translation(player)}无效`,
+          `享乐：弃置一张基本牌，否则此【杀】对${get.translation(player)}无效`,
           (card) => get.type(card) === "basic",
         )
         .set("ai", (card) => {
@@ -5790,7 +5790,7 @@ const skills = {
     },
     async cost(event, trigger, player) {
       const chooseToDiscard = player.chooseToDiscard(
-        "是否弃置一张手牌并令一名其他角色进行一个额外回合？",
+        "是否弃置一张手牌，令一名其他角色执行一个额外的回合？",
       )
       chooseToDiscard.ai = (card) => 20 - get.value(card)
       if (!(await chooseToDiscard.forResult()).bool) {
@@ -5798,7 +5798,7 @@ const skills = {
       }
       const chooseTarget = player.chooseTarget(
         true,
-        "请选择进行额外回合的目标角色",
+        "请选择执行额外回合的目标角色",
         lib.filter.notMe,
       )
       chooseTarget.ai = (target) => {
@@ -5824,7 +5824,12 @@ const skills = {
         event.targets,
         "fire",
       )
-      target.markSkillCharacter("fangquan", player, "放权", "进行一个额外回合")
+      target.markSkillCharacter(
+        "fangquan",
+        player,
+        "放权",
+        "执行一个额外的回合",
+      )
       target.insertPhase()
       player.removeMark("fangquan2")
       target.addSkill("fangquan3")

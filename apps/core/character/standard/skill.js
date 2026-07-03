@@ -155,7 +155,7 @@ const skills = {
   // 激将
   jijiang: {
     audio: 2,
-    audioname: ["liushan"],
+    audioname: ["liushan", "re_liushan"],
     audioname2: { re_liubei: "rejijiang", old_liubei: "rejijiang" },
     group: ["jijiang1"],
     zhuSkill: true,
@@ -198,8 +198,6 @@ const skills = {
   },
   jijiang1: {
     audio: "jijiang",
-    audioname: ["liushan"],
-    audioname2: { re_liubei: "rejijiang", old_liubei: "rejijiang" },
     trigger: { player: ["useCardBegin", "respondBegin"] },
     logTarget: "targets",
     sourceSkill: "jijiang",

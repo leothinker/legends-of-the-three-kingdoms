@@ -1267,11 +1267,7 @@ export default () => {
                     player._toKill = list[0]
                     player._toSave = list[1]
                   }
-                  ui.huanhuazhizhan.innerHTML =
-                    "击杀" +
-                    get.translation(game.me._toKill) +
-                    "，保护" +
-                    get.translation(game.me._toSave)
+                  ui.huanhuazhizhan.innerHTML = `击杀${get.translation(game.me._toKill)}，保护${get.translation(game.me._toSave)}`
                 },
                 getSkillDialog: (skills, prompt) => {
                   var dialog = ui.create.dialog("hidden", "forcebutton")
@@ -1280,11 +1276,7 @@ export default () => {
                   }
                   for (var i = 0; i < skills.length; i++) {
                     dialog.add(
-                      '<div class="popup pointerdiv" style="width:80%;display:inline-block"><div class="skill">【' +
-                        get.translation(skills[i]) +
-                        "】</div><div>" +
-                        lib.translate[`${skills[i]}_info`] +
-                        "</div></div>",
+                      `<div class="popup pointerdiv" style="width:80%;display:inline-block"><div class="skill">【${get.translation(skills[i])}】</div><div>${lib.translate[`${skills[i]}_info`]}</div></div>`,
                     )
                   }
                   dialog.addText(" <br> ")
@@ -2832,6 +2824,7 @@ export default () => {
         ],
         init: () => {
           game.saveConfig("player_number", "8", "identity")
+          game.saveConfig("double_character", false, "identity")
         },
         showcase: function (init) {
           var list = [
@@ -3035,7 +3028,11 @@ export default () => {
           gameStart: () => {
             game.identityVideoName = "同将模式"
             var target = _status.mode === "zhong" ? game.zhong : game.zhu
-            target.init(game.me.name1)
+            if (get.config("double_character")) {
+              target.init(game.me.name1, game.me.name2)
+            } else {
+              target.init(game.me.name1)
+            }
             target.hp++
             target.maxHp++
             target.update()
@@ -3056,7 +3053,11 @@ export default () => {
             if (player === game.zhu) {
               return
             }
-            player.init(game.me.name1)
+            if (get.config("double_character")) {
+              player.init(game.me.name1, game.me.name2)
+            } else {
+              player.init(game.me.name1)
+            }
           },
           chooseCharacter: (list, list2, num) => {
             if (game.me !== game.zhu) {
@@ -3930,9 +3931,7 @@ export default () => {
         intro: [
           "无尽而漫长的单挑试炼",
           lib.config.qianlidanji_level
-            ? "你的最高纪录是连续通过" +
-              lib.config.qianlidanji_level +
-              "关，是否能够突破这一记录呢？"
+            ? `你的最高纪录是连续通过${lib.config.qianlidanji_level}关，是否能够突破这一记录呢？`
             : "你能否过五关斩六将，击败古城战神蔡阳呢？",
         ],
         init: () => {
@@ -5317,6 +5316,7 @@ export default () => {
         template: {
           mode: "identity",
           init: () => {
+            game.saveConfig("double_character", false, "identity")
             _status.brawl.playerNumber = _status.brawl.scene.players.length
           },
           showcase: function (init) {
@@ -5655,9 +5655,7 @@ export default () => {
             var scenename = ui.create.node(
               "input",
               ui.create.div(style2, "", "场景名称：", this),
-              {
-                width: "120px",
-              },
+              { width: "120px" },
             )
             scenename.type = "text"
             scenename.style.marginTop = "20px"
@@ -6602,9 +6600,7 @@ export default () => {
             var scenename = ui.create.node(
               "input",
               ui.create.div(style2, "", "关卡名称：", this),
-              {
-                width: "120px",
-              },
+              { width: "120px" },
             )
             scenename.type = "text"
             scenename.style.marginTop = "20px"

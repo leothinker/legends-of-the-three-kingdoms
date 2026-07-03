@@ -133,6 +133,16 @@ export default {
   "#reguanxing_re_jiangwei2": "欲尽人事，亦先听天命。",
   "#re_jiangwei:die": "可惜大计未成，吾已身陨。",
 
+  "#xiangle_re_liushan1": "天府之国，自然民安国泰。",
+  "#xiangle_re_liushan2": "战事扰乱民生，不如作罢。",
+  "#refangquan1": "爱卿自行定夺便是。",
+  "#refangquan2": "北伐事重，相父全权处理即可。",
+  "#ruoyu_re_liushan1": "唯有自认庸主之名，方能保蜀地官民无虞啊。",
+  "#ruoyu_re_liushan2": "既无争雄天下之才，只好做守成之主。",
+  "#jijiang_re_liushan1": "还望诸卿勠力同心，以保国祚。",
+  "#jijiang_re_liushan2": "哪位爱卿愿意报效国家？",
+  "#re_liushan:die": "实在有愧父皇与相父啊……",
+
   "#rehuashen1": "世间万物，贫道皆可化为其形。",
   "#rehuashen2": "尘身土塑，唯魂魄难得。",
   "#rexinsheng1": "大成若缺，损亦无妨。",

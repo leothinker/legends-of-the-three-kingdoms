@@ -169,4 +169,16 @@ export default {
   "#reguanxing_ol_jiangwei1": "星之分野，各有所属。",
   "#reguanxing_ol_jiangwei2": "星象相衔，此乃吉兆！",
   "#ol_jiangwei:die": "星散流离……",
+
+  "#xiangle_ol_liushan1": "嘿嘿嘿，还是玩耍快乐~",
+  "#xiangle_ol_liushan2": "美好的日子，应该好好享受。",
+  "#olfangquan1": "蜀汉有相父在，我可安心。",
+  "#olfangquan2": "这些事情，你们安排就好。",
+  "#olruoyu1": "若愚故泰，巧骗众人。",
+  "#olruoyu2": "愚昧者，非真傻也。",
+  "#rejijiang_ol_liushan1": "爱卿爱卿，快来护驾！",
+  "#rejijiang_ol_liushan2": "将军快替我，拦下此贼！",
+  "#sishu1": "蜀乐乡土，怎不思念？",
+  "#sishu2": "思乡心切，徘徊惶惶。",
+  "#ol_liushan:die": "将军英勇，我……我投降……",
 }

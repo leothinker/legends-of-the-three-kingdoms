@@ -6,6 +6,7 @@ const skills = {
   // 激将
   rejijiang: {
     audio: 2,
+    audioname: ["ol_liushan"],
     group: ["rejijiang1", "rejijiang3"],
     zhuSkill: true,
     filter(event, player) {
@@ -4251,6 +4252,7 @@ const skills = {
     },
   },
   // 界徐晃
+  // 断粮
   olduanliang: {
     audio: 2,
     locked: false,
@@ -4281,6 +4283,7 @@ const skills = {
       },
     },
   },
+  // 截辎
   rejiezi: {
     audio: 2,
     trigger: { global: ["phaseDrawSkipped", "phaseDrawCancelled"] },
@@ -4935,7 +4938,6 @@ const skills = {
     },
     ai: { combo: "olhuashen" },
   },
-
   // 界姜维
   // 挑衅
   oltiaoxin: {
@@ -5041,6 +5043,232 @@ const skills = {
       player.chooseDrawRecover(2, true)
       player.loseMaxHp()
       player.addSkills("reguanxing")
+    },
+  },
+  // 界刘禅
+  // 放权
+  olfangquan: {
+    audio: 2,
+    audioname2: { shen_caopi: "olfangquan_shen_caopi" },
+    trigger: { player: "phaseUseBefore" },
+    filter(event, player) {
+      return player.countCards("h") > 0 && !player.hasSkill("olfangquan3")
+    },
+    direct: true,
+    async content(event, trigger, player) {
+      // step 0
+      var fang =
+        player.countMark("olfangquan2") === 0 &&
+        player.hp >= 2 &&
+        player.countCards("h") <= player.hp + 2
+      const result = await player
+        .chooseBool(get.prompt2("olfangquan"))
+        .set("ai", () => {
+          if (!_status.event.fang) {
+            return false
+          }
+          return game.hasPlayer((target) => {
+            if (target.hasJudge("lebu") || target === player) {
+              return false
+            }
+            if (get.attitude(player, target) > 4) {
+              return (
+                get.threaten(target) /
+                  Math.sqrt(target.hp + 1) /
+                  Math.sqrt(target.countCards("h") + 1) >
+                0
+              )
+            }
+            return false
+          })
+        })
+        .set("fang", fang)
+        .forResult()
+      // step 1
+      if (result.bool) {
+        player.logSkill("olfangquan")
+        trigger.cancel()
+        player.addTempSkill("olfangquan2")
+        player.addMark("olfangquan2", 1, false)
+      }
+    },
+  },
+  olfangquan2: {
+    trigger: { player: "phaseDiscardBegin" },
+    forced: true,
+    popup: false,
+    audio: false,
+    onremove: true,
+    sourceSkill: "olfangquan",
+    async content(event, trigger, player) {
+      // step 0
+      event.count = player.countMark(event.name)
+      player.removeMark(event.name, event.count, false)
+      while (event.count > 0) {
+        // step 1
+        event.count--
+        const result = await player
+          .chooseToDiscard(
+            "是否弃置一张手牌，令一名其他角色于回合结束时执行一个额外的回合？",
+          )
+          .set("logSkill", "olfangquan")
+          .set("ai", (card) => {
+            return 20 - get.value(card)
+          })
+          .forResult()
+        // step 2
+        if (result.bool) {
+          const result2 = await player
+            .chooseTarget(
+              true,
+              "请选择执行额外回合的目标角色",
+              lib.filter.notMe,
+            )
+            .set("ai", (target) => {
+              if (target.hasJudge("lebu")) {
+                return -1
+              }
+              if (get.attitude(player, target) > 4) {
+                return (
+                  get.threaten(target) /
+                  Math.sqrt(target.hp + 1) /
+                  Math.sqrt(target.countCards("h") + 1)
+                )
+              }
+              return -1
+            })
+            .forResult()
+          // step 3
+          if (result2.bool) {
+            var target = result2.targets[0]
+            player.line(target, "fire")
+            target.markSkillCharacter(
+              "olfangquan",
+              player,
+              "放权",
+              "执行一个额外的回合",
+            )
+            target.insertPhase()
+            target.addSkill("olfangquan3")
+          }
+        } else {
+          break
+        }
+      }
+    },
+  },
+  olfangquan3: {
+    trigger: { player: ["phaseAfter", "phaseCancelled"] },
+    forced: true,
+    popup: false,
+    audio: false,
+    sourceSkill: "olfangquan",
+    async content(event, trigger, player) {
+      player.unmarkSkill("olfangquan")
+      player.removeSkill("olfangquan3")
+    },
+  },
+  // 若愚
+  olruoyu: {
+    skillAnimation: true,
+    animationColor: "fire",
+    audio: 2,
+    juexingji: true,
+    zhuSkill: true,
+    keepSkill: true,
+    derivation: ["rejijiang", "sishu"],
+    trigger: { player: "phaseZhunbeiBegin" },
+    forced: true,
+    filter(event, player) {
+      if (!player.hasZhuSkill("olruoyu")) {
+        return false
+      }
+      return player.isMinHp()
+    },
+    async content(event, trigger, player) {
+      // step 0
+      player.awakenSkill(event.name)
+      await player.gainMaxHp()
+      // step 1
+      if (player.hp < 3) {
+        await player.recover(3 - player.hp)
+      }
+      player.addSkills(["sishu", "rejijiang"])
+    },
+  },
+  // 思蜀
+  sishu: {
+    audio: 2,
+    trigger: { player: "phaseUseBegin" },
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseTarget(get.prompt2(event.skill))
+        .set("ai", (target) => {
+          const att = get.attitude(get.player(), target)
+          if (target.countMark("sishu2") % 2 === 1) {
+            return -att
+          }
+          return att
+        })
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      const target = event.targets[0]
+      target.addSkill("sishu_reverse")
+      target.addMark("sishu_reverse", 1, false)
+    },
+    subSkill: {
+      reverse: {
+        charlotte: true,
+        onremove: true,
+        marktext: "思",
+        intro: {
+          name: "思蜀",
+          content: "本局游戏【乐不思蜀】的判定结果反转#次",
+        },
+        trigger: {
+          player: "judgeBefore",
+        },
+        filter(event, player) {
+          return event.card?.name === "lebu"
+        },
+        firstDo: true,
+        forced: true,
+        locked: false,
+        async content(event, trigger, player) {
+          trigger.judgeFromSishu = trigger.judge
+          trigger.judge = function (card) {
+            const { player, judgeFromSishu } = this
+            let result = judgeFromSishu(card)
+            if (player.countMark("sishu_reverse") % 2 === 1) {
+              result *= -1
+            }
+            return result
+          }
+        },
+      },
+    },
+  },
+  sishu2: {
+    charlotte: true,
+    marktext: "思",
+    intro: {
+      name: "思蜀",
+      content: "本局游戏【乐不思蜀】的判定结果反转#次",
+    },
+    mod: {
+      judge(player, result) {
+        if (
+          _status.event.cardname === "lebu" &&
+          player.countMark("sishu2") % 2 === 1
+        ) {
+          if (result.bool === false) {
+            result.bool = true
+          } else {
+            result.bool = false
+          }
+        }
+      },
     },
   },
 }

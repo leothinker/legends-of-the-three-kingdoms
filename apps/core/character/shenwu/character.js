@@ -415,12 +415,18 @@ const characters = {
     hp: 3,
     skills: ["olhuashen", "olxinsheng"],
   },
-
   ol_jiangwei: {
     sex: "male",
     group: "shu",
     hp: 4,
     skills: ["oltiaoxin", "olzhiji"],
+  },
+  ol_liushan: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["xiangle", "olfangquan", "olruoyu"],
+    isZhugong: true,
   },
 }
 

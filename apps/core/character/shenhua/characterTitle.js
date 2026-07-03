@@ -35,7 +35,7 @@ export default {
   caiwenji: "异乡的孤女",
   zuoci: "迷之仙人",
   jiangwei: "龙的衣钵",
-  // liushan: "无为的真命主",
+  liushan: "无为的真命主",
   // zhanghe: "料敌机先",
   // dengai: "矫然的壮士",
   // old_dengai: "武将列传",

@@ -320,6 +320,9 @@ export default () => {
         )
       },
       getRoomInfo(uiintro) {
+        uiintro.add(
+          `<div class="text chat">双将模式：${lib.configOL.double_character ? "开启" : "关闭"}`,
+        )
         if (lib.configOL.banned.length) {
           uiintro.add(
             `<div class="text chat">禁用武将：${get.translation(lib.configOL.banned)}`,
@@ -901,7 +904,11 @@ export default () => {
               listc[i] = listx.randomGet()
             }
           }
-          player.init(listc[0])
+          if (get.config("double_character")) {
+            player.init(listc[0], listc[1])
+          } else {
+            player.init(listc[0])
+          }
           if (player === game.zhu) {
             if (!game.zhu.isInitFilter("noZhuHp")) {
               game.zhu.maxHp++
@@ -1211,7 +1218,8 @@ export default () => {
           if (!event.chosen.length) {
             game.me
               .chooseButton(dialog, true)
-              .set("onfree", true).selectButton = () => 1
+              .set("onfree", true).selectButton = () =>
+              get.config("double_character") ? 2 : 1
           } else {
             lib.init.onfree()
           }
@@ -1671,7 +1679,9 @@ export default () => {
           }
           for (var i in result) {
             if (result[i] === "ai") {
-              result[i] = event.list2.randomRemove(1)
+              result[i] = event.list2.randomRemove(
+                lib.configOL.double_character ? 2 : 1,
+              )
             } else {
               result[i] = result[i].links
             }
@@ -2196,7 +2206,7 @@ export default () => {
           _status.characterlist = list4
           ;("step 1")
           var list = []
-          var selectButton = 1
+          var selectButton = lib.configOL.double_character ? 2 : 1
 
           var num = Math.floor(event.list.length / game.players.length)
 
@@ -2228,7 +2238,9 @@ export default () => {
           }
           for (var i in result) {
             if (result[i] === "ai") {
-              var listc = event.list.randomRemove(1)
+              var listc = event.list.randomRemove(
+                lib.configOL.double_character ? 2 : 1,
+              )
               for (var i = 0; i < listc.length; i++) {
                 var listx = lib.characterReplace[listc[i]]
                 if (listx?.length) {
@@ -4725,7 +4737,7 @@ export default () => {
       ["spade", 12, "tiesuo"],
       ["spade", 12, "zhangba"],
       ["spade", 13, "wuxie"],
-      ["spade", 13, "dayuanma"],
+      ["spade", 13, "dayuan"],
 
       ["club", 1, "baiyin"],
       ["club", 1, "zhuge"],

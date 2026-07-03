@@ -212,6 +212,13 @@ const characters = {
     hp: 4,
     skills: ["retiaoxin", "rezhiji"],
   },
+  re_liushan: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["xiangle", "refangquan", "ruoyu"],
+    isZhugong: true,
+  },
   re_caiwenji: {
     sex: "female",
     group: "qun",
@@ -236,13 +243,6 @@ const characters = {
   //   group: "wu",
   //   hp: 3,
   //   skills: ["rezhijian", "guzheng"],
-  // },
-  // re_liushan: {
-  //   sex: "male",
-  //   group: "shu",
-  //   hp: 3,
-  //   skills: ["xiangle", "refangquan", "ruoyu"],
-  //   isZhugong: true,
   // },
   // re_zhanghe: {
   //   sex: "male",

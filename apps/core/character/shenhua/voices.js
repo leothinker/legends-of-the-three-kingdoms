@@ -191,4 +191,14 @@ export default {
   "#guanxing_jiangwei1": "克复中原，指日可待！",
   "#guanxing_jiangwei2": "继丞相之遗志，讨篡汉之逆贼！",
   "#jiangwei:die": "我计不成，乃天命也……",
+
+  "#xiangle1": "哼，打打杀杀，真没意思。",
+  "#xiangle2": "我爸爸是刘备！",
+  "#fangquan1": "诶，这可如何是好啊？",
+  "#fangquan2": "哎，你办事儿，我放心~",
+  "#ruoyu1": "不装疯卖傻，岂能安然无恙？",
+  "#ruoyu2": "世人皆错看我，唉！",
+  "#jijiang_liushan1": "匡扶汉室，谁敢出战！",
+  "#jijiang_liushan2": "我蜀汉岂无人乎？",
+  "#liushan:die": "诶，别打脸，我投降还不行吗？",
 }

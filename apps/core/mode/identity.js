@@ -650,6 +650,9 @@ export default () => {
         uiintro.add(
           `<div class="text chat">游戏模式：${lib.configOL.identity_mode === "zhong" ? "明忠" : "标准"}`,
         )
+        uiintro.add(
+          `<div class="text chat">双将模式：${lib.configOL.double_character ? "开启" : "关闭"}`,
+        )
         if (lib.configOL.identity_mode !== "zhong") {
           if (lib.configOL.identity_mode === "stratagem") {
             uiintro.add(
@@ -1742,7 +1745,7 @@ export default () => {
             const num = Math.floor(
               event.list.length / (game.players.length - 1),
             )
-            const selectButton = 1
+            const selectButton = lib.configOL.double_character ? 2 : 1
             for (const current of game.players) {
               const num2 = lib.configOL[`choice_${current.identity}`]
               const str = "选择角色"
@@ -1776,7 +1779,9 @@ export default () => {
             }
             for (const id in result) {
               if (result[id] === "ai") {
-                result[id] = event.list2.randomRemove(1)
+                result[id] = event.list2.randomRemove(
+                  lib.configOL.double_character ? 2 : 1,
+                )
                 for (let j = 0; j < result[id].length; j++) {
                   const listx = lib.characterReplace[result[id][j]]
                   if (listx?.length) {
@@ -1940,7 +1945,11 @@ export default () => {
                 listc[index] = listx.randomGet()
               }
             }
-            player.init(listc[0])
+            if (get.config("double_character")) {
+              player.init(listc[0], listc[1])
+            } else {
+              player.init(listc[0])
+            }
             if (
               player.identity === "mingzhong" &&
               !player.isInitFilter("noZhuHp")
@@ -1972,7 +1981,11 @@ export default () => {
             if (choice2List?.length) {
               choice2 = choice2List.randomGet()
             }
-            player.init(choice)
+            if (get.config("double_character")) {
+              player.init(choice, choice2)
+            } else {
+              player.init(choice)
+            }
             if (game.players.length > 4 && !player.isInitFilter("noZhuHp")) {
               player.hp++
               player.maxHp++
@@ -1998,7 +2011,14 @@ export default () => {
                 break
               }
             }
-            player.init(listc[choice])
+            if (get.config("double_character")) {
+              player.init(
+                listc[choice],
+                listc[choice === 0 ? choice + 1 : choice - 1],
+              )
+            } else {
+              player.init(listc[choice])
+            }
           } else {
             const listc = list.slice(0, 2)
             for (const index of listc.keys()) {
@@ -2007,7 +2027,11 @@ export default () => {
                 listc[index] = listx.randomGet()
               }
             }
-            player.init(listc[0])
+            if (get.config("double_character")) {
+              player.init(listc[0], listc[1])
+            } else {
+              player.init(listc[0])
+            }
           }
           if (back) {
             list.remove(get.sourceCharacter(player.name1))
@@ -2690,7 +2714,9 @@ export default () => {
               game.me
                 .chooseButton(dialog, true)
                 .set("onfree", true).selectButton = () =>
-                _status.brawl?.doubleCharacter ? 2 : 1
+                _status.brawl?.doubleCharacter || get.config("double_character")
+                  ? 2
+                  : 1
             } else {
               lib.init.onfree()
             }
@@ -3181,7 +3207,10 @@ export default () => {
               )
             }
             const chooseButtonEvent = game.zhu.chooseButton(true)
-            chooseButtonEvent.set("selectButton", 1)
+            chooseButtonEvent.set(
+              "selectButton",
+              lib.configOL.double_character ? 2 : 1,
+            )
             chooseButtonEvent.set("createDialog", [
               "选择角色",
               [list, "characterx"],
@@ -3247,7 +3276,7 @@ export default () => {
           // step 2
           async (event, trigger, player) => {
             const list = []
-            const selectButton = 1
+            const selectButton = lib.configOL.double_character ? 2 : 1
 
             const num = Math.floor(
               event.list.length / (game.players.length - 1),
@@ -3299,13 +3328,15 @@ export default () => {
             }
             for (const id in result) {
               if (result[id] === "ai") {
-                result[id] = event.list2.randomRemove(1).map((name) => {
-                  const listx = lib.characterReplace[name]
-                  if (listx?.length) {
-                    return listx.randomGet()
-                  }
-                  return name
-                })
+                result[id] = event.list2
+                  .randomRemove(lib.configOL.double_character ? 2 : 1)
+                  .map((name) => {
+                    const listx = lib.characterReplace[name]
+                    if (listx?.length) {
+                      return listx.randomGet()
+                    }
+                    return name
+                  })
               } else {
                 result[id] = result[id].links
               }

@@ -5271,6 +5271,343 @@ const skills = {
       },
     },
   },
+  // 界孙策
+  // 激昂
+  oljiang: {
+    audio: 2,
+    inherit: "jiang",
+    group: "oljiang_gain",
+    subSkill: {
+      gain: {
+        audio: "oljiang",
+        trigger: { global: ["loseAfter", "loseAsyncAfter"] },
+        usable: 1,
+        filter(event, player) {
+          if (
+            player.hp < 1 ||
+            event.type !== "discard" ||
+            event.position !== ui.discardPile
+          ) {
+            return false
+          }
+          var filter = (card) =>
+            card.name === "juedou" ||
+            (card.name === "sha" && get.color(card, false) === "red")
+          var cards = event.getd().filter(filter)
+          if (
+            !cards.filter((card) => get.position(card, true) === "d").length
+          ) {
+            return false
+          }
+          var searched = false
+          if (
+            game.getGlobalHistory("cardMove", (evt) => {
+              if (
+                searched ||
+                evt.type !== "discard" ||
+                evt.position !== ui.discardPile
+              ) {
+                return false
+              }
+              var evtx = evt
+              if (evtx.getlx === false) {
+                evtx = evt.getParent()
+              }
+              var cards = evtx.getd().filter(filter)
+              if (!cards.length) {
+                return false
+              }
+              searched = true
+              return evtx !== event
+            }).length > 0
+          ) {
+            return false
+          }
+          return true
+        },
+        prompt2(event, player) {
+          var cards = event
+            .getd()
+            .filter(
+              (card) =>
+                (card.name === "juedou" ||
+                  (card.name === "sha" && get.color(card, false) === "red")) &&
+                get.position(card, true) === "d",
+            )
+          return `失去1点体力获得${get.translation(cards)}`
+        },
+        check(event, player) {
+          return player.hp > 1 && !player.storage.olhunzi
+        },
+        async content(event, trigger, player) {
+          await player.loseHp()
+          const cards = trigger.getd().filter((card) => {
+            return (
+              (card.name === "juedou" ||
+                (card.name === "sha" && get.color(card, false) === "red")) &&
+              get.position(card, true) === "d"
+            )
+          })
+          if (cards.length > 0) {
+            await player.gain(cards, "gain2")
+          }
+        },
+      },
+    },
+  },
+  // 魂姿
+  olhunzi: {
+    audio: 2,
+    inherit: "hunzi",
+    derivation: ["reyingzi", "yinghun"],
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      await player.loseMaxHp()
+      //player.recover();
+      await player.addSkills(["reyingzi", "yinghun"])
+      player.addTempSkill("olhunzi_effect")
+    },
+    subSkill: {
+      effect: {
+        trigger: { player: "phaseJieshuBegin" },
+        forced: true,
+        popup: false,
+        charlotte: true,
+        async content(event, trigger, player) {
+          await player.chooseDrawRecover(2, true)
+        },
+      },
+    },
+  },
+  // 制霸
+  olzhiba: {
+    audio: 2,
+    zhuSkill: true,
+    global: "olzhiba2",
+  },
+  olzhiba2: {
+    ai: {
+      order: 1,
+      result: {
+        target(player, target) {
+          if (
+            player.hasZhuSkill("olzhiba") &&
+            !player.hasSkill("olzhiba3") &&
+            target.group === "wu"
+          ) {
+            if (
+              player.countCards("h", (card) => {
+                var val = get.value(card)
+                if (val < 0) {
+                  return true
+                }
+                if (val <= 5) {
+                  return get.number(card) >= 12
+                }
+                if (val <= 6) {
+                  return get.number(card) >= 13
+                }
+                return false
+              }) > 0
+            ) {
+              return -1
+            }
+            return 0
+          }
+          if (
+            player.countCards("h", "du") &&
+            get.attitude(player, target) < 0
+          ) {
+            return -1
+          }
+          if (player.countCards("h") <= player.hp) {
+            return 0
+          }
+          var maxnum = 0
+          var cards2 = target.getCards("h")
+          for (var i = 0; i < cards2.length; i++) {
+            if (get.number(cards2[i]) > maxnum) {
+              maxnum = get.number(cards2[i])
+            }
+          }
+          if (maxnum > 10) {
+            maxnum = 10
+          }
+          if (maxnum < 5 && cards2.length > 1) {
+            maxnum = 5
+          }
+          var cards = player.getCards("h")
+          for (var i = 0; i < cards.length; i++) {
+            if (get.number(cards[i]) < maxnum) {
+              return 1
+            }
+          }
+          return 0
+        },
+      },
+    },
+    enable: "phaseUse",
+    //usable:1,
+    prompt: "请选择〖制霸〗的目标",
+    filter(event, player) {
+      if (
+        player.hasZhuSkill("olzhiba") &&
+        !player.hasSkill("olzhiba3") &&
+        game.hasPlayer(
+          (current) =>
+            current !== player &&
+            current.group === "wu" &&
+            player.canCompare(current),
+        )
+      ) {
+        return true
+      }
+      return (
+        player.group === "wu" &&
+        game.hasPlayer(
+          (current) =>
+            current !== player &&
+            current.hasZhuSkill("olzhiba", player) &&
+            !current.hasSkill("olzhiba3") &&
+            player.canCompare(current),
+        )
+      )
+    },
+    filterTarget(card, player, target) {
+      if (
+        player.hasZhuSkill("olzhiba") &&
+        !player.hasSkill("olzhiba3") &&
+        target.group === "wu" &&
+        player.canCompare(target)
+      ) {
+        return true
+      }
+      return (
+        player.group === "wu" &&
+        target.hasZhuSkill("olzhiba", player) &&
+        !target.hasSkill("olzhiba3") &&
+        player.canCompare(target)
+      )
+    },
+    prepare(cards, player, targets) {
+      if (player.hasZhuSkill("olzhiba")) {
+        player.logSkill("olzhiba")
+      }
+      if (targets[0].hasZhuSkill("olzhiba", player)) {
+        targets[0].logSkill("olzhiba")
+      }
+    },
+    direct: true,
+    clearTime: true,
+    async contentBefore(event, trigger, player) {
+      const { targets } = event
+      const list = []
+      if (
+        player.hasZhuSkill("olzhiba") &&
+        targets[0].group === "wu" &&
+        !player.hasSkill("olzhiba3")
+      ) {
+        list.push(player)
+      }
+      if (
+        player.group === "wu" &&
+        targets[0].hasZhuSkill("olzhiba") &&
+        !targets[0].hasSkill("olzhiba3")
+      ) {
+        list.push(targets[0])
+      }
+
+      let chooseRes
+      if (list.length === 1) {
+        event.target = list[0]
+      } else {
+        chooseRes = await player
+          .chooseTarget(
+            true,
+            "请选择获得所有拼点牌的角色",
+            (card, pl, target) => _status.event.list.includes(target),
+          )
+          .set("list", list)
+          .forResult()
+        if (!chooseRes?.bool) {
+          return
+        }
+        event.target = chooseRes.targets[0]
+      }
+
+      const target = event.target
+      target.addTempSkill("olzhiba3", "phaseUseEnd")
+
+      let acceptRes
+      if (target === targets[0]) {
+        acceptRes = await target
+          .chooseBool(`是否接受来自${get.translation(player)}的拼点请求？`)
+          .set(
+            "choice",
+            get.attitude(target, player) > 0 ||
+              target.countCards("h", (card) => {
+                const val = get.value(card)
+                if (val < 0) return true
+                if (val <= 5) return get.number(card) >= 12
+                if (val <= 6) return get.number(card) >= 13
+                return false
+              }) > 0,
+          )
+          .set("ai", () => _status.event.choice)
+          .forResult()
+      } else {
+        acceptRes = { bool: true }
+      }
+
+      if (acceptRes.bool) {
+        event.getParent().zhiba_target = target
+      } else {
+        game.log(target, "拒绝了", player, "的拼点请求")
+        target.chat("拒绝")
+      }
+    },
+    async content(event, trigger, player) {
+      const { target } = event
+      const parent = event.getParent()
+      const source = parent?.zhiba_target
+      event.source = source
+      if (!source) {
+        return
+      }
+
+      // step 1: 比拼
+      const comp = player
+        .chooseToCompare(target)
+        .set("small", target === source && get.attitude(player, target) > 0)
+      comp.clear = false
+      const cmpResult = await comp.forResult()
+
+      // step 2: 根据拼点结果处理
+      if (
+        (player === source && cmpResult.bool) ||
+        (target === source && !cmpResult.bool)
+      ) {
+        event.cards = [cmpResult.player, cmpResult.target].filterInD("d")
+        if (!event.cards.length) return
+
+        // 询问 source 是否获得拼点牌
+        const ctrl = await source
+          .chooseControl("ok", "cancel2")
+          .set("dialog", ["是否获得拼点的两张牌？", event.cards])
+          .set("ai", () => get.value(event.cards, source, "raw") > 0)
+          .forResult()
+
+        if (ctrl.control !== "cancel2") {
+          await source.gain(event.cards, "gain2", "log")
+        } else {
+          ui.clear()
+        }
+      } else {
+        return
+      }
+    },
+  },
+  olzhiba3: {},
 }
 
 export default skills

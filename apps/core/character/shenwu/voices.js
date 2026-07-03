@@ -181,4 +181,16 @@ export default {
   "#sishu1": "蜀乐乡土，怎不思念？",
   "#sishu2": "思乡心切，徘徊惶惶。",
   "#ol_liushan:die": "将军英勇，我……我投降……",
+
+  "#oljiang1": "收合流散，东据吴会。",
+  "#oljiang2": "策虽暗稚，窃有微志。",
+  "#olhunzi1": "江东新秀，由此崛起。",
+  "#olhunzi2": "看汝等大展英气！",
+  "#olzhiba1": "让将军在此恭候多时了。",
+  "#olzhiba2": "有诸位将军在，此战岂会不胜？",
+  "#reyingzi_ol_sunce1": "得公瑾辅助，策必当一战！",
+  "#reyingzi_ol_sunce2": "公瑾在此，此战无忧！",
+  "#yinghun_ol_sunce1": "东吴繁盛，望父亲可知。",
+  "#yinghun_ol_sunce2": "父亲，吾定不负你期望！",
+  "#ol_sunce:die": "汝等，怎能受于吉蛊惑？",
 }

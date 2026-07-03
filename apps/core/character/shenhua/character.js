@@ -222,6 +222,13 @@ const characters = {
     skills: ["xiangle", "fangquan", "ruoyu"],
     isZhugong: true,
   },
+  sunce: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["jiang", "hunzi", "zhiba"],
+    isZhugong: true,
+  },
 
   // dengai: {
   //   sex: "male",
@@ -234,13 +241,6 @@ const characters = {
   //   group: "wei",
   //   hp: 4,
   //   skills: ["qiaobian"],
-  // },
-  // sunce: {
-  //   sex: "male",
-  //   group: "wu",
-  //   hp: 4,
-  //   skills: ["jiang", "hunzi", "zhiba"],
-  //   isZhugong: true,
   // },
   // zhangzhang: {
   //   sex: "male",

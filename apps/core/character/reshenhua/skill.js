@@ -2870,6 +2870,54 @@ const skills = {
       },
     },
   },
+  // 界孙策
+  // 魂姿
+  rehunzi: {
+    inherit: "hunzi",
+    derivation: ["reyingzi", "yinghun"],
+    filter(event, player) {
+      return player.hp <= 2 && !player.storage.rehunzi
+    },
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      await player.loseMaxHp()
+      await player.addSkills(["reyingzi", "yinghun"])
+    },
+    ai: {
+      threaten(player, target) {
+        if (target.hp <= 2) {
+          return 2
+        }
+        return 0.5
+      },
+      maixie: true,
+      effect: {
+        target(card, player, target) {
+          if (!target.hasFriend()) {
+            return
+          }
+          if (
+            target.hp === 3 &&
+            get.tag(card, "damage") === 1 &&
+            !target.isTurnedOver() &&
+            _status.currentPhase !== target &&
+            get.distance(_status.currentPhase, target, "absolute") <= 3
+          ) {
+            return [0.5, 1]
+          }
+          if (
+            target.hp === 1 &&
+            get.tag(card, "recover") &&
+            !target.isTurnedOver() &&
+            _status.currentPhase !== target &&
+            get.distance(_status.currentPhase, target, "absolute") <= 3
+          ) {
+            return [1, -3]
+          }
+        },
+      },
+    },
+  },
   // 界左慈
   // 化身
   rehuashen: {

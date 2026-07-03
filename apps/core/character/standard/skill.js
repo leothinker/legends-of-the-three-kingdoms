@@ -779,7 +779,7 @@ const skills = {
   // 周瑜
   yingzi: {
     audio: 2,
-    audioname: ["sp_lvmeng"],
+    audioname: ["sunce"],
     trigger: { player: "phaseDrawBegin2" },
     frequent: true,
     filter(event, player) {

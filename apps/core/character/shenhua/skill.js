@@ -5873,7 +5873,7 @@ const skills = {
   jiang: {
     audio: 2,
     preHidden: true,
-    audioname: ["sp_lvmeng", "re_sunben", "re_sunce"],
+    audioname: ["re_sunce"],
     mod: {
       aiOrder(player, card, num) {
         if (get.color(card) === "red" && get.name(card) === "sha") {
@@ -5921,7 +5921,6 @@ const skills = {
   },
   // 魂姿
   hunzi: {
-    //audioname:['re_sunben'],
     skillAnimation: true,
     animationColor: "wood",
     audio: 2,
@@ -5975,10 +5974,7 @@ const skills = {
   // 制霸
   zhiba: {
     global: "zhiba_global",
-    audioname: ["re_sunben"],
-    audioname2: {
-      pe_jun_sunce: "olzhiba",
-    },
+    audioname: ["re_sunce"],
     audio: 2,
     zhuSkill: true,
     subSkill: {
@@ -5990,11 +5986,11 @@ const skills = {
             (target) =>
               target.hasZhuSkill("zhiba", player) && player.canCompare(target),
           )
-          let str = `和${get.translation(list)}`
+          let str = `与${get.translation(list)}`
           if (list.length > 1) {
             str += "中的一人"
           }
-          str += "进行拼点。若你没赢，其可以获得两张拼点牌。"
+          str += "拼点。若你没赢，其可以获得拼点的两张牌。"
           return str
         },
         filter(event, player) {

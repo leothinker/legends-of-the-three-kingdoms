@@ -219,11 +219,12 @@ const characters = {
     skills: ["xiangle", "refangquan", "ruoyu"],
     isZhugong: true,
   },
-  re_caiwenji: {
-    sex: "female",
-    group: "qun",
-    hp: 3,
-    skills: ["rebeige", "duanchang"],
+  re_sunce: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["jiang", "rehunzi", "zhiba"],
+    isZhugong: true,
   },
   re_zuoci: {
     sex: "male",
@@ -231,13 +232,12 @@ const characters = {
     hp: 3,
     skills: ["rehuashen", "rexinsheng"],
   },
-  // re_sunce: {
-  //   sex: "male",
-  //   group: "wu",
-  //   hp: 4,
-  //   skills: ["jiang", "rehunzi", "zhiba"],
-  //   isZhugong: true,
-  // },
+  re_caiwenji: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["rebeige", "duanchang"],
+  },
   // re_zhangzhang: {
   //   sex: "male",
   //   group: "wu",

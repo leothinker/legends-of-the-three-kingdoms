@@ -201,4 +201,16 @@ export default {
   "#jijiang_liushan1": "匡扶汉室，谁敢出战！",
   "#jijiang_liushan2": "我蜀汉岂无人乎？",
   "#liushan:die": "诶，别打脸，我投降还不行吗？",
+
+  "#jiang1": "江东子弟，何惧于天下！",
+  "#jiang2": "吾乃江东小霸王孙伯符！",
+  "#hunzi1": "父亲在上，魂佑江东；公瑾在旁，智定天下！",
+  "#hunzi2": "愿承父志，与公瑾共谋天下。",
+  "#zhiba1": "我若怕你，非孙伯符也！",
+  "#zhiba2": "是友是敌，一探便知。",
+  "#yingzi_sunce1": "公瑾，助我决一死战。",
+  "#yingzi_sunce2": "尔等看好了！",
+  "#yinghun_sunce1": "父亲，助我背水一战。",
+  "#yinghun_sunce2": "孙氏英烈，庇佑江东！",
+  "#sunce:die": "内事不决问张昭，外事不决问周瑜……",
 }

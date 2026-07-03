@@ -49,4 +49,5 @@ export default {
   ol_zuoci: "迷之仙人",
   ol_jiangwei: "龙的衣钵",
   ol_liushan: "无为的真命主",
+  ol_sunce: "江东的小霸王",
 }

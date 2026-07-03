@@ -143,6 +143,18 @@ export default {
   "#jijiang_re_liushan2": "哪位爱卿愿意报效国家？",
   "#re_liushan:die": "实在有愧父皇与相父啊……",
 
+  "#jiang_re_sunce1": "我会把胜利带回江东。",
+  "#jiang_re_sunce2": "天下英雄，谁能与我一战？",
+  "#rehunzi1": "小霸王之名响彻天下，何人不知？",
+  "#rehunzi2": "江东已平，中原动荡，直取许昌。",
+  "#zhiba_re_sunce1": "我的霸业才刚刚开始。",
+  "#zhiba_re_sunce2": "汝是战是降，我皆奉陪。",
+  "#reyingzi_re_sunce1": "有公瑾助我，可平天下。",
+  "#reyingzi_re_sunce2": "所到之处，战无不胜。",
+  "#yinghun_re_sunce1": "武烈之魂，助我扬名。",
+  "#yinghun_re_sunce2": "江东之主，众望所归。",
+  "#re_sunce:die": "大业未就，中世尔殒……",
+
   "#rehuashen1": "世间万物，贫道皆可化为其形。",
   "#rehuashen2": "尘身土塑，唯魂魄难得。",
   "#rexinsheng1": "大成若缺，损亦无妨。",

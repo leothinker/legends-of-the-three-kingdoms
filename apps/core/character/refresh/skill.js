@@ -1150,7 +1150,7 @@ const skills = {
   // 英姿
   reyingzi: {
     audio: 2,
-    audioname: ["re_sunce"],
+    audioname: ["re_sunce", "ol_sunce"],
     trigger: { player: "phaseDrawBegin2" },
     forced: true,
     preHidden: true,

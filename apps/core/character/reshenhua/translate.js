@@ -204,6 +204,21 @@ const translates = {
   refangquan_info:
     "你可以跳过出牌阶段，令你本回合的手牌上限等于体力上限。若如此做，本回合结束时，你可以弃置一张手牌，令一名其他角色执行一个额外的回合。",
 
+  re_sunce: "界孙策",
+  re_sunce_prefix: "界",
+  rehunzi: "魂姿",
+  rehunzi_info:
+    "觉醒技，准备阶段，若你的体力值不大于2，你减1点体力上限，然后获得〖英姿〗和〖英魂〗。",
+
+  re_zhangzhang: "界张昭张纮",
+  re_zhangzhang_prefix: "界",
+  rezhijian: "直谏",
+  rezhijian_info:
+    "出牌阶段，你可以将手牌中的一张装备牌置于一名其他角色的装备区里，然后你摸一张牌；当你于出牌阶段内使用装备牌时，你摸一张牌。",
+  guzheng: "固政",
+  guzheng_info:
+    "其他角色的弃牌阶段结束时，你可以将弃牌堆里该角色此阶段内弃置的一张手牌返还给其，然后你可以获得弃牌堆里所有其余于此阶段内弃置的牌。",
+
   re_zuoci: "界左慈",
   re_zuoci_prefix: "界",
   rehuashen: "化身",
@@ -218,26 +233,6 @@ const translates = {
   rebeige: "悲歌",
   rebeige_info:
     "当一名角色受到【杀】造成的伤害后，你可以弃置一张牌，然后令其进行判定，若结果为：红桃，其回复X点体力（X为其本次受到的伤害值）；方块，其摸三张牌；梅花，伤害来源弃置两张牌；黑桃，伤害来源翻面。",
-
-  jx_sunce: "界孙策",
-  jx_sunce_prefix: "界",
-  jiang: "激昂",
-  jiang_info:
-    "每当你使用（指定目标后）或被使用（成为目标后）一张【决斗】或红色的【杀】时，你可以摸一张牌。",
-  jx_hunzi: "魂姿",
-  jx_hunzi_info: `觉醒技，准备阶段，若你的体力值不大于2，你减1点体力上限，然后获得${get.poptip("jx_yingzi")}和${get.poptip("yinghun")}。`,
-  zhiba: "制霸",
-  zhiba_info:
-    "主公技，每名其他吴势力角色的出牌阶段限一次，该角色可以与你拼点（若你已发动过“魂姿”，则你可以拒绝此次拼点）：若其没赢，你可以获得你与其此次拼点的牌。",
-
-  jx_zhangzhang: "界张昭张纮",
-  jx_zhangzhang_prefix: "界",
-  jx_zhijian: "直谏",
-  jx_zhijian_info:
-    "出牌阶段，你可以将手牌中的一张装备牌置于一名其他角色的装备区里，然后你摸一张牌；当你于出牌阶段内使用装备牌时，你摸一张牌。",
-  guzheng: "固政",
-  guzheng_info:
-    "其他角色的弃牌阶段结束时，你可以将弃牌堆里该角色此阶段内弃置的一张手牌返还给其，然后你可以获得弃牌堆里所有其余于此阶段内弃置的牌。",
 
   jx_zhanghe: "界张郃",
   jx_zhanghe_prefix: "界",

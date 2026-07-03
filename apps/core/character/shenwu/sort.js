@@ -72,7 +72,7 @@ const characterSort = {
     "ol_zuoci",
     "ol_jiangwei",
     "ol_liushan",
-    "re_sunce",
+    "ol_sunce",
     "ol_dengai",
     "re_zhanghe",
     "ol_zhangzhang",

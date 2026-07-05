@@ -2722,7 +2722,84 @@ const skills = {
       },
     },
   },
+  // 界邓艾
+  // 屯田
+  retuntian: {
+    audio: 2,
+    trigger: {
+      player: "loseAfter",
+      global: [
+        "equipAfter",
+        "addJudgeAfter",
+        "gainAfter",
+        "loseAsyncAfter",
+        "addToExpansionAfter",
+      ],
+    },
+    frequent: true,
+    filter(event, player) {
+      if (player === _status.currentPhase) {
+        return false
+      }
+      if (event.name === "gain" && event.player === player) {
+        return false
+      }
+      var evt = event.getl(player)
+      return evt?.cards2 && evt.cards2.length > 0
+    },
+    async content(event, trigger, player) {
+      const judgeEvent = player.judge((card) => 1)
+      judgeEvent.callback = lib.skill.retuntian.callback
+      await judgeEvent
+    },
+    async callback(event, trigger, player) {
+      let result
+      const { card } = event
+      // step 0
+      if (event.judgeResult.suit === "heart") {
+        player.gain(card, "gain2")
+        return
+      }
+      if (get.mode() === "guozhan") {
+        result = await player
+          .chooseBool(
+            `是否将${get.translation(card)}置于你的武将牌上，称为“田”？`,
+          )
+          .set("frequentSkill", "retuntian")
+          .set("ai", () => true)
+          .forResult()
+      } else {
+        result = { bool: true }
+      }
 
+      // step 1
+      if (!result.bool) {
+        //game.cardsDiscard(card);
+        return
+      }
+      const next = player.addToExpansion(card, "gain2")
+      next.gaintag.add("tuntian")
+      await next
+    },
+    group: "tuntian_dist",
+    locked: false,
+    ai: {
+      effect: {
+        target() {
+          return lib.skill.tuntian.ai.effect.target.apply(this, arguments)
+        },
+      },
+      threaten(player, target) {
+        if (target.countCards("h") === 0) {
+          return 2
+        }
+        return 0.5
+      },
+      nodiscard: true,
+      nolose: true,
+      notemp: true,
+    },
+  },
   // 界姜维
   // 挑衅
   retiaoxin: {
@@ -2914,6 +2991,27 @@ const skills = {
           ) {
             return [1, -3]
           }
+        },
+      },
+    },
+  },
+  // 界张昭张纮
+  // 直谏
+  rezhijian: {
+    inherit: "zhijian",
+    group: ["rezhijian_use"],
+    subfrequent: ["use"],
+    subSkill: {
+      use: {
+        audio: "rezhijian",
+        trigger: { player: "useCard" },
+        frequent: true,
+        filter(event, player) {
+          return get.type(event.card) === "equip"
+        },
+        prompt: "是否发动【直谏】摸一张牌？",
+        async content(event, trigger, player) {
+          await player.draw("nodelay")
         },
       },
     },

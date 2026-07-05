@@ -346,6 +346,24 @@ const translates = {
   olzhiba2: "制霸",
   olzhiba_info:
     "主公技，其他吴势力角色的出牌阶段限一次，其可以与你拼点（你可以拒绝此拼点）；出牌阶段限一次，你可以与其他吴势力角色拼点。若其没赢，你可以获得拼点的两张牌。",
+
+  ol_dengai: "界邓艾",
+  ol_dengai_prefix: "界",
+  oltuntian: "屯田",
+  oltuntian_info:
+    "当你于回合外失去牌后，或于回合内弃置【杀】后，你可以进行判定，若结果不为红桃，你将此判定牌置于你的武将牌上，称为“田”。你计算与其他角色的距离-X（X为“田”的数量）。",
+  olzaoxian: "凿险",
+  olzaoxian_info:
+    "觉醒技，准备阶段，若“田”的数量大于2，你减1点体力上限，然后获得〖急袭〗。你于此回合结束后获得一个额外的回合。",
+
+  ol_zhangzhang: "界张昭张纮",
+  ol_zhangzhang_prefix: "界",
+  olzhijian: "直谏",
+  olzhijian_info:
+    "出牌阶段，你可以将一张装备牌置入其他角色的装备区（替换原装备），然后摸一张牌。",
+  olguzheng: "固政",
+  olguzheng_info:
+    "每阶段限一次，当其他角色的至少两张牌因弃置而置入弃牌堆后，你可以令其获得其中一张牌，然后你可以获得其余牌。",
 }
 
 export default translates

@@ -193,4 +193,18 @@ export default {
   "#yinghun_ol_sunce1": "东吴繁盛，望父亲可知。",
   "#yinghun_ol_sunce2": "父亲，吾定不负你期望！",
   "#ol_sunce:die": "汝等，怎能受于吉蛊惑？",
+
+  "#oltuntian1": "垦田南山，志在西川。",
+  "#oltuntian2": "兵农一体，以屯养战。",
+  "#olzaoxian1": "良田厚土，足平蜀道之难。",
+  "#olzaoxian2": "效仿五丁开川，赢粮直捣黄龙。",
+  "#jixi_ol_dengai1": "明至剑阁，暗袭蜀都。",
+  "#jixi_ol_dengai2": "良田为济，神兵天降。",
+  "#ol_dengai:die": "钟会，你为何害我……",
+
+  "#olzhijian1": "君有恙，臣者当舍命除之。",
+  "#olzhijian2": "臣有言在喉，不吐不快。",
+  "#olguzheng1": "兴国为任，可驱百里之行。",
+  "#olguzheng2": "固政之责，在君亦在臣。",
+  "#ol_zhangzhang:die": "老臣年迈，无力为继。",
 }

@@ -435,6 +435,19 @@ const characters = {
     skills: ["oljiang", "olhunzi", "olzhiba"],
     isZhugong: true,
   },
+  ol_dengai: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["oltuntian", "olzaoxian"],
+  },
+  ol_zhangzhang: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["olzhijian", "olguzheng"],
+    names: "张|昭-张|纮",
+  },
 }
 
 export default characters

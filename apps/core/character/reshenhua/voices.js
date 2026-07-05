@@ -125,6 +125,14 @@ export default {
   "#rezaiqi2": "汉人奸诈，还是不服，再战！",
   "#re_menghuo:die": "我一定要赢，要赢啊……",
 
+  "#retuntian1": "休养生息，是为以备不虞。",
+  "#retuntian2": "战损难免，应以军务减之。",
+  "#zaoxian_re_dengai1": "用兵以险，则战之以胜！",
+  "#zaoxian_re_dengai2": "已至马阁山，宜速进军破蜀！",
+  "#jixi_re_dengai1": "攻敌之不备，斩将夺辎！",
+  "#jixi_re_dengai2": "奇兵正攻，敌何能为？",
+  "#re_dengai:die": "一片忠心，换来这般田地。",
+
   "#retiaoxin1": "黄口竖子，何必上阵送命？",
   "#retiaoxin2": "汝如欲大败而归，则可进军一战！",
   "#rezhiji1": "维定当奋身以复汉室。",
@@ -154,6 +162,12 @@ export default {
   "#yinghun_re_sunce1": "武烈之魂，助我扬名。",
   "#yinghun_re_sunce2": "江东之主，众望所归。",
   "#re_sunce:die": "大业未就，中世尔殒……",
+
+  "#rezhijian1": "为臣之道，在于直言无讳。",
+  "#rezhijian2": "忠言或逆耳，于国无一害。",
+  "#guzheng_re_zhangzhang1": "为君者，不可肆兴土木，奢费物力。",
+  "#guzheng_re_zhangzhang2": "安民固国，方可思动。",
+  "#re_zhangzhang:die": "只恨不能为东吴百姓再谋一日福祉……",
 
   "#rehuashen1": "世间万物，贫道皆可化为其形。",
   "#rehuashen2": "尘身土塑，唯魂魄难得。",

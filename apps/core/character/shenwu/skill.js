@@ -5608,6 +5608,231 @@ const skills = {
     },
   },
   olzhiba3: {},
+  // 界邓艾
+  // 屯田
+  oltuntian: {
+    inherit: "tuntian",
+    filter(event, player) {
+      if (player === _status.currentPhase) {
+        if (event.type !== "discard") {
+          return false
+        }
+        var evt = event.getl(player)
+        return (
+          evt?.cards2 &&
+          evt.cards2.filter(
+            (i) => get.name(i, evt.hs.includes(i) ? player : false) === "sha",
+          ).length > 0
+        )
+      }
+      if (event.name === "gain" && event.player === player) {
+        return false
+      }
+      var evt = event.getl(player)
+      return evt?.cards2 && evt.cards2.length > 0
+    },
+  },
+  // 凿险
+  olzaoxian: {
+    inherit: "zaoxian",
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      await player.loseMaxHp()
+      player.addSkills("jixi")
+      player.insertPhase()
+    },
+    ai: {
+      combo: "oltuntian",
+    },
+  },
+  // 界张昭张纮
+  // 直谏
+  olzhijian: {
+    audio: 2,
+    enable: "phaseUse",
+    filter(event, player) {
+      return player.countCards("he", { type: "equip" }) > 0
+    },
+    filterCard(card) {
+      return get.type(card) === "equip"
+    },
+    position: "he",
+    check(card) {
+      var player = _status.currentPhase
+      if (player.countCards("he", { subtype: get.subtype(card) }) > 1) {
+        return 11 - get.equipValue(card)
+      }
+      return 6 - get.value(card)
+    },
+    filterTarget(card, player, target) {
+      if (target.isMin()) {
+        return false
+      }
+      return player !== target && target.canEquip(card, true)
+    },
+    async content(event, trigger, player) {
+      await event.target.equip(event.cards[0])
+      await player.draw()
+    },
+    discard: false,
+    lose: false,
+    prepare(cards, player, targets) {
+      player.$give(cards, targets[0], false)
+    },
+    ai: {
+      basic: {
+        order: 10,
+      },
+      result: {
+        target(player, target) {
+          var card = ui.selected.cards[0]
+          if (card) {
+            return get.effect(target, card, target, target)
+          }
+          return 0
+        },
+      },
+      threaten: 1.35,
+    },
+  },
+  // 固政
+  olguzheng: {
+    audio: 2,
+    trigger: {
+      global: ["loseAfter", "loseAsyncAfter"],
+    },
+    filter(event, player) {
+      if (event.type !== "discard") {
+        return false
+      }
+      if (player.hasSkill("olguzheng_used")) {
+        return false
+      }
+      var phaseName
+      for (var name of lib.phaseName) {
+        var evt = event.getParent(name)
+        if (!evt || evt.name !== name) {
+          continue
+        }
+        phaseName = name
+        break
+      }
+      if (!phaseName) {
+        return false
+      }
+      return game.hasPlayer((current) => {
+        if (current === player) {
+          return false
+        }
+        var evt = event.getl(current)
+        if (!evt?.cards2 || evt.cards2.filterInD("d").length < 2) {
+          return false
+        }
+        return true
+      })
+    },
+    checkx(event, player, cards) {
+      if (cards.length > 2 || get.attitude(player, event.player) > 0) {
+        return true
+      }
+      for (var i = 0; i < cards.length; i++) {
+        if (get.value(cards[i], event.player, "raw") < 0) {
+          return true
+        }
+      }
+      return false
+    },
+    direct: true,
+    preHidden: true,
+    async content(event, trigger, player) {
+      const targets = [],
+        cardsList = [],
+        players = game.filterPlayer().sortBySeat(_status.currentPhase)
+      for (const current of players) {
+        if (current === player) {
+          continue
+        }
+        const cards = []
+        const evt = trigger.getl(current)
+        if (!evt?.cards2) {
+          continue
+        }
+        const cardsx = evt.cards2.filterInD("d")
+        cards.addArray(cardsx)
+        if (cards.length) {
+          targets.push(current)
+          cardsList.push(cards)
+        }
+      }
+      while (targets.length) {
+        const target = targets.shift()
+        let cards = cardsList.shift()
+        const result = await player
+          .chooseButton(2, [
+            get.prompt("olguzheng", target),
+            '<span class="text center">被选择的牌将成为对方收回的牌</span>',
+            cards,
+            [["获得剩余的牌", "放弃剩余的牌"], "tdnodes"],
+          ])
+          .set("filterButton", (button) => {
+            const type = typeof button.link
+            if (
+              ui.selected.buttons.length &&
+              type === typeof ui.selected.buttons[0].link
+            ) {
+              return false
+            }
+            return true
+          })
+          .set("check", lib.skill.olguzheng.checkx(trigger, player, cards))
+          .set("ai", (button) => {
+            if (typeof button.link === "string") {
+              return button.link === "获得剩余的牌" ? 1 : 0
+            }
+            if (_status.event.check) {
+              return (
+                20 - get.value(button.link, _status.event.getTrigger().player)
+              )
+            }
+            return 0
+          })
+          .setHiddenSkill("olguzheng")
+          .forResult()
+        if (result?.links) {
+          player.logSkill("olguzheng", target)
+          const links = result.links
+          player.addTempSkill("olguzheng_used", [
+            "phaseZhunbeiAfter",
+            "phaseDrawAfter",
+            "phaseJudgeAfter",
+            "phaseUseAfter",
+            "phaseDiscardAfter",
+            "phaseJieshuAfter",
+          ])
+          if (typeof links[0] !== "string") {
+            links.reverse()
+          }
+          const card = links[1]
+          await target.gain(card, "gain2")
+          cards.remove(card)
+          cards = cards.filterInD("d")
+          if (cards.length > 0 && links[0] === "获得剩余的牌") {
+            await player.gain(cards, "gain2")
+          }
+          break
+        }
+      }
+    },
+    ai: {
+      threaten: 1.3,
+      expose: 0.2,
+    },
+    subSkill: {
+      used: {
+        charlotte: true,
+      },
+    },
+  },
 }
 
 export default skills

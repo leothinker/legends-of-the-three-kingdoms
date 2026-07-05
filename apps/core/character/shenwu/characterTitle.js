@@ -50,4 +50,6 @@ export default {
   ol_jiangwei: "龙的衣钵",
   ol_liushan: "无为的真命主",
   ol_sunce: "江东的小霸王",
+  ol_dengai: "矫然的壮士",
+  ol_zhangzhang: "经天纬地",
 }

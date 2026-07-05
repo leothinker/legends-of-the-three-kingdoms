@@ -229,25 +229,24 @@ const characters = {
     skills: ["jiang", "hunzi", "zhiba"],
     isZhugong: true,
   },
-
-  // dengai: {
-  //   sex: "male",
-  //   group: "wei",
-  //   hp: 4,
-  //   skills: ["tuntian", "zaoxian"],
-  // },
+  zhangzhang: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["zhijian", "guzheng"],
+    names: "张|昭-张|纮",
+  },
+  dengai: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["tuntian", "zaoxian"],
+  },
   // zhanghe: {
   //   sex: "male",
   //   group: "wei",
   //   hp: 4,
   //   skills: ["qiaobian"],
-  // },
-  // zhangzhang: {
-  //   sex: "male",
-  //   group: "wu",
-  //   hp: 3,
-  //   skills: ["zhijian", "guzheng"],
-  //   names: "张|昭-张|纮",
   // },
   // shen_simayi: {
   //   sex: "male",

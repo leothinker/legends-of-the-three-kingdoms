@@ -5313,262 +5313,6 @@ const skills = {
     },
     ai: { threaten: 3 },
   },
-  // 邓艾
-  // 屯田
-  tuntian: {
-    audio: 2,
-    audioname: ["gz_dengai"],
-    trigger: {
-      player: "loseAfter",
-      global: [
-        "equipAfter",
-        "addJudgeAfter",
-        "gainAfter",
-        "loseAsyncAfter",
-        "addToExpansionAfter",
-      ],
-    },
-    frequent: true,
-    preHidden: true,
-    filter(event, player) {
-      if (player === _status.currentPhase) {
-        return false
-      }
-      if (event.name === "gain" && event.player === player) {
-        return false
-      }
-      const evt = event.getl(player)
-      return evt?.cards2 && evt.cards2.length > 0
-    },
-    async content(event, trigger, player) {
-      const judge = player.judge((card) => {
-        if (get.suit(card) === "heart") {
-          return -1
-        }
-        return 1
-      })
-      judge.judge2 = (result) => result.bool
-      if (get.mode() !== "guozhan") {
-        judge.callback = lib.skill.tuntian.callback
-        return void (await judge)
-      }
-      const result = await judge.forResult()
-      if (!result.bool || get.position(result.card) !== "d") {
-        //game.cardsDiscard(card);
-        return
-      }
-      const card = result.card
-      const chooseBool = player.chooseBool(
-        `是否将${get.translation(card)}作为“田”置于武将牌上？`,
-      )
-      chooseBool.ai = () => true
-      const { bool } = await chooseBool.forResult()
-      if (!bool) {
-        return
-      }
-      const addToExpansion = player.addToExpansion(card, "gain2")
-      addToExpansion.gaintag.add("tuntian")
-      await addToExpansion
-    },
-    async callback(event, trigger, player) {
-      if (!event.judgeResult.bool) {
-        return
-      }
-      const next = player.addToExpansion(event.judgeResult.card, "gain2")
-      next.gaintag.add("tuntian")
-      await next
-    },
-    marktext: "田",
-    intro: {
-      content: "expansion",
-      markcount: "expansion",
-    },
-    onremove(player, skill) {
-      const cards = player.getExpansions(skill)
-      if (cards.length) {
-        player.loseToDiscardpile(cards)
-      }
-    },
-    group: "tuntian_dist",
-    locked: false,
-    subSkill: {
-      dist: {
-        locked: false,
-        mod: {
-          globalFrom(from, to, distance) {
-            let num = distance - from.getExpansions("tuntian").length
-            if (
-              _status.event.skill === "jixi_backup" ||
-              _status.event.skill === "gz_jixi_backup"
-            ) {
-              num++
-            }
-            return num
-          },
-        },
-      },
-    },
-    ai: {
-      effect: {
-        target(card, player, target, current) {
-          if (
-            typeof card === "object" &&
-            get.name(card) === "sha" &&
-            target.mayHaveShan(player, "use")
-          ) {
-            return [0.6, 0.75]
-          }
-          if (!target.hasFriend() && !player.hasUnknown()) {
-            return
-          }
-          if (_status.currentPhase === target || get.type(card) === "delay") {
-            return
-          }
-          if (
-            card.name !== "shuiyanqijunx" &&
-            get.tag(card, "loseCard") &&
-            target.countCards("he")
-          ) {
-            if (target.hasSkill("ziliang")) {
-              return 0.7
-            }
-            return [0.5, Math.max(2, target.countCards("h"))]
-          }
-          if (target.isUnderControl(true, player)) {
-            if (
-              (get.tag(card, "respondSha") && target.countCards("h", "sha")) ||
-              (get.tag(card, "respondShan") && target.countCards("h", "shan"))
-            ) {
-              if (target.hasSkill("ziliang")) {
-                return 0.7
-              }
-              return [0.5, 1]
-            }
-          } else if (
-            get.tag(card, "respondSha") ||
-            get.tag(card, "respondShan")
-          ) {
-            if (get.attitude(player, target) > 0 && card.name === "juedou") {
-              return
-            }
-            if (get.tag(card, "damage") && target.hasSkillTag("maixie")) {
-              return
-            }
-            if (target.countCards("h") === 0) {
-              return 2
-            }
-            if (target.hasSkill("ziliang")) {
-              return 0.7
-            }
-            if (get.mode() === "guozhan") {
-              return 0.5
-            }
-            return [
-              0.5,
-              Math.max(
-                target.countCards("h") / 4,
-                target.countCards("h", "sha") + target.countCards("h", "shan"),
-              ),
-            ]
-          }
-        },
-      },
-      threaten(player, target) {
-        if (target.countCards("h") === 0) {
-          return 2
-        }
-        return 0.5
-      },
-      nodiscard: true,
-      nolose: true,
-      notemp: true,
-    },
-  },
-  // 凿险
-  zaoxian: {
-    skillAnimation: true,
-    animationColor: "thunder",
-    audio: 2,
-    audioname: ["re_dengai"],
-    juexingji: true,
-    trigger: { player: "phaseZhunbeiBegin" },
-    forced: true,
-    filter(event, player) {
-      return player.getExpansions("tuntian").length >= 3
-    },
-    derivation: "jixi",
-    async content(event, trigger, player) {
-      player.awakenSkill(event.name)
-      await player.loseMaxHp()
-      await player.addSkills("jixi")
-    },
-    ai: {
-      combo: "tuntian",
-    },
-  },
-  // 急袭
-  jixi: {
-    audio: 2,
-    audioname: ["re_dengai", "gz_dengai", "ol_dengai"],
-    enable: "phaseUse",
-    filter(event, player) {
-      return (
-        player.getExpansions("tuntian").length > 0 &&
-        event.filterCard({ name: "shunshou" }, player, event)
-      )
-    },
-    chooseButton: {
-      dialog(event, player) {
-        return ui.create.dialog(
-          "急袭",
-          player.getExpansions("tuntian"),
-          "hidden",
-        )
-      },
-      filter(button, player) {
-        const card = button.link
-        if (!game.checkMod(card, player, "unchanged", "cardEnabled2", player)) {
-          return false
-        }
-        const evt = _status.event.getParent()
-        return evt.filterCard(
-          get.autoViewAs({ name: "shunshou" }, [card]),
-          player,
-          evt,
-        )
-      },
-      backup(links, player) {
-        const skill = _status.event.buttoned
-        return {
-          audio: "jixi",
-          audioname: ["re_dengai", "gz_dengai", "ol_dengai"],
-          selectCard: -1,
-          position: "x",
-          filterCard:
-            skill === "jixi"
-              ? (card) => card === lib.skill.jixi_backup.card
-              : (card) => card === lib.skill.gz_jixi_backup.card,
-          viewAs: { name: "shunshou" },
-          card: links[0],
-        }
-      },
-      prompt(links, player) {
-        return `选择 顺手牵羊（${get.translation(links[0])}）的目标`
-      },
-    },
-    subSkill: {
-      backup: {},
-    },
-    ai: {
-      order: 10,
-      result: {
-        player(player) {
-          return player.getExpansions("tuntian").length - 1
-        },
-      },
-      combo: "tuntian",
-    },
-  },
   // 姜维
   // 挑衅
   tiaoxin: {
@@ -6200,7 +5944,7 @@ const skills = {
           const moves = evt.cards.filterInD("d")
           cards.addArray(moves)
           if (evt.player === target) {
-            cards2.addArray(moves)
+            cards2.addArray(moves.filter((c) => evt.hs.includes(c)))
           } else {
             cards2.removeArray(moves)
           }
@@ -6322,6 +6066,262 @@ const skills = {
     ai: {
       threaten: 1.3,
       expose: 0.2,
+    },
+  },
+  // 邓艾
+  // 屯田
+  tuntian: {
+    audio: 2,
+    audioname: ["gz_dengai"],
+    trigger: {
+      player: "loseAfter",
+      global: [
+        "equipAfter",
+        "addJudgeAfter",
+        "gainAfter",
+        "loseAsyncAfter",
+        "addToExpansionAfter",
+      ],
+    },
+    frequent: true,
+    preHidden: true,
+    filter(event, player) {
+      if (player === _status.currentPhase) {
+        return false
+      }
+      if (event.name === "gain" && event.player === player) {
+        return false
+      }
+      const evt = event.getl(player)
+      return evt?.cards2 && evt.cards2.length > 0
+    },
+    async content(event, trigger, player) {
+      const judge = player.judge((card) => {
+        if (get.suit(card) === "heart") {
+          return -1
+        }
+        return 1
+      })
+      judge.judge2 = (result) => result.bool
+      if (get.mode() !== "guozhan") {
+        judge.callback = lib.skill.tuntian.callback
+        return void (await judge)
+      }
+      const result = await judge.forResult()
+      if (!result.bool || get.position(result.card) !== "d") {
+        //game.cardsDiscard(card);
+        return
+      }
+      const card = result.card
+      const chooseBool = player.chooseBool(
+        `是否将${get.translation(card)}置于你的武将牌上，称为“田”？`,
+      )
+      chooseBool.ai = () => true
+      const { bool } = await chooseBool.forResult()
+      if (!bool) {
+        return
+      }
+      const addToExpansion = player.addToExpansion(card, "gain2")
+      addToExpansion.gaintag.add("tuntian")
+      await addToExpansion
+    },
+    async callback(event, trigger, player) {
+      if (!event.judgeResult.bool) {
+        return
+      }
+      const next = player.addToExpansion(event.judgeResult.card, "gain2")
+      next.gaintag.add("tuntian")
+      await next
+    },
+    marktext: "田",
+    intro: {
+      content: "expansion",
+      markcount: "expansion",
+    },
+    onremove(player, skill) {
+      const cards = player.getExpansions(skill)
+      if (cards.length) {
+        player.loseToDiscardpile(cards)
+      }
+    },
+    group: "tuntian_dist",
+    locked: false,
+    subSkill: {
+      dist: {
+        locked: false,
+        mod: {
+          globalFrom(from, to, distance) {
+            let num = distance - from.getExpansions("tuntian").length
+            if (
+              _status.event.skill === "jixi_backup" ||
+              _status.event.skill === "gz_jixi_backup"
+            ) {
+              num++
+            }
+            return num
+          },
+        },
+      },
+    },
+    ai: {
+      effect: {
+        target(card, player, target, current) {
+          if (
+            typeof card === "object" &&
+            get.name(card) === "sha" &&
+            target.mayHaveShan(player, "use")
+          ) {
+            return [0.6, 0.75]
+          }
+          if (!target.hasFriend() && !player.hasUnknown()) {
+            return
+          }
+          if (_status.currentPhase === target || get.type(card) === "delay") {
+            return
+          }
+          if (
+            card.name !== "shuiyanqijunx" &&
+            get.tag(card, "loseCard") &&
+            target.countCards("he")
+          ) {
+            if (target.hasSkill("ziliang")) {
+              return 0.7
+            }
+            return [0.5, Math.max(2, target.countCards("h"))]
+          }
+          if (target.isUnderControl(true, player)) {
+            if (
+              (get.tag(card, "respondSha") && target.countCards("h", "sha")) ||
+              (get.tag(card, "respondShan") && target.countCards("h", "shan"))
+            ) {
+              if (target.hasSkill("ziliang")) {
+                return 0.7
+              }
+              return [0.5, 1]
+            }
+          } else if (
+            get.tag(card, "respondSha") ||
+            get.tag(card, "respondShan")
+          ) {
+            if (get.attitude(player, target) > 0 && card.name === "juedou") {
+              return
+            }
+            if (get.tag(card, "damage") && target.hasSkillTag("maixie")) {
+              return
+            }
+            if (target.countCards("h") === 0) {
+              return 2
+            }
+            if (target.hasSkill("ziliang")) {
+              return 0.7
+            }
+            if (get.mode() === "guozhan") {
+              return 0.5
+            }
+            return [
+              0.5,
+              Math.max(
+                target.countCards("h") / 4,
+                target.countCards("h", "sha") + target.countCards("h", "shan"),
+              ),
+            ]
+          }
+        },
+      },
+      threaten(player, target) {
+        if (target.countCards("h") === 0) {
+          return 2
+        }
+        return 0.5
+      },
+      nodiscard: true,
+      nolose: true,
+      notemp: true,
+    },
+  },
+  // 凿险
+  zaoxian: {
+    skillAnimation: true,
+    animationColor: "thunder",
+    audio: 2,
+    audioname: ["re_dengai"],
+    juexingji: true,
+    trigger: { player: "phaseZhunbeiBegin" },
+    forced: true,
+    filter(event, player) {
+      return player.getExpansions("tuntian").length >= 3
+    },
+    derivation: "jixi",
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      await player.loseMaxHp()
+      await player.addSkills("jixi")
+    },
+    ai: {
+      combo: "tuntian",
+    },
+  },
+  // 急袭
+  jixi: {
+    audio: 2,
+    audioname: ["gz_dengai", "re_dengai", "ol_dengai"],
+    enable: "phaseUse",
+    filter(event, player) {
+      return (
+        player.getExpansions("tuntian").length > 0 &&
+        event.filterCard({ name: "shunshou" }, player, event)
+      )
+    },
+    chooseButton: {
+      dialog(event, player) {
+        return ui.create.dialog(
+          "急袭",
+          player.getExpansions("tuntian"),
+          "hidden",
+        )
+      },
+      filter(button, player) {
+        const card = button.link
+        if (!game.checkMod(card, player, "unchanged", "cardEnabled2", player)) {
+          return false
+        }
+        const evt = _status.event.getParent()
+        return evt.filterCard(
+          get.autoViewAs({ name: "shunshou" }, [card]),
+          player,
+          evt,
+        )
+      },
+      backup(links, player) {
+        const skill = _status.event.buttoned
+        return {
+          audio: "jixi",
+          audioname: ["re_dengai", "gz_dengai", "ol_dengai"],
+          selectCard: -1,
+          position: "x",
+          filterCard:
+            skill === "jixi"
+              ? (card) => card === lib.skill.jixi_backup.card
+              : (card) => card === lib.skill.gz_jixi_backup.card,
+          viewAs: { name: "shunshou" },
+          card: links[0],
+        }
+      },
+      prompt(links, player) {
+        return `选择 顺手牵羊（${get.translation(links[0])}）的目标`
+      },
+    },
+    subSkill: {
+      backup: {},
+    },
+    ai: {
+      order: 10,
+      result: {
+        player(player) {
+          return player.getExpansions("tuntian").length - 1
+        },
+      },
+      combo: "tuntian",
     },
   },
   // 神赵云

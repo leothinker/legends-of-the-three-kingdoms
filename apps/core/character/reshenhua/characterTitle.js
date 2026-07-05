@@ -26,9 +26,11 @@ export default {
   re_jiaxu: "毒士无双",
   re_lusu: "荷檐吐奇",
 
+  re_dengai: "矫然的壮士",
   re_jiangwei: "龙的衣钵",
   re_liushan: "无为的真命主",
   re_sunce: "江东的小霸王",
+  re_zhangzhang: "经天纬地",
   re_zuoci: "迷之仙人",
   re_caiwenji: "异乡的孤女",
 }

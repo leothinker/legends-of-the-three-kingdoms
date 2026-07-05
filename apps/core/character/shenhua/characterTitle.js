@@ -39,7 +39,7 @@ export default {
   sunce: "江东的小霸王",
   zhangzhang: "经天纬地",
   dengai: "矫然的壮士",
-  // zhanghe: "料敌机先",
+  zhanghe: "料敌机先",
 
   // re_lusu: "独断外交家",
   // wangji: "经行合一",

@@ -51,5 +51,6 @@ export default {
   ol_liushan: "无为的真命主",
   ol_sunce: "江东的小霸王",
   ol_dengai: "矫然的壮士",
+  ol_zhanghe: "料敌机先",
   ol_zhangzhang: "经天纬地",
 }

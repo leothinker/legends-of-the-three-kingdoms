@@ -5182,137 +5182,6 @@ const skills = {
     },
     ai: { combo: "huashen" },
   },
-  // 张郃
-  // 巧变
-  qiaobian: {
-    audio: 2,
-    audioname2: { gz_jun_caocao: "jianan_qiaobian" },
-    trigger: {
-      player: [
-        "phaseJudgeBefore",
-        "phaseDrawBefore",
-        "phaseUseBefore",
-        "phaseDiscardBefore",
-      ],
-    },
-    filter(event, player) {
-      return player.countCards("h") > 0
-    },
-    preHidden: true,
-    async cost(event, trigger, player) {
-      let check,
-        str = "弃置一张手牌并跳过"
-      str += ["判定", "摸牌", "出牌", "弃牌"][
-        lib.skill.qiaobian.trigger.player.indexOf(event.triggername)
-      ]
-      str += "阶段"
-      if (trigger.name === "phaseDraw") {
-        str += "，然后可以获得至多两名角色各一张手牌"
-      }
-      if (trigger.name === "phaseUse") {
-        str += "，然后可以移动场上的一张牌"
-      }
-      switch (trigger.name) {
-        case "phaseJudge":
-          check = player.countCards("j")
-          break
-        case "phaseDraw": {
-          let i,
-            num = 0,
-            num2 = 0
-          const players = game.filterPlayer()
-          for (i = 0; i < players.length; i++) {
-            if (player !== players[i] && players[i].countCards("h")) {
-              const att = get.attitude(player, players[i])
-              if (att <= 0) {
-                num++
-              }
-              if (att < 0) {
-                num2++
-              }
-            }
-          }
-          check = num >= 2 && num2 > 0
-          break
-        }
-        case "phaseUse":
-          if (!player.canMoveCard(true)) {
-            check = false
-          } else {
-            check = game.hasPlayer(
-              (current) =>
-                get.attitude(player, current) > 0 && current.countCards("j"),
-            )
-            if (!check) {
-              if (player.countCards("h") > player.hp + 1) {
-                check = false
-              } else if (player.countCards("h", { name: "wuzhong" })) {
-                check = false
-              } else {
-                check = true
-              }
-            }
-          }
-          break
-        case "phaseDiscard":
-          check = player.needsToDiscard()
-          break
-      }
-      event.result = await player
-        .chooseToDiscard(
-          get.prompt(event.skill),
-          str,
-          lib.filter.cardDiscardable,
-        )
-        .set("ai", (card) => {
-          if (!_status.event.check) {
-            return -1
-          }
-          return 7 - get.value(card)
-        })
-        .set("check", check)
-        .setHiddenSkill(event.skill)
-        .forResult()
-    },
-    async content(event, trigger, player) {
-      trigger.cancel()
-      game.log(
-        player,
-        "跳过了",
-        "#y" +
-          ["判定", "摸牌", "出牌", "弃牌"][
-            lib.skill.qiaobian.trigger.player.indexOf(event.triggername)
-          ] +
-          "阶段",
-      )
-      if (trigger.name === "phaseUse") {
-        if (player.canMoveCard()) {
-          await player.moveCard()
-        }
-      } else if (trigger.name === "phaseDraw") {
-        const result = await player
-          .chooseTarget(
-            [1, 2],
-            "获得至多两名角色各一张手牌",
-            (card, player, target) =>
-              target !== player && target.countCards("h"),
-          )
-          .set("ai", (target) => 1 - get.attitude(_status.event.player, target))
-          .forResult()
-        if (!result.bool) {
-          return
-        }
-        result.targets.sortBySeat()
-        player.line(result.targets, "green")
-        if (!result.targets.length) {
-          return
-        }
-        await player.gainMultiple(result.targets)
-        await game.delay()
-      }
-    },
-    ai: { threaten: 3 },
-  },
   // 姜维
   // 挑衅
   tiaoxin: {
@@ -6296,7 +6165,7 @@ const skills = {
         const skill = _status.event.buttoned
         return {
           audio: "jixi",
-          audioname: ["re_dengai", "gz_dengai", "ol_dengai"],
+          audioname: ["gz_dengai", "re_dengai", "ol_dengai"],
           selectCard: -1,
           position: "x",
           filterCard:
@@ -6323,6 +6192,132 @@ const skills = {
       },
       combo: "tuntian",
     },
+  },
+  // 张郃
+  // 巧变
+  qiaobian: {
+    audio: 2,
+    trigger: {
+      player: [
+        "phaseJudgeBefore",
+        "phaseDrawBefore",
+        "phaseUseBefore",
+        "phaseDiscardBefore",
+      ],
+    },
+    filter(event, player) {
+      return player.countCards("h") > 0
+    },
+    preHidden: true,
+    async cost(event, trigger, player) {
+      let check,
+        str = "弃置一张手牌并跳过"
+      str += ["判定", "摸牌", "出牌", "弃牌"][
+        lib.skill.qiaobian.trigger.player.indexOf(event.triggername)
+      ]
+      str += "阶段"
+      if (trigger.name === "phaseDraw") {
+        str += "，然后可以获得至多两名角色各一张手牌"
+      }
+      if (trigger.name === "phaseUse") {
+        str += "，然后可以移动场上的一张牌"
+      }
+      switch (trigger.name) {
+        case "phaseJudge":
+          check = player.countCards("j")
+          break
+        case "phaseDraw": {
+          let i,
+            num = 0,
+            num2 = 0
+          const players = game.filterPlayer()
+          for (i = 0; i < players.length; i++) {
+            if (player !== players[i] && players[i].countCards("h")) {
+              const att = get.attitude(player, players[i])
+              if (att <= 0) {
+                num++
+              }
+              if (att < 0) {
+                num2++
+              }
+            }
+          }
+          check = num >= 2 && num2 > 0
+          break
+        }
+        case "phaseUse":
+          if (!player.canMoveCard(true)) {
+            check = false
+          } else {
+            check = game.hasPlayer(
+              (current) =>
+                get.attitude(player, current) > 0 && current.countCards("j"),
+            )
+            if (!check) {
+              if (player.countCards("h") > player.hp + 1) {
+                check = false
+              } else if (player.countCards("h", { name: "wuzhong" })) {
+                check = false
+              } else {
+                check = true
+              }
+            }
+          }
+          break
+        case "phaseDiscard":
+          check = player.needsToDiscard()
+          break
+      }
+      event.result = await player
+        .chooseToDiscard(
+          get.prompt(event.skill),
+          str,
+          lib.filter.cardDiscardable,
+        )
+        .set("ai", (card) => {
+          if (!_status.event.check) {
+            return -1
+          }
+          return 7 - get.value(card)
+        })
+        .set("check", check)
+        .setHiddenSkill(event.skill)
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      trigger.cancel()
+      game.log(
+        player,
+        "跳过了",
+        `#y${["判定", "摸牌", "出牌", "弃牌"][lib.skill.qiaobian.trigger.player.indexOf(event.triggername)]}阶段`,
+      )
+      if (trigger.name === "phaseUse") {
+        if (player.canMoveCard()) {
+          await player.moveCard()
+        }
+      } else if (trigger.name === "phaseDraw") {
+        const result = await player
+          .chooseTarget(
+            [1, 2],
+            "获得至多两名角色各一张手牌",
+            (card, player, target) =>
+              target !== player && target.countCards("h"),
+          )
+          .set("ai", (target) => 1 - get.attitude(_status.event.player, target))
+          .forResult()
+        if (!result.bool) {
+          return
+        }
+        result.targets.sortBySeat()
+        player.line(result.targets, "green")
+        if (!result.targets.length) {
+          return
+        }
+        await player.gainMultiple(result.targets)
+        await game.delay()
+      }
+    },
+    ai: { threaten: 3 },
   },
   // 神赵云
   // 绝境

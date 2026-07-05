@@ -202,6 +202,10 @@ export default {
   "#jixi_ol_dengai2": "良田为济，神兵天降。",
   "#ol_dengai:die": "钟会，你为何害我……",
 
+  "#olqiaobian1": "顺势而变，则胜矣。",
+  "#olqiaobian2": "万物变化，固无休息。",
+  "#ol_zhanghe:die": "何处之流矢……",
+
   "#olzhijian1": "君有恙，臣者当舍命除之。",
   "#olzhijian2": "臣有言在喉，不吐不快。",
   "#olguzheng1": "兴国为任，可驱百里之行。",

@@ -242,12 +242,12 @@ const characters = {
     hp: 4,
     skills: ["tuntian", "zaoxian"],
   },
-  // zhanghe: {
-  //   sex: "male",
-  //   group: "wei",
-  //   hp: 4,
-  //   skills: ["qiaobian"],
-  // },
+  zhanghe: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["qiaobian"],
+  },
   // shen_simayi: {
   //   sex: "male",
   //   group: "shen",

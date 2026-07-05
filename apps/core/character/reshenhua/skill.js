@@ -2722,6 +2722,199 @@ const skills = {
       },
     },
   },
+  // 界张郃
+  // 巧变
+  reqiaobian: {
+    audio: "olqiaobian",
+    trigger: { global: "roundStart" },
+    filter(event, player) {
+      const lastTarget = get.info("reqiaobian").getLastTarget(player)
+      return game.hasPlayer((current) => current !== lastTarget)
+    },
+    async cost(event, trigger, player) {
+      const lastTarget = get.info("reqiaobian").getLastTarget(player)
+      event.result = await player
+        .chooseTarget(
+          get.prompt2(event.skill),
+          (_, player, target) => target !== get.event().lastTarget,
+        )
+        .set(
+          "ai",
+          (target) =>
+            get.attitude(get.player(), target) * target.countCards("h"),
+        )
+        .set("lastTarget", lastTarget)
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      await game.asyncDraw([player, ...event.targets].sortBySeat())
+      player.setStorage("reqiaobian_effect", event.targets[0], true)
+      player.addTempSkill("reqiaobian_effect", { global: "roundEnd" })
+    },
+    getLastTarget(player) {
+      const historys = player.getRoundHistory(
+        "useSkill",
+        (evt) => evt.skill === "reqiaobian",
+        1,
+      )
+      if (!historys.length) {
+        return null
+      }
+      return historys[0]?.targets?.[0]
+    },
+    subSkill: {
+      effect: {
+        audio: "olqiaobian",
+        charlotte: true,
+        init(player, skill) {
+          const target = player.getStorage(skill)
+          if (target) {
+            player.markSkillCharacter(
+              skill,
+              target,
+              "巧变",
+              `本轮选择${get.translation(target)}为目标`,
+            )
+          }
+        },
+        onremove: true,
+        trigger: {
+          global: [
+            "phaseJudgeBefore",
+            "phaseDrawBefore",
+            "phaseUseBefore",
+            "phaseDiscardBefore",
+          ],
+        },
+        filter(event, player) {
+          if (!player.countDiscardableCards(player, "he")) {
+            return false
+          }
+          return player.getStorage("reqiaobian_effect") === event.player
+        },
+        async cost(event, trigger, player) {
+          let check,
+            str = `弃置一张牌跳过其${get.translation(trigger.name)}`
+          if (trigger.name === "phaseDraw") {
+            str += "，其获得至多两名角色各一张手牌"
+          }
+          if (trigger.name === "phaseUse") {
+            str += "，其可以移动场上的一张牌"
+          }
+          switch (trigger.name) {
+            case "phaseJudge":
+              check = trigger.player.countCards("j")
+              break
+            case "phaseDraw": {
+              let num = 0,
+                num2 = 0
+              const players = game.filterPlayer(
+                (current) => current !== trigger.player,
+              )
+              for (const current of players) {
+                let hs = current.countGainableCards(trigger.player, "h")
+                if (current === player) {
+                  hs--
+                }
+                if (hs) {
+                  const att = get.attitude(trigger.player, current)
+                  if (att <= 0) {
+                    num++
+                  }
+                  if (att < 0) {
+                    num2++
+                  }
+                }
+              }
+              if (trigger.num < 2) {
+                check = true
+              }
+              check = num >= 2 && num2 > 0
+              break
+            }
+            case "phaseUse":
+              if (!trigger.player.canMoveCard(true)) {
+                check = false
+              } else {
+                check = game.hasPlayer(
+                  (current) =>
+                    get.attitude(trigger.player, current) > 0 &&
+                    current.countCards("j"),
+                )
+                if (!check) {
+                  if (trigger.player.countCards("h") > trigger.player.hp + 1) {
+                    check = false
+                  } else if (
+                    trigger.player.mayHaveSha() &&
+                    trigger.player.getUseValue("sha") > 0
+                  ) {
+                    check = false
+                  } else {
+                    check = true
+                  }
+                }
+              }
+              break
+            case "phaseDiscard":
+              check = trigger.player.needsToDiscard()
+              break
+          }
+          event.result = await player
+            .chooseToDiscard(get.prompt(event.skill, trigger.player), str)
+            .set("ai", (card) => {
+              if (!_status.event.check) {
+                return -1
+              }
+              return 7 - get.value(card)
+            })
+            .set("check", check)
+            .set("chooseonly", true)
+            .forResult()
+        },
+        async content(event, trigger, player) {
+          await player.discard(event.cards)
+          trigger.cancel()
+          game.log(
+            trigger.player,
+            "跳过了",
+            `#y${get.translation(trigger.name)}`,
+          )
+          if (trigger.name === "phaseUse") {
+            if (trigger.player.canMoveCard()) {
+              await trigger.player.moveCard()
+            }
+          } else if (trigger.name === "phaseDraw") {
+            const result = await trigger.player
+              .chooseTarget(
+                [1, 2],
+                "获得至多两名角色各一张手牌",
+                (card, player, target) =>
+                  target !== player && target.countGainableCards(player, "h"),
+              )
+              .set("ai", (target) =>
+                get.effect(
+                  target,
+                  { name: "shunshou_copy2" },
+                  get.player(),
+                  get.player(),
+                ),
+              )
+              .forResult()
+            if (!result?.bool || !result.targets?.length) {
+              return
+            }
+            result.targets.sortBySeat()
+            trigger.player.line(result.targets, "green")
+            await trigger.player.gainMultiple(result.targets)
+            await game.delay()
+          }
+        },
+        ai: {
+          threaten: 3,
+        },
+      },
+    },
+  },
   // 界邓艾
   // 屯田
   retuntian: {

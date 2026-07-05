@@ -262,11 +262,6 @@ const translates = {
   xinsheng: "新生",
   xinsheng_info: "当你受到1点伤害后，你可以获得一张新的“化身”牌。",
 
-  zhanghe: "张郃",
-  qiaobian: "巧变",
-  qiaobian_info:
-    "你可以弃置一张手牌并跳过一个阶段。若你以此法跳过摸牌阶段，你可以获得至多两名角色的各一张手牌；若你以此法跳过出牌阶段，你可以移动场上的一张牌。",
-
   jiangwei: "姜维",
   tiaoxin: "挑衅",
   tiaoxin_info:
@@ -310,6 +305,11 @@ const translates = {
   zaoxian_info: `觉醒技，准备阶段，若“田”的数量大于2，你减1点体力上限，然后获得${get.poptip("jixi")}。`,
   jixi: "急袭",
   jixi_info: "你可以将一张“田”当【顺手牵羊】使用。",
+
+  zhanghe: "张郃",
+  qiaobian: "巧变",
+  qiaobian_info:
+    "你可以弃置一张手牌跳过你的一个阶段（准备阶段和结束阶段除外），若以此法跳过：摸牌阶段，你可以获得至多两名其他角色各一张手牌；出牌阶段，你可以移动场上的一张牌。",
 
   shen_zhaoyun: "神赵云",
   shen_zhaoyun_prefix: "神",

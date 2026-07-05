@@ -74,7 +74,7 @@ const characterSort = {
     "ol_liushan",
     "ol_sunce",
     "ol_dengai",
-    "re_zhanghe",
+    "ol_zhanghe",
     "ol_zhangzhang",
   ],
   shenwu_yin: [

@@ -5645,6 +5645,458 @@ const skills = {
       combo: "oltuntian",
     },
   },
+  // 界张郃
+  // 巧变
+  olqiaobian: {
+    audio: 2,
+    trigger: {
+      global: "phaseBefore",
+      player: "enterGame",
+    },
+    forced: true,
+    locked: false,
+    filter(event, player) {
+      return event.name !== "phase" || game.phaseNumber === 0
+    },
+    async content(event, trigger, player) {
+      player.addMark("olqiaobian", 2)
+      await game.delayx()
+    },
+    marktext: "变",
+    intro: {
+      name2: "变",
+      content(storage, player) {
+        var str = `共有${storage || 0}个标记`
+        if (player.storage.olqiaobian_jieshu) {
+          str = `<li>${str}<br><li>已记录手牌数：${get.translation(player.storage.olqiaobian_jieshu)}`
+        }
+        return str
+      },
+    },
+    group: [
+      "olqiaobian_judge",
+      "olqiaobian_draw",
+      "olqiaobian_use",
+      "olqiaobian_discard",
+      "olqiaobian_jieshu",
+    ],
+    subSkill: {
+      judge: {
+        audio: "olqiaobian",
+        trigger: { player: "phaseJudgeBefore" },
+        direct: true,
+        filter(event, player) {
+          return (
+            player.hasMark("olqiaobian") ||
+            player.hasCard(
+              (card) =>
+                lib.filter.cardDiscardable(card, player, "olqiaobian_judge"),
+              "he",
+            )
+          )
+        },
+        check(event, player) {
+          return player.hasCard(
+            (card) =>
+              get.effect(
+                player,
+                {
+                  name: card.viewAs || card.name,
+                  cards: [card],
+                },
+                player,
+                player,
+              ) < 0,
+            "j",
+          )
+        },
+        async content(event, trigger, player) {
+          let result
+
+          // step 0
+          var choices = []
+          if (player.hasMark("olqiaobian")) {
+            choices.push("弃置标记")
+          }
+          if (
+            player.hasCard(
+              (card) =>
+                lib.filter.cardDiscardable(card, player, "olqiaobian_judge"),
+              "he",
+            )
+          ) {
+            choices.push("弃置牌")
+          }
+          choices.push("cancel2")
+          result = await player
+            .chooseControl(choices)
+            .set("prompt", "巧变：是否跳过判定阶段？")
+            .set("ai", () => {
+              var evt = _status.event
+              if (
+                lib.skill[evt.getParent().name].check(
+                  evt.getTrigger(),
+                  evt.player,
+                )
+              ) {
+                return 0
+              }
+              return "cancel2"
+            })
+            .forResult()
+
+          // step 1
+          if (result.control !== "cancel2") {
+            if (result.control === "弃置牌") {
+              const discardResult = await player
+                .chooseToDiscard("he", true)
+                .forResult()
+              discardResult.logSkill = event.name
+            } else {
+              player.logSkill(event.name)
+              player.removeMark("olqiaobian", 1)
+            }
+
+            // step 2
+            trigger.cancel()
+          }
+        },
+      },
+      draw: {
+        audio: "olqiaobian",
+        trigger: { player: "phaseDrawBefore" },
+        direct: true,
+        filter(event, player) {
+          return (
+            player.hasMark("olqiaobian") ||
+            player.hasCard(
+              (card) =>
+                lib.filter.cardDiscardable(card, player, "olqiaobian_judge"),
+              "he",
+            )
+          )
+        },
+        check(event, player) {
+          return (
+            game.countPlayer((current) => {
+              if (
+                current === player ||
+                current.countGainableCards(player, "h") === 0
+              ) {
+                return false
+              }
+              var att = get.attitude(player, current)
+              if (current.hasSkill("tuntian")) {
+                return att > 0
+              }
+              return att < 1
+            }) > 1
+          )
+        },
+        async content(event, trigger, player) {
+          let result
+
+          // step 0
+          var choices = []
+          if (player.hasMark("olqiaobian")) {
+            choices.push("弃置标记")
+          }
+          if (
+            player.hasCard(
+              (card) =>
+                lib.filter.cardDiscardable(card, player, "olqiaobian_draw"),
+              "he",
+            )
+          ) {
+            choices.push("弃置牌")
+          }
+          choices.push("cancel2")
+          result = await player
+            .chooseControl(choices)
+            .set("prompt", "巧变：是否跳过摸牌阶段？")
+            .set("ai", () => {
+              var evt = _status.event
+              if (
+                lib.skill[evt.getParent().name].check(
+                  evt.getTrigger(),
+                  evt.player,
+                )
+              ) {
+                return 0
+              }
+              return "cancel2"
+            })
+            .forResult()
+
+          // step 1
+          if (result.control !== "cancel2") {
+            if (result.control === "弃置牌") {
+              const discardResult = await player
+                .chooseToDiscard("he", true)
+                .forResult()
+              discardResult.logSkill = event.name
+            } else {
+              player.logSkill(event.name)
+              player.removeMark("olqiaobian", 1)
+            }
+
+            // step 2
+            trigger.cancel()
+            if (
+              game.hasPlayer(
+                (current) => current.countGainableCards(player, "h") > 0,
+              )
+            ) {
+              result = await player
+                .chooseTarget(
+                  "是否获得至多两名其他角色的各一张手牌？",
+                  [1, 2],
+                  (card, player, target) =>
+                    target !== player &&
+                    target.countGainableCards(player, "h") > 0,
+                )
+                .set("ai", (target) => {
+                  var att = get.attitude(_status.event.player, target)
+                  if (target.hasSkill("tuntian")) {
+                    return att / 10
+                  }
+                  return 1 - att
+                })
+                .forResult()
+
+              // step 3
+              if (result.bool) {
+                var targets = result.targets.sortBySeat()
+                player.line(targets, "green")
+                await player.gainMultiple(targets).forResult()
+              }
+            }
+          }
+        },
+      },
+      use: {
+        audio: "olqiaobian",
+        trigger: { player: "phaseUseBefore" },
+        direct: true,
+        filter(event, player) {
+          return (
+            player.hasMark("olqiaobian") ||
+            player.hasCard(
+              (card) =>
+                lib.filter.cardDiscardable(card, player, "olqiaobian_judge"),
+              "he",
+            )
+          )
+        },
+        check(event, player) {
+          if (
+            player.countCards("h", (card) =>
+              player.hasValueTarget(card, null, true),
+            ) > 1
+          ) {
+            return false
+          }
+          return game.hasPlayer((current) => {
+            var att = get.sgn(get.attitude(player, current))
+            if (att !== 0) {
+              var es = current.getCards("e")
+              for (var i = 0; i < es.length; i++) {
+                if (
+                  game.hasPlayer((current2) => {
+                    if (
+                      get.sgn(get.value(es[i], current)) !== -att ||
+                      get.value(es[i], current) < 5
+                    ) {
+                      return false
+                    }
+                    var att2 = get.sgn(get.attitude(player, current2))
+                    if (
+                      att === att2 ||
+                      att2 !==
+                        get.sgn(get.effect(current2, es[i], player, current2))
+                    ) {
+                      return false
+                    }
+                    return (
+                      current !== current2 &&
+                      !current2.isMin() &&
+                      current2.canEquip(es[i])
+                    )
+                  })
+                ) {
+                  return true
+                }
+              }
+            }
+            if (att > 0) {
+              var js = current.getCards(
+                "j",
+                (card) =>
+                  get.effect(
+                    current,
+                    {
+                      name: card.viewAs || card.name,
+                      cards: [card],
+                    },
+                    current,
+                    current,
+                  ) < -2,
+              )
+              for (var i = 0; i < js.length; i++) {
+                if (
+                  game.hasPlayer((current2) => {
+                    var att2 = get.attitude(player, current2)
+                    if (att2 >= 0) {
+                      return false
+                    }
+                    return current !== current2 && current2.canAddJudge(js[i])
+                  })
+                ) {
+                  return true
+                }
+              }
+            }
+          })
+        },
+        async content(event, trigger, player) {
+          let result
+
+          // step 0
+          var choices = []
+          if (player.hasMark("olqiaobian")) {
+            choices.push("弃置标记")
+          }
+          if (
+            player.hasCard(
+              (card) =>
+                lib.filter.cardDiscardable(card, player, "olqiaobian_use"),
+              "he",
+            )
+          ) {
+            choices.push("弃置牌")
+          }
+          choices.push("cancel2")
+          result = await player
+            .chooseControl(choices)
+            .set("prompt", "巧变：是否跳过出牌阶段？")
+            .set("ai", () => {
+              var evt = _status.event
+              if (
+                lib.skill[evt.getParent().name].check(
+                  evt.getTrigger(),
+                  evt.player,
+                )
+              ) {
+                return 0
+              }
+              return "cancel2"
+            })
+            .forResult()
+
+          // step 1
+          if (result.control !== "cancel2") {
+            if (result.control === "弃置牌") {
+              const discardResult = await player
+                .chooseToDiscard("he", true)
+                .forResult()
+              discardResult.logSkill = event.name
+            } else {
+              player.logSkill(event.name)
+              player.removeMark("olqiaobian", 1)
+            }
+
+            // step 2
+            trigger.cancel()
+            await player.moveCard().forResult()
+          }
+        },
+      },
+      discard: {
+        audio: "olqiaobian",
+        trigger: { player: "phaseDiscardBefore" },
+        direct: true,
+        filter(event, player) {
+          return (
+            player.hasMark("olqiaobian") ||
+            player.hasCard(
+              (card) =>
+                lib.filter.cardDiscardable(card, player, "olqiaobian_judge"),
+              "he",
+            )
+          )
+        },
+        check(event, player) {
+          return player.needsToDiscard()
+        },
+        async content(event, trigger, player) {
+          let result
+
+          // step 0
+          var choices = []
+          if (player.hasMark("olqiaobian")) {
+            choices.push("弃置标记")
+          }
+          if (
+            player.hasCard(
+              (card) =>
+                lib.filter.cardDiscardable(card, player, "olqiaobian_discard"),
+              "he",
+            )
+          ) {
+            choices.push("弃置牌")
+          }
+          choices.push("cancel2")
+          result = await player
+            .chooseControl(choices)
+            .set("prompt", "巧变：是否跳过弃牌阶段？")
+            .set("ai", () => {
+              var evt = _status.event
+              if (
+                lib.skill[evt.getParent().name].check(
+                  evt.getTrigger(),
+                  evt.player,
+                )
+              ) {
+                return 0
+              }
+              return "cancel2"
+            })
+            .forResult()
+
+          // step 1
+          if (result.control !== "cancel2") {
+            if (result.control === "弃置牌") {
+              const discardResult = await player
+                .chooseToDiscard("he", true)
+                .forResult()
+              discardResult.logSkill = event.name
+            } else {
+              player.logSkill(event.name)
+              player.removeMark("olqiaobian", 1)
+            }
+
+            // step 2
+            trigger.cancel()
+          }
+        },
+      },
+      jieshu: {
+        audio: "olqiaobian",
+        trigger: { player: "phaseJieshuBegin" },
+        forced: true,
+        filter(event, player) {
+          return !player
+            .getStorage("olqiaobian_jieshu")
+            .includes(player.countCards("h"))
+        },
+        async content(event, trigger, player) {
+          player.addMark("olqiaobian", 1)
+          player.markAuto("olqiaobian_jieshu", [player.countCards("h")])
+          player.storage.olqiaobian_jieshu.sort()
+        },
+      },
+    },
+  },
   // 界张昭张纮
   // 直谏
   olzhijian: {

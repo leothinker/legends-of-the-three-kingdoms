@@ -200,6 +200,13 @@ const characters = {
     skills: ["kuangbao", "wumou", "wuqian", "shenfen"],
     groupInGuozhan: "qun",
   },
+  re_zhanghe: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["reqiaobian"],
+    dieAudios: ["ol_zhanghe"],
+  },
   re_dengai: {
     sex: "male",
     group: "wei",
@@ -245,18 +252,6 @@ const characters = {
     hp: 3,
     skills: ["rebeige", "duanchang"],
   },
-  // re_zhangzhang: {
-  //   sex: "male",
-  //   group: "wu",
-  //   hp: 3,
-  //   skills: ["rezhijian", "guzheng"],
-  // },
-  // re_zhanghe: {
-  //   sex: "male",
-  //   group: "wei",
-  //   hp: 4,
-  //   skills: ["reqiaobian"],
-  // },
   // wangji: {
   //   sex: "male",
   //   group: "wei",

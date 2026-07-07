@@ -248,21 +248,21 @@ const characters = {
     hp: 4,
     skills: ["qiaobian"],
   },
-  // shen_simayi: {
-  //   sex: "male",
-  //   group: "shen",
-  //   hp: 4,
-  //   skills: ["renjie", "sbaiyin", "lianpo"],
-  //   groupInGuozhan: "wei",
-  //   names: "司马|懿",
-  // },
-  // shen_zhaoyun: {
-  //   sex: "male",
-  //   group: "shen",
-  //   hp: 2,
-  //   skills: ["xinjuejing", "relonghun"],
-  //   groupInGuozhan: "shu",
-  // },
+  shen_simayi: {
+    sex: "male",
+    group: "shen",
+    hp: 4,
+    skills: ["renjie", "sbaiyin", "lianpo"],
+    groupInGuozhan: "wei",
+    names: "司马|懿",
+  },
+  shen_zhaoyun: {
+    sex: "male",
+    group: "shen",
+    hp: 2,
+    skills: ["xinjuejing", "relonghun"],
+    groupInGuozhan: "shu",
+  },
 }
 
 export default characters

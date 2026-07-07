@@ -5,50 +5,49 @@ const characters = {
     hp: 4,
     skills: ["rerende", "rejijiang"],
     isZhugong: true,
-    img: "image/character/re_liubei.jpg",
     dieAudios: ["re_liubei"],
   },
-  re_guanyu: {
+  ol_guanyu: {
     sex: "male",
     group: "shu",
     hp: 4,
     skills: ["rewusheng", "yijue"],
+    dieAudios: ["re_guanyu"],
   },
   ol_zhangfei: {
     sex: "male",
     group: "shu",
     hp: 4,
     skills: ["olpaoxiao", "retishen"],
-    img: "image/character/re_zhangfei.jpg",
     dieAudios: ["re_zhangfei"],
   },
-  re_zhugeliang: {
+  ol_zhugeliang: {
     sex: "male",
     group: "shu",
     hp: 3,
     skills: ["reguanxing", "kongcheng"],
     names: "诸葛|亮",
+    dieAudios: ["re_zhugeliang"],
   },
   ol_zhaoyun: {
     sex: "male",
     group: "shu",
     hp: 4,
     skills: ["relongdan", "reyajiao"],
-    img: "image/character/re_zhaoyun.jpg",
     dieAudios: ["re_zhaoyun"],
   },
-  re_machao: {
+  ol_machao: {
     sex: "male",
     group: "shu",
     hp: 4,
     skills: ["mashu", "retieji"],
+    dieAudios: ["re_machao"],
   },
   ol_huangyueying: {
     sex: "female",
     group: "shu",
     hp: 3,
     skills: ["oljizhi", "reqicai"],
-    img: "image/character/re_huangyueying.jpg",
     dieAudios: ["re_huangyueying"],
   },
   ol_caocao: {
@@ -57,7 +56,6 @@ const characters = {
     hp: 4,
     skills: ["rejianxiong", "rehujia"],
     isZhugong: true,
-    img: "image/character/re_caocao.jpg",
     dieAudios: ["re_caocao"],
   },
   re_simayi: {
@@ -110,21 +108,20 @@ const characters = {
     hp: 4,
     skills: ["rezhiheng", "oljiuyuan"],
     isZhugong: true,
-    img: "image/character/re_sunquan.jpg",
     dieAudios: ["re_sunquan"],
   },
-  re_ganning: {
+  ol_ganning: {
     sex: "male",
     group: "wu",
     hp: 4,
     skills: ["qixi", "fenwei"],
+    dieAudios: ["re_ganning"],
   },
   ol_lvmeng: {
     sex: "male",
     group: "wu",
     hp: 4,
     skills: ["keji", "reqinxue", "botu"],
-    img: "image/character/re_lvmeng.jpg",
     dieAudios: ["re_lvmeng"],
   },
   ol_huanggai: {
@@ -132,48 +129,51 @@ const characters = {
     group: "wu",
     hp: 4,
     skills: ["rekurou", "rezhaxiang"],
-    img: "image/character/re_huanggai.jpg",
     dieAudios: ["re_huanggai"],
   },
-  re_zhouyu: {
+  ol_zhouyu: {
     sex: "male",
     group: "wu",
     hp: 3,
     skills: ["reyingzi", "refanjian"],
+    dieAudios: ["re_zhouyu"],
   },
-  re_daqiao: {
+  ol_daqiao: {
     sex: "female",
     group: "wu",
     hp: 3,
     skills: ["reguose", "liuli"],
     names: "桥|null",
+    dieAudios: ["re_daqiao"],
   },
-  re_luxun: {
+  ol_luxun: {
     sex: "male",
     group: "wu",
     hp: 3,
     skills: ["reqianxun", "relianying"],
     clans: ["吴郡陆氏"],
+    dieAudios: ["re_luxun"],
   },
   ol_sunshangxiang: {
     sex: "female",
     group: "wu",
     hp: 3,
     skills: ["rejieyin", "xiaoji"],
-    img: "image/character/re_sunshangxiang.jpg",
     dieAudios: ["re_sunshangxiang"],
   },
-  re_huatuo: {
+  ol_huatuo: {
     sex: "male",
     group: "qun",
     hp: 3,
     skills: ["jijiu", "chuli"],
+    dieAudios: ["re_huatuo"],
   },
-  re_lvbu: {
+  ol_lvbu: {
     sex: "male",
     group: "qun",
     hp: 5,
     skills: ["wushuang", "liyu"],
+    dieAudios: ["re_lvbu"],
   },
   ol_diaochan: {
     sex: "female",
@@ -188,7 +188,6 @@ const characters = {
     group: "qun",
     hp: 4,
     skills: ["reyicong", "reqiaomeng"],
-    img: "image/character/re_gongsunzan.jpg",
     dieAudios: ["re_gongsunzan"],
   },
   ol_huaxiong: {
@@ -196,7 +195,6 @@ const characters = {
     group: "qun",
     hp: 6,
     skills: ["olyaowu", "shizhan"],
-    img: "image/character/re_huaxiong.jpg",
   },
   ol_yuji: {
     sex: "male",

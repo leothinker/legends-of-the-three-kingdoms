@@ -6211,16 +6211,16 @@ const skills = {
     preHidden: true,
     async cost(event, trigger, player) {
       let check,
-        str = "弃置一张手牌并跳过"
+        str = "弃置一张手牌跳过你的"
       str += ["判定", "摸牌", "出牌", "弃牌"][
         lib.skill.qiaobian.trigger.player.indexOf(event.triggername)
       ]
       str += "阶段"
       if (trigger.name === "phaseDraw") {
-        str += "，然后可以获得至多两名角色各一张手牌"
+        str += "，你可以获得至多两名其他角色各一张手牌"
       }
       if (trigger.name === "phaseUse") {
-        str += "，然后可以移动场上的一张牌"
+        str += "，你可以移动场上的一张牌"
       }
       switch (trigger.name) {
         case "phaseJudge":
@@ -6299,7 +6299,7 @@ const skills = {
         const result = await player
           .chooseTarget(
             [1, 2],
-            "获得至多两名角色各一张手牌",
+            "获得至多两名其他角色各一张手牌",
             (card, player, target) =>
               target !== player && target.countCards("h"),
           )
@@ -6322,10 +6322,17 @@ const skills = {
   // 神赵云
   // 绝境
   juejing: {
+    audio: 2,
+    trigger: { player: "phaseDrawBegin2" },
+    filter(event, player) {
+      return !event.numFixed && player.getHp() < player.maxHp
+    },
+    forced: true,
+    async content(event, trigger, player) {
+      trigger.num += player.getDamagedHp()
+    },
     mod: {
-      maxHandcard(player, num) {
-        return 2 + num
-      },
+      maxHandcard: (player, num) => num + 2,
       aiOrder(player, card, num) {
         if (num <= 0 || !player.isPhaseUsing() || !get.tag(card, "recover")) {
           return num
@@ -6335,16 +6342,6 @@ const skills = {
         }
         return 0
       },
-    },
-    audio: 2,
-    trigger: { player: "phaseDrawBegin2" },
-    //priority:-5,
-    filter(event, player) {
-      return !event.numFixed && player.hp < player.maxHp
-    },
-    forced: true,
-    async content(event, trigger, player) {
-      trigger.num += player.getDamagedHp()
     },
   },
   // 龙魂
@@ -6392,166 +6389,220 @@ const skills = {
       },
     },
     locked: false,
-    group: ["longhun1", "longhun2", "longhun3", "longhun4"],
-    ai: {
-      fireAttack: true,
-      skillTagFilter(player, tag) {
-        switch (tag) {
-          case "respondSha": {
-            if (
-              player.countCards("he", { suit: "diamond" }) <
-              Math.max(1, player.hp)
-            ) {
-              return false
-            }
+    enable: ["chooseToUse", "chooseToRespond"],
+    prompt: () =>
+      `将花色相同的${get.cnNumber(Math.max(1, get.player().getHp()))}张牌按以下规则使用或打出：红桃当【桃】；方块当火【杀】；梅花当【闪】；黑桃当【无懈可击】`,
+    viewAs(cards, player) {
+      if (cards.length) {
+        var name = false,
+          nature = null
+        switch (get.suit(cards[0], player)) {
+          case "club":
+            name = "shan"
             break
-          }
-          case "respondShan": {
-            if (
-              player.countCards("he", { suit: "club" }) < Math.max(1, player.hp)
-            ) {
-              return false
-            }
+          case "diamond":
+            name = "sha"
+            nature = "fire"
             break
-          }
-          case "save": {
-            if (
-              player.countCards("he", { suit: "heart" }) <
-              Math.max(1, player.hp)
-            ) {
-              return false
-            }
+          case "spade":
+            name = "wuxie"
             break
-          }
-          default:
-            return true
+          case "heart":
+            name = "tao"
+            break
         }
-      },
-      maixie: true,
+        if (name) {
+          return { name: name, nature: nature }
+        }
+      }
+      return null
+    },
+    check(card) {
+      var player = _status.event.player
+      if (_status.event.type === "phase") {
+        var max = 0
+        var name2
+        var list = ["sha", "tao"]
+        var map = { sha: "diamond", tao: "heart" }
+        for (var i = 0; i < list.length; i++) {
+          var name = list[i]
+          if (
+            player.countCards(
+              "hs",
+              (card) =>
+                (name !== "sha" || get.value(card) < 5) &&
+                get.suit(card, player) === map[name],
+            ) > 0 &&
+            player.getUseValue({
+              name: name,
+              nature: name === "sha" ? "fire" : null,
+            }) > 0
+          ) {
+            var temp = get.order({
+              name: name,
+              nature: name === "sha" ? "fire" : null,
+            })
+            if (temp > max) {
+              max = temp
+              name2 = map[name]
+            }
+          }
+        }
+        if (name2 === get.suit(card, player)) {
+          return name2 === "diamond"
+            ? 5 - get.value(card)
+            : 20 - get.value(card)
+        }
+        return 0
+      }
+      return 1
+    },
+    position: "hs",
+    selectCard: () => Math.max(1, get.player().getHp()),
+    filterCard(card, player, event) {
+      event = event || _status.event
+      var filter = event._backup.filterCard
+      var name = get.suit(card, player)
+      if (
+        name === "club" &&
+        filter({ name: "shan", cards: [card] }, player, event)
+      ) {
+        return true
+      }
+      if (
+        name === "diamond" &&
+        filter({ name: "sha", cards: [card], nature: "fire" }, player, event)
+      ) {
+        return true
+      }
+      if (
+        name === "spade" &&
+        filter({ name: "wuxie", cards: [card] }, player, event)
+      ) {
+        return true
+      }
+      if (
+        name === "heart" &&
+        filter({ name: "tao", cards: [card] }, player, event)
+      ) {
+        return true
+      }
+      return false
+    },
+    filter(event, player) {
+      var filter = event.filterCard
+      if (
+        filter(
+          get.autoViewAs({ name: "sha", nature: "fire" }, "unsure"),
+          player,
+          event,
+        ) &&
+        player.countCards("hs", { suit: "diamond" })
+      ) {
+        return true
+      }
+      if (
+        filter(get.autoViewAs({ name: "shan" }, "unsure"), player, event) &&
+        player.countCards("hs", { suit: "club" })
+      ) {
+        return true
+      }
+      if (
+        filter(get.autoViewAs({ name: "tao" }, "unsure"), player, event) &&
+        player.countCards("hs", { suit: "heart" })
+      ) {
+        return true
+      }
+      if (
+        filter(get.autoViewAs({ name: "wuxie" }, "unsure"), player, event) &&
+        player.countCards("hs", { suit: "spade" })
+      ) {
+        return true
+      }
+      return false
+    },
+    logAudio(event, player) {
+      return `longhun${4 - lib.suit.indexOf(get.suit(event.cards[0], player))}.mp3`
+    },
+    complexCard: true,
+    log: false,
+    async precontent(event, trigger, player) {
+      player.logSkill("longhun")
+    },
+    ai: {
       respondSha: true,
       respondShan: true,
-      effect: {
-        target(card, player, target) {
-          if (get.tag(card, "recover") && target.hp >= 1) {
-            return [0, 0]
-          }
-          if (!target.hasFriend()) {
-            return
-          }
-          if (
-            (get.tag(card, "damage") === 1 || get.tag(card, "loseHp")) &&
-            target.hp > 1
-          ) {
-            return [0, 1]
-          }
-        },
-      },
-      threaten(player, target) {
-        if (target.hp === 1) {
-          return 2
+      skillTagFilter(player, tag) {
+        var name
+        switch (tag) {
+          case "respondSha":
+            name = "diamond"
+            break
+          case "respondShan":
+            name = "club"
+            break
+          case "save":
+            name = "heart"
+            break
         }
-        return 0.5
+        if (!player.countCards("hes", { suit: name })) {
+          return false
+        }
+      },
+      order(item, player) {
+        if (player && _status.event.type === "phase") {
+          var max = 0
+          var list = ["sha", "tao"]
+          var map = { sha: "diamond", tao: "heart" }
+          for (var i = 0; i < list.length; i++) {
+            var name = list[i]
+            if (
+              player.countCards(
+                "hes",
+                (card) =>
+                  (name !== "sha" || get.value(card) < 5) &&
+                  get.suit(card, player) === map[name],
+              ) >= Math.max(1, player.getHp()) &&
+              player.getUseValue({
+                name: name,
+                nature: name === "sha" ? "fire" : null,
+              }) > 0
+            ) {
+              var temp = get.order({
+                name: name,
+                nature: name === "sha" ? "fire" : null,
+              })
+              if (temp > max) {
+                max = temp
+              }
+            }
+          }
+          max /= 1.1
+          return max
+        }
+        return 2
       },
     },
-  },
-  longhun1: {
-    audio: "longhun",
-    enable: ["chooseToUse", "chooseToRespond"],
-    sourceSkill: "longhun",
-    prompt() {
-      return `将${get.cnNumber(Math.max(1, _status.event.player.hp))}张红桃牌当作桃使用`
-    },
-    position: "hes",
-    check(card, event) {
-      if (_status.event.player.hp > 1) {
-        return 0
+    hiddenCard(player, name) {
+      if (
+        name === "wuxie" &&
+        _status.connectMode &&
+        player.countCards("hes") > 0
+      ) {
+        return true
       }
-      return 10 - get.value(card)
-    },
-    selectCard() {
-      return Math.max(1, _status.event.player.hp)
-    },
-    viewAs: { name: "tao" },
-    viewAsFilter(player) {
-      return player.countCards("hes", { suit: "heart" }) >= player.hp
-    },
-    filterCard(card) {
-      return get.suit(card) === "heart"
-    },
-  },
-  longhun2: {
-    audio: "longhun",
-    enable: ["chooseToUse", "chooseToRespond"],
-    sourceSkill: "longhun",
-    prompt() {
-      return `将${get.cnNumber(Math.max(1, _status.event.player.hp))}张方片当作火杀使用或打出`
-    },
-    position: "hes",
-    check(card, event) {
-      if (_status.event.player.hp > 1) {
-        return 0
+      if (name === "wuxie") {
+        return (
+          player.countCards("hes", { suit: "spade" }) >=
+          Math.max(1, get.player().getHp())
+        )
       }
-      return 10 - get.value(card)
-    },
-    selectCard() {
-      return Math.max(1, _status.event.player.hp)
-    },
-    viewAs: { name: "sha", nature: "fire" },
-    viewAsFilter(player) {
-      return player.countCards("hes", { suit: "diamond" }) >= player.hp
-    },
-    filterCard(card) {
-      return get.suit(card) === "diamond"
-    },
-  },
-  longhun3: {
-    audio: "longhun",
-    enable: ["chooseToUse", "chooseToRespond"],
-    sourceSkill: "longhun",
-    prompt() {
-      return `将${get.cnNumber(Math.max(1, _status.event.player.hp))}张梅花牌当作闪使用或打出`
-    },
-    position: "hes",
-    check(card, event) {
-      if (_status.event.player.hp > 1) {
-        return 0
+      if (name === "tao") {
+        return (
+          player.countCards("hes", { suit: "heart" }) >=
+          Math.max(1, get.player().getHp())
+        )
       }
-      return 10 - get.value(card)
-    },
-    selectCard() {
-      return Math.max(1, _status.event.player.hp)
-    },
-    viewAsFilter(player) {
-      return player.countCards("hes", { suit: "club" }) >= player.hp
-    },
-    viewAs: { name: "shan" },
-    filterCard(card) {
-      return get.suit(card) === "club"
-    },
-  },
-  longhun4: {
-    audio: "longhun",
-    enable: ["chooseToUse", "chooseToRespond"],
-    sourceSkill: "longhun",
-    prompt() {
-      return `将${get.cnNumber(Math.max(1, _status.event.player.hp))}张黑桃牌当作无懈可击使用`
-    },
-    position: "hes",
-    check(card, event) {
-      if (_status.event.player.hp > 1) {
-        return 0
-      }
-      return 7 - get.value(card)
-    },
-    selectCard() {
-      return Math.max(1, _status.event.player.hp)
-    },
-    viewAs: { name: "wuxie" },
-    viewAsFilter(player) {
-      return player.countCards("hes", { suit: "spade" }) >= player.hp
-    },
-    filterCard(card) {
-      return get.suit(card) === "spade"
     },
   },
   // 神司马懿

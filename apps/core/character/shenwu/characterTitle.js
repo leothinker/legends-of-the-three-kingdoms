@@ -10,13 +10,19 @@ export default {
   ol_zhenji: "薄幸的美人",
 
   ol_sunquan: "年轻的贤君",
+  ol_ganning: "劈舟斩浪",
   ol_lvmeng: "士别三日",
   ol_huanggai: "轻身为国",
+  ol_zhouyu: "兔年清明",
+  ol_daqiao: "春花恋蝶",
+  ol_luxun: "火烧连营",
   ol_sunshangxiang: "弓腰姬",
 
+  ol_huatuo: "仙山游医",
+  ol_lvbu: "傲睨万物",
   ol_diaochan: "绝世的舞姬",
-  ol_gongsunzan: "白马将军",
-  ol_huaxiong: "飞扬跋扈",
+  ol_gongsunzan: "义从金镞",
+  ol_huaxiong: "刀斩潘凤",
 
   ol_yuji: "太平道人",
   ol_zhangjiao: "天公将军",

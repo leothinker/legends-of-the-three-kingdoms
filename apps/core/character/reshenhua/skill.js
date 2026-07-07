@@ -2860,7 +2860,7 @@ const skills = {
               break
           }
           event.result = await player
-            .chooseToDiscard(get.prompt(event.skill, trigger.player), str)
+            .chooseToDiscard(get.prompt(event.skill, trigger.player), str, "he")
             .set("ai", (card) => {
               if (!_status.event.check) {
                 return -1

@@ -7,6 +7,9 @@ const translates = {
   rejijiang_info:
     "主公技，当你需要使用或打出【杀】时，你可以令其他蜀势力角色选择是否替你使用或打出【杀】（视为由你使用或打出）。当其他蜀势力角色于其回合外使用、打出或替你使用或打出【杀】时，其可以令你摸一张牌（每回合限一次）。",
 
+  ol_guanyu: "界关羽",
+  ol_guanyu_prefix: "界",
+
   ol_zhangfei: "界张飞",
   ol_zhangfei_prefix: "界",
   olpaoxiao: "咆哮",
@@ -17,6 +20,9 @@ const translates = {
   retishen_info:
     "限定技，准备阶段，你可以将体力回复至上限，然后摸X张牌（X为你本次回复的体力值）。",
 
+  ol_zhugeliang: "界诸葛亮",
+  ol_zhugeliang_prefix: "界",
+
   ol_zhaoyun: "界赵云",
   ol_zhaoyun_prefix: "界",
   relongdan: "龙胆",
@@ -25,6 +31,9 @@ const translates = {
   reyajiao: "涯角",
   reyajiao_info:
     "当你于回合外使用或打出手牌时，你可以展示牌堆顶的一张牌。若这两张牌的类别：相同，你可以将此牌交给一名角色；不同，你可以弃置攻击范围内包含你的角色区域里的一张牌。",
+
+  ol_machao: "界马超",
+  ol_machao_prefix: "界",
 
   ol_huangyueying: "界黄月英",
   ol_huangyueying_prefix: "界",
@@ -62,6 +71,9 @@ const translates = {
   oljiuyuan_info:
     "主公技，当其他吴势力角色于其回合内回复体力时，若其体力值不小于你，其可以改为令你回复1点体力，然后其摸一张牌。",
 
+  ol_ganning: "界甘宁",
+  ol_ganning_prefix: "界",
+
   ol_lvmeng: "界吕蒙",
   ol_lvmeng_prefix: "界",
   reqinxue: "勤学",
@@ -77,8 +89,23 @@ const translates = {
   rezhaxiang_info:
     "锁定技，当你失去1点体力后，你摸三张牌，然后若此时为你的出牌阶段内，则此回合你使用【杀】的次数上限+1、使用红色【杀】无距离限制且不能被【闪】响应。",
 
+  ol_zhouyu: "界周瑜",
+  ol_zhouyu_prefix: "界",
+
+  ol_daqiao: "界大乔",
+  ol_daqiao_prefix: "界",
+
+  ol_luxun: "界陆逊",
+  ol_luxun_prefix: "界",
+
   ol_sunshangxiang: "界孙尚香",
   ol_sunshangxiang_prefix: "界",
+
+  ol_huatuo: "界华佗",
+  ol_huatuo_prefix: "界",
+
+  ol_lvbu: "界吕布",
+  ol_lvbu_prefix: "界",
 
   ol_diaochan: "界貂蝉",
   ol_diaochan_prefix: "界",

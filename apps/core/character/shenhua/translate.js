@@ -311,19 +311,6 @@ const translates = {
   qiaobian_info:
     "你可以弃置一张手牌跳过你的一个阶段（准备阶段和结束阶段除外），若以此法跳过：摸牌阶段，你可以获得至多两名其他角色各一张手牌；出牌阶段，你可以移动场上的一张牌。",
 
-  shen_zhaoyun: "神赵云",
-  shen_zhaoyun_prefix: "神",
-  juejing: "绝境",
-  juejing_info:
-    "锁定技，摸牌阶段，你摸牌的数量改为你已损失的体力值+2；你的手牌上限+2。",
-  longhun: "龙魂",
-  longhun1: "龙魂♥︎",
-  longhun2: "龙魂♦︎",
-  longhun3: "龙魂♣︎",
-  longhun4: "龙魂♠︎",
-  longhun_info:
-    "你可以将同花色的X张牌按下列规则使用或打出：♥当【桃】，♦当火【杀】，♣当【闪】，♠当【无懈可击】（X为你当前体力值且至少为1）。",
-
   shen_simayi: "神司马懿",
   shen_simayi_prefix: "神",
   renjie: "忍戒",
@@ -351,6 +338,15 @@ const translates = {
   lianpo: "连破",
   lianpo_info:
     "每回合结束后，若你本回合杀死过其他角色，你可以执行一个额外的回合。",
+
+  shen_zhaoyun: "神赵云",
+  shen_zhaoyun_prefix: "神",
+  juejing: "绝境",
+  juejing_info:
+    "锁定技，摸牌阶段，你多摸X张牌（X为你已损失的体力值）；你的手牌上限+2。",
+  longhun: "龙魂",
+  longhun_info:
+    "你可以将花色相同的X张牌按以下规则使用或打出：红桃当【桃】；方块当火【杀】；梅花当【闪】；黑桃当【无懈可击】（X为你的体力值且至少为1）。",
 }
 
 export default translates

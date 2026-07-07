@@ -5849,7 +5849,7 @@ const skills = {
             ) {
               result = await player
                 .chooseTarget(
-                  "是否获得至多两名其他角色的各一张手牌？",
+                  "是否获得至多两名其他角色各一张手牌？",
                   [1, 2],
                   (card, player, target) =>
                     target !== player &&

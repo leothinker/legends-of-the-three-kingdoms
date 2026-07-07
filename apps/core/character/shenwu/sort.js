@@ -1,11 +1,11 @@
 const characterSort = {
   shenwu_standard: [
     "ol_liubei",
-    "re_guanyu",
+    "ol_guanyu",
     "ol_zhangfei",
-    "re_zhugeliang",
+    "ol_zhugeliang",
     "ol_zhaoyun",
-    "re_machao",
+    "ol_machao",
     "ol_huangyueying",
 
     "ol_caocao",
@@ -17,16 +17,16 @@ const characterSort = {
     "ol_zhenji",
 
     "ol_sunquan",
-    "re_ganning",
+    "ol_ganning",
     "ol_lvmeng",
     "ol_huanggai",
-    "re_zhouyu",
-    "re_daqiao",
-    "re_luxun",
+    "ol_zhouyu",
+    "ol_daqiao",
+    "ol_luxun",
     "ol_sunshangxiang",
 
-    "re_huatuo",
-    "re_lvbu",
+    "ol_huatuo",
+    "ol_lvbu",
     "ol_diaochan",
     "ol_gongsunzan",
     "ol_huaxiong",

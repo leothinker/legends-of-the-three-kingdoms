@@ -1,2118 +1,1700 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
-game.import("card", function () {
-  return {
-    name: "wangzhe",
-    connect: true,
-    card: {
-      damage: {
-        ai: {
-          result: {
-            target: -1.5,
-          },
-          tag: {
-            damage: 1,
-          },
+import { _status, ai, game, get, lib, ui } from "wtk"
+
+game.import("card", () => ({
+  name: "wangzhe",
+  connect: true,
+  card: {
+    damage: {
+      ai: {
+        result: {
+          target: -1.5,
+        },
+        tag: {
+          damage: 1,
         },
       },
-      draw: {
-        ai: {
-          result: {
-            target: 1,
-          },
-          tag: {
-            draw: 1,
-          },
+    },
+    draw: {
+      ai: {
+        result: {
+          target: 1,
+        },
+        tag: {
+          draw: 1,
         },
       },
-      losehp: {
-        ai: {
-          result: {
-            target: -1.5,
-          },
-          tag: {
-            loseHp: 1,
-          },
+    },
+    losehp: {
+      ai: {
+        result: {
+          target: -1.5,
+        },
+        tag: {
+          loseHp: 1,
         },
       },
-      recover: {
-        ai: {
-          result: {
-            target: 1.5,
-          },
-          tag: {
-            recover: 1,
-          },
+    },
+    recover: {
+      ai: {
+        result: {
+          target: 1.5,
+        },
+        tag: {
+          recover: 1,
         },
       },
-      respondShan: {
-        ai: {
-          result: {
-            target: -1.5,
-          },
-          tag: {
-            respond: 1,
-            respondShan: 1,
-            damage: 1,
-          },
+    },
+    respondShan: {
+      ai: {
+        result: {
+          target: -1.5,
+        },
+        tag: {
+          respond: 1,
+          respondShan: 1,
+          damage: 1,
         },
       },
-      sha: {
-        audio: true,
-        fullskin: true,
-        nature: ["thunder", "fire", "kami", "ice"],
-        type: "basic",
-        enable: true,
-        usable: 1,
-        updateUsable: "phaseUse",
-        global: "icesha_skill",
-        range(card, player, target) {
-          return player.inRange(target)
-        },
-        selectTarget: 1,
-        cardPrompt(card) {
-          var natures = get.natureList(Array.isArray(card) ? card[3] : card)
-          if (lib.translate["sha_nature_" + natures[0] + "_info"]) {
-            return lib.translate["sha_nature_" + natures[0] + "_info"]
+    },
+    sha: {
+      audio: true,
+      fullskin: true,
+      nature: ["thunder", "fire", "kami", "ice"],
+      type: "basic",
+      enable: true,
+      usable: 1,
+      updateUsable: "phaseUse",
+      global: "icesha_skill",
+      range(card, player, target) {
+        return player.inRange(target)
+      },
+      selectTarget: 1,
+      cardPrompt(card) {
+        var natures = get.natureList(Array.isArray(card) ? card[3] : card)
+        if (lib.translate[`sha_nature_${natures[0]}_info`]) {
+          return lib.translate[`sha_nature_${natures[0]}_info`]
+        }
+        var str = "出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，"
+        if (natures.includes("stab")) {
+          str += "且在此之后需弃置一张手牌（没有则不弃），"
+        }
+        str += "否则你对其造成1点"
+        var linked = lib.linked.filter((n) => natures.includes(n))
+        if (linked.length) {
+          str += `${get.translation(get.nature(linked))}属性`
+        }
+        str += "伤害。"
+        return str
+      },
+      defaultYingbianEffect: "add",
+      filterTarget(card, player, target) {
+        return player !== target
+      },
+      content() {
+        "step 0"
+        if (
+          typeof event.shanRequired !== "number" ||
+          !event.shanRequired ||
+          event.shanRequired < 0
+        ) {
+          event.shanRequired = 1
+        }
+        if (typeof event.baseDamage !== "number") {
+          event.baseDamage = 1
+        }
+        if (typeof event.extraDamage !== "number") {
+          event.extraDamage = 0
+        }
+        ;("step 1")
+        if (
+          event.directHit ||
+          event.directHit2 ||
+          (!_status.connectMode && lib.config.skip_shan && !target.hasShan())
+        ) {
+          event._result = { bool: false }
+        } else if (event.skipShan) {
+          event._result = { bool: true, result: "shaned" }
+        } else {
+          var next = target.chooseToUse("请使用一张闪响应杀")
+          next.set("type", "respondShan")
+          next.set("filterCard", (card, player) => {
+            if (get.name(card) !== "shan") {
+              return false
+            }
+            return lib.filter.cardEnabled(card, player, "forceEnable")
+          })
+          if (event.shanRequired > 1) {
+            next.set("prompt2", `（共需使用${event.shanRequired}张闪）`)
+          } else if (game.hasNature(event.card, "stab")) {
+            next.set("prompt2", "（在此之后仍需弃置一张手牌）")
           }
-          var str = "出牌阶段，对你攻击范围内的一名角色使用。其须使用一张【闪】，"
-          if (natures.includes("stab")) {
-            str += "且在此之后需弃置一张手牌（没有则不弃），"
-          }
-          str += "否则你对其造成1点"
-          var linked = lib.linked.filter((n) => natures.includes(n))
-          if (linked.length) {
-            str += get.translation(get.nature(linked)) + "属性"
-          }
-          str += "伤害。"
-          return str
-        },
-        defaultYingbianEffect: "add",
-        filterTarget(card, player, target) {
-          return player !== target
-        },
-        content() {
-          "step 0"
-          if (
-            typeof event.shanRequired !== "number" ||
-            !event.shanRequired ||
-            event.shanRequired < 0
-          ) {
-            event.shanRequired = 1
-          }
-          if (typeof event.baseDamage !== "number") {
-            event.baseDamage = 1
-          }
-          if (typeof event.extraDamage !== "number") {
-            event.extraDamage = 0
-          }
-          ;("step 1")
-          if (
-            event.directHit ||
-            event.directHit2 ||
-            (!_status.connectMode && lib.config.skip_shan && !target.hasShan())
-          ) {
-            event._result = { bool: false }
-          } else if (event.skipShan) {
-            event._result = { bool: true, result: "shaned" }
-          } else {
-            var next = target.chooseToUse("请使用一张闪响应杀")
-            next.set("type", "respondShan")
-            next.set("filterCard", function (card, player) {
-              if (get.name(card) !== "shan") {
+          next
+            .set("ai1", (card) => {
+              if (get.event().toUse) {
+                return get.order(card)
+              }
+              return 0
+            })
+            .set("shanRequired", event.shanRequired)
+          next.set("respondTo", [player, card])
+          next.set(
+            "toUse",
+            (() => {
+              if (target.hasSkillTag("noShan", null, "use")) {
                 return false
               }
-              return lib.filter.cardEnabled(card, player, "forceEnable")
-            })
-            if (event.shanRequired > 1) {
-              next.set("prompt2", "（共需使用" + event.shanRequired + "张闪）")
-            } else if (game.hasNature(event.card, "stab")) {
-              next.set("prompt2", "（在此之后仍需弃置一张手牌）")
-            }
-            next
-              .set("ai1", function (card) {
-                if (get.event().toUse) {
-                  return get.order(card)
-                }
-                return 0
-              })
-              .set("shanRequired", event.shanRequired)
-            next.set("respondTo", [player, card])
-            next.set(
-              "toUse",
-              (() => {
-                if (target.hasSkillTag("noShan", null, "use")) {
-                  return false
-                }
-                if (target.hasSkillTag("useShan", null, "use")) {
-                  return true
-                }
-                if (
-                  target.isLinked() &&
-                  game.hasNature(event.card) &&
-                  game.hasPlayer((cur) => {
-                    if (cur === target || !cur.isLinked()) {
-                      return false
-                    }
-                    return true //return get.attitude(target, cur) <= 0;
-                  })
-                ) {
-                  if (get.attitude(target, player._trueMe || player) > 0) {
+              if (target.hasSkillTag("useShan", null, "use")) {
+                return true
+              }
+              if (
+                target.isLinked() &&
+                game.hasNature(event.card) &&
+                game.hasPlayer((cur) => {
+                  if (cur === target || !cur.isLinked()) {
                     return false
                   }
-                }
-                if (
-                  event.baseDamage + event.extraDamage <= 0 &&
-                  !game.hasNature(event.card, "ice")
-                ) {
+                  return true //return get.attitude(target, cur) <= 0;
+                })
+              ) {
+                if (get.attitude(target, player._trueMe || player) > 0) {
                   return false
                 }
-                if (
-                  !game.hasNature(event.card, "ice") &&
-                  !player.hasSkillTag("jueqing", false, target) &&
-                  !target.hasSkill("gangzhi") &&
-                  get.damageEffect(target, player, target, get.nature(event.card)) >= 0
-                ) {
-                  return false
-                }
-                if (
-                  event.baseDamage + event.extraDamage >=
-                  target.hp +
-                    (player.hasSkillTag("jueqing", false, target) || target.hasSkill("gangzhi")
-                      ? 0
-                      : target.hujia)
-                ) {
-                  return true
-                }
-                if (
-                  event.shanRequired > 1 &&
-                  !target.hasSkillTag("freeShan", null, {
-                    player: player,
-                    card: event.card,
-                    type: "use",
-                  }) &&
-                  target.mayHaveShan(target, "use", true, "count") <
-                    event.shanRequired - (event.shanIgnored || 0)
-                ) {
-                  return false
-                }
+              }
+              if (
+                event.baseDamage + event.extraDamage <= 0 &&
+                !game.hasNature(event.card, "ice")
+              ) {
+                return false
+              }
+              if (
+                !game.hasNature(event.card, "ice") &&
+                !player.hasSkillTag("jueqing", false, target) &&
+                !target.hasSkill("gangzhi") &&
+                get.damageEffect(
+                  target,
+                  player,
+                  target,
+                  get.nature(event.card),
+                ) >= 0
+              ) {
+                return false
+              }
+              if (
+                event.baseDamage + event.extraDamage >=
+                target.hp +
+                  (player.hasSkillTag("jueqing", false, target) ||
+                  target.hasSkill("gangzhi")
+                    ? 0
+                    : target.hujia)
+              ) {
                 return true
-              })(),
-            )
-            //next.autochoose=lib.filter.autoRespondShan;
-          }
-          ;("step 2")
-          if (!result || !result.bool || !result.result || result.result !== "shaned") {
-            event.trigger("shaHit")
-          } else {
-            event.shanRequired--
-            if (event.shanRequired > 0) {
-              event.goto(1)
-            } else if (game.hasNature(event.card, "stab") && target.countCards("h") > 0) {
-              event.responded = result
-              event.goto(4)
-            } else {
-              event.trigger("shaMiss")
-              event.responded = result
-            }
-          }
-          ;("step 3")
-          if (
-            (!result || !result.bool || !result.result || result.result !== "shaned") &&
-            !event.unhurt
+              }
+              if (
+                event.shanRequired > 1 &&
+                !target.hasSkillTag("freeShan", null, {
+                  player: player,
+                  card: event.card,
+                  type: "use",
+                }) &&
+                target.mayHaveShan(target, "use", true, "count") <
+                  event.shanRequired - (event.shanIgnored || 0)
+              ) {
+                return false
+              }
+              return true
+            })(),
+          )
+          //next.autochoose=lib.filter.autoRespondShan;
+        }
+        ;("step 2")
+        if (!result?.bool || !result.result || result.result !== "shaned") {
+          event.trigger("shaHit")
+        } else {
+          event.shanRequired--
+          if (event.shanRequired > 0) {
+            event.goto(1)
+          } else if (
+            game.hasNature(event.card, "stab") &&
+            target.countCards("h") > 0
           ) {
-            if (
-              !event.directHit &&
-              !event.directHit2 &&
-              lib.filter.cardEnabled(
-                new lib.element.VCard({ name: "shan" }),
-                target,
-                "forceEnable",
-              ) &&
-              target.countCards("hs") > 0 &&
-              get.damageEffect(target, player, target) < 0
-            ) {
-              target.addGaintag(target.getCards("hs"), "sha_notshan")
-            }
-            target.damage(get.nature(event.card))
-            event.result = { bool: true }
-            event.trigger("shaDamage")
-          } else {
-            event.result = { bool: false }
-            event.trigger("shaUnhirt")
-          }
-          event.finish()
-          ;("step 4")
-          target
-            .chooseToDiscard("刺杀：请弃置一张牌，否则此【杀】依然造成伤害")
-            .set("ai", function (card) {
-              var target = _status.event.player
-              var evt = _status.event.getParent()
-              var bool = true
-              if (get.damageEffect(target, evt.player, target, evt.card.nature) >= 0) {
-                bool = false
-              }
-              if (bool) {
-                return 8 - get.useful(card)
-              }
-              return 0
-            })
-          ;("step 5")
-          if ((!result || !result.bool) && !event.unhurt) {
-            target.damage(get.nature(event.card))
-            event.result = { bool: true }
-            event.trigger("shaDamage")
-            event.finish()
+            event.responded = result
+            event.goto(4)
           } else {
             event.trigger("shaMiss")
+            event.responded = result
           }
-          ;("step 6")
-          if ((!result || !result.bool) && !event.unhurt) {
-            target.damage(get.nature(event.card))
-            event.result = { bool: true }
-            event.trigger("shaDamage")
-            event.finish()
-          } else {
-            event.result = { bool: false }
-            event.trigger("shaUnhirt")
+        }
+        ;("step 3")
+        if (
+          (!result?.bool || !result.result || result.result !== "shaned") &&
+          !event.unhurt
+        ) {
+          if (
+            !event.directHit &&
+            !event.directHit2 &&
+            lib.filter.cardEnabled(
+              new lib.element.VCard({ name: "shan" }),
+              target,
+              "forceEnable",
+            ) &&
+            target.countCards("hs") > 0 &&
+            get.damageEffect(target, player, target) < 0
+          ) {
+            target.addGaintag(target.getCards("hs"), "sha_notshan")
           }
-        },
-        ai: {
-          yingbian(card, player, targets, viewer) {
-            if (get.attitude(viewer, player) <= 0) {
-              return 0
-            }
-            var base = 0,
-              hit = false
-            if (get.cardtag(card, "yingbian_hit")) {
-              hit = true
-              if (
-                targets.some((target) => {
-                  return (
-                    target.mayHaveShan(viewer, "use") &&
-                    get.attitude(viewer, target) < 0 &&
-                    get.damageEffect(target, player, viewer, get.natureList(card)) > 0
-                  )
-                })
-              ) {
-                base += 5
-              }
-            }
-            if (get.cardtag(card, "yingbian_add")) {
-              if (
-                game.hasPlayer(function (current) {
-                  return (
-                    !targets.includes(current) &&
-                    lib.filter.targetEnabled2(card, player, current) &&
-                    get.effect(current, card, player, player) > 0
-                  )
-                })
-              ) {
-                base += 5
-              }
-            }
-            if (get.cardtag(card, "yingbian_damage")) {
-              if (
-                targets.some((target) => {
-                  return (
-                    get.attitude(player, target) < 0 &&
-                    (hit ||
-                      !target.mayHaveShan(viewer, "use") ||
-                      player.hasSkillTag(
-                        "directHit_ai",
-                        true,
-                        {
-                          target: target,
-                          card: card,
-                        },
-                        true,
-                      )) &&
-                    !target.hasSkillTag("filterDamage", null, {
-                      player: player,
-                      card: card,
-                      jiu: true,
-                    })
-                  )
-                })
-              ) {
-                base += 5
-              }
-            }
-            return base
-          },
-          canLink(player, target, card) {
-            if (!target.isLinked() && !player.hasSkill("wutiesuolian_skill")) {
-              return false
-            }
+          target.damage(get.nature(event.card))
+          event.result = { bool: true }
+          event.trigger("shaDamage")
+        } else {
+          event.result = { bool: false }
+          event.trigger("shaUnhirt")
+        }
+        event.finish()
+        ;("step 4")
+        target
+          .chooseToDiscard("刺杀：请弃置一张牌，否则此【杀】依然造成伤害")
+          .set("ai", (card) => {
+            var target = _status.event.player
+            var evt = _status.event.getParent()
+            var bool = true
             if (
-              player.hasSkill("jueqing") ||
-              player.hasSkill("gangzhi") ||
-              target.hasSkill("gangzhi")
+              get.damageEffect(target, evt.player, target, evt.card.nature) >= 0
             ) {
-              return false
+              bool = false
             }
-            let obj = {}
-            if (get.attitude(player, target) > 0 && get.attitude(target, player) > 0) {
-              if (
-                (player.hasSkill("jiu") ||
-                  player.hasSkillTag("damageBonus", true, {
-                    target: target,
+            if (bool) {
+              return 8 - get.useful(card)
+            }
+            return 0
+          })
+        ;("step 5")
+        if (!result?.bool && !event.unhurt) {
+          target.damage(get.nature(event.card))
+          event.result = { bool: true }
+          event.trigger("shaDamage")
+          event.finish()
+        } else {
+          event.trigger("shaMiss")
+        }
+        ;("step 6")
+        if (!result?.bool && !event.unhurt) {
+          target.damage(get.nature(event.card))
+          event.result = { bool: true }
+          event.trigger("shaDamage")
+          event.finish()
+        } else {
+          event.result = { bool: false }
+          event.trigger("shaUnhirt")
+        }
+      },
+      ai: {
+        yingbian(card, player, targets, viewer) {
+          if (get.attitude(viewer, player) <= 0) {
+            return 0
+          }
+          var base = 0,
+            hit = false
+          if (get.cardtag(card, "yingbian_hit")) {
+            hit = true
+            if (
+              targets.some((target) => {
+                return (
+                  target.mayHaveShan(viewer, "use") &&
+                  get.attitude(viewer, target) < 0 &&
+                  get.damageEffect(
+                    target,
+                    player,
+                    viewer,
+                    get.natureList(card),
+                  ) > 0
+                )
+              })
+            ) {
+              base += 5
+            }
+          }
+          if (get.cardtag(card, "yingbian_add")) {
+            if (
+              game.hasPlayer(
+                (current) =>
+                  !targets.includes(current) &&
+                  lib.filter.targetEnabled2(card, player, current) &&
+                  get.effect(current, card, player, player) > 0,
+              )
+            ) {
+              base += 5
+            }
+          }
+          if (get.cardtag(card, "yingbian_damage")) {
+            if (
+              targets.some((target) => {
+                return (
+                  get.attitude(player, target) < 0 &&
+                  (hit ||
+                    !target.mayHaveShan(viewer, "use") ||
+                    player.hasSkillTag(
+                      "directHit_ai",
+                      true,
+                      {
+                        target: target,
+                        card: card,
+                      },
+                      true,
+                    )) &&
+                  !target.hasSkillTag("filterDamage", null, {
+                    player: player,
                     card: card,
-                  })) &&
-                !target.hasSkillTag("filterDamage", null, {
+                    jiu: true,
+                  })
+                )
+              })
+            ) {
+              base += 5
+            }
+          }
+          return base
+        },
+        canLink(player, target, card) {
+          if (!target.isLinked() && !player.hasSkill("wutiesuolian_skill")) {
+            return false
+          }
+          if (
+            player.hasSkill("jueqing") ||
+            player.hasSkill("gangzhi") ||
+            target.hasSkill("gangzhi")
+          ) {
+            return false
+          }
+          const obj = {}
+          if (
+            get.attitude(player, target) > 0 &&
+            get.attitude(target, player) > 0
+          ) {
+            if (
+              (player.hasSkill("jiu") ||
+                player.hasSkillTag("damageBonus", true, {
+                  target: target,
+                  card: card,
+                })) &&
+              !target.hasSkillTag("filterDamage", null, {
+                player: player,
+                card: card,
+                jiu: player.hasSkill("jiu"),
+              })
+            ) {
+              obj.num = 2
+            }
+            if (target.hp > obj.num) {
+              obj.odds = 1
+            }
+          }
+          if (!obj.odds) {
+            obj.odds = 1 - target.mayHaveShan(player, "use", true, "odds")
+          }
+          return obj
+        },
+        basic: {
+          useful: [5, 3, 1],
+          value: [5, 3, 1],
+        },
+        order(item, player) {
+          let res = 3.2
+          if (player.hasSkillTag("presha", true, null, true)) {
+            res = 10
+          }
+          if (
+            typeof item !== "object" ||
+            !game.hasNature(item, "linked") ||
+            game.countPlayer((cur) => cur.isLinked()) < 2
+          ) {
+            return res
+          }
+          //let used = player.getCardUsable('sha') - 1.5, natures = ['thunder', 'fire', 'ice', 'kami'];
+          const uv = player.getUseValue(item, true)
+          if (uv <= 0) {
+            return res
+          }
+          const temp = player.getUseValue("sha", true) - uv
+          if (temp < 0) {
+            return res + 0.15
+          }
+          if (temp > 0) {
+            return res - 0.15
+          }
+          return res
+        },
+        result: {
+          target(player, target, card, isLink) {
+            let eff = -1.5,
+              odds = 1.35,
+              num = 1
+            if (isLink) {
+              eff = isLink.eff || -2
+              odds = isLink.odds || 0.65
+              num = isLink.num || 1
+              if (
+                num > 1 &&
+                target.hasSkillTag("filterDamage", null, {
                   player: player,
                   card: card,
                   jiu: player.hasSkill("jiu"),
                 })
               ) {
-                obj.num = 2
+                num = 1
               }
-              if (target.hp > obj.num) {
-                obj.odds = 1
-              }
-            }
-            if (!obj.odds) {
-              obj.odds = 1 - target.mayHaveShan(player, "use", true, "odds")
-            }
-            return obj
-          },
-          basic: {
-            useful: [5, 3, 1],
-            value: [5, 3, 1],
-          },
-          order(item, player) {
-            let res = 3.2
-            if (player.hasSkillTag("presha", true, null, true)) {
-              res = 10
+              return odds * eff * num
             }
             if (
-              typeof item !== "object" ||
-              !game.hasNature(item, "linked") ||
-              game.countPlayer((cur) => cur.isLinked()) < 2
+              player.hasSkill("jiu") ||
+              player.hasSkillTag("damageBonus", true, {
+                target: target,
+                card: card,
+              })
             ) {
-              return res
-            }
-            //let used = player.getCardUsable('sha') - 1.5, natures = ['thunder', 'fire', 'ice', 'kami'];
-            let uv = player.getUseValue(item, true)
-            if (uv <= 0) {
-              return res
-            }
-            let temp = player.getUseValue("sha", true) - uv
-            if (temp < 0) {
-              return res + 0.15
-            }
-            if (temp > 0) {
-              return res - 0.15
-            }
-            return res
-          },
-          result: {
-            target(player, target, card, isLink) {
-              let eff = -1.5,
-                odds = 1.35,
-                num = 1
-              if (isLink) {
-                eff = isLink.eff || -2
-                odds = isLink.odds || 0.65
-                num = isLink.num || 1
-                if (
-                  num > 1 &&
-                  target.hasSkillTag("filterDamage", null, {
-                    player: player,
-                    card: card,
-                    jiu: player.hasSkill("jiu"),
-                  })
-                ) {
-                  num = 1
-                }
-                return odds * eff * num
-              }
               if (
-                player.hasSkill("jiu") ||
-                player.hasSkillTag("damageBonus", true, {
+                target.hasSkillTag("filterDamage", null, {
+                  player: player,
+                  card: card,
+                  jiu: player.hasSkill("jiu"),
+                })
+              ) {
+                eff = -0.5
+              } else {
+                num = 2
+                if (get.attitude(player, target) > 0) {
+                  eff = -7
+                } else {
+                  eff = -4
+                }
+              }
+            }
+            if (
+              !player.hasSkillTag(
+                "directHit_ai",
+                true,
+                {
                   target: target,
                   card: card,
-                })
-              ) {
-                if (
-                  target.hasSkillTag("filterDamage", null, {
-                    player: player,
-                    card: card,
-                    jiu: player.hasSkill("jiu"),
-                  })
-                ) {
-                  eff = -0.5
-                } else {
-                  num = 2
-                  if (get.attitude(player, target) > 0) {
-                    eff = -7
-                  } else {
-                    eff = -4
-                  }
-                }
-              }
-              if (
-                !player.hasSkillTag(
-                  "directHit_ai",
-                  true,
-                  {
-                    target: target,
-                    card: card,
-                  },
-                  true,
-                )
-              ) {
-                odds -= 0.7 * target.mayHaveShan(player, "use", true, "odds")
-              }
-              _status.event.putTempCache("sha_result", "eff", {
-                bool: target.hp > num && get.attitude(player, target) > 0,
-                card: ai.getCacheKey(card, true),
-                eff: eff,
-                odds: odds,
-              })
-              return odds * eff
-            },
+                },
+                true,
+              )
+            ) {
+              odds -= 0.7 * target.mayHaveShan(player, "use", true, "odds")
+            }
+            _status.event.putTempCache("sha_result", "eff", {
+              bool: target.hp > num && get.attitude(player, target) > 0,
+              card: ai.getCacheKey(card, true),
+              eff: eff,
+              odds: odds,
+            })
+            return odds * eff
           },
-          tag: {
-            respond: 1,
-            respondShan: 1,
-            damage(card) {
-              if (game.hasNature(card, "poison")) {
+        },
+        tag: {
+          respond: 1,
+          respondShan: 1,
+          damage(card) {
+            if (game.hasNature(card, "poison")) {
+              return
+            }
+            return 1
+          },
+          natureDamage(card) {
+            if (game.hasNature(card, "linked")) {
+              return 1
+            }
+          },
+          fireDamage(card, nature) {
+            if (game.hasNature(card, "fire")) {
+              return 1
+            }
+          },
+          thunderDamage(card, nature) {
+            if (game.hasNature(card, "thunder")) {
+              return 1
+            }
+          },
+          poisonDamage(card, nature) {
+            if (game.hasNature(card, "poison")) {
+              return 1
+            }
+          },
+        },
+      },
+    },
+    shacopy: {
+      ai: {
+        basic: {
+          useful: [5, 3, 1],
+          value: [5, 3, 1],
+        },
+        order: 3,
+        result: {
+          target: -1.5,
+        },
+        tag: {
+          respond: 1,
+          respondShan: 1,
+          damage(card) {
+            if (game.hasNature(card, "poison")) {
+              return
+            }
+            return 1
+          },
+          natureDamage(card) {
+            if (game.hasNature(card)) {
+              return 1
+            }
+          },
+          fireDamage(card, nature) {
+            if (game.hasNature(card, "fire")) {
+              return 1
+            }
+          },
+          thunderDamage(card, nature) {
+            if (game.hasNature(card, "thunder")) {
+              return 1
+            }
+          },
+          poisonDamage(card, nature) {
+            if (game.hasNature(card, "poison")) {
+              return 1
+            }
+          },
+        },
+      },
+    },
+    shan: {
+      audio: true,
+      fullskin: true,
+      type: "basic",
+      cardcolor: "red",
+      notarget: true,
+      nodelay: true,
+      defaultYingbianEffect: "draw",
+      content() {
+        event.result = "shaned"
+        event.getParent().delayx = false
+        game.delay(0.5)
+      },
+      ai: {
+        order: 3,
+        basic: {
+          useful: (card, i) => {
+            let player = _status.event.player,
+              basic = [7, 5.1, 2],
+              num = basic[Math.min(2, i)]
+            if (player.hp > 2 && player.hasSkillTag("maixie")) {
+              num *= 0.57
+            }
+            if (
+              player.hasSkillTag("freeShan", false, null, true) ||
+              player.getEquip("rewrite_renwang")
+            ) {
+              num *= 0.8
+            }
+            return num
+          },
+          value: [7, 5.1, 2],
+        },
+        result: { player: 1 },
+        //expose:0.2
+      },
+    },
+    tao: {
+      fullskin: true,
+      type: "basic",
+      cardcolor: "red",
+      toself: true,
+      enable(card, player) {
+        return player.isDamaged()
+      },
+      savable: true,
+      selectTarget: -1,
+      filterTarget(card, player, target) {
+        return target === player && target.isDamaged()
+      },
+      modTarget(card, player, target) {
+        return target.isDamaged()
+      },
+      content() {
+        target.recover()
+      },
+      ai: {
+        basic: {
+          order: (card, player) => {
+            if (player.hasSkillTag("pretao")) {
+              return 9
+            }
+            return 2
+          },
+          useful: (card, i) => {
+            const player = _status.event.player
+            if (
+              !game.checkMod(card, player, "unchanged", "cardEnabled2", player)
+            ) {
+              return 2 / (1 + i)
+            }
+            let fs = game.filterPlayer((current) => {
+                return get.attitude(player, current) > 0 && current.hp <= 2
+              }),
+              damaged = 0,
+              needs = 0
+            fs.forEach((f) => {
+              if (f.hp > 3 || !lib.filter.cardSavable(card, player, f)) {
                 return
               }
-              return 1
-            },
-            natureDamage(card) {
-              if (game.hasNature(card, "linked")) {
-                return 1
-              }
-            },
-            fireDamage(card, nature) {
-              if (game.hasNature(card, "fire")) {
-                return 1
-              }
-            },
-            thunderDamage(card, nature) {
-              if (game.hasNature(card, "thunder")) {
-                return 1
-              }
-            },
-            poisonDamage(card, nature) {
-              if (game.hasNature(card, "poison")) {
-                return 1
-              }
-            },
-          },
-        },
-      },
-      shacopy: {
-        ai: {
-          basic: {
-            useful: [5, 3, 1],
-            value: [5, 3, 1],
-          },
-          order: 3,
-          result: {
-            target: -1.5,
-          },
-          tag: {
-            respond: 1,
-            respondShan: 1,
-            damage(card) {
-              if (game.hasNature(card, "poison")) {
-                return
-              }
-              return 1
-            },
-            natureDamage(card) {
-              if (game.hasNature(card)) {
-                return 1
-              }
-            },
-            fireDamage(card, nature) {
-              if (game.hasNature(card, "fire")) {
-                return 1
-              }
-            },
-            thunderDamage(card, nature) {
-              if (game.hasNature(card, "thunder")) {
-                return 1
-              }
-            },
-            poisonDamage(card, nature) {
-              if (game.hasNature(card, "poison")) {
-                return 1
-              }
-            },
-          },
-        },
-      },
-      shan: {
-        audio: true,
-        fullskin: true,
-        type: "basic",
-        cardcolor: "red",
-        notarget: true,
-        nodelay: true,
-        defaultYingbianEffect: "draw",
-        content() {
-          event.result = "shaned"
-          event.getParent().delayx = false
-          game.delay(0.5)
-        },
-        ai: {
-          order: 3,
-          basic: {
-            useful: (card, i) => {
-              let player = _status.event.player,
-                basic = [7, 5.1, 2],
-                num = basic[Math.min(2, i)]
-              if (player.hp > 2 && player.hasSkillTag("maixie")) {
-                num *= 0.57
-              }
-              if (
-                player.hasSkillTag("freeShan", false, null, true) ||
-                player.getEquip("rewrite_renwang")
-              ) {
-                num *= 0.8
-              }
-              return num
-            },
-            value: [7, 5.1, 2],
-          },
-          result: { player: 1 },
-          //expose:0.2
-        },
-      },
-      tao: {
-        fullskin: true,
-        type: "basic",
-        cardcolor: "red",
-        toself: true,
-        enable(card, player) {
-          return player.isDamaged()
-        },
-        savable: true,
-        selectTarget: -1,
-        filterTarget(card, player, target) {
-          return target === player && target.isDamaged()
-        },
-        modTarget(card, player, target) {
-          return target.isDamaged()
-        },
-        content() {
-          target.recover()
-        },
-        ai: {
-          basic: {
-            order: (card, player) => {
-              if (player.hasSkillTag("pretao")) {
-                return 9
-              }
-              return 2
-            },
-            useful: (card, i) => {
-              let player = _status.event.player
-              if (!game.checkMod(card, player, "unchanged", "cardEnabled2", player)) {
-                return 2 / (1 + i)
-              }
-              let fs = game.filterPlayer((current) => {
-                  return get.attitude(player, current) > 0 && current.hp <= 2
-                }),
-                damaged = 0,
-                needs = 0
-              fs.forEach((f) => {
-                if (f.hp > 3 || !lib.filter.cardSavable(card, player, f)) {
-                  return
-                }
-                if (f.hp > 1) {
-                  damaged++
-                } else {
-                  needs++
-                }
-              })
-              if (needs && damaged) {
-                return 5 * needs + 3 * damaged
-              }
-              if (needs + damaged > 1 || player.hasSkillTag("maixie")) {
-                return 8
-              }
-              if (player.hp / player.maxHp < 0.7) {
-                return 7 + Math.abs(player.hp / player.maxHp - 0.5)
-              }
-              if (needs) {
-                return 7
-              }
-              if (damaged) {
-                return Math.max(3, 7.8 - i)
-              }
-              return Math.max(1, 7.2 - i)
-            },
-            value: (card, player) => {
-              let fs = game.filterPlayer((current) => {
-                  return get.attitude(_status.event.player, current) > 0
-                }),
-                damaged = 0,
-                needs = 0
-              fs.forEach((f) => {
-                if (!player.canUse("tao", f)) {
-                  return
-                }
-                if (f.hp <= 1) {
-                  needs++
-                } else if (f.hp === 2) {
-                  damaged++
-                }
-              })
-              if ((needs && damaged) || player.hasSkillTag("maixie")) {
-                return Math.max(9, 5 * needs + 3 * damaged)
-              }
-              if (needs || damaged > 1) {
-                return 8
-              }
-              if (damaged) {
-                return 7.5
-              }
-              return Math.max(5, 9.2 - player.hp)
-            },
-          },
-          result: {
-            target: (player, target) => {
-              if (target.hasSkillTag("maixie")) {
-                return 3
-              }
-              return 2
-            },
-            target_use: (player, target, card) => {
-              let mode = get.mode(),
-                taos = player.getCards(
-                  "hs",
-                  (i) => get.name(i) === "tao" && lib.filter.cardEnabled(i, target, "forceEnable"),
-                )
-              if (target !== _status.event.dying) {
-                if (
-                  !player.isPhaseUsing() ||
-                  player.needsToDiscard(0, (i, player) => {
-                    return !player.canIgnoreHandcard(i) && taos.includes(i)
-                  }) ||
-                  player.hasSkillTag(
-                    "nokeep",
-                    true,
-                    {
-                      card: card,
-                      target: target,
-                    },
-                    true,
-                  )
-                ) {
-                  return 2
-                }
-                let min = 8.1 - (4.5 * player.hp) / player.maxHp,
-                  nd = player.needsToDiscard(0, (i, player) => {
-                    return !player.canIgnoreHandcard(i) && (taos.includes(i) || get.value(i) >= min)
-                  }),
-                  keep = nd ? 0 : 2
-                if (
-                  nd > 2 ||
-                  (taos.length > 1 && (nd > 1 || (nd && player.hp < 1 + taos.length))) ||
-                  (target.identity === "zhu" &&
-                    (nd || target.hp < 3) &&
-                    (mode === "identity" || mode === "versus" || mode === "chess")) ||
-                  !player.hasFriend()
-                ) {
-                  return 2
-                }
-                if (
-                  game.hasPlayer((current) => {
-                    return (
-                      player !== current &&
-                      current.identity === "zhu" &&
-                      current.hp < 3 &&
-                      (mode === "identity" || mode === "versus" || mode === "chess") &&
-                      get.attitude(player, current) > 0
-                    )
-                  })
-                ) {
-                  keep = 3
-                } else if (nd === 2 || player.hp < 2) {
-                  return 2
-                }
-                if (nd === 2 && player.hp <= 1) {
-                  return 2
-                }
-                if (keep === 3) {
-                  return 0
-                }
-                if (taos.length <= player.hp / 2) {
-                  keep = 1
-                }
-                if (
-                  keep &&
-                  game.countPlayer((current) => {
-                    if (
-                      player !== current &&
-                      current.hp < 3 &&
-                      player.hp > current.hp &&
-                      get.attitude(player, current) > 2
-                    ) {
-                      keep += player.hp - current.hp
-                      return true
-                    }
-                    return false
-                  })
-                ) {
-                  if (keep > 2) {
-                    return 0
-                  }
-                }
-                return 2
-              }
-              if (target.isZhu2() || target === game.boss) {
-                return 2
-              }
-              if (player !== target) {
-                if (target.hp < 0 && taos.length + target.hp <= 0) {
-                  return 0
-                }
-                if (Math.abs(get.attitude(player, target)) < 1) {
-                  return 0
-                }
-              }
-              if (!player.getFriends().length) {
-                return 2
-              }
-              let tri = _status.event.getTrigger(),
-                num = game.countPlayer((current) => {
-                  if (get.attitude(current, target) > 0) {
-                    return current.countCards(
-                      "hs",
-                      (i) =>
-                        get.name(i) === "tao" && lib.filter.cardEnabled(i, target, "forceEnable"),
-                    )
-                  }
-                }),
-                dis = 1,
-                t = _status.currentPhase || game.me
-              while (t !== target) {
-                let att = get.attitude(player, t)
-                if (att < -2) {
-                  dis++
-                } else if (att < 1) {
-                  dis += 0.45
-                }
-                t = t.next
-              }
-              if (mode === "identity") {
-                if (tri && tri.name === "dying") {
-                  if (target.identity === "fan") {
-                    if (
-                      (!tri.source && player !== target) ||
-                      (tri.source &&
-                        tri.source !== target &&
-                        player.getFriends().includes(tri.source.identity))
-                    ) {
-                      if (
-                        num > dis ||
-                        (player === target &&
-                          player.countCards("hs", { type: "basic" }) > 1.6 * dis)
-                      ) {
-                        return 2
-                      }
-                      return 0
-                    }
-                  } else if (
-                    tri.source &&
-                    tri.source.isZhu &&
-                    (target.identity === "zhong" || target.identity === "mingzhong") &&
-                    (tri.source.countCards("he") > 2 ||
-                      (player === tri.source && player.hasCard((i) => i.name !== "tao", "he")))
-                  ) {
-                    return 2
-                  }
-                  //if(player!==target&&!target.isZhu&&target.countCards('hs')<dis) return 0;
-                }
-                if (player.identity === "zhu") {
-                  if (
-                    player.hp <= 1 &&
-                    player !== target &&
-                    taos + player.countCards("hs", "jiu") <=
-                      Math.min(
-                        dis,
-                        game.countPlayer((current) => {
-                          return current.identity === "fan"
-                        }),
-                      )
-                  ) {
-                    return 0
-                  }
-                }
-              } else if (
-                mode === "stone" &&
-                target.isMin() &&
-                player !== target &&
-                tri &&
-                tri.name === "dying" &&
-                player.side === target.side &&
-                tri.source !== target.getEnemy()
-              ) {
-                return 0
-              }
-              return 2
-            },
-          },
-          tag: {
-            recover: 1,
-            save: 1,
-          },
-        },
-      },
-      guohe: {
-        audio: true,
-        fullskin: true,
-        type: "trick",
-        enable: true,
-        selectTarget: 1,
-        postAi(targets) {
-          return targets.length === 1 && targets[0].countCards("j")
-        },
-        filterTarget(card, player, target) {
-          if (player === target) {
-            return false
-          }
-          return target.hasCard(
-            (card) => lib.filter.canBeDiscarded(card, player, target),
-            get.is.single() ? "he" : "hej",
-          )
-        },
-        defaultYingbianEffect: "add",
-        content() {
-          "step 0"
-          if (get.is.single()) {
-            let bool1 = target.countDiscardableCards(player, "h"),
-              bool2 = target.countDiscardableCards(player, "e")
-            if (bool1 && bool2) {
-              player
-                .chooseControl("手牌区", "装备区")
-                .set("ai", function () {
-                  return Math.random() < 0.5 ? 1 : 0
-                })
-                .set(
-                  "prompt",
-                  "弃置" +
-                    get.translation(target) +
-                    "装备区的一张牌，或观看其手牌并弃置其中的一张牌。",
-                )
-            } else {
-              event._result = { control: bool1 ? "手牌区" : "装备区" }
-            }
-          } else {
-            event._result = { control: "所有区域" }
-          }
-          ;("step 1")
-          let pos,
-            vis = "visible"
-          if (result.control === "手牌区") {
-            pos = "h"
-          } else if (result.control === "装备区") {
-            pos = "e"
-          } else {
-            pos = "hej"
-            vis = undefined
-          }
-          if (target.countDiscardableCards(player, pos)) {
-            player
-              .discardPlayerCard(pos, target, true, vis)
-              .set("target", target)
-              .set("complexSelect", false)
-              .set("ai", lib.card.guohe.ai.button)
-          }
-        },
-        ai: {
-          wuxie: (target, card, player, viewer, status) => {
-            if (
-              !target.countCards("hej") ||
-              status * get.attitude(viewer, player._trueMe || player) > 0 ||
-              (target.hp > 2 &&
-                !target.hasCard((i) => {
-                  let val = get.value(i, target),
-                    subtypes = get.subtypes(i)
-                  if (
-                    val < 8 &&
-                    target.hp < 2 &&
-                    !subtypes.includes("equip2") &&
-                    !subtypes.includes("equip5")
-                  ) {
-                    return false
-                  }
-                  return val > 3 + Math.min(5, target.hp)
-                }, "e") &&
-                target.countCards("h") * _status.event.getRand("guohe_wuxie") > 1.57)
-            ) {
-              return 0
-            }
-          },
-          basic: {
-            order: 9,
-            useful: (card, i) => 10 / (3 + i),
-            value: (card, player) => {
-              let max = 0
-              game.countPlayer((cur) => {
-                max = Math.max(
-                  max,
-                  lib.card.guohe.ai.result.target(player, cur) * get.attitude(player, cur),
-                )
-              })
-              if (max <= 0) {
-                return 5
-              }
-              return 0.42 * max
-            },
-          },
-          yingbian(card, player, targets, viewer) {
-            if (get.attitude(viewer, player) <= 0) {
-              return 0
-            }
-            if (
-              game.hasPlayer(function (current) {
-                return (
-                  !targets.includes(current) &&
-                  lib.filter.targetEnabled2(card, player, current) &&
-                  get.effect(current, card, player, player) > 0
-                )
-              })
-            ) {
-              return 6
-            }
-            return 0
-          },
-          button: (button) => {
-            let player = _status.event.player,
-              target = _status.event.target
-            if (!lib.filter.canBeDiscarded(button.link, player, target)) {
-              return 0
-            }
-            let att = get.attitude(player, target),
-              val = get.buttonValue(button),
-              pos = get.position(button.link),
-              name = get.name(button.link)
-            if (pos === "j") {
-              let viewAs = button.link.viewAs
-              if (viewAs === "lebu") {
-                let needs = target.needsToDiscard(2)
-                val *= 1.08 + 0.2 * needs
-              } else if (viewAs === "shandian" || viewAs === "fulei") {
-                val /= 2
-              }
-            }
-            if (att > 0) {
-              val = -val
-            }
-            if (pos !== "e") {
-              return val
-            }
-            let sub = get.subtypes(button.link)
-            if (sub.includes("equip1")) {
-              return (val * Math.min(3.6, target.hp)) / 3
-            }
-            if (sub.includes("equip2")) {
-              if (name === "baiyin" && pos === "e" && target.isDamaged()) {
-                let by = 3 - 0.6 * Math.min(5, target.hp)
-                return get.sgn(get.recoverEffect(target, player, player)) * by
-              }
-              return 1.57 * val
-            }
-            if (
-              att <= 0 &&
-              (sub.includes("equip3") || sub.includes("equip4")) &&
-              (player.hasSkill("shouli") || player.hasSkill("psshouli"))
-            ) {
-              return 0
-            }
-            if (sub.includes("equip6")) {
-              return val
-            }
-            if (sub.includes("equip4")) {
-              return val / 2
-            }
-            if (
-              sub.includes("equip3") &&
-              !game.hasPlayer((cur) => {
-                return !cur.inRange(target) && get.attitude(cur, target) < 0
-              })
-            ) {
-              return 0.4 * val
-            }
-            return val
-          },
-          result: {
-            target(player, target) {
-              const att = get.attitude(player, target)
-              const hs = target.getDiscardableCards(player, "h")
-              const es = target.getDiscardableCards(player, "e")
-              const js = target.getDiscardableCards(player, "j")
-              if (!hs.length && !es.length && !js.length) {
-                return 0
-              }
-              if (att > 0) {
-                if (
-                  js.some((card) => {
-                    const cardj = card.viewAs ? { name: card.viewAs } : card
-                    if (cardj.name === "xumou_jsrg") {
-                      return false
-                    }
-                    return get.effect(target, cardj, target, player) < 0
-                  })
-                ) {
-                  return 3
-                }
-                if (
-                  target.isDamaged() &&
-                  es.some((card) => card.name === "baiyin") &&
-                  get.recoverEffect(target, player, player) > 0
-                ) {
-                  if (target.hp === 1 && !target.hujia) {
-                    return 1.6
-                  }
-                }
-                if (
-                  es.some((card) => {
-                    return get.value(card, target) < 0
-                  })
-                ) {
-                  return 1
-                }
-                return -1.5
+              if (f.hp > 1) {
+                damaged++
               } else {
-                const noh = hs.length === 0 || target.hasSkillTag("noh")
-                const noe = es.length === 0 || target.hasSkillTag("noe")
-                const noe2 =
-                  noe ||
-                  !es.some((card) => {
-                    return get.value(card, target) > 0
-                  })
-                const noj =
-                  js.length === 0 ||
-                  !js.some((card) => {
-                    const cardj = card.viewAs ? { name: card.viewAs } : card
-                    if (cardj.name === "xumou_jsrg") {
-                      return true
-                    }
-                    return get.effect(target, cardj, target, player) < 0
-                  })
-                if (noh && noe2 && noj) {
-                  return 1.5
-                }
-                return -1.5
+                needs++
               }
-            },
-          },
-          tag: {
-            loseCard: 1,
-            discard: 1,
-          },
-        },
-      },
-      guohe_copy: {
-        ai: {
-          basic: {
-            order: 9,
-            useful: 5,
-            value: 5,
-          },
-          result: {
-            target(player, target, card) {
-              let position = "hej"
-              if (card && card.position) {
-                position = card.position
-              }
-              const att = get.attitude(player, target)
-              const hs = position.includes("h") ? target.getDiscardableCards(player, "h") : []
-              const es = position.includes("e") ? target.getDiscardableCards(player, "e") : []
-              const js = position.includes("j") ? target.getDiscardableCards(player, "j") : []
-              if (!hs.length && !es.length && !js.length) {
-                return 0
-              }
-              if (att > 0) {
-                if (
-                  js.some((card) => {
-                    const cardj = card.viewAs ? { name: card.viewAs } : card
-                    if (cardj.name === "xumou_jsrg") {
-                      return false
-                    }
-                    return get.effect(target, cardj, target, player) < 0
-                  })
-                ) {
-                  return 3
-                }
-                if (
-                  target.isDamaged() &&
-                  es.some((card) => card.name === "baiyin") &&
-                  get.recoverEffect(target, player, player) > 0
-                ) {
-                  if (target.hp === 1 && !target.hujia) {
-                    return 1.6
-                  }
-                }
-                if (
-                  es.some((card) => {
-                    return get.value(card, target) < 0
-                  })
-                ) {
-                  return 1
-                }
-                return -1.5
-              } else {
-                const noh = hs.length === 0 || target.hasSkillTag("noh")
-                const noe = es.length === 0 || target.hasSkillTag("noe")
-                const noe2 =
-                  noe ||
-                  !es.some((card) => {
-                    return get.value(card, target) > 0
-                  })
-                const noj =
-                  js.length === 0 ||
-                  !js.some((card) => {
-                    const cardj = card.viewAs ? { name: card.viewAs } : card
-                    if (cardj.name === "xumou_jsrg") {
-                      return true
-                    }
-                    return get.effect(target, cardj, target, player) < 0
-                  })
-                if (noh && noe2 && noj) {
-                  return 1.5
-                }
-                return -1.5
-              }
-            },
-          },
-          tag: {
-            loseCard: 1,
-            discard: 1,
-          },
-        },
-      },
-      guohe_copy2: {
-        ai: {
-          basic: {
-            order: 9,
-            useful: 5,
-            value: 5,
-          },
-          result: {
-            target(player, target, card, isLink) {
-              return lib.card.guohe_copy.ai.result.target(
-                player,
-                target,
-                {
-                  name: "guohe_copy",
-                  position: "he",
-                },
-                isLink,
-              )
-            },
-          },
-          tag: {
-            loseCard: 1,
-            discard: 1,
-          },
-        },
-      },
-      shunshou: {
-        audio: true,
-        fullskin: true,
-        type: "trick",
-        enable: true,
-        range: { global: 1 },
-        selectTarget: 1,
-        postAi(targets) {
-          return targets.length === 1 && targets[0].countCards("j")
-        },
-        filterTarget(card, player, target) {
-          if (player === target) {
-            return false
-          }
-          return target.hasCard(
-            (card) => lib.filter.canBeGained(card, player, target),
-            get.is.single() ? "he" : "hej",
-          )
-        },
-        async content(event, trigger, player) {
-          const target = event.target
-          let pos = get.is.single() ? "he" : "hej"
-          if (target.countGainableCards(player, pos)) {
-            await player
-              .gainPlayerCard(pos, target, true)
-              .set("target", target)
-              .set("complexSelect", false)
-              .set("ai", lib.card.shunshou.ai.button)
-          }
-        },
-        ai: {
-          wuxie(target, card, player, viewer) {
-            if (!target.countCards("hej") || get.attitude(viewer, player._trueMe || player) > 0) {
-              return 0
+            })
+            if (needs && damaged) {
+              return 5 * needs + 3 * damaged
             }
-          },
-          basic: {
-            order: 7.5,
-            useful: (card, i) => 8 / (3 + i),
-            value: (card, player) => {
-              let max = 0
-              game.countPlayer((cur) => {
-                max = Math.max(
-                  max,
-                  lib.card.shunshou.ai.result.target(player, cur) * get.attitude(player, cur),
-                )
-              })
-              if (max <= 0) {
-                return 2
-              }
-              return 0.53 * max
-            },
-          },
-          button: (button) => {
-            let player = _status.event.player,
-              target = _status.event.target
-            if (!lib.filter.canBeGained(button.link, player, target)) {
-              return 0
+            if (needs + damaged > 1 || player.hasSkillTag("maixie")) {
+              return 8
             }
-            let att = get.attitude(player, target),
-              val = get.value(button.link, player) / 60,
-              btv = get.buttonValue(button),
-              pos = get.position(button.link),
-              name = get.name(button.link)
-            if (pos === "j") {
-              let viewAs = button.link.viewAs
-              if (viewAs === "lebu") {
-                let needs = target.needsToDiscard(2)
-                btv *= 1.08 + 0.2 * needs
-              } else if (viewAs === "shandian" || viewAs === "fulei") {
-                btv /= 2
-              }
+            if (player.hp / player.maxHp < 0.7) {
+              return 7 + Math.abs(player.hp / player.maxHp - 0.5)
             }
-            if (att > 0) {
-              btv = -btv
-            }
-            if (pos !== "e") {
-              if (pos === "h" && !player.hasSkillTag("viewHandcard", null, target, true)) {
-                return btv + 0.1
-              }
-              return btv + val
-            }
-            let sub = get.subtype(button.link)
-            if (sub === "equip1") {
-              return (btv * Math.min(3.6, target.hp)) / 3
-            }
-            if (sub === "equip2") {
-              if (name === "baiyin" && pos === "e" && target.isDamaged()) {
-                let by = 3 - 0.6 * Math.min(5, target.hp)
-                return get.sgn(get.recoverEffect(target, player, player)) * by
-              }
-              return 1.57 * btv + val
-            }
-            if (
-              att <= 0 &&
-              (sub === "equip3" || sub === "equip4") &&
-              (player.hasSkill("shouli") || player.hasSkill("psshouli"))
-            ) {
-              return 0
-            }
-            if (
-              sub === "equip3" &&
-              !game.hasPlayer((cur) => !cur.inRange(target) && get.attitude(cur, target) < 0)
-            ) {
-              return 0.4 * btv + val
-            }
-            if (sub === "equip4") {
-              return btv / 2 + val
-            }
-            return btv + val
-          },
-          result: {
-            player(player, target) {
-              const hs = target.getGainableCards(player, "h")
-              const es = target.getGainableCards(player, "e")
-              const js = target.getGainableCards(player, "j")
-              const att = get.attitude(player, target)
-              if (att < 0) {
-                if (
-                  !hs.length &&
-                  !es.some((card) => {
-                    return get.value(card, target) > 0 && card !== target.getEquip("jinhe")
-                  }) &&
-                  !js.some((card) => {
-                    var cardj = card.viewAs ? { name: card.viewAs } : card
-                    if (cardj.name === "xumou_jsrg") {
-                      return true
-                    }
-                    return get.effect(target, cardj, target, player) < 0
-                  })
-                ) {
-                  return 0
-                }
-              } else if (att > 1) {
-                return es.some((card) => {
-                  return get.value(card, target) <= 0
-                }) ||
-                  js.some((card) => {
-                    var cardj = card.viewAs ? { name: card.viewAs } : card
-                    if (cardj.name === "xumou_jsrg") {
-                      return false
-                    }
-                    return get.effect(target, cardj, target, player) < 0
-                  })
-                  ? 1.5
-                  : 0
-              }
-              return 1
-            },
-            target(player, target) {
-              const hs = target.getGainableCards(player, "h")
-              const es = target.getGainableCards(player, "e")
-              const js = target.getGainableCards(player, "j")
-
-              if (get.attitude(player, target) <= 0) {
-                if (hs.length > 0) {
-                  return -1.5
-                }
-                return es.some((card) => {
-                  return get.value(card, target) > 0 && card !== target.getEquip("jinhe")
-                }) ||
-                  js.some((card) => {
-                    var cardj = card.viewAs ? { name: card.viewAs } : card
-                    if (cardj.name === "xumou_jsrg") {
-                      return true
-                    }
-                    return get.effect(target, cardj, target, player) < 0
-                  })
-                  ? -1.5
-                  : 1.5
-              }
-              return es.some((card) => {
-                return get.value(card, target) <= 0
-              }) ||
-                js.some((card) => {
-                  var cardj = card.viewAs ? { name: card.viewAs } : card
-                  if (cardj.name === "xumou_jsrg") {
-                    return false
-                  }
-                  return get.effect(target, cardj, target, player) < 0
-                })
-                ? 1.5
-                : -1.5
-            },
-          },
-          tag: {
-            loseCard: 1,
-            gain: 1,
-          },
-        },
-      },
-      shunshou_copy: {
-        ai: {
-          basic: {
-            order: 7.5,
-            useful: 4,
-            value: 9,
-          },
-          result: {
-            target(player, target, card) {
-              let position = "hej"
-              if (card && card.position) {
-                position = card.position
-              }
-              const hs = position.includes("h") ? target.getGainableCards(player, "h") : []
-              const es = position.includes("e") ? target.getGainableCards(player, "e") : []
-              const js = position.includes("j") ? target.getGainableCards(player, "j") : []
-              if (get.attitude(player, target) <= 0) {
-                if (hs.length > 0) {
-                  return -1.5
-                }
-                return es.some((card) => {
-                  return get.value(card, target) > 0 && card !== target.getEquip("jinhe")
-                }) ||
-                  js.some((card) => {
-                    var cardj = card.viewAs ? { name: card.viewAs } : card
-                    if (cardj.name === "xumou_jsrg") {
-                      return true
-                    }
-                    return get.effect(target, cardj, target, player) < 0
-                  })
-                  ? -1.5
-                  : 1.5
-              }
-              return es.some((card) => {
-                return get.value(card, target) <= 0
-              }) ||
-                js.some((card) => {
-                  var cardj = card.viewAs ? { name: card.viewAs } : card
-                  if (cardj.name === "xumou_jsrg") {
-                    return false
-                  }
-                  return get.effect(target, cardj, target, player) < 0
-                })
-                ? 1.5
-                : -1.5
-            },
-            player(player, target, card) {
-              let position = "hej"
-              if (card && card.position) {
-                position = card.position
-              }
-              const hs = position.includes("h") ? target.getGainableCards(player, "h") : []
-              const es = position.includes("e") ? target.getGainableCards(player, "e") : []
-              const js = position.includes("j") ? target.getGainableCards(player, "j") : []
-              const att = get.attitude(player, target)
-              if (att < 0) {
-                if (
-                  !hs.length &&
-                  !es.some((card) => {
-                    return get.value(card, target) > 0 && card !== target.getEquip("jinhe")
-                  }) &&
-                  !js.some((card) => {
-                    var cardj = card.viewAs ? { name: card.viewAs } : card
-                    if (cardj.name === "xumou_jsrg") {
-                      return true
-                    }
-                    return get.effect(target, cardj, target, player) < 0
-                  })
-                ) {
-                  return 0
-                }
-              } else if (att > 1) {
-                return es.some((card) => {
-                  return get.value(card, target) <= 0
-                }) ||
-                  js.some((card) => {
-                    var cardj = card.viewAs ? { name: card.viewAs } : card
-                    if (cardj.name === "xumou_jsrg") {
-                      return false
-                    }
-                    return get.effect(target, cardj, target, player) < 0
-                  })
-                  ? 1.5
-                  : 0
-              }
-              return 1
-            },
-          },
-          tag: {
-            loseCard: 1,
-            gain: 1,
-          },
-        },
-      },
-      shunshou_copy2: {
-        ai: {
-          basic: {
-            order: 7.5,
-            useful: 4,
-            value: 9,
-          },
-          result: {
-            target(player, target, card, isLink) {
-              return lib.card.shunshou_copy.ai.result.target(
-                player,
-                target,
-                {
-                  name: "shunshou_copy",
-                  position: "he",
-                },
-                isLink,
-              )
-            },
-            player(player, target, card, isLink) {
-              return lib.card.shunshou_copy.ai.result.player(
-                player,
-                target,
-                {
-                  name: "shunshou_copy",
-                  position: "he",
-                },
-                isLink,
-              )
-            },
-          },
-          tag: {
-            loseCard: 1,
-            gain: 1,
-          },
-        },
-      },
-      juedou: {
-        audio: true,
-        fullskin: true,
-        type: "trick",
-        enable: true,
-        defaultYingbianEffect: "hit",
-        filterTarget(card, player, target) {
-          return target !== player
-        },
-        async content(event, trigger, player) {
-          const target = event.target
-          if (event.turn === undefined) {
-            event.turn = target
-          }
-          event.source = player
-          if (typeof event.baseDamage !== "number") {
-            event.baseDamage = 1
-          }
-          if (typeof event.extraDamage !== "number") {
-            event.extraDamage = 0
-          }
-          if (!event.shaReq) {
-            event.shaReq = {}
-          }
-          if (typeof event.shaReq[player.playerid] !== "number") {
-            event.shaReq[player.playerid] = 1
-          }
-          if (typeof event.shaReq[target.playerid] !== "number") {
-            event.shaReq[target.playerid] = 1
-          }
-          event.playerCards = []
-          event.targetCards = []
-          while (true) {
-            await event.trigger("juedou")
-            event.shaRequired = event.shaReq[event.turn.playerid]
-            let damaged = false
-            while (event.shaRequired > 0) {
-              let result = { bool: false }
-              if (!event.directHit) {
-                const next = event.turn.chooseToRespond()
-                next.set("filterCard", function (card, player) {
-                  if (get.name(card) !== "sha") {
-                    return false
-                  }
-                  return lib.filter.cardRespondable(card, player)
-                })
-                if (event.shaRequired > 1) {
-                  next.set("prompt2", "共需打出" + event.shaRequired + "张杀")
-                }
-                next.set("ai", function (card) {
-                  if (get.event().toRespond) {
-                    return get.order(card)
-                  }
-                  return -1
-                })
-                next.set("shaRequired", event.shaRequired)
-                next.set(
-                  "toRespond",
-                  (() => {
-                    const responder = event.turn
-                    const opposite = event.source
-                    if (responder.hasSkillTag("noSha", null, "respond")) {
-                      return false
-                    }
-                    if (responder.hasSkillTag("useSha", null, "respond")) {
-                      return true
-                    }
-                    if (
-                      event.baseDamage + event.extraDamage <= 0 ||
-                      player.hasSkillTag("notricksource", null, event) ||
-                      responder.hasSkillTag("notrick", null, event)
-                    ) {
-                      return false
-                    }
-                    if (
-                      event.baseDamage + event.extraDamage >=
-                      responder.hp +
-                        (opposite.hasSkillTag("jueqing", false, target) ||
-                        target.hasSkill("gangzhi")
-                          ? 0
-                          : target.hujia)
-                    ) {
-                      return true
-                    }
-                    const damage = get.damageEffect(responder, opposite, responder)
-                    if (damage >= 0) {
-                      return false
-                    }
-                    if (
-                      event.shaRequired > 1 &&
-                      !target.hasSkillTag("freeSha", null, {
-                        player: player,
-                        card: event.card,
-                        type: "respond",
-                      }) &&
-                      event.shaRequired > responder.mayHaveSha(responder, "respond", null, "count")
-                    ) {
-                      return false
-                    }
-                    if (
-                      get.attitude(responder, opposite._trueMe || opposite) > 0 &&
-                      damage >= get.damageEffect(opposite, responder, responder)
-                    ) {
-                      return false
-                    }
-                    // if (responder.hasSkill("naman")) {
-                    // 	return true;
-                    // }
-                    return true
-                  })(),
-                )
-                next.set("respondTo", [player, event.card])
-                next.autochoose = lib.filter.autoRespondSha
-                if (event.turn === target) {
-                  next.source = player
-                } else {
-                  next.source = target
-                }
-                result = await next.forResult()
-              }
-              if (result?.bool) {
-                event.shaRequired--
-                if (result.cards?.length) {
-                  if (event.turn === target) {
-                    event.targetCards.addArray(result.cards)
-                  } else {
-                    event.playerCards.addArray(result.cards)
-                  }
-                }
-              } else {
-                await event.turn.damage(event.source)
-                damaged = true
-                break
-              }
+            if (needs) {
+              return 7
             }
             if (damaged) {
-              break
+              return Math.max(3, 7.8 - i)
             }
-            ;[event.source, event.turn] = [event.turn, event.source]
-          }
+            return Math.max(1, 7.2 - i)
+          },
+          value: (card, player) => {
+            let fs = game.filterPlayer((current) => {
+                return get.attitude(_status.event.player, current) > 0
+              }),
+              damaged = 0,
+              needs = 0
+            fs.forEach((f) => {
+              if (!player.canUse("tao", f)) {
+                return
+              }
+              if (f.hp <= 1) {
+                needs++
+              } else if (f.hp === 2) {
+                damaged++
+              }
+            })
+            if ((needs && damaged) || player.hasSkillTag("maixie")) {
+              return Math.max(9, 5 * needs + 3 * damaged)
+            }
+            if (needs || damaged > 1) {
+              return 8
+            }
+            if (damaged) {
+              return 7.5
+            }
+            return Math.max(5, 9.2 - player.hp)
+          },
         },
-        ai: {
-          wuxie(target, card, player, viewer, status) {
-            if (player === game.me && get.attitude(viewer, player._trueMe || player) > 0) {
-              return 0
+        result: {
+          target: (player, target) => {
+            if (target.hasSkillTag("maixie")) {
+              return 3
             }
-            if (
-              status * get.attitude(viewer, target) * get.effect(target, card, player, target) >=
-              0
+            return 2
+          },
+          target_use: (player, target, card) => {
+            const mode = get.mode(),
+              taos = player.getCards(
+                "hs",
+                (i) =>
+                  get.name(i) === "tao" &&
+                  lib.filter.cardEnabled(i, target, "forceEnable"),
+              )
+            if (target !== _status.event.dying) {
+              if (
+                !player.isPhaseUsing() ||
+                player.needsToDiscard(0, (i, player) => {
+                  return !player.canIgnoreHandcard(i) && taos.includes(i)
+                }) ||
+                player.hasSkillTag(
+                  "nokeep",
+                  true,
+                  {
+                    card: card,
+                    target: target,
+                  },
+                  true,
+                )
+              ) {
+                return 2
+              }
+              let min = 8.1 - (4.5 * player.hp) / player.maxHp,
+                nd = player.needsToDiscard(0, (i, player) => {
+                  return (
+                    !player.canIgnoreHandcard(i) &&
+                    (taos.includes(i) || get.value(i) >= min)
+                  )
+                }),
+                keep = nd ? 0 : 2
+              if (
+                nd > 2 ||
+                (taos.length > 1 &&
+                  (nd > 1 || (nd && player.hp < 1 + taos.length))) ||
+                (target.identity === "zhu" &&
+                  (nd || target.hp < 3) &&
+                  (mode === "identity" ||
+                    mode === "versus" ||
+                    mode === "chess")) ||
+                !player.hasFriend()
+              ) {
+                return 2
+              }
+              if (
+                game.hasPlayer((current) => {
+                  return (
+                    player !== current &&
+                    current.identity === "zhu" &&
+                    current.hp < 3 &&
+                    (mode === "identity" ||
+                      mode === "versus" ||
+                      mode === "chess") &&
+                    get.attitude(player, current) > 0
+                  )
+                })
+              ) {
+                keep = 3
+              } else if (nd === 2 || player.hp < 2) {
+                return 2
+              }
+              if (nd === 2 && player.hp <= 1) {
+                return 2
+              }
+              if (keep === 3) {
+                return 0
+              }
+              if (taos.length <= player.hp / 2) {
+                keep = 1
+              }
+              if (
+                keep &&
+                game.countPlayer((current) => {
+                  if (
+                    player !== current &&
+                    current.hp < 3 &&
+                    player.hp > current.hp &&
+                    get.attitude(player, current) > 2
+                  ) {
+                    keep += player.hp - current.hp
+                    return true
+                  }
+                  return false
+                })
+              ) {
+                if (keep > 2) {
+                  return 0
+                }
+              }
+              return 2
+            }
+            if (target.isZhu2() || target === game.boss) {
+              return 2
+            }
+            if (player !== target) {
+              if (target.hp < 0 && taos.length + target.hp <= 0) {
+                return 0
+              }
+              if (Math.abs(get.attitude(player, target)) < 1) {
+                return 0
+              }
+            }
+            if (!player.getFriends().length) {
+              return 2
+            }
+            let tri = _status.event.getTrigger(),
+              num = game.countPlayer((current) => {
+                if (get.attitude(current, target) > 0) {
+                  return current.countCards(
+                    "hs",
+                    (i) =>
+                      get.name(i) === "tao" &&
+                      lib.filter.cardEnabled(i, target, "forceEnable"),
+                  )
+                }
+              }),
+              dis = 1,
+              t = _status.currentPhase || game.me
+            while (t !== target) {
+              const att = get.attitude(player, t)
+              if (att < -2) {
+                dis++
+              } else if (att < 1) {
+                dis += 0.45
+              }
+              t = t.next
+            }
+            if (mode === "identity") {
+              if (tri && tri.name === "dying") {
+                if (target.identity === "fan") {
+                  if (
+                    (!tri.source && player !== target) ||
+                    (tri.source &&
+                      tri.source !== target &&
+                      player.getFriends().includes(tri.source.identity))
+                  ) {
+                    if (
+                      num > dis ||
+                      (player === target &&
+                        player.countCards("hs", { type: "basic" }) > 1.6 * dis)
+                    ) {
+                      return 2
+                    }
+                    return 0
+                  }
+                } else if (
+                  tri.source?.isZhu &&
+                  (target.identity === "zhong" ||
+                    target.identity === "mingzhong") &&
+                  (tri.source.countCards("he") > 2 ||
+                    (player === tri.source &&
+                      player.hasCard((i) => i.name !== "tao", "he")))
+                ) {
+                  return 2
+                }
+                //if(player!==target&&!target.isZhu&&target.countCards('hs')<dis) return 0;
+              }
+              if (player.identity === "zhu") {
+                if (
+                  player.hp <= 1 &&
+                  player !== target &&
+                  taos + player.countCards("hs", "jiu") <=
+                    Math.min(
+                      dis,
+                      game.countPlayer((current) => {
+                        return current.identity === "fan"
+                      }),
+                    )
+                ) {
+                  return 0
+                }
+              }
+            } else if (
+              mode === "stone" &&
+              target.isMin() &&
+              player !== target &&
+              tri &&
+              tri.name === "dying" &&
+              player.side === target.side &&
+              tri.source !== target.getEnemy()
             ) {
               return 0
             }
+            return 2
           },
-          basic: {
-            order: 5,
-            useful: 1,
-            value: 5.5,
-          },
-          result: {
-            player(player, target, card) {
-              if (
-                player.hasSkillTag(
-                  "directHit_ai",
-                  true,
-                  {
-                    target: target,
-                    card: card,
-                  },
-                  true,
-                )
-              ) {
-                return 0
-              }
-              if (get.damageEffect(target, player, target) >= 0) {
-                return 0
-              }
-              let pd = get.damageEffect(player, target, player),
-                att = get.attitude(player, target)
-              if (att > 0 && get.damageEffect(target, player, player) > pd) {
-                return 0
-              }
-              let ts = target.mayHaveSha(player, "respond", null, "count"),
-                ps = player.mayHaveSha(
-                  player,
-                  "respond",
-                  player.getCards("h", (i) => {
-                    return (
-                      card === i ||
-                      (card.cards && card.cards.includes(i)) ||
-                      ui.selected.cards.includes(i)
-                    )
-                  }),
-                  "count",
-                )
-              if (ts < 1 && ts * 8 < Math.pow(player.hp, 2)) {
-                return 0
-              }
-              if (att > 0) {
-                if (ts < 1) {
-                  return 0
-                }
-                return -2
-              }
-              if (pd >= 0) {
-                return pd / get.attitude(player, player)
-              }
-              if (ts - ps + Math.exp(0.8 - player.hp) < 1) {
-                return -ts
-              }
-              return -2 - ts
-            },
-            target(player, target, card) {
-              if (
-                player.hasSkillTag(
-                  "directHit_ai",
-                  true,
-                  {
-                    target: target,
-                    card: card,
-                  },
-                  true,
-                )
-              ) {
-                return -2
-              }
-              let td = get.damageEffect(target, player, target)
-              if (td >= 0) {
-                return td / get.attitude(target, target)
-              }
-              let pd = get.damageEffect(player, target, player),
-                att = get.attitude(player, target)
-              if (att > 0 && get.damageEffect(target, player, player) > pd) {
-                return -2
-              }
-              let ts = target.mayHaveSha(player, "respond", null, "count"),
-                ps = player.mayHaveSha(
-                  player,
-                  "respond",
-                  player.getCards("h", (i) => {
-                    return (
-                      card === i ||
-                      (card.cards && card.cards.includes(i)) ||
-                      ui.selected.cards.includes(i)
-                    )
-                  }),
-                  "count",
-                )
-              if (ts < 1) {
-                return -1.5
-              }
-              if (att > 0) {
-                return -2
-              }
-              if (pd >= 0) {
-                return -1
-              }
-              if (ts - ps < 1) {
-                return -2 - ts
-              }
-              return -ts
-            },
-          },
-          tag: {
-            respond: 2,
-            respondSha: 2,
-            damage: 1,
-          },
+        },
+        tag: {
+          recover: 1,
+          save: 1,
         },
       },
-      wuzhong: {
-        audio: true,
-        fullskin: true,
-        type: "trick",
-        enable: true,
-        selectTarget: -1,
-        cardcolor: "red",
-        toself: true,
-        filterTarget(card, player, target) {
-          return target === player
-        },
-        modTarget: true,
-        content() {
-          if (get.is.versus()) {
-            if (game.friend.includes(target)) {
-              if (game.friend.length < game.enemy.length) {
-                target.draw(3)
-                return
-              }
-            } else {
-              if (game.friend.length > game.enemy.length) {
-                target.draw(3)
-                return
-              }
-            }
-          }
-          target.draw(2)
-        },
-        ai: {
-          wuxie(target, card, player, viewer) {
-            if (get.mode() === "guozhan") {
-              if (!_status._aozhan) {
-                if (!player.isMajor()) {
-                  if (!viewer.isMajor()) {
-                    return 0
-                  }
-                }
-              }
-            }
-            if (target.countCards("h") * Math.max(target.hp, 5) > 6) {
-              return 0
-            }
-          },
-          basic: {
-            order: 7,
-            useful: 4.5,
-            value(card, player) {
-              if (player.hp > 2) {
-                return 9.2
-              }
-              return 9.2 - 0.7 * Math.min(3, player.countCards("hs"))
-            },
-          },
-          result: {
-            target: 2,
-          },
-          tag: {
-            draw: 2,
-          },
-        },
+    },
+    guohe: {
+      audio: true,
+      fullskin: true,
+      type: "trick",
+      enable: true,
+      selectTarget: 1,
+      postAi(targets) {
+        return targets.length === 1 && targets[0].countCards("j")
       },
-      jiedao: {
-        audio: true,
-        fullskin: true,
-        type: "trick",
-        enable: true,
-        singleCard: true,
-        targetprompt: ["被借刀", "出杀目标"],
-        complexSelect: true,
-        complexTarget: true,
-        multicheck() {
-          var card = { name: "sha", isCard: true }
-          return game.hasPlayer(function (current) {
-            if (current.getEquips(1).length > 0) {
-              return game.hasPlayer(function (current2) {
-                return (
-                  current.inRange(current2) && lib.filter.targetEnabled(card, current, current2)
-                )
-              })
-            }
-          })
-        },
-        filterTarget(card, player, target) {
-          var card = { name: "sha", isCard: true }
-          return (
-            player !== target &&
-            target.getEquips(1).length > 0 &&
-            game.hasPlayer(function (current) {
-              return (
-                target !== current &&
-                target.inRange(current) &&
-                lib.filter.targetEnabled(card, target, current)
+      filterTarget(card, player, target) {
+        if (player === target) {
+          return false
+        }
+        return target.hasCard(
+          (card) => lib.filter.canBeDiscarded(card, player, target),
+          get.is.single() ? "he" : "hej",
+        )
+      },
+      defaultYingbianEffect: "add",
+      content() {
+        "step 0"
+        if (get.is.single()) {
+          const bool1 = target.countDiscardableCards(player, "h"),
+            bool2 = target.countDiscardableCards(player, "e")
+          if (bool1 && bool2) {
+            player
+              .chooseControl("手牌区", "装备区")
+              .set("ai", () => (Math.random() < 0.5 ? 1 : 0))
+              .set(
+                "prompt",
+                "弃置" +
+                  get.translation(target) +
+                  "装备区的一张牌，或观看其手牌并弃置其中的一张牌。",
               )
-            })
-          )
-        },
-        filterAddedTarget(card, player, target, preTarget) {
-          var card = { name: "sha", isCard: true }
-          return (
-            target !== preTarget &&
-            preTarget.inRange(target) &&
-            lib.filter.targetEnabled(card, preTarget, target)
-          )
-        },
-        content() {
-          "step 0"
-          if (
-            event.directHit ||
-            !event.addedTarget ||
-            (!_status.connectMode && lib.config.skip_shan && !target.hasSha())
-          ) {
-            event.directfalse = true
           } else {
-            target
-              .chooseToUse(
-                "对" +
-                  get.translation(event.addedTarget) +
-                  "使用一张杀，或令" +
-                  get.translation(player) +
-                  "获得你的武器牌",
-                function (card, player) {
-                  if (get.name(card) !== "sha") {
-                    return false
-                  }
-                  return lib.filter.filterCard.apply(this, arguments)
-                },
-              )
-              .set("targetRequired", true)
-              .set("complexSelect", true)
-              .set("complexTarget", true)
-              .set("filterTarget", function (card, player, target) {
+            event._result = { control: bool1 ? "手牌区" : "装备区" }
+          }
+        } else {
+          event._result = { control: "所有区域" }
+        }
+        ;("step 1")
+        let pos,
+          vis = "visible"
+        if (result.control === "手牌区") {
+          pos = "h"
+        } else if (result.control === "装备区") {
+          pos = "e"
+        } else {
+          pos = "hej"
+          vis = undefined
+        }
+        if (target.countDiscardableCards(player, pos)) {
+          player
+            .discardPlayerCard(pos, target, true, vis)
+            .set("target", target)
+            .set("complexSelect", false)
+            .set("ai", lib.card.guohe.ai.button)
+        }
+      },
+      ai: {
+        wuxie: (target, card, player, viewer, status) => {
+          if (
+            !target.countCards("hej") ||
+            status * get.attitude(viewer, player._trueMe || player) > 0 ||
+            (target.hp > 2 &&
+              !target.hasCard((i) => {
+                const val = get.value(i, target),
+                  subtypes = get.subtypes(i)
                 if (
-                  target !== _status.event.sourcex &&
-                  !ui.selected.targets.includes(_status.event.sourcex)
+                  val < 8 &&
+                  target.hp < 2 &&
+                  !subtypes.includes("equip2") &&
+                  !subtypes.includes("equip5")
                 ) {
                   return false
                 }
-                return lib.filter.filterTarget.apply(this, arguments)
-              })
-              .set("sourcex", event.addedTarget)
-              .set("addCount", false)
-              .set("respondTo", [player, card])
-          }
-          ;("step 1")
-          if (event.directfalse || result.bool === false) {
-            const cards = target.getGainableCards(player, "e", (card) =>
-              get.subtypes(card)?.includes("equip1"),
-            )
-            if (cards.length) {
-              player.gain(cards, target, "give", "bySelf")
-            }
+                return val > 3 + Math.min(5, target.hp)
+              }, "e") &&
+              target.countCards("h") * _status.event.getRand("guohe_wuxie") >
+                1.57)
+          ) {
+            return 0
           }
         },
-        ai: {
-          wuxie(target, card, player, viewer) {
-            if (player === game.me && get.attitude(viewer, player._trueMe || player) > 0) {
+        basic: {
+          order: 9,
+          useful: (card, i) => 10 / (3 + i),
+          value: (card, player) => {
+            let max = 0
+            game.countPlayer((cur) => {
+              max = Math.max(
+                max,
+                lib.card.guohe.ai.result.target(player, cur) *
+                  get.attitude(player, cur),
+              )
+            })
+            if (max <= 0) {
+              return 5
+            }
+            return 0.42 * max
+          },
+        },
+        yingbian(card, player, targets, viewer) {
+          if (get.attitude(viewer, player) <= 0) {
+            return 0
+          }
+          if (
+            game.hasPlayer(
+              (current) =>
+                !targets.includes(current) &&
+                lib.filter.targetEnabled2(card, player, current) &&
+                get.effect(current, card, player, player) > 0,
+            )
+          ) {
+            return 6
+          }
+          return 0
+        },
+        button: (button) => {
+          const player = _status.event.player,
+            target = _status.event.target
+          if (!lib.filter.canBeDiscarded(button.link, player, target)) {
+            return 0
+          }
+          let att = get.attitude(player, target),
+            val = get.buttonValue(button),
+            pos = get.position(button.link),
+            name = get.name(button.link)
+          if (pos === "j") {
+            const viewAs = button.link.viewAs
+            if (viewAs === "lebu") {
+              const needs = target.needsToDiscard(2)
+              val *= 1.08 + 0.2 * needs
+            } else if (viewAs === "shandian" || viewAs === "fulei") {
+              val /= 2
+            }
+          }
+          if (att > 0) {
+            val = -val
+          }
+          if (pos !== "e") {
+            return val
+          }
+          const sub = get.subtypes(button.link)
+          if (sub.includes("equip1")) {
+            return (val * Math.min(3.6, target.hp)) / 3
+          }
+          if (sub.includes("equip2")) {
+            if (name === "baiyin" && pos === "e" && target.isDamaged()) {
+              const by = 3 - 0.6 * Math.min(5, target.hp)
+              return get.sgn(get.recoverEffect(target, player, player)) * by
+            }
+            return 1.57 * val
+          }
+          if (
+            att <= 0 &&
+            (sub.includes("equip3") || sub.includes("equip4")) &&
+            (player.hasSkill("shouli") || player.hasSkill("psshouli"))
+          ) {
+            return 0
+          }
+          if (sub.includes("equip6")) {
+            return val
+          }
+          if (sub.includes("equip4")) {
+            return val / 2
+          }
+          if (
+            sub.includes("equip3") &&
+            !game.hasPlayer((cur) => {
+              return !cur.inRange(target) && get.attitude(cur, target) < 0
+            })
+          ) {
+            return 0.4 * val
+          }
+          return val
+        },
+        result: {
+          target(player, target) {
+            const att = get.attitude(player, target)
+            const hs = target.getDiscardableCards(player, "h")
+            const es = target.getDiscardableCards(player, "e")
+            const js = target.getDiscardableCards(player, "j")
+            if (!hs.length && !es.length && !js.length) {
               return 0
             }
-          },
-          basic: {
-            order: 8,
-            value: 2,
-            useful: 1,
-          },
-          result: {
-            player: (player, target) => {
-              if (!target.hasSkillTag("noe") && get.attitude(player, target) > 0) {
-                return 0
+            if (att > 0) {
+              if (
+                js.some((card) => {
+                  const cardj = card.viewAs ? { name: card.viewAs } : card
+                  if (cardj.name === "xumou_jsrg") {
+                    return false
+                  }
+                  return get.effect(target, cardj, target, player) < 0
+                })
+              ) {
+                return 3
               }
-              return (
-                (player.hasSkillTag("noe") ? 0.32 : 0.15) *
-                target.getEquips(1).reduce((num, i) => {
-                  return num + get.value(i, player)
-                }, 0)
-              )
-            },
-            target: (player, target, card) => {
-              let targets = ui.selected.targets.slice()
-              if (_status.event.preTarget) {
-                targets.add(_status.event.preTarget)
-              }
-              if (targets.length) {
-                let preTarget = targets.at(-1),
-                  pre = _status.event.getTempCache("jiedao_result", preTarget.playerid)
-                if (
-                  pre &&
-                  pre.target &&
-                  pre.target.isIn() &&
-                  pre.card === ai.getCacheKey(card, true)
-                ) {
-                  return target === pre.target ? pre.res : 0
+              if (
+                target.isDamaged() &&
+                es.some((card) => card.name === "baiyin") &&
+                get.recoverEffect(target, player, player) > 0
+              ) {
+                if (target.hp === 1 && !target.hujia) {
+                  return 1.6
                 }
-                return (
-                  (get.effect(target, { name: "sha" }, preTarget, target) /
-                    get.attitude(target, target)) *
-                  preTarget.mayHaveSha(player, "use", null, "odds")
-                )
               }
-              let odds = target.mayHaveSha(player, "use", null, "odds"),
-                addTar = null,
-                sha = game
-                  .filterPlayer((cur) => {
-                    return get.info({ name: "jiedao" }).filterAddedTarget(null, player, cur, target)
-                  })
-                  .reduce((num, current) => {
-                    let eff = get.effect(current, { name: "sha" }, target, player)
-                    if (eff < num) {
-                      return num
-                    }
-                    addTar = current
-                    return eff
-                  }, -Infinity)
-              if (addTar) {
-                sha = get.effect(addTar, { name: "sha" }, target, target) / 10
+              if (
+                es.some((card) => {
+                  return get.value(card, target) < 0
+                })
+              ) {
+                return 1
               }
-              let res =
-                target.getEquips(1).reduce((num, i) => {
-                  return num + get.value(i, target)
-                }, 0) / (target.hasSkillTag("noe") ? -2 : -4)
-              if (odds > 0.06 && sha > res) {
-                res += (sha - res) * odds
-              }
-              _status.event.putTempCache("jiedao_result", target.playerid, {
-                target: addTar,
-                card: ai.getCacheKey(card, true),
-                res: res,
+              return -1.5
+            }
+            const noh = hs.length === 0 || target.hasSkillTag("noh")
+            const noe = es.length === 0 || target.hasSkillTag("noe")
+            const noe2 =
+              noe ||
+              !es.some((card) => {
+                return get.value(card, target) > 0
               })
-              return res
-            },
+            const noj =
+              js.length === 0 ||
+              !js.some((card) => {
+                const cardj = card.viewAs ? { name: card.viewAs } : card
+                if (cardj.name === "xumou_jsrg") {
+                  return true
+                }
+                return get.effect(target, cardj, target, player) < 0
+              })
+            if (noh && noe2 && noj) {
+              return 1.5
+            }
+            return -1.5
           },
-          tag: {
-            gain: 1,
-            use: 1,
-            useSha: 1,
-            loseCard: 1,
-          },
+        },
+        tag: {
+          loseCard: 1,
+          discard: 1,
         },
       },
-      nanman: {
-        audio: true,
-        fullskin: true,
-        type: "trick",
-        enable: true,
-        selectTarget: -1,
-        defaultYingbianEffect: "remove",
-        filterTarget(card, player, target) {
-          return target !== player
+    },
+    guohe_copy: {
+      ai: {
+        basic: {
+          order: 9,
+          useful: 5,
+          value: 5,
         },
-        reverseOrder: true,
-        async content(event, trigger, player) {
-          const target = event.target
+        result: {
+          target(player, target, card) {
+            let position = "hej"
+            if (card?.position) {
+              position = card.position
+            }
+            const att = get.attitude(player, target)
+            const hs = position.includes("h")
+              ? target.getDiscardableCards(player, "h")
+              : []
+            const es = position.includes("e")
+              ? target.getDiscardableCards(player, "e")
+              : []
+            const js = position.includes("j")
+              ? target.getDiscardableCards(player, "j")
+              : []
+            if (!hs.length && !es.length && !js.length) {
+              return 0
+            }
+            if (att > 0) {
+              if (
+                js.some((card) => {
+                  const cardj = card.viewAs ? { name: card.viewAs } : card
+                  if (cardj.name === "xumou_jsrg") {
+                    return false
+                  }
+                  return get.effect(target, cardj, target, player) < 0
+                })
+              ) {
+                return 3
+              }
+              if (
+                target.isDamaged() &&
+                es.some((card) => card.name === "baiyin") &&
+                get.recoverEffect(target, player, player) > 0
+              ) {
+                if (target.hp === 1 && !target.hujia) {
+                  return 1.6
+                }
+              }
+              if (
+                es.some((card) => {
+                  return get.value(card, target) < 0
+                })
+              ) {
+                return 1
+              }
+              return -1.5
+            }
+            const noh = hs.length === 0 || target.hasSkillTag("noh")
+            const noe = es.length === 0 || target.hasSkillTag("noe")
+            const noe2 =
+              noe ||
+              !es.some((card) => {
+                return get.value(card, target) > 0
+              })
+            const noj =
+              js.length === 0 ||
+              !js.some((card) => {
+                const cardj = card.viewAs ? { name: card.viewAs } : card
+                if (cardj.name === "xumou_jsrg") {
+                  return true
+                }
+                return get.effect(target, cardj, target, player) < 0
+              })
+            if (noh && noe2 && noj) {
+              return 1.5
+            }
+            return -1.5
+          },
+        },
+        tag: {
+          loseCard: 1,
+          discard: 1,
+        },
+      },
+    },
+    guohe_copy2: {
+      ai: {
+        basic: {
+          order: 9,
+          useful: 5,
+          value: 5,
+        },
+        result: {
+          target(player, target, card, isLink) {
+            return lib.card.guohe_copy.ai.result.target(
+              player,
+              target,
+              {
+                name: "guohe_copy",
+                position: "he",
+              },
+              isLink,
+            )
+          },
+        },
+        tag: {
+          loseCard: 1,
+          discard: 1,
+        },
+      },
+    },
+    shunshou: {
+      audio: true,
+      fullskin: true,
+      type: "trick",
+      enable: true,
+      range: { global: 1 },
+      selectTarget: 1,
+      postAi(targets) {
+        return targets.length === 1 && targets[0].countCards("j")
+      },
+      filterTarget(card, player, target) {
+        if (player === target) {
+          return false
+        }
+        return target.hasCard(
+          (card) => lib.filter.canBeGained(card, player, target),
+          get.is.single() ? "he" : "hej",
+        )
+      },
+      async content(event, trigger, player) {
+        const target = event.target
+        const pos = get.is.single() ? "he" : "hej"
+        if (target.countGainableCards(player, pos)) {
+          await player
+            .gainPlayerCard(pos, target, true)
+            .set("target", target)
+            .set("complexSelect", false)
+            .set("ai", lib.card.shunshou.ai.button)
+        }
+      },
+      ai: {
+        wuxie(target, card, player, viewer) {
           if (
-            typeof event.shaRequired !== "number" ||
-            !event.shaRequired ||
-            event.shaRequired < 0
+            !target.countCards("hej") ||
+            get.attitude(viewer, player._trueMe || player) > 0
           ) {
-            event.shaRequired = 1
+            return 0
           }
-          if (typeof event.baseDamage !== "number") {
-            event.baseDamage = 1
+        },
+        basic: {
+          order: 7.5,
+          useful: (card, i) => 8 / (3 + i),
+          value: (card, player) => {
+            let max = 0
+            game.countPlayer((cur) => {
+              max = Math.max(
+                max,
+                lib.card.shunshou.ai.result.target(player, cur) *
+                  get.attitude(player, cur),
+              )
+            })
+            if (max <= 0) {
+              return 2
+            }
+            return 0.53 * max
+          },
+        },
+        button: (button) => {
+          const player = _status.event.player,
+            target = _status.event.target
+          if (!lib.filter.canBeGained(button.link, player, target)) {
+            return 0
           }
+          let att = get.attitude(player, target),
+            val = get.value(button.link, player) / 60,
+            btv = get.buttonValue(button),
+            pos = get.position(button.link),
+            name = get.name(button.link)
+          if (pos === "j") {
+            const viewAs = button.link.viewAs
+            if (viewAs === "lebu") {
+              const needs = target.needsToDiscard(2)
+              btv *= 1.08 + 0.2 * needs
+            } else if (viewAs === "shandian" || viewAs === "fulei") {
+              btv /= 2
+            }
+          }
+          if (att > 0) {
+            btv = -btv
+          }
+          if (pos !== "e") {
+            if (
+              pos === "h" &&
+              !player.hasSkillTag("viewHandcard", null, target, true)
+            ) {
+              return btv + 0.1
+            }
+            return btv + val
+          }
+          const sub = get.subtype(button.link)
+          if (sub === "equip1") {
+            return (btv * Math.min(3.6, target.hp)) / 3
+          }
+          if (sub === "equip2") {
+            if (name === "baiyin" && pos === "e" && target.isDamaged()) {
+              const by = 3 - 0.6 * Math.min(5, target.hp)
+              return get.sgn(get.recoverEffect(target, player, player)) * by
+            }
+            return 1.57 * btv + val
+          }
+          if (
+            att <= 0 &&
+            (sub === "equip3" || sub === "equip4") &&
+            (player.hasSkill("shouli") || player.hasSkill("psshouli"))
+          ) {
+            return 0
+          }
+          if (
+            sub === "equip3" &&
+            !game.hasPlayer(
+              (cur) => !cur.inRange(target) && get.attitude(cur, target) < 0,
+            )
+          ) {
+            return 0.4 * btv + val
+          }
+          if (sub === "equip4") {
+            return btv / 2 + val
+          }
+          return btv + val
+        },
+        result: {
+          player(player, target) {
+            const hs = target.getGainableCards(player, "h")
+            const es = target.getGainableCards(player, "e")
+            const js = target.getGainableCards(player, "j")
+            const att = get.attitude(player, target)
+            if (att < 0) {
+              if (
+                !hs.length &&
+                !es.some((card) => {
+                  return (
+                    get.value(card, target) > 0 &&
+                    card !== target.getEquip("jinhe")
+                  )
+                }) &&
+                !js.some((card) => {
+                  var cardj = card.viewAs ? { name: card.viewAs } : card
+                  if (cardj.name === "xumou_jsrg") {
+                    return true
+                  }
+                  return get.effect(target, cardj, target, player) < 0
+                })
+              ) {
+                return 0
+              }
+            } else if (att > 1) {
+              return es.some((card) => {
+                return get.value(card, target) <= 0
+              }) ||
+                js.some((card) => {
+                  var cardj = card.viewAs ? { name: card.viewAs } : card
+                  if (cardj.name === "xumou_jsrg") {
+                    return false
+                  }
+                  return get.effect(target, cardj, target, player) < 0
+                })
+                ? 1.5
+                : 0
+            }
+            return 1
+          },
+          target(player, target) {
+            const hs = target.getGainableCards(player, "h")
+            const es = target.getGainableCards(player, "e")
+            const js = target.getGainableCards(player, "j")
+
+            if (get.attitude(player, target) <= 0) {
+              if (hs.length > 0) {
+                return -1.5
+              }
+              return es.some((card) => {
+                return (
+                  get.value(card, target) > 0 &&
+                  card !== target.getEquip("jinhe")
+                )
+              }) ||
+                js.some((card) => {
+                  var cardj = card.viewAs ? { name: card.viewAs } : card
+                  if (cardj.name === "xumou_jsrg") {
+                    return true
+                  }
+                  return get.effect(target, cardj, target, player) < 0
+                })
+                ? -1.5
+                : 1.5
+            }
+            return es.some((card) => {
+              return get.value(card, target) <= 0
+            }) ||
+              js.some((card) => {
+                var cardj = card.viewAs ? { name: card.viewAs } : card
+                if (cardj.name === "xumou_jsrg") {
+                  return false
+                }
+                return get.effect(target, cardj, target, player) < 0
+              })
+              ? 1.5
+              : -1.5
+          },
+        },
+        tag: {
+          loseCard: 1,
+          gain: 1,
+        },
+      },
+    },
+    shunshou_copy: {
+      ai: {
+        basic: {
+          order: 7.5,
+          useful: 4,
+          value: 9,
+        },
+        result: {
+          target(player, target, card) {
+            let position = "hej"
+            if (card?.position) {
+              position = card.position
+            }
+            const hs = position.includes("h")
+              ? target.getGainableCards(player, "h")
+              : []
+            const es = position.includes("e")
+              ? target.getGainableCards(player, "e")
+              : []
+            const js = position.includes("j")
+              ? target.getGainableCards(player, "j")
+              : []
+            if (get.attitude(player, target) <= 0) {
+              if (hs.length > 0) {
+                return -1.5
+              }
+              return es.some((card) => {
+                return (
+                  get.value(card, target) > 0 &&
+                  card !== target.getEquip("jinhe")
+                )
+              }) ||
+                js.some((card) => {
+                  var cardj = card.viewAs ? { name: card.viewAs } : card
+                  if (cardj.name === "xumou_jsrg") {
+                    return true
+                  }
+                  return get.effect(target, cardj, target, player) < 0
+                })
+                ? -1.5
+                : 1.5
+            }
+            return es.some((card) => {
+              return get.value(card, target) <= 0
+            }) ||
+              js.some((card) => {
+                var cardj = card.viewAs ? { name: card.viewAs } : card
+                if (cardj.name === "xumou_jsrg") {
+                  return false
+                }
+                return get.effect(target, cardj, target, player) < 0
+              })
+              ? 1.5
+              : -1.5
+          },
+          player(player, target, card) {
+            let position = "hej"
+            if (card?.position) {
+              position = card.position
+            }
+            const hs = position.includes("h")
+              ? target.getGainableCards(player, "h")
+              : []
+            const es = position.includes("e")
+              ? target.getGainableCards(player, "e")
+              : []
+            const js = position.includes("j")
+              ? target.getGainableCards(player, "j")
+              : []
+            const att = get.attitude(player, target)
+            if (att < 0) {
+              if (
+                !hs.length &&
+                !es.some((card) => {
+                  return (
+                    get.value(card, target) > 0 &&
+                    card !== target.getEquip("jinhe")
+                  )
+                }) &&
+                !js.some((card) => {
+                  var cardj = card.viewAs ? { name: card.viewAs } : card
+                  if (cardj.name === "xumou_jsrg") {
+                    return true
+                  }
+                  return get.effect(target, cardj, target, player) < 0
+                })
+              ) {
+                return 0
+              }
+            } else if (att > 1) {
+              return es.some((card) => {
+                return get.value(card, target) <= 0
+              }) ||
+                js.some((card) => {
+                  var cardj = card.viewAs ? { name: card.viewAs } : card
+                  if (cardj.name === "xumou_jsrg") {
+                    return false
+                  }
+                  return get.effect(target, cardj, target, player) < 0
+                })
+                ? 1.5
+                : 0
+            }
+            return 1
+          },
+        },
+        tag: {
+          loseCard: 1,
+          gain: 1,
+        },
+      },
+    },
+    shunshou_copy2: {
+      ai: {
+        basic: {
+          order: 7.5,
+          useful: 4,
+          value: 9,
+        },
+        result: {
+          target(player, target, card, isLink) {
+            return lib.card.shunshou_copy.ai.result.target(
+              player,
+              target,
+              {
+                name: "shunshou_copy",
+                position: "he",
+              },
+              isLink,
+            )
+          },
+          player(player, target, card, isLink) {
+            return lib.card.shunshou_copy.ai.result.player(
+              player,
+              target,
+              {
+                name: "shunshou_copy",
+                position: "he",
+              },
+              isLink,
+            )
+          },
+        },
+        tag: {
+          loseCard: 1,
+          gain: 1,
+        },
+      },
+    },
+    juedou: {
+      audio: true,
+      fullskin: true,
+      type: "trick",
+      enable: true,
+      defaultYingbianEffect: "hit",
+      filterTarget(card, player, target) {
+        return target !== player
+      },
+      async content(event, trigger, player) {
+        const target = event.target
+        if (event.turn === undefined) {
+          event.turn = target
+        }
+        event.source = player
+        if (typeof event.baseDamage !== "number") {
+          event.baseDamage = 1
+        }
+        if (typeof event.extraDamage !== "number") {
+          event.extraDamage = 0
+        }
+        if (!event.shaReq) {
+          event.shaReq = {}
+        }
+        if (typeof event.shaReq[player.playerid] !== "number") {
+          event.shaReq[player.playerid] = 1
+        }
+        if (typeof event.shaReq[target.playerid] !== "number") {
+          event.shaReq[target.playerid] = 1
+        }
+        event.playerCards = []
+        event.targetCards = []
+        while (true) {
+          await event.trigger("juedou")
+          event.shaRequired = event.shaReq[event.turn.playerid]
+          let damaged = false
           while (event.shaRequired > 0) {
             let result = { bool: false }
             if (!event.directHit) {
-              const next = target.chooseToRespond()
-              next.set("filterCard", function (card, player) {
+              const next = event.turn.chooseToRespond()
+              next.set("filterCard", (card, player) => {
                 if (get.name(card) !== "sha") {
                   return false
                 }
                 return lib.filter.cardRespondable(card, player)
               })
               if (event.shaRequired > 1) {
-                next.set("prompt2", "共需打出" + event.shaRequired + "张【杀】")
+                next.set("prompt2", `共需打出${event.shaRequired}张杀`)
               }
-              next.set("ai", function (card) {
+              next.set("ai", (card) => {
                 if (get.event().toRespond) {
                   return get.order(card)
                 }
                 return -1
               })
+              next.set("shaRequired", event.shaRequired)
               next.set(
                 "toRespond",
                 (() => {
-                  if (target.hasSkillTag("noSha", null, "respond")) {
+                  const responder = event.turn
+                  const opposite = event.source
+                  if (responder.hasSkillTag("noSha", null, "respond")) {
                     return false
                   }
-                  if (target.hasSkillTag("useSha", null, "respond")) {
+                  if (responder.hasSkillTag("useSha", null, "respond")) {
                     return true
                   }
                   if (
-                    event.baseDamage <= 0 ||
+                    event.baseDamage + event.extraDamage <= 0 ||
                     player.hasSkillTag("notricksource", null, event) ||
-                    target.hasSkillTag("notrick", null, event)
+                    responder.hasSkillTag("notrick", null, event)
                   ) {
                     return false
                   }
                   if (
-                    event.baseDamage >=
-                    target.hp +
-                      (player.hasSkillTag("jueqing", false, target) || target.hasSkill("gangzhi")
+                    event.baseDamage + event.extraDamage >=
+                    responder.hp +
+                      (opposite.hasSkillTag("jueqing", false, target) ||
+                      target.hasSkill("gangzhi")
                         ? 0
                         : target.hujia)
                   ) {
                     return true
                   }
-                  const damage = get.damageEffect(target, player, target)
+                  const damage = get.damageEffect(
+                    responder,
+                    opposite,
+                    responder,
+                  )
                   if (damage >= 0) {
                     return false
                   }
@@ -2123,11 +1705,18 @@ game.import("card", function () {
                       card: event.card,
                       type: "respond",
                     }) &&
-                    event.shaRequired > target.mayHaveSha(target, "respond", null, "count")
+                    event.shaRequired >
+                      responder.mayHaveSha(responder, "respond", null, "count")
                   ) {
                     return false
                   }
-                  // if (target.hasSkill("naman")) {
+                  if (
+                    get.attitude(responder, opposite._trueMe || opposite) > 0 &&
+                    damage >= get.damageEffect(opposite, responder, responder)
+                  ) {
+                    return false
+                  }
+                  // if (responder.hasSkill("naman")) {
                   // 	return true;
                   // }
                   return true
@@ -2135,4318 +1724,5038 @@ game.import("card", function () {
               )
               next.set("respondTo", [player, event.card])
               next.autochoose = lib.filter.autoRespondSha
+              if (event.turn === target) {
+                next.source = player
+              } else {
+                next.source = target
+              }
               result = await next.forResult()
             }
-            if (!result?.bool) {
-              await target.damage()
-              break
-            } else {
+            if (result?.bool) {
               event.shaRequired--
+              if (result.cards?.length) {
+                if (event.turn === target) {
+                  event.targetCards.addArray(result.cards)
+                } else {
+                  event.playerCards.addArray(result.cards)
+                }
+              }
+            } else {
+              await event.turn.damage(event.source)
+              damaged = true
+              break
             }
           }
-        },
-        ai: {
-          wuxie(target, card, player, viewer, status) {
-            let att = get.attitude(viewer, target),
-              eff = get.effect(target, card, player, target)
-            if (Math.abs(att) < 1 || status * eff * att >= 0) {
-              return 0
-            }
-            let evt = _status.event.getParent("useCard"),
-              pri = 1,
-              bonus = player.hasSkillTag("damageBonus", true, {
-                target: target,
-                card: card,
-              }),
-              damage = 1,
-              isZhu = function (tar) {
-                return (
-                  tar.isZhu || tar === game.boss || tar === game.trueZhu || tar === game.falseZhu
-                )
-              },
-              canSha = function (tar, blur) {
-                let known = tar.getKnownCards(viewer)
-                if (!blur) {
-                  return known.some((card) => {
-                    let name = get.name(card, tar)
-                    return (
-                      (name === "sha" || name === "hufu" || name === "yuchanqian") &&
-                      lib.filter.cardRespondable(card, tar)
-                    )
-                  })
-                }
-                if (
-                  tar.countCards("hs", (i) => !known.includes(i)) >
-                  4.67 - (2 * tar.hp) / tar.maxHp
-                ) {
-                  return true
-                }
-                if (!tar.hasSkillTag("respondSha", true, "respond", true)) {
-                  return false
-                }
-                if (tar.hp <= damage) {
-                  return false
-                }
-                if (tar.hp <= damage + 1) {
-                  return isZhu(tar)
-                }
-                return true
-              },
-              self = false
-            if (canSha(target)) {
-              return 0
-            }
-            if (
-              bonus &&
-              !viewer.hasSkillTag("filterDamage", null, {
-                player: player,
-                card: card,
-              })
-            ) {
-              damage = 2
-            }
-            if (
-              (viewer.hp <= damage || (viewer.hp <= damage + 1 && isZhu(viewer))) &&
-              !canSha(viewer)
-            ) {
-              if (viewer === target) {
-                return status
-              }
-              let fv = true
-              if (evt && evt.targets) {
-                for (let i of evt.targets) {
-                  if (fv) {
-                    if (target === i) {
-                      fv = false
-                    }
-                    continue
-                  }
-                  if (viewer === i) {
-                    if (isZhu(viewer)) {
-                      return 0
-                    }
-                    self = true
-                    break
-                  }
-                }
-              }
-            }
-            let maySha = canSha(target, true)
-            if (
-              bonus &&
-              !target.hasSkillTag("filterDamage", null, {
-                player: player,
-                card: card,
-              })
-            ) {
-              damage = 2
-            } else {
-              damage = 1
-            }
-            if (isZhu(target)) {
-              if (eff < 0) {
-                if (target.hp <= damage + 1 || (!maySha && target.hp <= damage + 2)) {
-                  return 1
-                }
-                if (maySha && target.hp > damage + 2) {
-                  return 0
-                } else if (maySha || target.hp > damage + 2) {
-                  pri = 3
-                } else {
-                  pri = 4
-                }
-              } else if (target.hp > damage + 1) {
-                pri = 2
-              } else {
-                return 0
-              }
-            } else if (self) {
-              return 0
-            } else if (eff < 0) {
-              if (!maySha && target.hp <= damage) {
-                pri = 5
-              } else if (maySha) {
-                return 0
-              } else if (target.hp > damage + 1) {
-                pri = 2
-              } else if (target.hp === damage + 1) {
-                pri = 3
-              } else {
-                pri = 4
-              }
-            } else if (target.hp <= damage) {
-              return 0
-            }
-            let find = false
-            if (evt && evt.targets) {
-              for (let i = 0; i < evt.targets.length; i++) {
-                if (!find) {
-                  if (evt.targets[i] === target) {
-                    find = true
-                  }
-                  continue
-                }
-                let att1 = get.attitude(viewer, evt.targets[i]),
-                  eff1 = get.effect(evt.targets[i], card, player, evt.targets[i]),
-                  temp = 1
-                if (Math.abs(att1) < 1 || att1 * eff1 >= 0 || canSha(evt.targets[i])) {
-                  continue
-                }
-                maySha = canSha(evt.targets[i], true)
-                if (
-                  bonus &&
-                  !evt.targets[i].hasSkillTag("filterDamage", null, {
-                    player: player,
-                    card: card,
-                  })
-                ) {
-                  damage = 2
-                } else {
-                  damage = 1
-                }
-                if (isZhu(evt.targets[i])) {
-                  if (eff1 < 0) {
-                    if (
-                      evt.targets[i].hp <= damage + 1 ||
-                      (!maySha && evt.targets[i].hp <= damage + 2)
-                    ) {
-                      return 0
-                    }
-                    if (maySha && evt.targets[i].hp > damage + 2) {
-                      continue
-                    }
-                    if (maySha || evt.targets[i].hp > damage + 2) {
-                      temp = 3
-                    } else {
-                      temp = 4
-                    }
-                  } else if (evt.targets[i].hp > damage + 1) {
-                    temp = 2
-                  } else {
-                    continue
-                  }
-                } else if (eff1 < 0) {
-                  if (!maySha && evt.targets[i].hp <= damage) {
-                    temp = 5
-                  } else if (maySha) {
-                    continue
-                  } else if (evt.targets[i].hp > damage + 1) {
-                    temp = 2
-                  } else if (evt.targets[i].hp === damage + 1) {
-                    temp = 3
-                  } else {
-                    temp = 4
-                  }
-                } else if (evt.targets[i].hp > damage + 1) {
-                  temp = 2
-                }
-                if (temp > pri) {
-                  return 0
-                }
-              }
-            }
-            return 1
-          },
-          basic: {
-            order: 7.2,
-            useful: [5, 1],
-            value: 5,
-          },
-          result: {
-            player(player, target) {
-              if (player._nanman_temp || player.hasSkillTag("jueqing", false, target)) {
-                return 0
-              }
-              if (
-                target.hp > 2 ||
-                (target.hp > 1 &&
-                  !target.isZhu &&
-                  target !== game.boss &&
-                  target !== game.trueZhu &&
-                  target !== game.falseZhu)
-              ) {
-                return 0
-              }
-              player._nanman_temp = true
-              let eff = get.effect(
-                target,
-                new lib.element.VCard({ name: "nanman" }),
-                player,
-                target,
-              )
-              delete player._nanman_temp
-              if (eff >= 0) {
-                return 0
-              }
-              if (target.hp > 1 && target.hasSkillTag("respondSha", true, "respond", true)) {
-                return 0
-              }
-              let known = target.getKnownCards(player)
-              if (
-                known.some((card) => {
-                  let name = get.name(card, target)
-                  if (name === "sha" || name === "hufu" || name === "yuchanqian") {
-                    return lib.filter.cardRespondable(card, target)
-                  }
-                  if (name === "wuxie") {
-                    return lib.filter.cardEnabled(card, target, "forceEnable")
-                  }
-                })
-              ) {
-                return 0
-              }
-              if (
-                target.hp > 1 ||
-                target.countCards("hs", (i) => !known.includes(i)) >
-                  4.67 - (2 * target.hp) / target.maxHp
-              ) {
-                return 0
-              }
-              let res = 0,
-                att = get.sgnAttitude(player, target)
-              res -= att * (0.8 * target.countCards("hs") + 0.6 * target.countCards("e") + 3.6)
-              if (get.mode() === "identity" && target.identity === "fan") {
-                res += 2.4
-              }
-              if (
-                (get.mode() === "guozhan" &&
-                  player.identity !== "ye" &&
-                  player.identity === target.identity) ||
-                (get.mode() === "identity" &&
-                  player.identity === "zhu" &&
-                  (target.identity === "zhong" || target.identity === "mingzhong"))
-              ) {
-                res -= 0.8 * player.countCards("he")
-              }
-              return res
-            },
-            target(player, target) {
-              let zhu = (get.mode() === "identity" && target.isZhu) || target.identity === "zhu"
-              if (!lib.filter.cardRespondable({ name: "sha" }, target)) {
-                if (zhu) {
-                  if (target.hp < 2) {
-                    return -99
-                  }
-                  if (target.hp === 2) {
-                    return -3.6
-                  }
-                }
-                return -2
-              }
-              let known = target.getKnownCards(player)
-              if (
-                known.some((card) => {
-                  let name = get.name(card, target)
-                  if (name === "sha" || name === "hufu" || name === "yuchanqian") {
-                    return lib.filter.cardRespondable(card, target)
-                  }
-                  if (name === "wuxie") {
-                    return lib.filter.cardEnabled(card, target, "forceEnable")
-                  }
-                })
-              ) {
-                return -1.2
-              }
-              let nh = target.countCards("hs", (i) => !known.includes(i))
-              if (zhu && target.hp <= 1) {
-                if (nh === 0) {
-                  return -99
-                }
-                if (nh === 1) {
-                  return -60
-                }
-                if (nh === 2) {
-                  return -36
-                }
-                if (nh === 3) {
-                  return -12
-                }
-                if (nh === 4) {
-                  return -8
-                }
-                return -5
-              }
-              if (target.hasSkillTag("respondSha", true, "respond", true)) {
-                return -1.35
-              }
-              if (!nh) {
-                return -2
-              }
-              if (nh === 1) {
-                return -1.8
-              }
-              return -1.5
-            },
-          },
-          tag: {
-            respond: 1,
-            respondSha: 1,
-            damage: 1,
-            multitarget: 1,
-            multineg: 1,
-          },
-        },
+          if (damaged) {
+            break
+          }
+          ;[event.source, event.turn] = [event.turn, event.source]
+        }
       },
-      wanjian: {
-        audio: true,
-        fullskin: true,
-        type: "trick",
-        enable: true,
-        selectTarget: -1,
-        reverseOrder: true,
-        defaultYingbianEffect: "remove",
-        filterTarget(card, player, target) {
-          return target !== player
-        },
-        async content(event, trigger, player) {
-          const target = event.target
+      ai: {
+        wuxie(target, card, player, viewer, status) {
           if (
-            typeof event.shanRequired !== "number" ||
-            !event.shanRequired ||
-            event.shanRequired < 0
+            player === game.me &&
+            get.attitude(viewer, player._trueMe || player) > 0
           ) {
-            event.shanRequired = 1
-          }
-          if (typeof event.baseDamage !== "number") {
-            event.baseDamage = 1
-          }
-          while (event.shanRequired > 0) {
-            let result = { bool: false }
-            if (!event.directHit) {
-              const next = target.chooseToRespond()
-              next.set("filterCard", function (card, player) {
-                if (get.name(card) !== "shan") {
-                  return false
-                }
-                return lib.filter.cardRespondable(card, player)
-              })
-              if (event.shanRequired > 1) {
-                next.set("prompt2", "共需打出" + event.shanRequired + "张闪")
-              }
-              next.set("ai", function (card) {
-                if (get.event().toRespond) {
-                  return get.order(card)
-                }
-                return -1
-              })
-              next.set(
-                "toRespond",
-                (() => {
-                  if (target.hasSkillTag("noShan", null, "respond")) {
-                    return false
-                  }
-                  if (target.hasSkillTag("useShan", null, "respond")) {
-                    return true
-                  }
-                  if (
-                    event.baseDamage <= 0 ||
-                    player.hasSkillTag("notricksource", null, event) ||
-                    target.hasSkillTag("notrick", null, event)
-                  ) {
-                    return false
-                  }
-                  if (
-                    event.baseDamage >=
-                    target.hp +
-                      (player.hasSkillTag("jueqing", false, target) || target.hasSkill("gangzhi")
-                        ? 0
-                        : target.hujia)
-                  ) {
-                    return true
-                  }
-                  const damage = get.damageEffect(target, player, target)
-                  if (damage >= 0) {
-                    return false
-                  }
-                  if (
-                    event.shanRequired > 1 &&
-                    !target.hasSkillTag("freeShan", null, {
-                      player: player,
-                      card: event.card,
-                      type: "respond",
-                    }) &&
-                    event.shanRequired > target.mayHaveShan(target, "respond", null, "count")
-                  ) {
-                    return false
-                  }
-                  return true
-                })(),
-              )
-              next.set("respondTo", [player, event.card])
-              next.autochoose = lib.filter.autoRespondShan
-              result = await next.forResult()
-            }
-            if (!result?.bool) {
-              await target.damage()
-              break
-            } else {
-              event.shanRequired--
-            }
-          }
-        },
-        ai: {
-          wuxie(target, card, player, viewer, status) {
-            let att = get.attitude(viewer, target),
-              eff = get.effect(target, card, player, target)
-            if (Math.abs(att) < 1 || status * eff * att >= 0) {
-              return 0
-            }
-            let evt = _status.event.getParent("useCard"),
-              pri = 1,
-              bonus = player.hasSkillTag("damageBonus", true, {
-                target: target,
-                card: card,
-              }),
-              damage = 1,
-              isZhu = function (tar) {
-                return (
-                  tar.isZhu || tar === game.boss || tar === game.trueZhu || tar === game.falseZhu
-                )
-              },
-              canShan = function (tar, blur) {
-                let known = tar.getKnownCards(viewer)
-                if (!blur) {
-                  return known.some((card) => {
-                    let name = get.name(card, tar)
-                    return (
-                      (name === "shan" || name === "hufu") && lib.filter.cardRespondable(card, tar)
-                    )
-                  })
-                }
-                if (
-                  tar.countCards("hs", (i) => !known.includes(i)) >
-                  3.67 - (2 * tar.hp) / tar.maxHp
-                ) {
-                  return true
-                }
-                if (!tar.hasSkillTag("respondShan", true, "respond", true)) {
-                  return false
-                }
-                if (tar.hp <= damage) {
-                  return false
-                }
-                if (tar.hp <= damage + 1) {
-                  return isZhu(tar)
-                }
-                return true
-              },
-              self = false
-            if (canShan(target)) {
-              return 0
-            }
-            if (
-              bonus &&
-              !viewer.hasSkillTag("filterDamage", null, {
-                player: player,
-                card: card,
-              })
-            ) {
-              damage = 2
-            }
-            if (
-              (viewer.hp <= damage || (viewer.hp <= damage + 1 && isZhu(viewer))) &&
-              !canShan(viewer)
-            ) {
-              if (viewer === target) {
-                return status
-              }
-              let fv = true
-              if (evt && evt.targets) {
-                for (let i of evt.targets) {
-                  if (fv) {
-                    if (target === i) {
-                      fv = false
-                    }
-                    continue
-                  }
-                  if (viewer === i) {
-                    if (isZhu(viewer)) {
-                      return 0
-                    }
-                    self = true
-                    break
-                  }
-                }
-              }
-            }
-            let mayShan = canShan(target, true)
-            if (
-              bonus &&
-              !target.hasSkillTag("filterDamage", null, {
-                player: player,
-                card: card,
-              })
-            ) {
-              damage = 2
-            } else {
-              damage = 1
-            }
-            if (isZhu(target)) {
-              if (eff < 0) {
-                if (target.hp <= damage + 1 || (!mayShan && target.hp <= damage + 2)) {
-                  return 1
-                }
-                if (mayShan && target.hp > damage + 2) {
-                  return 0
-                } else if (mayShan || target.hp > damage + 2) {
-                  pri = 3
-                } else {
-                  pri = 4
-                }
-              } else if (target.hp > damage + 1) {
-                pri = 2
-              } else {
-                return 0
-              }
-            } else if (self) {
-              return 0
-            } else if (eff < 0) {
-              if (!mayShan && target.hp <= damage) {
-                pri = 5
-              } else if (mayShan) {
-                return 0
-              } else if (target.hp > damage + 1) {
-                pri = 2
-              } else if (target.hp === damage + 1) {
-                pri = 3
-              } else {
-                pri = 4
-              }
-            } else if (target.hp <= damage) {
-              return 0
-            }
-            let find = false
-            if (evt && evt.targets) {
-              for (let i = 0; i < evt.targets.length; i++) {
-                if (!find) {
-                  if (evt.targets[i] === target) {
-                    find = true
-                  }
-                  continue
-                }
-                let att1 = get.attitude(viewer, evt.targets[i]),
-                  eff1 = get.effect(evt.targets[i], card, player, evt.targets[i]),
-                  temp = 1
-                if (Math.abs(att1) < 1 || att1 * eff1 >= 0 || canShan(evt.targets[i])) {
-                  continue
-                }
-                mayShan = canShan(evt.targets[i], true)
-                if (
-                  bonus &&
-                  !evt.targets[i].hasSkillTag("filterDamage", null, {
-                    player: player,
-                    card: card,
-                  })
-                ) {
-                  damage = 2
-                } else {
-                  damage = 1
-                }
-                if (isZhu(evt.targets[i])) {
-                  if (eff1 < 0) {
-                    if (
-                      evt.targets[i].hp <= damage + 1 ||
-                      (!mayShan && evt.targets[i].hp <= damage + 2)
-                    ) {
-                      return 0
-                    }
-                    if (mayShan && evt.targets[i].hp > damage + 2) {
-                      continue
-                    }
-                    if (mayShan || evt.targets[i].hp > damage + 2) {
-                      temp = 3
-                    } else {
-                      temp = 4
-                    }
-                  } else if (evt.targets[i].hp > damage + 1) {
-                    temp = 2
-                  } else {
-                    continue
-                  }
-                } else if (eff1 < 0) {
-                  if (!mayShan && evt.targets[i].hp <= damage) {
-                    temp = 5
-                  } else if (mayShan) {
-                    continue
-                  } else if (evt.targets[i].hp > damage + 1) {
-                    temp = 2
-                  } else if (evt.targets[i].hp === damage + 1) {
-                    temp = 3
-                  } else {
-                    temp = 4
-                  }
-                } else if (evt.targets[i].hp > damage + 1) {
-                  temp = 2
-                }
-                if (temp > pri) {
-                  return 0
-                }
-              }
-            }
-            return 1
-          },
-          basic: {
-            order: 7.2,
-            useful: 1,
-            value: 5,
-          },
-          result: {
-            player(player, target) {
-              if (player._wanjian_temp || player.hasSkillTag("jueqing", false, target)) {
-                return 0
-              }
-              if (
-                target.hp > 2 ||
-                (target.hp > 1 &&
-                  !target.isZhu &&
-                  target !== game.boss &&
-                  target !== game.trueZhu &&
-                  target !== game.falseZhu)
-              ) {
-                return 0
-              }
-              player._wanjian_temp = true
-              let eff = get.effect(
-                target,
-                new lib.element.VCard({ name: "wanjian" }),
-                player,
-                target,
-              )
-              delete player._wanjian_temp
-              if (eff >= 0) {
-                return 0
-              }
-              if (target.hp > 1 && target.hasSkillTag("respondShan", true, "respond", true)) {
-                return 0
-              }
-              let known = target.getKnownCards(player)
-              if (
-                known.some((card) => {
-                  let name = get.name(card, target)
-                  if (name === "shan" || name === "hufu") {
-                    return lib.filter.cardRespondable(card, target)
-                  }
-                  if (name === "wuxie") {
-                    return lib.filter.cardEnabled(card, target, "forceEnable")
-                  }
-                })
-              ) {
-                return 0
-              }
-              if (
-                target.hp > 1 ||
-                target.countCards("hs", (i) => !known.includes(i)) >
-                  3.67 - (2 * target.hp) / target.maxHp
-              ) {
-                return 0
-              }
-              let res = 0,
-                att = get.sgnAttitude(player, target)
-              res -= att * (0.8 * target.countCards("hs") + 0.6 * target.countCards("e") + 3.6)
-              if (get.mode() === "identity" && target.identity === "fan") {
-                res += 2.4
-              }
-              if (
-                (get.mode() === "guozhan" &&
-                  player.identity !== "ye" &&
-                  player.identity === target.identity) ||
-                (get.mode() === "identity" &&
-                  player.identity === "zhu" &&
-                  (target.identity === "zhong" || target.identity === "mingzhong"))
-              ) {
-                res -= 0.8 * player.countCards("he")
-              }
-              return res
-            },
-            target(player, target) {
-              let zhu = (get.mode() === "identity" && target.isZhu) || target.identity === "zhu"
-              if (!lib.filter.cardRespondable({ name: "shan" }, target)) {
-                if (zhu) {
-                  if (target.hp < 2) {
-                    return -99
-                  }
-                  if (target.hp === 2) {
-                    return -3.6
-                  }
-                }
-                return -2
-              }
-              let known = target.getKnownCards(player)
-              if (
-                known.some((card) => {
-                  let name = get.name(card, target)
-                  if (name === "shan" || name === "hufu") {
-                    return lib.filter.cardRespondable(card, target)
-                  }
-                  if (name === "wuxie") {
-                    return lib.filter.cardEnabled(card, target, "forceEnable")
-                  }
-                })
-              ) {
-                return -1.2
-              }
-              let nh = target.countCards("hs", (i) => !known.includes(i))
-              if (zhu && target.hp <= 1) {
-                if (nh === 0) {
-                  return -99
-                }
-                if (nh === 1) {
-                  return -60
-                }
-                if (nh === 2) {
-                  return -36
-                }
-                if (nh === 3) {
-                  return -8
-                }
-                return -5
-              }
-              if (target.hasSkillTag("respondShan", true, "respond", true)) {
-                return -1.35
-              }
-              if (!nh) {
-                return -2
-              }
-              if (nh === 1) {
-                return -1.65
-              }
-              return -1.5
-            },
-          },
-          tag: {
-            respond: 1,
-            respondShan: 1,
-            damage: 1,
-            multitarget: 1,
-            multineg: 1,
-          },
-        },
-      },
-      taoyuan: {
-        audio: true,
-        fullskin: true,
-        type: "trick",
-        enable: true,
-        selectTarget: -1,
-        cardcolor: "red",
-        reverseOrder: true,
-        defaultYingbianEffect: "remove",
-        filterTarget(card, player, target) {
-          //return target.hp<target.maxHp;
-          return true
-        },
-        ignoreTarget(card, player, target) {
-          return target.isHealthy()
-        },
-        content() {
-          target.recover()
-        },
-        ai: {
-          basic: {
-            order: (item, player) => {
-              if (
-                game.hasPlayer(
-                  (current) =>
-                    current.hp <= 1 && get.recoverEffect(current, player, _status.event.player) < 0,
-                )
-              ) {
-                return 1
-              }
-              return 10
-            },
-            useful: [3, 1],
-            value: 0,
-          },
-          result: {
-            target(player, target) {
-              return target.hp < target.maxHp ? 2 : 0
-            },
-          },
-          tag: {
-            recover: 0.5,
-            multitarget: 1,
-          },
-        },
-      },
-      wugu: {
-        audio: true,
-        fullskin: true,
-        type: "trick",
-        enable: true,
-        cardcolor: "red",
-        selectTarget: -1,
-        filterTarget: true,
-        contentBefore() {
-          "step 0"
-          if (!targets.length) {
-            event.finish()
-            return
-          }
-          if (card.storage?.chooseDirection || get.is.versus()) {
-            player
-              .chooseControl("顺时针", "逆时针", function (event, player) {
-                if (
-                  (get.event().isVersus && player.next.side === player.side) ||
-                  get.attitude(player, player.next) > get.attitude(player, player.previous)
-                ) {
-                  return "逆时针"
-                }
-                return "顺时针"
-              })
-              .set("prompt", "选择" + get.translation(card) + "的结算方向")
-              .set("isVersus", get.is.versus())
-          } else {
-            event.goto(2)
-          }
-          ;("step 1")
-          if (result && result.control === "顺时针") {
-            var evt = event.getParent(),
-              sorter = _status.currentPhase || player
-            evt.fixedSeat = true
-            evt.targets.sortBySeat(sorter)
-            evt.targets.reverse()
-            if (evt.targets[evt.targets.length - 1] === sorter) {
-              evt.targets.unshift(evt.targets.pop())
-            }
-          }
-          ;("step 2")
-          ui.clear()
-          var cards
-          if (get.itemtype(card.storage?.fixedShownCards) === "cards") {
-            cards = card.storage.fixedShownCards.slice()
-            var lose_list = [],
-              cards2 = []
-            cards.forEach((card) => {
-              var owner = get.owner(card)
-              if (owner) {
-                var arr = lose_list.find((i) => i[0] === owner)
-                if (arr) {
-                  arr[1].push(card)
-                } else {
-                  lose_list.push([owner, [card]])
-                }
-              } else {
-                cards2.add(card)
-              }
-            })
-            if (lose_list.length) {
-              lose_list.forEach((list) => {
-                list[0].$throw(list[1])
-                game.log(list[0], "将", list[1], "置于了处理区")
-              })
-              game
-                .loseAsync({
-                  lose_list: lose_list,
-                  visible: true,
-                  relatedEvent: event.getParent(),
-                })
-                .setContent("chooseToCompareLose")
-            }
-            if (cards2.length) {
-              game.cardsGotoOrdering(cards2).relatedEvent = event.getParent()
-            }
-            game.delayex()
-          } else {
-            let num = event.targets?.length ?? game.countPlayer()
-            if (typeof card.storage?.extraCardsNum === "number") {
-              num += card.storage.extraCardsNum
-            }
-            cards = get.cards(num)
-            game.cardsGotoOrdering(cards).relatedEvent = event.getParent()
-          }
-          var dialog = ui.create.dialog("五谷丰登", cards, true)
-          _status.dieClose.push(dialog)
-          dialog.videoId = lib.status.videoId++
-          game.addVideo("cardDialog", null, ["五谷丰登", get.cardsInfo(cards), dialog.videoId])
-          event.getParent().preResult = dialog.videoId
-          game.broadcast(
-            function (cards, id) {
-              var dialog = ui.create.dialog("五谷丰登", cards, true)
-              _status.dieClose.push(dialog)
-              dialog.videoId = id
-            },
-            cards,
-            dialog.videoId,
-          )
-          game.log(event.card, "亮出了", cards)
-        },
-        content() {
-          "step 0"
-          for (var i = 0; i < ui.dialogs.length; i++) {
-            if (ui.dialogs[i].videoId === event.preResult) {
-              event.dialog = ui.dialogs[i]
-              break
-            }
-          }
-          if (!event.dialog || event.dialog.buttons.length === 0) {
-            event.finish()
-            return
-          }
-          if (event.dialog.buttons.length > 1) {
-            var next = target.chooseButton(true)
-            next.set("ai", (button) => {
-              let player = _status.event.player,
-                card = button.link,
-                val = get.value(card, player)
-              if (get.tag(card, "recover")) {
-                val += game.countPlayer((target) => {
-                  return (
-                    target.hp < 2 &&
-                    get.attitude(player, target) > 0 &&
-                    lib.filter.cardSavable(card, player, target)
-                  )
-                })
-                if (
-                  player.hp <= 2 &&
-                  game.checkMod(card, player, "unchanged", "cardEnabled2", player)
-                ) {
-                  val *= 2
-                }
-              }
-              return val
-            })
-            next.set("dialog", event.preResult)
-            next.set("closeDialog", false)
-            next.set("dialogdisplay", true)
-          } else {
-            event.directButton = event.dialog.buttons[0]
-          }
-          ;("step 1")
-          var dialog = event.dialog
-          var card
-          if (event.directButton) {
-            card = event.directButton.link
-          } else {
-            for (var i of dialog.buttons) {
-              if (i.link === result.links[0]) {
-                card = i.link
-                break
-              }
-            }
-            if (!card) {
-              card = event.dialog.buttons[0].link
-            }
-          }
-          var button
-          for (var i = 0; i < dialog.buttons.length; i++) {
-            if (dialog.buttons[i].link === card) {
-              button = dialog.buttons[i]
-              const innerHTML = target.getName(true)
-              game.createButtonCardsetion(innerHTML, button)
-              dialog.buttons.remove(button)
-              break
-            }
-          }
-          var capt = get.translation(target) + "选择了" + get.translation(button.link)
-          if (card) {
-            target.gain(card, "visible")
-            target.$gain2(card)
-            game.broadcast(
-              function (card, id, name, capt) {
-                var dialog = get.idDialog(id)
-                if (dialog) {
-                  dialog.content.firstChild.innerHTML = capt
-                  for (var i = 0; i < dialog.buttons.length; i++) {
-                    if (dialog.buttons[i].link === card) {
-                      game.createButtonCardsetion(name, dialog.buttons[i])
-                      dialog.buttons.splice(i--, 1)
-                      break
-                    }
-                  }
-                }
-              },
-              card,
-              dialog.videoId,
-              target.getName(true),
-              capt,
-            )
-          }
-          dialog.content.firstChild.innerHTML = capt
-          game.addVideo("dialogCapt", null, [dialog.videoId, dialog.content.firstChild.innerHTML])
-          game.log(target, "选择了", button.link)
-          game.delay()
-        },
-        contentAfter() {
-          for (var i = 0; i < ui.dialogs.length; i++) {
-            if (ui.dialogs[i].videoId === event.preResult) {
-              var dialog = ui.dialogs[i]
-              dialog.close()
-              _status.dieClose.remove(dialog)
-              if (dialog.buttons.length) {
-                event.remained = []
-                for (var i = 0; i < dialog.buttons.length; i++) {
-                  event.remained.push(dialog.buttons[i].link)
-                }
-                event.trigger("wuguRemained")
-              }
-              break
-            }
-          }
-          game.broadcast(function (id) {
-            var dialog = get.idDialog(id)
-            if (dialog) {
-              dialog.close()
-              _status.dieClose.remove(dialog)
-            }
-          }, event.preResult)
-          game.addVideo("cardDialog", null, event.preResult)
-        },
-        ai: {
-          wuxie() {
-            if (Math.random() < 0.5) {
-              return 0
-            }
-          },
-          basic: {
-            order: 3,
-            useful: 0.5,
-          },
-          result: {
-            target(player, target) {
-              var sorter = _status.currentPhase || player
-              let opt =
-                6 + 0.75 * (game.countPlayer() - 2 * get.distance(sorter, target, "absolute"))
-              if (get.is.versus()) {
-                if (
-                  target !== sorter &&
-                  get.attitude(player, player.next) < get.attitude(player, player.previous)
-                ) {
-                  opt =
-                    6 + 0.75 * (2 * get.distance(sorter, target, "absolute") - game.countPlayer())
-                }
-              }
-              if (player.hasUnknown(2)) {
-                return 0
-              }
-              return opt / 6
-            },
-          },
-          tag: {
-            draw: 1,
-            multitarget: 1,
-          },
-        },
-      },
-      wuxie: {
-        audio: true,
-        fullskin: true,
-        type: "trick",
-        ai: {
-          basic: {
-            useful: [6, 4, 3],
-            value: [6, 4, 3],
-          },
-          result: { player: 1 },
-          expose: 0.2,
-        },
-        notarget: true,
-        finalDelay: false,
-        defaultYingbianEffect: "draw",
-        contentBefore() {
-          "step 0"
-          if (get.mode() === "guozhan" && get.cardtag(card, "guo")) {
-            var trigger = event.getParent(2)._trigger
-            if (
-              trigger.name !== "phaseJudge" &&
-              trigger.card.name !== "wuxie" &&
-              trigger.targets.length > 1
-            ) {
-              player
-                .chooseControl("对单体使用", "对势力使用")
-                .set("prompt", "请选择" + get.translation(card) + "的使用方式")
-                .set("ai", function () {
-                  return "对势力使用"
-                })
-            } else {
-              event.finish()
-            }
-          } else {
-            event.finish()
-          }
-          ;("step 1")
-          if (result.control === "对势力使用") {
-            player.chat("对势力使用")
-            event.getParent().guowuxie = true
-          }
-        },
-        content() {
-          var trigger = event.getParent(2)._trigger
-          if (trigger.name === "phaseJudge") {
-            trigger.untrigger("currentOnly")
-            trigger.cancelled = true
-          } else {
-            trigger.neutralize()
-            if (event.getParent().guowuxie === true) {
-              trigger.getParent().excluded.addArray(
-                game.filterPlayer(function (current) {
-                  return current.isFriendOf(trigger.target)
-                }),
-              )
-            }
-          }
-          /*
-                    event.result={
-                        wuxied:true,
-                        directHit:evt.directHit||[],
-                        nowuxie:evt.nowuxie,
-                    };*/
-          if (player.isOnline()) {
-            player.send(function (player) {
-              if (ui.tempnowuxie && !player.hasWuxie()) {
-                ui.tempnowuxie.close()
-                delete ui.tempnowuxie
-              }
-            }, player)
-          } else if (player === game.me) {
-            if (ui.tempnowuxie && !player.hasWuxie()) {
-              ui.tempnowuxie.close()
-              delete ui.tempnowuxie
-            }
-          }
-        },
-      },
-      lebu: {
-        audio: true,
-        fullskin: true,
-        type: "delay",
-        filterTarget(card, player, target) {
-          return lib.filter.judge(card, player, target) && player !== target
-        },
-        judge(card) {
-          if (get.suit(card) === "heart") {
-            return 1
-          }
-          return -2
-        },
-        judge2(result) {
-          if (result.bool === false) {
-            return true
-          }
-          return false
-        },
-        effect() {
-          if (result.bool === false) {
-            player.skip("phaseUse")
-          }
-        },
-        ai: {
-          basic: {
-            order: 1,
-            useful(card, i) {
-              let player = _status.event.player
-              if (_status.event.isPhaseUsing()) {
-                return game.hasPlayer((cur) => {
-                  return (
-                    cur !== player &&
-                    lib.filter.judge(card, player, cur) &&
-                    get.effect(cur, card, player, player) > 0
-                  )
-                })
-                  ? 4.2
-                  : 1
-              }
-              return 1.3
-            },
-            value: 8,
-          },
-          result: {
-            ignoreStatus: true,
-            target: (player, target) => {
-              if (target === _status.currentPhase && target.skipList.includes("phaseUse")) {
-                let evt = _status.event.getParent("phase")
-                if (evt && evt.phaseList.indexOf("phaseJudge") <= evt.num) {
-                  return 0
-                }
-              }
-              let num = target.needsToDiscard(3),
-                cf = Math.pow(get.threaten(target, player) + 0.6, 2)
-              if (!num) {
-                return -0.01 * cf
-              }
-              if (target.hp > 2) {
-                num--
-              }
-              let dist = Math.sqrt(1 + get.distance(player, target, "absolute"))
-              if (dist < 1) {
-                dist = 1
-              }
-              if (target.isTurnedOver()) {
-                dist++
-              }
-              return (Math.min(-0.1, -num) * cf) / dist
-            },
-          },
-          tag: {
-            skip: "phaseUse",
-          },
-        },
-      },
-      shandian: {
-        audio: true,
-        fullskin: true,
-        type: "delay",
-        cardnature: "thunder",
-        modTarget(card, player, target) {
-          return lib.filter.judge(card, player, target)
-        },
-        enable(card, player) {
-          return player.canAddJudge(card)
-        },
-        filterTarget(card, player, target) {
-          return lib.filter.judge(card, player, target) && player === target
-        },
-        selectTarget: [-1, -1],
-        toself: true,
-        judge(card) {
-          if (get.suit(card) === "spade" && get.number(card) > 1 && get.number(card) < 10) {
-            return -5
-          }
-          return 1
-        },
-        judge2(result) {
-          if (result.bool === false) {
-            return true
-          }
-          return false
-        },
-        effect() {
-          if (result.bool === false) {
-            player.damage(3, "thunder", "nosource")
-          } else {
-            player.addJudgeNext(card)
-          }
-        },
-        cancel() {
-          player.addJudgeNext(card)
-        },
-        ai: {
-          basic: {
-            order: 1,
-            useful: 0,
-            value: 0,
-          },
-          result: {
-            target(player, target) {
-              var num = game.countPlayer(function (current) {
-                //var skills=current.getSkills();
-                for (var j = 0; j < current.skills.length; j++) {
-                  var rejudge = get.tag(current.skills[j], "rejudge", current)
-                  if (rejudge !== undefined) {
-                    if (get.attitude(target, current) > 0 && get.attitude(current, target) > 0) {
-                      return rejudge
-                    } else {
-                      return -rejudge
-                    }
-                  }
-                }
-              })
-              if (num > 0) {
-                return num
-              }
-              if (num === 0) {
-                var mode = get.mode()
-                if (mode === "identity") {
-                  if (target.identity === "nei") {
-                    return 1
-                  }
-                  var situ = get.situation()
-                  if (target.identity === "fan") {
-                    if (situ > 1) {
-                      return 1
-                    }
-                  } else {
-                    if (situ < -1) {
-                      return 1
-                    }
-                  }
-                } else if (mode === "guozhan") {
-                  if (target.identity === "ye") {
-                    return 1
-                  }
-                  if (
-                    game.hasPlayer(function (current) {
-                      return current.identity === "unknown"
-                    })
-                  ) {
-                    return -1
-                  }
-                  if (get.population(target.identity) === 1) {
-                    if (target.maxHp > 2 && target.hp < 2) {
-                      return 1
-                    }
-                    if (game.countPlayer() < 3) {
-                      return -1
-                    }
-                    if (target.hp <= 2 && target.countCards("he") <= 3) {
-                      return 1
-                    }
-                  }
-                }
-              }
-              return -1
-            },
-          },
-          tag: {
-            damage: 0.16,
-            natureDamage: 0.16,
-            thunderDamage: 0.16,
-          },
-        },
-      },
-      zhuge: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip1",
-        ai: {
-          order() {
-            return get.order({ name: "sha" }) - 0.1
-          },
-          equipValue(card, player) {
-            if (player._zhuge_temp) {
-              return 1
-            }
-            player._zhuge_temp = true
-            var result = (function () {
-              if (
-                !game.hasPlayer(function (current) {
-                  return (
-                    get.distance(player, current) <= 1 &&
-                    player.canUse("sha", current) &&
-                    get.effect(current, { name: "sha" }, player, player) > 0
-                  )
-                })
-              ) {
-                return 1
-              }
-              if (player.hasSha() && _status.currentPhase === player) {
-                if (
-                  (player.getEquip("zhuge") && player.countUsed("sha")) ||
-                  player.getCardUsable("sha") === 0
-                ) {
-                  return 10
-                }
-              }
-              var num = player.countCards("h", "sha")
-              if (num > 1) {
-                return 6 + num
-              }
-              return 3 + num
-            })()
-            delete player._zhuge_temp
-            return result
-          },
-          basic: {
-            equipValue: 5,
-          },
-          tag: {
-            valueswap: 1,
-          },
-        },
-        skills: ["zhuge_skill"],
-      },
-      qinggang: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip1",
-        distance: { attackFrom: -1 },
-        ai: {
-          basic: {
-            equipValue: 2,
-          },
-        },
-        skills: ["qinggang_skill"],
-      },
-      cixiong: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip1",
-        distance: { attackFrom: -1 },
-        ai: {
-          basic: {
-            equipValue: 2,
-          },
-        },
-        skills: ["cixiong_skill"],
-      },
-      hanbing: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip1",
-        distance: { attackFrom: -1 },
-        skills: ["hanbing_skill"],
-        ai: {
-          basic: {
-            equipValue: 2,
-          },
-        },
-      },
-      qinglong: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip1",
-        distance: { attackFrom: -2 },
-        ai: {
-          equipValue(card, player) {
-            return Math.min(2.5 + player.countCards("h", "sha"), 4)
-          },
-          basic: {
-            equipValue: 3.5,
-          },
-        },
-        skills: ["qinglong_skill"],
-      },
-      zhangba: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip1",
-        distance: { attackFrom: -2 },
-        ai: {
-          equipValue(card, player) {
-            var num = 2.5 + player.countCards("h") / 3
-            return Math.min(num, 4)
-          },
-          basic: {
-            equipValue: 3.5,
-          },
-        },
-        skills: ["zhangba_skill"],
-      },
-      guanshi: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip1",
-        distance: { attackFrom: -2 },
-        ai: {
-          equipValue(card, player) {
-            var num = 2.5 + (player.countCards("h") + player.countCards("e")) / 2.5
-            return Math.min(num, 5)
-          },
-          basic: {
-            equipValue: 4.5,
-          },
-        },
-        skills: ["guanshi_skill"],
-      },
-      fangtian: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip1",
-        distance: { attackFrom: -3 },
-        ai: {
-          basic: {
-            equipValue: 2.5,
-          },
-        },
-        skills: ["fangtian_skill", "fangtian_guozhan"],
-      },
-      qilin: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip1",
-        distance: { attackFrom: -4 },
-        ai: {
-          basic: {
-            equipValue: 3,
-          },
-        },
-        skills: ["qilin_skill"],
-      },
-      bagua: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip2",
-        ai: {
-          basic: {
-            equipValue: 7.5,
-          },
-        },
-        skills: ["bagua_skill"],
-      },
-      renwang: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip2",
-        skills: ["renwang_skill"],
-        ai: {
-          basic: {
-            equipValue: 7.5,
-          },
-        },
-      },
-      jueying: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip3",
-        distance: { globalTo: 1 },
-        battleOfWancheng() {
-          // 宛城之战
-          if (get.mode() !== "doudizhu") {
-            return false
-          }
-          const date = new Date()
-          if (date.getMonth() !== 6) {
-            return false
-          }
-          let day = date.getDate()
-          if (day === 5) {
-            return date.getHours() >= 8
-          }
-          return day > 5 && day < 22
-        },
-        global: "jueying_wancheng",
-      },
-      dilu: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip3",
-        distance: { globalTo: 1 },
-      },
-      zhuahuang: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip3",
-        distance: { globalTo: 1 },
-      },
-      chitu: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip4",
-        distance: { globalFrom: -1 },
-      },
-      dayuan: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip4",
-        distance: { globalFrom: -1 },
-      },
-      zixing: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip4",
-        distance: { globalFrom: -1 },
-      },
-      firedamage: {
-        ai: {
-          result: {
-            target: -1.5,
-          },
-          tag: {
-            damage: 1,
-            fireDamage: 1,
-            natureDamage: 1,
-          },
-        },
-      },
-      thunderdamage: {
-        ai: {
-          result: {
-            target: -1.5,
-          },
-          tag: {
-            damage: 1,
-            thunderDamage: 1,
-            natureDamage: 1,
-          },
-        },
-      },
-      jiu: {
-        audio: true,
-        fullskin: true,
-        type: "basic",
-        toself: true,
-        enable(event, player) {
-          //return !player.hasSkill('jiu');
-          return true
-        },
-        lianheng: true,
-        logv: false,
-        savable(card, player, dying) {
-          return dying == player || player.hasSkillTag("jiuOther", null, dying, true)
-        },
-        usable: 1,
-        selectTarget: -1,
-        modTarget: true,
-        filterTarget(card, player, target) {
-          return target == player
-        },
-        content() {
-          if (typeof event.baseDamage != "number") {
-            event.baseDamage = 1
-          }
-          if (target.isDying() || event.getParent(2).type == "dying") {
-            target.recover()
-            if (_status.currentPhase == target && typeof target.getStat().card.jiu == "number") {
-              target.getStat().card.jiu--
-            }
-          } else {
-            game.addVideo("jiuNode", target, true)
-            if (cards && cards.length) {
-              card = cards[0]
-            }
-            if (!target.storage.jiu) {
-              target.storage.jiu = 0
-            }
-            target.storage.jiu += event.baseDamage
-            game.broadcastAll(
-              function (target, card, gain2) {
-                target.addSkill("jiu")
-                if (!target.node.jiu && lib.config.jiu_effect) {
-                  target.node.jiu = ui.create.div(".playerjiu", target.node.avatar)
-                  target.node.jiu2 = ui.create.div(".playerjiu", target.node.avatar2)
-                }
-                if (
-                  gain2 &&
-                  card.clone &&
-                  (card.clone.parentNode == target.parentNode || card.clone.parentNode == ui.arena)
-                ) {
-                  card.clone.moveDelete(target)
-                }
-              },
-              target,
-              card,
-              target == targets[0] && cards.length == 1,
-            )
-            if (target == targets[0] && cards.length == 1) {
-              if (
-                card.clone &&
-                (card.clone.parentNode == target.parentNode || card.clone.parentNode == ui.arena)
-              ) {
-                game.addVideo("gain2", target, get.cardsInfo([card]))
-              }
-            }
-          }
-        },
-        ai: {
-          basic: {
-            useful: (card, i) => {
-              if (_status.event.player.hp > 1) {
-                if (i === 0) {
-                  return 4
-                }
-                return 1
-              }
-              if (i === 0) {
-                return 7.3
-              }
-              return 3
-            },
-            value: (card, player, i) => {
-              if (player.hp > 1) {
-                if (i === 0) {
-                  return 5
-                }
-                return 1
-              }
-              if (i === 0) {
-                return 7.3
-              }
-              return 3
-            },
-          },
-          order(item, player) {
-            if (_status.event.dying) {
-              return 9
-            }
-            let sha = get.order({ name: "sha" })
-            if (sha <= 0) {
-              return 0
-            }
-            let usable = player.getCardUsable("sha")
-            if (
-              usable < 2 &&
-              player.hasCard((i) => {
-                return get.name(i, player) == "zhuge"
-              }, "hs")
-            ) {
-              usable = Infinity
-            }
-            let shas = Math.min(usable, player.mayHaveSha(player, "use", item, "count"))
-            if (
-              shas != 1 ||
-              (lib.config.mode === "stone" &&
-                !player.isMin() &&
-                player.getActCount() + 1 >= player.actcount)
-            ) {
-              return 0
-            }
-            return sha + 0.2
-          },
-          result: {
-            target: (player, target, card) => {
-              if (target && target.isDying()) {
-                return 2
-              }
-              if (!target || target._jiu_temp || !target.isPhaseUsing()) {
-                return 0
-              }
-              let effs = { order: 0 },
-                temp
-              target.getCards("hs", (i) => {
-                if (get.name(i) !== "sha" || ui.selected.cards.includes(i)) {
-                  return false
-                }
-                temp = get.order(i, target)
-                if (temp < effs.order) {
-                  return false
-                }
-                if (temp > effs.order) {
-                  effs = { order: temp }
-                }
-                effs[i.cardid] = {
-                  card: i,
-                  target: null,
-                  eff: 0,
-                }
-              })
-              delete effs.order
-              for (let i in effs) {
-                if (!lib.filter.filterCard(effs[i].card, target)) {
-                  continue
-                }
-                game.filterPlayer((current) => {
-                  if (
-                    get.attitude(target, current) >= 0 ||
-                    !target.canUse(effs[i].card, current, null, true) ||
-                    current.hasSkillTag("filterDamage", null, {
-                      player: target,
-                      card: effs[i].card,
-                      jiu: true,
-                    })
-                  ) {
-                    return false
-                  }
-                  temp = get.effect(current, effs[i].card, target, player)
-                  if (temp <= effs[i].eff) {
-                    return false
-                  }
-                  effs[i].target = current
-                  effs[i].eff = temp
-                  return false
-                })
-                if (!effs[i].target) {
-                  continue
-                }
-                if (
-                  target.hasSkillTag(
-                    "directHit_ai",
-                    true,
-                    {
-                      target: effs[i].target,
-                      card: i,
-                    },
-                    true,
-                  ) ||
-                  //(Math.min(target.getCardUsable("sha"), target.mayHaveSha(player, "use", item, "count")) === 1 && (
-                  target.needsToDiscard() > Math.max(0, 3 - target.hp) ||
-                  !effs[i].target.mayHaveShan(player, "use")
-                  //))
-                ) {
-                  delete target._jiu_temp
-                  return 1
-                }
-              }
-              delete target._jiu_temp
-              return 0
-            },
-          },
-          tag: {
-            save: 1,
-            recover: 0.1,
-          },
-        },
-      },
-      huogong: {
-        audio: true,
-        fullskin: true,
-        type: "trick",
-        enable: true,
-        cardnature: "fire",
-        filterTarget(card, player, target) {
-          //if(player!=game.me&&player.countCards('h')<2) return false;
-          return target.countCards("h") > 0
-        },
-        async content(event, trigger, player) {
-          const { target, showPosition = "h" } = event
-          if (target.countCards(showPosition) == 0) {
-            return event.finish()
-          }
-          //返回目标选展示牌的结果，给出默认逻辑
-          event.chooseToShow ??= async (event, player, target) => {
-            const { showPosition = "h", filterShow = () => true } = event
-            let result
-            if (target.countCards(showPosition) == 1) {
-              result = { bool: true, cards: target.getCards(showPosition) }
-            } else {
-              result = await target
-                .chooseCard(true, showPosition, "请选择【火攻】要展示的牌", filterShow)
-                .set("ai", function (card) {
-                  if (_status.event.getRand() < 0.5) {
-                    return Math.random()
-                  }
-                  return get.value(card)
-                })
-                .forResult()
-            }
-            return result
-          }
-          const result = await event.chooseToShow(event, player, target)
-          event.showResult = result
-          const { cards } = result
-          event.cards2 = cards
-          const showEvent = target
-            .showCards(cards, `${get.translation(target)}因【火攻】展示的牌`)
-            .set("closeDialog", false)
-          await showEvent
-          const videoId = showEvent.videoId
-          event.videoId = videoId
-          //返回玩家弃牌/其他操作的结果，给出默认逻辑
-          event.chooseToDiscard ??= async (event, player, target) => {
-            const {
-              discardPostion = "h",
-              cards2,
-              filterDiscard = { suit: get.suit(cards2[0]) },
-            } = event
-            const result = await player
-              .chooseToDiscard(discardPostion, filterDiscard)
-              .set("ai", (card) => {
-                const evt = _status.event.getParent()
-                if (get.damageEffect(evt.target, evt.player, evt.player, "fire") > 0) {
-                  return 6.2 + Math.min(4, evt.player.hp) - get.value(card, evt.player)
-                }
-                return -1
-              })
-              .set("prompt", false)
-              .forResult()
-            return result
-          }
-          const result2 = await event.chooseToDiscard(event, player, target)
-          event.discardResult = result2
-          if (result2?.bool) {
-            await target.damage("fire")
-          } else {
-            target.addTempSkill("huogong2")
-          }
-          game.addVideo("cardDialog", null, videoId)
-          game.broadcastAll("closeDialog", videoId)
-        },
-        ai: {
-          basic: {
-            order: 9.2,
-            value: [3, 1],
-            useful: 0.6,
-          },
-          wuxie(target, card, player, viewer, status) {
-            if (get.attitude(viewer, player._trueMe || player) > 0) {
-              return 0
-            }
-            if (
-              status * get.attitude(viewer, target) * get.effect(target, card, player, target) >=
-              0
-            ) {
-              return 0
-            }
-            if (_status.event.getRand("huogong_wuxie") * 4 > player.countCards("h")) {
-              return 0
-            }
-          },
-          result: {
-            player(player) {
-              var nh = player.countCards("h")
-              if (nh <= player.hp && nh <= 4 && _status.event.name == "chooseToUse") {
-                if (
-                  typeof _status.event.filterCard == "function" &&
-                  _status.event.filterCard(
-                    new lib.element.VCard({ name: "huogong" }),
-                    player,
-                    _status.event,
-                  )
-                ) {
-                  return -10
-                }
-                if (_status.event.skill) {
-                  var viewAs = get.info(_status.event.skill).viewAs
-                  if (viewAs == "huogong") {
-                    return -10
-                  }
-                  if (viewAs && viewAs.name == "huogong") {
-                    return -10
-                  }
-                }
-              }
-              return 0
-            },
-            target(player, target) {
-              if (target.hasSkill("huogong2") || target.countCards("h") == 0) {
-                return 0
-              }
-              if (player.countCards("h") <= 1) {
-                return 0
-              }
-              if (_status.event.player == player) {
-                if (target.isAllCardsKnown(player)) {
-                  if (
-                    !target.countCards("h", (card) => {
-                      return player.countCards("h", (card2) => {
-                        return get.suit(card2) == get.suit(card)
-                      })
-                    })
-                  ) {
-                    return 0
-                  }
-                }
-              }
-              if (target == player) {
-                if (
-                  typeof _status.event.filterCard == "function" &&
-                  _status.event.filterCard(
-                    new lib.element.VCard({ name: "huogong" }),
-                    player,
-                    _status.event,
-                  )
-                ) {
-                  return -1.15
-                }
-                if (_status.event.skill) {
-                  var viewAs = get.info(_status.event.skill).viewAs
-                  if (viewAs == "huogong") {
-                    return -1.15
-                  }
-                  if (viewAs && viewAs.name == "huogong") {
-                    return -1.15
-                  }
-                }
-                return 0
-              }
-              return -1.15
-            },
-          },
-          tag: {
-            damage: 1,
-            fireDamage: 1,
-            natureDamage: 1,
-            norepeat: 1,
-          },
-        },
-      },
-      tiesuo: {
-        audio: true,
-        fullskin: true,
-        type: "trick",
-        enable: true,
-        filterTarget: true,
-        selectTarget: [1, 2],
-        complexTarget: true,
-        content() {
-          target.link()
-        },
-        recastable: true,
-        ai: {
-          wuxie: (target, card, player, viewer, status) => {
-            if (
-              status * get.attitude(viewer, player._trueMe || player) > 0 ||
-              target.hasSkillTag("noLink") ||
-              target.hasSkillTag("nodamage") ||
-              target.hasSkillTag("nofire") ||
-              target.hasSkillTag("nothunder")
-            ) {
-              return 0
-            }
-            if (
-              get.damageEffect(target, player, viewer, "thunder") >= 0 ||
-              get.damageEffect(target, player, viewer, "fire") >= 0
-            ) {
-              return 0
-            }
-            if (target.hp + target.hujia > 2 && target.mayHaveShan(viewer, "use")) {
-              return 0
-            }
-          },
-          basic: {
-            order: 7.3,
-            useful: 1.2,
-            value: 4,
-          },
-          result: {
-            target: (player, target) => {
-              if (target.hasSkillTag("link") || target.hasSkillTag("noLink")) {
-                return 0
-              }
-              let curs = game.filterPlayer((current) => {
-                if (current.hasSkillTag("noLink") || current.hasSkillTag("nodamage")) {
-                  return false
-                }
-                return !current.hasSkillTag("nofire") || !current.hasSkillTag("nothunder")
-              })
-              if (curs.length < 2) {
-                return 0
-              }
-              let f = target.hasSkillTag("nofire"),
-                t = target.hasSkillTag("nothunder"),
-                res = 0.9
-              if ((f && t) || target.hasSkillTag("nodamage")) {
-                return 0
-              }
-              if (f || t) {
-                res = 0.45
-              }
-              if (!f && target.getEquip("tengjia")) {
-                res *= 2
-              }
-              if (!target.isLinked()) {
-                res = -res
-              }
-              if (ui.selected.targets.length) {
-                return res
-              }
-              let fs = 0,
-                es = 0,
-                att = get.attitude(player, target),
-                linkf = false,
-                alink = true
-              curs.forEach((i) => {
-                let atti = get.attitude(player, i)
-                if (atti > 0) {
-                  fs++
-                  if (i.isLinked()) {
-                    linkf = true
-                  }
-                } else if (atti < 0) {
-                  es++
-                  if (!i.isLinked()) {
-                    alink = false
-                  }
-                }
-              })
-              if (es < 2 && !alink) {
-                if (att <= 0 || (att > 0 && linkf && fs < 2)) {
-                  return 0
-                }
-              }
-              return res
-            },
-          },
-          tag: {
-            multitarget: 1,
-            multineg: 1,
-            norepeat: 1,
-          },
-        },
-      },
-      bingliang: {
-        audio: true,
-        fullskin: true,
-        type: "delay",
-        range: { global: 1 },
-        filterTarget(card, player, target) {
-          return lib.filter.judge(card, player, target) && player != target
-        },
-        judge(card) {
-          if (get.suit(card) == "club") {
-            return 1
-          }
-          return -2
-        },
-        judge2(result) {
-          if (result.bool == false) {
-            return true
-          }
-          return false
-        },
-        effect() {
-          if (result.bool == false) {
-            if (get.is.changban()) {
-              player.addTempSkill("bingliang_changban")
-            } else {
-              player.skip("phaseDraw")
-            }
-          }
-        },
-        ai: {
-          basic: {
-            order: 1,
-            useful(card, i) {
-              let player = _status.event.player
-              if (_status.event.isPhaseUsing()) {
-                return game.hasPlayer((cur) => {
-                  return (
-                    cur !== player &&
-                    lib.filter.judge(card, player, cur) &&
-                    get.effect(cur, card, player, player) > 0
-                  )
-                })
-                  ? 3.2
-                  : 1
-              }
-              return 0.6
-            },
-            value: 4,
-          },
-          result: {
-            target(player, target) {
-              if (target.hasJudge("caomu")) {
-                return 0
-              }
-              return -2.7 / Math.sqrt(target.countCards("h") + 1)
-            },
-          },
-          tag: {
-            skip: "phaseDraw",
-          },
-        },
-      },
-      guding: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip1",
-        distance: { attackFrom: -1 },
-        ai: {
-          basic: {
-            equipValue: 2,
-          },
-        },
-        skills: ["guding_skill"],
-      },
-      zhuque: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip1",
-        distance: { attackFrom: -3 },
-        ai: {
-          basic: {
-            equipValue: 2,
-          },
-        },
-        skills: ["zhuque_skill"],
-      },
-      tengjia: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip2",
-        ai: {
-          value(card, player, index, method) {
-            if (player.isDisabled(2)) {
-              return 0.01
-            }
-            if (player.getEquips("tengjia").includes(card)) {
-              if (player.hasSkillTag("noDirectDamage")) {
-                return 10
-              }
-              if (
-                game.hasPlayer(function (current) {
-                  return (
-                    current != player &&
-                    get.attitude(current, player) < 0 &&
-                    current.hasSkillTag("fireAttack", null, null, true)
-                  )
-                })
-              ) {
-                return 0
-              }
-              return 6
-            }
-            var value = 0
-            var info = get.info(card)
-            var current = player.getEquip(info.subtype)
-            if (current && card != current) {
-              value = get.value(current, player)
-            }
-            var equipValue = info.ai.equipValue
-            if (equipValue == undefined) {
-              equipValue = info.ai.basic.equipValue
-            }
-            if (typeof equipValue == "function") {
-              if (method == "raw") {
-                return equipValue(card, player)
-              }
-              if (method == "raw2") {
-                return equipValue(card, player) - value
-              }
-              return Math.max(0.1, equipValue(card, player) - value)
-            }
-            if (typeof equipValue != "number") {
-              equipValue = 0
-            }
-            if (method == "raw") {
-              return equipValue
-            }
-            if (method == "raw2") {
-              return equipValue - value
-            }
-            return Math.max(0.1, equipValue - value)
-          },
-          equipValue(card, player) {
-            if (player._tengjiaEv_temp) {
-              return Math.max(1, 6 - player.hp)
-            }
-            if (player.hasSkillTag("maixie") && player.hp > 1) {
-              return 0
-            }
-            if (player.hasSkillTag("noDirectDamage")) {
-              return 10
-            }
-            player._tengjiaEv_temp = true
-            let eff = get.damageEffect(player, player, player, "fire")
-            delete player._tengjiaEv_temp
-            if (eff >= 0) {
-              return 10
-            }
-            let num =
-              4 -
-              game.countPlayer(function (current) {
-                if (get.attitude(current, player) < 0) {
-                  if (current.hasSkillTag("fireAttack", null, null, true)) {
-                    return 3
-                  }
-                  return 1
-                }
-                return false
-              })
-            if (player.hp == 1) {
-              num += 3
-            }
-            if (player.hp == 2) {
-              num += 1
-            }
-            return num
-          },
-          basic: {
-            equipValue: 3,
-          },
-        },
-        skills: ["tengjia1", "tengjia2", "tengjia3"],
-      },
-      baiyin: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip2",
-        loseDelay: false,
-        onLose() {
-          player.addTempSkill("baiyin_skill_lose")
-        },
-        skills: ["baiyin_skill"],
-        tag: {
-          recover: 1,
-        },
-        ai: {
-          order: 9.5,
-          equipValue(card, player) {
-            if (player.hp == player.maxHp) {
-              return 5
-            }
-            if (player.countCards("h", "baiyin")) {
-              return 6
-            }
             return 0
-          },
-          basic: {
-            equipValue: 5,
-            useful: (card, i) => {
-              let player = get.event().player,
-                num
-              if (
-                player.isDamaged() &&
-                player.hp < 2 &&
-                get.recoverEffect(player, player, player) > 0
-              ) {
-                return -10
-              }
-              num = player.hasSkillTag(
-                "filterDamage",
-                null,
+          }
+          if (
+            status *
+              get.attitude(viewer, target) *
+              get.effect(target, card, player, target) >=
+            0
+          ) {
+            return 0
+          }
+        },
+        basic: {
+          order: 5,
+          useful: 1,
+          value: 5.5,
+        },
+        result: {
+          player(player, target, card) {
+            if (
+              player.hasSkillTag(
+                "directHit_ai",
+                true,
                 {
-                  card: new lib.element.VCard("sha"),
-                  jiu: true,
+                  target: target,
+                  card: card,
                 },
                 true,
               )
-                ? 0.6
-                : 1.2
-              if (
-                player.canAddJudge("shandian") &&
-                get.effect(player, { name: "shandian" }, player, player) < 0 &&
-                !player.hasSkillTag("rejudge")
-              ) {
-                if (game.hasPlayer((cur) => cur.hasJudge("shandian"))) {
-                  num += 2
-                } else {
-                  num++
-                }
+            ) {
+              return 0
+            }
+            if (get.damageEffect(target, player, target) >= 0) {
+              return 0
+            }
+            const pd = get.damageEffect(player, target, player),
+              att = get.attitude(player, target)
+            if (att > 0 && get.damageEffect(target, player, player) > pd) {
+              return 0
+            }
+            const ts = target.mayHaveSha(player, "respond", null, "count"),
+              ps = player.mayHaveSha(
+                player,
+                "respond",
+                player.getCards("h", (i) => {
+                  return (
+                    card === i ||
+                    card.cards?.includes(i) ||
+                    ui.selected.cards.includes(i)
+                  )
+                }),
+                "count",
+              )
+            if (ts < 1 && ts * 8 < player.hp ** 2) {
+              return 0
+            }
+            if (att > 0) {
+              if (ts < 1) {
+                return 0
               }
-              num += game.countPlayer((cur) => {
-                if (get.attitude(cur, player) <= 0) {
-                  return cur.hasSkillTag("damageBonus")
-                }
-              })
-              if (player.isDamaged()) {
-                num /= player.getDamagedHp()
-              }
-              return num
-            },
+              return -2
+            }
+            if (pd >= 0) {
+              return pd / get.attitude(player, player)
+            }
+            if (ts - ps + Math.exp(0.8 - player.hp) < 1) {
+              return -ts
+            }
+            return -2 - ts
+          },
+          target(player, target, card) {
+            if (
+              player.hasSkillTag(
+                "directHit_ai",
+                true,
+                {
+                  target: target,
+                  card: card,
+                },
+                true,
+              )
+            ) {
+              return -2
+            }
+            const td = get.damageEffect(target, player, target)
+            if (td >= 0) {
+              return td / get.attitude(target, target)
+            }
+            const pd = get.damageEffect(player, target, player),
+              att = get.attitude(player, target)
+            if (att > 0 && get.damageEffect(target, player, player) > pd) {
+              return -2
+            }
+            const ts = target.mayHaveSha(player, "respond", null, "count"),
+              ps = player.mayHaveSha(
+                player,
+                "respond",
+                player.getCards("h", (i) => {
+                  return (
+                    card === i ||
+                    card.cards?.includes(i) ||
+                    ui.selected.cards.includes(i)
+                  )
+                }),
+                "count",
+              )
+            if (ts < 1) {
+              return -1.5
+            }
+            if (att > 0) {
+              return -2
+            }
+            if (pd >= 0) {
+              return -1
+            }
+            if (ts - ps < 1) {
+              return -2 - ts
+            }
+            return -ts
           },
         },
-      },
-      hualiu: {
-        fullskin: true,
-        type: "equip",
-        subtype: "equip3",
-        distance: { globalTo: 1 },
+        tag: {
+          respond: 2,
+          respondSha: 2,
+          damage: 1,
+        },
       },
     },
-    skill: {
-      _wuxie: {
-        trigger: { player: ["useCardToBegin", "phaseJudge"] },
-        priority: 5,
-        popup: false,
-        forced: true,
-        silent: true,
-        filter(event, player) {
-          if (event.card.storage?.nowuxie) {
-            return false
-          }
-          var card = event.card
-          if (event.name === "phaseJudge" && card.viewAs) {
-            card = { name: card.viewAs }
-          }
-          var info = get.info(card)
-          if (info.wuxieable === false) {
-            return false
-          }
-          if (event.name !== "phaseJudge") {
-            if (event.getParent().nowuxie) {
-              return false
+    wuzhong: {
+      audio: true,
+      fullskin: true,
+      type: "trick",
+      enable: true,
+      selectTarget: -1,
+      cardcolor: "red",
+      toself: true,
+      filterTarget(card, player, target) {
+        return target === player
+      },
+      modTarget: true,
+      content() {
+        if (get.is.versus()) {
+          if (game.friend.includes(target)) {
+            if (game.friend.length < game.enemy.length) {
+              target.draw(3)
+              return
             }
-            if (event.player.hasSkillTag("playernowuxie", false, event.card)) {
-              return false
-            }
-            if (get.type(event.card) !== "trick" && !info.wuxieable) {
-              return false
-            }
-          }
-          return true
-        },
-        forceLoad: true,
-        forceDie: true,
-        content() {
-          "step 0"
-          delete event.wuxieresult
-          delete event.wuxieresult2
-          delete event._result
-          delete event.resultOL
-          delete event._info_map
-          //创建map存储各种信息，用于hasHiddenWuxie判断
-          var map = {}
-          event._info_map = map
-          var card = trigger.card
-          var state = true
-          if (trigger.name === "phaseJudge") {
-            if (get.itemtype(card) === "card" && card.viewAs) {
-              card = get.autoViewAs({ name: card.viewAs }, [card])
-            }
-            map.target = trigger.player
-            map.isJudge = true
           } else {
-            map.player = trigger.player
-            if (trigger.multitarget) {
-              map.multitargets = true
+            if (game.friend.length > game.enemy.length) {
+              target.draw(3)
+              return
             }
-            map.target = trigger.target
-            map.targets = trigger.targets
-            map.tempnowuxie = trigger.targets && trigger.targets.length > 1 && !trigger.multitarget
-            map.noai = Boolean(trigger.getParent().noai)
-            //如果对拼无懈，获取历史数据
-            if (card.name === "wuxie") {
-              var evt = event
-              while (true) {
-                evt = evt.getParent(5)
-                if (evt && evt.name === "_wuxie") {
-                  state = !state
-                  var evtmap = evt._info_map
-                  if (evtmap.card.name !== "wuxie") {
-                    map._source = evtmap
+          }
+        }
+        target.draw(2)
+      },
+      ai: {
+        wuxie(target, card, player, viewer) {
+          if (get.mode() === "guozhan") {
+            if (!_status._aozhan) {
+              if (!player.isMajor()) {
+                if (!viewer.isMajor()) {
+                  return 0
+                }
+              }
+            }
+          }
+          if (target.countCards("h") * Math.max(target.hp, 5) > 6) {
+            return 0
+          }
+        },
+        basic: {
+          order: 7,
+          useful: 4.5,
+          value(card, player) {
+            if (player.hp > 2) {
+              return 9.2
+            }
+            return 9.2 - 0.7 * Math.min(3, player.countCards("hs"))
+          },
+        },
+        result: {
+          target: 2,
+        },
+        tag: {
+          draw: 2,
+        },
+      },
+    },
+    jiedao: {
+      audio: true,
+      fullskin: true,
+      type: "trick",
+      enable: true,
+      singleCard: true,
+      targetprompt: ["被借刀", "出杀目标"],
+      complexSelect: true,
+      complexTarget: true,
+      multicheck() {
+        var card = { name: "sha", isCard: true }
+        return game.hasPlayer((current) => {
+          if (current.getEquips(1).length > 0) {
+            return game.hasPlayer(
+              (current2) =>
+                current.inRange(current2) &&
+                lib.filter.targetEnabled(card, current, current2),
+            )
+          }
+        })
+      },
+      filterTarget(card, player, target) {
+        var card = { name: "sha", isCard: true }
+        return (
+          player !== target &&
+          target.getEquips(1).length > 0 &&
+          game.hasPlayer(
+            (current) =>
+              target !== current &&
+              target.inRange(current) &&
+              lib.filter.targetEnabled(card, target, current),
+          )
+        )
+      },
+      filterAddedTarget(card, player, target, preTarget) {
+        var card = { name: "sha", isCard: true }
+        return (
+          target !== preTarget &&
+          preTarget.inRange(target) &&
+          lib.filter.targetEnabled(card, preTarget, target)
+        )
+      },
+      content() {
+        "step 0"
+        if (
+          event.directHit ||
+          !event.addedTarget ||
+          (!_status.connectMode && lib.config.skip_shan && !target.hasSha())
+        ) {
+          event.directfalse = true
+        } else {
+          target
+            .chooseToUse(
+              "对" +
+                get.translation(event.addedTarget) +
+                "使用一张杀，或令" +
+                get.translation(player) +
+                "获得你的武器牌",
+              function (card, player) {
+                if (get.name(card) !== "sha") {
+                  return false
+                }
+                return lib.filter.filterCard.apply(this, arguments)
+              },
+            )
+            .set("targetRequired", true)
+            .set("complexSelect", true)
+            .set("complexTarget", true)
+            .set("filterTarget", function (card, player, target) {
+              if (
+                target !== _status.event.sourcex &&
+                !ui.selected.targets.includes(_status.event.sourcex)
+              ) {
+                return false
+              }
+              return lib.filter.filterTarget.apply(this, arguments)
+            })
+            .set("sourcex", event.addedTarget)
+            .set("addCount", false)
+            .set("respondTo", [player, card])
+        }
+        ;("step 1")
+        if (event.directfalse || result.bool === false) {
+          const cards = target.getGainableCards(player, "e", (card) =>
+            get.subtypes(card)?.includes("equip1"),
+          )
+          if (cards.length) {
+            player.gain(cards, target, "give", "bySelf")
+          }
+        }
+      },
+      ai: {
+        wuxie(target, card, player, viewer) {
+          if (
+            player === game.me &&
+            get.attitude(viewer, player._trueMe || player) > 0
+          ) {
+            return 0
+          }
+        },
+        basic: {
+          order: 8,
+          value: 2,
+          useful: 1,
+        },
+        result: {
+          player: (player, target) => {
+            if (
+              !target.hasSkillTag("noe") &&
+              get.attitude(player, target) > 0
+            ) {
+              return 0
+            }
+            return (
+              (player.hasSkillTag("noe") ? 0.32 : 0.15) *
+              target.getEquips(1).reduce((num, i) => {
+                return num + get.value(i, player)
+              }, 0)
+            )
+          },
+          target: (player, target, card) => {
+            const targets = ui.selected.targets.slice()
+            if (_status.event.preTarget) {
+              targets.add(_status.event.preTarget)
+            }
+            if (targets.length) {
+              const preTarget = targets.at(-1),
+                pre = _status.event.getTempCache(
+                  "jiedao_result",
+                  preTarget.playerid,
+                )
+              if (
+                pre?.target?.isIn() &&
+                pre.card === ai.getCacheKey(card, true)
+              ) {
+                return target === pre.target ? pre.res : 0
+              }
+              return (
+                (get.effect(target, { name: "sha" }, preTarget, target) /
+                  get.attitude(target, target)) *
+                preTarget.mayHaveSha(player, "use", null, "odds")
+              )
+            }
+            let odds = target.mayHaveSha(player, "use", null, "odds"),
+              addTar = null,
+              sha = game
+                .filterPlayer((cur) => {
+                  return get
+                    .info({ name: "jiedao" })
+                    .filterAddedTarget(null, player, cur, target)
+                })
+                .reduce((num, current) => {
+                  const eff = get.effect(
+                    current,
+                    { name: "sha" },
+                    target,
+                    player,
+                  )
+                  if (eff < num) {
+                    return num
                   }
-                } else {
+                  addTar = current
+                  return eff
+                }, -Infinity)
+            if (addTar) {
+              sha = get.effect(addTar, { name: "sha" }, target, target) / 10
+            }
+            let res =
+              target.getEquips(1).reduce((num, i) => {
+                return num + get.value(i, target)
+              }, 0) / (target.hasSkillTag("noe") ? -2 : -4)
+            if (odds > 0.06 && sha > res) {
+              res += (sha - res) * odds
+            }
+            _status.event.putTempCache("jiedao_result", target.playerid, {
+              target: addTar,
+              card: ai.getCacheKey(card, true),
+              res: res,
+            })
+            return res
+          },
+        },
+        tag: {
+          gain: 1,
+          use: 1,
+          useSha: 1,
+          loseCard: 1,
+        },
+      },
+    },
+    nanman: {
+      audio: true,
+      fullskin: true,
+      type: "trick",
+      enable: true,
+      selectTarget: -1,
+      defaultYingbianEffect: "remove",
+      filterTarget(card, player, target) {
+        return target !== player
+      },
+      reverseOrder: true,
+      async content(event, trigger, player) {
+        const target = event.target
+        if (
+          typeof event.shaRequired !== "number" ||
+          !event.shaRequired ||
+          event.shaRequired < 0
+        ) {
+          event.shaRequired = 1
+        }
+        if (typeof event.baseDamage !== "number") {
+          event.baseDamage = 1
+        }
+        while (event.shaRequired > 0) {
+          let result = { bool: false }
+          if (!event.directHit) {
+            const next = target.chooseToRespond()
+            next.set("filterCard", (card, player) => {
+              if (get.name(card) !== "sha") {
+                return false
+              }
+              return lib.filter.cardRespondable(card, player)
+            })
+            if (event.shaRequired > 1) {
+              next.set("prompt2", `共需打出${event.shaRequired}张【杀】`)
+            }
+            next.set("ai", (card) => {
+              if (get.event().toRespond) {
+                return get.order(card)
+              }
+              return -1
+            })
+            next.set(
+              "toRespond",
+              (() => {
+                if (target.hasSkillTag("noSha", null, "respond")) {
+                  return false
+                }
+                if (target.hasSkillTag("useSha", null, "respond")) {
+                  return true
+                }
+                if (
+                  event.baseDamage <= 0 ||
+                  player.hasSkillTag("notricksource", null, event) ||
+                  target.hasSkillTag("notrick", null, event)
+                ) {
+                  return false
+                }
+                if (
+                  event.baseDamage >=
+                  target.hp +
+                    (player.hasSkillTag("jueqing", false, target) ||
+                    target.hasSkill("gangzhi")
+                      ? 0
+                      : target.hujia)
+                ) {
+                  return true
+                }
+                const damage = get.damageEffect(target, player, target)
+                if (damage >= 0) {
+                  return false
+                }
+                if (
+                  event.shaRequired > 1 &&
+                  !target.hasSkillTag("freeSha", null, {
+                    player: player,
+                    card: event.card,
+                    type: "respond",
+                  }) &&
+                  event.shaRequired >
+                    target.mayHaveSha(target, "respond", null, "count")
+                ) {
+                  return false
+                }
+                // if (target.hasSkill("naman")) {
+                // 	return true;
+                // }
+                return true
+              })(),
+            )
+            next.set("respondTo", [player, event.card])
+            next.autochoose = lib.filter.autoRespondSha
+            result = await next.forResult()
+          }
+          if (!result?.bool) {
+            await target.damage()
+            break
+          }
+          event.shaRequired--
+        }
+      },
+      ai: {
+        wuxie(target, card, player, viewer, status) {
+          const att = get.attitude(viewer, target),
+            eff = get.effect(target, card, player, target)
+          if (Math.abs(att) < 1 || status * eff * att >= 0) {
+            return 0
+          }
+          let evt = _status.event.getParent("useCard"),
+            pri = 1,
+            bonus = player.hasSkillTag("damageBonus", true, {
+              target: target,
+              card: card,
+            }),
+            damage = 1,
+            isZhu = (tar) =>
+              tar.isZhu ||
+              tar === game.boss ||
+              tar === game.trueZhu ||
+              tar === game.falseZhu,
+            canSha = (tar, blur) => {
+              const known = tar.getKnownCards(viewer)
+              if (!blur) {
+                return known.some((card) => {
+                  const name = get.name(card, tar)
+                  return (
+                    (name === "sha" ||
+                      name === "hufu" ||
+                      name === "yuchanqian") &&
+                    lib.filter.cardRespondable(card, tar)
+                  )
+                })
+              }
+              if (
+                tar.countCards("hs", (i) => !known.includes(i)) >
+                4.67 - (2 * tar.hp) / tar.maxHp
+              ) {
+                return true
+              }
+              if (!tar.hasSkillTag("respondSha", true, "respond", true)) {
+                return false
+              }
+              if (tar.hp <= damage) {
+                return false
+              }
+              if (tar.hp <= damage + 1) {
+                return isZhu(tar)
+              }
+              return true
+            },
+            self = false
+          if (canSha(target)) {
+            return 0
+          }
+          if (
+            bonus &&
+            !viewer.hasSkillTag("filterDamage", null, {
+              player: player,
+              card: card,
+            })
+          ) {
+            damage = 2
+          }
+          if (
+            (viewer.hp <= damage ||
+              (viewer.hp <= damage + 1 && isZhu(viewer))) &&
+            !canSha(viewer)
+          ) {
+            if (viewer === target) {
+              return status
+            }
+            let fv = true
+            if (evt?.targets) {
+              for (const i of evt.targets) {
+                if (fv) {
+                  if (target === i) {
+                    fv = false
+                  }
+                  continue
+                }
+                if (viewer === i) {
+                  if (isZhu(viewer)) {
+                    return 0
+                  }
+                  self = true
                   break
                 }
               }
             }
           }
-          map.card = card
-          map.state = state ? 1 : -1
-          map.id2 = trigger.getParent().id
-          event._global_waiting = true
-          //发送函数
-          event.send = function (player, map, skillState, eventData) {
-            //获取技能数据
-            if (skillState) {
-              player.applySkills(skillState)
-            }
-            //生成描述提示
-            var prompt = "",
-              evtmap = map,
-              state = map.state
-            if (map._source) {
-              evtmap = map._source
-            }
-            if (evtmap.isJudge) {
-              prompt +=
-                get.translation(evtmap.target) +
-                "的" +
-                get.translation(evtmap.card) +
-                "即将" +
-                (state > 0 ? "生" : "失") +
-                "效。"
-            } else {
-              prompt += get.translation(evtmap.player)
-              if (evtmap.multitarget) {
-                if (evtmap.targets.length) {
-                  prompt += "对"
-                  prompt += get.translation(evtmap.targets)
-                }
-              } else if (evtmap.target) {
-                prompt += "对"
-                prompt += evtmap.target === evtmap.player ? "自己" : get.translation(evtmap.target)
-              }
-              prompt += "使用的" + get.translation(evtmap.card)
-              prompt += "即将" + (state > 0 ? "生" : "失") + "效。"
-            }
-            prompt += "是否使用【无懈可击】？"
-            if (
-              player.isUnderControl(true) &&
-              !_status.auto &&
-              !ui.tempnowuxie &&
-              map.tempnowuxie
-            ) {
-              var translation = get.translation(map.card.name)
-              if (translation.length >= 4) {
-                translation = lib.translate[map.card.name + "_ab"] || translation.slice(0, 2)
-              }
-              ui.tempnowuxie = ui.create.control(
-                "不无懈" + translation,
-                ui.click.tempnowuxie,
-                "stayleft",
-              )
-              ui.tempnowuxie._origin = map.id2
-            }
-            var next = player.chooseToUse({
-              filterCard(card, player) {
-                if (get.name(card) !== "wuxie") {
-                  return false
-                }
-                return lib.filter.cardEnabled(card, player, "forceEnable")
-              },
-              prompt: prompt,
-              type: "wuxie",
-              _global_waiting: true,
-              ai1() {
-                if (map.isJudge) {
-                  var card = evtmap.card,
-                    source = evtmap.target
-                  var name = card.viewAs || card.name
-                  var info = lib.card[name]
-                  if (info && info.ai && info.ai.wuxie) {
-                    var aiii = info.ai.wuxie(source, card, source, _status.event.player, state)
-                    if (typeof aiii === "number") {
-                      return aiii
-                    }
-                  }
-                  if (Math.abs(get.attitude(_status.event.player, source)) < 3) {
-                    return 0
-                  }
-                  if (
-                    source.hasSkillTag("nowuxie_judge") ||
-                    (source.hasSkillTag("guanxing") &&
-                      (source !== player || !source.hasSkill("guanxing_fail")))
-                  ) {
-                    return 0
-                  }
-                  if (name !== "lebu" && name !== "bingliang") {
-                    if (source !== _status.event.player) {
-                      return 0
-                    }
-                  }
-                  if (
-                    name === "bingliang" &&
-                    source.countCards("j") > 0 &&
-                    source.countCards("h") >= source.hp - 1
-                  ) {
-                    return 0
-                  }
-                  var card2
-                  if (name !== card.name) {
-                    card2 = { name: name }
-                  } else {
-                    card2 = card
-                  }
-                  var eff = get.effect(source, card2, source, source)
-                  if (eff >= 0) {
-                    return 0
-                  }
-                  return state * get.attitude(_status.event.player, source)
-                } else if (evtmap.target) {
-                  var triggerevent = _status.event.getTrigger()
-                  if (
-                    triggerevent &&
-                    triggerevent.parent &&
-                    triggerevent.parent.postAi &&
-                    triggerevent.player.isUnknown(_status.event.player)
-                  ) {
-                    return 0
-                  }
-                  var card = evtmap.card,
-                    target = evtmap.target,
-                    source = evtmap.player
-                  var info = get.info(card)
-                  if (info.ai && info.ai.wuxie) {
-                    var aiii = info.ai.wuxie(target, card, source, _status.event.player, state)
-                    if (typeof aiii === "number") {
-                      return aiii
-                    }
-                  }
-                  if (info.multitarget && targets) {
-                    var eff = 0
-                    for (var i = 0; i < targets.length; i++) {
-                      eff += get.effect(targets[i], card, source, _status.event.player)
-                    }
-                    return -eff * state
-                  }
-                  if (Math.abs(get.attitude(_status.event.player, target)) < 3) {
-                    return 0
-                  }
-                  return -get.effect(target, card, source, _status.event.player) * state
-                } else {
-                  var triggerevent = _status.event.getTrigger()
-                  if (
-                    triggerevent &&
-                    triggerevent.parent &&
-                    triggerevent.parent.postAi &&
-                    triggerevent.player.isUnknown(_status.event.player)
-                  ) {
-                    return 0
-                  }
-                  var card = evtmap.card,
-                    source = evtmap.player
-                  var info = get.info(card)
-                  if (info.ai && info.ai.wuxie) {
-                    var aiii = info.ai.wuxie(target, card, source, _status.event.player, state)
-                    if (typeof aiii === "number") {
-                      return aiii
-                    }
-                  }
-                  if (Math.abs(get.attitude(_status.event.player, source)) < 3) {
-                    return 0
-                  }
-                  return -get.attitude(_status.event.player, source) * state
-                }
-              },
-              source: evtmap.target,
-              source2: evtmap.targets,
-              id: map.id,
-              id2: map.id2,
-              state: state,
-              info_map: map,
-            })
-            if (map.card && map.player) {
-              next.respondTo = [map.player, map.card]
-            }
-            if (game.online) {
-              _status.event._resultid = map.id
-              game.resume()
-            } else {
-              next.nouse = true
-            }
-            if (eventData) {
-              for (let key in eventData) {
-                if (next[key] === undefined) {
-                  next[key] = eventData[key]
-                }
-              }
-            }
-          }
-          ;("step 1")
-          //判断谁有无懈
-          var map = event._info_map
-          var list = game.filterPlayer(function (current) {
-            if (event.triggername === "phaseJudge") {
-              if (
-                game.checkMod(
-                  map.card,
-                  map.target,
-                  current,
-                  "unchanged",
-                  "wuxieJudgeEnabled",
-                  current,
-                ) === false
-              ) {
-                return false
-              }
-              if (
-                game.checkMod(
-                  map.card,
-                  map.target,
-                  current,
-                  "unchanged",
-                  "wuxieJudgeRespondable",
-                  map.target,
-                ) === false
-              ) {
-                return false
-              }
-            } else {
-              if (trigger.getParent().directHit.includes(current)) {
-                return false
-              }
-              if (
-                game.checkMod(
-                  map.card,
-                  map.player,
-                  map.target,
-                  current,
-                  "unchanged",
-                  "wuxieEnabled",
-                  current,
-                ) === false
-              ) {
-                return false
-              }
-              if (
-                game.checkMod(
-                  map.card,
-                  map.player,
-                  map.target,
-                  current,
-                  "unchanged",
-                  "wuxieRespondable",
-                  map.player,
-                ) === false
-              ) {
-                return false
-              }
-            }
-            return current.hasWuxie(map)
-          })
-          event.list = list
-          if (!event.id) {
-            event.id = get.id()
-          }
-          map.id = event.id
-          list.sortBySeat(_status.currentPhase)
-          ;("step 2")
-          if (event.list.length === 0) {
-            event.finish()
-          } else if (
-            _status.connectMode &&
-            (event.list[0].isOnline() || event.list[0] === game.me)
-          ) {
-            event.goto(4)
-          } else {
-            event.current = event.list.shift()
-            event.send(event.current, event._info_map)
-          }
-          ;("step 3")
-          if (result.bool) {
-            event.wuxieresult = event.current
-            event.wuxieresult2 = result
-            event.goto(8)
-          } else {
-            event.goto(2)
-          }
-          ;("step 4")
-          var id = event.id
-          var sendback = function (result, player) {
-            if (result && result.id === id && !event.wuxieresult && result.bool) {
-              event.wuxieresult = player
-              event.wuxieresult2 = result
-              game.broadcast("cancel", id)
-              return function () {
-                var evt = get.event()
-                if (evt.getParent().name === "chooseToUse") {
-                  evt = evt.getParent()
-                }
-                if (evt.id === id && evt.name === "chooseToUse" && _status.paused) {
-                  event.resultOL = _status.event.resultOL
-                }
-                if (_status.event._parent_id === id) {
-                  ui.click.cancel()
-                  if (
-                    _status.event.getParent().name === "chooseToUse" &&
-                    _status.event.getParent().id === id
-                  ) {
-                    _status.event.getParent().cancel(null, null, true)
-                    if (ui.confirm) {
-                      ui.confirm.close()
-                    }
-                  }
-                }
-                if (_status.event.id === id) {
-                  if (_status.event._backup) {
-                    ui.click.cancel()
-                  }
-                  ui.click.cancel()
-                  if (ui.confirm) {
-                    ui.confirm.close()
-                  }
-                  if (_status.event.result) {
-                    _status.event.result.id = id
-                  }
-                }
-              }
-            } else {
-              var evt = get.event()
-              //判断主机是否还在特殊框架内转化卡牌
-              if (evt.getParent().name === "chooseToUse") {
-                evt = evt.getParent()
-              }
-              if (evt.id === id && evt.name === "chooseToUse" && _status.paused) {
-                return function () {
-                  //如果主机还在想要不要打无懈(包括chooseButton+backup框架)的情况下所有客机均完成响应执行的代码
-                  event.resultOL = _status.event.resultOL
-                }
-              } else {
-                //主机完成响应后所有客机完成响应后执行的代码
-                return () => {
-                  //判断本次_wuxie事件是否在“暂停”状态
-                  if (
-                    get.event().name === "_wuxie" &&
-                    _status.paused &&
-                    get.event().withol &&
-                    get.event().step === 6
-                  ) {
-                    game.resume()
-                  }
-                }
-              }
-            }
-          }
-
-          var withme = false
-          var withol = false
-          var list = event.list
-          for (var i = 0; i < list.length; i++) {
-            if (list[i].isOnline()) {
-              withol = true
-              const onchooseToUse_data = list[i].chooseToUse()
-              onchooseToUse_data.setContent(async function () {})
-              event.next.remove(onchooseToUse_data)
-              var skills = list[i].getSkills("invisible").concat(lib.skill.global)
-              game.expandSkills(skills)
-              for (let skill of skills) {
-                var info = lib.skill[skill]
-                if (info?.onChooseToUse) {
-                  info.onChooseToUse(onchooseToUse_data)
-                }
-              }
-              onchooseToUse_data.cancel(null, null, true)
-              list[i].wait(sendback)
-              list[i].send(
-                event.send,
-                list[i],
-                event._info_map,
-                get.skillState(list[i]),
-                onchooseToUse_data,
-              )
-              list.splice(i--, 1)
-            } else if (list[i] === game.me) {
-              withme = true
-              event.send(list[i], event._info_map)
-              list.splice(i--, 1)
-            }
-          }
-          if (!withme) {
-            event.goto(6)
-          }
-          if (_status.connectMode) {
-            if (withme || withol) {
-              for (var i = 0; i < game.players.length; i++) {
-                game.players[i].showTimer()
-              }
-            }
-          }
-          event.withol = withol
-          ;("step 5")
-          if (result && result.bool && !event.wuxieresult) {
-            game.broadcast("cancel", event.id)
-            event.wuxieresult = game.me
-            event.wuxieresult2 = result
-          }
-          ;("step 6")
-          if (event.withol && !event.wuxieresult && !event.resultOL) {
-            game.pause()
-          }
-          ;("step 7")
-          for (var i = 0; i < game.players.length; i++) {
-            game.players[i].hideTimer()
-          }
-          ;("step 8")
-          if (event.wuxieresult2 && event.wuxieresult2._sendskill) {
-            lib.skill[event.wuxieresult2._sendskill[0]] = event.wuxieresult2._sendskill[1]
-          }
-          if (event.wuxieresult && event.wuxieresult2 && event.wuxieresult2.skill) {
-            var info = get.info(event.wuxieresult2.skill)
-            if (info && info.precontent && !game.online) {
-              var next = game.createEvent("pre_" + event.wuxieresult2.skill)
-              next.setContent(info.precontent)
-              next.set("result", event.wuxieresult2)
-              next.set("player", event.wuxieresult)
-            }
-          }
-          ;("step 9")
-          if (event?.wuxieresult2?.cancel) {
-            event.goto(0)
-          } else if (event.wuxieresult) {
-            var next = event.wuxieresult.useResult(event.wuxieresult2)
-            if (event.triggername !== "phaseJudge") {
-              next.respondTo = [trigger.player, trigger.card]
-            }
-          }
-        },
-      },
-      zhuge_skill: {
-        equipSkill: true,
-        audio: true,
-        firstDo: true,
-        trigger: { player: "useCard1" },
-        forced: true,
-        filter(event, player) {
-          return (
-            !event.audioed &&
-            event.card.name === "sha" &&
-            player.countUsed("sha", true) > 1 &&
-            event.getParent().type === "phase"
-          )
-        },
-        content() {
-          trigger.audioed = true
-        },
-        mod: {
-          cardUsable(card, player, num) {
-            var cards = player.getCards("e", (card) => get.name(card) == "zhuge")
-            if (card.name === "sha") {
-              if (
-                !cards.length ||
-                player.hasSkill("zhuge_skill", null, false) ||
-                cards.some(
-                  (card) => card !== _status.zhuge_temp && !ui.selected.cards.includes(card),
-                )
-              ) {
-                if (get.is.versus() || get.is.changban()) {
-                  return num + 3
-                }
-                return Infinity
-              }
-            }
-          },
-          cardEnabled2(card, player) {
-            if (!_status.event.addCount_extra || player.hasSkill("zhuge_skill", null, false)) {
-              return
-            }
-            var cards = player.getCards("e", (card) => get.name(card) == "zhuge")
-            if (card && cards.includes(card)) {
-              try {
-                var cardz = get.card()
-              } catch (e) {
-                return
-              }
-              if (!cardz || cardz.name !== "sha") {
-                return
-              }
-              _status.zhuge_temp = card
-              var bool = lib.filter.cardUsable(
-                get.autoViewAs(cardz, ui.selected.cards.concat([card])),
-                player,
-              )
-              delete _status.zhuge_temp
-              if (!bool) {
-                return false
-              }
-            }
-          },
-        },
-      },
-      qinggang_skill: {
-        equipSkill: true,
-        audio: true,
-        trigger: {
-          player: "useCardToPlayered",
-        },
-        filter(event) {
-          return event.card.name === "sha"
-        },
-        forced: true,
-        logTarget: "target",
-        content() {
-          trigger.target.addTempSkill("qinggang2")
-          trigger.target.storage.qinggang2.add(trigger.card)
-          trigger.target.markSkill("qinggang2")
-        },
-        ai: {
-          unequip_ai: true,
-          skillTagFilter(player, tag, arg) {
-            if (arg && arg.name === "sha") {
-              return true
-            }
-            return false
-          },
-        },
-      },
-      qinggang2: {
-        firstDo: true,
-        ai: { unequip2: true },
-        init(player, skill) {
-          if (!player.storage[skill]) {
-            player.storage[skill] = []
-          }
-        },
-        onremove: true,
-        trigger: {
-          player: ["damage", "damageCancelled", "damageZero"],
-          source: ["damage", "damageCancelled", "damageZero"],
-          target: ["shaMiss", "useCardToExcluded", "useCardToEnd", "eventNeutralized"],
-          global: ["useCardEnd"],
-        },
-        charlotte: true,
-        filter(event, player) {
-          const evt = event.getParent("useCard", true, true)
-          if (evt && evt.effectedCount < evt.effectCount) {
-            return false
-          }
-          return (
-            player.storage.qinggang2 &&
-            event.card &&
-            player.storage.qinggang2.includes(event.card) &&
-            (event.name !== "damage" || event.notLink())
-          )
-        },
-        silent: true,
-        forced: true,
-        popup: false,
-        priority: 12,
-        content() {
-          player.storage.qinggang2.remove(trigger.card)
-          if (!player.storage.qinggang2.length) {
-            player.removeSkill("qinggang2")
-          }
-        },
-        marktext: "※",
-        intro: { content: "当前防具技能已失效" },
-      },
-      cixiong_skill: {
-        equipSkill: true,
-        trigger: { player: "useCardToPlayered" },
-        audio: true,
-        logTarget: "target",
-        check(event, player) {
-          if (get.attitude(player, event.target) > 0) {
-            return true
-          }
-          var target = event.target
-          return target.countCards("h") === 0 || !target.hasSkillTag("noh")
-        },
-        filter(event, player) {
-          if (event.card.name !== "sha") {
-            return false
-          }
-          return player.differentSexFrom(event.target)
-        },
-        content() {
-          "step 0"
-          if (!trigger.target.countCards("h")) {
-            event._result = { bool: false }
-          } else {
-            trigger.target
-              .chooseToDiscard("弃置一张手牌，或令" + get.translation(player) + "摸一张牌")
-              .set("ai", function (card) {
-                const bool = get.event().bool
-                if (!bool) {
-                  return 0
-                }
-                if (get.name(card) === "shan") {
-                  return bool - get.event().shan * get.value(card)
-                }
-                return bool - get.value(card)
-              })
-              .set(
-                "bool",
-                (function () {
-                  const hs = trigger.target.countCards("h"),
-                    att = get.attitude(trigger.target, trigger.player)
-                  if (!hs || att > 0) {
-                    return false
-                  }
-                  if (trigger.target.hasSkillTag("noh")) {
-                    return 8
-                  }
-                  if (get.effect(trigger.target, trigger.card, player, trigger.target) >= 0) {
-                    return 6
-                  }
-                  return -att - Math.max(0, 4 - trigger.target.hp) * 2
-                })(),
-              )
-              .set(
-                "shan",
-                (function () {
-                  if (
-                    player.hasSkillTag("directHit_ai", true, {
-                      target: trigger.target,
-                      card: trigger.card,
-                    })
-                  ) {
-                    return 0
-                  }
-                  const shans = trigger.target.mayHaveShan(trigger.target, "use", true, "count")
-                  if (shans === 0 || shans > 2) {
-                    return 1
-                  }
-                  if (shans === 1) {
-                    return 3.6 / Math.min(3.6, trigger.target.getHp())
-                  }
-                  return 1.8 / Math.min(1.8, trigger.target.getHp())
-                })(),
-              )
-          }
-          ;("step 1")
-          if (result.bool === false) {
-            player.draw()
-          }
-        },
-      },
-      hanbing_skill: {
-        equipSkill: true,
-        trigger: { source: "damageBegin2" },
-        //direct:true,
-        audio: true,
-        filter(event) {
-          return (
-            event.card &&
-            event.card.name === "sha" &&
-            event.notLink() &&
-            event.player.getCards("he").length > 0
-          )
-        },
-        //priority:1,
-        check(event, player) {
-          var target = event.player
-          var eff = get.damageEffect(target, player, player, event.nature)
-          if (get.attitude(player, target) > 0) {
-            if (
-              eff >= 0 ||
-              (event.nature &&
-                target.isLinked() &&
-                game.hasPlayer((cur) => {
-                  return (
-                    cur !== target &&
-                    cur.isLinked() &&
-                    get.damageEffect(cur, player, player, event.nature) > 0
-                  )
-                }))
-            ) {
-              return false
-            }
-            return true
-          }
-          if (eff <= 0) {
-            return true
-          }
-          if (target.hp === 1 || player.hasSkill("tianxianjiu")) {
-            return false
-          }
+          let maySha = canSha(target, true)
           if (
+            bonus &&
             !target.hasSkillTag("filterDamage", null, {
               player: player,
-              card: event.card,
-              jiu: player.hasSkill("jiu"),
+              card: card,
             })
           ) {
-            if (
-              event.num > 1 ||
-              player.hasSkillTag("damageBonus", true, {
-                player: player,
-                card: event.card,
-              })
-            ) {
-              return false
-            }
+            damage = 2
+          } else {
+            damage = 1
           }
-          if (target.countCards("he") < 2) {
-            return false
-          }
-          var num = 0
-          var cards = target.getCards("he")
-          for (var i = 0; i < cards.length; i++) {
-            if (get.value(cards[i]) > 6) {
-              num++
-            }
-          }
-          if (num >= 2) {
-            return true
-          }
-          return false
-        },
-        logTarget: "player",
-        content() {
-          "step 0"
-          trigger.cancel()
-          ;("step 1")
-          if (trigger.player.countDiscardableCards(player, "he")) {
-            player.line(trigger.player)
-            player.discardPlayerCard("he", trigger.player, true)
-          }
-          ;("step 2")
-          if (trigger.player.countDiscardableCards(player, "he")) {
-            player.line(trigger.player)
-            player.discardPlayerCard("he", trigger.player, true)
-          }
-        },
-      },
-      qinglong_skill: {
-        audio: true,
-        equipSkill: true,
-        trigger: { player: ["shaMiss", "eventNeutralized"] },
-        direct: true,
-        filter(event, player) {
-          if (get.mode() === "guozhan" || !event.card || event.card.name !== "sha") {
-            return false
-          }
-          return (
-            event.target.isIn() &&
-            player.canUse("sha", event.target, false) &&
-            (player.hasSha() || (_status.connectMode && player.countCards("hs")))
-          )
-        },
-        content() {
-          "step 0"
-          player
-            .chooseToUse(
-              get.prompt("qinglong", trigger.target),
-              function (card, player, event) {
-                if (get.name(card) !== "sha") {
-                  return false
-                }
-                if (!player.hasSkill("qinglong_skill", null, false)) {
-                  var cards = player.getCards("e", (card) => get.name(card) == "qinglong")
-                  if (
-                    !cards.some((card2) => card2 !== card && !ui.selected.cards.includes(card2))
-                  ) {
-                    return false
-                  }
-                }
-                return lib.filter.filterCard.apply(this, arguments)
-              },
-              trigger.target,
-              -1,
-            )
-            .set("addCount", false).logSkill = "qinglong_skill"
-        },
-      },
-      zhangba_skill: {
-        audio: true,
-        equipSkill: true,
-        enable: ["chooseToUse", "chooseToRespond"],
-        filterCard: true,
-        selectCard: 2,
-        position: "hs",
-        viewAs: { name: "sha" },
-        complexCard: true,
-        filter(event, player) {
-          return player.countCards("hs") >= 2
-        },
-        prompt: "将两张手牌当杀使用或打出",
-        check(card) {
-          let player = _status.event.player
-          if (
-            player.hasCard(function (card) {
-              return get.name(card) === "sha"
-            })
-          ) {
-            return 0
-          }
-          if (
-            _status.event &&
-            _status.event.name === "chooseToRespond" &&
-            player.hp < 3 &&
-            !player.countCards("hs", function (card) {
-              return get.name(card) !== "tao" && get.name(card) !== "jiu"
-            })
-          ) {
-            return (player.hp > 1 ? 10 : 8) - get.value(card)
-          }
-          return Math.max(5, 8 - 0.7 * player.hp) - get.value(card)
-        },
-        ai: {
-          respondSha: true,
-          skillTagFilter(player) {
-            return player.countCards("hs") >= 2
-          },
-        },
-      },
-      guanshi_skill: {
-        equipSkill: true,
-        trigger: {
-          player: ["shaMiss", "eventNeutralized"],
-        },
-        direct: true,
-        audio: true,
-        filter(event, player) {
-          if (event.type !== "card" || event.card.name !== "sha" || !event.target.isIn()) {
-            return false
-          }
-          var min = 2
-          if (!player.hasSkill("guanshi_skill", null, false)) {
-            min += get.sgn(player.getCards("e", (card) => get.name(card) == "guanshi").length)
-          }
-          return player.countCards("he") >= min
-        },
-        content() {
-          "step 0"
-          //装备区内可能有多个贯石斧 或者玩家可能通过其他渠道获得贯石斧技能 只要留一张贯石斧不扔掉即可
-          var next = player
-            .chooseToDiscard(get.prompt("guanshi"), 2, "he", function (card, player) {
-              if (_status.event.ignoreCard) {
-                return true
+          if (isZhu(target)) {
+            if (eff < 0) {
+              if (
+                target.hp <= damage + 1 ||
+                (!maySha && target.hp <= damage + 2)
+              ) {
+                return 1
               }
-              var cards = player.getCards("e", (card) => get.name(card) == "guanshi")
-              if (!cards.includes(card)) {
-                return true
+              if (maySha && target.hp > damage + 2) {
+                return 0
               }
-              return cards.some((cardx) => cardx !== card && !ui.selected.cards.includes(cardx))
-            })
-            .set("ignoreCard", player.hasSkill("guanshi_skill", null, false))
-            .set("complexCard", true)
-          next.logSkill = "guanshi_skill"
-          next.set("ai", function (card) {
-            var evt = _status.event.getTrigger()
-            if (get.attitude(evt.player, evt.target) < 0) {
-              if (evt.player.needsToDiscard()) {
-                return 15 - get.value(card)
+              if (maySha || target.hp > damage + 2) {
+                pri = 3
+              } else {
+                pri = 4
               }
-              if (evt.baseDamage + evt.extraDamage >= Math.min(2, evt.target.hp)) {
-                return 8 - get.value(card)
-              }
-              return 5 - get.value(card)
-            }
-            return -1
-          })
-          ;("step 1")
-          if (result.bool) {
-            if (event.triggername === "shaMiss") {
-              trigger.untrigger()
-              trigger.trigger("shaHit")
-              trigger._result.bool = false
-              trigger._result.result = null
+            } else if (target.hp > damage + 1) {
+              pri = 2
             } else {
-              trigger.unneutralize()
+              return 0
             }
-          }
-        },
-        ai: {
-          directHit_ai: true,
-          skillTagFilter(player, tag, arg) {
-            if (player._guanshi_temp) {
-              return
-            }
-            player._guanshi_temp = true
-            var bool =
-              get.attitude(player, arg.target) < 0 &&
-              arg.card &&
-              arg.card.name === "sha" &&
-              player.countCards("he", function (card) {
-                return (
-                  card !== player.getEquip("guanshi") &&
-                  card !== arg.card &&
-                  (!arg.card.cards || !arg.card.cards.includes(card)) &&
-                  get.value(card) < 5
-                )
-              }) > 1
-            delete player._guanshi_temp
-            return bool
-          },
-        },
-      },
-      fangtian_skill: {
-        equipSkill: true,
-        audio: true,
-        trigger: { player: "useCard1" },
-        forced: true,
-        firstDo: true,
-        filter(event, player) {
-          if (event.card.name !== "sha" || get.mode() === "guozhan") {
-            return false
-          }
-          var card = event.card
-          var range
-          var select = get.copy(get.info(card).selectTarget)
-          if (select === undefined) {
-            if (get.info(card).filterTarget === undefined) {
-              return false
-            }
-            range = [1, 1]
-          } else if (typeof select === "number") {
-            range = [select, select]
-          } else if (get.itemtype(select) === "select") {
-            range = select
-          } else if (typeof select === "function") {
-            range = select(card, player)
-            if (typeof range == "number") {
-              range = [range, range]
-            }
-          }
-          game.checkMod(card, player, range, "selectTarget", player)
-          return range[1] !== -1 && event.targets.length > range[1]
-        },
-        content() {},
-        mod: {
-          selectTarget(card, player, range) {
-            if (card.name !== "sha") {
-              return
-            }
-            if (get.mode() === "guozhan") {
-              return
-            }
-            if (range[1] === -1) {
-              return
-            }
-            var cards = player.getCards("h")
-            if (!cards.length) {
-              return
-            }
-            for (var i = 0; i < cards.length; i++) {
-              if (cards[i].classList.contains("selected") === false) {
-                return
-              }
-            }
-            range[1] += 2
-          },
-        },
-      },
-      qilin_skill: {
-        equipSkill: true,
-        trigger: { source: "damageBegin2" },
-        filter(event, player) {
-          return (
-            event.card &&
-            event.card.name === "sha" &&
-            event.notLink() &&
-            event.player.getCards("e", { subtype: ["equip3", "equip4", "equip6"] }).length > 0
-          )
-        },
-        direct: true,
-        audio: true,
-        content() {
-          "step 0"
-          var att = get.attitude(player, trigger.player) <= 0
-          var next = player.chooseButton()
-          next.set("att", att)
-          next.set("createDialog", [
-            "是否发动【麒麟弓】，弃置" + get.translation(trigger.player) + "的一张坐骑牌？",
-            trigger.player.getCards("e", { subtype: ["equip3", "equip4", "equip6"] }),
-          ])
-          next.set("ai", function (button) {
-            if (_status.event.att) {
-              return get.buttonValue(button)
-            }
+          } else if (self) {
             return 0
-          })
-          ;("step 1")
-          if (result.bool) {
-            player.logSkill("qilin_skill", trigger.player)
-            trigger.player.discard(result.links[0])
-          }
-        },
-      },
-      bagua_skill: {
-        equipSkill: true,
-        trigger: { player: ["chooseToRespondBegin", "chooseToUseBegin"] },
-        filter(event, player) {
-          if (event.responded) {
-            return false
-          }
-          if (event.bagua_skill) {
-            return false
-          }
-          if (!event.filterCard || !event.filterCard({ name: "shan" }, player, event)) {
-            return false
-          }
-          if (
-            event.name === "chooseToRespond" &&
-            !lib.filter.cardRespondable({ name: "shan" }, player, event)
-          ) {
-            return false
-          }
-          if (player.hasSkillTag("unequip2")) {
-            return false
-          }
-          var evt = event.getParent()
-          if (
-            evt.player &&
-            evt.player.hasSkillTag("unequip", false, {
-              name: evt.card ? evt.card.name : null,
-              target: player,
-              card: evt.card,
-            })
-          ) {
-            return false
-          }
-          return true
-        },
-        audio: true,
-        check(event, player) {
-          if (!event) {
-            return true
-          }
-          if (event.ai) {
-            var ai = event.ai
-            var tmp = _status.event
-            _status.event = event
-            var result = ai({ name: "shan" }, _status.event.player, event)
-            _status.event = tmp
-            return result > 0
-          }
-          const type = event.name === "chooseToRespond" ? "respond" : "use"
-          let evt = event.getParent()
-          if (player.hasSkillTag("noShan", null, type)) {
-            return false
-          }
-          if (!evt || !evt.card || !evt.player || player.hasSkillTag("useShan", null, type)) {
-            return true
-          }
-          if (
-            evt.card &&
-            evt.player &&
-            player.isLinked() &&
-            game.hasNature(evt.card) &&
-            get.attitude(player, evt.player._trueMe || evt.player) > 0
-          ) {
-            return false
-          }
-          return true
-        },
-        content() {
-          "step 0"
-          trigger.bagua_skill = true
-          player.judge("bagua", function (card) {
-            return get.color(card) === "red" ? 1.5 : -0.5
-          }).judge2 = function (result) {
-            return result.bool
-          }
-          ;("step 1")
-          if (result.judge > 0) {
-            trigger.untrigger()
-            trigger.set("responded", true)
-            trigger.result = { bool: true, card: { name: "shan", isCard: true } }
-          }
-        },
-        ai: {
-          respondShan: true,
-          freeShan: true,
-          skillTagFilter(player, tag, arg) {
-            if (tag !== "respondShan" && tag !== "freeShan") {
-              return
+          } else if (eff < 0) {
+            if (!maySha && target.hp <= damage) {
+              pri = 5
+            } else if (maySha) {
+              return 0
+            } else if (target.hp > damage + 1) {
+              pri = 2
+            } else if (target.hp === damage + 1) {
+              pri = 3
+            } else {
+              pri = 4
             }
-            if (player.hasSkillTag("unequip2")) {
-              return false
-            }
-            if (!arg || !arg.player) {
-              return true
-            }
-            if (
-              arg.player.hasSkillTag("unequip", false, {
-                target: player,
-              })
-            ) {
-              return false
-            }
-            return true
-          },
-          effect: {
-            target(card, player, target, effect) {
-              if (target.hasSkillTag("unequip2")) {
-                return
+          } else if (target.hp <= damage) {
+            return 0
+          }
+          let find = false
+          if (evt?.targets) {
+            for (let i = 0; i < evt.targets.length; i++) {
+              if (!find) {
+                if (evt.targets[i] === target) {
+                  find = true
+                }
+                continue
               }
+              let att1 = get.attitude(viewer, evt.targets[i]),
+                eff1 = get.effect(evt.targets[i], card, player, evt.targets[i]),
+                temp = 1
               if (
-                player.hasSkillTag("unequip", false, {
-                  name: card ? card.name : null,
-                  target: target,
-                  card: card,
-                }) ||
-                player.hasSkillTag("unequip_ai", false, {
-                  name: card ? card.name : null,
-                  target: target,
-                  card: card,
-                })
+                Math.abs(att1) < 1 ||
+                att1 * eff1 >= 0 ||
+                canSha(evt.targets[i])
               ) {
-                return
+                continue
               }
-              if (get.tag(card, "respondShan")) {
-                return 0.5
-              }
-            },
-          },
-        },
-      },
-      renwang_skill: {
-        equipSkill: true,
-        trigger: { target: "shaBegin" },
-        forced: true,
-        priority: 6,
-        audio: true,
-        filter(event, player) {
-          if (player.hasSkillTag("unequip2")) {
-            return false
-          }
-          if (
-            event.player.hasSkillTag("unequip", false, {
-              name: event.card ? event.card.name : null,
-              target: player,
-              card: event.card,
-            })
-          ) {
-            return false
-          }
-          return event.card.name === "sha" && get.color(event.card) === "black"
-        },
-        content() {
-          trigger.cancel()
-        },
-        ai: {
-          effect: {
-            target(card, player, target) {
-              if (typeof card !== "object" || target.hasSkillTag("unequip2")) {
-                return
-              }
+              maySha = canSha(evt.targets[i], true)
               if (
-                player.hasSkillTag("unequip", false, {
-                  name: card ? card.name : null,
-                  target: target,
-                  card: card,
-                }) ||
-                player.hasSkillTag("unequip_ai", false, {
-                  name: card ? card.name : null,
-                  target: target,
-                  card: card,
-                })
-              ) {
-                return
-              }
-              if (card.name === "sha" && get.color(card) === "black") {
-                return "zeroplayertarget"
-              }
-            },
-          },
-        },
-      },
-      jiu: {
-        trigger: { player: "useCard1" },
-        filter(event) {
-          return event.card && event.card.name == "sha"
-        },
-        forced: true,
-        charlotte: true,
-        firstDo: true,
-        content() {
-          if (!trigger.baseDamage) {
-            trigger.baseDamage = 1
-          }
-          trigger.baseDamage += player.storage.jiu
-          trigger.jiu = true
-          trigger.jiu_add = player.storage.jiu
-          if (lib.skill.jiu2.filter(trigger, player)) {
-            game.broadcastAll(function (player) {
-              player.removeSkill("jiu")
-            }, player)
-            game.addVideo("jiuNode", player, false)
-          }
-        },
-        temp: true,
-        vanish: true,
-        silent: true,
-        popup: false,
-        nopop: true,
-        onremove(player) {
-          if (player.node.jiu) {
-            player.node.jiu.delete()
-            player.node.jiu2.delete()
-            delete player.node.jiu
-            delete player.node.jiu2
-          }
-          delete player.storage.jiu
-        },
-        ai: {
-          damageBonus: true,
-          skillTagFilter(player, tag, arg) {
-            if (tag === "damageBonus") {
-              return arg && arg.card && arg.card.name === "sha"
-            }
-          },
-        },
-        group: "jiu2",
-      },
-      jiu2: {
-        trigger: { player: "useCardAfter", global: "phaseAfter" },
-        priority: 2,
-        firstDo: true,
-        charlotte: true,
-        filter(event, player) {
-          if (player.hasSkillTag("jiuSustain", null, event.name)) {
-            return false
-          }
-          if (event.name == "useCard") {
-            return event.card && event.card.name == "sha"
-          }
-          return true
-        },
-        forced: true,
-        popup: false,
-        audio: false,
-        content() {
-          game.broadcastAll(function (player) {
-            player.removeSkill("jiu")
-          }, player)
-          game.addVideo("jiuNode", player, false)
-        },
-      },
-      huogong2: { charlotte: true },
-      bingliang_changban: {
-        cardSkill: true,
-        unique: true,
-        trigger: { player: "phaseDrawBegin" },
-        silent: true,
-        content() {
-          trigger.num--
-        },
-        group: "bingliang_changban2",
-      },
-      bingliang_changban2: {
-        cardSkill: true,
-        trigger: { player: "phaseDrawAfter" },
-        silent: true,
-        content() {
-          if (player.enemy) {
-            player.enemy.draw()
-          }
-        },
-      },
-      guding_skill: {
-        equipSkill: true,
-        audio: true,
-        trigger: { source: "damageBegin1" },
-        filter(event) {
-          if (event.parent.name == "_lianhuan" || event.parent.name == "_lianhuan2") {
-            return false
-          }
-          if (event.card && event.card.name == "sha") {
-            if (event.player.countCards("h") == 0) {
-              return true
-            }
-          }
-          return false
-        },
-        forced: true,
-        content() {
-          trigger.num++
-        },
-        ai: {
-          effect: {
-            player(card, player, target, current, isLink) {
-              if (
-                card.name == "sha" &&
-                !isLink &&
-                target.countCards("h") == 0 &&
-                !target.hasSkillTag("filterDamage", null, {
+                bonus &&
+                !evt.targets[i].hasSkillTag("filterDamage", null, {
                   player: player,
                   card: card,
                 })
               ) {
-                return [1, 0, 1, -3]
+                damage = 2
+              } else {
+                damage = 1
               }
-            },
-          },
-        },
-      },
-      zhuque_skill: {
-        equipSkill: true,
-        trigger: { player: "useCard1" },
-        //priority:7,
-        filter(event, player) {
-          if (event.card.name == "sha" && !game.hasNature(event.card)) {
-            return true
-          }
-        },
-        audio: true,
-        check(event, player) {
-          let eff = 0,
-            nature = event.card.nature
-          for (let i = 0; i < event.targets.length; i++) {
-            eff -= get.effect(event.targets[i], event.card, player, player)
-            event.card.nature = "fire"
-            eff += get.effect(event.targets[i], event.card, player, player)
-            event.card.nature = nature
-          }
-          return eff > 0
-        },
-        prompt2(event, player) {
-          return "将" + get.translation(event.card) + "改为火属性"
-        },
-        content() {
-          game.setNature(trigger.card, "fire")
-          if (get.itemtype(trigger.card) == "card") {
-            var next = game.createEvent("zhuque_clear")
-            next.card = trigger.card
-            event.next.remove(next)
-            trigger.after.push(next)
-            next.setContent(function () {
-              game.setNature(trigger.card, [])
-            })
-          }
-        },
-      },
-      zhuque_skill2: {
-        trigger: { player: "useCardAfter" },
-        forced: true,
-        popup: false,
-        content() {
-          delete player.storage.zhuque_skill.nature
-        },
-      },
-      tengjia1: {
-        equipSkill: true,
-        trigger: { target: ["useCardToBefore"] },
-        forced: true,
-        priority: 6,
-        audio: true,
-        filter(event, player) {
-          if (player.hasSkillTag("unequip2")) {
-            return false
-          }
-          if (
-            event.player.hasSkillTag("unequip", false, {
-              name: event.card ? event.card.name : null,
-              target: player,
-              card: event.card,
-            })
-          ) {
-            return false
-          }
-          if (event.card.name == "nanman") {
-            return true
-          }
-          if (event.card.name == "wanjian") {
-            return true
-          }
-          //if(event.card.name=='chuqibuyi') return true;
-          return false
-        },
-        content() {
-          trigger.cancel()
-        },
-        ai: {
-          effect: {
-            target(card, player, target, current) {
-              if (target.hasSkillTag("unequip2")) {
-                return
-              }
-              if (
-                player.hasSkillTag("unequip", false, {
-                  name: card ? card.name : null,
-                  target: target,
-                  card: card,
-                }) ||
-                player.hasSkillTag("unequip_ai", false, {
-                  name: card ? card.name : null,
-                  target: target,
-                  card: card,
-                })
-              ) {
-                return
-              }
-              if (card.name == "nanman" || card.name == "wanjian") {
-                return "zeroplayertarget"
-              }
-              if (card.name == "sha") {
-                var equip1 = player.getEquip("zhuque")
-                if (equip1 && equip1.name == "zhuque") {
-                  return 1.9
+              if (isZhu(evt.targets[i])) {
+                if (eff1 < 0) {
+                  if (
+                    evt.targets[i].hp <= damage + 1 ||
+                    (!maySha && evt.targets[i].hp <= damage + 2)
+                  ) {
+                    return 0
+                  }
+                  if (maySha && evt.targets[i].hp > damage + 2) {
+                    continue
+                  }
+                  if (maySha || evt.targets[i].hp > damage + 2) {
+                    temp = 3
+                  } else {
+                    temp = 4
+                  }
+                } else if (evt.targets[i].hp > damage + 1) {
+                  temp = 2
+                } else {
+                  continue
                 }
-                if (!game.hasNature(card)) {
-                  return "zeroplayertarget"
+              } else if (eff1 < 0) {
+                if (!maySha && evt.targets[i].hp <= damage) {
+                  temp = 5
+                } else if (maySha) {
+                  continue
+                } else if (evt.targets[i].hp > damage + 1) {
+                  temp = 2
+                } else if (evt.targets[i].hp === damage + 1) {
+                  temp = 3
+                } else {
+                  temp = 4
                 }
+              } else if (evt.targets[i].hp > damage + 1) {
+                temp = 2
               }
-            },
-          },
-        },
-      },
-      tengjia2: {
-        equipSkill: true,
-        trigger: { player: "damageBegin3" },
-        filter(event, player) {
-          if (!event.hasNature("fire")) {
-            return false
+              if (temp > pri) {
+                return 0
+              }
+            }
           }
-          if (player.hasSkillTag("unequip2")) {
-            return false
-          }
-          if (
-            event.source &&
-            event.source.hasSkillTag("unequip", false, {
-              name: event.card ? event.card.name : null,
-              target: player,
-              card: event.card,
-            })
-          ) {
-            return false
-          }
-          return true
+          return 1
         },
-        audio: true,
-        forced: true,
-        content() {
-          trigger.num++
+        basic: {
+          order: 7.2,
+          useful: [5, 1],
+          value: 5,
         },
-        ai: {
-          effect: {
-            target(card, player, target, current) {
-              if (card.name == "sha") {
-                if (game.hasNature(card, "fire")) {
-                  return 2
+        result: {
+          player(player, target) {
+            if (
+              player._nanman_temp ||
+              player.hasSkillTag("jueqing", false, target)
+            ) {
+              return 0
+            }
+            if (
+              target.hp > 2 ||
+              (target.hp > 1 &&
+                !target.isZhu &&
+                target !== game.boss &&
+                target !== game.trueZhu &&
+                target !== game.falseZhu)
+            ) {
+              return 0
+            }
+            player._nanman_temp = true
+            const eff = get.effect(
+              target,
+              new lib.element.VCard({ name: "nanman" }),
+              player,
+              target,
+            )
+            delete player._nanman_temp
+            if (eff >= 0) {
+              return 0
+            }
+            if (
+              target.hp > 1 &&
+              target.hasSkillTag("respondSha", true, "respond", true)
+            ) {
+              return 0
+            }
+            const known = target.getKnownCards(player)
+            if (
+              known.some((card) => {
+                const name = get.name(card, target)
+                if (
+                  name === "sha" ||
+                  name === "hufu" ||
+                  name === "yuchanqian"
+                ) {
+                  return lib.filter.cardRespondable(card, target)
                 }
-                if (player.hasSkill("zhuque_skill")) {
-                  return 1.9
-                }
-              }
-              if (get.tag(card, "fireDamage") && current < 0) {
-                return 2
-              }
-            },
-          },
-        },
-      },
-      tengjia3: {
-        equipSkill: true,
-        audio: "tengjia1",
-        trigger: { target: "shaBefore" },
-        forced: true,
-        filter(event, player) {
-          if (player.hasSkillTag("unequip2")) {
-            return false
-          }
-          if (
-            event.player.hasSkillTag("unequip", false, {
-              name: event.card ? event.card.name : null,
-              target: player,
-              card: event.card,
-            })
-          ) {
-            return false
-          }
-          if (event.card.name == "sha" && !game.hasNature(event.card)) {
-            return true
-          }
-          return false
-        },
-        content() {
-          trigger.cancel()
-        },
-      },
-      baiyin_skill: {
-        equipSkill: true,
-        trigger: { player: "damageBegin4" },
-        forced: true,
-        audio: true,
-        filter(event, player) {
-          if (event.num <= 1) {
-            return false
-          }
-          if (player.hasSkillTag("unequip2")) {
-            return false
-          }
-          if (
-            event.source &&
-            event.source.hasSkillTag("unequip", false, {
-              name: event.card ? event.card.name : null,
-              target: player,
-              card: event.card,
-            })
-          ) {
-            return false
-          }
-          return true
-        },
-        //priority:-10,
-        content() {
-          trigger.num = 1
-        },
-        subSkill: {
-          lose: {
-            audio: "baiyin_skill",
-            forced: true,
-            charlotte: true,
-            equipSkill: true,
-            trigger: {
-              player: "loseAfter",
-              global: [
-                "equipAfter",
-                "addJudgeAfter",
-                "gainAfter",
-                "loseAsyncAfter",
-                "addToExpansionAfter",
-              ],
-            },
-            filter: (event, player, name, card) => {
-              if (!card || card.name != "baiyin") {
-                return false
-              }
-              return player.isDamaged() && !player.hasSkillTag("unequip2")
-            },
-            getIndex(event, player) {
-              const evt = event.getl(player)
-              const lostCards = []
-              evt.es.forEach((card) => {
-                const VEquip = evt.vcard_map.get(card)
-                if (VEquip?.name === "baiyin") {
-                  lostCards.add(VEquip)
+                if (name === "wuxie") {
+                  return lib.filter.cardEnabled(card, target, "forceEnable")
                 }
               })
-              return lostCards
-            },
-            async content(event, trigger, player) {
-              await player.recover()
-            },
+            ) {
+              return 0
+            }
+            if (
+              target.hp > 1 ||
+              target.countCards("hs", (i) => !known.includes(i)) >
+                4.67 - (2 * target.hp) / target.maxHp
+            ) {
+              return 0
+            }
+            let res = 0,
+              att = get.sgnAttitude(player, target)
+            res -=
+              att *
+              (0.8 * target.countCards("hs") +
+                0.6 * target.countCards("e") +
+                3.6)
+            if (get.mode() === "identity" && target.identity === "fan") {
+              res += 2.4
+            }
+            if (
+              (get.mode() === "guozhan" &&
+                player.identity !== "ye" &&
+                player.identity === target.identity) ||
+              (get.mode() === "identity" &&
+                player.identity === "zhu" &&
+                (target.identity === "zhong" ||
+                  target.identity === "mingzhong"))
+            ) {
+              res -= 0.8 * player.countCards("he")
+            }
+            return res
+          },
+          target(player, target) {
+            const zhu =
+              (get.mode() === "identity" && target.isZhu) ||
+              target.identity === "zhu"
+            if (!lib.filter.cardRespondable({ name: "sha" }, target)) {
+              if (zhu) {
+                if (target.hp < 2) {
+                  return -99
+                }
+                if (target.hp === 2) {
+                  return -3.6
+                }
+              }
+              return -2
+            }
+            const known = target.getKnownCards(player)
+            if (
+              known.some((card) => {
+                const name = get.name(card, target)
+                if (
+                  name === "sha" ||
+                  name === "hufu" ||
+                  name === "yuchanqian"
+                ) {
+                  return lib.filter.cardRespondable(card, target)
+                }
+                if (name === "wuxie") {
+                  return lib.filter.cardEnabled(card, target, "forceEnable")
+                }
+              })
+            ) {
+              return -1.2
+            }
+            const nh = target.countCards("hs", (i) => !known.includes(i))
+            if (zhu && target.hp <= 1) {
+              if (nh === 0) {
+                return -99
+              }
+              if (nh === 1) {
+                return -60
+              }
+              if (nh === 2) {
+                return -36
+              }
+              if (nh === 3) {
+                return -12
+              }
+              if (nh === 4) {
+                return -8
+              }
+              return -5
+            }
+            if (target.hasSkillTag("respondSha", true, "respond", true)) {
+              return -1.35
+            }
+            if (!nh) {
+              return -2
+            }
+            if (nh === 1) {
+              return -1.8
+            }
+            return -1.5
           },
         },
-        ai: {
-          filterDamage: true,
-          skillTagFilter(player, tag, arg) {
-            if (player.hasSkillTag("unequip2")) {
+        tag: {
+          respond: 1,
+          respondSha: 1,
+          damage: 1,
+          multitarget: 1,
+          multineg: 1,
+        },
+      },
+    },
+    wanjian: {
+      audio: true,
+      fullskin: true,
+      type: "trick",
+      enable: true,
+      selectTarget: -1,
+      reverseOrder: true,
+      defaultYingbianEffect: "remove",
+      filterTarget(card, player, target) {
+        return target !== player
+      },
+      async content(event, trigger, player) {
+        const target = event.target
+        if (
+          typeof event.shanRequired !== "number" ||
+          !event.shanRequired ||
+          event.shanRequired < 0
+        ) {
+          event.shanRequired = 1
+        }
+        if (typeof event.baseDamage !== "number") {
+          event.baseDamage = 1
+        }
+        while (event.shanRequired > 0) {
+          let result = { bool: false }
+          if (!event.directHit) {
+            const next = target.chooseToRespond()
+            next.set("filterCard", (card, player) => {
+              if (get.name(card) !== "shan") {
+                return false
+              }
+              return lib.filter.cardRespondable(card, player)
+            })
+            if (event.shanRequired > 1) {
+              next.set("prompt2", `共需打出${event.shanRequired}张闪`)
+            }
+            next.set("ai", (card) => {
+              if (get.event().toRespond) {
+                return get.order(card)
+              }
+              return -1
+            })
+            next.set(
+              "toRespond",
+              (() => {
+                if (target.hasSkillTag("noShan", null, "respond")) {
+                  return false
+                }
+                if (target.hasSkillTag("useShan", null, "respond")) {
+                  return true
+                }
+                if (
+                  event.baseDamage <= 0 ||
+                  player.hasSkillTag("notricksource", null, event) ||
+                  target.hasSkillTag("notrick", null, event)
+                ) {
+                  return false
+                }
+                if (
+                  event.baseDamage >=
+                  target.hp +
+                    (player.hasSkillTag("jueqing", false, target) ||
+                    target.hasSkill("gangzhi")
+                      ? 0
+                      : target.hujia)
+                ) {
+                  return true
+                }
+                const damage = get.damageEffect(target, player, target)
+                if (damage >= 0) {
+                  return false
+                }
+                if (
+                  event.shanRequired > 1 &&
+                  !target.hasSkillTag("freeShan", null, {
+                    player: player,
+                    card: event.card,
+                    type: "respond",
+                  }) &&
+                  event.shanRequired >
+                    target.mayHaveShan(target, "respond", null, "count")
+                ) {
+                  return false
+                }
+                return true
+              })(),
+            )
+            next.set("respondTo", [player, event.card])
+            next.autochoose = lib.filter.autoRespondShan
+            result = await next.forResult()
+          }
+          if (!result?.bool) {
+            await target.damage()
+            break
+          }
+          event.shanRequired--
+        }
+      },
+      ai: {
+        wuxie(target, card, player, viewer, status) {
+          const att = get.attitude(viewer, target),
+            eff = get.effect(target, card, player, target)
+          if (Math.abs(att) < 1 || status * eff * att >= 0) {
+            return 0
+          }
+          let evt = _status.event.getParent("useCard"),
+            pri = 1,
+            bonus = player.hasSkillTag("damageBonus", true, {
+              target: target,
+              card: card,
+            }),
+            damage = 1,
+            isZhu = (tar) =>
+              tar.isZhu ||
+              tar === game.boss ||
+              tar === game.trueZhu ||
+              tar === game.falseZhu,
+            canShan = (tar, blur) => {
+              const known = tar.getKnownCards(viewer)
+              if (!blur) {
+                return known.some((card) => {
+                  const name = get.name(card, tar)
+                  return (
+                    (name === "shan" || name === "hufu") &&
+                    lib.filter.cardRespondable(card, tar)
+                  )
+                })
+              }
+              if (
+                tar.countCards("hs", (i) => !known.includes(i)) >
+                3.67 - (2 * tar.hp) / tar.maxHp
+              ) {
+                return true
+              }
+              if (!tar.hasSkillTag("respondShan", true, "respond", true)) {
+                return false
+              }
+              if (tar.hp <= damage) {
+                return false
+              }
+              if (tar.hp <= damage + 1) {
+                return isZhu(tar)
+              }
+              return true
+            },
+            self = false
+          if (canShan(target)) {
+            return 0
+          }
+          if (
+            bonus &&
+            !viewer.hasSkillTag("filterDamage", null, {
+              player: player,
+              card: card,
+            })
+          ) {
+            damage = 2
+          }
+          if (
+            (viewer.hp <= damage ||
+              (viewer.hp <= damage + 1 && isZhu(viewer))) &&
+            !canShan(viewer)
+          ) {
+            if (viewer === target) {
+              return status
+            }
+            let fv = true
+            if (evt?.targets) {
+              for (const i of evt.targets) {
+                if (fv) {
+                  if (target === i) {
+                    fv = false
+                  }
+                  continue
+                }
+                if (viewer === i) {
+                  if (isZhu(viewer)) {
+                    return 0
+                  }
+                  self = true
+                  break
+                }
+              }
+            }
+          }
+          let mayShan = canShan(target, true)
+          if (
+            bonus &&
+            !target.hasSkillTag("filterDamage", null, {
+              player: player,
+              card: card,
+            })
+          ) {
+            damage = 2
+          } else {
+            damage = 1
+          }
+          if (isZhu(target)) {
+            if (eff < 0) {
+              if (
+                target.hp <= damage + 1 ||
+                (!mayShan && target.hp <= damage + 2)
+              ) {
+                return 1
+              }
+              if (mayShan && target.hp > damage + 2) {
+                return 0
+              }
+              if (mayShan || target.hp > damage + 2) {
+                pri = 3
+              } else {
+                pri = 4
+              }
+            } else if (target.hp > damage + 1) {
+              pri = 2
+            } else {
+              return 0
+            }
+          } else if (self) {
+            return 0
+          } else if (eff < 0) {
+            if (!mayShan && target.hp <= damage) {
+              pri = 5
+            } else if (mayShan) {
+              return 0
+            } else if (target.hp > damage + 1) {
+              pri = 2
+            } else if (target.hp === damage + 1) {
+              pri = 3
+            } else {
+              pri = 4
+            }
+          } else if (target.hp <= damage) {
+            return 0
+          }
+          let find = false
+          if (evt?.targets) {
+            for (let i = 0; i < evt.targets.length; i++) {
+              if (!find) {
+                if (evt.targets[i] === target) {
+                  find = true
+                }
+                continue
+              }
+              let att1 = get.attitude(viewer, evt.targets[i]),
+                eff1 = get.effect(evt.targets[i], card, player, evt.targets[i]),
+                temp = 1
+              if (
+                Math.abs(att1) < 1 ||
+                att1 * eff1 >= 0 ||
+                canShan(evt.targets[i])
+              ) {
+                continue
+              }
+              mayShan = canShan(evt.targets[i], true)
+              if (
+                bonus &&
+                !evt.targets[i].hasSkillTag("filterDamage", null, {
+                  player: player,
+                  card: card,
+                })
+              ) {
+                damage = 2
+              } else {
+                damage = 1
+              }
+              if (isZhu(evt.targets[i])) {
+                if (eff1 < 0) {
+                  if (
+                    evt.targets[i].hp <= damage + 1 ||
+                    (!mayShan && evt.targets[i].hp <= damage + 2)
+                  ) {
+                    return 0
+                  }
+                  if (mayShan && evt.targets[i].hp > damage + 2) {
+                    continue
+                  }
+                  if (mayShan || evt.targets[i].hp > damage + 2) {
+                    temp = 3
+                  } else {
+                    temp = 4
+                  }
+                } else if (evt.targets[i].hp > damage + 1) {
+                  temp = 2
+                } else {
+                  continue
+                }
+              } else if (eff1 < 0) {
+                if (!mayShan && evt.targets[i].hp <= damage) {
+                  temp = 5
+                } else if (mayShan) {
+                  continue
+                } else if (evt.targets[i].hp > damage + 1) {
+                  temp = 2
+                } else if (evt.targets[i].hp === damage + 1) {
+                  temp = 3
+                } else {
+                  temp = 4
+                }
+              } else if (evt.targets[i].hp > damage + 1) {
+                temp = 2
+              }
+              if (temp > pri) {
+                return 0
+              }
+            }
+          }
+          return 1
+        },
+        basic: {
+          order: 7.2,
+          useful: 1,
+          value: 5,
+        },
+        result: {
+          player(player, target) {
+            if (
+              player._wanjian_temp ||
+              player.hasSkillTag("jueqing", false, target)
+            ) {
+              return 0
+            }
+            if (
+              target.hp > 2 ||
+              (target.hp > 1 &&
+                !target.isZhu &&
+                target !== game.boss &&
+                target !== game.trueZhu &&
+                target !== game.falseZhu)
+            ) {
+              return 0
+            }
+            player._wanjian_temp = true
+            const eff = get.effect(
+              target,
+              new lib.element.VCard({ name: "wanjian" }),
+              player,
+              target,
+            )
+            delete player._wanjian_temp
+            if (eff >= 0) {
+              return 0
+            }
+            if (
+              target.hp > 1 &&
+              target.hasSkillTag("respondShan", true, "respond", true)
+            ) {
+              return 0
+            }
+            const known = target.getKnownCards(player)
+            if (
+              known.some((card) => {
+                const name = get.name(card, target)
+                if (name === "shan" || name === "hufu") {
+                  return lib.filter.cardRespondable(card, target)
+                }
+                if (name === "wuxie") {
+                  return lib.filter.cardEnabled(card, target, "forceEnable")
+                }
+              })
+            ) {
+              return 0
+            }
+            if (
+              target.hp > 1 ||
+              target.countCards("hs", (i) => !known.includes(i)) >
+                3.67 - (2 * target.hp) / target.maxHp
+            ) {
+              return 0
+            }
+            let res = 0,
+              att = get.sgnAttitude(player, target)
+            res -=
+              att *
+              (0.8 * target.countCards("hs") +
+                0.6 * target.countCards("e") +
+                3.6)
+            if (get.mode() === "identity" && target.identity === "fan") {
+              res += 2.4
+            }
+            if (
+              (get.mode() === "guozhan" &&
+                player.identity !== "ye" &&
+                player.identity === target.identity) ||
+              (get.mode() === "identity" &&
+                player.identity === "zhu" &&
+                (target.identity === "zhong" ||
+                  target.identity === "mingzhong"))
+            ) {
+              res -= 0.8 * player.countCards("he")
+            }
+            return res
+          },
+          target(player, target) {
+            const zhu =
+              (get.mode() === "identity" && target.isZhu) ||
+              target.identity === "zhu"
+            if (!lib.filter.cardRespondable({ name: "shan" }, target)) {
+              if (zhu) {
+                if (target.hp < 2) {
+                  return -99
+                }
+                if (target.hp === 2) {
+                  return -3.6
+                }
+              }
+              return -2
+            }
+            const known = target.getKnownCards(player)
+            if (
+              known.some((card) => {
+                const name = get.name(card, target)
+                if (name === "shan" || name === "hufu") {
+                  return lib.filter.cardRespondable(card, target)
+                }
+                if (name === "wuxie") {
+                  return lib.filter.cardEnabled(card, target, "forceEnable")
+                }
+              })
+            ) {
+              return -1.2
+            }
+            const nh = target.countCards("hs", (i) => !known.includes(i))
+            if (zhu && target.hp <= 1) {
+              if (nh === 0) {
+                return -99
+              }
+              if (nh === 1) {
+                return -60
+              }
+              if (nh === 2) {
+                return -36
+              }
+              if (nh === 3) {
+                return -8
+              }
+              return -5
+            }
+            if (target.hasSkillTag("respondShan", true, "respond", true)) {
+              return -1.35
+            }
+            if (!nh) {
+              return -2
+            }
+            if (nh === 1) {
+              return -1.65
+            }
+            return -1.5
+          },
+        },
+        tag: {
+          respond: 1,
+          respondShan: 1,
+          damage: 1,
+          multitarget: 1,
+          multineg: 1,
+        },
+      },
+    },
+    taoyuan: {
+      audio: true,
+      fullskin: true,
+      type: "trick",
+      enable: true,
+      selectTarget: -1,
+      cardcolor: "red",
+      reverseOrder: true,
+      defaultYingbianEffect: "remove",
+      filterTarget(card, player, target) {
+        //return target.hp<target.maxHp;
+        return true
+      },
+      ignoreTarget(card, player, target) {
+        return target.isHealthy()
+      },
+      content() {
+        target.recover()
+      },
+      ai: {
+        basic: {
+          order: (item, player) => {
+            if (
+              game.hasPlayer(
+                (current) =>
+                  current.hp <= 1 &&
+                  get.recoverEffect(current, player, _status.event.player) < 0,
+              )
+            ) {
+              return 1
+            }
+            return 10
+          },
+          useful: [3, 1],
+          value: 0,
+        },
+        result: {
+          target(player, target) {
+            return target.hp < target.maxHp ? 2 : 0
+          },
+        },
+        tag: {
+          recover: 0.5,
+          multitarget: 1,
+        },
+      },
+    },
+    wugu: {
+      audio: true,
+      fullskin: true,
+      type: "trick",
+      enable: true,
+      cardcolor: "red",
+      selectTarget: -1,
+      filterTarget: true,
+      contentBefore() {
+        "step 0"
+        if (!targets.length) {
+          event.finish()
+          return
+        }
+        if (card.storage?.chooseDirection || get.is.versus()) {
+          player
+            .chooseControl("顺时针", "逆时针", (event, player) => {
+              if (
+                (get.event().isVersus && player.next.side === player.side) ||
+                get.attitude(player, player.next) >
+                  get.attitude(player, player.previous)
+              ) {
+                return "逆时针"
+              }
+              return "顺时针"
+            })
+            .set("prompt", `选择${get.translation(card)}的结算方向`)
+            .set("isVersus", get.is.versus())
+        } else {
+          event.goto(2)
+        }
+        ;("step 1")
+        if (result && result.control === "顺时针") {
+          var evt = event.getParent(),
+            sorter = _status.currentPhase || player
+          evt.fixedSeat = true
+          evt.targets.sortBySeat(sorter)
+          evt.targets.reverse()
+          if (evt.targets[evt.targets.length - 1] === sorter) {
+            evt.targets.unshift(evt.targets.pop())
+          }
+        }
+        ;("step 2")
+        ui.clear()
+        var cards
+        if (get.itemtype(card.storage?.fixedShownCards) === "cards") {
+          cards = card.storage.fixedShownCards.slice()
+          var lose_list = [],
+            cards2 = []
+          cards.forEach((card) => {
+            var owner = get.owner(card)
+            if (owner) {
+              var arr = lose_list.find((i) => i[0] === owner)
+              if (arr) {
+                arr[1].push(card)
+              } else {
+                lose_list.push([owner, [card]])
+              }
+            } else {
+              cards2.add(card)
+            }
+          })
+          if (lose_list.length) {
+            lose_list.forEach((list) => {
+              list[0].$throw(list[1])
+              game.log(list[0], "将", list[1], "置于了处理区")
+            })
+            game
+              .loseAsync({
+                lose_list: lose_list,
+                visible: true,
+                relatedEvent: event.getParent(),
+              })
+              .setContent("chooseToCompareLose")
+          }
+          if (cards2.length) {
+            game.cardsGotoOrdering(cards2).relatedEvent = event.getParent()
+          }
+          game.delayex()
+        } else {
+          let num = event.targets?.length ?? game.countPlayer()
+          if (typeof card.storage?.extraCardsNum === "number") {
+            num += card.storage.extraCardsNum
+          }
+          cards = get.cards(num)
+          game.cardsGotoOrdering(cards).relatedEvent = event.getParent()
+        }
+        var dialog = ui.create.dialog("五谷丰登", cards, true)
+        _status.dieClose.push(dialog)
+        dialog.videoId = lib.status.videoId++
+        game.addVideo("cardDialog", null, [
+          "五谷丰登",
+          get.cardsInfo(cards),
+          dialog.videoId,
+        ])
+        event.getParent().preResult = dialog.videoId
+        game.broadcast(
+          (cards, id) => {
+            var dialog = ui.create.dialog("五谷丰登", cards, true)
+            _status.dieClose.push(dialog)
+            dialog.videoId = id
+          },
+          cards,
+          dialog.videoId,
+        )
+        game.log(event.card, "亮出了", cards)
+      },
+      content() {
+        "step 0"
+        for (var i = 0; i < ui.dialogs.length; i++) {
+          if (ui.dialogs[i].videoId === event.preResult) {
+            event.dialog = ui.dialogs[i]
+            break
+          }
+        }
+        if (!event.dialog || event.dialog.buttons.length === 0) {
+          event.finish()
+          return
+        }
+        if (event.dialog.buttons.length > 1) {
+          var next = target.chooseButton(true)
+          next.set("ai", (button) => {
+            let player = _status.event.player,
+              card = button.link,
+              val = get.value(card, player)
+            if (get.tag(card, "recover")) {
+              val += game.countPlayer((target) => {
+                return (
+                  target.hp < 2 &&
+                  get.attitude(player, target) > 0 &&
+                  lib.filter.cardSavable(card, player, target)
+                )
+              })
+              if (
+                player.hp <= 2 &&
+                game.checkMod(card, player, "unchanged", "cardEnabled2", player)
+              ) {
+                val *= 2
+              }
+            }
+            return val
+          })
+          next.set("dialog", event.preResult)
+          next.set("closeDialog", false)
+          next.set("dialogdisplay", true)
+        } else {
+          event.directButton = event.dialog.buttons[0]
+        }
+        ;("step 1")
+        var dialog = event.dialog
+        var card
+        if (event.directButton) {
+          card = event.directButton.link
+        } else {
+          for (var i of dialog.buttons) {
+            if (i.link === result.links[0]) {
+              card = i.link
+              break
+            }
+          }
+          if (!card) {
+            card = event.dialog.buttons[0].link
+          }
+        }
+        var button
+        for (var i = 0; i < dialog.buttons.length; i++) {
+          if (dialog.buttons[i].link === card) {
+            button = dialog.buttons[i]
+            const innerHTML = target.getName(true)
+            game.createButtonCardsetion(innerHTML, button)
+            dialog.buttons.remove(button)
+            break
+          }
+        }
+        var capt = `${get.translation(target)}选择了${get.translation(button.link)}`
+        if (card) {
+          target.gain(card, "visible")
+          target.$gain2(card)
+          game.broadcast(
+            (card, id, name, capt) => {
+              var dialog = get.idDialog(id)
+              if (dialog) {
+                dialog.content.firstChild.innerHTML = capt
+                for (var i = 0; i < dialog.buttons.length; i++) {
+                  if (dialog.buttons[i].link === card) {
+                    game.createButtonCardsetion(name, dialog.buttons[i])
+                    dialog.buttons.splice(i--, 1)
+                    break
+                  }
+                }
+              }
+            },
+            card,
+            dialog.videoId,
+            target.getName(true),
+            capt,
+          )
+        }
+        dialog.content.firstChild.innerHTML = capt
+        game.addVideo("dialogCapt", null, [
+          dialog.videoId,
+          dialog.content.firstChild.innerHTML,
+        ])
+        game.log(target, "选择了", button.link)
+        game.delay()
+      },
+      contentAfter() {
+        for (var i = 0; i < ui.dialogs.length; i++) {
+          if (ui.dialogs[i].videoId === event.preResult) {
+            var dialog = ui.dialogs[i]
+            dialog.close()
+            _status.dieClose.remove(dialog)
+            if (dialog.buttons.length) {
+              event.remained = []
+              for (var i = 0; i < dialog.buttons.length; i++) {
+                event.remained.push(dialog.buttons[i].link)
+              }
+              event.trigger("wuguRemained")
+            }
+            break
+          }
+        }
+        game.broadcast((id) => {
+          var dialog = get.idDialog(id)
+          if (dialog) {
+            dialog.close()
+            _status.dieClose.remove(dialog)
+          }
+        }, event.preResult)
+        game.addVideo("cardDialog", null, event.preResult)
+      },
+      ai: {
+        wuxie() {
+          if (Math.random() < 0.5) {
+            return 0
+          }
+        },
+        basic: {
+          order: 3,
+          useful: 0.5,
+        },
+        result: {
+          target(player, target) {
+            var sorter = _status.currentPhase || player
+            let opt =
+              6 +
+              0.75 *
+                (game.countPlayer() -
+                  2 * get.distance(sorter, target, "absolute"))
+            if (get.is.versus()) {
+              if (
+                target !== sorter &&
+                get.attitude(player, player.next) <
+                  get.attitude(player, player.previous)
+              ) {
+                opt =
+                  6 +
+                  0.75 *
+                    (2 * get.distance(sorter, target, "absolute") -
+                      game.countPlayer())
+              }
+            }
+            if (player.hasUnknown(2)) {
+              return 0
+            }
+            return opt / 6
+          },
+        },
+        tag: {
+          draw: 1,
+          multitarget: 1,
+        },
+      },
+    },
+    wuxie: {
+      audio: true,
+      fullskin: true,
+      type: "trick",
+      ai: {
+        basic: {
+          useful: [6, 4, 3],
+          value: [6, 4, 3],
+        },
+        result: { player: 1 },
+        expose: 0.2,
+      },
+      notarget: true,
+      finalDelay: false,
+      defaultYingbianEffect: "draw",
+      contentBefore() {
+        "step 0"
+        if (get.mode() === "guozhan" && get.cardtag(card, "guo")) {
+          var trigger = event.getParent(2)._trigger
+          if (
+            trigger.name !== "phaseJudge" &&
+            trigger.card.name !== "wuxie" &&
+            trigger.targets.length > 1
+          ) {
+            player
+              .chooseControl("对单体使用", "对势力使用")
+              .set("prompt", `请选择${get.translation(card)}的使用方式`)
+              .set("ai", () => "对势力使用")
+          } else {
+            event.finish()
+          }
+        } else {
+          event.finish()
+        }
+        ;("step 1")
+        if (result.control === "对势力使用") {
+          player.chat("对势力使用")
+          event.getParent().guowuxie = true
+        }
+      },
+      content() {
+        var trigger = event.getParent(2)._trigger
+        if (trigger.name === "phaseJudge") {
+          trigger.untrigger("currentOnly")
+          trigger.cancelled = true
+        } else {
+          trigger.neutralize()
+          if (event.getParent().guowuxie === true) {
+            trigger
+              .getParent()
+              .excluded.addArray(
+                game.filterPlayer((current) =>
+                  current.isFriendOf(trigger.target),
+                ),
+              )
+          }
+        }
+        /*
+                    event.result={
+                        wuxied:true,
+                        directHit:evt.directHit||[],
+                        nowuxie:evt.nowuxie,
+                    };*/
+        if (player.isOnline()) {
+          player.send((player) => {
+            if (ui.tempnowuxie && !player.hasWuxie()) {
+              ui.tempnowuxie.close()
+              delete ui.tempnowuxie
+            }
+          }, player)
+        } else if (player === game.me) {
+          if (ui.tempnowuxie && !player.hasWuxie()) {
+            ui.tempnowuxie.close()
+            delete ui.tempnowuxie
+          }
+        }
+      },
+    },
+    lebu: {
+      audio: true,
+      fullskin: true,
+      type: "delay",
+      filterTarget(card, player, target) {
+        return lib.filter.judge(card, player, target) && player !== target
+      },
+      judge(card) {
+        if (get.suit(card) === "heart") {
+          return 1
+        }
+        return -2
+      },
+      judge2(result) {
+        if (result.bool === false) {
+          return true
+        }
+        return false
+      },
+      effect() {
+        if (result.bool === false) {
+          player.skip("phaseUse")
+        }
+      },
+      ai: {
+        basic: {
+          order: 1,
+          useful(card, i) {
+            const player = _status.event.player
+            if (_status.event.isPhaseUsing()) {
+              return game.hasPlayer((cur) => {
+                return (
+                  cur !== player &&
+                  lib.filter.judge(card, player, cur) &&
+                  get.effect(cur, card, player, player) > 0
+                )
+              })
+                ? 4.2
+                : 1
+            }
+            return 1.3
+          },
+          value: 8,
+        },
+        result: {
+          ignoreStatus: true,
+          target: (player, target) => {
+            if (
+              target === _status.currentPhase &&
+              target.skipList.includes("phaseUse")
+            ) {
+              const evt = _status.event.getParent("phase")
+              if (evt && evt.phaseList.indexOf("phaseJudge") <= evt.num) {
+                return 0
+              }
+            }
+            let num = target.needsToDiscard(3),
+              cf = (get.threaten(target, player) + 0.6) ** 2
+            if (!num) {
+              return -0.01 * cf
+            }
+            if (target.hp > 2) {
+              num--
+            }
+            let dist = Math.sqrt(1 + get.distance(player, target, "absolute"))
+            if (dist < 1) {
+              dist = 1
+            }
+            if (target.isTurnedOver()) {
+              dist++
+            }
+            return (Math.min(-0.1, -num) * cf) / dist
+          },
+        },
+        tag: {
+          skip: "phaseUse",
+        },
+      },
+    },
+    shandian: {
+      audio: true,
+      fullskin: true,
+      type: "delay",
+      cardnature: "thunder",
+      modTarget(card, player, target) {
+        return lib.filter.judge(card, player, target)
+      },
+      enable(card, player) {
+        return player.canAddJudge(card)
+      },
+      filterTarget(card, player, target) {
+        return lib.filter.judge(card, player, target) && player === target
+      },
+      selectTarget: [-1, -1],
+      toself: true,
+      judge(card) {
+        if (
+          get.suit(card) === "spade" &&
+          get.number(card) > 1 &&
+          get.number(card) < 10
+        ) {
+          return -5
+        }
+        return 1
+      },
+      judge2(result) {
+        if (result.bool === false) {
+          return true
+        }
+        return false
+      },
+      effect() {
+        if (result.bool === false) {
+          player.damage(3, "thunder", "nosource")
+        } else {
+          player.addJudgeNext(card)
+        }
+      },
+      cancel() {
+        player.addJudgeNext(card)
+      },
+      ai: {
+        basic: {
+          order: 1,
+          useful: 0,
+          value: 0,
+        },
+        result: {
+          target(player, target) {
+            var num = game.countPlayer((current) => {
+              //var skills=current.getSkills();
+              for (var j = 0; j < current.skills.length; j++) {
+                var rejudge = get.tag(current.skills[j], "rejudge", current)
+                if (rejudge !== undefined) {
+                  if (
+                    get.attitude(target, current) > 0 &&
+                    get.attitude(current, target) > 0
+                  ) {
+                    return rejudge
+                  }
+                  return -rejudge
+                }
+              }
+            })
+            if (num > 0) {
+              return num
+            }
+            if (num === 0) {
+              var mode = get.mode()
+              if (mode === "identity") {
+                if (target.identity === "nei") {
+                  return 1
+                }
+                var situ = get.situation()
+                if (target.identity === "fan") {
+                  if (situ > 1) {
+                    return 1
+                  }
+                } else {
+                  if (situ < -1) {
+                    return 1
+                  }
+                }
+              } else if (mode === "guozhan") {
+                if (target.identity === "ye") {
+                  return 1
+                }
+                if (
+                  game.hasPlayer((current) => current.identity === "unknown")
+                ) {
+                  return -1
+                }
+                if (get.population(target.identity) === 1) {
+                  if (target.maxHp > 2 && target.hp < 2) {
+                    return 1
+                  }
+                  if (game.countPlayer() < 3) {
+                    return -1
+                  }
+                  if (target.hp <= 2 && target.countCards("he") <= 3) {
+                    return 1
+                  }
+                }
+              }
+            }
+            return -1
+          },
+        },
+        tag: {
+          damage: 0.16,
+          natureDamage: 0.16,
+          thunderDamage: 0.16,
+        },
+      },
+    },
+    zhuge: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip1",
+      ai: {
+        order() {
+          return get.order({ name: "sha" }) - 0.1
+        },
+        equipValue(card, player) {
+          if (player._zhuge_temp) {
+            return 1
+          }
+          player._zhuge_temp = true
+          var result = (() => {
+            if (
+              !game.hasPlayer(
+                (current) =>
+                  get.distance(player, current) <= 1 &&
+                  player.canUse("sha", current) &&
+                  get.effect(current, { name: "sha" }, player, player) > 0,
+              )
+            ) {
+              return 1
+            }
+            if (player.hasSha() && _status.currentPhase === player) {
+              if (
+                (player.getEquip("zhuge") && player.countUsed("sha")) ||
+                player.getCardUsable("sha") === 0
+              ) {
+                return 10
+              }
+            }
+            var num = player.countCards("h", "sha")
+            if (num > 1) {
+              return 6 + num
+            }
+            return 3 + num
+          })()
+          delete player._zhuge_temp
+          return result
+        },
+        basic: {
+          equipValue: 5,
+        },
+        tag: {
+          valueswap: 1,
+        },
+      },
+      skills: ["zhuge_skill"],
+    },
+    qinggang: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip1",
+      distance: { attackFrom: -1 },
+      ai: {
+        basic: {
+          equipValue: 2,
+        },
+      },
+      skills: ["qinggang_skill"],
+    },
+    cixiong: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip1",
+      distance: { attackFrom: -1 },
+      ai: {
+        basic: {
+          equipValue: 2,
+        },
+      },
+      skills: ["cixiong_skill"],
+    },
+    hanbing: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip1",
+      distance: { attackFrom: -1 },
+      skills: ["hanbing_skill"],
+      ai: {
+        basic: {
+          equipValue: 2,
+        },
+      },
+    },
+    qinglong: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip1",
+      distance: { attackFrom: -2 },
+      ai: {
+        equipValue(card, player) {
+          return Math.min(2.5 + player.countCards("h", "sha"), 4)
+        },
+        basic: {
+          equipValue: 3.5,
+        },
+      },
+      skills: ["qinglong_skill"],
+    },
+    zhangba: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip1",
+      distance: { attackFrom: -2 },
+      ai: {
+        equipValue(card, player) {
+          var num = 2.5 + player.countCards("h") / 3
+          return Math.min(num, 4)
+        },
+        basic: {
+          equipValue: 3.5,
+        },
+      },
+      skills: ["zhangba_skill"],
+    },
+    guanshi: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip1",
+      distance: { attackFrom: -2 },
+      ai: {
+        equipValue(card, player) {
+          var num =
+            2.5 + (player.countCards("h") + player.countCards("e")) / 2.5
+          return Math.min(num, 5)
+        },
+        basic: {
+          equipValue: 4.5,
+        },
+      },
+      skills: ["guanshi_skill"],
+    },
+    fangtian: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip1",
+      distance: { attackFrom: -3 },
+      ai: {
+        basic: {
+          equipValue: 2.5,
+        },
+      },
+      skills: ["fangtian_skill", "fangtian_guozhan"],
+    },
+    qilin: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip1",
+      distance: { attackFrom: -4 },
+      ai: {
+        basic: {
+          equipValue: 3,
+        },
+      },
+      skills: ["qilin_skill"],
+    },
+    bagua: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip2",
+      ai: {
+        basic: {
+          equipValue: 7.5,
+        },
+      },
+      skills: ["bagua_skill"],
+    },
+    renwang: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip2",
+      skills: ["renwang_skill"],
+      ai: {
+        basic: {
+          equipValue: 7.5,
+        },
+      },
+    },
+    jueying: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip3",
+      distance: { globalTo: 1 },
+      battleOfWancheng() {
+        // 宛城之战
+        if (get.mode() !== "doudizhu") {
+          return false
+        }
+        const date = new Date()
+        if (date.getMonth() !== 6) {
+          return false
+        }
+        const day = date.getDate()
+        if (day === 5) {
+          return date.getHours() >= 8
+        }
+        return day > 5 && day < 22
+      },
+      global: "jueying_wancheng",
+    },
+    dilu: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip3",
+      distance: { globalTo: 1 },
+    },
+    zhuahuang: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip3",
+      distance: { globalTo: 1 },
+    },
+    chitu: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip4",
+      distance: { globalFrom: -1 },
+    },
+    dayuan: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip4",
+      distance: { globalFrom: -1 },
+    },
+    zixing: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip4",
+      distance: { globalFrom: -1 },
+    },
+    firedamage: {
+      ai: {
+        result: {
+          target: -1.5,
+        },
+        tag: {
+          damage: 1,
+          fireDamage: 1,
+          natureDamage: 1,
+        },
+      },
+    },
+    thunderdamage: {
+      ai: {
+        result: {
+          target: -1.5,
+        },
+        tag: {
+          damage: 1,
+          thunderDamage: 1,
+          natureDamage: 1,
+        },
+      },
+    },
+    jiu: {
+      audio: true,
+      fullskin: true,
+      type: "basic",
+      toself: true,
+      enable(event, player) {
+        //return !player.hasSkill('jiu');
+        return true
+      },
+      lianheng: true,
+      logv: false,
+      savable(card, player, dying) {
+        return (
+          dying === player || player.hasSkillTag("jiuOther", null, dying, true)
+        )
+      },
+      usable: 1,
+      selectTarget: -1,
+      modTarget: true,
+      filterTarget(card, player, target) {
+        return target === player
+      },
+      content() {
+        if (typeof event.baseDamage !== "number") {
+          event.baseDamage = 1
+        }
+        if (target.isDying() || event.getParent(2).type === "dying") {
+          target.recover()
+          if (
+            _status.currentPhase === target &&
+            typeof target.getStat().card.jiu === "number"
+          ) {
+            target.getStat().card.jiu--
+          }
+        } else {
+          game.addVideo("jiuNode", target, true)
+          if (cards?.length) {
+            card = cards[0]
+          }
+          if (!target.storage.jiu) {
+            target.storage.jiu = 0
+          }
+          target.storage.jiu += event.baseDamage
+          game.broadcastAll(
+            (target, card, gain2) => {
+              target.addSkill("jiu")
+              if (!target.node.jiu && lib.config.jiu_effect) {
+                target.node.jiu = ui.create.div(
+                  ".playerjiu",
+                  target.node.avatar,
+                )
+                target.node.jiu2 = ui.create.div(
+                  ".playerjiu",
+                  target.node.avatar2,
+                )
+              }
+              if (
+                gain2 &&
+                card.clone &&
+                (card.clone.parentNode === target.parentNode ||
+                  card.clone.parentNode === ui.arena)
+              ) {
+                card.clone.moveDelete(target)
+              }
+            },
+            target,
+            card,
+            target === targets[0] && cards.length === 1,
+          )
+          if (target === targets[0] && cards.length === 1) {
+            if (
+              card.clone &&
+              (card.clone.parentNode === target.parentNode ||
+                card.clone.parentNode === ui.arena)
+            ) {
+              game.addVideo("gain2", target, get.cardsInfo([card]))
+            }
+          }
+        }
+      },
+      ai: {
+        basic: {
+          useful: (card, i) => {
+            if (_status.event.player.hp > 1) {
+              if (i === 0) {
+                return 4
+              }
+              return 1
+            }
+            if (i === 0) {
+              return 7.3
+            }
+            return 3
+          },
+          value: (card, player, i) => {
+            if (player.hp > 1) {
+              if (i === 0) {
+                return 5
+              }
+              return 1
+            }
+            if (i === 0) {
+              return 7.3
+            }
+            return 3
+          },
+        },
+        order(item, player) {
+          if (_status.event.dying) {
+            return 9
+          }
+          const sha = get.order({ name: "sha" })
+          if (sha <= 0) {
+            return 0
+          }
+          let usable = player.getCardUsable("sha")
+          if (
+            usable < 2 &&
+            player.hasCard((i) => {
+              return get.name(i, player) === "zhuge"
+            }, "hs")
+          ) {
+            usable = Infinity
+          }
+          const shas = Math.min(
+            usable,
+            player.mayHaveSha(player, "use", item, "count"),
+          )
+          if (
+            shas !== 1 ||
+            (lib.config.mode === "stone" &&
+              !player.isMin() &&
+              player.getActCount() + 1 >= player.actcount)
+          ) {
+            return 0
+          }
+          return sha + 0.2
+        },
+        result: {
+          target: (player, target, card) => {
+            if (target?.isDying()) {
+              return 2
+            }
+            if (!target || target._jiu_temp || !target.isPhaseUsing()) {
+              return 0
+            }
+            let effs = { order: 0 },
+              temp
+            target.getCards("hs", (i) => {
+              if (get.name(i) !== "sha" || ui.selected.cards.includes(i)) {
+                return false
+              }
+              temp = get.order(i, target)
+              if (temp < effs.order) {
+                return false
+              }
+              if (temp > effs.order) {
+                effs = { order: temp }
+              }
+              effs[i.cardid] = {
+                card: i,
+                target: null,
+                eff: 0,
+              }
+            })
+            delete effs.order
+            for (const i in effs) {
+              if (!lib.filter.filterCard(effs[i].card, target)) {
+                continue
+              }
+              game.filterPlayer((current) => {
+                if (
+                  get.attitude(target, current) >= 0 ||
+                  !target.canUse(effs[i].card, current, null, true) ||
+                  current.hasSkillTag("filterDamage", null, {
+                    player: target,
+                    card: effs[i].card,
+                    jiu: true,
+                  })
+                ) {
+                  return false
+                }
+                temp = get.effect(current, effs[i].card, target, player)
+                if (temp <= effs[i].eff) {
+                  return false
+                }
+                effs[i].target = current
+                effs[i].eff = temp
+                return false
+              })
+              if (!effs[i].target) {
+                continue
+              }
+              if (
+                target.hasSkillTag(
+                  "directHit_ai",
+                  true,
+                  {
+                    target: effs[i].target,
+                    card: i,
+                  },
+                  true,
+                ) ||
+                //(Math.min(target.getCardUsable("sha"), target.mayHaveSha(player, "use", item, "count")) === 1 && (
+                target.needsToDiscard() > Math.max(0, 3 - target.hp) ||
+                !effs[i].target.mayHaveShan(player, "use")
+                //))
+              ) {
+                delete target._jiu_temp
+                return 1
+              }
+            }
+            delete target._jiu_temp
+            return 0
+          },
+        },
+        tag: {
+          save: 1,
+          recover: 0.1,
+        },
+      },
+    },
+    huogong: {
+      audio: true,
+      fullskin: true,
+      type: "trick",
+      enable: true,
+      cardnature: "fire",
+      filterTarget(card, player, target) {
+        //if(player!=game.me&&player.countCards('h')<2) return false;
+        return target.countCards("h") > 0
+      },
+      async content(event, trigger, player) {
+        const { target, showPosition = "h" } = event
+        if (target.countCards(showPosition) === 0) {
+          return event.finish()
+        }
+        //返回目标选展示牌的结果，给出默认逻辑
+        event.chooseToShow ??= async (event, player, target) => {
+          const { showPosition = "h", filterShow = () => true } = event
+          let result
+          if (target.countCards(showPosition) === 1) {
+            result = { bool: true, cards: target.getCards(showPosition) }
+          } else {
+            result = await target
+              .chooseCard(
+                true,
+                showPosition,
+                "请选择【火攻】要展示的牌",
+                filterShow,
+              )
+              .set("ai", (card) => {
+                if (_status.event.getRand() < 0.5) {
+                  return Math.random()
+                }
+                return get.value(card)
+              })
+              .forResult()
+          }
+          return result
+        }
+        const result = await event.chooseToShow(event, player, target)
+        event.showResult = result
+        const { cards } = result
+        event.cards2 = cards
+        const showEvent = target
+          .showCards(cards, `${get.translation(target)}因【火攻】展示的牌`)
+          .set("closeDialog", false)
+        await showEvent
+        const videoId = showEvent.videoId
+        event.videoId = videoId
+        //返回玩家弃牌/其他操作的结果，给出默认逻辑
+        event.chooseToDiscard ??= async (event, player, target) => {
+          const {
+            discardPostion = "h",
+            cards2,
+            filterDiscard = { suit: get.suit(cards2[0]) },
+          } = event
+          const result = await player
+            .chooseToDiscard(discardPostion, filterDiscard)
+            .set("ai", (card) => {
+              const evt = _status.event.getParent()
+              if (
+                get.damageEffect(evt.target, evt.player, evt.player, "fire") > 0
+              ) {
+                return (
+                  6.2 + Math.min(4, evt.player.hp) - get.value(card, evt.player)
+                )
+              }
+              return -1
+            })
+            .set("prompt", false)
+            .forResult()
+          return result
+        }
+        const result2 = await event.chooseToDiscard(event, player, target)
+        event.discardResult = result2
+        if (result2?.bool) {
+          await target.damage("fire")
+        } else {
+          target.addTempSkill("huogong2")
+        }
+        game.addVideo("cardDialog", null, videoId)
+        game.broadcastAll("closeDialog", videoId)
+      },
+      ai: {
+        basic: {
+          order: 9.2,
+          value: [3, 1],
+          useful: 0.6,
+        },
+        wuxie(target, card, player, viewer, status) {
+          if (get.attitude(viewer, player._trueMe || player) > 0) {
+            return 0
+          }
+          if (
+            status *
+              get.attitude(viewer, target) *
+              get.effect(target, card, player, target) >=
+            0
+          ) {
+            return 0
+          }
+          if (
+            _status.event.getRand("huogong_wuxie") * 4 >
+            player.countCards("h")
+          ) {
+            return 0
+          }
+        },
+        result: {
+          player(player) {
+            var nh = player.countCards("h")
+            if (
+              nh <= player.hp &&
+              nh <= 4 &&
+              _status.event.name === "chooseToUse"
+            ) {
+              if (
+                typeof _status.event.filterCard === "function" &&
+                _status.event.filterCard(
+                  new lib.element.VCard({ name: "huogong" }),
+                  player,
+                  _status.event,
+                )
+              ) {
+                return -10
+              }
+              if (_status.event.skill) {
+                var viewAs = get.info(_status.event.skill).viewAs
+                if (viewAs === "huogong") {
+                  return -10
+                }
+                if (viewAs && viewAs.name === "huogong") {
+                  return -10
+                }
+              }
+            }
+            return 0
+          },
+          target(player, target) {
+            if (target.hasSkill("huogong2") || target.countCards("h") === 0) {
+              return 0
+            }
+            if (player.countCards("h") <= 1) {
+              return 0
+            }
+            if (_status.event.player === player) {
+              if (target.isAllCardsKnown(player)) {
+                if (
+                  !target.countCards("h", (card) => {
+                    return player.countCards("h", (card2) => {
+                      return get.suit(card2) === get.suit(card)
+                    })
+                  })
+                ) {
+                  return 0
+                }
+              }
+            }
+            if (target === player) {
+              if (
+                typeof _status.event.filterCard === "function" &&
+                _status.event.filterCard(
+                  new lib.element.VCard({ name: "huogong" }),
+                  player,
+                  _status.event,
+                )
+              ) {
+                return -1.15
+              }
+              if (_status.event.skill) {
+                var viewAs = get.info(_status.event.skill).viewAs
+                if (viewAs === "huogong") {
+                  return -1.15
+                }
+                if (viewAs && viewAs.name === "huogong") {
+                  return -1.15
+                }
+              }
+              return 0
+            }
+            return -1.15
+          },
+        },
+        tag: {
+          damage: 1,
+          fireDamage: 1,
+          natureDamage: 1,
+          norepeat: 1,
+        },
+      },
+    },
+    tiesuo: {
+      audio: true,
+      fullskin: true,
+      type: "trick",
+      enable: true,
+      filterTarget: true,
+      selectTarget: [1, 2],
+      complexTarget: true,
+      content() {
+        target.link()
+      },
+      recastable: true,
+      ai: {
+        wuxie: (target, card, player, viewer, status) => {
+          if (
+            status * get.attitude(viewer, player._trueMe || player) > 0 ||
+            target.hasSkillTag("noLink") ||
+            target.hasSkillTag("nodamage") ||
+            target.hasSkillTag("nofire") ||
+            target.hasSkillTag("nothunder")
+          ) {
+            return 0
+          }
+          if (
+            get.damageEffect(target, player, viewer, "thunder") >= 0 ||
+            get.damageEffect(target, player, viewer, "fire") >= 0
+          ) {
+            return 0
+          }
+          if (
+            target.hp + target.hujia > 2 &&
+            target.mayHaveShan(viewer, "use")
+          ) {
+            return 0
+          }
+        },
+        basic: {
+          order: 7.3,
+          useful: 1.2,
+          value: 4,
+        },
+        result: {
+          target: (player, target) => {
+            if (target.hasSkillTag("link") || target.hasSkillTag("noLink")) {
+              return 0
+            }
+            const curs = game.filterPlayer((current) => {
+              if (
+                current.hasSkillTag("noLink") ||
+                current.hasSkillTag("nodamage")
+              ) {
+                return false
+              }
+              return (
+                !current.hasSkillTag("nofire") ||
+                !current.hasSkillTag("nothunder")
+              )
+            })
+            if (curs.length < 2) {
+              return 0
+            }
+            let f = target.hasSkillTag("nofire"),
+              t = target.hasSkillTag("nothunder"),
+              res = 0.9
+            if ((f && t) || target.hasSkillTag("nodamage")) {
+              return 0
+            }
+            if (f || t) {
+              res = 0.45
+            }
+            if (!f && target.getEquip("tengjia")) {
+              res *= 2
+            }
+            if (!target.isLinked()) {
+              res = -res
+            }
+            if (ui.selected.targets.length) {
+              return res
+            }
+            let fs = 0,
+              es = 0,
+              att = get.attitude(player, target),
+              linkf = false,
+              alink = true
+            curs.forEach((i) => {
+              const atti = get.attitude(player, i)
+              if (atti > 0) {
+                fs++
+                if (i.isLinked()) {
+                  linkf = true
+                }
+              } else if (atti < 0) {
+                es++
+                if (!i.isLinked()) {
+                  alink = false
+                }
+              }
+            })
+            if (es < 2 && !alink) {
+              if (att <= 0 || (att > 0 && linkf && fs < 2)) {
+                return 0
+              }
+            }
+            return res
+          },
+        },
+        tag: {
+          multitarget: 1,
+          multineg: 1,
+          norepeat: 1,
+        },
+      },
+    },
+    bingliang: {
+      audio: true,
+      fullskin: true,
+      type: "delay",
+      range: { global: 1 },
+      filterTarget(card, player, target) {
+        return lib.filter.judge(card, player, target) && player !== target
+      },
+      judge(card) {
+        if (get.suit(card) === "club") {
+          return 1
+        }
+        return -2
+      },
+      judge2(result) {
+        if (result.bool === false) {
+          return true
+        }
+        return false
+      },
+      effect() {
+        if (result.bool === false) {
+          if (get.is.changban()) {
+            player.addTempSkill("bingliang_changban")
+          } else {
+            player.skip("phaseDraw")
+          }
+        }
+      },
+      ai: {
+        basic: {
+          order: 1,
+          useful(card, i) {
+            const player = _status.event.player
+            if (_status.event.isPhaseUsing()) {
+              return game.hasPlayer((cur) => {
+                return (
+                  cur !== player &&
+                  lib.filter.judge(card, player, cur) &&
+                  get.effect(cur, card, player, player) > 0
+                )
+              })
+                ? 3.2
+                : 1
+            }
+            return 0.6
+          },
+          value: 4,
+        },
+        result: {
+          target(player, target) {
+            if (target.hasJudge("caomu")) {
+              return 0
+            }
+            return -2.7 / Math.sqrt(target.countCards("h") + 1)
+          },
+        },
+        tag: {
+          skip: "phaseDraw",
+        },
+      },
+    },
+    guding: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip1",
+      distance: { attackFrom: -1 },
+      ai: {
+        basic: {
+          equipValue: 2,
+        },
+      },
+      skills: ["guding_skill"],
+    },
+    zhuque: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip1",
+      distance: { attackFrom: -3 },
+      ai: {
+        basic: {
+          equipValue: 2,
+        },
+      },
+      skills: ["zhuque_skill"],
+    },
+    tengjia: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip2",
+      ai: {
+        value(card, player, index, method) {
+          if (player.isDisabled(2)) {
+            return 0.01
+          }
+          if (player.getEquips("tengjia").includes(card)) {
+            if (player.hasSkillTag("noDirectDamage")) {
+              return 10
+            }
+            if (
+              game.hasPlayer(
+                (current) =>
+                  current !== player &&
+                  get.attitude(current, player) < 0 &&
+                  current.hasSkillTag("fireAttack", null, null, true),
+              )
+            ) {
+              return 0
+            }
+            return 6
+          }
+          var value = 0
+          var info = get.info(card)
+          var current = player.getEquip(info.subtype)
+          if (current && card !== current) {
+            value = get.value(current, player)
+          }
+          var equipValue = info.ai.equipValue
+          if (equipValue === undefined) {
+            equipValue = info.ai.basic.equipValue
+          }
+          if (typeof equipValue === "function") {
+            if (method === "raw") {
+              return equipValue(card, player)
+            }
+            if (method === "raw2") {
+              return equipValue(card, player) - value
+            }
+            return Math.max(0.1, equipValue(card, player) - value)
+          }
+          if (typeof equipValue !== "number") {
+            equipValue = 0
+          }
+          if (method === "raw") {
+            return equipValue
+          }
+          if (method === "raw2") {
+            return equipValue - value
+          }
+          return Math.max(0.1, equipValue - value)
+        },
+        equipValue(card, player) {
+          if (player._tengjiaEv_temp) {
+            return Math.max(1, 6 - player.hp)
+          }
+          if (player.hasSkillTag("maixie") && player.hp > 1) {
+            return 0
+          }
+          if (player.hasSkillTag("noDirectDamage")) {
+            return 10
+          }
+          player._tengjiaEv_temp = true
+          const eff = get.damageEffect(player, player, player, "fire")
+          delete player._tengjiaEv_temp
+          if (eff >= 0) {
+            return 10
+          }
+          let num =
+            4 -
+            game.countPlayer((current) => {
+              if (get.attitude(current, player) < 0) {
+                if (current.hasSkillTag("fireAttack", null, null, true)) {
+                  return 3
+                }
+                return 1
+              }
+              return false
+            })
+          if (player.hp === 1) {
+            num += 3
+          }
+          if (player.hp === 2) {
+            num += 1
+          }
+          return num
+        },
+        basic: {
+          equipValue: 3,
+        },
+      },
+      skills: ["tengjia1", "tengjia2", "tengjia3"],
+    },
+    baiyin: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip2",
+      loseDelay: false,
+      onLose() {
+        player.addTempSkill("baiyin_skill_lose")
+      },
+      skills: ["baiyin_skill"],
+      tag: {
+        recover: 1,
+      },
+      ai: {
+        order: 9.5,
+        equipValue(card, player) {
+          if (player.hp === player.maxHp) {
+            return 5
+          }
+          if (player.countCards("h", "baiyin")) {
+            return 6
+          }
+          return 0
+        },
+        basic: {
+          equipValue: 5,
+          useful: (card, i) => {
+            let player = get.event().player,
+              num
+            if (
+              player.isDamaged() &&
+              player.hp < 2 &&
+              get.recoverEffect(player, player, player) > 0
+            ) {
+              return -10
+            }
+            num = player.hasSkillTag(
+              "filterDamage",
+              null,
+              {
+                card: new lib.element.VCard("sha"),
+                jiu: true,
+              },
+              true,
+            )
+              ? 0.6
+              : 1.2
+            if (
+              player.canAddJudge("shandian") &&
+              get.effect(player, { name: "shandian" }, player, player) < 0 &&
+              !player.hasSkillTag("rejudge")
+            ) {
+              if (game.hasPlayer((cur) => cur.hasJudge("shandian"))) {
+                num += 2
+              } else {
+                num++
+              }
+            }
+            num += game.countPlayer((cur) => {
+              if (get.attitude(cur, player) <= 0) {
+                return cur.hasSkillTag("damageBonus")
+              }
+            })
+            if (player.isDamaged()) {
+              num /= player.getDamagedHp()
+            }
+            return num
+          },
+        },
+      },
+    },
+    hualiu: {
+      fullskin: true,
+      type: "equip",
+      subtype: "equip3",
+      distance: { globalTo: 1 },
+    },
+  },
+  skill: {
+    _wuxie: {
+      trigger: { player: ["useCardToBegin", "phaseJudge"] },
+      priority: 5,
+      popup: false,
+      forced: true,
+      silent: true,
+      filter(event, player) {
+        if (event.card.storage?.nowuxie) {
+          return false
+        }
+        var card = event.card
+        if (event.name === "phaseJudge" && card.viewAs) {
+          card = { name: card.viewAs }
+        }
+        var info = get.info(card)
+        if (info.wuxieable === false) {
+          return false
+        }
+        if (event.name !== "phaseJudge") {
+          if (event.getParent().nowuxie) {
+            return false
+          }
+          if (event.player.hasSkillTag("playernowuxie", false, event.card)) {
+            return false
+          }
+          if (get.type(event.card) !== "trick" && !info.wuxieable) {
+            return false
+          }
+        }
+        return true
+      },
+      forceLoad: true,
+      forceDie: true,
+      content() {
+        "step 0"
+        delete event.wuxieresult
+        delete event.wuxieresult2
+        delete event._result
+        delete event.resultOL
+        delete event._info_map
+        //创建map存储各种信息，用于hasHiddenWuxie判断
+        var map = {}
+        event._info_map = map
+        var card = trigger.card
+        var state = true
+        if (trigger.name === "phaseJudge") {
+          if (get.itemtype(card) === "card" && card.viewAs) {
+            card = get.autoViewAs({ name: card.viewAs }, [card])
+          }
+          map.target = trigger.player
+          map.isJudge = true
+        } else {
+          map.player = trigger.player
+          if (trigger.multitarget) {
+            map.multitargets = true
+          }
+          map.target = trigger.target
+          map.targets = trigger.targets
+          map.tempnowuxie =
+            trigger.targets &&
+            trigger.targets.length > 1 &&
+            !trigger.multitarget
+          map.noai = Boolean(trigger.getParent().noai)
+          //如果对拼无懈，获取历史数据
+          if (card.name === "wuxie") {
+            var evt = event
+            while (true) {
+              evt = evt.getParent(5)
+              if (evt && evt.name === "_wuxie") {
+                state = !state
+                var evtmap = evt._info_map
+                if (evtmap.card.name !== "wuxie") {
+                  map._source = evtmap
+                }
+              } else {
+                break
+              }
+            }
+          }
+        }
+        map.card = card
+        map.state = state ? 1 : -1
+        map.id2 = trigger.getParent().id
+        event._global_waiting = true
+        //发送函数
+        event.send = (player, map, skillState, eventData) => {
+          //获取技能数据
+          if (skillState) {
+            player.applySkills(skillState)
+          }
+          //生成描述提示
+          var prompt = "",
+            evtmap = map,
+            state = map.state
+          if (map._source) {
+            evtmap = map._source
+          }
+          if (evtmap.isJudge) {
+            prompt +=
+              get.translation(evtmap.target) +
+              "的" +
+              get.translation(evtmap.card) +
+              "即将" +
+              (state > 0 ? "生" : "失") +
+              "效。"
+          } else {
+            prompt += get.translation(evtmap.player)
+            if (evtmap.multitarget) {
+              if (evtmap.targets.length) {
+                prompt += "对"
+                prompt += get.translation(evtmap.targets)
+              }
+            } else if (evtmap.target) {
+              prompt += "对"
+              prompt +=
+                evtmap.target === evtmap.player
+                  ? "自己"
+                  : get.translation(evtmap.target)
+            }
+            prompt += `使用的${get.translation(evtmap.card)}`
+            prompt += `即将${state > 0 ? "生" : "失"}效。`
+          }
+          prompt += "是否使用【无懈可击】？"
+          if (
+            player.isUnderControl(true) &&
+            !_status.auto &&
+            !ui.tempnowuxie &&
+            map.tempnowuxie
+          ) {
+            var translation = get.translation(map.card.name)
+            if (translation.length >= 4) {
+              translation =
+                lib.translate[`${map.card.name}_ab`] || translation.slice(0, 2)
+            }
+            ui.tempnowuxie = ui.create.control(
+              `不无懈${translation}`,
+              ui.click.tempnowuxie,
+              "stayleft",
+            )
+            ui.tempnowuxie._origin = map.id2
+          }
+          var next = player.chooseToUse({
+            filterCard(card, player) {
+              if (get.name(card) !== "wuxie") {
+                return false
+              }
+              return lib.filter.cardEnabled(card, player, "forceEnable")
+            },
+            prompt: prompt,
+            type: "wuxie",
+            _global_waiting: true,
+            ai1() {
+              if (map.isJudge) {
+                var card = evtmap.card,
+                  source = evtmap.target
+                var name = card.viewAs || card.name
+                var info = lib.card[name]
+                if (info?.ai?.wuxie) {
+                  var aiii = info.ai.wuxie(
+                    source,
+                    card,
+                    source,
+                    _status.event.player,
+                    state,
+                  )
+                  if (typeof aiii === "number") {
+                    return aiii
+                  }
+                }
+                if (Math.abs(get.attitude(_status.event.player, source)) < 3) {
+                  return 0
+                }
+                if (
+                  source.hasSkillTag("nowuxie_judge") ||
+                  (source.hasSkillTag("guanxing") &&
+                    (source !== player || !source.hasSkill("guanxing_fail")))
+                ) {
+                  return 0
+                }
+                if (name !== "lebu" && name !== "bingliang") {
+                  if (source !== _status.event.player) {
+                    return 0
+                  }
+                }
+                if (
+                  name === "bingliang" &&
+                  source.countCards("j") > 0 &&
+                  source.countCards("h") >= source.hp - 1
+                ) {
+                  return 0
+                }
+                var card2
+                if (name !== card.name) {
+                  card2 = { name: name }
+                } else {
+                  card2 = card
+                }
+                var eff = get.effect(source, card2, source, source)
+                if (eff >= 0) {
+                  return 0
+                }
+                return state * get.attitude(_status.event.player, source)
+              }
+              if (evtmap.target) {
+                var triggerevent = _status.event.getTrigger()
+                if (
+                  triggerevent?.parent?.postAi &&
+                  triggerevent.player.isUnknown(_status.event.player)
+                ) {
+                  return 0
+                }
+                var card = evtmap.card,
+                  target = evtmap.target,
+                  source = evtmap.player
+                var info = get.info(card)
+                if (info.ai?.wuxie) {
+                  var aiii = info.ai.wuxie(
+                    target,
+                    card,
+                    source,
+                    _status.event.player,
+                    state,
+                  )
+                  if (typeof aiii === "number") {
+                    return aiii
+                  }
+                }
+                if (info.multitarget && targets) {
+                  var eff = 0
+                  for (var i = 0; i < targets.length; i++) {
+                    eff += get.effect(
+                      targets[i],
+                      card,
+                      source,
+                      _status.event.player,
+                    )
+                  }
+                  return -eff * state
+                }
+                if (Math.abs(get.attitude(_status.event.player, target)) < 3) {
+                  return 0
+                }
+                return (
+                  -get.effect(target, card, source, _status.event.player) *
+                  state
+                )
+              }
+              var triggerevent = _status.event.getTrigger()
+              if (
+                triggerevent?.parent?.postAi &&
+                triggerevent.player.isUnknown(_status.event.player)
+              ) {
+                return 0
+              }
+              var card = evtmap.card,
+                source = evtmap.player
+              var info = get.info(card)
+              if (info.ai?.wuxie) {
+                var aiii = info.ai.wuxie(
+                  target,
+                  card,
+                  source,
+                  _status.event.player,
+                  state,
+                )
+                if (typeof aiii === "number") {
+                  return aiii
+                }
+              }
+              if (Math.abs(get.attitude(_status.event.player, source)) < 3) {
+                return 0
+              }
+              return -get.attitude(_status.event.player, source) * state
+            },
+            source: evtmap.target,
+            source2: evtmap.targets,
+            id: map.id,
+            id2: map.id2,
+            state: state,
+            info_map: map,
+          })
+          if (map.card && map.player) {
+            next.respondTo = [map.player, map.card]
+          }
+          if (game.online) {
+            _status.event._resultid = map.id
+            game.resume()
+          } else {
+            next.nouse = true
+          }
+          if (eventData) {
+            for (const key in eventData) {
+              if (next[key] === undefined) {
+                next[key] = eventData[key]
+              }
+            }
+          }
+        }
+        ;("step 1")
+        //判断谁有无懈
+        var map = event._info_map
+        var list = game.filterPlayer((current) => {
+          if (event.triggername === "phaseJudge") {
+            if (
+              game.checkMod(
+                map.card,
+                map.target,
+                current,
+                "unchanged",
+                "wuxieJudgeEnabled",
+                current,
+              ) === false
+            ) {
               return false
             }
-            if (arg && arg.player) {
-              if (
-                arg.player.hasSkillTag("unequip", false, {
-                  name: arg.card ? arg.card.name : null,
-                  target: player,
-                  card: arg.card,
-                })
-              ) {
-                return false
+            if (
+              game.checkMod(
+                map.card,
+                map.target,
+                current,
+                "unchanged",
+                "wuxieJudgeRespondable",
+                map.target,
+              ) === false
+            ) {
+              return false
+            }
+          } else {
+            if (trigger.getParent().directHit.includes(current)) {
+              return false
+            }
+            if (
+              game.checkMod(
+                map.card,
+                map.player,
+                map.target,
+                current,
+                "unchanged",
+                "wuxieEnabled",
+                current,
+              ) === false
+            ) {
+              return false
+            }
+            if (
+              game.checkMod(
+                map.card,
+                map.player,
+                map.target,
+                current,
+                "unchanged",
+                "wuxieRespondable",
+                map.player,
+              ) === false
+            ) {
+              return false
+            }
+          }
+          return current.hasWuxie(map)
+        })
+        event.list = list
+        if (!event.id) {
+          event.id = get.id()
+        }
+        map.id = event.id
+        list.sortBySeat(_status.currentPhase)
+        ;("step 2")
+        if (event.list.length === 0) {
+          event.finish()
+        } else if (
+          _status.connectMode &&
+          (event.list[0].isOnline() || event.list[0] === game.me)
+        ) {
+          event.goto(4)
+        } else {
+          event.current = event.list.shift()
+          event.send(event.current, event._info_map)
+        }
+        ;("step 3")
+        if (result.bool) {
+          event.wuxieresult = event.current
+          event.wuxieresult2 = result
+          event.goto(8)
+        } else {
+          event.goto(2)
+        }
+        ;("step 4")
+        var id = event.id
+        var sendback = (result, player) => {
+          if (result && result.id === id && !event.wuxieresult && result.bool) {
+            event.wuxieresult = player
+            event.wuxieresult2 = result
+            game.broadcast("cancel", id)
+            return () => {
+              var evt = get.event()
+              if (evt.getParent().name === "chooseToUse") {
+                evt = evt.getParent()
               }
               if (
-                arg.player.hasSkillTag("unequip_ai", false, {
-                  name: arg.card ? arg.card.name : null,
-                  target: player,
-                  card: arg.card,
-                })
+                evt.id === id &&
+                evt.name === "chooseToUse" &&
+                _status.paused
               ) {
+                event.resultOL = _status.event.resultOL
+              }
+              if (_status.event._parent_id === id) {
+                ui.click.cancel()
+                if (
+                  _status.event.getParent().name === "chooseToUse" &&
+                  _status.event.getParent().id === id
+                ) {
+                  _status.event.getParent().cancel(null, null, true)
+                  if (ui.confirm) {
+                    ui.confirm.close()
+                  }
+                }
+              }
+              if (_status.event.id === id) {
+                if (_status.event._backup) {
+                  ui.click.cancel()
+                }
+                ui.click.cancel()
+                if (ui.confirm) {
+                  ui.confirm.close()
+                }
+                if (_status.event.result) {
+                  _status.event.result.id = id
+                }
+              }
+            }
+          }
+          var evt = get.event()
+          //判断主机是否还在特殊框架内转化卡牌
+          if (evt.getParent().name === "chooseToUse") {
+            evt = evt.getParent()
+          }
+          if (evt.id === id && evt.name === "chooseToUse" && _status.paused) {
+            return () => {
+              //如果主机还在想要不要打无懈(包括chooseButton+backup框架)的情况下所有客机均完成响应执行的代码
+              event.resultOL = _status.event.resultOL
+            }
+          }
+          //主机完成响应后所有客机完成响应后执行的代码
+          return () => {
+            //判断本次_wuxie事件是否在“暂停”状态
+            if (
+              get.event().name === "_wuxie" &&
+              _status.paused &&
+              get.event().withol &&
+              get.event().step === 6
+            ) {
+              game.resume()
+            }
+          }
+        }
+
+        var withme = false
+        var withol = false
+        var list = event.list
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].isOnline()) {
+            withol = true
+            const onchooseToUse_data = list[i].chooseToUse()
+            onchooseToUse_data.setContent(async () => {})
+            event.next.remove(onchooseToUse_data)
+            var skills = list[i].getSkills("invisible").concat(lib.skill.global)
+            game.expandSkills(skills)
+            for (const skill of skills) {
+              var info = lib.skill[skill]
+              if (info?.onChooseToUse) {
+                info.onChooseToUse(onchooseToUse_data)
+              }
+            }
+            onchooseToUse_data.cancel(null, null, true)
+            list[i].wait(sendback)
+            list[i].send(
+              event.send,
+              list[i],
+              event._info_map,
+              get.skillState(list[i]),
+              onchooseToUse_data,
+            )
+            list.splice(i--, 1)
+          } else if (list[i] === game.me) {
+            withme = true
+            event.send(list[i], event._info_map)
+            list.splice(i--, 1)
+          }
+        }
+        if (!withme) {
+          event.goto(6)
+        }
+        if (_status.connectMode) {
+          if (withme || withol) {
+            for (var i = 0; i < game.players.length; i++) {
+              game.players[i].showTimer()
+            }
+          }
+        }
+        event.withol = withol
+        ;("step 5")
+        if (result?.bool && !event.wuxieresult) {
+          game.broadcast("cancel", event.id)
+          event.wuxieresult = game.me
+          event.wuxieresult2 = result
+        }
+        ;("step 6")
+        if (event.withol && !event.wuxieresult && !event.resultOL) {
+          game.pause()
+        }
+        ;("step 7")
+        for (var i = 0; i < game.players.length; i++) {
+          game.players[i].hideTimer()
+        }
+        ;("step 8")
+        if (event.wuxieresult2?._sendskill) {
+          lib.skill[event.wuxieresult2._sendskill[0]] =
+            event.wuxieresult2._sendskill[1]
+        }
+        if (event.wuxieresult && event.wuxieresult2?.skill) {
+          var info = get.info(event.wuxieresult2.skill)
+          if (info?.precontent && !game.online) {
+            var next = game.createEvent(`pre_${event.wuxieresult2.skill}`)
+            next.setContent(info.precontent)
+            next.set("result", event.wuxieresult2)
+            next.set("player", event.wuxieresult)
+          }
+        }
+        ;("step 9")
+        if (event?.wuxieresult2?.cancel) {
+          event.goto(0)
+        } else if (event.wuxieresult) {
+          var next = event.wuxieresult.useResult(event.wuxieresult2)
+          if (event.triggername !== "phaseJudge") {
+            next.respondTo = [trigger.player, trigger.card]
+          }
+        }
+      },
+    },
+    zhuge_skill: {
+      equipSkill: true,
+      audio: true,
+      firstDo: true,
+      trigger: { player: "useCard1" },
+      forced: true,
+      filter(event, player) {
+        return (
+          !event.audioed &&
+          event.card.name === "sha" &&
+          player.countUsed("sha", true) > 1 &&
+          event.getParent().type === "phase"
+        )
+      },
+      content() {
+        trigger.audioed = true
+      },
+      mod: {
+        cardUsable(card, player, num) {
+          var cards = player.getCards("e", (card) => get.name(card) === "zhuge")
+          if (card.name === "sha") {
+            if (
+              !cards.length ||
+              player.hasSkill("zhuge_skill", null, false) ||
+              cards.some(
+                (card) =>
+                  card !== _status.zhuge_temp &&
+                  !ui.selected.cards.includes(card),
+              )
+            ) {
+              if (get.is.versus() || get.is.changban()) {
+                return num + 3
+              }
+              return Infinity
+            }
+          }
+        },
+        cardEnabled2(card, player) {
+          if (
+            !_status.event.addCount_extra ||
+            player.hasSkill("zhuge_skill", null, false)
+          ) {
+            return
+          }
+          var cards = player.getCards("e", (card) => get.name(card) === "zhuge")
+          if (card && cards.includes(card)) {
+            try {
+              var cardz = get.card()
+            } catch (e) {
+              return
+            }
+            if (cardz?.name !== "sha") {
+              return
+            }
+            _status.zhuge_temp = card
+            var bool = lib.filter.cardUsable(
+              get.autoViewAs(cardz, ui.selected.cards.concat([card])),
+              player,
+            )
+            delete _status.zhuge_temp
+            if (!bool) {
+              return false
+            }
+          }
+        },
+      },
+    },
+    qinggang_skill: {
+      equipSkill: true,
+      audio: true,
+      trigger: {
+        player: "useCardToPlayered",
+      },
+      filter(event) {
+        return event.card.name === "sha"
+      },
+      forced: true,
+      logTarget: "target",
+      content() {
+        trigger.target.addTempSkill("qinggang2")
+        trigger.target.storage.qinggang2.add(trigger.card)
+        trigger.target.markSkill("qinggang2")
+      },
+      ai: {
+        unequip_ai: true,
+        skillTagFilter(player, tag, arg) {
+          if (arg && arg.name === "sha") {
+            return true
+          }
+          return false
+        },
+      },
+    },
+    qinggang2: {
+      firstDo: true,
+      ai: { unequip2: true },
+      init(player, skill) {
+        if (!player.storage[skill]) {
+          player.storage[skill] = []
+        }
+      },
+      onremove: true,
+      trigger: {
+        player: ["damage", "damageCancelled", "damageZero"],
+        source: ["damage", "damageCancelled", "damageZero"],
+        target: [
+          "shaMiss",
+          "useCardToExcluded",
+          "useCardToEnd",
+          "eventNeutralized",
+        ],
+        global: ["useCardEnd"],
+      },
+      charlotte: true,
+      filter(event, player) {
+        const evt = event.getParent("useCard", true, true)
+        if (evt && evt.effectedCount < evt.effectCount) {
+          return false
+        }
+        return (
+          player.storage.qinggang2 &&
+          event.card &&
+          player.storage.qinggang2.includes(event.card) &&
+          (event.name !== "damage" || event.notLink())
+        )
+      },
+      silent: true,
+      forced: true,
+      popup: false,
+      priority: 12,
+      content() {
+        player.storage.qinggang2.remove(trigger.card)
+        if (!player.storage.qinggang2.length) {
+          player.removeSkill("qinggang2")
+        }
+      },
+      marktext: "※",
+      intro: { content: "当前防具技能已失效" },
+    },
+    cixiong_skill: {
+      equipSkill: true,
+      trigger: { player: "useCardToPlayered" },
+      audio: true,
+      logTarget: "target",
+      check(event, player) {
+        if (get.attitude(player, event.target) > 0) {
+          return true
+        }
+        var target = event.target
+        return target.countCards("h") === 0 || !target.hasSkillTag("noh")
+      },
+      filter(event, player) {
+        if (event.card.name !== "sha") {
+          return false
+        }
+        return player.differentSexFrom(event.target)
+      },
+      content() {
+        "step 0"
+        if (!trigger.target.countCards("h")) {
+          event._result = { bool: false }
+        } else {
+          trigger.target
+            .chooseToDiscard(
+              `弃置一张手牌，或令${get.translation(player)}摸一张牌`,
+            )
+            .set("ai", (card) => {
+              const bool = get.event().bool
+              if (!bool) {
+                return 0
+              }
+              if (get.name(card) === "shan") {
+                return bool - get.event().shan * get.value(card)
+              }
+              return bool - get.value(card)
+            })
+            .set(
+              "bool",
+              (() => {
+                const hs = trigger.target.countCards("h"),
+                  att = get.attitude(trigger.target, trigger.player)
+                if (!hs || att > 0) {
+                  return false
+                }
+                if (trigger.target.hasSkillTag("noh")) {
+                  return 8
+                }
+                if (
+                  get.effect(
+                    trigger.target,
+                    trigger.card,
+                    player,
+                    trigger.target,
+                  ) >= 0
+                ) {
+                  return 6
+                }
+                return -att - Math.max(0, 4 - trigger.target.hp) * 2
+              })(),
+            )
+            .set(
+              "shan",
+              (() => {
+                if (
+                  player.hasSkillTag("directHit_ai", true, {
+                    target: trigger.target,
+                    card: trigger.card,
+                  })
+                ) {
+                  return 0
+                }
+                const shans = trigger.target.mayHaveShan(
+                  trigger.target,
+                  "use",
+                  true,
+                  "count",
+                )
+                if (shans === 0 || shans > 2) {
+                  return 1
+                }
+                if (shans === 1) {
+                  return 3.6 / Math.min(3.6, trigger.target.getHp())
+                }
+                return 1.8 / Math.min(1.8, trigger.target.getHp())
+              })(),
+            )
+        }
+        ;("step 1")
+        if (result.bool === false) {
+          player.draw()
+        }
+      },
+    },
+    hanbing_skill: {
+      equipSkill: true,
+      trigger: { source: "damageBegin2" },
+      //direct:true,
+      audio: true,
+      filter(event) {
+        return (
+          event.card &&
+          event.card.name === "sha" &&
+          event.notLink() &&
+          event.player.getCards("he").length > 0
+        )
+      },
+      //priority:1,
+      check(event, player) {
+        var target = event.player
+        var eff = get.damageEffect(target, player, player, event.nature)
+        if (get.attitude(player, target) > 0) {
+          if (
+            eff >= 0 ||
+            (event.nature &&
+              target.isLinked() &&
+              game.hasPlayer((cur) => {
+                return (
+                  cur !== target &&
+                  cur.isLinked() &&
+                  get.damageEffect(cur, player, player, event.nature) > 0
+                )
+              }))
+          ) {
+            return false
+          }
+          return true
+        }
+        if (eff <= 0) {
+          return true
+        }
+        if (target.hp === 1 || player.hasSkill("tianxianjiu")) {
+          return false
+        }
+        if (
+          !target.hasSkillTag("filterDamage", null, {
+            player: player,
+            card: event.card,
+            jiu: player.hasSkill("jiu"),
+          })
+        ) {
+          if (
+            event.num > 1 ||
+            player.hasSkillTag("damageBonus", true, {
+              player: player,
+              card: event.card,
+            })
+          ) {
+            return false
+          }
+        }
+        if (target.countCards("he") < 2) {
+          return false
+        }
+        var num = 0
+        var cards = target.getCards("he")
+        for (var i = 0; i < cards.length; i++) {
+          if (get.value(cards[i]) > 6) {
+            num++
+          }
+        }
+        if (num >= 2) {
+          return true
+        }
+        return false
+      },
+      logTarget: "player",
+      content() {
+        "step 0"
+        trigger.cancel()
+        ;("step 1")
+        if (trigger.player.countDiscardableCards(player, "he")) {
+          player.line(trigger.player)
+          player.discardPlayerCard("he", trigger.player, true)
+        }
+        ;("step 2")
+        if (trigger.player.countDiscardableCards(player, "he")) {
+          player.line(trigger.player)
+          player.discardPlayerCard("he", trigger.player, true)
+        }
+      },
+    },
+    qinglong_skill: {
+      audio: true,
+      equipSkill: true,
+      trigger: { player: ["shaMiss", "eventNeutralized"] },
+      direct: true,
+      filter(event, player) {
+        if (
+          get.mode() === "guozhan" ||
+          !event.card ||
+          event.card.name !== "sha"
+        ) {
+          return false
+        }
+        return (
+          event.target.isIn() &&
+          player.canUse("sha", event.target, false) &&
+          (player.hasSha() || (_status.connectMode && player.countCards("hs")))
+        )
+      },
+      content() {
+        "step 0"
+        player
+          .chooseToUse(
+            get.prompt("qinglong", trigger.target),
+            function (card, player, event) {
+              if (get.name(card) !== "sha") {
                 return false
               }
-              if (arg.player.hasSkillTag("jueqing", false, player)) {
-                return false
+              if (!player.hasSkill("qinglong_skill", null, false)) {
+                var cards = player.getCards(
+                  "e",
+                  (card) => get.name(card) === "qinglong",
+                )
+                if (
+                  !cards.some(
+                    (card2) =>
+                      card2 !== card && !ui.selected.cards.includes(card2),
+                  )
+                ) {
+                  return false
+                }
+              }
+              return lib.filter.filterCard.apply(this, arguments)
+            },
+            trigger.target,
+            -1,
+          )
+          .set("addCount", false).logSkill = "qinglong_skill"
+      },
+    },
+    zhangba_skill: {
+      audio: true,
+      equipSkill: true,
+      enable: ["chooseToUse", "chooseToRespond"],
+      filterCard: true,
+      selectCard: 2,
+      position: "hs",
+      viewAs: { name: "sha" },
+      complexCard: true,
+      filter(event, player) {
+        return player.countCards("hs") >= 2
+      },
+      prompt: "将两张手牌当杀使用或打出",
+      check(card) {
+        const player = _status.event.player
+        if (player.hasCard((card) => get.name(card) === "sha")) {
+          return 0
+        }
+        if (
+          _status.event &&
+          _status.event.name === "chooseToRespond" &&
+          player.hp < 3 &&
+          !player.countCards(
+            "hs",
+            (card) => get.name(card) !== "tao" && get.name(card) !== "jiu",
+          )
+        ) {
+          return (player.hp > 1 ? 10 : 8) - get.value(card)
+        }
+        return Math.max(5, 8 - 0.7 * player.hp) - get.value(card)
+      },
+      ai: {
+        respondSha: true,
+        skillTagFilter(player) {
+          return player.countCards("hs") >= 2
+        },
+      },
+    },
+    guanshi_skill: {
+      equipSkill: true,
+      trigger: {
+        player: ["shaMiss", "eventNeutralized"],
+      },
+      direct: true,
+      audio: true,
+      filter(event, player) {
+        if (
+          event.type !== "card" ||
+          event.card.name !== "sha" ||
+          !event.target.isIn()
+        ) {
+          return false
+        }
+        var min = 2
+        if (!player.hasSkill("guanshi_skill", null, false)) {
+          min += get.sgn(
+            player.getCards("e", (card) => get.name(card) === "guanshi").length,
+          )
+        }
+        return player.countCards("he") >= min
+      },
+      content() {
+        "step 0"
+        //装备区内可能有多个贯石斧 或者玩家可能通过其他渠道获得贯石斧技能 只要留一张贯石斧不扔掉即可
+        var next = player
+          .chooseToDiscard(get.prompt("guanshi"), 2, "he", (card, player) => {
+            if (_status.event.ignoreCard) {
+              return true
+            }
+            var cards = player.getCards(
+              "e",
+              (card) => get.name(card) === "guanshi",
+            )
+            if (!cards.includes(card)) {
+              return true
+            }
+            return cards.some(
+              (cardx) => cardx !== card && !ui.selected.cards.includes(cardx),
+            )
+          })
+          .set("ignoreCard", player.hasSkill("guanshi_skill", null, false))
+          .set("complexCard", true)
+        next.logSkill = "guanshi_skill"
+        next.set("ai", (card) => {
+          var evt = _status.event.getTrigger()
+          if (get.attitude(evt.player, evt.target) < 0) {
+            if (evt.player.needsToDiscard()) {
+              return 15 - get.value(card)
+            }
+            if (
+              evt.baseDamage + evt.extraDamage >=
+              Math.min(2, evt.target.hp)
+            ) {
+              return 8 - get.value(card)
+            }
+            return 5 - get.value(card)
+          }
+          return -1
+        })
+        ;("step 1")
+        if (result.bool) {
+          if (event.triggername === "shaMiss") {
+            trigger.untrigger()
+            trigger.trigger("shaHit")
+            trigger._result.bool = false
+            trigger._result.result = null
+          } else {
+            trigger.unneutralize()
+          }
+        }
+      },
+      ai: {
+        directHit_ai: true,
+        skillTagFilter(player, tag, arg) {
+          if (player._guanshi_temp) {
+            return
+          }
+          player._guanshi_temp = true
+          var bool =
+            get.attitude(player, arg.target) < 0 &&
+            arg.card &&
+            arg.card.name === "sha" &&
+            player.countCards(
+              "he",
+              (card) =>
+                card !== player.getEquip("guanshi") &&
+                card !== arg.card &&
+                !arg.card.cards?.includes(card) &&
+                get.value(card) < 5,
+            ) > 1
+          delete player._guanshi_temp
+          return bool
+        },
+      },
+    },
+    fangtian_skill: {
+      equipSkill: true,
+      audio: true,
+      trigger: { player: "useCard1" },
+      forced: true,
+      firstDo: true,
+      filter(event, player) {
+        if (event.card.name !== "sha" || get.mode() === "guozhan") {
+          return false
+        }
+        var card = event.card
+        var range
+        var select = get.copy(get.info(card).selectTarget)
+        if (select === undefined) {
+          if (get.info(card).filterTarget === undefined) {
+            return false
+          }
+          range = [1, 1]
+        } else if (typeof select === "number") {
+          range = [select, select]
+        } else if (get.itemtype(select) === "select") {
+          range = select
+        } else if (typeof select === "function") {
+          range = select(card, player)
+          if (typeof range === "number") {
+            range = [range, range]
+          }
+        }
+        game.checkMod(card, player, range, "selectTarget", player)
+        return range[1] !== -1 && event.targets.length > range[1]
+      },
+      content() {},
+      mod: {
+        selectTarget(card, player, range) {
+          if (card.name !== "sha") {
+            return
+          }
+          if (get.mode() === "guozhan") {
+            return
+          }
+          if (range[1] === -1) {
+            return
+          }
+          var cards = player.getCards("h")
+          if (!cards.length) {
+            return
+          }
+          for (var i = 0; i < cards.length; i++) {
+            if (cards[i].classList.contains("selected") === false) {
+              return
+            }
+          }
+          range[1] += 2
+        },
+      },
+    },
+    qilin_skill: {
+      equipSkill: true,
+      trigger: { source: "damageBegin2" },
+      filter(event, player) {
+        return (
+          event.card &&
+          event.card.name === "sha" &&
+          event.notLink() &&
+          event.player.getCards("e", {
+            subtype: ["equip3", "equip4", "equip6"],
+          }).length > 0
+        )
+      },
+      direct: true,
+      audio: true,
+      content() {
+        "step 0"
+        var att = get.attitude(player, trigger.player) <= 0
+        var next = player.chooseButton()
+        next.set("att", att)
+        next.set("createDialog", [
+          `是否发动【麒麟弓】，弃置${get.translation(trigger.player)}的一张坐骑牌？`,
+          trigger.player.getCards("e", {
+            subtype: ["equip3", "equip4", "equip6"],
+          }),
+        ])
+        next.set("ai", (button) => {
+          if (_status.event.att) {
+            return get.buttonValue(button)
+          }
+          return 0
+        })
+        ;("step 1")
+        if (result.bool) {
+          player.logSkill("qilin_skill", trigger.player)
+          trigger.player.discard(result.links[0])
+        }
+      },
+    },
+    bagua_skill: {
+      equipSkill: true,
+      trigger: { player: ["chooseToRespondBegin", "chooseToUseBegin"] },
+      filter(event, player) {
+        if (event.responded) {
+          return false
+        }
+        if (event.bagua_skill) {
+          return false
+        }
+        if (!event.filterCard?.({ name: "shan" }, player, event)) {
+          return false
+        }
+        if (
+          event.name === "chooseToRespond" &&
+          !lib.filter.cardRespondable({ name: "shan" }, player, event)
+        ) {
+          return false
+        }
+        if (player.hasSkillTag("unequip2")) {
+          return false
+        }
+        var evt = event.getParent()
+        if (
+          evt.player?.hasSkillTag("unequip", false, {
+            name: evt.card ? evt.card.name : null,
+            target: player,
+            card: evt.card,
+          })
+        ) {
+          return false
+        }
+        return true
+      },
+      audio: true,
+      check(event, player) {
+        if (!event) {
+          return true
+        }
+        if (event.ai) {
+          var ai = event.ai
+          var tmp = _status.event
+          _status.event = event
+          var result = ai({ name: "shan" }, _status.event.player, event)
+          _status.event = tmp
+          return result > 0
+        }
+        const type = event.name === "chooseToRespond" ? "respond" : "use"
+        const evt = event.getParent()
+        if (player.hasSkillTag("noShan", null, type)) {
+          return false
+        }
+        if (
+          !evt?.card ||
+          !evt.player ||
+          player.hasSkillTag("useShan", null, type)
+        ) {
+          return true
+        }
+        if (
+          evt.card &&
+          evt.player &&
+          player.isLinked() &&
+          game.hasNature(evt.card) &&
+          get.attitude(player, evt.player._trueMe || evt.player) > 0
+        ) {
+          return false
+        }
+        return true
+      },
+      content() {
+        "step 0"
+        trigger.bagua_skill = true
+        player.judge("bagua", (card) =>
+          get.color(card) === "red" ? 1.5 : -0.5,
+        ).judge2 = (result) => result.bool
+        ;("step 1")
+        if (result.judge > 0) {
+          trigger.untrigger()
+          trigger.set("responded", true)
+          trigger.result = { bool: true, card: { name: "shan", isCard: true } }
+        }
+      },
+      ai: {
+        respondShan: true,
+        freeShan: true,
+        skillTagFilter(player, tag, arg) {
+          if (tag !== "respondShan" && tag !== "freeShan") {
+            return
+          }
+          if (player.hasSkillTag("unequip2")) {
+            return false
+          }
+          if (!arg?.player) {
+            return true
+          }
+          if (
+            arg.player.hasSkillTag("unequip", false, {
+              target: player,
+            })
+          ) {
+            return false
+          }
+          return true
+        },
+        effect: {
+          target(card, player, target, effect) {
+            if (target.hasSkillTag("unequip2")) {
+              return
+            }
+            if (
+              player.hasSkillTag("unequip", false, {
+                name: card ? card.name : null,
+                target: target,
+                card: card,
+              }) ||
+              player.hasSkillTag("unequip_ai", false, {
+                name: card ? card.name : null,
+                target: target,
+                card: card,
+              })
+            ) {
+              return
+            }
+            if (get.tag(card, "respondShan")) {
+              return 0.5
+            }
+          },
+        },
+      },
+    },
+    renwang_skill: {
+      equipSkill: true,
+      trigger: { target: "shaBegin" },
+      forced: true,
+      priority: 6,
+      audio: true,
+      filter(event, player) {
+        if (player.hasSkillTag("unequip2")) {
+          return false
+        }
+        if (
+          event.player.hasSkillTag("unequip", false, {
+            name: event.card ? event.card.name : null,
+            target: player,
+            card: event.card,
+          })
+        ) {
+          return false
+        }
+        return event.card.name === "sha" && get.color(event.card) === "black"
+      },
+      content() {
+        trigger.cancel()
+      },
+      ai: {
+        effect: {
+          target(card, player, target) {
+            if (typeof card !== "object" || target.hasSkillTag("unequip2")) {
+              return
+            }
+            if (
+              player.hasSkillTag("unequip", false, {
+                name: card ? card.name : null,
+                target: target,
+                card: card,
+              }) ||
+              player.hasSkillTag("unequip_ai", false, {
+                name: card ? card.name : null,
+                target: target,
+                card: card,
+              })
+            ) {
+              return
+            }
+            if (card.name === "sha" && get.color(card) === "black") {
+              return "zeroplayertarget"
+            }
+          },
+        },
+      },
+    },
+    jiu: {
+      trigger: { player: "useCard1" },
+      filter(event) {
+        return event.card && event.card.name === "sha"
+      },
+      forced: true,
+      charlotte: true,
+      firstDo: true,
+      content() {
+        if (!trigger.baseDamage) {
+          trigger.baseDamage = 1
+        }
+        trigger.baseDamage += player.storage.jiu
+        trigger.jiu = true
+        trigger.jiu_add = player.storage.jiu
+        if (lib.skill.jiu2.filter(trigger, player)) {
+          game.broadcastAll((player) => {
+            player.removeSkill("jiu")
+          }, player)
+          game.addVideo("jiuNode", player, false)
+        }
+      },
+      temp: true,
+      vanish: true,
+      silent: true,
+      popup: false,
+      nopop: true,
+      onremove(player) {
+        if (player.node.jiu) {
+          player.node.jiu.delete()
+          player.node.jiu2.delete()
+          delete player.node.jiu
+          delete player.node.jiu2
+        }
+        delete player.storage.jiu
+      },
+      ai: {
+        damageBonus: true,
+        skillTagFilter(player, tag, arg) {
+          if (tag === "damageBonus") {
+            return arg?.card && arg.card.name === "sha"
+          }
+        },
+      },
+      group: "jiu2",
+    },
+    jiu2: {
+      trigger: { player: "useCardAfter", global: "phaseAfter" },
+      priority: 2,
+      firstDo: true,
+      charlotte: true,
+      filter(event, player) {
+        if (player.hasSkillTag("jiuSustain", null, event.name)) {
+          return false
+        }
+        if (event.name === "useCard") {
+          return event.card && event.card.name === "sha"
+        }
+        return true
+      },
+      forced: true,
+      popup: false,
+      audio: false,
+      content() {
+        game.broadcastAll((player) => {
+          player.removeSkill("jiu")
+        }, player)
+        game.addVideo("jiuNode", player, false)
+      },
+    },
+    huogong2: { charlotte: true },
+    bingliang_changban: {
+      cardSkill: true,
+      unique: true,
+      trigger: { player: "phaseDrawBegin" },
+      silent: true,
+      content() {
+        trigger.num--
+      },
+      group: "bingliang_changban2",
+    },
+    bingliang_changban2: {
+      cardSkill: true,
+      trigger: { player: "phaseDrawAfter" },
+      silent: true,
+      content() {
+        if (player.enemy) {
+          player.enemy.draw()
+        }
+      },
+    },
+    guding_skill: {
+      equipSkill: true,
+      audio: true,
+      trigger: { source: "damageBegin1" },
+      filter(event) {
+        if (
+          event.parent.name === "_lianhuan" ||
+          event.parent.name === "_lianhuan2"
+        ) {
+          return false
+        }
+        if (event.card && event.card.name === "sha") {
+          if (event.player.countCards("h") === 0) {
+            return true
+          }
+        }
+        return false
+      },
+      forced: true,
+      content() {
+        trigger.num++
+      },
+      ai: {
+        effect: {
+          player(card, player, target, current, isLink) {
+            if (
+              card.name === "sha" &&
+              !isLink &&
+              target.countCards("h") === 0 &&
+              !target.hasSkillTag("filterDamage", null, {
+                player: player,
+                card: card,
+              })
+            ) {
+              return [1, 0, 1, -3]
+            }
+          },
+        },
+      },
+    },
+    zhuque_skill: {
+      equipSkill: true,
+      trigger: { player: "useCard1" },
+      //priority:7,
+      filter(event, player) {
+        if (event.card.name === "sha" && !game.hasNature(event.card)) {
+          return true
+        }
+      },
+      audio: true,
+      check(event, player) {
+        let eff = 0,
+          nature = event.card.nature
+        for (let i = 0; i < event.targets.length; i++) {
+          eff -= get.effect(event.targets[i], event.card, player, player)
+          event.card.nature = "fire"
+          eff += get.effect(event.targets[i], event.card, player, player)
+          event.card.nature = nature
+        }
+        return eff > 0
+      },
+      prompt2(event, player) {
+        return `将${get.translation(event.card)}改为火属性`
+      },
+      content() {
+        game.setNature(trigger.card, "fire")
+        if (get.itemtype(trigger.card) === "card") {
+          var next = game.createEvent("zhuque_clear")
+          next.card = trigger.card
+          event.next.remove(next)
+          trigger.after.push(next)
+          next.setContent(() => {
+            game.setNature(trigger.card, [])
+          })
+        }
+      },
+    },
+    zhuque_skill2: {
+      trigger: { player: "useCardAfter" },
+      forced: true,
+      popup: false,
+      content() {
+        delete player.storage.zhuque_skill.nature
+      },
+    },
+    tengjia1: {
+      equipSkill: true,
+      trigger: { target: ["useCardToBefore"] },
+      forced: true,
+      priority: 6,
+      audio: true,
+      filter(event, player) {
+        if (player.hasSkillTag("unequip2")) {
+          return false
+        }
+        if (
+          event.player.hasSkillTag("unequip", false, {
+            name: event.card ? event.card.name : null,
+            target: player,
+            card: event.card,
+          })
+        ) {
+          return false
+        }
+        if (event.card.name === "nanman") {
+          return true
+        }
+        if (event.card.name === "wanjian") {
+          return true
+        }
+        //if(event.card.name=='chuqibuyi') return true;
+        return false
+      },
+      content() {
+        trigger.cancel()
+      },
+      ai: {
+        effect: {
+          target(card, player, target, current) {
+            if (target.hasSkillTag("unequip2")) {
+              return
+            }
+            if (
+              player.hasSkillTag("unequip", false, {
+                name: card ? card.name : null,
+                target: target,
+                card: card,
+              }) ||
+              player.hasSkillTag("unequip_ai", false, {
+                name: card ? card.name : null,
+                target: target,
+                card: card,
+              })
+            ) {
+              return
+            }
+            if (card.name === "nanman" || card.name === "wanjian") {
+              return "zeroplayertarget"
+            }
+            if (card.name === "sha") {
+              var equip1 = player.getEquip("zhuque")
+              if (equip1 && equip1.name === "zhuque") {
+                return 1.9
+              }
+              if (!game.hasNature(card)) {
+                return "zeroplayertarget"
               }
             }
           },
         },
       },
     },
-    translate: {
-      sha: "杀",
-      sha_info: "出牌阶段，对你攻击范围内的一名其他角色使用。若命中，则对目标角色造成1点伤害。",
-      sha_notshan: "invisible",
-      shan: "闪",
-      shan_info: "当一张【杀】对你生效前，可响应此【杀】——对此【杀】使用，抵消其的效果。",
-      tao: "桃",
-      tao_info:
-        "出牌阶段，若你已受伤，对自己使用，令自己回复一点体力。当一名角色处于濒死阶段时，对其使用，令其回复1点体力值。",
-
-      guohe: "过河拆桥",
-      guohe_bg: "拆",
-      guohe_info: "出牌阶段，对一名其他角色使用。弃置其所属区域里的一张牌。",
-      shunshou: "顺手牵羊",
-      shunshou_info: "出牌阶段，对距离为1的一名其他角色使用。获得其所属区域里的一张牌。",
-      juedou: "决斗",
-      juedou_bg: "斗",
-      juedou_info:
-        "出牌阶段，对一名其他角色使用。从该角色开始，你与其轮流打出一张【杀】，首先不打出【杀】的角色受到1点伤害。",
-      wuzhong: "无中生有",
-      wuzhong_bg: "生",
-      wuzhong_info: "出牌阶段，你摸两张牌。",
-      jiedao: "借刀杀人",
-      jiedao_info:
-        "出牌阶段，对一名装备区里有武器牌的其他角色使用。除非该角色对其攻击范围内，由你选择的另一名角色使用一张【杀】，否则将其装备区里的武器牌交给你。",
-      jiedao_append:
-        '<span class="text" style="font-family: yuanli">这是一种十分含蓄的计谋。</span>',
-      nanman: "南蛮入侵",
-      nanman_bg: "蛮",
-      nanman_info: "出牌阶段，对所有其他角色使用。每人需打出一张【杀】，否则受到1点伤害。",
-      wanjian: "万箭齐发",
-      wanjian_bg: "箭",
-      wanjian_info: "出牌阶段，对所有其他角色使用。每人需打出一张【闪】，否则受到1点伤害。",
-      taoyuan: "桃园结义",
-      taoyuan_bg: "园",
-      taoyuan_info: "出牌阶段，对所有角色使用。每人回复1点体力。",
-      wugu: "五谷丰登",
-      wugu_bg: "谷",
-      wugu_info: "出牌阶段，对所有角色使用。从牌堆顶亮出等同于目标角色数的牌，每人获得其中一张。",
-      wuxie: "无懈可击",
-      wuxie_bg: "懈",
-      wuxie_info:
-        "当一张锦囊牌对一名角色生效前，抵消此牌对该角色的效果；或抵消另一张【无懈可击】的效果。",
-
-      lebu: "乐不思蜀",
-      lebu_info:
-        "出牌阶段，对一名其他角色使用，将【乐不思蜀】放入该角色的判定区。若判定结果不为♥，则其跳过出牌阶段。",
-      shandian: "闪电",
-      shandian_bg: "电",
-      shandian_info:
-        "出牌阶段，将【闪电】放入你的判定区。若判定结果为♠2~9，则目标角色受到3点雷电伤害；若为其他结果，则将【闪电】放入其下家的判定区。",
-
-      zhuge: "诸葛连弩",
-      zhuge_bg: "弩",
-      zhuge_skill: "诸葛连弩",
-      zhuge_skill_info: "锁定技，你使用【杀】无次数限制。",
-      zhuge_info: "锁定技，你使用【杀】无次数限制。",
-      qinggang: "青釭剑",
-      qinggang_skill: "青釭剑",
-      qinggang_skill_info: "锁定技，你的【杀】指定目标后，令其防具无效。",
-      qinggang_info: "锁定技，你的【杀】指定目标后，令其防具无效。",
-      qinggang2: "破防",
-      cixiong: "雌雄双股剑",
-      cixiong_bg: "双",
-      cixiong_skill: "雌雄双股剑",
-      cixiong_skill_info:
-        "你的【杀】指定异性角色为目标后，你可以令其选择一项：弃一张手牌，或令你摸一张牌。",
-      cixiong_info:
-        "你的【杀】指定异性角色为目标后，你可以令其选择一项：弃一张手牌，或令你摸一张牌。",
-      hanbing: "寒冰剑",
-      hanbing_bg: "冰",
-      hanbing_skill: "寒冰剑",
-      hanbing_info: "你的【杀】造成伤害时，你可以防止此伤害改为弃置目标角色两张牌。",
-      hanbing_skill_info: "你的【杀】造成伤害时，你可以防止此伤害改为弃置目标角色两张牌。",
-      qinglong: "青龙偃月刀",
-      qinglong_bg: "偃",
-      qinglong_skill: "青龙偃月刀",
-      qinglong_skill_info: "你的【杀】被抵消时，可以对相同目标继续使用【杀】。",
-      qinglong_info: "你的【杀】被抵消时，可以对相同目标继续使用【杀】。",
-      zhangba: "丈八蛇矛",
-      zhangba_bg: "蛇",
-      zhangba_skill: "丈八蛇矛",
-      zhangba_skill_info: "你可以将两张手牌当【杀】使用或打出。",
-      zhangba_info: "你可以将两张手牌当【杀】使用或打出。",
-      guanshi: "贯石斧",
-      guanshi_skill: "贯石斧",
-      guanshi_skill_info: "你的【杀】被抵消时，你可以弃置两张牌使此【杀】依然造成伤害。",
-      guanshi_info: "你的【杀】被抵消时，你可以弃置两张牌使此【杀】依然造成伤害。",
-      fangtian: "方天画戟",
-      fangtian_skill: "方天画戟",
-      fangtian_skill_info: "若你使用的【杀】是你最后的手牌，则你可以多选择两个目标。",
-      fangtian_info: "若你使用的【杀】是你最后的手牌，则你可以多选择两个目标。",
-      qilin: "麒麟弓",
-      qilin_bg: "弓",
-      qilin_skill: "麒麟弓",
-      qilin_skill_info: "你的【杀】造成伤害时，你可以弃置目标角色装备区里的一张坐骑牌。",
-      qilin_info: "你的【杀】造成伤害时，你可以弃置目标角色装备区里的一张坐骑牌。",
-
-      bagua: "八卦阵",
-      bagua_bg: "卦",
-      bagua_skill: "八卦阵",
-      bagua_info:
-        "当你需要使用或打出【闪】时，你可以进行判定，若结果为红色，则你视为使用或打出一张【闪】。",
-      bagua_skill_info:
-        "当你需要使用或打出【闪】时，你可以进行判定，若结果为红色，则你视为使用或打出一张【闪】。",
-      renwang: "仁王盾",
-      renwang_bg: "盾",
-      renwang_skill: "仁王盾",
-      renwang_info: "锁定技，黑色【杀】对你无效。",
-      renwang_skill_info: "锁定技，黑色【杀】对你无效。",
-
-      jueying: "绝影",
-      jueying_bg: "+马",
-      jueying_info: "当其他角色计算与你距离时，始终+1。",
-      dilu: "的卢",
-      dilu_bg: "+马",
-      dilu_info: "当其他角色计算与你距离时，始终+1。",
-      zhuahuang: "爪黄飞电",
-      zhuahuang_bg: "+马",
-      zhuahuang_info: "当其他角色计算与你距离时，始终+1。",
-      chitu: "赤兔",
-      chitu_bg: "-马",
-      chitu_info: "当你计算与其他角色距离时，始终-1。",
-      dayuan: "大宛",
-      dayuan_bg: "-马",
-      dayuan_info: "当你计算与其他角色距离时，始终-1。",
-      zixing: "紫骍",
-      zixing_bg: "-马",
-      zixing_info: "当你计算与其他角色距离时，始终-1。",
-
-      huosha: "火杀",
-      huosha_info:
-        "出牌阶段，对你攻击范围内的一名其他角色使用。若命中，则对目标角色造成1点火焰伤害。",
-      leisha: "雷杀",
-      leisha_info:
-        "出牌阶段，对你攻击范围内的一名其他角色使用。若命中，则对目标角色造成1点雷电伤害。",
-      jiu: "酒",
-      jiu_info:
-        "出牌阶段，对自己使用，令下一张你使用的【杀】造成的基础伤害+1（每回合限使用1次）；当你处于濒死阶段时，对自己使用，回复1点体力值。",
-
-      huogong: "火攻",
-      huogong_bg: "攻",
-      huogong_info:
-        "出牌阶段，对一名有手牌的角色使用。该角色展示一张手牌，然后若你弃置与之花色相同的一张手牌，则你对其造成1点火焰伤害。",
-      huogong_append:
-        '<span class="text" style="font-family: yuanli">“行火必有因，烟火必素具。”——《孙子·火攻》</span>',
-      tiesuo: "铁索连环",
-      tiesuo_info:
-        "出牌阶段，对一至两名角色使用。目标角色横置或重置。（被横置的角色处于“连环状态”）\n重铸：出牌阶段，你可以将此牌放入弃牌堆，然后摸一张牌。",
-      tiesuo_bg: "索",
-      tiesuo_append:
-        '<span class="text" style="font-family: yuanli">“或三十为一排，或五十为一排，首尾用铁环连锁，上铺阔板，休言人可渡，马亦可走矣。乘此而行，任他风浪潮水上下，复何惧哉？”——《三国演义》</span>',
-
-      bingliang: "兵粮寸断",
-      bingliang_bg: "粮",
-      bingliang_info:
-        "出牌阶段，对距离为1的一名其他角色使用，将【兵粮寸断】放入该角色的判断区。若判定结果不为♣，则其跳过摸牌阶段。",
-
-      guding: "古锭刀",
-      guding_info: "锁定技，当你使用【杀】对目标角色造成伤害时，若其没有手牌，则此伤害+1。",
-      guding_skill: "古锭刀",
-      guding_append:
-        '<span class="text" style="font-family: yuanli">“孙坚披烂银铠，裹赤帻，横古锭刀，骑花鬃马…”——《三国演义》</span>',
-      zhuque: "朱雀羽扇",
-      zhuque_bg: "扇",
-      zhuque_skill: "朱雀羽扇",
-      zhuque_info: "当你使用普通【杀】时，你可以将此【杀】改为火【杀】。",
-      zhuque_append:
-        '<span class="text" style="font-family: yuanli">“羽扇纶巾，谈笑间，樯橹灰飞烟灭。”——《念奴娇·赤壁怀古》</span>',
-
-      tengjia: "藤甲",
-      tengjia_info:
-        "锁定技，【南蛮入侵】、【万箭齐发】和普通【杀】对你无效；当你受到火焰伤害时，此伤害+1。",
-      tengjia1: "藤甲",
-      tengjia2: "藤甲",
-      tengjia3: "藤甲",
-      tengjia_append:
-        '<span class="text" style="font-family: yuanli">“…穿在身上，渡江不沉，经水不湿，刀箭皆不能入…”——《三国演义》</span>',
-      baiyin: "白银狮子",
-      baiyin_info:
-        "锁定技，当你受到伤害时，若伤害值大于1，则你将此伤害值改为1；当你失去装备区里的【白银狮子】后，你回复1点体力。",
-      baiyin_skill: "白银狮子",
-      baiyin_append:
-        '<span class="text" style="font-family: yuanli">“马超纵骑持枪而出；狮盔兽带，银甲白袍：一来结束非凡，二者人才出众。”——《三国演义》</span>',
-
-      hualiu: "骅骝",
-      hualiu_bg: "+马",
-      hualiu_info: "当其他角色计算与你距离时，始终+1。",
-      hualiu_append:
-        '<span class="text" style="font-family: yuanli">“枥上骅骝嘶鼓角，门前老将识风云。”——《上将行》</span>',
+    tengjia2: {
+      equipSkill: true,
+      trigger: { player: "damageBegin3" },
+      filter(event, player) {
+        if (!event.hasNature("fire")) {
+          return false
+        }
+        if (player.hasSkillTag("unequip2")) {
+          return false
+        }
+        if (
+          event.source?.hasSkillTag("unequip", false, {
+            name: event.card ? event.card.name : null,
+            target: player,
+            card: event.card,
+          })
+        ) {
+          return false
+        }
+        return true
+      },
+      audio: true,
+      forced: true,
+      content() {
+        trigger.num++
+      },
+      ai: {
+        effect: {
+          target(card, player, target, current) {
+            if (card.name === "sha") {
+              if (game.hasNature(card, "fire")) {
+                return 2
+              }
+              if (player.hasSkill("zhuque_skill")) {
+                return 1.9
+              }
+            }
+            if (get.tag(card, "fireDamage") && current < 0) {
+              return 2
+            }
+          },
+        },
+      },
     },
-    list: [
-      ["spade", 1, "juedou"],
-      ["spade", 1, "shandian"],
-      ["spade", 1, "guding"],
-      ["spade", 2, "cixiong"],
-      ["spade", 2, "hanbing"],
-      ["spade", 3, "guohe"],
-      ["spade", 3, "jiu"],
-      ["spade", 4, "guohe"],
-      ["spade", 4, "sha", "thunder"],
-      ["spade", 5, "qinglong"],
-      ["spade", 5, "sha", "thunder"],
-      ["spade", 6, "lebu"],
-      ["spade", 6, "sha", "thunder"],
-      ["spade", 7, "sha"],
-      ["spade", 7, "nanman"],
-      ["spade", 8, "sha"],
-      ["spade", 8, "sha"],
-      ["spade", 9, "sha"],
-      ["spade", 9, "sha"],
-      ["spade", 10, "sha"],
-      ["spade", 10, "bingliang"],
-      ["spade", 11, "shunshou"],
-      ["spade", 11, "tiesuo"],
-      ["spade", 12, "guohe"],
-      ["spade", 12, "zhangba"],
-      ["spade", 13, "dayuan"],
-      ["spade", 13, "wuxie"],
+    tengjia3: {
+      equipSkill: true,
+      audio: "tengjia1",
+      trigger: { target: "shaBefore" },
+      forced: true,
+      filter(event, player) {
+        if (player.hasSkillTag("unequip2")) {
+          return false
+        }
+        if (
+          event.player.hasSkillTag("unequip", false, {
+            name: event.card ? event.card.name : null,
+            target: player,
+            card: event.card,
+          })
+        ) {
+          return false
+        }
+        if (event.card.name === "sha" && !game.hasNature(event.card)) {
+          return true
+        }
+        return false
+      },
+      content() {
+        trigger.cancel()
+      },
+    },
+    baiyin_skill: {
+      equipSkill: true,
+      trigger: { player: "damageBegin4" },
+      forced: true,
+      audio: true,
+      filter(event, player) {
+        if (event.num <= 1) {
+          return false
+        }
+        if (player.hasSkillTag("unequip2")) {
+          return false
+        }
+        if (
+          event.source?.hasSkillTag("unequip", false, {
+            name: event.card ? event.card.name : null,
+            target: player,
+            card: event.card,
+          })
+        ) {
+          return false
+        }
+        return true
+      },
+      //priority:-10,
+      content() {
+        trigger.num = 1
+      },
+      subSkill: {
+        lose: {
+          audio: "baiyin_skill",
+          forced: true,
+          charlotte: true,
+          equipSkill: true,
+          trigger: {
+            player: "loseAfter",
+            global: [
+              "equipAfter",
+              "addJudgeAfter",
+              "gainAfter",
+              "loseAsyncAfter",
+              "addToExpansionAfter",
+            ],
+          },
+          filter: (event, player, name, card) => {
+            if (card?.name !== "baiyin") {
+              return false
+            }
+            return player.isDamaged() && !player.hasSkillTag("unequip2")
+          },
+          getIndex(event, player) {
+            const evt = event.getl(player)
+            const lostCards = []
+            evt.es.forEach((card) => {
+              const VEquip = evt.vcard_map.get(card)
+              if (VEquip?.name === "baiyin") {
+                lostCards.add(VEquip)
+              }
+            })
+            return lostCards
+          },
+          async content(event, trigger, player) {
+            await player.recover()
+          },
+        },
+      },
+      ai: {
+        filterDamage: true,
+        skillTagFilter(player, tag, arg) {
+          if (player.hasSkillTag("unequip2")) {
+            return false
+          }
+          if (arg?.player) {
+            if (
+              arg.player.hasSkillTag("unequip", false, {
+                name: arg.card ? arg.card.name : null,
+                target: player,
+                card: arg.card,
+              })
+            ) {
+              return false
+            }
+            if (
+              arg.player.hasSkillTag("unequip_ai", false, {
+                name: arg.card ? arg.card.name : null,
+                target: player,
+                card: arg.card,
+              })
+            ) {
+              return false
+            }
+            if (arg.player.hasSkillTag("jueqing", false, player)) {
+              return false
+            }
+          }
+        },
+      },
+    },
+  },
+  translate: {
+    sha: "杀",
+    sha_info:
+      "出牌阶段，对你攻击范围内的一名其他角色使用。若命中，则对目标角色造成1点伤害。",
+    sha_notshan: "invisible",
+    shan: "闪",
+    shan_info:
+      "当一张【杀】对你生效前，可响应此【杀】——对此【杀】使用，抵消其的效果。",
+    tao: "桃",
+    tao_info:
+      "出牌阶段，若你已受伤，对自己使用，令自己回复一点体力。当一名角色处于濒死阶段时，对其使用，令其回复1点体力值。",
 
-      ["heart", 1, "wanjian"],
-      ["heart", 1, "taoyuan"],
-      ["heart", 1, "wuxie"],
-      ["heart", 2, "shan"],
-      ["heart", 2, "shan"],
-      ["heart", 3, "wugu"],
-      ["heart", 3, "huogong"],
-      ["heart", 4, "tao"],
-      ["heart", 4, "sha", "fire"],
-      ["heart", 5, "chitu"],
-      ["heart", 5, "qilin"],
-      ["heart", 6, "lebu"],
-      ["heart", 6, "tao"],
-      ["heart", 7, "wuzhong"],
-      ["heart", 7, "tao"],
-      ["heart", 8, "wuzhong"],
-      ["heart", 8, "tao"],
-      ["heart", 9, "tao"],
-      ["heart", 9, "shan"],
-      ["heart", 10, "sha"],
-      ["heart", 10, "sha", "fire"],
-      ["heart", 11, "wuzhong"],
-      ["heart", 11, "shan"],
-      ["heart", 12, "guohe"],
-      ["heart", 12, "shandian"],
-      ["heart", 13, "shan"],
-      ["heart", 13, "zhuahuang"],
+    guohe: "过河拆桥",
+    guohe_bg: "拆",
+    guohe_info: "出牌阶段，对一名其他角色使用。弃置其所属区域里的一张牌。",
+    shunshou: "顺手牵羊",
+    shunshou_info:
+      "出牌阶段，对距离为1的一名其他角色使用。获得其所属区域里的一张牌。",
+    juedou: "决斗",
+    juedou_bg: "斗",
+    juedou_info:
+      "出牌阶段，对一名其他角色使用。从该角色开始，你与其轮流打出一张【杀】，首先不打出【杀】的角色受到1点伤害。",
+    wuzhong: "无中生有",
+    wuzhong_bg: "生",
+    wuzhong_info: "出牌阶段，你摸两张牌。",
+    jiedao: "借刀杀人",
+    jiedao_info:
+      "出牌阶段，对一名装备区里有武器牌的其他角色使用。除非该角色对其攻击范围内，由你选择的另一名角色使用一张【杀】，否则将其装备区里的武器牌交给你。",
+    jiedao_append:
+      '<span class="text" style="font-family: yuanli">这是一种十分含蓄的计谋。</span>',
+    nanman: "南蛮入侵",
+    nanman_bg: "蛮",
+    nanman_info:
+      "出牌阶段，对所有其他角色使用。每人需打出一张【杀】，否则受到1点伤害。",
+    wanjian: "万箭齐发",
+    wanjian_bg: "箭",
+    wanjian_info:
+      "出牌阶段，对所有其他角色使用。每人需打出一张【闪】，否则受到1点伤害。",
+    taoyuan: "桃园结义",
+    taoyuan_bg: "园",
+    taoyuan_info: "出牌阶段，对所有角色使用。每人回复1点体力。",
+    wugu: "五谷丰登",
+    wugu_bg: "谷",
+    wugu_info:
+      "出牌阶段，对所有角色使用。从牌堆顶亮出等同于目标角色数的牌，每人获得其中一张。",
+    wuxie: "无懈可击",
+    wuxie_bg: "懈",
+    wuxie_info:
+      "当一张锦囊牌对一名角色生效前，抵消此牌对该角色的效果；或抵消另一张【无懈可击】的效果。",
 
-      ["club", 1, "zhuge"],
-      ["club", 1, "baiyin"],
-      ["club", 2, "bagua"],
-      ["club", 2, "tengjia"],
-      ["club", 3, "sha"],
-      ["club", 3, "jiu"],
-      ["club", 4, "sha"],
-      ["club", 4, "bingliang"],
-      ["club", 5, "dilu"],
-      ["club", 5, "sha", "thunder"],
-      ["club", 6, "sha"],
-      ["club", 6, "sha", "thunder"],
-      ["club", 7, "nanman"],
-      ["club", 7, "sha", "thunder"],
-      ["club", 8, "sha"],
-      ["club", 8, "sha", "thunder"],
-      ["club", 9, "sha"],
-      ["club", 9, "sha"],
-      ["club", 10, "sha"],
-      ["club", 10, "sha"],
-      ["club", 11, "sha"],
-      ["club", 11, "sha"],
-      ["club", 12, "wuxie"],
-      ["club", 12, "jiedao"],
-      ["club", 12, "tiesuo"],
-      ["club", 13, "jiedao"],
-      ["club", 13, "tiesuo"],
+    lebu: "乐不思蜀",
+    lebu_info:
+      "出牌阶段，对一名其他角色使用，将【乐不思蜀】放入该角色的判定区。若判定结果不为♥，则其跳过出牌阶段。",
+    shandian: "闪电",
+    shandian_bg: "电",
+    shandian_info:
+      "出牌阶段，将【闪电】放入你的判定区。若判定结果为♠2~9，则目标角色受到3点雷电伤害；若为其他结果，则将【闪电】放入其下家的判定区。",
 
-      ["diamond", 1, "juedou"],
-      ["diamond", 1, "zhuque"],
-      ["diamond", 2, "shan"],
-      ["diamond", 2, "tao"],
-      ["diamond", 3, "shunshou"],
-      ["diamond", 3, "tao"],
-      ["diamond", 4, "shunshou"],
-      ["diamond", 4, "sha", "fire"],
-      ["diamond", 5, "guanshi"],
-      ["diamond", 5, "sha", "fire"],
-      ["diamond", 6, "sha"],
-      ["diamond", 6, "shan"],
-      ["diamond", 7, "shan"],
-      ["diamond", 7, "shan"],
-      ["diamond", 8, "shan"],
-      ["diamond", 8, "shan"],
-      ["diamond", 9, "shan"],
-      ["diamond", 9, "jiu"],
-      ["diamond", 10, "sha"],
-      ["diamond", 10, "shan"],
-      ["diamond", 11, "shan"],
-      ["diamond", 11, "shan"],
-      ["diamond", 12, "tao"],
-      ["diamond", 12, "wuxie"],
-      ["diamond", 12, "huogong"],
-      ["diamond", 13, "sha"],
-      ["diamond", 13, "hualiu"],
-    ],
-  }
-})
+    zhuge: "诸葛连弩",
+    zhuge_bg: "弩",
+    zhuge_skill: "诸葛连弩",
+    zhuge_skill_info: "锁定技，你使用【杀】无次数限制。",
+    zhuge_info: "锁定技，你使用【杀】无次数限制。",
+    qinggang: "青釭剑",
+    qinggang_skill: "青釭剑",
+    qinggang_skill_info: "锁定技，你的【杀】指定目标后，令其防具无效。",
+    qinggang_info: "锁定技，你的【杀】指定目标后，令其防具无效。",
+    qinggang2: "破防",
+    cixiong: "雌雄双股剑",
+    cixiong_bg: "双",
+    cixiong_skill: "雌雄双股剑",
+    cixiong_skill_info:
+      "你的【杀】指定异性角色为目标后，你可以令其选择一项：弃一张手牌，或令你摸一张牌。",
+    cixiong_info:
+      "你的【杀】指定异性角色为目标后，你可以令其选择一项：弃一张手牌，或令你摸一张牌。",
+    hanbing: "寒冰剑",
+    hanbing_bg: "冰",
+    hanbing_skill: "寒冰剑",
+    hanbing_info:
+      "你的【杀】造成伤害时，你可以防止此伤害改为弃置目标角色两张牌。",
+    hanbing_skill_info:
+      "你的【杀】造成伤害时，你可以防止此伤害改为弃置目标角色两张牌。",
+    qinglong: "青龙偃月刀",
+    qinglong_bg: "偃",
+    qinglong_skill: "青龙偃月刀",
+    qinglong_skill_info: "你的【杀】被抵消时，可以对相同目标继续使用【杀】。",
+    qinglong_info: "你的【杀】被抵消时，可以对相同目标继续使用【杀】。",
+    zhangba: "丈八蛇矛",
+    zhangba_bg: "蛇",
+    zhangba_skill: "丈八蛇矛",
+    zhangba_skill_info: "你可以将两张手牌当【杀】使用或打出。",
+    zhangba_info: "你可以将两张手牌当【杀】使用或打出。",
+    guanshi: "贯石斧",
+    guanshi_skill: "贯石斧",
+    guanshi_skill_info:
+      "你的【杀】被抵消时，你可以弃置两张牌使此【杀】依然造成伤害。",
+    guanshi_info:
+      "你的【杀】被抵消时，你可以弃置两张牌使此【杀】依然造成伤害。",
+    fangtian: "方天画戟",
+    fangtian_skill: "方天画戟",
+    fangtian_skill_info:
+      "若你使用的【杀】是你最后的手牌，则你可以多选择两个目标。",
+    fangtian_info: "若你使用的【杀】是你最后的手牌，则你可以多选择两个目标。",
+    qilin: "麒麟弓",
+    qilin_bg: "弓",
+    qilin_skill: "麒麟弓",
+    qilin_skill_info:
+      "你的【杀】造成伤害时，你可以弃置目标角色装备区里的一张坐骑牌。",
+    qilin_info:
+      "你的【杀】造成伤害时，你可以弃置目标角色装备区里的一张坐骑牌。",
+
+    bagua: "八卦阵",
+    bagua_bg: "卦",
+    bagua_skill: "八卦阵",
+    bagua_info:
+      "当你需要使用或打出【闪】时，你可以进行判定，若结果为红色，则你视为使用或打出一张【闪】。",
+    bagua_skill_info:
+      "当你需要使用或打出【闪】时，你可以进行判定，若结果为红色，则你视为使用或打出一张【闪】。",
+    renwang: "仁王盾",
+    renwang_bg: "盾",
+    renwang_skill: "仁王盾",
+    renwang_info: "锁定技，黑色【杀】对你无效。",
+    renwang_skill_info: "锁定技，黑色【杀】对你无效。",
+
+    jueying: "绝影",
+    jueying_bg: "+马",
+    jueying_info: "当其他角色计算与你距离时，始终+1。",
+    dilu: "的卢",
+    dilu_bg: "+马",
+    dilu_info: "当其他角色计算与你距离时，始终+1。",
+    zhuahuang: "爪黄飞电",
+    zhuahuang_bg: "+马",
+    zhuahuang_info: "当其他角色计算与你距离时，始终+1。",
+    chitu: "赤兔",
+    chitu_bg: "-马",
+    chitu_info: "当你计算与其他角色距离时，始终-1。",
+    dayuan: "大宛",
+    dayuan_bg: "-马",
+    dayuan_info: "当你计算与其他角色距离时，始终-1。",
+    zixing: "紫骍",
+    zixing_bg: "-马",
+    zixing_info: "当你计算与其他角色距离时，始终-1。",
+
+    huosha: "火杀",
+    huosha_info:
+      "出牌阶段，对你攻击范围内的一名其他角色使用。若命中，则对目标角色造成1点火焰伤害。",
+    leisha: "雷杀",
+    leisha_info:
+      "出牌阶段，对你攻击范围内的一名其他角色使用。若命中，则对目标角色造成1点雷电伤害。",
+    jiu: "酒",
+    jiu_info:
+      "出牌阶段，对自己使用，令下一张你使用的【杀】造成的基础伤害+1（每回合限使用1次）；当你处于濒死阶段时，对自己使用，回复1点体力值。",
+
+    huogong: "火攻",
+    huogong_bg: "攻",
+    huogong_info:
+      "出牌阶段，对一名有手牌的角色使用。该角色展示一张手牌，然后若你弃置与之花色相同的一张手牌，则你对其造成1点火焰伤害。",
+    huogong_append:
+      '<span class="text" style="font-family: yuanli">“行火必有因，烟火必素具。”——《孙子·火攻》</span>',
+    tiesuo: "铁索连环",
+    tiesuo_info:
+      "出牌阶段，对一至两名角色使用。目标角色横置或重置。（被横置的角色处于“连环状态”）\n重铸：出牌阶段，你可以将此牌放入弃牌堆，然后摸一张牌。",
+    tiesuo_bg: "索",
+    tiesuo_append:
+      '<span class="text" style="font-family: yuanli">“或三十为一排，或五十为一排，首尾用铁环连锁，上铺阔板，休言人可渡，马亦可走矣。乘此而行，任他风浪潮水上下，复何惧哉？”——《三国演义》</span>',
+
+    bingliang: "兵粮寸断",
+    bingliang_bg: "粮",
+    bingliang_info:
+      "出牌阶段，对距离为1的一名其他角色使用，将【兵粮寸断】放入该角色的判断区。若判定结果不为♣，则其跳过摸牌阶段。",
+
+    guding: "古锭刀",
+    guding_info:
+      "锁定技，当你使用【杀】对目标角色造成伤害时，若其没有手牌，则此伤害+1。",
+    guding_skill: "古锭刀",
+    guding_append:
+      '<span class="text" style="font-family: yuanli">“孙坚披烂银铠，裹赤帻，横古锭刀，骑花鬃马…”——《三国演义》</span>',
+    zhuque: "朱雀羽扇",
+    zhuque_bg: "扇",
+    zhuque_skill: "朱雀羽扇",
+    zhuque_info: "当你使用普通【杀】时，你可以将此【杀】改为火【杀】。",
+    zhuque_append:
+      '<span class="text" style="font-family: yuanli">“羽扇纶巾，谈笑间，樯橹灰飞烟灭。”——《念奴娇·赤壁怀古》</span>',
+
+    tengjia: "藤甲",
+    tengjia_info:
+      "锁定技，【南蛮入侵】、【万箭齐发】和普通【杀】对你无效；当你受到火焰伤害时，此伤害+1。",
+    tengjia1: "藤甲",
+    tengjia2: "藤甲",
+    tengjia3: "藤甲",
+    tengjia_append:
+      '<span class="text" style="font-family: yuanli">“…穿在身上，渡江不沉，经水不湿，刀箭皆不能入…”——《三国演义》</span>',
+    baiyin: "白银狮子",
+    baiyin_info:
+      "锁定技，当你受到伤害时，若伤害值大于1，则你将此伤害值改为1；当你失去装备区里的【白银狮子】后，你回复1点体力。",
+    baiyin_skill: "白银狮子",
+    baiyin_append:
+      '<span class="text" style="font-family: yuanli">“马超纵骑持枪而出；狮盔兽带，银甲白袍：一来结束非凡，二者人才出众。”——《三国演义》</span>',
+
+    hualiu: "骅骝",
+    hualiu_bg: "+马",
+    hualiu_info: "当其他角色计算与你距离时，始终+1。",
+    hualiu_append:
+      '<span class="text" style="font-family: yuanli">“枥上骅骝嘶鼓角，门前老将识风云。”——《上将行》</span>',
+  },
+  list: [
+    ["spade", 1, "juedou"],
+    ["spade", 1, "shandian"],
+    ["spade", 1, "guding"],
+    ["spade", 2, "cixiong"],
+    ["spade", 2, "hanbing"],
+    ["spade", 3, "guohe"],
+    ["spade", 3, "jiu"],
+    ["spade", 4, "guohe"],
+    ["spade", 4, "sha", "thunder"],
+    ["spade", 5, "qinglong"],
+    ["spade", 5, "sha", "thunder"],
+    ["spade", 6, "lebu"],
+    ["spade", 6, "sha", "thunder"],
+    ["spade", 7, "sha"],
+    ["spade", 7, "nanman"],
+    ["spade", 8, "sha"],
+    ["spade", 8, "sha"],
+    ["spade", 9, "sha"],
+    ["spade", 9, "sha"],
+    ["spade", 10, "sha"],
+    ["spade", 10, "bingliang"],
+    ["spade", 11, "shunshou"],
+    ["spade", 11, "tiesuo"],
+    ["spade", 12, "guohe"],
+    ["spade", 12, "zhangba"],
+    ["spade", 13, "dayuan"],
+    ["spade", 13, "wuxie"],
+
+    ["heart", 1, "wanjian"],
+    ["heart", 1, "taoyuan"],
+    ["heart", 1, "wuxie"],
+    ["heart", 2, "shan"],
+    ["heart", 2, "shan"],
+    ["heart", 3, "wugu"],
+    ["heart", 3, "huogong"],
+    ["heart", 4, "tao"],
+    ["heart", 4, "sha", "fire"],
+    ["heart", 5, "chitu"],
+    ["heart", 5, "qilin"],
+    ["heart", 6, "lebu"],
+    ["heart", 6, "tao"],
+    ["heart", 7, "wuzhong"],
+    ["heart", 7, "tao"],
+    ["heart", 8, "wuzhong"],
+    ["heart", 8, "tao"],
+    ["heart", 9, "tao"],
+    ["heart", 9, "shan"],
+    ["heart", 10, "sha"],
+    ["heart", 10, "sha", "fire"],
+    ["heart", 11, "wuzhong"],
+    ["heart", 11, "shan"],
+    ["heart", 12, "guohe"],
+    ["heart", 12, "shandian"],
+    ["heart", 13, "shan"],
+    ["heart", 13, "zhuahuang"],
+
+    ["club", 1, "zhuge"],
+    ["club", 1, "baiyin"],
+    ["club", 2, "bagua"],
+    ["club", 2, "tengjia"],
+    ["club", 3, "sha"],
+    ["club", 3, "jiu"],
+    ["club", 4, "sha"],
+    ["club", 4, "bingliang"],
+    ["club", 5, "dilu"],
+    ["club", 5, "sha", "thunder"],
+    ["club", 6, "sha"],
+    ["club", 6, "sha", "thunder"],
+    ["club", 7, "nanman"],
+    ["club", 7, "sha", "thunder"],
+    ["club", 8, "sha"],
+    ["club", 8, "sha", "thunder"],
+    ["club", 9, "sha"],
+    ["club", 9, "sha"],
+    ["club", 10, "sha"],
+    ["club", 10, "sha"],
+    ["club", 11, "sha"],
+    ["club", 11, "sha"],
+    ["club", 12, "wuxie"],
+    ["club", 12, "jiedao"],
+    ["club", 12, "tiesuo"],
+    ["club", 13, "jiedao"],
+    ["club", 13, "tiesuo"],
+
+    ["diamond", 1, "juedou"],
+    ["diamond", 1, "zhuque"],
+    ["diamond", 2, "shan"],
+    ["diamond", 2, "tao"],
+    ["diamond", 3, "shunshou"],
+    ["diamond", 3, "tao"],
+    ["diamond", 4, "shunshou"],
+    ["diamond", 4, "sha", "fire"],
+    ["diamond", 5, "guanshi"],
+    ["diamond", 5, "sha", "fire"],
+    ["diamond", 6, "sha"],
+    ["diamond", 6, "shan"],
+    ["diamond", 7, "shan"],
+    ["diamond", 7, "shan"],
+    ["diamond", 8, "shan"],
+    ["diamond", 8, "shan"],
+    ["diamond", 9, "shan"],
+    ["diamond", 9, "jiu"],
+    ["diamond", 10, "sha"],
+    ["diamond", 10, "shan"],
+    ["diamond", 11, "shan"],
+    ["diamond", 11, "shan"],
+    ["diamond", 12, "tao"],
+    ["diamond", 12, "wuxie"],
+    ["diamond", 12, "huogong"],
+    ["diamond", 13, "sha"],
+    ["diamond", 13, "hualiu"],
+  ],
+}))

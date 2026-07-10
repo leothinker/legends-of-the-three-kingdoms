@@ -6,7 +6,7 @@ window.wtk_package = {
     refresh: "界限突破",
     reshenhua: "界神话再临",
     sp: "璀璨将星",
-    offline: "线下官正",
+    offline: "线下专属",
 
     jsrg: "江山如故",
     sxrm: "蚀心入魔",

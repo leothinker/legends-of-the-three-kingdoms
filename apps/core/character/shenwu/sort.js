@@ -9,11 +9,11 @@ const characterSort = {
     "ol_huangyueying",
 
     "ol_caocao",
-    "re_simayi",
+    "ol_simayi",
     "ol_xiahoudun",
-    "re_zhangliao",
+    "ol_zhangliao",
     "ol_xuzhu",
-    "re_guojia",
+    "ol_guojia",
     "ol_zhenji",
 
     "ol_sunquan",
@@ -40,8 +40,8 @@ const characterSort = {
     "ol_weiyan",
     "ol_caoren",
     "ol_xiahouyuan",
-    "re_shen_guanyu",
-    "shen_lvmeng",
+    "ol_shen_guanyu",
+    "ol_shen_lvmeng",
   ],
   shenwu_huo: [
     "ol_taishici",
@@ -52,8 +52,8 @@ const characterSort = {
     "ol_yuanshao",
     "ol_pangtong",
     "ol_sp_zhugeliang",
-    "shen_zhouyu",
-    "shen_zhugeliang",
+    "ol_shen_zhouyu",
+    "ol_shen_zhugeliang",
   ],
   shenwu_lin: [
     "ol_lusu",
@@ -64,8 +64,8 @@ const characterSort = {
     "ol_zhurong",
     "ol_xuhuang",
     "re_caopi",
-    "shen_caocao",
-    "shen_lvbu",
+    "ol_shen_caocao",
+    "ol_shen_lvbu",
   ],
   shenwu_shan: [
     "ol_caiwenji",

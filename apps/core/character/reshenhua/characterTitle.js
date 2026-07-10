@@ -7,6 +7,8 @@ export default {
   re_zhangjiao: "天公将军",
   re_zhoutai: "历战之躯",
   re_yuji: "太平青领道",
+  re_shen_guanyu: "链狱鬼神",
+  re_shen_lvmeng: "心生万象",
 
   re_dianwei: "古之恶来",
   re_xunyu: "王佐之才",
@@ -16,6 +18,8 @@ export default {
   re_pangde: "人马一体",
   re_yanwen: "虎狼兄弟",
   re_yuanshao: "高贵的名门",
+  re_shen_zhouyu: "陵光引灵",
+  re_shen_zhugeliang: "孟章诛邪",
 
   re_xuhuang: "周亚夫之风",
   re_caopi: "霸业的继承者",
@@ -25,6 +29,8 @@ export default {
   re_menghuo: "南蛮王",
   re_jiaxu: "毒士无双",
   re_lusu: "荷檐吐奇",
+  re_shen_caocao: "炼狱枭魂",
+  re_shen_lvbu: "戾火浮屠",
 
   re_dengai: "矫然的壮士",
   re_jiangwei: "龙的衣钵",

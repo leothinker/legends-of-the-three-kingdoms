@@ -62,6 +62,12 @@ const translates = {
   chanyuan_info:
     "锁定技，你不能质疑〖蛊惑〗；若你的体力值为1，你的其他技能失效。",
 
+  re_shen_guanyu: "神关羽",
+  re_shen_guanyu_prefix: "神",
+
+  re_shen_lvmeng: "神吕蒙",
+  re_shen_lvmeng_prefix: "神",
+
   re_dianwei: "界典韦",
   re_dianwei_prefix: "界",
   reqiangxi: "强袭",
@@ -116,6 +122,12 @@ const translates = {
   reluanji: "乱击",
   reluanji_info:
     "你可以将两张手牌当【万箭齐发】使用（不能使用本回合发动此技能时使用过的花色）。当你使用【万箭齐发】：被其他角色打出【闪】响应时，其摸一张牌；结算结束后，若没有角色受到此牌的伤害，你摸一张牌。",
+
+  re_shen_zhouyu: "神周瑜",
+  re_shen_zhouyu_prefix: "神",
+
+  re_shen_zhugeliang: "神诸葛亮",
+  re_shen_zhugeliang_prefix: "神",
 
   re_xuhuang: "界徐晃",
   re_xuhuang_prefix: "界",
@@ -179,6 +191,12 @@ const translates = {
   polu: "破虏",
   polu_info:
     "当你杀死一名角色或死亡后，你可以令任意名角色各摸X张牌（X为你此前发动过此技能的次数+1）。",
+
+  re_shen_caocao: "神曹操",
+  re_shen_caocao_prefix: "神",
+
+  re_shen_lvbu: "神吕布",
+  re_shen_lvbu_prefix: "神",
 
   re_zhanghe: "界张郃",
   re_zhanghe_prefix: "界",

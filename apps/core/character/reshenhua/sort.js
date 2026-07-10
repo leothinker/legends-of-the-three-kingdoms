@@ -8,8 +8,8 @@ const characterSort = {
     "re_zhangjiao",
     "re_zhoutai",
     "re_yuji",
-    "shen_guanyu",
-    "shen_lvmeng",
+    "re_shen_guanyu",
+    "re_shen_lvmeng",
   ],
   reshenhua_huo: [
     "re_dianwei",
@@ -20,8 +20,8 @@ const characterSort = {
     "re_pangde",
     "re_yanwen",
     "re_yuanshao",
-    "shen_zhouyu",
-    "shen_zhugeliang",
+    "re_shen_zhouyu",
+    "re_shen_zhugeliang",
   ],
   reshenhua_lin: [
     "re_xuhuang",
@@ -32,8 +32,8 @@ const characterSort = {
     "re_menghuo",
     "re_jiaxu",
     "re_lusu",
-    "shen_caocao",
-    "shen_lvbu",
+    "re_shen_caocao",
+    "re_shen_lvbu",
   ],
   reshenhua_shan: [
     "re_zhanghe",

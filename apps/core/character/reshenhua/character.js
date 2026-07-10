@@ -50,14 +50,14 @@ const characters = {
     hp: 3,
     skills: ["reguhuo"],
   },
-  shen_guanyu: {
+  re_shen_guanyu: {
     sex: "male",
     group: "shen",
     hp: 5,
     skills: ["wushen", "wuhun"],
     groupInGuozhan: "shu",
   },
-  shen_lvmeng: {
+  re_shen_lvmeng: {
     sex: "male",
     group: "shen",
     hp: 3,
@@ -118,14 +118,14 @@ const characters = {
     skills: ["reluanji", "xueyi"],
     isZhugong: true,
   },
-  shen_zhouyu: {
+  re_shen_zhouyu: {
     sex: "male",
     group: "shen",
     hp: 4,
     skills: ["qinyin", "yeyan"],
     groupInGuozhan: "wu",
   },
-  shen_zhugeliang: {
+  re_shen_zhugeliang: {
     sex: "male",
     group: "shen",
     hp: 3,
@@ -186,14 +186,14 @@ const characters = {
     skills: ["rehaoshi", "redimeng"],
     dieAudios: ["ol_lusu"],
   },
-  shen_caocao: {
+  re_shen_caocao: {
     sex: "male",
     group: "shen",
     hp: 3,
     skills: ["guixin", "feiying"],
     groupInGuozhan: "wei",
   },
-  shen_lvbu: {
+  re_shen_lvbu: {
     sex: "male",
     group: "shen",
     hp: 5,

@@ -47,17 +47,26 @@ const translates = {
   rehujia_info:
     "主公技，当你需要使用或打出【闪】时，你可以令其他魏势力角色选择是否替你使用或打出【闪】（视为由你使用或打出）。当其他魏势力角色于其回合外使用、打出或替你使用或打出【闪】时，其可以令你摸一张牌（每回合限一次）。",
 
+  ol_simayi: "界司马懿",
+  ol_simayi_prefix: "界",
+
   ol_xiahoudun: "界夏侯惇",
   ol_xiahoudun_prefix: "界",
   olganglie: "刚烈",
   olganglie_info:
     "当你受到其他角色造成的1点伤害后，你可以进行判定，若结果为：红色，你对伤害来源造成1点伤害；黑色，你弃置其一张牌。",
 
+  ol_zhangliao: "界张辽",
+  ol_zhangliao_prefix: "界",
+
   ol_xuzhu: "界许褚",
   ol_xuzhu_prefix: "界",
   olluoyi: "裸衣",
   olluoyi_info:
     "摸牌阶段开始前，你可以亮出牌堆顶的三张牌，然后你可以跳过摸牌阶段并获得其中的基本牌、武器牌和【决斗】。若如此做，直到你的下个回合开始，你为伤害来源的【杀】或【决斗】造成的伤害+1。",
+
+  ol_guojia: "界郭嘉",
+  ol_guojia_prefix: "界",
 
   ol_zhenji: "界甄姬",
   ol_zhenji_prefix: "界",
@@ -198,11 +207,14 @@ const translates = {
   shebian: "设变",
   shebian_info: "当你翻面时，你可以移动场上的一张装备牌。",
 
-  re_shen_guanyu: "神关羽",
-  re_shen_guanyu_prefix: "神",
+  ol_shen_guanyu: "神关羽",
+  ol_shen_guanyu_prefix: "神",
   rewushen: "武神",
   rewushen_info:
     "锁定技，你的红桃手牌视为【杀】；你使用红桃【杀】无距离和次数限制。",
+
+  ol_shen_lvmeng: "神吕蒙",
+  ol_shen_lvmeng_prefix: "神",
 
   ol_taishici: "界太史慈",
   ol_taishici_prefix: "界",
@@ -268,6 +280,12 @@ const translates = {
   cangzhuo_info:
     "弃牌阶段开始时，若你本回合未使用过锦囊牌，你可以展示任意张锦囊牌，令这些牌此阶段不计入手牌上限。",
 
+  ol_shen_zhouyu: "神周瑜",
+  ol_shen_zhouyu_prefix: "神",
+
+  ol_shen_zhugeliang: "神诸葛亮",
+  ol_shen_zhugeliang_prefix: "神",
+
   ol_lusu: "界鲁肃",
   ol_lusu_prefix: "界",
   olhaoshi: "好施",
@@ -316,6 +334,12 @@ const translates = {
   changbiao: "长标",
   changbiao_info:
     "出牌阶段限一次，你可以将任意张手牌当一张无距离限制的【杀】使用。若此【杀】对目标角色造成伤害，出牌阶段结束时，你摸等量的牌。",
+
+  ol_shen_caocao: "神曹操",
+  ol_shen_caocao_prefix: "神",
+
+  ol_shen_lvbu: "神吕布",
+  ol_shen_lvbu_prefix: "神",
 
   ol_xuhuang: "界徐晃",
   ol_xuhuang_prefix: "界",

@@ -58,12 +58,13 @@ const characters = {
     isZhugong: true,
     dieAudios: ["re_caocao"],
   },
-  re_simayi: {
+  ol_simayi: {
     sex: "male",
     group: "wei",
     hp: 3,
     skills: ["refankui", "reguicai"],
     names: "司马|懿",
+    dieAudios: ["re_simayi"],
   },
   ol_xiahoudun: {
     sex: "male",
@@ -71,35 +72,34 @@ const characters = {
     hp: 4,
     skills: ["olganglie", "qingjian"],
     names: "夏侯|惇",
-    img: "image/character/re_xiahoudun.jpg",
     dieAudios: ["re_xiahoudun"],
   },
-  re_zhangliao: {
+  ol_zhangliao: {
     sex: "male",
     group: "wei",
     hp: 4,
     skills: ["retuxi"],
+    dieAudios: ["re_zhangliao"],
   },
   ol_xuzhu: {
     sex: "male",
     group: "wei",
     hp: 4,
     skills: ["olluoyi"],
-    img: "image/character/re_xuzhu.jpg",
     dieAudios: ["re_xuzhu"],
   },
-  re_guojia: {
+  ol_guojia: {
     sex: "male",
     group: "wei",
     hp: 3,
     skills: ["tiandu", "reyiji"],
+    dieAudios: ["re_guojia"],
   },
   ol_zhenji: {
     sex: "female",
     group: "wei",
     hp: 3,
     skills: ["reluoshen", "qingguo"],
-    img: "image/character/re_zhenji.jpg",
     dieAudios: ["re_zhenji"],
   },
   ol_sunquan: {
@@ -214,7 +214,6 @@ const characters = {
     group: "wu",
     hp: 4,
     skills: ["olbuqu", "refenji"],
-    img: "image/character/re_zhoutai.jpg",
     dieAudios: ["re_zhoutai"],
   },
   ol_xiaoqiao: {
@@ -241,7 +240,6 @@ const characters = {
     group: "wei",
     hp: 4,
     skills: ["rejushou", "rejiewei"],
-    img: "image/character/re_caoren.jpg",
     dieAudios: ["re_caoren"],
   },
   ol_xiahouyuan: {
@@ -251,16 +249,15 @@ const characters = {
     skills: ["reshensu", "shebian"],
     names: "夏侯|渊",
   },
-  re_shen_guanyu: {
+  ol_shen_guanyu: {
     sex: "male",
     group: "shen",
     hp: 5,
     skills: ["rewushen", "wuhun"],
     groupInGuozhan: "shu",
-    img: "image/character/shen_guanyu.jpg",
     dieAudios: ["shen_guanyu"],
   },
-  shen_lvmeng: {
+  ol_shen_lvmeng: {
     sex: "male",
     group: "shen",
     hp: 3,
@@ -320,14 +317,14 @@ const characters = {
     skills: ["bazhen", "olhuoji", "olkanpo", "cangzhuo"],
     names: "诸葛|亮",
   },
-  shen_zhouyu: {
+  ol_shen_zhouyu: {
     sex: "male",
     group: "shen",
     hp: 4,
     skills: ["qinyin", "yeyan"],
     groupInGuozhan: "wu",
   },
-  shen_zhugeliang: {
+  ol_shen_zhugeliang: {
     sex: "male",
     group: "shen",
     hp: 3,
@@ -387,19 +384,21 @@ const characters = {
     skills: ["rexingshang", "refangzhu", "songwei"],
     isZhugong: true,
   },
-  shen_caocao: {
+  ol_shen_caocao: {
     sex: "male",
     group: "shen",
     hp: 3,
     skills: ["guixin", "feiying"],
     groupInGuozhan: "wei",
+    dieAudios: ["shen_caocao"],
   },
-  shen_lvbu: {
+  ol_shen_lvbu: {
     sex: "male",
     group: "shen",
     hp: 5,
     skills: ["kuangbao", "wumou", "wuqian", "shenfen"],
     groupInGuozhan: "qun",
+    dieAudios: ["shen_lvbu"],
   },
   ol_caiwenji: {
     sex: "female",

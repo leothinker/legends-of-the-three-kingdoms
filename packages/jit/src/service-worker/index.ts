@@ -54,7 +54,7 @@ const strategies: CompileStrategy.BaseStrategy[] = [
   new CompileStrategy.VueSFCStrategy(),
 ]
 
-const proxyedPath = ["/extension", "/jit-test.ts"]
+const proxyedPath = ["/jit-test.ts"]
 // --- fetch 拦截入口 ---
 worker.addEventListener("fetch", (event: FetchEvent) => {
   const request = event.request

@@ -6,13 +6,7 @@ import { setOnError } from "@/util/error.ts"
 import { userAgentLowerCase } from "@/util/index.js"
 import { initializeSandboxRealms, security } from "@/util/sandbox.js"
 import { importCardPack, importCharacterPack, importMode } from "./import.js"
-import {
-  loadCard,
-  loadCardPile,
-  loadCharacter,
-  loadMode,
-  loadPlay,
-} from "./loading.js"
+import { loadCard, loadCardPile, loadCharacter, loadMode } from "./loading.js"
 
 // 三国杀，启动！
 export async function boot() {
@@ -591,10 +585,6 @@ export async function boot() {
   if (lib.config.mode === "connect") {
     _status.connectMode = true
   } else {
-    if (lib.imported.play != null) {
-      Object.values(lib.imported.play).forEach(loadPlay)
-    }
-
     lib.card.list = lib.card.list.filter((cardData) => {
       if (!cardData[2]) {
         return false

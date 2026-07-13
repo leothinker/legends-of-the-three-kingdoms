@@ -153,13 +153,13 @@ export const characterPackMenu = (connectMenu) => {
           }
         }
       }
+      // list.sort(lib.sort.character)
       var list2 = list.slice(0)
       var cfgnode = createConfig({
         name: "开启",
         _name: mode,
         init: (() => {
           // 原逻辑
-
           return connectMenu
             ? !lib.config.connect_characters.includes(mode)
             : lib.config.characters.includes(mode)

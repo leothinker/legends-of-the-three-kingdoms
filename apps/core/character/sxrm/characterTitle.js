@@ -1,4 +1,14 @@
 export default {
+  sxrm_zhouyu: "哀弦万耳惊",
+  sxrm_sunshangxiang: "生死相随",
+  sxrm_zhangzhao: "迂儒",
+  sxrm_lusu: "养虫成蛇",
+  sxrm_chen_caocao: "铜雀囚凰",
+  sxrm_zhugeliang: "人也神也",
+  sxrm_jiahua: "拔剑四顾",
+  sxrm_zhaoyun: "坐收渔利",
+  sxrm_caoren: "坚壳之蚌",
+
   sxrm_guanyu: "四海仰鼻息",
   sxrm_guanyinping: "天骄虎女",
   sxrm_yujin: "立地成佛",
@@ -18,6 +28,4 @@ export default {
   sxrm_xunyu: "末路见疑",
   sxrm_caopi: "兄友弟恭",
   sxrm_wanghou: "一刀斩讫",
-
-  sxrm_zhouyu: "哀弦万耳惊",
 }

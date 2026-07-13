@@ -244,19 +244,19 @@ export class Audio {
       if (path == void 0) {
         path = this.#Audio.defaultPath
       } else {
-        path = path + "/"
+        path = `${path}/`
       }
       if (ext == void 0) {
         ext = ".mp3"
       } else {
-        ext = "." + ext
+        ext = `.${ext}`
       }
 
       if (audioNum === "true") {
         return [this.#Audio.textMapWithIndex(path, ext)]
       }
       const audioList: TextMap[] = []
-      for (let i = 1; i <= parseInt(audioNum); i++) {
+      for (let i = 1; i <= parseInt(audioNum, 10); i++) {
         audioList.push(this.#Audio.textMapWithIndex(path, ext, i))
       }
       return audioList
@@ -471,7 +471,7 @@ class SkillAudio implements AudioBase {
   textMapWithIndex(path: string, ext: string, index?: number): TextMap {
     let name = this.name
     if (this.filteredAudioName) {
-      name += "_" + this.filteredAudioName
+      name += `_${this.filteredAudioName}`
     }
     if (typeof index === "number") {
       name += index

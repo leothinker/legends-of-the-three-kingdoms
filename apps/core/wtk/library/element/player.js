@@ -3711,9 +3711,42 @@ export class Player extends HTMLDivElement {
       var maxHp2 = info2.maxHp
       var hujia2 = info2.hujia
       this.hujia += hujia2
-      this.maxHp = Math.floor((maxHp1 + maxHp2) / 2)
-      this.hp = Math.floor((hp1 + hp2) / 2)
-      this.singleHp = (maxHp1 + maxHp2) % 2 === 1
+      var double_hp
+      if (
+        _status.connectMode ||
+        (get.mode() === "single" && _status.mode === "changban")
+      ) {
+        double_hp = "pingjun"
+      } else {
+        double_hp = get.config("double_hp")
+      }
+      switch (double_hp) {
+        case "pingjun": {
+          this.maxHp = Math.floor((maxHp1 + maxHp2) / 2)
+          this.hp = Math.floor((hp1 + hp2) / 2)
+          this.singleHp = (maxHp1 + maxHp2) % 2 === 1
+          break
+        }
+        case "zuidazhi": {
+          this.maxHp = Math.max(maxHp1, maxHp2)
+          this.hp = Math.max(hp1, hp2)
+          break
+        }
+        case "zuixiaozhi": {
+          this.maxHp = Math.min(maxHp1, maxHp2)
+          this.hp = Math.min(hp1, hp2)
+          break
+        }
+        case "zonghe": {
+          this.maxHp = maxHp1 + maxHp2
+          this.hp = hp1 + hp2
+          break
+        }
+        default: {
+          this.maxHp = maxHp1 + maxHp2 - 3
+          this.hp = hp1 + hp2 - 3
+        }
+      }
       if (info2.hasHiddenSkill && !this.noclick) {
         if (!this.hiddenSkills) {
           this.hiddenSkills = []
@@ -4924,7 +4957,7 @@ export class Player extends HTMLDivElement {
     if (_status.video) {
       numh = arguments[0]
     }
-    this.node.count.innerHTML = numh.toString()
+    this.node.count.innerHTML = numh?.toString()
     if (numh < 10) {
       this.node.count.dataset.condition = "low"
     } else if (numh < 100) {
@@ -12210,6 +12243,19 @@ export class Player extends HTMLDivElement {
     if (this.storage[skill] === undefined || this.storage[skill] === false) {
       this.storage[skill] = true
     }
+    _status.event.clearStepCache()
+    return this
+  }
+  awakenQidingSkill(skill) {
+    if (this.storage[skill]) {
+      return
+    }
+    if (this.storage[skill] === undefined || this.storage[skill] === false) {
+      this.storage[skill] = true
+    }
+    game.log(
+      `契约已成，${get.translation(this)}将【${get.translation(skill)}】改为锁定技。`,
+    )
     _status.event.clearStepCache()
     return this
   }

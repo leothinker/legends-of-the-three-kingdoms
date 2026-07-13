@@ -921,6 +921,9 @@ export class Get {
     if (info.feedPigSkill) {
       list.add("威主技")
     }
+    if (get.is.qidingSkill(skill, player)) {
+      list.add("契定技")
+    }
     if (info.categories) {
       list.addArray(info.categories(skill, player))
     }
@@ -1992,7 +1995,7 @@ export class Get {
         case "online":
           return "智斗三国"
         default:
-          return "休闲斗地主"
+          return `休闲${config.double_character ? "双将" : ""}斗地主`
       }
     }
     if (config.mode === "versus") {
@@ -2026,11 +2029,11 @@ export class Get {
         case "purple":
           return "三对三对二"
         case "zhong":
-          return "忠胆英杰"
+          return `${config.double_character ? "双将" : ""}忠胆英杰`
         case "stratagem":
-          return `${get.cnNumber(parseInt(config.number, 10))}人谋攻`
+          return `${get.cnNumber(parseInt(config.number, 10))}人${config.double_character ? "双将" : ""}谋攻`
         default:
-          return `${get.cnNumber(parseInt(config.number, 10))}人${config.double_nei ? "双内" : ""}${config.enable_commoner ? "带民" : ""}身份`
+          return `${get.cnNumber(parseInt(config.number, 10))}人${config.double_nei ? "双内" : ""}${config.enable_commoner ? "带民" : ""}${config.double_character ? "双将" : ""}身份`
       }
     }
     if (config.mode === "guozhan") {
@@ -5277,6 +5280,12 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           return "已发动"
         }
         return "未发动"
+      }
+      case "qidingSkill": {
+        if (content) {
+          return "此事已成"
+        }
+        return "契约未定"
       }
       case "info": {
         return lib.translate[`${skill}_info`]

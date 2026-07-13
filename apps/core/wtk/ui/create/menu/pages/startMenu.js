@@ -210,15 +210,15 @@ export const startMenu = (connectMenu) => {
         if (connectMenu) {
           infoconfig.connect_choose_timeout = {
             name: "出牌时限",
-            init: "300",
+            init: "30",
             item: {
               10: "10秒",
               15: "15秒",
               30: "30秒",
               60: "60秒",
               90: "90秒",
+              120: "120秒",
               180: "180秒",
-              300: "300秒",
             },
             connect: true,
             frequent: true,

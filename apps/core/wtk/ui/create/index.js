@@ -461,13 +461,6 @@ export class Create {
       }
       intro.innerHTML = get.translation(rarity)
     }
-    /*if((button.link=='xushu'||button.link=='xin_xushu'||button.link=='jsrg_guanyu')&&button.node&&button.node.name&&button.node.group){
-			if(button.classList.contains('newstyle')){
-				button.node.name.dataset.nature='watermm';
-				button.node.group.dataset.nature='water';
-			}
-			else button.node.group.style.backgroundColor=get.translation('weiColor');
-		}*/
   }
   div() {
     var str, innerHTML, position, position2, style, divposition, listen
@@ -727,11 +720,6 @@ export class Create {
           delete ui.connecting.splashtimeout
         }
       }, 300)
-      // setTimeout(function(){
-      // 	if(ui.connecting){
-      // 		ui.connecting.firstChild.show();
-      // 	}
-      // },1000);
     }
   }
   roomInfo() {
@@ -1092,16 +1080,6 @@ export class Create {
   #skillRegsCache = new Map()
 
   characterDialog() {
-    // if(lib.config.character_dialog_style=='newstyle'){
-    //     for(var i=0;i<arguments.length;i++){
-    //      			if(arguments[i]=='thisiscard'){
-    //      						 break;
-    //      			}
-    //     }
-    //     if(i==arguments.length){
-    //      			return ui.create.characterDialog2.apply(this,arguments);
-    //     }
-    // }
     var filter,
       str,
       noclick,
@@ -2343,9 +2321,6 @@ export class Create {
     }
     // 这里的条件用的是“AI代选”按钮的条件喵
     const selectCard = event.selectCard
-    /* if (typeof selectCard == "function") {
-			return null;
-		} */
     const range = get.select(selectCard)
     if (range[1] <= 1) {
       return null // 只选一张牌就不使用全选哦喵
@@ -2471,32 +2446,6 @@ export class Create {
         ui.window.show()
       }, 1000)
     }
-    // lib.setPressure(ui.window,ui.click.pressurepause);
-    // if (window.isWTKServer) {
-    // 	ui.window.classList.add("server");
-    // 	var serverinfo = ui.create.div(".serverinfo", ui.window);
-    // 	ui.create.div("", "服务器正在运行", serverinfo);
-    // 	var serverinfotable = ui.create.table(2, 2, ui.create.div(serverinfo));
-    // 	serverinfotable.style.display = "inline-block";
-    // 	serverinfotable.firstChild.firstChild.innerHTML = "房间人数：";
-    // 	serverinfotable.firstChild.lastChild.id = "server_count";
-    // 	serverinfotable.firstChild.lastChild.innerHTML = "0";
-    // 	serverinfotable.lastChild.firstChild.innerHTML = "房间状态：";
-    // 	serverinfotable.lastChild.lastChild.id = "server_status";
-    // 	serverinfotable.lastChild.lastChild.innerHTML = "空闲";
-    // 	ui.create.div(
-    // 		".menubutton.large",
-    // 		"关闭服务器",
-    // 		function () {
-    // 			if (_status.gameStarted && !confirm("关闭服务器当前进行的游戏将终止且不可恢复，是否确定关闭？")) {
-    // 				return;
-    // 			}
-    // 			localStorage.removeItem(lib.configprefix + "asserver");
-    // 			game.reload();
-    // 		},
-    // 		ui.create.div("", serverinfo)
-    // 	);
-    // }
 
     ui.window.addEventListener(
       lib.config.touchscreen ? "touchend" : "click",
@@ -2510,18 +2459,6 @@ export class Create {
     ui.arena.setNumber = function (num) {
       this.dataset.number = num
       ui.updatePlayerPositions()
-      // if(game.layout=='nova'&&parseInt(num)<7){
-      // 	ui.arena.classList.add('player_autolong');
-      // }
-      // else if(lib.config.player_height_nova!='long'){
-      // 	ui.arena.classList.remove('player_autolong');
-      // }
-      // if(game.layout=='long'&&parseInt(num)<parseInt(lib.config.fewplayer)){
-      //     this.classList.add('fewplayer');
-      // }
-      // else{
-      //     this.classList.remove('fewplayer');
-      // }
     }
 
     if (lib.config.low_performance) {
@@ -2897,9 +2834,6 @@ export class Create {
     if (!lib.config.show_wuxie) {
       ui.wuxie.style.display = "none"
     }
-    // if(!lib.config.show_cardpile||_status.connectMode){
-    // 	ui.cardPileButton.style.display='none';
-    // }
 
     ui.sortCard = ui.create.system("整理手牌", () => {
       if (!game.me) {
@@ -2909,35 +2843,6 @@ export class Create {
       //允许自定义手牌排序，自己想办法塞一个吧
       const sort = _status.tempHandcardSort
       game.me.sortHandcardOL(sort)
-      /*var hs = game.me.getCards("h");
-			if (!hs.length) {
-				return;
-			}
-			game.addVideo("lose", game.me, [get.cardsInfo(hs), [], [], []]);
-			for (var i = 0; i < hs.length; i++) {
-				hs[i].goto(ui.special);
-			}
-			if (game.me.hasSkillTag("sortCardByNum")) {
-				var getn = function (card) {
-					var num = get.number(card, game.me);
-					if (num < 3) {
-						return 13 + num;
-					}
-					return num;
-				};
-				hs.sort((a, b) => getn(b) - getn(a));
-			} else {
-				hs.sort(function (b, a) {
-					if (a.name != b.name) {
-						return lib.sort.card(a.name, b.name);
-					} else if (a.suit != b.suit) {
-						return lib.suit.indexOf(a) - lib.suit.indexOf(b);
-					} else {
-						return a.number - b.number;
-					}
-				});
-			}
-			game.me.directgain(hs, false);*/
     })
     if (!lib.config.show_sortcard) {
       ui.sortCard.style.display = "none"
@@ -3165,9 +3070,6 @@ export class Create {
     lib.arenaReady?.push(() => {
       if (lib.config.show_deckMonitor && !_status.connectMode) {
         ui.deckMonitor.style.display = ""
-        /*if (_status.connectMode && !lib.config.show_deckMonitor_online) {
-					ui.deckMonitor.style.display = "none";
-				}*/
       } else {
         ui.deckMonitor.style.display = "none"
       }
@@ -3481,17 +3383,6 @@ export class Create {
       node2.innerHTML = "已暂停"
     }
 
-    // node2.listen(function(){
-    // 	_status.clicked=true;
-    // 	if(ui.sidebar.classList.contains('hidden')){
-    // 		ui.sidebar.show();
-    // 		ui.sidebar3.show();
-    // 	}
-    // 	else{
-    // 		ui.sidebar.hide();
-    // 		ui.sidebar3.hide();
-    // 	}
-    // });
     return node
   }
   prebutton(item, type, position, noclick) {

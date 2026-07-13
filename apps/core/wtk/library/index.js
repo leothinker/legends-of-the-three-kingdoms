@@ -2576,11 +2576,6 @@ export class Library {
             node.style.backgroundSize = "auto"
             switch (link) {
               case "default":
-              case "custom": {
-                node.style.backgroundImage = "none"
-                node.classList.add("dashedmenubutton")
-                break
-              }
               case "wood":
                 node.setBackgroundImage("theme/woodden/wood2.png")
                 break
@@ -2635,11 +2630,6 @@ export class Library {
             node.style.backgroundSize = ""
             switch (link) {
               case "default":
-              case "custom": {
-                node.style.backgroundImage = "none"
-                node.classList.add("dashedmenubutton")
-                break
-              }
               case "wood":
                 node.setBackgroundImage("theme/woodden/wood.jpg")
                 break
@@ -3097,24 +3087,6 @@ export class Library {
             }
           },
         },
-        /*textequip:{
-					name:'装备显示',
-					init:'image',
-					unfrequent:true,
-					item:{
-						image:'图片',
-						text:'文字',
-					},
-					onclick(item){
-						game.saveConfig('textequip',item);
-						if(item=='text'&&(game.layout=='long'||game.layout=='mobile')){
-							ui.arena.classList.add('textequip');
-						}
-						else{
-							ui.arena.classList.remove('textequip');
-						}
-					}
-				},*/
         buttoncharacter_style: {
           name: "选将样式",
           init: "default",
@@ -3291,12 +3263,7 @@ export class Library {
       name: "显示",
       config: {
         update: (config, map) => {
-          if (
-            lib.config.mode === "versus" ||
-            lib.config.mode === "chess" ||
-            lib.config.mode === "tafang" ||
-            lib.config.mode === "boss"
-          ) {
+          if (lib.config.mode === "versus" || lib.config.mode === "boss") {
             map.show_handcardbutton.show()
           } else {
             map.show_handcardbutton.hide()
@@ -4425,7 +4392,9 @@ export class Library {
             map.connect_enable_year_limit.show()
             map.connect_zhong_card.show()
             map.connect_special_identity.hide()
+            map.connect_double_character.show()
           } else if (config.connect_identity_mode === "stratagem") {
+            map.connect_double_character.show()
             map.connect_player_number.show()
             map.connect_choice_zhu.show()
             map.connect_limit_zhu.hide()
@@ -4455,7 +4424,9 @@ export class Library {
             map.connect_enable_year_limit.hide()
             map.connect_zhong_card.hide()
             map.connect_special_identity.hide()
+            map.connect_double_character.hide()
           } else {
+            map.connect_double_character.show()
             map.connect_player_number.show()
             map.connect_choice_zhu.show()
             map.connect_limit_zhu.show()
@@ -4660,6 +4631,12 @@ export class Library {
             game.saveConfig("connect_choice_commoner", num, "identity")
           },
         },
+        connect_double_character: {
+          name: "双将模式",
+          init: false,
+          frequent: true,
+          restart: true,
+        },
         connect_change_card: {
           name: "启用手气卡",
           init: false,
@@ -4743,8 +4720,14 @@ export class Library {
             map.choose_group.show()
             map.change_choice.show()
             map.auto_mark_identity.show()
+            map.double_character.show()
             map.free_choose.show()
             map.change_identity.show()
+            if (config.double_character) {
+              map.double_hp.show()
+            } else {
+              map.double_hp.hide()
+            }
             map.continue_game.show()
           } else if (config.identity_mode === "stratagem") {
             map.continue_game.show()
@@ -4786,6 +4769,12 @@ export class Library {
             map.free_choose.show()
             map.change_identity.show()
             map.special_identity.hide()
+            map.double_character.show()
+            if (config.double_character) {
+              map.double_hp.show()
+            } else {
+              map.double_hp.hide()
+            }
           } else if (config.identity_mode === "purple") {
             map.player_number.hide()
             map.enhance_zhu.hide()
@@ -4805,6 +4794,8 @@ export class Library {
             map.ban_identity3.hide()
             map.zhong_card.hide()
             map.special_identity.hide()
+            map.double_character.hide()
+            map.double_hp.hide()
             map.choose_group.hide()
             map.auto_mark_identity.hide()
             map.change_choice.hide()
@@ -4858,6 +4849,12 @@ export class Library {
               map.special_identity.show()
             } else {
               map.special_identity.hide()
+            }
+            map.double_character.show()
+            if (config.double_character) {
+              map.double_hp.show()
+            } else {
+              map.double_hp.hide()
             }
           }
         },
@@ -4918,6 +4915,12 @@ export class Library {
           init: true,
           unfrequent: true,
         },
+        double_character: {
+          name: "双将模式",
+          init: false,
+          frequent: true,
+          restart: true,
+        },
         special_identity: {
           name: "特殊身份",
           init: false,
@@ -4929,6 +4932,18 @@ export class Library {
           name: "明忠卡牌替换",
           init: true,
           frequent: true,
+          restart: true,
+        },
+        double_hp: {
+          name: "双将体力上限",
+          init: "pingjun",
+          item: {
+            hejiansan: "和减三",
+            pingjun: "平均值",
+            zuidazhi: "最大值",
+            zuixiaozhi: "最小值",
+            zonghe: "相加",
+          },
           restart: true,
         },
         auto_identity: {
@@ -5598,6 +5613,18 @@ export class Library {
           intro:
             "若开启此选项，晋势力武将将使用OL【文德武备】版本；否则使用线下【紫气东来】【受命于天】版本。",
         },
+        double_hp: {
+          name: "双将体力上限",
+          init: "pingjun",
+          item: {
+            hejiansan: "和减三",
+            pingjun: "平均值",
+            zuidazhi: "最大值",
+            zuixiaozhi: "最小值",
+            zonghe: "相加",
+          },
+          restart: true,
+        },
         free_choose: {
           name: "自由选将",
           init: true,
@@ -5897,6 +5924,11 @@ export class Library {
           } else {
             map.free_choose.hide()
           }
+          if (config.versus_mode === "jiange") {
+            map.double_character_jiange.show()
+          } else {
+            map.double_character_jiange.hide()
+          }
           if (config.versus_mode === "two") {
             map.replace_handcard_two.show()
             map.olfeiyang_four.show()
@@ -6100,6 +6132,11 @@ export class Library {
               delete ui.cheat
             }
           },
+          frequent: true,
+        },
+        double_character_jiange: {
+          name: "双将模式",
+          init: false,
           frequent: true,
         },
         replace_handcard_two: {
@@ -6472,6 +6509,7 @@ export class Library {
             map.connect_change_card.show()
           }
           if (config.connect_doudizhu_mode !== "normal") {
+            map.connect_double_character.hide()
             if (config.connect_doudizhu_mode !== "kaihei") {
               map.connect_choice_zhu.hide()
               map.connect_choice_fan.hide()
@@ -6483,6 +6521,7 @@ export class Library {
             map.connect_enhance_nongmin.hide()
             map.connect_feiyang_version.hide()
           } else {
+            map.connect_double_character.show()
             map.connect_choice_zhu.show()
             map.connect_choice_fan.show()
             map.connect_enhance_dizhu.show()
@@ -6502,6 +6541,12 @@ export class Library {
           },
           restart: true,
           frequent: true,
+        },
+        connect_double_character: {
+          name: "双将模式",
+          init: false,
+          frequent: true,
+          restart: true,
         },
         connect_choice_zhu: {
           name: "地主候选武将数",
@@ -6596,6 +6641,7 @@ export class Library {
               map.choice_zhu.hide()
               map.choice_fan.hide()
             }
+            map.double_character.hide()
             map.free_choose.hide()
             map.change_identity.hide()
             map.change_choice.hide()
@@ -6606,6 +6652,7 @@ export class Library {
             map.enhance_nongmin.hide()
             map.feiyang_version.hide()
           } else {
+            map.double_character.show()
             map.choice_zhu.show()
             map.choice_fan.show()
             map.free_choose.show()
@@ -6617,6 +6664,11 @@ export class Library {
             map.enhance_dizhu.show()
             map.enhance_nongmin.show()
             map.feiyang_version.show()
+          }
+          if (config.double_character && config.doudizhu_mode === "normal") {
+            map.double_hp.show()
+          } else {
+            map.double_hp.hide()
           }
         },
         doudizhu_mode: {
@@ -6631,6 +6683,24 @@ export class Library {
           },
           restart: true,
           frequent: true,
+        },
+        double_character: {
+          name: "双将模式",
+          init: false,
+          frequent: true,
+          restart: true,
+        },
+        double_hp: {
+          name: "双将体力上限",
+          init: "pingjun",
+          item: {
+            hejiansan: "和减三",
+            pingjun: "平均值",
+            zuidazhi: "最大值",
+            zuixiaozhi: "最小值",
+            zonghe: "相加",
+          },
+          restart: true,
         },
         choice_zhu: {
           name: "地主候选武将数",
@@ -6913,6 +6983,28 @@ export class Library {
           init: false,
           frequent: true,
         },
+        connect_double_character: {
+          name: "启用双将",
+          init: "single",
+          item: {
+            single: "不启用",
+            double: "启用双将",
+            singble: "单双任选",
+          },
+          restart: true,
+        },
+        connect_double_hp: {
+          name: "双将体力上限",
+          init: "pingjun",
+          item: {
+            hejiansan: "和减三",
+            pingjun: "平均值",
+            zuidazhi: "最大值",
+            zuixiaozhi: "最小值",
+            zonghe: "相加",
+          },
+          restart: true,
+        },
         update: (config, map) => {
           if (config.connect_single_mode !== "normal") {
             map.connect_enable_jin.hide()
@@ -6923,6 +7015,19 @@ export class Library {
             map.connect_change_card.hide()
           } else {
             map.connect_change_card.show()
+          }
+          if (config.connect_single_mode !== "dianjiang") {
+            map.connect_double_character.hide()
+            map.connect_double_hp.hide()
+          } else {
+            map.connect_double_character.show()
+            if (
+              ["double", "singble"].includes(config.connect_double_character)
+            ) {
+              map.connect_double_hp.show()
+            } else {
+              map.connect_double_hp.hide()
+            }
           }
         },
       },
@@ -6955,6 +7060,28 @@ export class Library {
             twice: "两次",
             unlimited: "无限",
           },
+        },
+        double_character: {
+          name: "启用双将",
+          init: "single",
+          item: {
+            single: "不启用",
+            double: "启用双将",
+            singble: "单双任选",
+          },
+          restart: true,
+        },
+        double_hp: {
+          name: "双将体力上限",
+          init: "pingjun",
+          item: {
+            hejiansan: "和减三",
+            pingjun: "平均值",
+            zuidazhi: "最大值",
+            zuixiaozhi: "最小值",
+            zonghe: "相加",
+          },
+          restart: true,
         },
         single_control: {
           name: "单人控制",
@@ -6994,9 +7121,17 @@ export class Library {
             map.change_card.show()
           }
           if (config.single_mode !== "dianjiang") {
+            map.double_character.hide()
+            map.double_hp.hide()
             map.single_control.hide()
           } else {
+            map.double_character.show()
             map.single_control.show()
+            if (["double", "singble"].includes(config.double_character)) {
+              map.double_hp.show()
+            } else {
+              map.double_hp.hide()
+            }
           }
           if (
             config.single_mode === "wuxianhuoli" ||
@@ -8303,7 +8438,6 @@ export class Library {
         if (
           !lib.config.forbidai.includes(key) &&
           !key.startsWith("boss_") &&
-          !key.startsWith("tafang_") &&
           !list2.includes(key)
         ) {
           log(get.translation(key), key)
@@ -9525,6 +9659,17 @@ export class Library {
         var double_character = false
         if (lib.configOL.mode === "guozhan") {
           double_character = true
+        } else if (
+          lib.configOL.double_character &&
+          lib.configOL.mode === "identity"
+        ) {
+          double_character = true
+        } else if (
+          lib.configOL.double_character_jiange &&
+          lib.configOL.mode === "versus" &&
+          _status.mode === "jiange"
+        ) {
+          double_character = true
         }
         if (double_character && lib.config.forbiddouble.includes(i)) {
           return true
@@ -9535,6 +9680,17 @@ export class Library {
         }
         var double_character = false
         if (get.mode() === "guozhan") {
+          double_character = true
+        } else if (
+          get.config("double_character") &&
+          lib.config.mode === "identity"
+        ) {
+          double_character = true
+        } else if (
+          get.config("double_character_jiange") &&
+          lib.config.mode === "versus" &&
+          _status.mode === "jiange"
+        ) {
           double_character = true
         }
         if (double_character && lib.config.forbiddouble.includes(i)) {
@@ -10939,6 +11095,13 @@ export class Library {
           }, player)
         }
       },
+      exec(func) {
+        // if(typeof func=='function'){
+        //     var args=Array.from(arguments);
+        //     args.shift();
+        //     func.apply(this,args);
+        // }
+      },
       /**
        * 用于代替exec进行主机许可的请求喵
        *
@@ -11072,6 +11235,11 @@ export class Library {
           }
         }
         game.ws.close()
+      },
+      reloadroom: (forced) => {
+        // if (window.isWTKServer && (forced || !_status.protectingroom)) {
+        // 	game.reload();
+        // }
       },
       createroom: (index, config, mode) => {
         game.online = false
@@ -12328,6 +12496,13 @@ export class Library {
     ],
     [
       "慢",
+      {
+        color: "#5a6968",
+        nature: "graymm",
+      },
+    ],
+    [
+      "嗔",
       {
         color: "#5a6968",
         nature: "graymm",

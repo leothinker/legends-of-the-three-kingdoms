@@ -21,7 +21,17 @@ const characterSort = {
     "sxrm_pangde",
     "sxrm_yanwen",
   ],
-  shixinrumo_chen: ["sxrm_zhouyu"],
+  shixinrumo_chen: [
+    "sxrm_zhouyu",
+    "sxrm_sunshangxiang",
+    "sxrm_zhangzhao",
+    "sxrm_lusu",
+    "sxrm_chen_caocao",
+    "sxrm_zhugeliang",
+    "sxrm_jiahua",
+    "sxrm_zhaoyun",
+    "sxrm_caoren",
+  ],
 }
 
 const characterSortTranslate = {

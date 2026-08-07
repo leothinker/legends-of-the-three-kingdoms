@@ -9,9 +9,9 @@
     },
     "typeRoots": ["./typings", "./node_modules/@types"],
     "allowJs": true,
-    "allowImportingTsExtensions": true,
     "checkJs": true,
     "noEmit": true,
+    "disableSizeLimit": true,
     "strictPropertyInitialization": false,
     "ignoreDeprecations": "5.0"
   }

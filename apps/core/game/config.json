@@ -47,6 +47,7 @@
     "layout": ["default", "newlayout"],
     "theme": ["woodden", "music", "simple"],
     "card_font": ["xiaozhuan", "huangcao", "caoshu", "xingshu"],
+    "double_hp": ["hejiansan", "pingjun", "zuidazhi", "zuixiaozhi", "zonghe"],
     "image_background_filter": [
       "default",
       "blur",
@@ -184,11 +185,13 @@
     "global": {
       "player_number": 8,
       "auto_identity": "off",
+      "double_character": false,
       "save_progress": true,
       "free_choose": true,
       "swap": true,
       "change_identity": true,
-      "battle_number": 3
+      "battle_number": 3,
+      "double_hp": "pingjun"
     },
     "identity": {
       "identity": [

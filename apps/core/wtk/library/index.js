@@ -2138,17 +2138,6 @@ export class Library {
             node.style.backgroundSize = "100% 100%"
             switch (link) {
               case "default":
-              case "custom": {
-                if (lib.config.theme === "simple") {
-                  node.style.backgroundImage =
-                    "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))"
-                  node.className = "button character"
-                } else {
-                  node.style.backgroundImage = "none"
-                  node.className = "button character dashedmenubutton"
-                }
-                break
-              }
               case "new":
                 node.setBackgroundImage("theme/style/card/image/new.png")
                 break
@@ -3087,6 +3076,24 @@ export class Library {
             }
           },
         },
+        /*textequip:{
+					name:'装备显示',
+					init:'image',
+					unfrequent:true,
+					item:{
+						image:'图片',
+						text:'文字',
+					},
+					onclick(item){
+						game.saveConfig('textequip',item);
+						if(item=='text'&&(game.layout=='long'||game.layout=='mobile')){
+							ui.arena.classList.add('textequip');
+						}
+						else{
+							ui.arena.classList.remove('textequip');
+						}
+					}
+				},*/
         buttoncharacter_style: {
           name: "选将样式",
           init: "default",
@@ -3214,6 +3221,12 @@ export class Library {
             map.custom_button_control_bottom.hide()
           }
           map.image_background.show()
+          // if(lib.config.image_background=='custom'&&lib.db){
+          // 	map.import_background.show();
+          // }
+          // else{
+          // 	map.import_background.hide();
+          // }
           if (lib.config.layout === "long" || lib.config.layout === "mobile") {
             //map.textequip.show();
             map.cardshape.show()
@@ -3339,6 +3352,11 @@ export class Library {
             map.show_time.show()
             map.watchface.hide()
           }
+          /*if (lib.config.show_deckMonitor) {
+						map.show_deckMonitor_online.show();
+					} else {
+						map.show_deckMonitor_online.hide();
+					}*/
         },
         show_history: {
           name: "出牌记录栏",
@@ -4217,6 +4235,30 @@ export class Library {
     others: {
       name: "其它",
       config: {
+        // reset_database:{
+        // 	name:'重置游戏',
+        // 	onclick(){
+        // 		var node=this;
+        // 		if(node._clearing){
+        // 			if(indexedDB) indexedDB.deleteDatabase(lib.configprefix+'data');
+        // 			game.reload();
+        // 			return;
+        // 		}
+        // 		node._clearing=true;
+        // 		node.innerHTML='单击以确认 (3)';
+        // 		setTimeout(function(){
+        // 			node.innerHTML='单击以确认 (2)';
+        // 			setTimeout(function(){
+        // 				node.innerHTML='单击以确认 (1)';
+        // 				setTimeout(function(){
+        // 					node.innerHTML='重置游戏录像';
+        // 					delete node._clearing;
+        // 				},1000);
+        // 			},1000);
+        // 		},1000);
+        // 	},
+        // 	clear:true
+        // },
         reset_game: {
           name: "重置游戏设置",
           onclick() {
@@ -4364,6 +4406,58 @@ export class Library {
             map.redownload_game.hide()
           }
         },
+        // trim_game:{
+        // 	name:'隐藏非官方扩展包',
+        // 	onclick(){
+        // 		if(this.innerHTML!='已隐藏'){
+        // 			this.innerHTML='已隐藏';
+        //      						 var pack=lib.config.all.cards.slice(0);
+        //      						 if(Array.isArray(lib.config.hiddenCardPack)){
+        //      									  for(var i=0;i<lib.config.hiddenCardPack.length;i++){
+        //      															pack.add(lib.config.hiddenCardPack[i]);
+        //      									  }
+        //      						 }
+        //      						 for(var i=0;i<pack.length;i++){
+        //      									  if(lib.config.all.sgscards.includes(pack[i])){
+        //      															pack.splice(i--,1);
+        //      									  }
+        //      						 }
+        // 			game.saveConfig('hiddenCardPack',pack);
+        //
+        //      						 var pack=lib.config.all.characters.slice(0);
+        //      						 if(Array.isArray(lib.config.hiddenCharacterPack)){
+        //      									  for(var i=0;i<lib.config.hiddenCharacterPack.length;i++){
+        //      															pack.add(lib.config.hiddenCharacterPack[i]);
+        //      									  }
+        //      						 }
+        //      						 for(var i=0;i<pack.length;i++){
+        //      									  if(lib.config.all.sgscharacters.includes(pack[i])){
+        //      															pack.splice(i--,1);
+        //      									  }
+        //      						 }
+        // 			game.saveConfig('hiddenCharacterPack',pack);
+        //
+        //      						 var pack=lib.config.all.mode.slice(0);
+        //      						 if(Array.isArray(lib.config.hiddenModePack)){
+        //      									  for(var i=0;i<lib.config.hiddenModePack.length;i++){
+        //      															pack.add(lib.config.hiddenModePack[i]);
+        //      									  }
+        //      						 }
+        //      						 for(var i=0;i<pack.length;i++){
+        //      									  if(lib.config.all.sgsmodes.includes(pack[i])){
+        //      															pack.splice(i--,1);
+        //      									  }
+        //      						 }
+        // 			game.saveConfig('hiddenModePack',pack);
+        //
+        // 			var that=this;
+        // 			setTimeout(function(){
+        // 				that.innerHTML='隐藏非官方扩展包';
+        // 			},500);
+        // 		}
+        // 	},
+        // 	clear:true
+        // }
       },
     },
   }
@@ -7227,7 +7321,7 @@ export class Library {
   }
   help = {
     关于游戏:
-      '<div style="margin:10px">关于三国杀</div><ul style="margin-top:0"><li>无名杀官方发布地址仅有GitHub仓库！<br><a href="https://github.com/libnoname/noname">点击前往Github仓库</a><br><li>三国杀基于GPLv3开源协议。<br><a href="https://www.gnu.org/licenses/gpl-3.0.html">点击查看GPLv3协议</a><br><li>其他所有的所谓“三国杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与三国杀官方无关！',
+      '<div style="margin:10px">关于无名杀</div><ul style="margin-top:0"><li>无名杀官方发布地址仅有GitHub仓库！<br><a href="https://github.com/libnoname/noname">点击前往Github仓库</a><br><li>无名杀基于GPLv3开源协议。<br><a href="https://www.gnu.org/licenses/gpl-3.0.html">点击查看GPLv3协议</a><br><li>其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！',
     游戏操作:
       "<ul><li>长按/鼠标悬停/右键单击显示信息。<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管。<li>键盘快捷键<br>" +
       "<table><tr><td>A<td>切换托管<tr><td>W<td>切换不询问无懈<tr><td>空格<td>暂停</table><li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。</ul>",
@@ -9009,7 +9103,50 @@ export class Library {
         "游戏开始时，你可以查看一名角色的身份是否为反贼（对所有玩家可见）。",
       visible_sxrm_connect_tag: "连接牌",
     },
-    {},
+    {
+      // get(target, prop, receiver) {
+      // 	return Reflect.get(target, prop, receiver);
+      // },
+      // set(target, prop, newValue) {
+      // 	if (typeof prop == "string" && typeof newValue == "string") {
+      // 		const list = newValue.split("&");
+      // 		if (list.length > 1) {
+      // 			const newList = list.slice();
+      // 			for (let i = 0; i < list.length; i++) {
+      // 				const str = list[i];
+      // 				const listx = str.split("=");
+      // 				if (listx.length == 2) {
+      // 					if (listx[0] == "poptip") {
+      // 						newList[i] = get.poptip(listx[1]);
+      // 					}
+      // 				}
+      // 			}
+      // 			newValue = newList.join("");
+      // 		}
+      // 	}
+      // 	return Reflect.set(target, prop, newValue);
+      // },
+      // defineProperty(target, prop, descriptor) {
+      // 	const newValue = descriptor.value;
+      // 	if (typeof prop == "string" && typeof newValue == "string") {
+      // 		const list = newValue.split("&");
+      // 		if (list.length > 1) {
+      // 			const newList = list.slice();
+      // 			for (let i = 0; i < list.length; i++) {
+      // 				const str = list[i];
+      // 				const listx = str.split("=");
+      // 				if (listx.length == 2) {
+      // 					if (listx[0] == "poptip") {
+      // 						newList[i] = get.poptip(listx[1]);
+      // 					}
+      // 				}
+      // 			}
+      // 			descriptor.value = newList.join("");
+      // 		}
+      // 	}
+      // 	return Reflect.defineProperty(target, prop, descriptor);
+      // },
+    },
   )
 
   experimental = experimental
@@ -9710,8 +9847,7 @@ export class Library {
         }
         const doubleCharacter =
           get.mode() === "guozhan" ||
-          (get.config("double_character") &&
-            (lib.config.mode === "identity" || lib.config.mode === "stone")) ||
+          (get.config("double_character") && lib.config.mode === "identity") ||
           (get.config("double_character_jiange") &&
             lib.config.mode === "versus" &&
             _status.mode === "jiange")
@@ -13451,6 +13587,17 @@ export class Library {
           const span = document.createElement("span")
           span.style.fontFamily = "WTKSuits"
           span.textContent = "📚"
+          return span.outerHTML
+        },
+      },
+    ],
+    [
+      "那兔",
+      {
+        getSpan: () => {
+          const span = document.createElement("span")
+          span.style.fontFamily = "WTKSuits"
+          span.textContent = "🐰"
           return span.outerHTML
         },
       },

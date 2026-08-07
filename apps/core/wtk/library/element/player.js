@@ -1314,7 +1314,7 @@ export class Player extends HTMLDivElement {
       params !== null &&
       get.itemtype(params) == null
     ) {
-      Object.assign(next)
+      Object.assign(next, params)
     } else {
       for (const arg of args) {
         const type = get.itemtype(arg)
@@ -1846,6 +1846,9 @@ export class Player extends HTMLDivElement {
     if (type === "horse" || type === "equip3_4") {
       return this.hasEnabledSlot(3) && this.hasEnabledSlot(4)
     }
+    // else if(type=='equip3_4'){
+    // 	type='equip3';
+    // }
     return this.countEnabledSlot(type) > 0
   }
   /**
@@ -4957,6 +4960,21 @@ export class Player extends HTMLDivElement {
     if (_status.video) {
       numh = arguments[0]
     }
+    /*if (numh >= 10) {
+			this.node.count.dataset.condition = "low";
+			this.node.count.innerHTML = Array.from(numh.toString()).join("<br>");
+		} else {
+			if (numh > 5) {
+				this.node.count.dataset.condition = "higher";
+			} else if (numh > 2) {
+				this.node.count.dataset.condition = "high";
+			} else if (numh > 0) {
+				this.node.count.dataset.condition = "mid";
+			} else {
+				this.node.count.dataset.condition = "none";
+			}
+			this.node.count.innerHTML = numh;
+		}*/
     this.node.count.innerHTML = numh?.toString()
     if (numh < 10) {
       this.node.count.dataset.condition = "low"
@@ -6173,6 +6191,9 @@ export class Player extends HTMLDivElement {
       get.itemtype(params) == null
     ) {
       Object.assign(next, params)
+      if (params.filterCard != null && typeof params.filterCard === "object") {
+        next.filterCard = get.filter(params.filterCard)
+      }
     } else {
       for (const arg of args) {
         if (typeof arg === "number" || get.itemtype(arg) === "select") {
@@ -6248,6 +6269,12 @@ export class Player extends HTMLDivElement {
         Reflect.deleteProperty(next, "card")
         next.filterCard = get.filter(params.card)
         filter = params.card
+      } else if (
+        params.filterCard != null &&
+        typeof params.filterCard === "object"
+      ) {
+        next.filterCard = get.filter(params.filterCard)
+        filter = params.filterCard
       }
       if (typeof next.selectCard === "number") {
         next.selectCard = [next.selectCard, next.selectCard]
@@ -6336,6 +6363,9 @@ export class Player extends HTMLDivElement {
       get.itemtype(params) == null
     ) {
       Object.assign(next, params)
+      if (params.filterCard != null && typeof params.filterCard === "object") {
+        next.filterCard = get.filter(params.filterCard)
+      }
       if (params.dialog) {
         next.prompt = false
       } else if (params.prompt) {
@@ -6411,6 +6441,9 @@ export class Player extends HTMLDivElement {
       get.itemtype(params) == null
     ) {
       Object.assign(next, params)
+      if (params.filterCard != null && typeof params.filterCard === "object") {
+        next.filterCard = get.filter(params.filterCard)
+      }
       if (params.dialog) {
         next.prompt = false
       } else if (params.prompt) {
@@ -6933,6 +6966,9 @@ export class Player extends HTMLDivElement {
       get.itemtype(params) == null
     ) {
       Object.assign(next, params)
+      if (params.filterCard != null && typeof params.filterCard === "object") {
+        next.filterCard = get.filter(params.filterCard)
+      }
       if (typeof next.selectCard === "number") {
         next.selectCard = [next.selectCard, next.selectCard]
       }
@@ -7153,7 +7189,7 @@ export class Player extends HTMLDivElement {
     return next
   }
   /**
-   * @param {import("./Player/type.d").EventChooseCardTargetParams} [params]
+   * @param { import("./Player/type.d").EventChooseCardTargetParams } [params]
    * @returns
    */
   chooseCardTarget(params) {
@@ -7267,7 +7303,7 @@ export class Player extends HTMLDivElement {
         func = arg
       }
     }
-    const controls = forced ? ["cancel2"] : []
+    const controls = forced ? [] : ["cancel2"]
     return this.chooseControl({
       controls,
       choiceList: list,
@@ -8480,6 +8516,8 @@ export class Player extends HTMLDivElement {
     let num = 1
     let target = null
     let line = false
+    /** @type { import("./Player/type.d").GainAnimate } */
+    let animate = "giveAuto"
 
     const args = [...arguments]
     if (
@@ -8492,6 +8530,7 @@ export class Player extends HTMLDivElement {
       position = params.position ?? position
       target = params.target ?? target
       line = params.line ?? line
+      animate = params.animate ?? animate
     } else {
       for (const arg of args) {
         if (typeof arg === "number") {
@@ -8502,6 +8541,9 @@ export class Player extends HTMLDivElement {
           target = arg
         } else if (typeof arg === "boolean") {
           line = arg
+        } else if (typeof arg === "string") {
+          // @ts-expect-error
+          animate = arg
         }
       }
     }
@@ -8518,6 +8560,7 @@ export class Player extends HTMLDivElement {
     const next = this.gain({
       cards,
       source: target,
+      animate,
       log: true,
       bySelf: true,
     })
@@ -9466,7 +9509,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家受到伤害
    *
-   * @param {import("./Player/type.d").EventDamageParams} [params]
+   * @param { number | import("./Player/type.d").EventDamageParams } [params]
    * @returns { GameEvent }
    */
   damage(params) {
@@ -9588,7 +9631,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家回复体力
    *
-   * @param { import("./Player/type.d").EventRecoverParams } [params]
+   * @param { number | import("./Player/type.d").EventRecoverParams } [params]
    * @returns { GameEvent }
    */
   recover(params) {
@@ -9709,7 +9752,7 @@ export class Player extends HTMLDivElement {
   /**
    * 扣减玩家的体力上限
    *
-   * @param { import("./Player/type.d").EventGainMaxHpParams } [params]
+   * @param { number | import("./Player/type.d").EventGainMaxHpParams } [params]
    * @returns { GameEvent }}
    */
   loseMaxHp(params) {
@@ -9740,7 +9783,7 @@ export class Player extends HTMLDivElement {
   /**
    * 令玩家获得体力上限
    *
-   * @param { import("./Player/type.d").EventGainMaxHpParams } [params]
+   * @param { number | import("./Player/type.d").EventGainMaxHpParams } [params]
    * @returns { GameEvent }
    */
   gainMaxHp(params) {
@@ -11345,11 +11388,37 @@ export class Player extends HTMLDivElement {
         img.setBackgroundImage(lib.skill[name].markimage2)
         img.style["background-size"] = "contain"
       } else {
-        var str = lib.translate[`${name}_bg`]
+        let str = lib.translate[`${name}_bg`]
         if (!str || str[0] === "+" || str[0] === "-") {
           str = get.translation(name)[0]
         }
         ui.create.div(".background.skillmark", node).innerHTML = str
+        // 仅针对获得/失去显示为☯的转化技显示
+        if (lib.skill[name] && get.is.zhuanhuanji(name, this) && str === "☯") {
+          const zhuanhuanLimit = get.zhuanhuanItemNum(name, this)
+          const storage = this.storage[name]
+          let index
+          if (zhuanhuanLimit === 2) {
+            // 阴阳转换
+            if (
+              get.info(name).zhuanhuanji === "number" ||
+              typeof storage === "number"
+            ) {
+              index = this.countMark(name) % zhuanhuanLimit
+            } else {
+              index = storage ? 1 : 0
+            }
+          } else {
+            // 多项转换
+            index = this.countMark(name) % zhuanhuanLimit
+          }
+          // 旋转度数
+          const angle = index * (360 / zhuanhuanLimit)
+          // @ts-expect-error ignore
+          node.firstChild.reversed = angle
+          // @ts-expect-error ignore
+          node.firstChild.style.transform = `rotate(${angle}deg)`
+        }
       }
     }
     node.name = name
@@ -12085,8 +12154,8 @@ export class Player extends HTMLDivElement {
       this.additionalSkills[skill] = []
     }
     for (var i = 0; i < skillsToAdd.length; i++) {
-      this.addSkill(skillsToAdd[i], null, null, true)
       this.additionalSkills[skill].push(skillsToAdd[i])
+      this.addSkill(skillsToAdd[i], null, null, true)
     }
     game.broadcast(
       (player, map) => {
@@ -12258,7 +12327,11 @@ export class Player extends HTMLDivElement {
       this.storage[skill] = true
     }
     game.log(
-      `契约已成，${get.translation(this)}将【${get.translation(skill)}】改为锁定技。`,
+      "契约已成，",
+      this,
+      "将",
+      `#g${get.translation(skill)}】`,
+      `改为锁定技`,
     )
     _status.event.clearStepCache()
     return this
@@ -14595,19 +14668,25 @@ export class Player extends HTMLDivElement {
    *
    * @overload
    * @param { string } name
+   * @param { boolean } hasJudgeSlots 是否考虑牌的占位情况
    * @returns { boolean} 返回玩家判定区是否有某(种牌名的)牌
    */
-  hasJudge(name) {
+  hasJudge(name, hasJudgeSlots = true) {
     if (name && typeof name === "object") {
       name = name.viewAs || name.name
     }
-    var judges = this.getVCards("j")
-    for (var i = 0; i < judges.length; i++) {
-      if (judges[i].name === name) {
+    const judges = this.getVCards("j")
+    return judges.some((card) => {
+      if (card.name === name) {
         return true
       }
-    }
-    return false
+      if (
+        hasJudgeSlots &&
+        get.judgeSlots(card, this).containsSome(...get.judgeSlots(name, this))
+      ) {
+        return true
+      }
+    })
   }
   /**
    * 返回玩家是否存在队友
@@ -15621,7 +15700,7 @@ export class Player extends HTMLDivElement {
           ["name", "suit", "number", "nature"].every((key) => {
             const card = curEvent.cards[0]
             if (key === "nature") {
-              if (card.nature === void 0 && curEvent.card.nature === false) {
+              if (card.nature == void 0 && curEvent.card.nature === false) {
                 return true
               }
             }
@@ -15824,11 +15903,11 @@ export class Player extends HTMLDivElement {
       //////////////////////////////////////更改部分结束喵///////////////////////////////////////
     }
     var node
-    if (card === void 0 || card.length === 0) return
+    if (card == void 0 || card.length === 0) return
     var cardx = card.copy("thrown")
     if (id) cardx.node.throw_id = id
     node = this.$throwordered(cardx, nosource, cardsetion)
-    if (time !== void 0) {
+    if (time != void 0) {
       node.fixed = true
       setTimeout(() => {
         node.delete()

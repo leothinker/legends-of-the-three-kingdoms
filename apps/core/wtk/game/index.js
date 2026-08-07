@@ -737,22 +737,23 @@ export class Game {
    */
   addTempTag(id, translation) {
     game.addVideo("addTempTag", null, [id, translation])
-    game.broadcastAll(
+    // 重连恢复翻译
+    _status.postReconnect.addTempTag ??= [
+      (list) => {
+        for (const args of list) {
+          // @ts-expect-error ignore
+          game.addTempTag(...args)
+        }
+      },
+      [],
+    ]
+    _status.postReconnect.addTempTag[1].push([id, translation])
+    // 翻译
+    lib.translate[id] = translation
+    game.broadcast(
       // @ts-expect-error ignore
       (id, translation) => {
-        if (!lib.translate[id]) {
-          lib.translate[id] = translation
-          _status.postReconnect.addTempTag ??= [
-            (list) => {
-              for (const args of list) {
-                // @ts-expect-error ignore
-                game.addTempTag(...args)
-              }
-            },
-            [],
-          ]
-          _status.postReconnect.addTempTag[1].push([id, translation])
-        }
+        lib.translate[id] = translation
       },
       id,
       translation,
@@ -6217,7 +6218,8 @@ export class Game {
       tr,
       td,
       dialog,
-      hsMap = new Map([])
+      hsMap = new Map([]),
+      poptipData = new Map([])
     for (const target of [...game.players, ...game.dead]) {
       hsMap.set(target, target.getCards("h"))
     }
@@ -6247,6 +6249,27 @@ export class Game {
         dialog.content.firstChild.innerHTML = "战斗胜利"
       } else if (result2 === false) {
         dialog.content.firstChild.innerHTML = "战斗失败"
+      }
+      const poptipData = arguments[2]
+      if (poptipData instanceof Map) {
+        const players = game.players.concat(
+          game.dead,
+          game.additionaldead || [],
+        )
+        for (const target of players) {
+          if (!poptipData.has(target.playerid)) continue
+          const [id, hs] = poptipData.get(target.playerid)
+          lib.poptip.add({
+            id,
+            name: `<img style="width:15px; vertical-align: middle;" src="${lib.assetURL}image/card/handcard.png">`,
+            dialog(dialog) {
+              dialog.add(`${get.translation(target)}的手牌`)
+              dialog[hs.length ? "addSmall" : "addText"](
+                hs.length ? hs : "（没有手牌）",
+              )
+            },
+          })
+        }
       }
       ui.update()
       dialog.add(ui.create.div(".placeholder"))
@@ -6518,7 +6541,10 @@ export class Game {
         tr.appendChild(td)
         td = document.createElement("td")
         const target = game.players[i]
-        td.innerHTML = get.poptip({
+        const poptipId = get.id()
+        poptipData.set(target.playerid, [poptipId, hsMap.get(target) ?? []])
+        game.broadcastAll((item) => lib.poptip.add(item), {
+          id: poptipId,
           name: `<img style="width:15px; vertical-align: middle;" src="${lib.assetURL}image/card/handcard.png">`,
           dialog(dialog) {
             const hs = hsMap.get(target) ?? []
@@ -6529,6 +6555,7 @@ export class Game {
             return dialog
           },
         })
+        td.innerHTML = get.poptip(poptipId)
         tr.appendChild(td)
         table.appendChild(tr)
       }
@@ -6615,7 +6642,10 @@ export class Game {
         tr.appendChild(td)
         td = document.createElement("td")
         const target = game.dead[i]
-        td.innerHTML = get.poptip({
+        const poptipId = get.id()
+        poptipData.set(target.playerid, [poptipId, hsMap.get(target) ?? []])
+        game.broadcastAll((item) => lib.poptip.add(item), {
+          id: poptipId,
           name: `<img style="width:15px; vertical-align: middle;" src="${lib.assetURL}image/card/handcard.png">`,
           dialog(dialog) {
             const hs = hsMap.get(target) ?? []
@@ -6626,6 +6656,7 @@ export class Game {
             return dialog
           },
         })
+        td.innerHTML = get.poptip(poptipId)
         tr.appendChild(td)
         table.appendChild(tr)
       }
@@ -6687,7 +6718,10 @@ export class Game {
         tr.appendChild(td)
         td = document.createElement("td")
         const target = game.additionaldead[i]
-        td.innerHTML = get.poptip({
+        const poptipId = get.id()
+        poptipData.set(target.playerid, [poptipId, hsMap.get(target) ?? []])
+        game.broadcastAll((item) => lib.poptip.add(item), {
+          id: poptipId,
           name: `<img style="width:15px; vertical-align: middle;" src="${lib.assetURL}image/card/handcard.png">`,
           dialog(dialog) {
             const hs = hsMap.get(target) ?? []
@@ -6698,6 +6732,8 @@ export class Game {
             return dialog
           },
         })
+        td.innerHTML = get.poptip(poptipId)
+        tr.appendChild(td)
         table.appendChild(tr)
       }
       dialog.add(ui.create.div(".placeholder"))
@@ -6706,13 +6742,14 @@ export class Game {
     // }
     dialog.add(ui.create.div(".placeholder"))
 
-    const clients = game.players.concat(game.dead)
+    const clients = game.players.concat(game.dead, game.additionaldead || [])
     for (let i = 0; i < clients.length; i++) {
       if (clients[i].isOnline2()) {
         clients[i].send(
           game.over,
           dialog.content.innerHTML,
           game.checkOnlineResult(clients[i]),
+          poptipData,
         )
       }
     }
@@ -10474,6 +10511,7 @@ export class Game {
       isNext,
       config,
     )
+    await game.delay(2)
     //分配座位号
     const firstSeat = players.find((value) => value.getSeatNum() === 1)
     if (firstSeat) {
@@ -10700,7 +10738,6 @@ export class Game {
       player.classList.add("out")
       player.style.display = "none"
       player.delete()
-      await game.delay(1)
       //调整布局
       const players = game.players.concat(game.dead)
       const position = parseInt(player.dataset.position, 10)
@@ -10747,6 +10784,7 @@ export class Game {
     }
     game.broadcast(removePlayer, player, config, get.copy(lib.configOL))
     await removePlayer(player, config, get.copy(lib.configOL))
+    await game.delay(2)
     //判断胜负，避免移除后对局变成死局
     player.dieAfter()
     return player

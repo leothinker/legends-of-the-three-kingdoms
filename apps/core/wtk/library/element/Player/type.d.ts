@@ -12,6 +12,18 @@ import type { Button, Card, Dialog, GameEvent, Player, VCard } from ".."
 export type BroadSelect = number | Select
 
 /**
+ * 可传进`get.filter`作为卡牌过滤参数的对象
+ */
+export interface CardFilter {
+  name?: string | string[]
+  type?: string | string[]
+  subtype?: string | string[]
+  color?: string | string[]
+  suit?: string | string[]
+  number?: string | string[]
+}
+
+/**
  *
  */
 export interface CheckCardParams {
@@ -30,6 +42,7 @@ export interface CheckCardParams {
    */
   filterCard?:
     | boolean
+    | CardFilter
     | ((card: Card, player: Player, event?: string) => boolean)
 
   /**
@@ -539,6 +552,11 @@ export interface EventRandomGainParams {
    * 是否在获取时显示指示线
    */
   line?: boolean
+
+  /**
+   * 获得牌时的动画表现，默认为 "giveAuto"
+   */
+  animate?: GainAnimate
 }
 
 export interface EventDiscardParams {

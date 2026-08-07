@@ -3397,7 +3397,7 @@ export class Click {
       delete ui.intro
     }
     _status.clicked = true
-    if (this.parentNode.custom) {
+    if (this.parentNode?.custom) {
       this.parentNode.custom(this.link, this)
       return
     }

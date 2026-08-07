@@ -1,10 +1,10 @@
 # Contributing
 
-Thank you for your interest in contributing to the Full Stack FastAPI Template! 🙇
+Thank you for your interest in contributing to the War of the Three Kingdoms! 🙇
 
 ## Discussions First
 
-For **big changes** (new features, architectural changes, significant refactoring), please start by opening a [GitHub Discussion](https://github.com/leothinker/legends-of-the-three-kingdoms/discussions) first. This allows the community and maintainers to provide feedback on the approach before you invest significant time in implementation.
+For **big changes** (new features, architectural changes, significant refactoring), please start by opening a [GitHub Discussion](https://github.com/leothinker/war-of-the-three-kingdoms/discussions) first. This allows the community and maintainers to provide feedback on the approach before you invest significant time in implementation.
 
 For small, straightforward changes, you can go directly to a Pull Request without starting a discussion first. This includes:
 
@@ -13,9 +13,11 @@ For small, straightforward changes, you can go directly to a Pull Request withou
 - Fixing lint warnings or type errors
 - Minor code improvements (e.g., removing unused code)
 
+If you would like to add a new dependency, create a new [Discussion](https://github.com/leothinker/war-of-the-three-kingdoms/discussions) to explain why.
+
 ## Developing
 
-For detailed instructions on setting up your development environment, running the stack, linting, pre-commit hooks, and more, see the [Development Guide](development.md).
+For detailed instructions on setting up your development environment, running the stack, linting, pre-commit hooks, and more, see the [Development Guide](docs/how-to-start.md).
 
 ## Pull Requests
 
@@ -62,4 +64,4 @@ You have amazing tools at hand, use them wisely to help effectively.
 
 ## Questions?
 
-If you have questions about contributing, feel free to open a [GitHub Discussion](https://github.com/leothinker/legends-of-the-three-kingdoms/discussions).
+If you have questions about contributing, feel free to open a [GitHub Discussion](https://github.com/leothinker/war-of-the-three-kingdoms/discussions).

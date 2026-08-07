@@ -204,7 +204,7 @@ const translates = {
   old_clangaojin: "高劲",
   old_clangaojin_info:
     "锁定技，游戏开始时你计算与其他角色的距离-X，当你计算与其他角色的距离发生变化后，你摸一张牌（X为你的手牌上限）。",
-  old_clangaojin_append: `<span style="font-family: yuanli"><li><span style="text-decoration: line-through;">补丁×</span>注意事项：<br>真正意义上的距离变化后时机在无名杀现有框架无法实现，请不要反馈在某些情况距离变化后此技能不发动的问题。</span>`,
+  old_clangaojin_append: `<span style="font-family: yuanli"><li><span style="text-decoration: line-through;">补丁×</span>注意事项：<br>真正意义上的距离变化后时机在三国杀现有框架无法实现，请不要反馈在某些情况距离变化后此技能不发动的问题。</span>`,
   clanpoxi: "破袭",
   clanpoxi_info:
     "出牌阶段限一次，你可以弃置距离不大于1的一名角色的一张牌，若弃置的牌为装备牌/基本牌，则你可以将此牌当做【杀】使用，且可令目标角色不能响应此【杀】，若以此法造成伤害则你计算与其他角色的距离+1。",

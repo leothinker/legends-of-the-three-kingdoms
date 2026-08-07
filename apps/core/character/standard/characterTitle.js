@@ -1,4 +1,12 @@
 export default {
+  caocao: "魏武帝",
+  simayi: "狼顾之鬼",
+  xiahoudun: "独眼的罗刹",
+  zhangliao: "前将军",
+  xuzhu: "虎痴",
+  guojia: "早终的先知",
+  zhenji: "薄幸的美人",
+
   liubei: "乱世的枭雄",
   guanyu: "美髯公",
   zhangfei: "万夫不当",
@@ -16,14 +24,6 @@ export default {
   luxun: "儒生雄才",
   sunshangxiang: "弓腰姬",
 
-  caocao: "魏武帝",
-  simayi: "狼顾之鬼",
-  xiahoudun: "独眼的罗刹",
-  zhangliao: "前将军",
-  xuzhu: "虎痴",
-  guojia: "早终的先知",
-  zhenji: "薄幸的美人",
-
   huatuo: "神医",
   lvbu: "武的化身",
 
@@ -32,8 +32,8 @@ export default {
 
   gongsunzan: "白马将军",
 
-  panfeng: "联军上将",
   yuejin: "奋强突固",
+  panfeng: "联军上将",
 
   kongrong: "年少怀德",
 }

@@ -160,6 +160,7 @@ export const characterPackMenu = (connectMenu) => {
         _name: mode,
         init: (() => {
           // 原逻辑
+
           return connectMenu
             ? !lib.config.connect_characters.includes(mode)
             : lib.config.characters.includes(mode)

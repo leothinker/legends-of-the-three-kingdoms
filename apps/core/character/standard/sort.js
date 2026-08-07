@@ -1,5 +1,13 @@
 const characterSort = {
   standard_2008: [
+    "caocao",
+    "simayi",
+    "xiahoudun",
+    "zhangliao",
+    "xuzhu",
+    "guojia",
+    "zhenji",
+
     "liubei",
     "guanyu",
     "zhangfei",
@@ -17,20 +25,12 @@ const characterSort = {
     "luxun",
     "sunshangxiang",
 
-    "caocao",
-    "simayi",
-    "xiahoudun",
-    "zhangliao",
-    "xuzhu",
-    "guojia",
-    "zhenji",
-
     "huatuo",
     "lvbu",
   ],
   standard_2013: ["diaochan", "huaxiong"],
   standard_2019: ["gongsunzan"],
-  standard_2023: ["panfeng", "yuejin"],
+  standard_2023: ["yuejin", "panfeng"],
   standard_2026: ["kongrong"],
 }
 

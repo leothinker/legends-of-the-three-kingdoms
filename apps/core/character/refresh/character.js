@@ -1,4 +1,49 @@
 const characters = {
+  re_caocao: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["rejianxiong", "hujia"],
+    isZhugong: true,
+  },
+  re_simayi: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["refankui", "reguicai"],
+    names: "司马|懿",
+  },
+  re_xiahoudun: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["reganglie", "qingjian"],
+    names: "夏侯|惇",
+  },
+  re_zhangliao: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["retuxi"],
+  },
+  re_xuzhu: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["reluoyi"],
+  },
+  re_guojia: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["tiandu", "reyiji"],
+  },
+  re_zhenji: {
+    sex: "female",
+    group: "wei",
+    hp: 3,
+    skills: ["luoshen", "reqingguo"],
+  },
   re_liubei: {
     sex: "male",
     group: "shu",
@@ -94,51 +139,6 @@ const characters = {
     hp: 3,
     skills: ["rejieyin", "rexiaoji"],
   },
-  re_caocao: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["rejianxiong", "hujia"],
-    isZhugong: true,
-  },
-  re_simayi: {
-    sex: "male",
-    group: "wei",
-    hp: 3,
-    skills: ["refankui", "reguicai"],
-    names: "司马|懿",
-  },
-  re_xiahoudun: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["reganglie", "qingjian"],
-    names: "夏侯|惇",
-  },
-  re_zhangliao: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["retuxi"],
-  },
-  re_xuzhu: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["reluoyi"],
-  },
-  re_guojia: {
-    sex: "male",
-    group: "wei",
-    hp: 3,
-    skills: ["tiandu", "reyiji"],
-  },
-  re_zhenji: {
-    sex: "female",
-    group: "wei",
-    hp: 3,
-    skills: ["luoshen", "reqingguo"],
-  },
   re_huatuo: {
     sex: "male",
     group: "qun",
@@ -170,17 +170,17 @@ const characters = {
     hp: 4,
     skills: ["qiaomeng", "yicong"],
   },
-  re_yiji: {
-    sex: "male",
-    group: "shu",
-    hp: 3,
-    skills: ["jijie", "jiyuan"],
-  },
   caozhang: {
     sex: "male",
     group: "wei",
     hp: 4,
     skills: ["jiangchi"],
+  },
+  re_yiji: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["jijie", "jiyuan"],
   },
 }
 

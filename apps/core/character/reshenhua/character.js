@@ -1,4 +1,17 @@
 const characters = {
+  re_caoren: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["rejushou", "jiewei"],
+  },
+  re_xiahouyuan: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["reshensu"],
+    names: "夏侯|渊",
+  },
   re_huangzhong: {
     sex: "male",
     group: "shu",
@@ -11,19 +24,6 @@ const characters = {
     hp: 4,
     skills: ["rekuanggu", "qimou"],
   },
-  re_xiahouyuan: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["reshensu"],
-    names: "夏侯|渊",
-  },
-  re_caoren: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["rejushou", "jiewei"],
-  },
   re_xiaoqiao: {
     sex: "female",
     group: "wu",
@@ -31,18 +31,18 @@ const characters = {
     skills: ["retianxiang", "hongyan"],
     names: "桥|null",
   },
+  re_zhoutai: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["rebuqu", "fenji"],
+  },
   re_zhangjiao: {
     sex: "male",
     group: "qun",
     hp: 3,
     skills: ["releiji", "guidao", "huangtian"],
     isZhugong: true,
-  },
-  re_zhoutai: {
-    sex: "male",
-    group: "wu",
-    hp: 4,
-    skills: ["rebuqu", "fenji"],
   },
   re_yuji: {
     sex: "male",
@@ -77,18 +77,18 @@ const characters = {
     skills: ["quhu", "rejieming"],
     clans: ["颍川荀氏"],
   },
-  re_pangtong: {
-    sex: "male",
-    group: "shu",
-    hp: 3,
-    skills: ["relianhuan", "reniepan"],
-  },
   re_sp_zhugeliang: {
     sex: "male",
     group: "shu",
     hp: 3,
     skills: ["bazhen", "rehuoji", "rekanpo"],
     names: "诸葛|亮",
+  },
+  re_pangtong: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["relianhuan", "reniepan"],
   },
   re_taishici: {
     sex: "male",
@@ -104,19 +104,19 @@ const characters = {
     hp: 4,
     skills: ["mashu", "jianchu"],
   },
-  re_yanwen: {
-    sex: "male",
-    group: "qun",
-    hp: 4,
-    skills: ["reshuangxiong"],
-    names: "颜|良-文|丑",
-  },
   re_yuanshao: {
     sex: "male",
     group: "qun",
     hp: 4,
     skills: ["reluanji", "xueyi"],
     isZhugong: true,
+  },
+  re_yanwen: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["reshuangxiong"],
+    names: "颜|良-文|丑",
   },
   re_shen_zhouyu: {
     sex: "male",
@@ -133,12 +133,6 @@ const characters = {
     groupInGuozhan: "shu",
     names: "诸葛|亮",
   },
-  re_xuhuang: {
-    sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["reduanliang", "jiezi"],
-  },
   re_caopi: {
     sex: "male",
     group: "wei",
@@ -146,18 +140,11 @@ const characters = {
     skills: ["rexingshang", "refangzhu", "songwei"],
     isZhugong: true,
   },
-  re_sunjian: {
+  re_xuhuang: {
     sex: "male",
-    group: "wu",
+    group: "wei",
     hp: 4,
-    skills: ["yinghun", "polu"],
-  },
-  re_dongzhuo: {
-    sex: "male",
-    group: "qun",
-    hp: 8,
-    skills: ["rejiuchi", "roulin", "benghuai", "rebaonue"],
-    isZhugong: true,
+    skills: ["reduanliang", "jiezi"],
   },
   re_zhurong: {
     sex: "female",
@@ -172,13 +159,6 @@ const characters = {
     hp: 4,
     skills: ["huoshou", "rezaiqi"],
   },
-  re_jiaxu: {
-    sex: "male",
-    group: "qun",
-    hp: 3,
-    skills: ["rewansha", "reweimu", "luanwu"],
-    dieAudios: ["ol_jiaxu"],
-  },
   re_lusu: {
     sex: "male",
     group: "wu",
@@ -186,12 +166,25 @@ const characters = {
     skills: ["rehaoshi", "redimeng"],
     dieAudios: ["ol_lusu"],
   },
-  re_shen_caocao: {
+  re_sunjian: {
     sex: "male",
-    group: "shen",
+    group: "wu",
+    hp: 4,
+    skills: ["yinghun", "polu"],
+  },
+  re_dongzhuo: {
+    sex: "male",
+    group: "qun",
+    hp: 8,
+    skills: ["rejiuchi", "roulin", "benghuai", "rebaonue"],
+    isZhugong: true,
+  },
+  re_jiaxu: {
+    sex: "male",
+    group: "qun",
     hp: 3,
-    skills: ["guixin", "feiying"],
-    groupInGuozhan: "wei",
+    skills: ["rewansha", "reweimu", "luanwu"],
+    dieAudios: ["ol_jiaxu"],
   },
   re_shen_lvbu: {
     sex: "male",
@@ -200,18 +193,25 @@ const characters = {
     skills: ["kuangbao", "wumou", "wuqian", "shenfen"],
     groupInGuozhan: "qun",
   },
-  re_zhanghe: {
+  re_shen_caocao: {
     sex: "male",
-    group: "wei",
-    hp: 4,
-    skills: ["reqiaobian"],
-    dieAudios: ["ol_zhanghe"],
+    group: "shen",
+    hp: 3,
+    skills: ["guixin", "feiying"],
+    groupInGuozhan: "wei",
   },
   re_dengai: {
     sex: "male",
     group: "wei",
     hp: 4,
     skills: ["retuntian", "zaoxian"],
+  },
+  re_zhanghe: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["reqiaobian"],
+    dieAudios: ["ol_zhanghe"],
   },
   re_jiangwei: {
     sex: "male",

@@ -1,4 +1,42 @@
 export default {
+  "#rejianxiong1": "燕雀安知鸿鹄之志。",
+  "#rejianxiong2": "夫英雄者，胸怀大志，腹有良谋。",
+  "#rehujia1": "护卫何在！",
+  "#rehujia2": "大胆逆贼！谁可擒之？",
+  "#re_caocao:die": "华佗何在……",
+
+  "#refankui1": "哼！正中下怀！",
+  "#refankui2": "哼！自作孽不可活！",
+  "#reguicai1": "天命难违？哈哈哈哈哈哈！",
+  "#reguicai2": "才通天地，逆天改命！",
+  "#re_simayi:die": "我的气数就到这里了么？",
+
+  "#reganglie1": "哪个敢动我！",
+  "#reganglie2": "伤我者，十倍奉还！",
+  "#qingjian1": "福生于清俭，德生于卑退。",
+  "#qingjian2": "钱财乃身外之物。",
+  "#re_xiahoudun:die": "诸多败绩，有负丞相重托。",
+
+  "#retuxi1": "快马突袭，占尽先机！",
+  "#retuxi2": "马似飞影，枪如霹雳！",
+  "#re_zhangliao:die": "被敌人占了先机，呃啊~",
+
+  "#reluoyi1": "废话少说，放马过来吧！",
+  "#reluoyi2": "过来打一架，对，就是你！",
+  "#re_xuzhu:die": "丞相，末将尽力了！",
+
+  "#tiandu_re_guojia1": "那，就这样吧。",
+  "#tiandu_re_guojia2": "天意如此。",
+  "#reyiji1": "锦囊妙策，终定社稷。",
+  "#reyiji2": "依此计行，辽东可定。",
+  "#re_guojia:die": "咳咳咳咳咳……",
+
+  "#reluoshen1": "屏翳收风，川后静波。",
+  "#reluoshen2": "冯夷鸣鼓，女娲清歌。",
+  "#reqingguo1": "肩若削成，腰如约素。",
+  "#reqingguo2": "延颈秀项，皓质呈露。",
+  "#re_zhenji:die": "出亦复何苦，入亦复何愁。",
+
   "#rerende1": "同心同德，救困扶危！",
   "#rerende2": "施仁布泽，乃我大汉立国之本！",
   "#rejijiang1": "哪位将军替我拿下此贼？",
@@ -89,44 +127,6 @@ export default {
   "#rexiaoji2": "我会的武器，可多着呢。",
   "#re_sunshangxiang:die": "哎呀，这次弓箭射歪了。",
 
-  "#rejianxiong1": "燕雀安知鸿鹄之志。",
-  "#rejianxiong2": "夫英雄者，胸怀大志，腹有良谋。",
-  "#rehujia1": "护卫何在！",
-  "#rehujia2": "大胆逆贼！谁可擒之？",
-  "#re_caocao:die": "华佗何在……",
-
-  "#refankui1": "哼！正中下怀！",
-  "#refankui2": "哼！自作孽不可活！",
-  "#reguicai1": "天命难违？哈哈哈哈哈哈！",
-  "#reguicai2": "才通天地，逆天改命！",
-  "#re_simayi:die": "我的气数就到这里了么？",
-
-  "#reganglie1": "哪个敢动我！",
-  "#reganglie2": "伤我者，十倍奉还！",
-  "#qingjian1": "福生于清俭，德生于卑退。",
-  "#qingjian2": "钱财乃身外之物。",
-  "#re_xiahoudun:die": "诸多败绩，有负丞相重托。",
-
-  "#retuxi1": "快马突袭，占尽先机！",
-  "#retuxi2": "马似飞影，枪如霹雳！",
-  "#re_zhangliao:die": "被敌人占了先机，呃啊~",
-
-  "#reluoyi1": "废话少说，放马过来吧！",
-  "#reluoyi2": "过来打一架，对，就是你！",
-  "#re_xuzhu:die": "丞相，末将尽力了！",
-
-  "#tiandu_re_guojia1": "那，就这样吧。",
-  "#tiandu_re_guojia2": "天意如此。",
-  "#reyiji1": "锦囊妙策，终定社稷。",
-  "#reyiji2": "依此计行，辽东可定。",
-  "#re_guojia:die": "咳咳咳咳咳……",
-
-  "#reluoshen1": "屏翳收风，川后静波。",
-  "#reluoshen2": "冯夷鸣鼓，女娲清歌。",
-  "#reqingguo1": "肩若削成，腰如约素。",
-  "#reqingguo2": "延颈秀项，皓质呈露。",
-  "#re_zhenji:die": "出亦复何苦，入亦复何愁。",
-
   "#jijiu_re_huatuo1": "妙手仁心，药到病除。",
   "#jijiu_re_huatuo2": "救死扶伤，悬壶济世。",
   "#chuli1": "病入膏肓，需下猛药。",
@@ -155,13 +155,13 @@ export default {
   "#yicong_re_gongsunzan2": "变阵冲轭，以守代攻。",
   "#re_gongsunzan:die": "皇图霸业梦，付之，一炬中……",
 
+  "#jiangchi1": "谨遵父训，不可逞匹夫之勇。",
+  "#jiangchi2": "吾定当身先士卒，振魏武雄风！",
+  "#caozhang:die": "子桓，你害我。",
+
   "#jijie1": "一拜一起，未足为劳。",
   "#jijie2": "识言观行，方能雍容风议。",
   "#jiyuan1": "公若辞，必遭蔡瑁之害矣。",
   "#jiyuan2": "形势危急，还请速行。",
   "#re_yiji:die": "未能，救得刘公脱险……",
-
-  "#jiangchi1": "谨遵父训，不可逞匹夫之勇。",
-  "#jiangchi2": "吾定当身先士卒，振魏武雄风！",
-  "#caozhang:die": "子桓，你害我。",
 }

@@ -229,6 +229,7 @@ export const cardPackMenu = (connectMenu) => {
         _name: mode,
         init: (() => {
           // 原逻辑
+
           return lib.config.cards.includes(mode)
         })(),
         onclick: togglePack,

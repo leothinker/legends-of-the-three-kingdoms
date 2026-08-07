@@ -1,6 +1,22 @@
 import { get } from "wtk"
 
 const translates = {
+  re_caoren: "界曹仁",
+  re_caoren_prefix: "界",
+  rejushou: "据守",
+  rejushou_info:
+    "结束阶段，你可以翻面，然后摸四张牌并弃置一张手牌，若此牌为装备牌，则你改为使用之。",
+  jiewei: "解围",
+  jiewei_info:
+    "你可以将装备区里的一张牌当【无懈可击】使用；当你翻面至正面朝上时，你可以弃置一张手牌，然后可以移动场上的一张牌。",
+
+  re_xiahouyuan: "界夏侯渊",
+  re_xiahouyuan_prefix: "界",
+  reshensu: "神速",
+  shensu4: "神速",
+  reshensu_info:
+    "你可以做出如下选择：1.跳过判定阶段和摸牌阶段；2.跳过出牌阶段并弃置一张装备牌；3.跳过弃牌阶段并翻面。你每选择一项，便视为使用一张无距离限制的【杀】。",
+
   re_huangzhong: "界黄忠",
   re_huangzhong_prefix: "界",
   reliegong: "烈弓",
@@ -16,33 +32,11 @@ const translates = {
   qimou_info:
     "限定技，出牌阶段，你可以失去任意点体力，然后你于此阶段内计算与其他角色的距离-X，且你可以多使用X张【杀】（X为你以此法失去的体力值）。",
 
-  re_xiahouyuan: "界夏侯渊",
-  re_xiahouyuan_prefix: "界",
-  reshensu: "神速",
-  shensu4: "神速",
-  reshensu_info:
-    "你可以做出如下选择：1.跳过判定阶段和摸牌阶段；2.跳过出牌阶段并弃置一张装备牌；3.跳过弃牌阶段并翻面。你每选择一项，便视为使用一张无距离限制的【杀】。",
-
-  re_caoren: "界曹仁",
-  re_caoren_prefix: "界",
-  rejushou: "据守",
-  rejushou_info:
-    "结束阶段，你可以翻面，然后摸四张牌并弃置一张手牌，若此牌为装备牌，则你改为使用之。",
-  jiewei: "解围",
-  jiewei_info:
-    "你可以将装备区里的一张牌当【无懈可击】使用；当你翻面至正面朝上时，你可以弃置一张手牌，然后可以移动场上的一张牌。",
-
   re_xiaoqiao: "界小乔",
   re_xiaoqiao_prefix: "界",
   retianxiang: "天香",
   retianxiang_info:
     "当你受到伤害时，你可以弃置一张红桃手牌并选择一名其他角色，然后防止此伤害并选择一项：1.令来源对其造成1点伤害，然后其摸X张牌（X为其已损失的体力值且至多为5）；2.令其失去1点体力，然后其获得你弃置的牌。",
-
-  re_zhangjiao: "界张角",
-  re_zhangjiao_prefix: "界",
-  releiji: "雷击",
-  releiji_info:
-    "当你使用或打出【闪】时，你可以令一名其他角色进行判定，若结果为：黑桃，你对其造成2点雷电伤害；梅花，你回复1点体力，对其造成1点雷电伤害。",
 
   re_zhoutai: "界周泰",
   re_zhoutai_prefix: "界",
@@ -53,6 +47,12 @@ const translates = {
   fenji: "奋激",
   fenji_info:
     "一名角色的结束阶段，若其没有手牌，你可以令其摸两张牌，然后你失去1点体力。",
+
+  re_zhangjiao: "界张角",
+  re_zhangjiao_prefix: "界",
+  releiji: "雷击",
+  releiji_info:
+    "当你使用或打出【闪】时，你可以令一名其他角色进行判定，若结果为：黑桃，你对其造成2点雷电伤害；梅花，你回复1点体力，对其造成1点雷电伤害。",
 
   re_yuji: "界于吉",
   re_yuji_prefix: "界",
@@ -80,6 +80,13 @@ const translates = {
   rejieming_info:
     "当你受到1点伤害后，你可以令一名角色摸两张牌，然后若其手牌数小于其体力上限，你摸一张牌。",
 
+  re_sp_zhugeliang: "界卧龙诸葛",
+  re_sp_zhugeliang_prefix: "界",
+  rehuoji: "火计",
+  rehuoji_info: "你可以将一张红色牌当【火攻】使用。",
+  rekanpo: "看破",
+  rekanpo_info: "你可以将一张黑色牌当【无懈可击】使用。",
+
   re_pangtong: "界庞统",
   re_pangtong_prefix: "界",
   relianhuan: "连环",
@@ -88,13 +95,6 @@ const translates = {
   reniepan: "涅槃",
   reniepan_info:
     "限定技，出牌阶段或当你处于濒死状态时，你可以弃置区域里的所有牌，复原武将牌，然后摸三张牌并将体力回复至3点。",
-
-  re_sp_zhugeliang: "界卧龙诸葛",
-  re_sp_zhugeliang_prefix: "界",
-  rehuoji: "火计",
-  rehuoji_info: "你可以将一张红色牌当【火攻】使用。",
-  rekanpo: "看破",
-  rekanpo_info: "你可以将一张黑色牌当【无懈可击】使用。",
 
   re_taishici: "界太史慈",
   re_taishici_prefix: "界",
@@ -111,31 +111,23 @@ const translates = {
   jianchu_info:
     "当你使用【杀】指定一名角色为目标后，你可以弃置其一张牌，若弃置的牌：为装备牌，其不能使用【闪】；不为装备牌，其获得此【杀】。",
 
-  re_yanwen: "界颜良文丑",
-  re_yanwen_prefix: "界",
-  reshuangxiong: "双雄",
-  reshuangxiong_info:
-    "摸牌阶段，你可以改为亮出牌堆顶的两张牌，你获得其中一张牌，然后本回合你可以将与此牌颜色不同的一张手牌当【决斗】使用；当你因【决斗】受到伤害后，你可以获得此次【决斗】中其他角色打出的【杀】。",
-
   re_yuanshao: "界袁绍",
   re_yuanshao_prefix: "界",
   reluanji: "乱击",
   reluanji_info:
     "你可以将两张手牌当【万箭齐发】使用（不能使用本回合发动此技能时使用过的花色）。当你使用【万箭齐发】：被其他角色打出【闪】响应时，其摸一张牌；结算结束后，若没有角色受到此牌的伤害，你摸一张牌。",
 
+  re_yanwen: "界颜良文丑",
+  re_yanwen_prefix: "界",
+  reshuangxiong: "双雄",
+  reshuangxiong_info:
+    "摸牌阶段，你可以改为亮出牌堆顶的两张牌，你获得其中一张牌，然后本回合你可以将与此牌颜色不同的一张手牌当【决斗】使用；当你因【决斗】受到伤害后，你可以获得此次【决斗】中其他角色打出的【杀】。",
+
   re_shen_zhouyu: "神周瑜",
   re_shen_zhouyu_prefix: "神",
 
   re_shen_zhugeliang: "神诸葛亮",
   re_shen_zhugeliang_prefix: "神",
-
-  re_xuhuang: "界徐晃",
-  re_xuhuang_prefix: "界",
-  reduanliang: "断粮",
-  reduanliang_info:
-    "你可以将一张黑色非锦囊牌当【兵粮寸断】使用；你对手牌数不小于你的角色使用【兵粮寸断】无距离限制。",
-  jiezi: "截辎",
-  jiezi_info: "锁定技，当其他角色跳过摸牌阶段后，你摸一张牌。",
 
   re_caopi: "界曹丕",
   re_caopi_prefix: "界",
@@ -146,15 +138,13 @@ const translates = {
   refangzhu_info:
     "当你受到伤害后，你可以令一名其他角色选择一项：1.弃置X张牌并失去1点体力；2.摸X张牌并翻面（X为你已损失的体力值）。",
 
-  re_dongzhuo: "界董卓",
-  re_dongzhuo_prefix: "界",
-  rejiuchi: "酒池",
-  rejiuchi_info:
-    "你可以将一张黑桃手牌当【酒】使用。当你使用【酒】【杀】造成伤害后，本回合〖崩坏〗失效。",
-  rebaonue: "暴虐",
-  rebaonue2: "暴虐",
-  rebaonue_info:
-    "主公技，当其他群势力角色造成伤害后，其可以令你进行判定，若结果为黑桃，你回复1点体力。",
+  re_xuhuang: "界徐晃",
+  re_xuhuang_prefix: "界",
+  reduanliang: "断粮",
+  reduanliang_info:
+    "你可以将一张黑色非锦囊牌当【兵粮寸断】使用；你对手牌数不小于你的角色使用【兵粮寸断】无距离限制。",
+  jiezi: "截辎",
+  jiezi_info: "锁定技，当其他角色跳过摸牌阶段后，你摸一张牌。",
 
   re_zhurong: "界祝融",
   re_zhurong_prefix: "界",
@@ -167,15 +157,6 @@ const translates = {
   rezaiqi: "再起",
   rezaiqi_info:
     "弃牌阶段结束时，你可以令至多X名角色各选择一项（X为本回合置入弃牌堆的红色牌数）：1.摸一张牌；2.令你回复1点体力。",
-
-  re_jiaxu: "界贾诩",
-  re_jiaxu_prefix: "界",
-  reweimu: "帷幕",
-  reweimu_info:
-    "黑色锦囊牌对你无效；你可以将一张黑色非锦囊牌当【借刀杀人】使用。",
-  rewansha: "完杀",
-  rewansha_info:
-    "锁定技，你的回合内：除处于濒死状态的角色外的其他角色的红色基本牌均视为【杀】，此【杀】被使用时你摸两张牌。",
 
   re_lusu: "界鲁肃",
   re_lusu_prefix: "界",
@@ -192,23 +173,42 @@ const translates = {
   polu_info:
     "当你杀死一名角色或死亡后，你可以令任意名角色各摸X张牌（X为你此前发动过此技能的次数+1）。",
 
-  re_shen_caocao: "神曹操",
-  re_shen_caocao_prefix: "神",
+  re_dongzhuo: "界董卓",
+  re_dongzhuo_prefix: "界",
+  rejiuchi: "酒池",
+  rejiuchi_info:
+    "你可以将一张黑桃手牌当【酒】使用。当你使用【酒】【杀】造成伤害后，本回合〖崩坏〗失效。",
+  rebaonue: "暴虐",
+  rebaonue2: "暴虐",
+  rebaonue_info:
+    "主公技，当其他群势力角色造成伤害后，其可以令你进行判定，若结果为黑桃，你回复1点体力。",
+
+  re_jiaxu: "界贾诩",
+  re_jiaxu_prefix: "界",
+  reweimu: "帷幕",
+  reweimu_info:
+    "黑色锦囊牌对你无效；你可以将一张黑色非锦囊牌当【借刀杀人】使用。",
+  rewansha: "完杀",
+  rewansha_info:
+    "锁定技，你的回合内：除处于濒死状态的角色外的其他角色的红色基本牌均视为【杀】，此【杀】被使用时你摸两张牌。",
 
   re_shen_lvbu: "神吕布",
   re_shen_lvbu_prefix: "神",
 
-  re_zhanghe: "界张郃",
-  re_zhanghe_prefix: "界",
-  reqiaobian: "巧变",
-  reqiaobian_info:
-    "每轮开始时，你可以与一名上轮未选择过的角色各摸一张牌，本轮其回合内你可以弃置一张牌跳过其一个阶段（准备阶段和结束阶段除外），若以此法跳过：摸牌阶段，其获得至多两名角色各一张手牌；出牌阶段，其可以移动场上的一张牌。",
+  re_shen_caocao: "神曹操",
+  re_shen_caocao_prefix: "神",
 
   re_dengai: "界邓艾",
   re_dengai_prefix: "界",
   retuntian: "屯田",
   retuntian_info:
     "当你于回合外失去牌后，你可以进行判定，若结果为红桃，则你获得此判定牌；否则你将此判定牌置于你的武将牌上，称为“田”。你计算与其他角色的距离-X（X为“田”的数量）。",
+
+  re_zhanghe: "界张郃",
+  re_zhanghe_prefix: "界",
+  reqiaobian: "巧变",
+  reqiaobian_info:
+    "每轮开始时，你可以与一名上轮未选择过的角色各摸一张牌，本轮其回合内你可以弃置一张牌跳过其一个阶段（准备阶段和结束阶段除外），若以此法跳过：摸牌阶段，其获得至多两名角色各一张手牌；出牌阶段，其可以移动场上的一张牌。",
 
   re_jiangwei: "界姜维",
   re_jiangwei_prefix: "界",

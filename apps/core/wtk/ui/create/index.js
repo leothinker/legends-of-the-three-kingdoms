@@ -4111,4 +4111,161 @@ export class Create {
   pagination(options) {
     return new Pagination(options)
   }
+  /**
+   * 创建手牌容器
+   * @param {Card[]} [cards]
+   * @param {HTMLDivElement} [position]
+   * @param {Object} [options]
+   */
+  handcardsContainer(cards, position, options) {
+    const container = ui.create.div(".handcards-container", position)
+    //滚动查看手牌的监听
+    const wheelCards = (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault()
+        container.scrollLeft += e.deltaY
+      }
+    }
+    container.addEventListener("wheel", wheelCards, { passive: false })
+
+    //移动端点击查看手牌的监听
+    const activateCards = (e) => {
+      const card = e.target.closest(".handcards-container > .card")
+      if (!card) {
+        return
+      }
+
+      const isActive = card.classList.contains("card-active")
+
+      Array.from(container.children).forEach((child) => {
+        child.classList.remove("card-active")
+      })
+
+      if (!isActive) {
+        card.classList.add("card-active")
+      }
+
+      e.stopPropagation()
+    }
+    container.addEventListener("touchstart", activateCards)
+
+    //销毁容器的函数
+    container.destroyContainer = function () {
+      this.removeEventListener("wheel", wheelCards)
+      this.removeEventListener("touchstart", activateCards)
+      this.delete()
+    }
+
+    //清空容器里的牌
+    container.clearCards = function () {
+      this.buttons = []
+      if (typeof this.replaceChildren === "function") {
+        this.replaceChildren()
+      } else {
+        while (this.firstChild) {
+          this.removeChild(this.firstChild)
+        }
+      }
+    }
+
+    container.addCards = function (cards, noClear) {
+      if (
+        this.buttons?.length === cards.length &&
+        (cards.length === 0 ||
+          this.buttons?.every((button, index) => {
+            const card = cards[index]
+            return (
+              button.link === card &&
+              button.name === card.name &&
+              button.number === card.number &&
+              button.suit === card.suit &&
+              button.node.gaintag.innerHTML === card.node.gaintag.innerHTML &&
+              (get.name(card) !== card.name ||
+              !get.is.sameNature(get.nature(card), card.nature, true)
+                ? button._tempName?.tempname ===
+                  get.translation(get.nature(card) || "") +
+                    get.translation(get.name(card))
+                : true)
+            )
+          }))
+      ) {
+        return
+      }
+
+      //清空原来的牌
+      if (!noClear) {
+        this.clearCards()
+      }
+
+      //计算和添加偏移
+      const num = cards.length
+      if (num) {
+        const buttons = ui.create.buttons(cards, "card", container)
+        container.buttons = buttons
+        let marginRight = 0
+        let isShrink = true
+        const cardWidth = (buttons[0].offsetWidth || 90) + 6
+        const minShrinkWidth = 60 * ((buttons[0].offsetWidth || 90) / 90)
+        const containerWidth = container.offsetWidth
+        if (num * cardWidth <= containerWidth) {
+          marginRight = "0"
+          isShrink = false
+        } else {
+          const neededWidth =
+            num * (cardWidth - minShrinkWidth) + minShrinkWidth
+          if (neededWidth > containerWidth) {
+            marginRight = `-${minShrinkWidth}px`
+          } else {
+            marginRight = `-${cardWidth - (containerWidth - cardWidth) / (num - 1)}px`
+          }
+        }
+        buttons.forEach((button, index) => {
+          button.style.setProperty("margin-right", marginRight)
+          if (isShrink) {
+            button.node.info.style.setProperty(
+              "transform",
+              "translateX(-52px) translateY(-3px)",
+              "important",
+            )
+            button.node.name.style.setProperty(
+              "transform",
+              "translateY(14px)",
+              "important",
+            )
+          }
+          const card = cards[index]
+          if (
+            get.name(card) !== card.name ||
+            !get.is.sameNature(get.nature(card), card.nature, true)
+          ) {
+            ui.create.cardTempName(
+              get.autoViewAs({
+                name: get.name(card),
+                nature: get.nature(card),
+              }),
+              button,
+            )
+          }
+        })
+      } else {
+        container.buttons = []
+      }
+    }
+    container.removeCards = function (cards) {
+      if (!cards?.length) {
+        return
+      }
+      for (const button of this.buttons.slice()) {
+        if (cards.includes(button.link)) {
+          this.buttons.remove(button)
+          button.remove()
+        }
+      }
+    }
+    if (cards?.length) {
+      container.addCards(cards)
+    }
+
+    return container
+  }
 }

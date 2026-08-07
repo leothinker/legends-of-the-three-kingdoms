@@ -1,4 +1,4 @@
-import { lib, _status } from "wtk"
+import { lib } from "wtk"
 import poptips from "./poptip.js"
 
 export default `

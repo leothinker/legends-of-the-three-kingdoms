@@ -1,4 +1,5 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { _status, get, lib } from "wtk"
+
 const Character = lib.element.Character
 
 const bool = _status.connectMode ? lib.configOL.jinEx : get.config("jinEx")
@@ -237,14 +238,18 @@ export default {
     group: "jin",
     hp: 3,
     maxHp: 3,
-    skills: bool ? ["fakexiongshu", "fakejianhui"] : ["gz_chujue", "gz_jianzhi"],
+    skills: bool
+      ? ["fakexiongshu", "fakejianhui"]
+      : ["gz_chujue", "gz_jianzhi"],
   }),
   gz_jin_yanghu: new Character({
     sex: "male",
     group: "jin",
     hp: 4,
     maxHp: 4,
-    skills: bool ? ["fakechongxin", "fakeweirong"] : ["gz_huaiyuan", "gz_fushou"],
+    skills: bool
+      ? ["fakechongxin", "fakeweirong"]
+      : ["gz_huaiyuan", "gz_fushou"],
   }),
   gz_sp_duyu: new Character({
     sex: "male",

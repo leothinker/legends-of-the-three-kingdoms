@@ -1,11 +1,20 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { lib } from "wtk"
 
 lib.poptip.addType("guozhan")
 
 const guozhanPoptip = new Map([
-  ["guozhan_mainSkill", { name: "主将技", info: "此武将牌为主武将时方能使用的技能。" }],
-  ["guozhan_viceSkill", { name: "副将技", info: "此武将牌为副武将时才能使用的技能。" }],
-  ["guozhan_duilie", { name: "队列", info: "座次连续的至少两名同势力角色成为一条队列。" }],
+  [
+    "guozhan_mainSkill",
+    { name: "主将技", info: "此武将牌为主武将时方能使用的技能。" },
+  ],
+  [
+    "guozhan_viceSkill",
+    { name: "副将技", info: "此武将牌为副武将时才能使用的技能。" },
+  ],
+  [
+    "guozhan_duilie",
+    { name: "队列", info: "座次连续的至少两名同势力角色成为一条队列。" },
+  ],
   [
     "guozhan_weigong",
     {

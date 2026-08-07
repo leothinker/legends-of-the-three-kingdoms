@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { game, get, lib, ui } from "wtk"
 
 /** @type {Record<string, Skill>} */
 export default {
@@ -11,8 +11,9 @@ export default {
     filter(_event, player) {
       //if(event.player!=player) return false;
       return (
-        game.hasPlayer((current) => current != player && current.identity == "unknown") ||
-        player.countCards("h", { type: "basic" }) > 0
+        game.hasPlayer(
+          (current) => current !== player && current.identity === "unknown",
+        ) || player.countCards("h", { type: "basic" }) > 0
       )
     },
     check(event, player) {
@@ -29,7 +30,9 @@ export default {
         choices.push("选择一名未确定势力的角色")
       }
       if (
-        game.hasPlayer((current) => current != player && !current.isUnseen()) &&
+        game.hasPlayer(
+          (current) => current !== player && !current.isUnseen(),
+        ) &&
         player.countCards("h", { type: "basic" })
       ) {
         choices.push("将一张基本牌交给一名已确定势力的角色")
@@ -37,9 +40,9 @@ export default {
 
       /** @type {Partial<Result>} */
       let result
-      if (choices.length == 1) {
+      if (choices.length === 1) {
         result = {
-          index: choices[0] == "选择一名未确定势力的角色" ? 0 : 1,
+          index: choices[0] === "选择一名未确定势力的角色" ? 0 : 1,
         }
       } else {
         const next = player.chooseControl()
@@ -56,7 +59,8 @@ export default {
           result = await player
             .chooseTarget(
               "请选择一名未确定势力的角色",
-              (card, player, target) => target != player && target.identity == "unknown",
+              (card, player, target) =>
+                target !== player && target.identity === "unknown",
               true,
             )
             .forResult()
@@ -68,10 +72,10 @@ export default {
               prompt: "请将一张基本牌交给一名已确定势力的其他角色",
               position: "h",
               filterCard(card) {
-                return get.type(card) == "basic"
+                return get.type(card) === "basic"
               },
               filterTarget(card, player, target) {
-                return target != player && target.identity != "unknown"
+                return target !== player && target.identity !== "unknown"
               },
               ai1(card) {
                 return 5 - get.value(card)
@@ -131,7 +135,7 @@ export default {
             }
             return 0
           })
-          .set("prompt", "征辟：交给" + get.translation(player) + "…</div>")
+          .set("prompt", `征辟：交给${get.translation(player)}…</div>`)
           .forResult()
       } else {
         if (target.countCards("h")) {
@@ -141,7 +145,7 @@ export default {
         return
       }
 
-      const check = result.control == "一张非基本牌"
+      const check = result.control === "一张非基本牌"
       result = await target
         .chooseCard(
           "he",
@@ -165,20 +169,20 @@ export default {
               return (
                 (!current.isUnseen() && current.getEquip("yuxi")) ||
                 (current.hasSkill("gzyongsi") &&
-                  !game.hasPlayer(function (current) {
-                    return current.getEquips("yuxi").length > 0
-                  }))
+                  !game.hasPlayer(
+                    (current) => current.getEquips("yuxi").length > 0,
+                  ))
               )
             }) &&
             game.hasPlayer((current) => {
-              return current != player && current.isUnseen()
+              return current !== player && current.isUnseen()
             })
           ) {
             identity = game.players.find((item) => item.isMajor())?.identity
           }
           if (
             !player.isUnseen() &&
-            player.identity != identity &&
+            player.identity !== identity &&
             get.population(player.identity) + 1 >= get.population(identity)
           ) {
             return 0
@@ -199,7 +203,11 @@ export default {
         onremove: true,
         filter(_event, player) {
           const target = player.storage.gz_zhengbi_eff1
-          return target && !target.isUnseen() && target.countGainableCards(player, "he") > 0
+          return (
+            target &&
+            !target.isUnseen() &&
+            target.countGainableCards(player, "he") > 0
+          )
         },
         logTarget(event, player) {
           return player?.storage.gz_zhengbi_eff1
@@ -214,15 +222,20 @@ export default {
             num++
           }
           if (num) {
-            player.gainPlayerCard(target, num, "he", true).set("filterButton", (button) => {
-              for (let i = 0; i < ui.selected.buttons.length; i++) {
-                // @ts-expect-error 类型系统未来可期
-                if (get.position(button.link) == get.position(ui.selected.buttons[i].link)) {
-                  return false
+            player
+              .gainPlayerCard(target, num, "he", true)
+              .set("filterButton", (button) => {
+                for (let i = 0; i < ui.selected.buttons.length; i++) {
+                  // @ts-expect-error 类型系统未来可期
+                  if (
+                    get.position(button.link) ===
+                    get.position(ui.selected.buttons[i].link)
+                  ) {
+                    return false
+                  }
                 }
-              }
-              return true
-            })
+                return true
+              })
           }
         },
         sub: true,
@@ -239,7 +252,7 @@ export default {
       return !player.storage.gz_fengying && player.countCards("h") > 0
     },
     filterTarget(_card, player, target) {
-      return target == player
+      return target === player
     },
     selectTarget: -1,
     discard: false,
@@ -254,11 +267,15 @@ export default {
       await player.useCard({ name: "xietianzi" }, cards, target)
 
       const list = game.filterPlayer(
-        (current) => current.isFriendOf(player) && current.countCards("h") < current.maxHp,
+        (current) =>
+          current.isFriendOf(player) && current.countCards("h") < current.maxHp,
       )
       list.sort(lib.sort.seat)
       player.line(list, "thunder")
-      await game.asyncDraw(list, (current) => current.maxHp - current.countCards("h"))
+      await game.asyncDraw(
+        list,
+        (current) => current.maxHp - current.countCards("h"),
+      )
     },
     ai: {
       order: 0.1,
@@ -272,9 +289,9 @@ export default {
           for (let i = 0; i < cards.length; i++) {
             value += Math.max(0, get.value(cards[i], player, "raw"))
           }
-          const targets = game.filterPlayer(function (current) {
-            return current.isFriendOf(player) && current != player
-          })
+          const targets = game.filterPlayer(
+            (current) => current.isFriendOf(player) && current !== player,
+          )
           let eff = 0
           for (let i = 0; i < targets.length; i++) {
             var num = targets[i].countCards("h") - targets[i].maxHp
@@ -300,9 +317,9 @@ export default {
     filter(event, player) {
       return (
         player.countCards("h") > 0 &&
-        game.hasPlayer(function (current) {
-          return current != player && current.identity != "wei"
-        })
+        game.hasPlayer(
+          (current) => current !== player && current.identity !== "wei",
+        )
       )
     },
     preHidden: true,
@@ -313,7 +330,7 @@ export default {
           position: "h",
           filterCard: true,
           filterTarget(card, player, target) {
-            return target.identity != "wei" && target != player
+            return target.identity !== "wei" && target !== player
           },
           ai1(card, player, target) {
             if (get.attitude(player, target) > 0) {
@@ -353,7 +370,7 @@ export default {
         .set("ai", chooseJunlingCheck)
         .forResult()
 
-      if (chooseJunlingResult.index == 0) {
+      if (chooseJunlingResult.index === 0) {
         await target.carryOutJunling(player, junling, junlingTargets)
         await player.draw()
       } else {
@@ -364,9 +381,25 @@ export default {
 
       function chooseJunlingCheck() {
         if (get.attitude(target, player) > 0) {
-          return get.junlingEffect(player, junling, target, junlingTargets, target) > 1 ? 0 : 1
+          return get.junlingEffect(
+            player,
+            junling,
+            target,
+            junlingTargets,
+            target,
+          ) > 1
+            ? 0
+            : 1
         }
-        return get.junlingEffect(player, junling, target, junlingTargets, target) >= -1 ? 0 : 1
+        return get.junlingEffect(
+          player,
+          junling,
+          target,
+          junlingTargets,
+          target,
+        ) >= -1
+          ? 0
+          : 1
       }
     },
     ai: {

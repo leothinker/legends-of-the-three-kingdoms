@@ -1,14 +1,17 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
-
-import { start, startBefore, onreinit } from "./src/main.js"
-import { pack, intro, sort, yingbian } from "./src/character/index.js"
 import card from "./src/card/index.js"
+import { intro, pack, sort, yingbian } from "./src/character/index.js"
+import help from "./src/help/index.js"
+import * as info from "./src/info/index.js"
+import { onreinit, start, startBefore } from "./src/main.js"
+import {
+  contentPatch,
+  gamePatch,
+  getPatch,
+  playerPatch,
+} from "./src/patch/index.js"
 import skill from "./src/skill/index.js"
 import translate, { dynamic } from "./src/translate/index.js"
 import voices from "./src/voices/index.js"
-import * as info from "./src/info/index.js"
-import { gamePatch, getPatch, contentPatch, playerPatch } from "./src/patch/index.js"
-import help from "./src/help/index.js"
 
 export const type = "mode"
 

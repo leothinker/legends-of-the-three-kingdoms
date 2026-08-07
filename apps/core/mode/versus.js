@@ -1141,6 +1141,9 @@ export default () => {
           }
           game.me.chooseButton(dialog, true).set("onfree", true).selectButton =
             () => {
+              if (get.config("double_character_jiange")) {
+                return [2, 2]
+              }
               return [1, 1]
             }
           ;("step 2")

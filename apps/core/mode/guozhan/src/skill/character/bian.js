@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
 
 /** @type {Record<string, Skill>} */
 export default {
@@ -25,12 +25,13 @@ export default {
 
       const skills = target.getOriginalSkills()
       const list = skills.filter(
-        (skill) => lib.skill[skill].limited && target.awakenedSkills.includes(skill),
+        (skill) =>
+          lib.skill[skill].limited && target.awakenedSkills.includes(skill),
       )
 
       /** @type {Partial<Result>} */
       let result
-      if (list.length == 1) {
+      if (list.length === 1) {
         result = {
           control: list[0],
         }
@@ -68,12 +69,15 @@ export default {
           if (target.hp > 1) {
             var skills = target.getOriginalSkills()
             for (var i = 0; i < skills.length; i++) {
-              if (lib.skill[skills[i]].limited && target.awakenedSkills.includes(skills[i])) {
+              if (
+                lib.skill[skills[i]].limited &&
+                target.awakenedSkills.includes(skills[i])
+              ) {
                 return 8
               }
             }
           }
-          if (target != player) {
+          if (target !== player) {
             return 0
           }
           if (get.damageEffect(target, player, player) >= 0) {
@@ -82,12 +86,13 @@ export default {
           if (target.hp >= 4) {
             return 5
           }
-          if (target.hp == 3) {
+          if (target.hp === 3) {
             if (
               player.countCards("h") <= 2 &&
-              game.hasPlayer(function (current) {
-                return current.hp <= 1 && get.attitude(player, current) < 0
-              })
+              game.hasPlayer(
+                (current) =>
+                  current.hp <= 1 && get.attitude(player, current) < 0,
+              )
             ) {
               return 3
             }
@@ -102,7 +107,7 @@ export default {
     audio: "yigui",
     enable: "chooseToUse",
     filter(event, player) {
-      if (event.type == "wuxie" || event.type == "respondShan") {
+      if (event.type === "wuxie" || event.type === "respondShan") {
         return false
       }
       const storage = player.getStorage("fake_yigui"),
@@ -110,7 +115,7 @@ export default {
       if (!storage.length || storage2.length > 1) {
         return false
       }
-      if (event.type == "dying") {
+      if (event.type === "dying") {
         if (storage2.includes("basic")) {
           return false
         }
@@ -123,17 +128,17 @@ export default {
         // @ts-expect-error 类型系统未来可期
         const target = event.dying
         return (
-          target.identity == "unknown" ||
-          target.identity == "ye" ||
+          target.identity === "unknown" ||
+          target.identity === "ye" ||
           storage.some((i) => {
             var group = get.character(i, 1)
-            if (group == "ye" || target.identity == group) {
+            if (group === "ye" || target.identity === group) {
               return true
             }
             // @ts-expect-error 类型系统未来可期
             var double = get.is.double(i, true)
             // @ts-expect-error 类型系统未来可期
-            if (double && double.includes(target.identity)) {
+            if (double?.includes(target.identity)) {
               return true
             }
           })
@@ -145,7 +150,7 @@ export default {
           if (storage2.includes(get.type(name))) {
             return false
           }
-          return get.type(name) == "basic" || get.type(name) == "trick"
+          return get.type(name) === "basic" || get.type(name) === "trick"
         })
         .some((cardx) => {
           const card = { name: cardx[2], nature: cardx[3] },
@@ -162,7 +167,9 @@ export default {
               double = get.is.double(character, true)
             if (info.changeTarget) {
               // @ts-expect-error 类型系统未来可期
-              const list = game.filterPlayer((current) => player.canUse(card, current))
+              const list = game.filterPlayer((current) =>
+                player.canUse(card, current),
+              )
               for (let i = 0; i < list.length; i++) {
                 let giveup = false,
                   targets = [list[i]]
@@ -170,11 +177,11 @@ export default {
                 for (let j = 0; j < targets.length; j++) {
                   // @ts-expect-error 类型系统未来可期
                   if (
-                    group != "ye" &&
-                    targets[j].identity != "unknown" &&
-                    targets[j].identity != "ye" &&
-                    targets[j].identity != group &&
-                    (!double || !double.includes(targets[j].identity))
+                    group !== "ye" &&
+                    targets[j].identity !== "unknown" &&
+                    targets[j].identity !== "ye" &&
+                    targets[j].identity !== group &&
+                    !double?.includes(targets[j].identity)
                   ) {
                     giveup = true
                     break
@@ -193,18 +200,21 @@ export default {
               // @ts-expect-error 类型系统未来可期
               return (
                 event.filterTarget(card, player, current) &&
-                (group == "ye" ||
-                  current.identity == "unknown" ||
-                  current.identity == "ye" ||
-                  current.identity == group ||
-                  (double && double.includes(current.identity)))
+                (group === "ye" ||
+                  current.identity === "unknown" ||
+                  current.identity === "ye" ||
+                  current.identity === group ||
+                  double?.includes(current.identity))
               )
             })
           })
         })
     },
     hiddenCard(player, name) {
-      if (["shan", "wuxie"].includes(name) || !["basic", "trick"].includes(get.type(name))) {
+      if (
+        ["shan", "wuxie"].includes(name) ||
+        !["basic", "trick"].includes(get.type(name))
+      ) {
         return false
       }
       return (
@@ -223,7 +233,7 @@ export default {
           if (player.getStorage("fake_yigui2").includes(get.type(name))) {
             return false
           }
-          return get.type(name) == "basic" || get.type(name) == "trick"
+          return get.type(name) === "basic" || get.type(name) === "trick"
         })
         // @ts-expect-error 类型系统未来可期
         dialog.add([list, "vcard"])
@@ -234,104 +244,105 @@ export default {
         var evt = _status.event.getParent("chooseToUse")
         if (!ui.selected.buttons.length) {
           // @ts-expect-error 类型系统未来可期
-          if (typeof button.link != "string") {
+          if (typeof button.link !== "string") {
             return false
           }
           // @ts-expect-error 类型系统未来可期
-          if (evt.type == "dying") {
+          if (evt.type === "dying") {
             // @ts-expect-error 类型系统未来可期
-            if (evt.dying.identity == "unknown" || evt.dying.identity == "ye") {
+            if (
+              evt.dying.identity === "unknown" ||
+              evt.dying.identity === "ye"
+            ) {
               return true
             }
             // @ts-expect-error 类型系统未来可期
             var double = get.is.double(button.link, true)
             // @ts-expect-error 类型系统未来可期
             return (
-              evt.dying.identity == lib.character[button.link][1] ||
-              lib.character[button.link][1] == "ye" ||
-              (double && double.includes(evt.dying.identity))
+              evt.dying.identity === lib.character[button.link][1] ||
+              lib.character[button.link][1] === "ye" ||
+              double?.includes(evt.dying.identity)
             )
           }
           return true
-        } else {
+        }
+        // @ts-expect-error 类型系统未来可期
+        if (typeof ui.selected.buttons[0].link !== "string") {
+          return false
+        }
+        // @ts-expect-error 类型系统未来可期
+        if (typeof button.link !== "object") {
+          return false
+        }
+        // @ts-expect-error 类型系统未来可期
+        var name = button.link[2]
+        if (player.getStorage("fake_yigui2").includes(get.type(name))) {
+          return false
+        }
+        var card = { name: name }
+        // @ts-expect-error 类型系统未来可期
+        if (button.link[3]) {
+          card.nature = button.link[3]
+        }
+        var info = get.info(card)
+        // @ts-expect-error 类型系统未来可期
+        var group = lib.character[ui.selected.buttons[0].link][1]
+        // @ts-expect-error 类型系统未来可期
+        var double = get.is.double(ui.selected.buttons[0].link, true)
+        // @ts-expect-error 类型系统未来可期
+        if (evt.type === "dying") {
+          return evt.filterCard(card, player, evt)
+        }
+        if (!lib.filter.filterCard(card, player, evt)) {
+          return false
+        }
+        // @ts-expect-error 类型系统未来可期
+        if (evt.filterCard && !evt.filterCard(card, player, evt)) {
+          return false
+        }
+        if (info.changeTarget) {
           // @ts-expect-error 类型系统未来可期
-          if (typeof ui.selected.buttons[0].link != "string") {
-            return false
-          }
-          // @ts-expect-error 类型系统未来可期
-          if (typeof button.link != "object") {
-            return false
-          }
-          // @ts-expect-error 类型系统未来可期
-          var name = button.link[2]
-          if (player.getStorage("fake_yigui2").includes(get.type(name))) {
-            return false
-          }
-          var card = { name: name }
-          // @ts-expect-error 类型系统未来可期
-          if (button.link[3]) {
-            card.nature = button.link[3]
-          }
-          var info = get.info(card)
-          // @ts-expect-error 类型系统未来可期
-          var group = lib.character[ui.selected.buttons[0].link][1]
-          // @ts-expect-error 类型系统未来可期
-          var double = get.is.double(ui.selected.buttons[0].link, true)
-          // @ts-expect-error 类型系统未来可期
-          if (evt.type == "dying") {
-            return evt.filterCard(card, player, evt)
-          }
-          if (!lib.filter.filterCard(card, player, evt)) {
-            return false
-          }
-          // @ts-expect-error 类型系统未来可期
-          else if (evt.filterCard && !evt.filterCard(card, player, evt)) {
-            return false
-          }
-          if (info.changeTarget) {
-            // @ts-expect-error 类型系统未来可期
-            var list = game.filterPlayer(function (current) {
-              return player.canUse(card, current)
-            })
-            for (var i = 0; i < list.length; i++) {
-              var giveup = false
-              var targets = [list[i]]
-              info.changeTarget(player, targets)
-              for (var j = 0; j < targets.length; j++) {
-                // @ts-expect-error 类型系统未来可期
-                if (
-                  group != "ye" &&
-                  targets[j].identity != "unknown" &&
-                  targets[j].identity != "ye" &&
-                  targets[j].identity != group &&
-                  (!double || !double.includes(targets[j].identity))
-                ) {
-                  giveup = true
-                  break
-                }
-              }
-              if (giveup) {
-                continue
-              }
-              if (giveup == false) {
-                return true
+          var list = game.filterPlayer((current) =>
+            player.canUse(card, current),
+          )
+          for (var i = 0; i < list.length; i++) {
+            var giveup = false
+            var targets = [list[i]]
+            info.changeTarget(player, targets)
+            for (var j = 0; j < targets.length; j++) {
+              // @ts-expect-error 类型系统未来可期
+              if (
+                group !== "ye" &&
+                targets[j].identity !== "unknown" &&
+                targets[j].identity !== "ye" &&
+                targets[j].identity !== group &&
+                !double?.includes(targets[j].identity)
+              ) {
+                giveup = true
+                break
               }
             }
-            return false
-          } else {
-            return game.hasPlayer(function (current) {
-              // @ts-expect-error 类型系统未来可期
-              return (
-                evt.filterTarget(card, player, current) &&
-                (group == "ye" ||
-                  current.identity == "unknown" ||
-                  current.identity == "ye" ||
-                  current.identity == group ||
-                  (double && double.includes(current.identity)))
-              )
-            })
+            if (giveup) {
+              continue
+            }
+            if (giveup === false) {
+              return true
+            }
           }
+          return false
         }
+        return game.hasPlayer((current) => {
+          // @ts-expect-error 类型系统未来可期
+          return (
+            evt.filterTarget(card, player, current) &&
+            (group === "ye" ||
+              current.identity === "unknown" ||
+              current.identity === "ye" ||
+              current.identity === group ||
+              double?.includes(current.identity))
+          )
+        })
       },
       check(button) {
         if (ui.selected.buttons.length) {
@@ -346,12 +357,15 @@ export default {
           // @ts-expect-error 类型系统未来可期
           var player = _status.event.player
           // @ts-expect-error 类型系统未来可期
-          if (evt.type == "dying") {
+          if (evt.type === "dying") {
             // @ts-expect-error 类型系统未来可期
-            if (evt.dying != player && get.effect(evt.dying, { name: name }, player, player) <= 0) {
+            if (
+              evt.dying !== player &&
+              get.effect(evt.dying, { name: name }, player, player) <= 0
+            ) {
               return 0
             }
-            if (name == "jiu") {
+            if (name === "jiu") {
               return 2.1
             }
             return 2
@@ -374,15 +388,23 @@ export default {
           ) {
             return 0
           }
-          if (["taoyuan", "wugu", "wanjian", "nanman", "huoshaolianying"].includes(name)) {
-            var list = game.filterPlayer(function (current) {
+          if (
+            [
+              "taoyuan",
+              "wugu",
+              "wanjian",
+              "nanman",
+              "huoshaolianying",
+            ].includes(name)
+          ) {
+            var list = game.filterPlayer((current) => {
               // @ts-expect-error 类型系统未来可期
               return (
-                (group == "ye" ||
-                  current.identity == "unknown" ||
-                  current.identity == "ye" ||
-                  current.identity == group ||
-                  (double && double.includes(current.identity))) &&
+                (group === "ye" ||
+                  current.identity === "unknown" ||
+                  current.identity === "ye" ||
+                  current.identity === group ||
+                  double?.includes(current.identity)) &&
                 player.canUse({ name: name }, current)
               )
             })
@@ -427,11 +449,11 @@ export default {
             // @ts-expect-error 类型系统未来可期
             if (
               !(info.singleCard && ui.selected.targets.length) &&
-              group != "ye" &&
-              target.identity != "unknown" &&
-              target.identity != "ye" &&
-              target.identity != group &&
-              (!double || !double.includes(target.identity))
+              group !== "ye" &&
+              target.identity !== "unknown" &&
+              target.identity !== "ye" &&
+              target.identity !== group &&
+              !double?.includes(target.identity)
             ) {
               return false
             }
@@ -441,18 +463,18 @@ export default {
               for (var i = 0; i < targets.length; i++) {
                 // @ts-expect-error 类型系统未来可期
                 if (
-                  group != "ye" &&
-                  targets[i].identity != "unknown" &&
-                  targets[i].identity != "ye" &&
-                  targets[i].identity != group &&
-                  (!double || !double.includes(targets[i].identity))
+                  group !== "ye" &&
+                  targets[i].identity !== "unknown" &&
+                  targets[i].identity !== "ye" &&
+                  targets[i].identity !== group &&
+                  !double?.includes(targets[i].identity)
                 ) {
                   return false
                 }
               }
             }
             // @ts-expect-error 类型系统未来可期
-            if (evt._backup && evt._backup.filterTarget) {
+            if (evt._backup?.filterTarget) {
               return evt._backup.filterTarget(card, player, target)
             }
             return lib.filter.filterTarget(card, player, target)
@@ -463,7 +485,11 @@ export default {
             player.unmarkAuto("fake_yigui", [character])
             // @ts-expect-error 类型系统未来可期
             _status.characterlist.add(character)
-            game.log(player, "移去了一张", "#g“魂（" + get.translation(character) + "）”")
+            game.log(
+              player,
+              "移去了一张",
+              `#g“魂（${get.translation(character)}）”`,
+            )
             if (!player.storage.fake_yigui2) {
               player
                 .when({ global: "phaseBefore" })
@@ -478,13 +504,7 @@ export default {
         var name = links[1][2],
           character = links[0],
           nature = links[1][3]
-        return (
-          "移除「" +
-          get.translation(character) +
-          "」并视为使用" +
-          (get.translation(nature) || "") +
-          get.translation(name)
-        )
+        return `移除「${get.translation(character)}」并视为使用${get.translation(nature) || ""}${get.translation(name)}`
       },
     },
     ai: {
@@ -500,19 +520,19 @@ export default {
         storage = []
       },
       mark(dialog, storage, player) {
-        if (storage && storage.length) {
+        if (storage?.length) {
           // @ts-expect-error 类型系统未来可期
           if (player.isUnderControl(true)) {
             dialog.addSmall([storage, "character"])
           } else {
-            return "共有" + get.cnNumber(storage.length) + "张“魂”"
+            return `共有${get.cnNumber(storage.length)}张“魂”`
           }
         } else {
           return "没有“魂”"
         }
       },
       content(storage) {
-        return "共有" + get.cnNumber(storage.length) + "张“魂”"
+        return `共有${get.cnNumber(storage.length)}张“魂”`
       },
     },
     gainHun(player, num) {
@@ -523,7 +543,7 @@ export default {
         _status.characterlist.removeArray(list)
         player.markAuto("fake_yigui", list)
         get.info("rehuashen").drawCharacter(player, list)
-        game.log(player, "获得了" + get.cnNumber(list.length) + "张", "#g“魂”")
+        game.log(player, `获得了${get.cnNumber(list.length)}张`, "#g“魂”")
       }
     },
     subSkill: {
@@ -533,7 +553,11 @@ export default {
         trigger: { player: "showCharacterAfter" },
         filter(event, player) {
           // @ts-expect-error 类型系统未来可期
-          if (!event.toShow.some((i) => get.character(i, 3).includes("fake_yigui"))) {
+          if (
+            !event.toShow.some((i) =>
+              get.character(i, 3).includes("fake_yigui"),
+            )
+          ) {
             return false
           }
           return (
@@ -543,14 +567,16 @@ export default {
                 (evt) => {
                   // @ts-expect-error 类型系统未来可期
                   return (
-                    evt.name == "showCharacter" &&
-                    evt.player == player &&
-                    evt.toShow.some((i) => get.character(i, 3).includes("fake_yigui"))
+                    evt.name === "showCharacter" &&
+                    evt.player === player &&
+                    evt.toShow.some((i) =>
+                      get.character(i, 3).includes("fake_yigui"),
+                    )
                   )
                 },
                 event,
               )
-              .indexOf(event) == 0
+              .indexOf(event) === 0
           )
         },
         forced: true,
@@ -596,13 +622,13 @@ export default {
                   // @ts-expect-error 类型系统未来可期
                   game.countPlayer((target) => {
                     const group = get.character(character, 1)
-                    if (group == "ye" || target.identity == group) {
+                    if (group === "ye" || target.identity === group) {
                       return true
                     }
                     // @ts-expect-error 类型系统未来可期
                     const double = get.is.double(character, true)
                     // @ts-expect-error 类型系统未来可期
-                    if (double && double.includes(target.identity)) {
+                    if (double?.includes(target.identity)) {
                       return true
                     }
                   }) + 1
@@ -618,7 +644,11 @@ export default {
           player.unmarkAuto("fake_yigui", event.cost_data)
           // @ts-expect-error 类型系统未来可期
           _status.characterlist.addArray(event.cost_data)
-          game.log(player, "移除了" + get.cnNumber(event.cost_data.length) + "张", "#g“魂”")
+          game.log(
+            player,
+            `移除了${get.cnNumber(event.cost_data.length)}张`,
+            "#g“魂”",
+          )
           get.info("fake_yigui").gainHun(player, event.cost_data.length)
         },
       },
@@ -635,16 +665,16 @@ export default {
     filter(event, player) {
       if (player.isFriendOf(event.player)) {
         return (
-          event.player.getHistory("useCard", function (evt) {
+          event.player.getHistory("useCard", (evt) => {
             if (evt.targets) {
               var targets = evt.targets.slice(0)
               while (targets.includes(event.player)) {
                 targets.remove(event.player)
               }
-              return targets.length != 0
+              return targets.length !== 0
             }
             return false
-          }).length == 0
+          }).length === 0
         )
       }
       return false
@@ -675,7 +705,13 @@ export default {
       }
       for (var i = 0; i < hs.length; i++) {
         // @ts-expect-error 类型系统未来可期
-        var mod2 = game.checkMod(hs[i], player, "unchanged", "cardEnabled2", player)
+        var mod2 = game.checkMod(
+          hs[i],
+          player,
+          "unchanged",
+          "cardEnabled2",
+          player,
+        )
         if (mod2 === false) {
           return false
         }
@@ -687,7 +723,7 @@ export default {
         var list = lib.inpile
         var list2 = []
         for (var i = 0; i < list.length; i++) {
-          if (list[i] != "wuxie" && get.type(list[i]) == "trick") {
+          if (list[i] !== "wuxie" && get.type(list[i]) === "trick") {
             list2.push(["锦囊", "", list[i]])
           }
         }
@@ -699,21 +735,19 @@ export default {
         var info = get.info(card)
         var num = player.countCards("h")
         //if(get.tag(card,'multitarget')&&get.select(info.selectTarget)[1]==-1){
-        if (get.select(info.selectTarget)[1] == -1) {
+        if (get.select(info.selectTarget)[1] === -1) {
           if (
             // @ts-expect-error 类型系统未来可期
-            game.countPlayer(function (current) {
-              return player.canUse(card, current)
-            }) > num
+            game.countPlayer((current) => player.canUse(card, current)) > num
           ) {
             return false
           }
         } else if (info.changeTarget) {
           var giveup = true
           // @ts-expect-error 类型系统未来可期
-          var list = game.filterPlayer(function (current) {
-            return player.canUse(card, current)
-          })
+          var list = game.filterPlayer((current) =>
+            player.canUse(card, current),
+          )
           for (var i = 0; i < list.length; i++) {
             var targets = [list[i]]
             info.changeTarget(player, targets)
@@ -732,9 +766,14 @@ export default {
       check(button) {
         // @ts-expect-error 类型系统未来可期
         if (
-          ["chiling", "xietianzi", "tiesuo", "lulitongxin", "diaohulishan", "jiedao"].includes(
-            button.link[2],
-          )
+          [
+            "chiling",
+            "xietianzi",
+            "tiesuo",
+            "lulitongxin",
+            "diaohulishan",
+            "jiedao",
+          ].includes(button.link[2])
         ) {
           return 0
         }
@@ -776,7 +815,7 @@ export default {
         }
       },
       prompt(links, player) {
-        return "将全部手牌当作" + get.translation(links[0][2]) + "使用"
+        return `将全部手牌当作${get.translation(links[0][2])}使用`
       },
     },
     group: "gz_qice_change",
@@ -786,7 +825,7 @@ export default {
           player: "useCardAfter",
         },
         filter(event, player) {
-          return event.skill == "gz_qice_backup"
+          return event.skill === "gz_qice_backup"
         },
         silent: true,
         async content(event, _trigger, player) {
@@ -834,7 +873,8 @@ export default {
       const next = player.chooseTarget(
         get.prompt2("gz_diaodu_best"),
         (_card, player, current) =>
-          current.isFriendOf(player) && current.countGainableCards(player, "e") > 0,
+          current.isFriendOf(player) &&
+          current.countGainableCards(player, "e") > 0,
       )
 
       next.set("ai", (target) => {
@@ -871,10 +911,16 @@ export default {
         return
       }
 
-      const next = player.chooseTarget(`是否将${get.translation(card)}交给一名其他角色？`)
+      const next = player.chooseTarget(
+        `是否将${get.translation(card)}交给一名其他角色？`,
+      )
       next.set("filterTarget", (_card, player, current) => {
         const event = get.event()
-        return current !== player && current !== event.target && player.isFriendOf(current)
+        return (
+          current !== player &&
+          current !== event.target &&
+          player.isFriendOf(current)
+        )
       })
       next.set("target", target)
 
@@ -907,7 +953,10 @@ export default {
         },
         logTarget: "player",
         async cost(event, trigger, player) {
-          const next = trigger.player.chooseBool(get.prompt("gz_diaodu_best"), "摸一张牌")
+          const next = trigger.player.chooseBool(
+            get.prompt("gz_diaodu_best"),
+            "摸一张牌",
+          )
 
           if (player.hasSkill("gz_diaodu_best")) {
             next.set("frequentSkill", "gz_diaodu_best")
@@ -963,7 +1012,9 @@ export default {
     audio: "sanyao",
     inherit: "sanyao",
     filterTarget(card, player, target) {
-      return target.hp > player.hp || target.countCards("h") > player.countCards("h")
+      return (
+        target.hp > player.hp || target.countCards("h") > player.countCards("h")
+      )
     },
   },
   gz_zhiman: {

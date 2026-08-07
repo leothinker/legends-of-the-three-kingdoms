@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { _status, game, get, lib, ui } from "wtk"
 import { broadcastAll } from "./patch/game.js"
 
 /**
@@ -6,7 +6,7 @@ import { broadcastAll } from "./patch/game.js"
  */
 export const start = async (event, trigger, player) => {
   // 首先检查是否在播放录像
-  const playback = localStorage.getItem(lib.configprefix + "playback")
+  const playback = localStorage.getItem(`${lib.configprefix}playback`)
 
   // 如果有录像信息，则尝试播放录像
   if (playback) {
@@ -15,12 +15,14 @@ export const start = async (event, trigger, player) => {
     ui.system.style.display = "none"
 
     _status.playback = playback
-    localStorage.removeItem(lib.configprefix + "playback")
+    localStorage.removeItem(`${lib.configprefix}playback`)
 
     // 读取录像信息
     // @ts-expect-error type error
-    const store = lib.db.transaction(["video"], "readwrite").objectStore("video")
-    store.get(parseInt(playback)).onsuccess = function (e) {
+    const store = lib.db
+      .transaction(["video"], "readwrite")
+      .objectStore("video")
+    store.get(parseInt(playback, 10)).onsuccess = (e) => {
       if (e.target.result) {
         game.playVideoContent(e.target.result.video)
       } else {
@@ -31,7 +33,7 @@ export const start = async (event, trigger, player) => {
 
     // 录像或许需要对乱斗模式进行特殊的处理
     _status.mode = get.config("guozhan_mode")
-    if (_status.brawl && _status.brawl.submode) {
+    if (_status.brawl?.submode) {
       _status.mode = _status.brawl.submode
     }
     if (get.config("separatism")) {
@@ -92,7 +94,7 @@ export const start = async (event, trigger, player) => {
         }
         // @ts-expect-error 祖宗之法就是这么写的
         const pack = lib.characterPack.mode_guozhan
-        if (mode == "yingbian") {
+        if (mode === "yingbian") {
           delete lib.translate.shuiyanqijunx_info_guozhan
           // @ts-expect-error 祖宗之法就是这么写的
           const pack2 = lib.yingbian_guozhan
@@ -107,11 +109,13 @@ export const start = async (event, trigger, player) => {
         for (const character in pack) {
           lib.character[character] = pack[character]
           if (
-            !lib.translate["#" + character + ":die"] &&
+            !lib.translate[`#${character}:die`] &&
             !lib.character[character].dieAudios?.length
           ) {
-            let list = lib.character?.[character.slice(3)]?.dieAudios
-            lib.character[character].dieAudios = list?.length ? list : [character.slice(3)]
+            const list = lib.character?.[character.slice(3)]?.dieAudios
+            lib.character[character].dieAudios = list?.length
+              ? list
+              : [character.slice(3)]
           }
           if (!lib.translate[character]) {
             lib.translate[character] = lib.translate[character.slice(3)]
@@ -121,11 +125,15 @@ export const start = async (event, trigger, player) => {
           ? lib.configOL.shenInGuozhan
           : get.config("shenInGuozhan")
         for (const character in lib.character) {
-          if (shenInGuozhan && lib.selectGroup.includes(lib.character[character][1])) {
+          if (
+            shenInGuozhan &&
+            lib.selectGroup.includes(lib.character[character][1])
+          ) {
             continue
           }
           if (lib.character[character].groupInGuozhan) {
-            lib.character[character].group = lib.character[character].groupInGuozhan
+            lib.character[character].group =
+              lib.character[character].groupInGuozhan
           }
         }
         //lib.characterReplace={};
@@ -162,8 +170,11 @@ export const start = async (event, trigger, player) => {
           lib.character[i] = pack[i]
           // @ts-expect-error 祖宗之法就是这么写的
           lib.characterPack.mode_guozhan[i] = pack[i]
-          if (!lib.translate["#" + i + ":die"] && !lib.character[i].dieAudios?.length) {
-            let list = lib.character?.[i.slice(3)]?.dieAudios
+          if (
+            !lib.translate[`#${i}:die`] &&
+            !lib.character[i].dieAudios?.length
+          ) {
+            const list = lib.character?.[i.slice(3)]?.dieAudios
             lib.character[i].dieAudios = list?.length ? list : [i.slice(3)]
           }
           if (!lib.translate[i]) {
@@ -178,7 +189,7 @@ export const start = async (event, trigger, player) => {
         break
     }
 
-    if (_status.mode != "free") {
+    if (_status.mode !== "free") {
       // @ts-expect-error 祖宗之法就是这么写的
       game.fixedPile = true
     } else {
@@ -188,7 +199,7 @@ export const start = async (event, trigger, player) => {
     game.prepareArena()
     // game.delay();
 
-    if (_status.brawl && _status.brawl.submode) {
+    if (_status.brawl?.submode) {
       _status.mode = _status.brawl.submode
     }
     if (get.config("separatism")) {
@@ -207,7 +218,7 @@ export const start = async (event, trigger, player) => {
     if (get.config("banGroup") && groups?.length && !chosen?.length) {
       const group = groups.randomGet()
       event.videoId = lib.status.videoId++
-      let createDialog = function (group, id) {
+      const createDialog = (group, id) => {
         _status.bannedGroup = group
         var dialog = ui.create.dialog(
           `本局禁用势力：${get.translation(group)}`,
@@ -226,14 +237,14 @@ export const start = async (event, trigger, player) => {
         const info = get.character(character)
         if (info?.doubleGroup?.includes(group)) {
           info.doubleGroup.remove(group)
-          if (info.group == group && info.doubleGroup?.length) {
+          if (info.group === group && info.doubleGroup?.length) {
             info.group = info.doubleGroup[0]
           }
-          if (info.doubleGroup.length == 1) {
+          if (info.doubleGroup.length === 1) {
             info.doubleGroup = []
           }
         }
-        if (info.group == group) {
+        if (info.group === group) {
           info.isUnseen = true
         }
         game.broadcast(
@@ -248,7 +259,7 @@ export const start = async (event, trigger, player) => {
       game.broadcastAll("closeDialog", event.videoId)
     }
 
-    if (_status.brawl && _status.brawl.chooseCharacterBefore) {
+    if (_status.brawl?.chooseCharacterBefore) {
       await _status.brawl.chooseCharacterBefore()
     }
 
@@ -265,8 +276,8 @@ export const start = async (event, trigger, player) => {
   // @ts-expect-error 祖宗之法就是这么写的
   if (_status.cheat_seat) {
     // @ts-expect-error 祖宗之法就是这么写的
-    let seat = _status.cheat_seat.link
-    if (seat == 0) {
+    const seat = _status.cheat_seat.link
+    if (seat === 0) {
       playerFirst = game.me
     } else {
       playerFirst = game.players[game.players.length - seat]
@@ -314,7 +325,7 @@ export const start = async (event, trigger, player) => {
   _status.videoInited = true
   game.addVideo("init", null, info)
 
-  if (_status.mode == "mingjiang") {
+  if (_status.mode === "mingjiang") {
     // @ts-expect-error 祖宗之法就是这么写的
     game.showIdentity(true)
   } else {
@@ -330,23 +341,29 @@ export const start = async (event, trigger, player) => {
 }
 
 export const startBefore = () => {
-  const playback = localStorage.getItem(lib.configprefix + "playback")
+  const playback = localStorage.getItem(`${lib.configprefix}playback`)
 
   // @ts-expect-error 祖宗之法就是这么写的
-  for (let character in lib.characterPack.mode_guozhan) {
+  for (const character in lib.characterPack.mode_guozhan) {
     if (!get.config("onlyguozhan") && !playback) {
       if (
         lib.character[character.slice(3)] &&
-        (!get.config("guozhanSkin") || !lib.characterPack.mode_guozhan[character].hasSkinInGuozhan)
+        (!get.config("guozhanSkin") ||
+          !lib.characterPack.mode_guozhan[character].hasSkinInGuozhan)
       ) {
         lib.character[character.slice(3)].isUnseen = true
       }
     }
     // @ts-expect-error 祖宗之法就是这么写的
     lib.character[character] = lib.characterPack.mode_guozhan[character]
-    if (!lib.translate["#" + character + ":die"] && !lib.character[character].dieAudios?.length) {
-      let list = lib.character?.[character.slice(3)]?.dieAudios
-      lib.character[character].dieAudios = list?.length ? list : [character.slice(3)]
+    if (
+      !lib.translate[`#${character}:die`] &&
+      !lib.character[character].dieAudios?.length
+    ) {
+      const list = lib.character?.[character.slice(3)]?.dieAudios
+      lib.character[character].dieAudios = list?.length
+        ? list
+        : [character.slice(3)]
     }
     if (!lib.translate[character]) {
       lib.translate[character] = lib.translate[character.slice(3)]
@@ -356,7 +373,10 @@ export const startBefore = () => {
     ? lib.configOL.shenInGuozhan
     : get.config("shenInGuozhan")
   for (const character in lib.character) {
-    if (shenInGuozhan && lib.selectGroup.includes(lib.character[character].group)) {
+    if (
+      shenInGuozhan &&
+      lib.selectGroup.includes(lib.character[character].group)
+    ) {
       continue
     }
     if (lib.character[character].groupInGuozhan) {
@@ -371,9 +391,14 @@ export const onreinit = () => {
 
   for (const character in pack) {
     lib.character[character] = pack[character]
-    if (!lib.translate["#" + character + ":die"] && !lib.character[character].dieAudios?.length) {
-      let list = lib.character?.[character.slice(3)]?.dieAudios
-      lib.character[character].dieAudios = list?.length ? list : [character.slice(3)]
+    if (
+      !lib.translate[`#${character}:die`] &&
+      !lib.character[character].dieAudios?.length
+    ) {
+      const list = lib.character?.[character.slice(3)]?.dieAudios
+      lib.character[character].dieAudios = list?.length
+        ? list
+        : [character.slice(3)]
     }
     if (!lib.translate[character]) {
       lib.translate[character] = lib.translate[character.slice(3)]
@@ -384,7 +409,10 @@ export const onreinit = () => {
     ? lib.configOL.shenInGuozhan
     : get.config("shenInGuozhan")
   for (const character in lib.character) {
-    if (shenInGuozhan && lib.selectGroup.includes(lib.character[character].group)) {
+    if (
+      shenInGuozhan &&
+      lib.selectGroup.includes(lib.character[character].group)
+    ) {
       continue
     }
     if (lib.character[character].groupInGuozhan) {

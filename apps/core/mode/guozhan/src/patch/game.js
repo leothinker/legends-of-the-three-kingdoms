@@ -1,5 +1,9 @@
-import { lib, game, Game, ui, get, ai, _status } from "wtk"
-import { showYexingsContent, chooseCharacterContent, chooseCharacterOLContent } from "./content.js"
+import { _status, Game, game, get, lib } from "wtk"
+import {
+  chooseCharacterContent,
+  chooseCharacterOLContent,
+  showYexingsContent,
+} from "./content.js"
 
 export class GameGuozhan extends Game {
   /**
@@ -47,9 +51,9 @@ export class GameGuozhan extends Game {
    * @returns {string[]} - 最终武将的数组
    */
   getCharacterChoice(list, num) {
-    const choice = list.splice(0, num).sort(function (a, b) {
-      return (get.is.double(a) ? 1 : -1) - (get.is.double(b) ? 1 : -1)
-    })
+    const choice = list
+      .splice(0, num)
+      .sort((a, b) => (get.is.double(a) ? 1 : -1) - (get.is.double(b) ? 1 : -1))
     const map = { wei: [], shu: [], wu: [], qun: [], key: [], jin: [], ye: [] }
     for (let i = 0; i < choice.length; ++i) {
       if (get.is.double(choice[i])) {
@@ -57,7 +61,7 @@ export class GameGuozhan extends Game {
         var group = get.is.double(choice[i], true)
         // @ts-expect-error 祖宗之法就是这么写的
         for (var ii of group) {
-          if (map[ii] && map[ii].length) {
+          if (map[ii]?.length) {
             map[ii].push(choice[i])
             lib.character[choice[i]][1] = ii
             group = false
@@ -77,14 +81,14 @@ export class GameGuozhan extends Game {
     }
     if (map.ye.length) {
       for (const i in map) {
-        if (i != "ye" && map[i].length) {
+        if (i !== "ye" && map[i].length) {
           return choice.randomSort()
         }
       }
       choice.remove(map.ye[0])
       map.ye.remove(map.ye[0])
       for (var i = 0; i < list.length; i++) {
-        if (lib.character[list[i]][1] != "ye") {
+        if (lib.character[list[i]][1] !== "ye") {
           choice.push(list[i])
           list.splice(i--, 1)
           return choice.randomSort()
@@ -93,14 +97,14 @@ export class GameGuozhan extends Game {
     }
     for (const i in map) {
       if (map[i].length < 2) {
-        if (map[i].length == 1) {
+        if (map[i].length === 1) {
           choice.remove(map[i][0])
           list.push(map[i][0])
         }
         map[i] = false
       }
     }
-    if (choice.length == num - 1) {
+    if (choice.length === num - 1) {
       for (let i = 0; i < list.length; ++i) {
         if (map[lib.character[list[i]][1]]) {
           choice.push(list[i])
@@ -112,7 +116,10 @@ export class GameGuozhan extends Game {
       let group = null
       for (let i = 0; i < list.length; ++i) {
         if (group) {
-          if (lib.character[list[i]][1] == group || lib.character[list[i]][1] == "ye") {
+          if (
+            lib.character[list[i]][1] === group ||
+            lib.character[list[i]][1] === "ye"
+          ) {
             choice.push(list[i])
             list.splice(i--, 1)
             if (choice.length >= num) {
@@ -122,7 +129,7 @@ export class GameGuozhan extends Game {
         } else {
           if (!map[lib.character[list[i]][1]] && !get.is.double(list[i])) {
             group = lib.character[list[i]][1]
-            if (group == "ye") {
+            if (group === "ye") {
               group = null
             }
             choice.push(list[i])
@@ -179,19 +186,29 @@ export class GameGuozhan extends Game {
    */
   getRoomInfo(uiintro) {
     var num, last
-    if (lib.configOL.initshow_draw == "off") {
+    if (lib.configOL.initshow_draw === "off") {
       num = "关闭"
     } else {
       num = { mark: "标记", draw: "摸牌" }[lib.configOL.initshow_draw]
     }
-    uiintro.add('<div class="text chat">群雄割据：' + (lib.configOL.separatism ? "开启" : "关闭"))
-    uiintro.add('<div class="text chat">首亮奖励：' + num)
-    uiintro.add('<div class="text chat">珠联璧合：' + (lib.configOL.zhulian ? "开启" : "关闭"))
-    uiintro.add('<div class="text chat">出牌时限：' + lib.configOL.choose_timeout + "秒")
-    uiintro.add('<div class="text chat">国战牌堆：' + (lib.configOL.guozhanpile ? "开启" : "关闭"))
-    uiintro.add('<div class="text chat">鏖战模式：' + (lib.configOL.aozhan ? "开启" : "关闭"))
+    uiintro.add(
+      `<div class="text chat">群雄割据：${lib.configOL.separatism ? "开启" : "关闭"}`,
+    )
+    uiintro.add(`<div class="text chat">首亮奖励：${num}`)
+    uiintro.add(
+      `<div class="text chat">珠联璧合：${lib.configOL.zhulian ? "开启" : "关闭"}`,
+    )
+    uiintro.add(
+      `<div class="text chat">出牌时限：${lib.configOL.choose_timeout}秒`,
+    )
+    uiintro.add(
+      `<div class="text chat">国战牌堆：${lib.configOL.guozhanpile ? "开启" : "关闭"}`,
+    )
+    uiintro.add(
+      `<div class="text chat">鏖战模式：${lib.configOL.aozhan ? "开启" : "关闭"}`,
+    )
     last = uiintro.add(
-      '<div class="text chat">观看下家副将：' + (lib.configOL.viewnext ? "开启" : "关闭"),
+      `<div class="text chat">观看下家副将：${lib.configOL.viewnext ? "开启" : "关闭"}`,
     )
 
     // @ts-expect-error 祖宗之法就是这么写的
@@ -224,7 +241,9 @@ export class GameGuozhan extends Game {
     /// 构建战绩记录字符串
     let group = [...lib.group, "ye"]
     // 过滤神和外服势力，以及没有战绩的势力
-    group = group.filter((group) => group !== "shen" && group !== "western" && data[group])
+    group = group.filter(
+      (group) => group !== "shen" && group !== "western" && data[group],
+    )
     // 将战绩记录转换为字符串
     const strs = group.map((id) => {
       const name = get.translation(`${id}2`)
@@ -255,7 +274,7 @@ export class GameGuozhan extends Game {
       return
     }
 
-    let list = {
+    const list = {
       wei: "魏",
       shu: "蜀",
       wu: "吴",
@@ -267,12 +286,12 @@ export class GameGuozhan extends Game {
     const maxPlayer = _status.separatism
       ? Math.max(get.population() / 2 - 1, 1)
       : get.population() / 2
-    for (let group of ["wei", "shu", "wu", "qun", "jin"]) {
+    for (const group of ["wei", "shu", "wu", "qun", "jin"]) {
       if (
-        group == _status.bannedGroup?.slice(6) ||
+        group === _status.bannedGroup?.slice(6) ||
         (get.population(group) >= maxPlayer &&
           !game.hasPlayer((current) => {
-            return get.is.jun(current) && current.identity == group
+            return get.is.jun(current) && current.identity === group
           }))
       ) {
         // @ts-expect-error 祖宗之法就是这么写的
@@ -315,17 +334,15 @@ export class GameGuozhan extends Game {
    * @returns {[name: string, situation: string]}
    */
   getVideoName() {
-    var str = get.translation(game.me.name1) + "/" + get.translation(game.me.name2)
+    var str = `${get.translation(game.me.name1)}/${get.translation(game.me.name2)}`
     // @ts-expect-error 祖宗之法就是这么写的
     var str2 = _status.separatism
       ? get.modetrans({
           mode: lib.config.mode,
           separatism: true,
         })
-      : get.cnNumber(parseInt(get.config("player_number"))) +
-        "人" +
-        get.translation(lib.config.mode)
-    if (game.me.identity == "ye") {
+      : `${get.cnNumber(parseInt(get.config("player_number"), 10))}人${get.translation(lib.config.mode)}`
+    if (game.me.identity === "ye") {
       str2 += " - 野心家"
     }
     return [str, str2]
@@ -337,7 +354,7 @@ export class GameGuozhan extends Game {
    * @param {boolean} started
    */
   showIdentity(started) {
-    if (game.phaseNumber == 0 && !started) {
+    if (game.phaseNumber === 0 && !started) {
       return
     }
     for (var i = 0; i < game.players.length; i++) {
@@ -354,7 +371,7 @@ export class GameGuozhan extends Game {
       pmap = _status.connectMode ? lib.playerOL : game.playerMap,
       hiddens = []
     for (var i of game.players) {
-      if (i.identity == "unknown") {
+      if (i.identity === "unknown") {
         hiddens.push(i)
         continue
       }
@@ -374,29 +391,27 @@ export class GameGuozhan extends Game {
     }
     if (!sides.length) {
       return
-    } else if (sides.length > 1) {
-      if (!hiddens.length && sides.length == 2) {
+    }
+    if (sides.length > 1) {
+      if (!hiddens.length && sides.length === 2) {
         if (
-          map[sides[0]].length == 1 &&
-          !map[sides[1]].filter(function (i) {
-            return i.identity != "ye" && i.isUnseen(0)
-          }).length
+          map[sides[0]].length === 1 &&
+          !map[sides[1]].filter((i) => i.identity !== "ye" && i.isUnseen(0))
+            .length
         ) {
           map[sides[0]][0].showGiveup()
         }
         if (
-          map[sides[1]].length == 1 &&
-          !map[sides[0]].filter(function (i) {
-            return i.identity != "ye" && i.isUnseen(0)
-          }).length
+          map[sides[1]].length === 1 &&
+          !map[sides[0]].filter((i) => i.identity !== "ye" && i.isUnseen(0))
+            .length
         ) {
           map[sides[1]][0].showGiveup()
         }
       }
     } else {
-      var isYe = function (player) {
-        return player.identity != "ye" && lib.character[player.name1][1] == "ye"
-      }
+      var isYe = (player) =>
+        player.identity !== "ye" && lib.character[player.name1][1] === "ye"
       if (!hiddens.length) {
         if (map[sides[0]].length > 1) {
           // @ts-expect-error 祖宗之法就是这么写的
@@ -408,7 +423,7 @@ export class GameGuozhan extends Game {
             }
           }
         }
-        broadcastAll(function (id) {
+        broadcastAll((id) => {
           // @ts-expect-error 祖宗之法就是这么写的
           game.winner_id = id
         }, sides[0])
@@ -416,7 +431,7 @@ export class GameGuozhan extends Game {
         game.checkResult()
       } else {
         var identity = map[sides[0]][0].identity
-        if (identity == "ye") {
+        if (identity === "ye") {
           return
         }
         // @ts-expect-error 祖宗之法就是这么写的
@@ -430,13 +445,13 @@ export class GameGuozhan extends Game {
           // @ts-expect-error 祖宗之法就是这么写的
           if (
             isYe(current) ||
-            current.getGuozhanGroup(2) != identity ||
+            current.getGuozhanGroup(2) !== identity ||
             !current.wontYe(null, ind + 1)
           ) {
             return
           }
         }
-        broadcastAll(function (id) {
+        broadcastAll((id) => {
           // @ts-expect-error 祖宗之法就是这么写的
           game.winner_id = id
         }, sides[0])
@@ -458,8 +473,10 @@ export class GameGuozhan extends Game {
       game.players[i].showCharacter(2)
     }
     // @ts-expect-error 祖宗之法就是这么写的
-    var winner = (_status.connectMode ? lib.playerOL : game.playerMap)[game.winner_id]
-    game.over(winner && winner.isFriendOf(me) ? true : false)
+    var winner = (_status.connectMode ? lib.playerOL : game.playerMap)[
+      game.winner_id
+    ]
+    game.over(!!winner?.isFriendOf(me))
     // @ts-expect-error 祖宗之法就是这么写的
     game.showIdentity()
   }
@@ -472,7 +489,7 @@ export class GameGuozhan extends Game {
   checkOnlineResult(player) {
     // @ts-expect-error 祖宗之法就是这么写的
     var winner = lib.playerOL[game.winner_id]
-    return winner && winner.isFriendOf(game.me)
+    return winner?.isFriendOf(game.me)
   }
 
   chooseCharacter() {
@@ -492,12 +509,12 @@ export class GameGuozhan extends Game {
      * @returns
      */
     function check(player, list, back) {
-      if (_status.brawl && _status.brawl.chooseCharacterAi) {
+      if (_status.brawl?.chooseCharacterAi) {
         if (_status.brawl.chooseCharacterAi(player, list, back) !== false) {
           return
         }
       }
-      var filterChoice = function (name1, name2) {
+      var filterChoice = (name1, name2) => {
         // @ts-expect-error 祖宗之法就是这么写的
         if (_status.separatism) {
           return true
@@ -515,22 +532,24 @@ export class GameGuozhan extends Game {
           }
           // @ts-expect-error 祖宗之法就是这么写的
           return doublex.includes(group2) || lib.selectGroup.includes(group2)
-        } else {
-          if (group1 == "ye" || lib.selectGroup.includes(group1)) {
-            return group2 != "ye"
-          }
-          // @ts-expect-error 祖宗之法就是这么写的
-          var double = get.is.double(name2, true)
-          // @ts-expect-error 祖宗之法就是这么写的
-          if (double) {
-            return double.includes(group1)
-          }
-          return group1 == group2 || lib.selectGroup.includes(group2)
         }
+        if (group1 === "ye" || lib.selectGroup.includes(group1)) {
+          return group2 !== "ye"
+        }
+        // @ts-expect-error 祖宗之法就是这么写的
+        var double = get.is.double(name2, true)
+        // @ts-expect-error 祖宗之法就是这么写的
+        if (double) {
+          return double.includes(group1)
+        }
+        return group1 === group2 || lib.selectGroup.includes(group2)
       }
       for (var i = 0; i < list.length - 1; i++) {
         for (var j = i + 1; j < list.length; j++) {
-          if (filterChoice(list[i], list[j]) || filterChoice(list[j], list[i])) {
+          if (
+            filterChoice(list[i], list[j]) ||
+            filterChoice(list[j], list[i])
+          ) {
             var mainx = list[i]
             var vicex = list[j]
             // @ts-expect-error 祖宗之法就是这么写的
@@ -554,8 +573,12 @@ export class GameGuozhan extends Game {
               }
               // @ts-expect-error 祖宗之法就是这么写的
               else if (
-                get.is.double(mainx, true).removeArray(get.is.double(vicex, true)).length == 0 ||
-                get.is.double(vicex, true).removeArray(get.is.double(mainx, true)).length == 0
+                get.is
+                  .double(mainx, true)
+                  .removeArray(get.is.double(vicex, true)).length === 0 ||
+                get.is
+                  .double(vicex, true)
+                  .removeArray(get.is.double(mainx, true)).length === 0
               ) {
                 // @ts-expect-error 祖宗之法就是这么写的
                 player.trueIdentity = get.is

@@ -1,7 +1,7 @@
 import card from "./card/index.js"
 import character from "./character/index.js"
-import skill from "./skill/index.js"
 import rest from "./rest.js"
+import skill from "./skill/index.js"
 
 export default {
   yexinjia_mark: "野心家",

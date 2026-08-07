@@ -1,7 +1,7 @@
+import ContentGuozhan from "./content.js"
 import { GameGuozhan } from "./game.js"
 import { GetGuozhan } from "./get.js"
 import { PlayerGuozhan } from "./player.js"
-import ContentGuozhan from "./content.js"
 
 export const gamePatch = _generateExtraFunctions(GameGuozhan.prototype)
 export const getPatch = _generateExtraFunctions(GetGuozhan.prototype)

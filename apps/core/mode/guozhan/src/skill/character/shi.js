@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { _status, game, get } from "wtk"
 
 /** @type {Record<string, Skill>} */
 export default {
@@ -12,12 +12,13 @@ export default {
     check(event, player) {
       // @ts-expect-error 类型系统未来可期
       return (
-        get.attitude(player, _status.currentPhase) < 0 || !_status.currentPhase.needsToDiscard(2)
+        get.attitude(player, _status.currentPhase) < 0 ||
+        !_status.currentPhase.needsToDiscard(2)
       )
     },
     filter(event) {
       // @ts-expect-error 类型系统未来可期
-      return _status.currentPhase && _status.currentPhase.isIn() && event.num > 0
+      return _status.currentPhase?.isIn() && event.num > 0
     },
     logTarget() {
       // @ts-expect-error 类型系统未来可期
@@ -90,15 +91,20 @@ export default {
     },
     unique: true,
     filter(event, player) {
-      if (event.name == "removeCharacter" || event.name == "changeVice") {
+      if (event.name === "removeCharacter" || event.name === "changeVice") {
         // @ts-expect-error 类型系统未来可期
-        return get.character(event.toRemove, 3).includes("gz_guixiu") && player.isDamaged()
+        return (
+          get.character(event.toRemove, 3).includes("gz_guixiu") &&
+          player.isDamaged()
+        )
       }
       // @ts-expect-error 类型系统未来可期
-      return event.toShow.some((name) => get.character(name, 3).includes("gz_guixiu"))
+      return event.toShow.some((name) =>
+        get.character(name, 3).includes("gz_guixiu"),
+      )
     },
     async content(_event, trigger, player) {
-      if (trigger.name == "showCharacter") {
+      if (trigger.name === "showCharacter") {
         await player.draw(2)
       } else {
         await player.recover()
@@ -109,7 +115,10 @@ export default {
     audio: "cunsi",
     enable: "phaseUse",
     filter(_event, player) {
-      return player.checkMainSkill("gz_cunsi", false) || player.checkViceSkill("gz_cunsi", false)
+      return (
+        player.checkMainSkill("gz_cunsi", false) ||
+        player.checkViceSkill("gz_cunsi", false)
+      )
     },
     unique: true,
     forceunique: true,
@@ -127,7 +136,7 @@ export default {
       }
 
       target.addSkills("gzyongjue")
-      if (target != player) {
+      if (target !== player) {
         await target.draw(2)
       }
     },
@@ -159,7 +168,7 @@ export default {
             if (target.hasSkill("zhangwu")) {
               num += 1.5
             }
-            if (target != player) {
+            if (target !== player) {
               num += 0.5
             }
           }
@@ -190,7 +199,7 @@ export default {
 
       const result = await next.forResult()
       event.result = {
-        bool: result.index != 2,
+        bool: result.index !== 2,
         cost_data: {
           index: result.index,
         },
@@ -209,9 +218,9 @@ export default {
       /** @type {number} */
       const index = event.cost_data?.index
 
-      if (index == 0) {
+      if (index === 0) {
         game.log(player, "拼点牌点数+3")
-        if (player == trigger.player) {
+        if (player === trigger.player) {
           // @ts-expect-error 类型系统未来可期
           trigger.num1 += 3
           // @ts-expect-error 类型系统未来可期
@@ -228,7 +237,7 @@ export default {
         }
       } else {
         game.log(player, "拼点牌点数-3")
-        if (player == trigger.player) {
+        if (player === trigger.player) {
           // @ts-expect-error 类型系统未来可期
           trigger.num1 -= 3
           // @ts-expect-error 类型系统未来可期
@@ -271,7 +280,7 @@ export default {
     },
     ai: {
       threaten(_player, target) {
-        if (target.hp == 1) {
+        if (target.hp === 1) {
           return 2
         }
         return 0.5
@@ -284,10 +293,10 @@ export default {
           }
           // @ts-expect-error 类型系统未来可期
           if (
-            get.tag(card, "damage") == 1 &&
-            target.hp == 2 &&
+            get.tag(card, "damage") === 1 &&
+            target.hp === 2 &&
             !target.isTurnedOver() &&
-            _status.currentPhase != target &&
+            _status.currentPhase !== target &&
             get.distance(_status.currentPhase, target, "absolute") <= 3
           ) {
             return [0.5, 1]
@@ -338,7 +347,7 @@ export default {
     multitarget: true,
     async content(event, trigger, player) {
       for (const target of event.targets) {
-        if (player == target) {
+        if (player === target) {
           await player.chooseToDiscard(true, "he")
         } else {
           await player.discardPlayerCard(true, "he", target)
@@ -391,7 +400,10 @@ export default {
         ])
         .set("ai", () => {
           const player = get.event().player
-          if (player.maxHp > 1 && (player.getHp() == 2 || !player.countCards("h"))) {
+          if (
+            player.maxHp > 1 &&
+            (player.getHp() === 2 || !player.countCards("h"))
+          ) {
             return "背水！"
           }
           return player.isDamaged() ? "上限" : "体力"
@@ -399,15 +411,15 @@ export default {
         .forResult()
       // @ts-expect-error 类型系统未来可期
       player.popup(control)
-      game.log(player, "选择了", "#g" + control)
-      if (control != "上限") {
+      game.log(player, "选择了", `#g${control}`)
+      if (control !== "上限") {
         await player.loseHp()
       }
-      if (control != "体力") {
+      if (control !== "体力") {
         await player.loseMaxHp()
       }
-      if (control == "背水！") {
-        let num = trigger.getParent().num + 1
+      if (control === "背水！") {
+        const num = trigger.getParent().num + 1
         trigger.getParent().phaseList.splice(num, 0, `phaseDraw|${event.name}`)
       }
     },
@@ -421,7 +433,7 @@ export default {
     },
     filter(event, player) {
       // @ts-expect-error 类型系统未来可期
-      if (event.card.name != "sha" || game.countPlayer() < 4) {
+      if (event.card.name !== "sha" || game.countPlayer() < 4) {
         return false
       }
       // @ts-expect-error 类型系统未来可期

@@ -1,8 +1,8 @@
-import normal, { sort as normalSort } from "./normal.js"
-import zhen, { sort as zhenSort } from "./zhen.js"
-import shi, { sort as shiSort } from "./shi.js"
 import bian, { sort as bianSort } from "./bian.js"
+import normal, { sort as normalSort } from "./normal.js"
 import quan, { sort as quanSort } from "./quan.js"
+import shi, { sort as shiSort } from "./shi.js"
+import zhen, { sort as zhenSort } from "./zhen.js"
 
 export default {
   [normalSort]: Object.keys(normal),
@@ -109,7 +109,6 @@ export default {
     "gz_gaolan",
     "gz_caoang",
     "gz_zhangxingcai",
-    "gz_luzhi",
     "gz_quyi",
     "gz_ws_caoying",
     "gz_ws_guansuo",
@@ -141,36 +140,17 @@ export default {
   ],
   guozhan_mobile: ["gz_caoying", "gz_guansuo", "gz_sp_duyu", "gz_mb_luxun"],
   guozhan_online: [
-    "gz_re_lvbu",
-    "gz_ol_yuanshao",
-    "gz_re_menghuo",
-    "gz_ol_sp_zhugeliang",
-    "gz_re_ganning",
-    "gz_re_zhangliao",
-    "gz_luzhi",
     "gz_ol_wangrong",
-    "gz_sp_ol_zhanghe",
-    "gz_zhugezhan",
-    "gz_sunhao",
-    "gz_yanrou",
+    "gz_re_xusheng",
+    "gz_re_lvbu",
+    "gz_re_taishici",
+    "gz_mayunlu",
+    "gz_luzhi",
     "gz_ol_xuyou",
     "gz_ol_wuyi",
     "gz_ol_zhonghui",
     "gz_chengpu",
     "gz_liaohua",
-    "gz_caochong",
-    "gz_liuyan",
-    "gz_re_xusheng",
-    "gz_ol_sb_sunjian",
-    "gz_re_huanggai",
-    "gz_re_xuzhu",
-    "gz_ol_weiyan",
-    "gz_ol_yanwen",
-    "gz_zhangsong",
-    "gz_re_huangyueying",
-    "gz_re_caocao",
-    "gz_re_zhangjiao",
-    "gz_re_luxun",
   ],
   guozhan_decade2: [
     "gz_huaxin",

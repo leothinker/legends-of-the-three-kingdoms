@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { get } from "wtk"
 
 export default {
   gz_hengjiang: "横江",
@@ -6,19 +6,22 @@ export default {
     "当你受到伤害后，你可以令当前回合角色本回合的手牌上限-X（X为其装备区牌数且至少为1）。然后其本回合弃牌阶段结束时，若其未于此阶段弃牌，则你将手牌摸至体力上限。",
 
   gz_guixiu: "闺秀",
-  gz_guixiu_info: "当你明置此武将牌时，你可以摸两张牌；当你移除此武将牌时，你可以回复1点体力。",
+  gz_guixiu_info:
+    "当你明置此武将牌时，你可以摸两张牌；当你移除此武将牌时，你可以回复1点体力。",
   gz_cunsi: "存嗣",
   gz_cunsi_info: `出牌阶段，你可以移除此武将牌并选择一名角色，然后其获得技能${get.poptip("gzyongjue")}，若你选择的目标角色不是自己，则其摸两张牌。`,
 
   yingyang: "鹰扬",
-  yingyang_info: "当你的拼点牌亮出后，你可以令此牌的点数+3或-3（至多为K，至少为1）。",
+  yingyang_info:
+    "当你的拼点牌亮出后，你可以令此牌的点数+3或-3（至多为K，至少为1）。",
   baka_hunshang: "魂殇",
   baka_hunshang_info: `${get.poptip("guozhan_viceSkill")}，此武将牌减少半个阴阳鱼；准备阶段，若你的体力值不大于1，则你获得${get.poptip("baka_yingzi")}和${get.poptip("baka_yinghun")}直到回合结束。`,
   baka_yinghun: "英魂",
   baka_yinghun_info:
     "准备阶段，你可令一名其他角色执行一项：摸X张牌，然后弃置一张牌；或摸一张牌，然后弃置X张牌（X为你已损失的体力值）。",
   baka_yingzi: "英姿",
-  baka_yingzi_info: "锁定技，摸牌阶段，你多摸一张牌；你的手牌上限+X（X为你已损失的体力值）。",
+  baka_yingzi_info:
+    "锁定技，摸牌阶段，你多摸一张牌；你的手牌上限+X（X为你已损失的体力值）。",
 
   fake_fenming: "奋命",
   fake_fenming_info:

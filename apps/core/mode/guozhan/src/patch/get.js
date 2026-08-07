@@ -1,7 +1,6 @@
 // @ts-nocheck
 
-import { lib, game, ui, get, Get, ai, _status } from "wtk"
-import { showYexingsContent, chooseCharacterContent, chooseCharacterOLContent } from "./content.js"
+import { _status, Get, game, get, lib } from "wtk"
 
 export class GetGuozhan extends Get {
   /**
@@ -23,9 +22,9 @@ export class GetGuozhan extends Get {
       case "junling1":
         if (
           !targets.length &&
-          game.countPlayer(function (current) {
-            return get.damageEffect(viewer, current, viewer) > 0
-          })
+          game.countPlayer(
+            (current) => get.damageEffect(viewer, current, viewer) > 0,
+          )
         ) {
           eff1 = 2
         } else {
@@ -51,10 +50,10 @@ export class GetGuozhan extends Get {
         }
         break
       case "junling3":
-        if (performer.hp == 1 && !performer.hasSkillTag("save", true)) {
+        if (performer.hp === 1 && !performer.hasSkillTag("save", true)) {
           eff2 = -5
         } else {
-          if (performer == viewer) {
+          if (performer === viewer) {
             if (performer.hasSkillTag("maihp", true)) {
               eff2 = 3
             } else {
@@ -73,12 +72,15 @@ export class GetGuozhan extends Get {
         eff1 = 0
         eff2 = -2
         break
-      case "junling5":
+      case "junling5": {
         var td = performer.isTurnedOver()
         if (td) {
-          if (performer == viewer) {
+          if (performer === viewer) {
             // @ts-expect-error 祖宗之法就是这么写的
-            if (_status.currentPhase == performer && performer.hasSkill("jushou")) {
+            if (
+              _status.currentPhase === performer &&
+              performer.hasSkill("jushou")
+            ) {
               eff2 = -3
             } else {
               eff2 = 3
@@ -87,7 +89,7 @@ export class GetGuozhan extends Get {
             eff2 = 3
           }
         } else {
-          if (performer == viewer) {
+          if (performer === viewer) {
             if (performer.hasSkillTag("noturn", true)) {
               eff2 = 0
             } else {
@@ -102,6 +104,7 @@ export class GetGuozhan extends Get {
           }
         }
         break
+      }
       case "junling6":
         if (performer.countCards("h") > 1) {
           eff2 += 1 - performer.countCards("h")
@@ -128,14 +131,14 @@ export class GetGuozhan extends Get {
     if (["gz_xunyou", "gz_lvfan", "gz_liubei"].includes(name2)) {
       return true
     }
-    if (name1 == "gz_re_xushu") {
+    if (name1 === "gz_re_xushu") {
       return true
     }
-    if (name2 == "gz_dengai") {
-      return lib.character[name1][2] % 2 == 1
+    if (name2 === "gz_dengai") {
+      return lib.character[name1][2] % 2 === 1
     }
     if (["gz_sunce", "gz_jiangwei"].includes(name1)) {
-      return name2 == "gz_zhoutai" || lib.character[name2][2] % 2 == 1
+      return name2 === "gz_zhoutai" || lib.character[name2][2] % 2 === 1
     }
     return false
   }
@@ -148,16 +151,19 @@ export class GetGuozhan extends Get {
    * @returns
    */
   guozhanRank(name, player) {
-    if (name.indexOf("gz_shibing") == 0) {
+    if (name.indexOf("gz_shibing") === 0) {
       return -1
     }
-    if (name.indexOf("gz_jun_") == 0) {
+    if (name.indexOf("gz_jun_") === 0) {
       return 7
     }
     if (player) {
       var skills = lib.character[name][3].slice(0)
       for (var i = 0; i < skills.length; i++) {
-        if (lib.skill[skills[i]].limited && player.awakenedSkills.includes(skills[i])) {
+        if (
+          lib.skill[skills[i]].limited &&
+          player.awakenedSkills.includes(skills[i])
+        ) {
           return skills.length - 1
         }
       }
@@ -165,13 +171,13 @@ export class GetGuozhan extends Get {
     if (_status._aozhan) {
       for (var i in lib.aozhanRank) {
         if (lib.aozhanRank[i].includes(name)) {
-          return parseInt(i)
+          return parseInt(i, 10)
         }
       }
     }
     for (var i in lib.guozhanRank) {
       if (lib.guozhanRank[i].includes(name)) {
-        return parseInt(i)
+        return parseInt(i, 10)
       }
     }
     return 0
@@ -187,7 +193,7 @@ export class GetGuozhan extends Get {
    * @returns
    */
   realAttitude(from, to, difficulty, toidentity) {
-    var getIdentity = function (player) {
+    var getIdentity = (player) => {
       if (player.isUnseen()) {
         if (!player.wontYe()) {
           return "ye"
@@ -197,10 +203,10 @@ export class GetGuozhan extends Get {
       return player.identity
     }
     var fid = getIdentity(from)
-    if (fid == toidentity && toidentity != "ye") {
+    if (fid === toidentity && toidentity !== "ye") {
       return 4 + difficulty
     }
-    if (from.identity == "unknown" && fid == toidentity) {
+    if (from.identity === "unknown" && fid === toidentity) {
       if (from.wontYe()) {
         return 4 + difficulty
       }
@@ -211,7 +217,7 @@ export class GetGuozhan extends Get {
       pmap = _status.connectMode ? lib.playerOL : game.playerMap,
       player
     for (var i of game.players) {
-      if (i.identity == "unknown") {
+      if (i.identity === "unknown") {
         continue
       }
       var added = false
@@ -219,7 +225,7 @@ export class GetGuozhan extends Get {
         if (i.isFriendOf(pmap[j])) {
           added = true
           map[j].push(i)
-          if (i == this) {
+          if (i === this) {
             player = j
           }
           break
@@ -228,7 +234,7 @@ export class GetGuozhan extends Get {
       if (!added) {
         map[i.playerid] = [i]
         sides.push(i.playerid)
-        if (i == this) {
+        if (i === this) {
           player = i.playerid
         }
       }
@@ -242,17 +248,13 @@ export class GetGuozhan extends Get {
       return -3
     }
     var from_p
-    if (from.identity == "unknown" && from.wontYe()) {
+    if (from.identity === "unknown" && from.wontYe()) {
       from_p = get.population(fid)
     } else {
-      from_p = game.countPlayer(function (current) {
-        return current.isFriendOf(from)
-      }, true)
+      from_p = game.countPlayer((current) => current.isFriendOf(from), true)
     }
-    var to_p = game.countPlayer(function (current) {
-      return current.isFriendOf(to)
-    }, true)
-    if (to.identity == "ye") {
+    var to_p = game.countPlayer((current) => current.isFriendOf(to), true)
+    if (to.identity === "ye") {
       to_p += 1.5
     }
 
@@ -282,7 +284,7 @@ export class GetGuozhan extends Get {
    * @returns
    */
   rawAttitude(from, to) {
-    var getIdentity = function (player) {
+    var getIdentity = (player) => {
       if (player.isUnseen()) {
         if (!player.wontYe()) {
           return "ye"
@@ -293,35 +295,35 @@ export class GetGuozhan extends Get {
     }
     var fid = getIdentity(from),
       tid = getIdentity(to)
-    if (to.identity == "unknown" && game.players.length == 2) {
+    if (to.identity === "unknown" && game.players.length === 2) {
       return -5
     }
     if (
-      _status.currentPhase == from &&
+      _status.currentPhase === from &&
       from.ai.tempIgnore &&
       from.ai.tempIgnore.includes(to) &&
-      to.identity == "unknown" &&
-      (!from.storage.zhibi || !from.storage.zhibi.includes(to))
+      to.identity === "unknown" &&
+      !from.storage.zhibi?.includes(to)
     ) {
       return 0
     }
     var difficulty = 0
-    if (to == game.me) {
+    if (to === game.me) {
       difficulty = (2 - get.difficulty()) * 1.5
     }
-    if (from == to) {
+    if (from === to) {
       return 5 + difficulty
     }
     if (from.isFriendOf(to)) {
       return 5 + difficulty
     }
-    if (from.identity == "unknown" && fid == to.identity) {
+    if (from.identity === "unknown" && fid === to.identity) {
       if (from.wontYe()) {
         return 4 + difficulty
       }
     }
     var att = get.realAttitude(from, to, difficulty, tid)
-    if (from.storage.zhibi && from.storage.zhibi.includes(to)) {
+    if (from.storage.zhibi?.includes(to)) {
       return att
     }
     if (to.ai.shown >= 0.5) {
@@ -330,11 +332,11 @@ export class GetGuozhan extends Get {
 
     var nshown = 0
     for (var i = 0; i < game.players.length; i++) {
-      if (game.players[i] != from && game.players[i].identity == "unknown") {
+      if (game.players[i] !== from && game.players[i].identity === "unknown") {
         nshown++
       }
     }
-    if (to.ai.shown == 0) {
+    if (to.ai.shown === 0) {
       if (nshown >= game.players.length / 2 && att >= 0) {
         return 0
       }

@@ -1,7 +1,7 @@
-import { intro as normalIntro } from "./normal.js"
-import { intro as zhenIntro } from "./zhen.js"
-import { intro as shiIntro } from "./shi.js"
 import { intro as bianIntro } from "./bian.js"
+import { intro as normalIntro } from "./normal.js"
+import { intro as shiIntro } from "./shi.js"
+import { intro as zhenIntro } from "./zhen.js"
 
 export default {
   ...normalIntro,

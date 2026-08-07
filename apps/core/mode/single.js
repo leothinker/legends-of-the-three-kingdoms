@@ -882,7 +882,18 @@ export default () => {
           game.me
             .chooseButton(true)
             .set("ai", (button) => Math.random())
-            .set("selectButton", 1)
+            .set(
+              "selectButton",
+              ((choice) => {
+                if (choice === "singble") {
+                  return [1, 2]
+                }
+                if (choice === "double") {
+                  return 2
+                }
+                return 1
+              })(get.config("double_character")),
+            )
             .set("dialog", event.videoId)
           ;("step 4")
           game.addRecentCharacter(result.links[0])
@@ -896,7 +907,18 @@ export default () => {
           game.me
             .chooseButton(true)
             .set("ai", (button) => Math.random())
-            .set("selectButton", 1)
+            .set(
+              "selectButton",
+              ((choice) => {
+                if (choice === "singble") {
+                  return [1, 2]
+                }
+                if (choice === "double") {
+                  return 2
+                }
+                return 1
+              })(get.config("double_character")),
+            )
             .set("dialog", event.videoId)
           ;("step 5")
           game.broadcastAll("closeDialog", event.videoId)
@@ -1373,7 +1395,18 @@ export default () => {
           game.zhu
             .chooseButton(true)
             .set("ai", (button) => Math.random())
-            .set("selectButton", 1)
+            .set(
+              "selectButton",
+              ((choice) => {
+                if (choice === "singble") {
+                  return [1, 2]
+                }
+                if (choice === "double") {
+                  return 2
+                }
+                return 1
+              })(lib.configOL.double_character),
+            )
             .set("dialog", event.videoId)
           ;("step 2")
           game.broadcastAll(
@@ -1397,7 +1430,18 @@ export default () => {
           game.fan
             .chooseButton(true)
             .set("ai", (button) => Math.random())
-            .set("selectButton", 1)
+            .set(
+              "selectButton",
+              ((choice) => {
+                if (choice === "singble") {
+                  return [1, 2]
+                }
+                if (choice === "double") {
+                  return 2
+                }
+                return 1
+              })(lib.configOL.double_character),
+            )
             .set("dialog", event.videoId)
           ;("step 3")
           game.broadcastAll("closeDialog", event.videoId)

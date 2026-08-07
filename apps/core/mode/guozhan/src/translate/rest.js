@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { get, lib } from "wtk"
 
 export default {
   gz_miheng: "祢衡",
@@ -16,7 +16,8 @@ export default {
     "其他角色的结束阶段，若其本回合内造成过伤害，则你可以对其使用一张【杀】（无距离限制）。若其本回合内对与你势力相同的角色造成过伤害，则此【杀】无视防具，且当其抵消此【杀】后，其须弃置一张牌。",
 
   gzzhaoxin: "昭心",
-  gzzhaoxin_info: "当你受到伤害后，你可展示所有手牌，然后与一名手牌数不大于你的其他角色交换手牌。",
+  gzzhaoxin_info:
+    "当你受到伤害后，你可展示所有手牌，然后与一名手牌数不大于你的其他角色交换手牌。",
   gzsuzhi: "夙智",
   gzsuzhi_info: `锁定技，每回合累计限三次；①当你于回合内因执行【杀】或【决斗】造成伤害时，此伤害+1；②你于回合内使用非转化的锦囊牌时摸一张牌，且无距离限制；③当有其他角色于你的回合内弃置牌后，你获得该角色的一张牌；④结束阶段，你获得${get.poptip("gzfankui")}直到下回合开始。`,
   gzhuaiyi: "怀异",
@@ -54,7 +55,8 @@ export default {
   gzzhukou_info:
     "当你于一名角色的出牌阶段第一次造成伤害后，你可以摸X张牌（X为本回合你已使用的牌数且至多为5）。",
   gzduannian: "断念",
-  gzduannian_info: "出牌阶段结束时，若你有手牌，你可以弃置所有手牌，然后将手牌摸至体力上限。",
+  gzduannian_info:
+    "出牌阶段结束时，若你有手牌，你可以弃置所有手牌，然后将手牌摸至体力上限。",
   gzlianyou: "莲佑",
   gzlianyou_info: `你死亡时，可以选择一名其他角色。该角色获得技能${get.poptip("gzxinghuo")}。`,
   gzxinghuo: "兴火",
@@ -77,7 +79,8 @@ export default {
   gzweimeng: "危盟",
   gzweimeng_info: `出牌阶段限一次，你可以获得一名其他角色的至多X张手牌，然后交给其等量的牌（X为你的体力值）。${get.poptip("guozhan_zongheng")}：X视为1。`,
   gzweimeng_zongheng: "危盟·纵横",
-  gzweimeng_zongheng_info: "出牌阶段限一次，你可以获得一名其他角色的一张手牌，然后交给其一张牌。",
+  gzweimeng_zongheng_info:
+    "出牌阶段限一次，你可以获得一名其他角色的一张手牌，然后交给其一张牌。",
   gzjuejue: "决绝",
   gzjuejue_info:
     "①弃牌阶段开始时，你可失去1点体力。然后若你于此阶段内弃置过你的牌，则你令其他角色各选择一项：1.将X张手牌置入弃牌堆（X为你于此阶段内弃置过的牌数）；2.受到你造成的1点伤害。②你杀死与你势力相同的角色不执行奖惩。",
@@ -90,9 +93,11 @@ export default {
   xiaoni_info:
     "锁定技，当你使用牌时，或成为其他角色使用牌的目标后，若场上存在其他己方角色且这些角色的手牌数均不大于你，则目标角色/你不可响应此牌。",
   gztongduo: "统度",
-  gztongduo_info: "己方角色的结束阶段，其可以摸X张牌（X为其本回合弃牌阶段弃置的牌数且至多为3）。",
+  gztongduo_info:
+    "己方角色的结束阶段，其可以摸X张牌（X为其本回合弃牌阶段弃置的牌数且至多为3）。",
   qingyin: "清隐",
-  qingyin_info: "限定技，出牌阶段，你可令所有己方角色回复所有体力，然后移除此武将牌。",
+  qingyin_info:
+    "限定技，出牌阶段，你可令所有己方角色回复所有体力，然后移除此武将牌。",
   gzlianpian: "联翩",
   gzlianpian_info:
     "①结束阶段，若你于此回合内弃置过所有角色的牌数之和大于你的体力值，你可令一名与你势力相同的角色将手牌补至X张（X为其体力上限）。②其他角色的结束阶段，若其于此回合内弃置过所有角色的牌数之和大于你的体力值，其可选择：1.弃置你的一张牌；2.令你回复1点体力。",
@@ -102,7 +107,8 @@ export default {
   gzboyan: "驳言",
   gzboyan_info: `出牌阶段限一次，你可令一名其他角色将手牌摸至体力上限（至多摸五张），然后其本回合不能使用或打出手牌。${get.poptip("guozhan_zongheng")}：删去摸牌。`,
   gzboyan_zongheng: "驳言·纵横",
-  gzboyan_zongheng_info: "出牌阶段限一次，你可令一名其他角色本回合不能使用或打出手牌。",
+  gzboyan_zongheng_info:
+    "出牌阶段限一次，你可令一名其他角色本回合不能使用或打出手牌。",
   gzjinfa: "矜伐",
   gzjinfa_info:
     "出牌阶段限一次，你可弃置一张牌并令一名其他角色选择一项：①交给你一张装备牌，若你以此法得到了♠牌，则其视为对你使用一张【杀】。②你获得其一张牌。",
@@ -123,7 +129,8 @@ export default {
   gzbaolie_info:
     "锁定技，出牌阶段开始时，你令所有攻击范围内包含你的非己方角色依次选择：①对你使用一张【杀】；②令你弃置其一张牌。锁定技，你对体力值不小于你的角色使用【杀】没有距离和次数限制。",
   gzshicai: "恃才",
-  gzshicai_info: "锁定技，当你受到的伤害后，若伤害值：为1，你摸一张牌；大于1，你弃置两张牌。",
+  gzshicai_info:
+    "锁定技，当你受到的伤害后，若伤害值：为1，你摸一张牌；大于1，你弃置两张牌。",
   gzxingzhao: "兴棹",
   gzxingzhao_info: `锁定技：①摸牌阶段开始时，若X不小于1，则你可以发动${get.poptip("gzxingzhao_xunxun")}的效果。②当你受到伤害后或使用装备牌时，若X不小于2且你的手牌数不为全场最多，则你摸一张牌。③若X不小于3，则你的手牌上限+4。④当你失去装备区的牌后，若X不小于4，则你摸一张牌。（X为场上有受伤角色的势力数）`,
   gzxingzhao_old_info: `锁定技：①摸牌阶段开始时，若X不小于1，则你可以发动${get.poptip("gzxingzhao_xunxun")}的效果。②当你受到伤害后，若X不小于2且你和伤害来源的手牌数不相等，则你于伤害来源中手牌数较少的角色摸一张牌。③若X不小于3，则你的手牌上限+4。④当你失去装备区的牌后，若X不小于4，则你摸一张牌。（X为场上有受伤角色的势力数）`,
@@ -190,7 +197,8 @@ export default {
     "出牌阶段限一次，你可以选择一名敌方角色。该角色的下个回合结束时，若其手牌数：小于你，你对其造成1点伤害并获得其一张手牌；大于你，你摸X张牌（X为你与其的手牌数之差且至多为5）。",
   gzjilei_info:
     "当你受到有来源的伤害后，你可以声明一种牌的类别。若如此做，你令伤害来源不能使用、打出或弃置此类别的手牌直到回合结束。",
-  gzdanlao_info: "当你成为锦囊牌的目标后，若此牌的目标数大于1，则你可以摸一张牌，令此牌对你无效。",
+  gzdanlao_info:
+    "当你成为锦囊牌的目标后，若此牌的目标数大于1，则你可以摸一张牌，令此牌对你无效。",
 
   gz_wangping: "王平",
   jianglue: "将略",
@@ -226,7 +234,8 @@ export default {
   gzfudi_info:
     "当你受到伤害后，你可以交给伤害来源一张手牌。若如此做，你对其势力中体力值最大且不小于你的一名角色造成1点伤害。",
   gzcongjian: "从谏",
-  gzcongjian_info: "锁定技，当你于回合外造成伤害，或于回合内受到伤害时，此伤害+1。",
+  gzcongjian_info:
+    "锁定技，当你于回合外造成伤害，或于回合内受到伤害时，此伤害+1。",
   gz_jun_caocao: "君曹操",
   gz_jun_caocao_prefix: "君",
   jianan: "建安",
@@ -296,7 +305,8 @@ export default {
   fengyin_vice_info: "",
 
   hmkyuanyu: "远域",
-  hmkyuanyu_info: "锁定技，当你受到伤害时，若伤害来源与你的座次不相邻，防止此伤害。",
+  hmkyuanyu_info:
+    "锁定技，当你受到伤害时，若伤害来源与你的座次不相邻，防止此伤害。",
   hmkguishu: "鬼术",
   hmkguishu_info:
     "出牌阶段，你可以将一张黑桃手牌当作【知己知彼】或【远交近攻】使用。若你本局游戏内已经发动过了〖鬼术〗，则你必须选择与上次不同的选项。",
@@ -317,7 +327,8 @@ export default {
   gz_yuji: "于吉",
 
   gzshushen: "淑慎",
-  gzshushen_info: "当你回复1点体力时，你可令与你势力相同的一名其他角色摸一张牌。",
+  gzshushen_info:
+    "当你回复1点体力时，你可令与你势力相同的一名其他角色摸一张牌。",
   _lianheng: "合纵",
   lianheng_tag: "合纵",
   guo_tag: "国",
@@ -331,7 +342,8 @@ export default {
   gzhuashen_info:
     "准备阶段，若你的“化身”不足两张，则你可以观看剩余武将牌堆中的五张牌，然后扣置其中至多两张武将牌在你的武将旁，称为“化身”；若“化身”有两张以上，则你可以用剩余武将牌堆顶的一张牌替换一张“化身”。你可以于相应的时机明置并发动“化身”的一个技能，技能结算完成后将该“化身”放回剩余武将牌堆。你每个时机只能发动一张“化身”的技能，且不能发动带有技能类型的技能（锁定技、限定技等）。",
   gzxinsheng: "新生",
-  gzxinsheng_info: "当你受到伤害后，你可以从剩余武将牌堆中扣置一张牌加入到“化身”牌中。",
+  gzxinsheng_info:
+    "当你受到伤害后，你可以从剩余武将牌堆中扣置一张牌加入到“化身”牌中。",
 
   jubao: "聚宝",
   jubao_info:
@@ -345,7 +357,8 @@ export default {
   })}”。`,
   jiahe_damage: "缘江烽火图",
   jiahe_put: "烽火",
-  jiahe_put_info: "出牌阶段限一次，你可以将一张装备牌置于“缘江烽火图”上，称之为“烽火”。",
+  jiahe_put_info:
+    "出牌阶段限一次，你可以将一张装备牌置于“缘江烽火图”上，称之为“烽火”。",
   jiahe_skill: "缘江烽火图",
   yuanjiangfenghuotu: "缘江烽火图",
   get yuanjiangfenghuotu_info() {
@@ -432,7 +445,8 @@ export default {
   gz_shibing2key: "键兵",
 
   gzkongcheng: "空城",
-  gzkongcheng_info: "锁定技，当你成为【杀】或【决斗】的目标时，若你没有手牌，则取消之。",
+  gzkongcheng_info:
+    "锁定技，当你成为【杀】或【决斗】的目标时，若你没有手牌，则取消之。",
 
   gzrende: "仁德",
   gzrende_info:
@@ -470,9 +484,11 @@ export default {
   gzyaowu_info:
     "限定技。当你造成伤害后，你可以明置此武将牌，然后你加2点体力上限并回复2点体力，修改〖恃勇〗，且当你死亡后，所有与你势力相同的角色失去1点体力。",
   gzshiyong: "恃勇",
-  gzshiyong_info: "锁定技。当你受到牌造成的伤害后，若此牌不为红色，你摸一张牌。",
+  gzshiyong_info:
+    "锁定技。当你受到牌造成的伤害后，若此牌不为红色，你摸一张牌。",
   gzshiyongx: "恃勇·改",
-  gzshiyongx_info: "锁定技。当你受到牌造成的伤害后，若此牌不为黑色，伤害来源摸一张牌。",
+  gzshiyongx_info:
+    "锁定技。当你受到牌造成的伤害后，若此牌不为黑色，伤害来源摸一张牌。",
   gztanfeng: "探锋",
   gztanfeng_info:
     "准备阶段，你可以弃置与你势力不同的一名角色区域内的一张牌，然后其可以令你对其造成1点火焰伤害，并令你跳过本回合的一个阶段（准备阶段和结束阶段除外）。",
@@ -499,7 +515,8 @@ export default {
   gzdianhu_info:
     "锁定技。当你首次明置此武将牌时，你选择一名其他角色。与你势力相同的角色对其造成伤害后，伤害来源摸一张牌。",
   gzjianji: "谏计",
-  gzjianji_info: "出牌阶段限一次。你可以令一名角色摸一张牌并展示之，然后其可以使用此牌。",
+  gzjianji_info:
+    "出牌阶段限一次。你可以令一名角色摸一张牌并展示之，然后其可以使用此牌。",
   gzgongjian: "攻坚",
   gzgongjian_info:
     "①当其他角色的牌因弃置而进入弃牌堆后，若令其弃置这些牌的角色为你，你获得其中所有的【杀】。②每回合限一次，当一名角色使用【杀】指定目标后，若有目标与本局游戏上一张被使用的【杀】相同，你可以令这些目标弃置两张牌。",
@@ -637,7 +654,8 @@ export default {
   fakeguishu_info:
     "出牌阶段限一次，你可以将一张黑桃手牌当作【知己知彼】或【远交近攻】使用。若你本局游戏内已经发动过了〖鬼术〗，则你必须选择与上次不同的选项。",
   fakeyuanyu: "远域",
-  fakeyuanyu_info: "锁定技，当你受到伤害时，若你不在伤害来源的攻击范围内，则防止此伤害。",
+  fakeyuanyu_info:
+    "锁定技，当你受到伤害时，若你不在伤害来源的攻击范围内，则防止此伤害。",
   fakemibei: "秘备",
   fakemibei_info:
     "①准备阶段，若你的手牌数不为全场最多，则你须选择一名手牌数为全场最多的角色，令其对你发起军令。②当你执行军令后，你将手牌数摸至与发起者相同（至多摸五张）。③当你拒绝执行军令后，你展示一至三张牌，然后你本回合可以将其中一张牌当作另一张基本牌或非延时锦囊牌使用一次。",
@@ -654,7 +672,8 @@ export default {
   fakedanshou_info:
     "每轮限一次，一名角色的准备阶段，你可以弃置一个区域的所有牌。若如此做，本回合其每个阶段开始时（准备阶段和结束阶段除外），你摸一张牌或令本回合以此法摸牌数+1，然后若你选择了摸牌且你本次至少摸了四张牌，则你可以对其造成1点伤害。",
   fakexunxi: "迅析",
-  fakexunxi_info: "其他角色于回合外明置武将牌时，你可以视为对其使用一张【杀】（无距离限制）。",
+  fakexunxi_info:
+    "其他角色于回合外明置武将牌时，你可以视为对其使用一张【杀】（无距离限制）。",
   fakehuanjia: "擐甲",
   fakehuanjia_info:
     "锁定技，每回合每项各限一次。①当你成为【杀】的目标后，本回合你视为装备此牌使用者的防具，直到你的装备区中有防具。②当你使用【杀】指定唯一目标后，本回合你视为装备目标角色的武器，直到你的装备区中有武器。",
@@ -667,15 +686,6 @@ export default {
     "①当你受到伤害时，你可以弃置两张颜色相同的牌并令此伤害-1。②当你因弃置而一次性失去至少两张牌后，若你的势力已确定且场上没有与你势力相同的其他角色，则你可以进行判定，若结果判定为红色，你摸一张牌。",
   gz_re_xusheng: "界徐盛",
   gz_re_xusheng_prefix: "界",
-  gz_ol_sb_sunjian_prefix: "OL谋",
-  gz_re_huanggai_prefix: "界",
-  gz_re_xuzhu_prefix: "界",
-  gz_ol_weiyan_prefix: "界",
-  gz_ol_yanwen_prefix: "界",
-  gz_re_huangyueying_prefix: "界",
-  gz_re_caocao_prefix: "界",
-  gz_re_zhangjiao_prefix: "界",
-  gz_re_luxun_prefix: "界",
   gz_zhoutai: "周泰",
   gz_pangde: "庞德",
   gz_ganfuren: "甘夫人",
@@ -712,7 +722,8 @@ export default {
   gzxixiu_info:
     "锁定技。①当你成为其他角色使用牌的目标时，若你的装备区内有和此牌花色相同的牌，则你摸一张牌。②若你装备区内的牌数为1，其他角色弃置此牌时，取消之。",
   gzyaner: "燕尔",
-  gzyaner_info: "每回合限一次，其他角色于其出牌阶段内失去最后的手牌后，你可以与其各摸一张牌。",
+  gzyaner_info:
+    "每回合限一次，其他角色于其出牌阶段内失去最后的手牌后，你可以与其各摸一张牌。",
   gzsidi: "司敌",
   gzsidi_info:
     "①一名与你势力相同的角色受到伤害后，你可以将一张与武将牌上的“驭”类别均不同的一张牌称为“驭”置于武将牌上。②与你势力不同的角色的回合开始时，你可以移去至多三张“驭”，然后选择执行等量项：⒈选择移去“驭”中的一个类别，令其本回合无法使用此类别的牌。⒉选择其一个已明置武将牌上的一个技能，令此技能于本回合失效。⒊选择一名与你势力相同的已受伤其他角色，令其回复1点体力。",
@@ -725,17 +736,19 @@ export default {
   gz_ol_zhonghui: "OL钟会",
   gz_ol_zhonghui_prefix: "OL",
   gz_ol_quanji: "权计",
-  gz_ol_quanji_info: "你受到伤害后，可以摸一张牌，然后将一张牌置于武将牌上，称为“权”。",
+  gz_ol_quanji_info:
+    "你受到伤害后，可以摸一张牌，然后将一张牌置于武将牌上，称为“权”。",
   gz_ol_paiyi: "排异",
-  gz_ol_paiyi_info: `${get.poptip("guozhan_mainSkill")}，①此武将牌计算体力上限时减少半个阴阳鱼。②弃牌阶段结束时，若你此阶段未弃置牌，你可以将任意张“权”交给一名角色，然后若其手牌数大于你，你对其造成1点伤害。`,
+  gz_ol_paiyi_info: `${get.poptip("guozhan_mainSkill")}，①此武将牌计算体力上限时减少半个阴阳鱼。②弃牌阶段结束时，若你此阶段弃牌数小于你拥有的“权”数，你可以将任意张“权”交给一名角色，然后若其手牌数大于你，你对其造成1点伤害。`,
   gz_yaopan: "邀叛",
-  gz_yaopan_info: `${get.poptip("guozhan_viceSkill")}，你杀死过角色的回合结束时，可以选择一名同势力角色，其可与你副将${get.poptip("guozhan_transCharacter")}，然后控制此武将牌的角色获得所有“权”并执行一个仅有出牌阶段的额外回合。`,
+  gz_yaopan_info: `${get.poptip("guozhan_viceSkill")}，每回合结束后，若你本回合令其他角色进入过濒死状态（每名角色限一次），你可以选择一名同势力角色，其可与你副将${get.poptip("guozhan_transCharacter")}，然后控制此武将牌的角色获得所有“权”并执行一个仅有出牌阶段的额外回合。`,
   gz_ol_wuyi: "OL吴懿",
   gz_ol_wuyi_prefix: "OL",
   gz_ol_benxi: "奔袭",
-  gz_ol_benxi_info: "锁定技，你于回合内使用牌后，本回合计算与其他角色的距离-1。",
+  gz_ol_benxi_info:
+    "锁定技，你于回合内使用牌后，本回合计算与其他角色的距离-1。",
   gz_ol_zhuanzheng: "转征",
-  gz_ol_zhuanzheng_info: `每轮限两次，出牌阶段，你可以选择一名距离1以内的同势力角色，你摸X张牌，然后其可与你副将${get.poptip("guozhan_transCharacter")}（X为你与其之间的角色数且至少为1）。`,
+  gz_ol_zhuanzheng_info: `每轮限一次，出牌阶段，你可以选择一名距离1以内的同势力角色，你摸X张牌，然后其可与你副将${get.poptip("guozhan_transCharacter")}（X为你与其之间的角色数且至少为1）。若控制此武将牌的角色发生变化，则本轮本技能发动次数+1。`,
   gz_mb_luxun: "手杀陆逊",
   gz_mb_luxun_prefix: "手杀",
   gz_mb_qianxun: "谦逊",
@@ -758,19 +771,16 @@ export default {
   gz_ol_fushi: "附势",
   gz_ol_fushi_info: `锁定技，若你的上家为群势力角色，你视为拥有${get.poptip("gz_ol_zezhu")}；若你的下家为魏势力角色，你视为拥有${get.poptip("gz_ol_chenggong")}。`,
   gz_ol_zezhu: "择主",
-  gz_ol_zezhu_info: "出牌阶段限一次，你可以获得相邻角色各一张牌，然后交给这些角色各一张牌。",
+  gz_ol_zezhu_info:
+    "出牌阶段限一次，你可以获得相邻角色各一张牌，然后交给这些角色各一张牌。",
   gz_ol_chenggong: "逞功",
   gz_ol_chenggong_info:
     "每回合限一次，相邻角色使用牌指定了至少两个目标后，你可以摸一张牌，然后弃置其中一个目标一张牌。",
   gz_ol_wangrong: "王荣",
-  gz_sp_ol_zhanghe: "SP张郃",
-  gz_sp_ol_zhanghe_prefix: "SP",
   gz_re_lvbu_prefix: "界",
-  gz_ol_yuanshao_prefix: "界",
-  gz_re_menghuo_prefix: "界",
-  gz_ol_sp_zhugeliang_prefix: "界",
-  gz_re_ganning_prefix: "界",
-  gz_re_zhangliao_prefix: "界",
+  gzfengpo: "凤魄",
+  gzfengpo_info:
+    "当你每回合首次使用【杀】或【决斗】指定唯一目标后，你可以选择一项：1.摸X张牌；2.摸一张牌（X为其♦手牌数）。",
 
   guozhan_jun: "君主武将",
   guozhan_jin: "文德武备",
@@ -780,7 +790,7 @@ export default {
   guozhan_double: "双势力武将",
   guozhan_yexinjia: "野心家武将",
   guozhan_decade2: "十周年专属", //"纵横捭阖",
-  guozhan_online: "Online专属",
+  guozhan_online: "他山之石", //"OL专属",
   guozhan_tw: "海外服专属",
   guozhan_mobile: "移动版专属",
   guozhan_qunxiong: "群雄割据",

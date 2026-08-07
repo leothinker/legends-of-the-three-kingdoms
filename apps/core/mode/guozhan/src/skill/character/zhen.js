@@ -1,4 +1,4 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
+import { _status, game, get, lib } from "wtk"
 
 /** @type {Record<string, Skill>} */
 export default {
@@ -61,10 +61,10 @@ export default {
     filter(_event, player) {
       return (
         player.countCards("he", (card) => {
-          if (get.position(card) == "h" && _status.connectMode) {
+          if (get.position(card) === "h" && _status.connectMode) {
             return true
           }
-          return get.type(card) == "equip"
+          return get.type(card) === "equip"
         }) > 0
       )
     },
@@ -73,7 +73,7 @@ export default {
         .chooseCardTarget({
           prompt: get.prompt2("yuanhu"),
           filterCard(card) {
-            return get.type(card) == "equip"
+            return get.type(card) === "equip"
           },
           position: "he",
           filterTarget(card, player, target) {
@@ -93,7 +93,7 @@ export default {
     async content(event, trigger, player) {
       const card = event.cards[0]
       const target = event.targets[0]
-      if (target != player) {
+      if (target !== player) {
         player.$give(card, target, false, void 0, void 0)
       }
       await target.equip(card, void 0)
@@ -107,11 +107,11 @@ export default {
         filter(event, player) {
           return (
             // @ts-expect-error 类型系统未来可期
-            _status.currentPhase == player &&
+            _status.currentPhase === player &&
             game.hasPlayer((target) => {
               return (
                 get.distance(event.player, target) <= 1 &&
-                target != event.player &&
+                target !== event.player &&
                 target.countCards("hej") > 0
               )
             })
@@ -121,14 +121,12 @@ export default {
           event.result = await player
             .chooseTarget(
               get.prompt("fake_huyuan"),
-              "弃置一名与" +
-                get.translation(trigger.player) +
-                "距离为1以内的另一名角色区域里的一张牌",
+              `弃置一名与${get.translation(trigger.player)}距离为1以内的另一名角色区域里的一张牌`,
               (card, player, target) => {
                 const trigger = get.event().getTrigger()
                 return (
                   get.distance(trigger.player, target) <= 1 &&
-                  target != trigger.player &&
+                  target !== trigger.player &&
                   target.countCards("hej")
                 )
               },
@@ -143,7 +141,13 @@ export default {
         popup: false,
         async content(event, trigger, player) {
           const target = event.targets[0]
-          player.logSkill("fake_huyuan", target, undefined, undefined, undefined)
+          player.logSkill(
+            "fake_huyuan",
+            target,
+            undefined,
+            undefined,
+            undefined,
+          )
           await player.discardPlayerCard(target, "hej", true)
         },
       },
@@ -191,24 +195,24 @@ export default {
     filter(event, player) {
       return game.hasPlayer((current) => {
         // @ts-expect-error 类型系统未来可期
-        if (current == _status.currentPhase || !current.isFriendOf(player)) {
+        if (current === _status.currentPhase || !current.isFriendOf(player)) {
           return false
         }
         // @ts-expect-error 类型系统未来可期
         const evt = event.getl(current)
-        return evt && evt.hs && evt.hs.length && current.countCards("h") == 0
+        return evt?.hs?.length && current.countCards("h") === 0
       })
     },
     async content(event, trigger, player) {
       const list = game
         .filterPlayer((current) => {
           // @ts-expect-error 类型系统未来可期
-          if (current == _status.currentPhase || !current.isFriendOf(player)) {
+          if (current === _status.currentPhase || !current.isFriendOf(player)) {
             return false
           }
           // @ts-expect-error 类型系统未来可期
           var evt = trigger.getl(current)
-          return evt && evt.hs && evt.hs.length
+          return evt?.hs?.length
         })
         // @ts-expect-error 类型系统未来可期
         .sortBySeat(_status.currentPhase)
@@ -220,9 +224,12 @@ export default {
 
         const result = await player
           .chooseBool(get.prompt2("gz_shoucheng", target))
-          .set("ai", function (event, player) {
-            return get.effect(get.event().target, { name: "draw" }, player, player) > 0
-          })
+          .set(
+            "ai",
+            (event, player) =>
+              get.effect(get.event().target, { name: "draw" }, player, player) >
+              0,
+          )
           .set("target", target)
           .setHiddenSkill(event.name)
           .forResult()
@@ -258,8 +265,7 @@ export default {
     viewAsFilter(player) {
       // @ts-expect-error 类型系统未来可期
       return (
-        _status.currentPhase &&
-        _status.currentPhase.inline(player) &&
+        _status.currentPhase?.inline(player) &&
         !player.hasSkill("kanpo") &&
         player.countCards("h", { color: "black" }) > 0
       )
@@ -273,7 +279,7 @@ export default {
       global: "useCardToTargeted",
     },
     filter(event, player) {
-      return event.card.name == "sha" && event.target.isFriendOf(player)
+      return event.card.name === "sha" && event.target.isFriendOf(player)
     },
     preHidden: true,
     logTarget: "target",
@@ -293,7 +299,10 @@ export default {
       if (bool && !event.isFirstTarget) {
         return false
       }
-      return event.card.name == "sha" && event[bool ? "player" : "target"].isFriendOf(player)
+      return (
+        event.card.name === "sha" &&
+        event[bool ? "player" : "target"].isFriendOf(player)
+      )
     },
     logTarget(event, player, name) {
       return event?.[name === "useCardToPlayered" ? "player" : "target"]
@@ -313,7 +322,9 @@ export default {
       return player.countCards("h") > 0
     },
     filterTarget(_card, player, target) {
-      return player != target && (target.countCards("h") > 0 || target.isUnseen(2))
+      return (
+        player !== target && (target.countCards("h") > 0 || target.isUnseen(2))
+      )
     },
     async content(event, trigger, player) {
       const target = event.target
@@ -336,12 +347,10 @@ export default {
           .forResult()
       }
 
-      if (result.index == 0) {
+      if (result.index === 0) {
         await player
           .discardPlayerCard(target, "h")
-          .set("filterButton", function (button) {
-            return get.color(button.link) == "black"
-          })
+          .set("filterButton", (button) => get.color(button.link) === "black")
           .set("visible", true)
       } else {
         player.viewCharacter(target, 2)
@@ -366,7 +375,7 @@ export default {
       global: "useCardToPlayered",
     },
     filter(event, player) {
-      if (event.card.name != "sha") {
+      if (event.card.name !== "sha") {
         return false
       }
       // @ts-expect-error 类型系统未来可期
@@ -387,7 +396,7 @@ export default {
       if (!map[id]) {
         map[id] = {}
       }
-      if (typeof map[id].shanRequired == "number") {
+      if (typeof map[id].shanRequired === "number") {
         map[id].shanRequired++
       } else {
         map[id].shanRequired = 2
@@ -430,7 +439,7 @@ export default {
           return (
             player.isFriendOf(event.player) &&
             player.hasCard((card) => {
-              if (_status.connectMode && get.position(card) == "h") {
+              if (_status.connectMode && get.position(card) === "h") {
                 return true
               }
               return !suits.includes(get.suit(card))
@@ -446,9 +455,7 @@ export default {
               // @ts-expect-error 类型系统未来可期
               return !_status.event.suits.includes(get.suit(card))
             })
-            .set("ai", function (card) {
-              return 9 - get.value(card)
-            })
+            .set("ai", (card) => 9 - get.value(card))
             .set("suits", suits)
             .setHiddenSkill("qianhuan")
             .forResult()
@@ -473,12 +480,13 @@ export default {
           return (
             event.target &&
             player.isFriendOf(event.target) &&
-            event.targets.length == 1 &&
+            event.targets.length === 1 &&
             player.getExpansions("qianhuan").length > 0
           )
         },
         async cost(event, trigger, player) {
-          let goon = get.effect(trigger.target, trigger.card, trigger.player, player) < 0
+          let goon =
+            get.effect(trigger.target, trigger.card, trigger.player, player) < 0
 
           if (goon) {
             if (
@@ -492,19 +500,31 @@ export default {
               ].includes(trigger.card.name)
             ) {
               goon = false
-            } else if (trigger.card.name == "sha") {
-              if (trigger.target.mayHaveShan(player, "use") || trigger.target.hp >= 3) {
+            } else if (trigger.card.name === "sha") {
+              if (
+                trigger.target.mayHaveShan(player, "use") ||
+                trigger.target.hp >= 3
+              ) {
                 goon = false
               }
-            } else if (trigger.card.name == "guohe") {
-              if (trigger.target.countCards("he") >= 3 || !trigger.target.countCards("h")) {
+            } else if (trigger.card.name === "guohe") {
+              if (
+                trigger.target.countCards("he") >= 3 ||
+                !trigger.target.countCards("h")
+              ) {
                 goon = false
               }
-            } else if (trigger.card.name == "shuiyanqijunx") {
-              if (trigger.target.countCards("e") <= 1 || trigger.target.hp >= 3) {
+            } else if (trigger.card.name === "shuiyanqijunx") {
+              if (
+                trigger.target.countCards("e") <= 1 ||
+                trigger.target.hp >= 3
+              ) {
                 goon = false
               }
-            } else if (get.tag(trigger.card, "damage") && trigger.target.hp >= 3) {
+            } else if (
+              get.tag(trigger.card, "damage") &&
+              trigger.target.hp >= 3
+            ) {
               goon = false
             }
           }
@@ -512,7 +532,7 @@ export default {
           const result = await player
             .chooseButton()
             .set("goon", goon)
-            .set("ai", function (button) {
+            .set("ai", (button) => {
               // @ts-expect-error 类型系统未来可期
               if (_status.event.goon) {
                 return 1
@@ -521,13 +541,7 @@ export default {
             })
             .set("createDialog", [
               get.prompt("qianhuan"),
-              '<div class="text center">移去一张“千幻”牌令' +
-                get.translation(trigger.player) +
-                "对" +
-                get.translation(trigger.target) +
-                "的" +
-                get.translation(trigger.card) +
-                "失效</div>",
+              `<div class="text center">移去一张“千幻”牌令${get.translation(trigger.player)}对${get.translation(trigger.target)}的${get.translation(trigger.card)}失效</div>`,
               player.getExpansions("qianhuan"),
             ])
             .forResult()

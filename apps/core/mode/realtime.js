@@ -1,4 +1,3 @@
-import { lib, game, ui, get, ai, _status } from "wtk"
 export const type = "mode"
 /**
  * @type { () => importModeConfig }

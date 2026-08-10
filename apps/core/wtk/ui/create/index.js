@@ -4383,13 +4383,8 @@ export class Create {
             button.node.info.style.setProperty(
               "transform",
               "translateX(-52px) translateY(-3px)",
-              "important",
             )
-            button.node.name.style.setProperty(
-              "transform",
-              "translateY(14px)",
-              "important",
-            )
+            button.node.name.style.setProperty("transform", "translateY(14px)")
           }
           const card = cards[index]
           if (

@@ -121,7 +121,7 @@ export const otherMenu = (/** @type { boolean | undefined } */ connectMenu) => {
     var li3 = document.createElement("li")
     li1.innerHTML = `游戏版本：${lib.version}`
     li3.innerHTML =
-      "由于三国杀正在重构项目结构，在线更新暂时无法使用，请访问github主页获取最新版本。"
+      "由于无名杀正在重构项目结构，在线更新暂时无法使用，请访问github主页获取最新版本。"
 
     /** @type { HTMLParagraphElement } */
     var updatepx = ui.create.node("p")

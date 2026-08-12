@@ -665,45 +665,35 @@ export class Player extends HTMLDivElement {
    * @param {string} message 设置提示标记的内容,标记中的\n代表换行符
    * @param { SkillTrigger | SAAType<Signal> | boolean } isTemp 是否是临时的tip。默认为false,表示一直存在；若为true,则回合结束自动失去。也可以填一个具体的自定义时机。
    * @param { object } [css] 自定义的样式
+   * @param { boolean } [nobroadcast] 是否不全局展示
    * @returns { void }
    * @author Curpond
    */
-  addTip(index, message, isTemp = false, css = {}) {
+  addTip(index, message, isTemp = false, css = {}, nobroadcast) {
     if (this.getHiddenSkills(true, true).includes(index)) {
       return
     }
-    game.broadcastAll(
-      (player, index, message, css) => {
-        player.node.tipContainer ??= ui.create.div(".tipContainer", player)
-        player.tips ??= new Map()
-        if (!player.tips.has(index)) {
-          player.tips.set(
-            index,
-            ui.create.div(".tip", player.node.tipContainer),
-          )
-        }
-        player.tips.get(index).innerHTML = message
-          .replace(/ /g, "&nbsp;")
-          .replace(/(?:♥︎|♦︎)/g, '<span style="color: red; ">$&</span>')
-          .replace(/\n/g, "<br>")
-        player.tips.get(index).css(css)
-
-        const double =
-          player.classList.contains("fullskin2") &&
-          lib.config.layout !== "long2"
-
-        const width = player.node.avatar.clientWidth
-        const w = width * (double ? 2 : 1)
-        player.style.setProperty("--w", `${w}px`)
-
-        //检查tip的高度，使其不覆盖装备
-        game.callHook("checkTipBottom", [player])
-      },
-      this,
-      index,
-      message,
-      css,
-    )
+    const func = (player, index, message, css) => {
+      player.node.tipContainer ??= ui.create.div(".tipContainer", player)
+      player.tips ??= new Map()
+      if (!player.tips.has(index)) {
+        player.tips.set(index, ui.create.div(".tip", player.node.tipContainer))
+      }
+      player.tips.get(index).innerHTML = message
+        .replace(/ /g, "&nbsp;")
+        .replace(/(?:♥︎|♦︎)/g, '<span style="color: red; ">$&</span>')
+        .replace(/\n/g, "<br>")
+      player.tips.get(index).css(css)
+      const double =
+        player.classList.contains("fullskin2") && lib.config.layout !== "long2"
+      const width = player.node.avatar.clientWidth
+      const w = width * (double ? 2 : 1)
+      player.style.setProperty("--w", `${w}px`)
+      //检查tip的高度，使其不覆盖装备
+      game.callHook("checkTipBottom", [player])
+    }
+    func(this, index, message, css)
+    if (!nobroadcast) game.broadcast(func, this, index, message, css)
     if (isTemp && !this.storage[`temp_tip_${index}`]) {
       this.storage[`temp_tip_${index}`] = true
       let expire
@@ -2428,7 +2418,6 @@ export class Player extends HTMLDivElement {
       this,
       skill,
     )
-
     let evt = _status.event
     //转换技转换后
     const next = game.createEvent("changeZhuanhuanji", false)
@@ -2974,7 +2963,6 @@ export class Player extends HTMLDivElement {
       }
       return player.getLeft() + player.offsetWidth / 2
     }
-
     var emotion = ui.create.div(
       "",
       `<div style="text-align:center"> <img src="${lib.assetURL}image/emotion/throw_emotion/${name}1.png"> </div>`,
@@ -3063,7 +3051,6 @@ export class Player extends HTMLDivElement {
       )
       return
     }
-
     game.broadcast(
       (player, name, popname) => {
         player.trySkillAnimate(name, popname)
@@ -4798,7 +4785,6 @@ export class Player extends HTMLDivElement {
   }
   setAvatarQueue(name, list) {
     var node
-
     if (this.name2 === name) {
       node = this.node.avatar2
     } else {
@@ -6065,7 +6051,6 @@ export class Player extends HTMLDivElement {
     time = time || 1000
     this.classList.add("playerfocus")
     ui.arena.classList.add("playerfocus")
-
     setTimeout(() => {
       this.classList.remove("playerfocus")
       ui.arena.classList.remove("playerfocus")
@@ -10954,7 +10939,6 @@ export class Player extends HTMLDivElement {
       this.popups.shift().delete()
       if (this.popups.length) {
         this.popups[0].show()
-
         setTimeout(() => {
           this._popup()
         }, 1000)
@@ -11546,7 +11530,6 @@ export class Player extends HTMLDivElement {
     if (typeof card === "string") {
       card = { name: card, isCard: true }
     }
-
     var targets = game.filterPlayer2(null, null, true)
     var value = []
     var min = 0
@@ -11609,7 +11592,6 @@ export class Player extends HTMLDivElement {
     if (typeof card === "string") {
       card = { name: card, isCard: true }
     }
-
     var targets = game.filterPlayer2(null, null, true)
     var value = []
     var min = 0
@@ -13424,7 +13406,6 @@ export class Player extends HTMLDivElement {
     if (time === undefined) {
       time = 500
     }
-
     this.queueCount++
     this.queueTimeout = setTimeout(() => {
       this.queueCount--
@@ -15286,7 +15267,6 @@ export class Player extends HTMLDivElement {
       ui.refresh(node)
       node.delete()
     })
-
     if (num && num > 1) {
       if (config && config.total > 1) {
         setTimeout(() => {
@@ -15333,7 +15313,6 @@ export class Player extends HTMLDivElement {
       get.targetsInfo(targets),
       get.cardsInfo(cards),
     ])
-
     var node1 = this.$throwxy2(
       card1,
       "calc(50% - 52px)",
@@ -15490,7 +15469,6 @@ export class Player extends HTMLDivElement {
       target.dataset.position,
       get.cardInfo(card2),
     ])
-
     var node1 = this.$throwxy2(
       card1,
       "calc(50% - 114px)",
@@ -16716,7 +16694,6 @@ export class Player extends HTMLDivElement {
       cardx = card
     }
     cardx.initID()
-
     game.broadcast(
       (player, card, cards) => {
         player.addVirtualJudge(card, cards)
@@ -16871,7 +16848,6 @@ export class Player extends HTMLDivElement {
       cardx = card
     }
     cardx.initID()
-
     game.broadcast(
       (player, card, cards) => {
         player.addVirtualEquip(card, cards)
@@ -16901,7 +16877,6 @@ export class Player extends HTMLDivElement {
     if (game.online) {
       return
     }
-
     const isViewAsCard =
         cards.length !== 1 || cards[0].name !== card.name || !card.isCard,
       info = get.info(card, false)
@@ -17026,7 +17001,6 @@ export class Player extends HTMLDivElement {
     card.style.transform = ""
     card.classList.remove("drawinghidden")
     delete card._transform
-
     var equipNum = get.equipNum(card)
     var equipped = false
     for (var i = 0; i < this.node.equips.childNodes.length; i++) {
@@ -17136,7 +17110,6 @@ export class Player extends HTMLDivElement {
         node.style.transform = ""
 
         lib.listenEnd(node)
-
         setTimeout(() => {
           node.moveDelete(this)
         }, 700)
@@ -17212,7 +17185,6 @@ export class Player extends HTMLDivElement {
       })
       game.delay(3)
     }
-
     setTimeout(
       () => {
         game.broadcastAll(
@@ -17567,7 +17539,6 @@ export class Player extends HTMLDivElement {
           node.delete()
         }, 200)
       })
-
       setTimeout(() => {
         this.damagepopups.shift()
         this.$damagepop()
@@ -17699,7 +17670,6 @@ export class Player extends HTMLDivElement {
   }
   $phaseJudge(card) {
     game.addVideo("phaseJudge", this, get.cardInfo(card))
-
     if (card[card.cardSymbol]?.cards?.length) {
       const cards = card[card.cardSymbol].cards
       const clone = this.$throw(cards)

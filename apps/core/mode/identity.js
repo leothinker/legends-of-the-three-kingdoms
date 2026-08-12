@@ -3315,49 +3315,6 @@ export default () => {
                 player.init(result.links[0], result.links[1])
               }
             })
-
-            ui.create.cheat2 = () => {
-              ui.cheat2 = ui.create.control("自由选将", () => {
-                const control = ui.cheat2
-                if (control.dialog === _status.event.dialog) {
-                  if (game.changeCoin) {
-                    game.changeCoin(10)
-                  }
-                  control.dialog.close()
-                  _status.event.dialog = control.backup
-                  control.backup.open()
-                  delete control.backup
-                  game.uncheck()
-                  game.check()
-                  if (ui.cheat) {
-                    ui.cheat.addTempClass("controlpressdownx", 500)
-                    ui.cheat.classList.remove("disabled")
-                  }
-                } else {
-                  if (game.changeCoin) {
-                    game.changeCoin(-10)
-                  }
-                  control.backup = _status.event.dialog
-                  _status.event.dialog.close()
-                  _status.event.dialog = _status.event.parent.dialogxx
-                  control.dialog = _status.event.dialog
-                  control.dialog.open()
-                  game.uncheck()
-                  game.check()
-                  if (ui.cheat) {
-                    ui.cheat.classList.add("disabled")
-                  }
-                }
-              })
-              if (lib.onfree) {
-                ui.cheat2.classList.add("disabled")
-              }
-            }
-            if (!_status.brawl?.chooseCharacterFixed) {
-              if (!ui.cheat2 && get.config("free_choose")) {
-                ui.create.cheat2()
-              }
-            }
           },
           // step 3
           async (event, trigger, player, result) => {

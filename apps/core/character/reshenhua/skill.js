@@ -3721,6 +3721,848 @@ const skills = {
       expose: 0.3,
     },
   },
+  // 神司马懿
+  // 忍戒
+  rerenjie: {
+    audio: 2,
+    trigger: { player: "damageEnd" },
+    forced: true,
+    group: "rerenjie2",
+    filter(event) {
+      return event.num > 0
+    },
+    async content(event, trigger, player) {
+      player.addMark("rerenjie", trigger.num)
+    },
+    intro: {
+      name2: "忍",
+      content: "mark",
+    },
+    marktext: "忍",
+    ai: {
+      maixie: true,
+      maixie_hp: true,
+      combo: "rejilue",
+      effect: {
+        target(card, player, target) {
+          if (
+            (!target.hasSkill("rebaiyin") && !target.hasSkill("rejilue")) ||
+            !target.hasFriend()
+          ) {
+            return
+          }
+          if (player.hasSkillTag("jueqing", false, target)) {
+            return [1, -2]
+          }
+          if (get.tag(card, "damage")) {
+            if (target.hp === target.maxHp) {
+              if (!target.hasSkill("rejilue")) {
+                return [0, 1]
+              }
+              return [0.7, 1]
+            }
+            return 0.7
+          }
+        },
+      },
+    },
+  },
+  rerenjie2: {
+    audio: "rerenjie",
+    mod: {
+      aiOrder: (player, card, num) => {
+        if (num <= 0 || typeof card !== "object" || !player.isPhaseUsing()) {
+          return num
+        }
+        if (player.hasSkill("rebaiyin")) {
+          if (
+            player.countMark("rerenjie") < 4 &&
+            player.getUseValue(card) < Math.min(4, (player.hp * player.hp) / 4)
+          ) {
+            return 0
+          }
+        } else if (player.hasSkill("rejilue")) {
+          if (
+            player.countMark("rerenjie") < 3 &&
+            player.getUseValue(card) <
+              Math.min(1.8, 0.18 * player.hp * player.hp)
+          ) {
+            return 0
+          }
+        }
+      },
+    },
+    trigger: {
+      player: "loseAfter",
+      global: "loseAsyncAfter",
+    },
+    forced: true,
+    sourceSkill: "rerenjie",
+    filter(event, player) {
+      if (event.type !== "discard" || event.getlx === false) {
+        return false
+      }
+      var evt = event.getParent("phaseDiscard"),
+        evt2 = event.getl(player)
+      return (
+        evt &&
+        evt2 &&
+        evt.name === "phaseDiscard" &&
+        evt.player === player &&
+        evt2.cards2 &&
+        evt2.cards2.length > 0
+      )
+    },
+    async content(event, trigger, player) {
+      player.addMark("rerenjie", trigger.getl(player).cards2.length)
+    },
+  },
+  // 拜印
+  rebaiyin: {
+    skillAnimation: "epic",
+    animationColor: "thunder",
+    juexingji: true,
+    trigger: { player: "phaseZhunbeiBegin" },
+    forced: true,
+    audio: 2,
+    filter(event, player) {
+      return player.countMark("rerenjie") >= 4
+    },
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      await player.loseMaxHp()
+      await player.addSkills("rejilue")
+    },
+    derivation: [
+      "rejilue",
+      "rejilue_guicai",
+      "rejilue_fangzhu",
+      "rejilue_jizhi",
+      "rejilue_zhiheng",
+      "rejilue_wansha",
+    ],
+    ai: { combo: "rerenjie" },
+  },
+  // 极略
+  rejilue: {
+    audio: 2,
+    group: [
+      "rejilue_guicai",
+      "rejilue_fangzhu",
+      "rejilue_jizhi",
+      "rejilue_zhiheng",
+      "rejilue_wansha",
+    ],
+    ai: { combo: "rerenjie" },
+  },
+  rejilue_guicai: {
+    audio: 1,
+    trigger: { global: "judge" },
+    filter(event, player) {
+      return player.countCards("hes") > 0 && player.hasMark("rerenjie")
+    },
+    async cost(event, trigger, player) {
+      const next = player.chooseCard(
+        "是否弃1枚“忍”，发动〖鬼才〗？",
+        "hes",
+        filterCard,
+      )
+      next.set("ai", processAI)
+
+      event.result = await next.forResult()
+
+      return
+
+      /**
+       * @param {Card} card
+       * @returns {boolean}
+       */
+      function filterCard(card) {
+        const player = get.player()
+        const mod2 = game.checkMod(
+          card,
+          player,
+          "unchanged",
+          "cardEnabled2",
+          player,
+        )
+        if (mod2 !== "unchanged") {
+          return mod2
+        }
+        const mod = game.checkMod(
+          card,
+          player,
+          "unchanged",
+          "cardRespondable",
+          player,
+        )
+        if (mod !== "unchanged") {
+          return mod
+        }
+        return true
+      }
+
+      /**
+       * @param {Card} card
+       * @returns {number}
+       */
+      function processAI(card) {
+        const trigger = get.event().parent._trigger
+        const player = get.event().player
+        const result =
+          trigger.judge(card) - trigger.judge(trigger.player.judging[0])
+        const attitude = get.attitude(player, trigger.player)
+        let val = get.value(card)
+        if (get.subtype(card) === "equip2") {
+          val /= 2
+        } else {
+          val /= 4
+        }
+        if (attitude === 0 || result === 0) {
+          return 0
+        }
+        if (attitude > 0) {
+          return result - val
+        }
+        return -result - val
+      }
+    },
+    async content(event, trigger, player) {
+      const { cards } = event
+      const [card] = cards
+      player.removeMark("rerenjie", 1)
+      await player.respond(cards, "highlight", "noOrdering")
+      if (trigger.player.judging[0].clone) {
+        trigger.player.judging[0].clone.delete()
+        game.addVideo(
+          "deletenode",
+          player,
+          get.cardsInfo([trigger.player.judging[0].clone]),
+        )
+      }
+      await game.cardsDiscard(trigger.player.judging[0])
+      trigger.player.judging[0] = card
+      trigger.orderingCards.addArray(cards)
+      game.log(trigger.player, "的判定牌改为", card)
+      await game.delay(2)
+    },
+    ai: {
+      rejudge: true,
+      tag: {
+        rejudge: 1,
+      },
+    },
+  },
+  rejilue_fangzhu: {
+    audio: 1,
+    trigger: { player: "damageEnd" },
+    //priority:-1,
+    filter(event, player) {
+      return player.hasMark("rerenjie")
+    },
+    async cost(event, trigger, player) {
+      const next = player.chooseTarget(
+        "是否弃1枚“忍”，发动【放逐】？",
+        (card, player, target) => player !== target,
+      )
+      next.set("ai", processAI)
+
+      event.result = await next.forResult()
+
+      return
+
+      /**
+       * @param {Player} target
+       * @returns {number}
+       */
+      function processAI(target) {
+        if (target.hasSkillTag("noturn")) {
+          return 0
+        }
+        const player = get.player()
+        const current = _status.currentPhase
+        const dis = current ? get.distance(current, target, "absolute") : 1
+        const draw = player.getDamagedHp()
+        const att = get.attitude(player, target)
+        if (att === 0) {
+          return target.hasJudge("lebu")
+            ? Math.random() / 3
+            : Math.sqrt(get.threaten(target)) / 5 + Math.random() / 2
+        }
+        if (att > 0) {
+          if (target.isTurnedOver()) {
+            return att + draw
+          }
+          if (draw < 4) {
+            return -1
+          }
+          if (current && target.getSeatNum() > current.getSeatNum()) {
+            return att + draw / 3
+          }
+          return (
+            (10 * Math.sqrt(Math.max(0.01, get.threaten(target)))) /
+              (3.5 - draw) +
+            dis / (2 * game.countPlayer())
+          )
+        }
+        if (target.isTurnedOver()) {
+          return att - draw
+        }
+        if (draw >= 5) {
+          return -1
+        }
+        if (current && target.getSeatNum() <= current.getSeatNum()) {
+          return -att + draw / 3
+        }
+        return (
+          (4.25 - draw) * 10 * Math.sqrt(Math.max(0.01, get.threaten(target))) +
+          (2 * game.countPlayer()) / dis
+        )
+      }
+    },
+    logTarget: "targets",
+    async content(event, trigger, player) {
+      const { targets } = event
+      const [target] = targets
+      player.removeMark("rerenjie", 1)
+      await target.draw(player.maxHp - player.hp)
+      await target.turnOver()
+    },
+  },
+  rejilue_jizhi: {
+    audio: 1,
+    trigger: { player: "useCard" },
+    filter(event, player) {
+      return (
+        get.type(event.card) === "trick" &&
+        event.card.isCard &&
+        player.hasMark("rerenjie")
+      )
+    },
+    async content(event, trigger, player) {
+      player.removeMark("rerenjie", 1)
+      const result = await player.draw("nodelay").forResult()
+      event.card = result.cards[0]
+
+      if (get.type(event.card) !== "basic") {
+        return
+      }
+
+      const result2 = await player
+        .chooseBool(
+          `是否弃置${get.translation(event.card)}然后本回合手牌上限+1？`,
+        )
+        .set(
+          "ai",
+          (evt, player) =>
+            _status.currentPhase === player &&
+            player.needsToDiscard(-3) &&
+            _status.event.value < 6,
+        )
+        .set("value", get.value(event.card, player))
+        .forResult()
+
+      if (result2.bool) {
+        await player.discard(event.card)
+        player.addTempSkill("rejilue_jizhi_clear")
+        player.addMark("rejilue_jizhi_clear", 1, false)
+      }
+    },
+    subSkill: {
+      clear: {
+        charlotte: true,
+        onremove: true,
+        mod: {
+          maxHandcard(player, num) {
+            return num + player.countMark("rejilue_jizhi_clear")
+          },
+        },
+        intro: { content: "手牌上限+#" },
+      },
+    },
+  },
+  rejilue_zhiheng: {
+    audio: 1,
+    audioname2: {},
+    inherit: "rezhiheng",
+    filter(event, player) {
+      return player.hasMark("rerenjie")
+    },
+    prompt:
+      "弃1枚“忍”，弃置任意张牌，然后摸等量的牌。若你以此法弃置了所有手牌，则你多摸一张牌。",
+    async content(event, trigger, player) {
+      const { cards } = event
+
+      player.removeMark("rerenjie", 1)
+      const hs = player.getCards("h")
+      const num =
+        hs.length > 0 && hs.every((card) => cards.includes(card)) ? 1 : 0
+
+      await player.discard({ cards })
+      await player.draw(num + cards.length)
+    },
+    ai: {
+      order(item, player) {
+        if (
+          player.hasCard((i) => get.value(i) > Math.max(6, 9 - player.hp), "he")
+        ) {
+          return 1
+        }
+        return 10
+      },
+      result: {
+        player(player) {
+          var num = 0
+          var cards = player.getCards("he")
+          for (var i = 0; i < cards.length; i++) {
+            if (get.value(cards[i]) < 6) {
+              num++
+            }
+          }
+          if (cards.length > 2) {
+            return 1
+          }
+          // if (cards.length == 2 && player.storage.rejilue > 1) {
+          // }
+          return 0
+        },
+      },
+      nokeep: true,
+      skillTagFilter(player, tag, arg) {
+        if (tag === "nokeep") {
+          return (
+            player.isPhaseUsing() &&
+            !player.getStat().skill.rejilue_zhiheng &&
+            player.hasCard((card) => get.name(card) !== "tao", "h")
+          )
+        }
+      },
+    },
+  },
+  rejilue_wansha: {
+    audio: 1,
+    enable: "phaseUse",
+    usable: 1,
+    filter(event, player) {
+      return player.hasMark("rerenjie")
+    },
+    async content(event, trigger, player) {
+      player.removeMark("rerenjie", 1)
+      player.addTempSkill("rewansha")
+    },
+    ai: {
+      order: () => {
+        const player = _status.event.player
+        if (
+          game.hasPlayer((current) => {
+            if (
+              player === current ||
+              current.hp > 1 ||
+              get.attitude(player, current) >= 0
+            ) {
+              return false
+            }
+            return (
+              (player.inRange(current) &&
+                player.countCards("hs", "sha") &&
+                player.getCardUsable("sha")) ||
+              player.countCards(
+                "hs",
+                (card) => get.name(card) !== "sha" && get.tag(card, "damage"),
+              ) > 1
+            )
+          })
+        ) {
+          return 9.2
+        }
+        return 0
+      },
+      result: {
+        player: 1,
+      },
+      effect: {
+        player(card, player, target) {
+          if (
+            target &&
+            player.hasSkill("rewansha") &&
+            target.hp <= 1 &&
+            get.tag(card, "damage")
+          ) {
+            return [1, 0, 1.5, -1.5]
+          }
+        },
+      },
+    },
+  },
+  // 神赵云
+  // 绝境
+  rejuejing: {
+    mod: {
+      maxHandcard(player, num) {
+        return 2 + num
+      },
+      aiOrder(player, card, num) {
+        if (num <= 0 || !player.isPhaseUsing() || !get.tag(card, "recover")) {
+          return num
+        }
+        if (player.needsToDiscard() > 1) {
+          return num
+        }
+        return 0
+      },
+    },
+    audio: 2,
+    trigger: { player: ["dying", "dyingAfter"] },
+    forced: true,
+    async content(event, trigger, player) {
+      await player.draw()
+    },
+    ai: {
+      effect: {
+        target(card, player, target) {
+          if (target.getHp() > 1) {
+            return
+          }
+          if (get.tag(card, "damage") || get.tag(card, "loseHp")) {
+            return [1, 1]
+          }
+        },
+      },
+    },
+  },
+  // 龙魂
+  relonghun: {
+    audio: 2,
+    mod: {
+      aiOrder(player, card, num) {
+        if (num <= 0 || !player.isPhaseUsing() || player.needsToDiscard() < 2) {
+          return num
+        }
+        const suit = get.suit(card, player)
+        if (suit === "heart") {
+          return num - 3.6
+        }
+      },
+      aiValue(player, card, num) {
+        if (num <= 0) {
+          return num
+        }
+        const suit = get.suit(card, player)
+        if (suit === "heart") {
+          return num + 3.6
+        }
+        if (suit === "club") {
+          return num + 1
+        }
+        if (suit === "spade") {
+          return num + 1.8
+        }
+      },
+      aiUseful(player, card, num) {
+        if (num <= 0) {
+          return num
+        }
+        const suit = get.suit(card, player)
+        if (suit === "heart") {
+          return num + 3
+        }
+        if (suit === "club") {
+          return num + 1
+        }
+        if (suit === "spade") {
+          return num + 1
+        }
+      },
+    },
+    locked: false,
+    //技能发动时机
+    enable: ["chooseToUse", "chooseToRespond"],
+    //发动时提示的技能描述
+    prompt:
+      "将至多两张花色相同的牌按以下规则使用或打出：红桃当【桃】；方块当火【杀】；梅花当【闪】；黑桃当【无懈可击】",
+    //动态的viewAs
+    viewAs(cards, player) {
+      if (cards.length) {
+        var name = false,
+          nature = null
+        //根据选择的卡牌的花色 判断要转化出的卡牌是闪还是火【杀】还是无懈还是桃
+        switch (get.suit(cards[0], player)) {
+          case "club":
+            name = "shan"
+            break
+          case "diamond":
+            name = "sha"
+            nature = "fire"
+            break
+          case "spade":
+            name = "wuxie"
+            break
+          case "heart":
+            name = "tao"
+            break
+        }
+        //返回判断结果
+        if (name) {
+          return { name: name, nature: nature }
+        }
+      }
+      return null
+    },
+    //AI选牌思路
+    check(card) {
+      if (ui.selected.cards.length) {
+        return 0
+      }
+      var player = _status.event.player
+      if (_status.event.type === "phase") {
+        var max = 0
+        var name2
+        var list = ["sha", "tao"]
+        var map = { sha: "diamond", tao: "heart" }
+        for (var i = 0; i < list.length; i++) {
+          var name = list[i]
+          if (
+            player.countCards(
+              "hes",
+              (card) =>
+                (name !== "sha" || get.value(card) < 5) &&
+                get.suit(card, player) === map[name],
+            ) > 0 &&
+            player.getUseValue({
+              name: name,
+              nature: name === "sha" ? "fire" : null,
+            }) > 0
+          ) {
+            var temp = get.order({
+              name: name,
+              nature: name === "sha" ? "fire" : null,
+            })
+            if (temp > max) {
+              max = temp
+              name2 = map[name]
+            }
+          }
+        }
+        if (name2 === get.suit(card, player)) {
+          return name2 === "diamond"
+            ? 5 - get.value(card)
+            : 20 - get.value(card)
+        }
+        return 0
+      }
+      return 1
+    },
+    //选牌数量
+    selectCard: [1, 2],
+    //确保选择第一张牌后 重新检测第二张牌的合法性 避免选择两张花色不同的牌
+    complexCard: true,
+    //选牌范围：手牌区和装备区和木马
+    position: "hes",
+    //选牌合法性判断
+    filterCard(card, player, event) {
+      //如果已经选了一张牌 那么第二张牌和第一张花色相同即可
+      if (ui.selected.cards.length) {
+        return get.suit(card, player) === get.suit(ui.selected.cards[0], player)
+      }
+      event = event || _status.event
+      //获取当前时机的卡牌选择限制
+      var filter = event._backup.filterCard
+      //获取卡牌花色
+      var name = get.suit(card, player)
+      //如果这张牌是梅花并且当前时机能够使用/打出闪 那么这张牌可以选择
+      if (
+        name === "club" &&
+        filter(get.autoViewAs({ name: "shan" }, "unsure"), player, event)
+      ) {
+        return true
+      }
+      //如果这张牌是方片并且当前时机能够使用/打出火【杀】 那么这张牌可以选择
+      if (
+        name === "diamond" &&
+        filter(
+          get.autoViewAs({ name: "sha", nature: "fire" }, "unsure"),
+          player,
+          event,
+        )
+      ) {
+        return true
+      }
+      //如果这张牌是黑桃并且当前时机能够使用/打出无懈 那么这张牌可以选择
+      if (
+        name === "spade" &&
+        filter(get.autoViewAs({ name: "wuxie" }, "unsure"), player, event)
+      ) {
+        return true
+      }
+      //如果这张牌是红桃并且当前时机能够使用/打出桃 那么这张牌可以选择
+      if (
+        name === "heart" &&
+        filter(get.autoViewAs({ name: "tao" }, "unsure"), player, event)
+      ) {
+        return true
+      }
+      //上述条件都不满足 那么就不能选择这张牌
+      return false
+    },
+    //判断当前时机能否发动技能
+    filter(event, player) {
+      //获取当前时机的卡牌选择限制
+      var filter = event.filterCard
+      //如果当前时机能够使用/打出火【杀】并且角色有方片 那么可以发动技能
+      if (
+        filter(
+          get.autoViewAs({ name: "sha", nature: "fire" }, "unsure"),
+          player,
+          event,
+        ) &&
+        player.countCards("hes", { suit: "diamond" })
+      ) {
+        return true
+      }
+      //如果当前时机能够使用/打出闪并且角色有梅花 那么可以发动技能
+      if (
+        filter(get.autoViewAs({ name: "shan" }, "unsure"), player, event) &&
+        player.countCards("hes", { suit: "club" })
+      ) {
+        return true
+      }
+      //如果当前时机能够使用/打出桃并且角色有红桃 那么可以发动技能
+      if (
+        filter(get.autoViewAs({ name: "tao" }, "unsure"), player, event) &&
+        player.countCards("hes", { suit: "heart" })
+      ) {
+        return true
+      }
+      //如果当前时机能够使用/打出无懈可击并且角色有黑桃 那么可以发动技能
+      if (
+        filter(get.autoViewAs({ name: "wuxie" }, "unsure"), player, event) &&
+        player.countCards("hes", { suit: "spade" })
+      ) {
+        return true
+      }
+      return false
+    },
+    ai: {
+      respondSha: true,
+      respondShan: true,
+      //让系统知道角色“有杀”“有闪”
+      skillTagFilter(player, tag) {
+        var name
+        switch (tag) {
+          case "respondSha":
+            name = "diamond"
+            break
+          case "respondShan":
+            name = "club"
+            break
+          case "save":
+            name = "heart"
+            break
+        }
+        if (!player.countCards("hes", { suit: name })) {
+          return false
+        }
+      },
+      //AI牌序
+      order(item, player) {
+        if (player && _status.event.type === "phase") {
+          var max = 0
+          var list = ["sha", "tao"]
+          var map = { sha: "diamond", tao: "heart" }
+          for (var i = 0; i < list.length; i++) {
+            var name = list[i]
+            if (
+              player.countCards(
+                "hes",
+                (card) =>
+                  (name !== "sha" || get.value(card) < 5) &&
+                  get.suit(card, player) === map[name],
+              ) > 0 &&
+              player.getUseValue({
+                name: name,
+                nature: name === "sha" ? "fire" : null,
+              }) > 0
+            ) {
+              var temp = get.order({
+                name: name,
+                nature: name === "sha" ? "fire" : null,
+              })
+              if (temp > max) {
+                max = temp
+              }
+            }
+          }
+          max /= 1.1
+          return max
+        }
+        return 2
+      },
+    },
+    //让系统知道玩家“有无懈”“有桃”
+    hiddenCard(player, name) {
+      if (
+        name === "wuxie" &&
+        _status.connectMode &&
+        player.countCards("hs") > 0
+      ) {
+        return true
+      }
+      if (name === "wuxie") {
+        return player.countCards("hes", { suit: "spade" }) > 0
+      }
+      if (name === "tao") {
+        return player.countCards("hes", { suit: "heart" }) > 0
+      }
+    },
+    group: ["relonghun_num", "relonghun_discard"],
+    subSkill: {
+      num: {
+        trigger: { player: "useCard" },
+        forced: true,
+        popup: false,
+        filter(event) {
+          var evt = event
+          return (
+            ["sha", "tao"].includes(evt.card.name) &&
+            evt.skill === "relonghun" &&
+            evt.cards &&
+            evt.cards.length === 2
+          )
+        },
+        async content(event, trigger, player) {
+          trigger.baseDamage++
+        },
+      },
+      discard: {
+        trigger: { player: ["useCardAfter", "respondAfter"] },
+        forced: true,
+        popup: false,
+        logTarget() {
+          return _status.currentPhase
+        },
+        autodelay(event) {
+          return event.name === "respond" ? 0.5 : false
+        },
+        filter(evt, player) {
+          return (
+            ["shan", "wuxie"].includes(evt.card.name) &&
+            evt.skill === "relonghun" &&
+            evt.cards &&
+            evt.cards.length === 2 &&
+            _status.currentPhase &&
+            _status.currentPhase !== player &&
+            _status.currentPhase.countDiscardableCards(player, "he")
+          )
+        },
+        async content(event, trigger, player) {
+          //game.log(trigger.card)
+          //game.log(trigger.cards)
+          player.line(_status.currentPhase, "green")
+          await player.discardPlayerCard(_status.currentPhase, "he", true)
+        },
+      },
+    },
+  },
 }
 
 export default skills

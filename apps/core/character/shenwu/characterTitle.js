@@ -71,4 +71,6 @@ export default {
   ol_zhangzhang: "经天纬地",
   ol_zuoci: "迷之仙人",
   ol_caiwenji: "异乡的孤女",
+  ol_shen_simayi: "徐图大略",
+  ol_shen_zhaoyun: "神龙天降",
 }

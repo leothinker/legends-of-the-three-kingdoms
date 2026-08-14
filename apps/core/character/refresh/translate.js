@@ -193,6 +193,11 @@ const translates = {
   qiaomeng_info:
     "当你使用的黑色【杀】对一名角色造成伤害后，你可以弃置其装备区里的一张牌。然后当此牌置入弃牌堆后，若此牌为坐骑牌，你获得之。",
 
+  caozhang: "曹彰",
+  jiangchi: "将驰",
+  jiangchi_info:
+    "摸牌阶段结束时，你可以选择一项：1.摸一张牌，本回合不能使用或打出【杀】；2.弃置一张牌，本回合使用【杀】无距离限制且可以多使用一张【杀】。",
+
   re_yiji: "伊籍",
   jijie: "机捷",
   jijie_info:
@@ -200,11 +205,6 @@ const translates = {
   jiyuan: "急援",
   jiyuan_info:
     "当一名角色进入濒死状态或你交给一名其他角色牌时，你可以令该角色摸一张牌。",
-
-  caozhang: "曹彰",
-  jiangchi: "将驰",
-  jiangchi_info:
-    "摸牌阶段结束时，你可以选择一项：1.摸一张牌，本回合不能使用或打出【杀】；2.弃置一张牌，本回合使用【杀】无距离限制且可以多使用一张【杀】。",
 }
 
 export default translates

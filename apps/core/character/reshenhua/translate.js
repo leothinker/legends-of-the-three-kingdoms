@@ -185,12 +185,12 @@ const translates = {
 
   re_jiaxu: "界贾诩",
   re_jiaxu_prefix: "界",
-  reweimu: "帷幕",
-  reweimu_info:
-    "黑色锦囊牌对你无效；你可以将一张黑色非锦囊牌当【借刀杀人】使用。",
   rewansha: "完杀",
   rewansha_info:
     "锁定技，你的回合内：除处于濒死状态的角色外的其他角色的红色基本牌均视为【杀】，此【杀】被使用时你摸两张牌。",
+  reweimu: "帷幕",
+  reweimu_info:
+    "黑色锦囊牌对你无效；你可以将一张黑色非锦囊牌当【借刀杀人】使用。",
 
   re_shen_lvbu: "神吕布",
   re_shen_lvbu_prefix: "神",
@@ -250,6 +250,44 @@ const translates = {
   rebeige: "悲歌",
   rebeige_info:
     "当一名角色受到【杀】造成的伤害后，你可以弃置一张牌，然后令其进行判定，若结果为：红桃，其回复X点体力（X为其本次受到的伤害值）；方块，其摸三张牌；梅花，伤害来源弃置两张牌；黑桃，伤害来源翻面。",
+
+  re_shen_simayi: "神司马懿",
+  re_shen_simayi_prefix: "神",
+  rerenjie: "忍戒",
+  rerenjie2: "忍戒",
+  rerenjie_info:
+    "锁定技，当你受到伤害后/于弃牌阶段内弃置手牌后，你获得伤害值枚/弃置手牌数枚“忍”。",
+  rebaiyin: "拜印",
+  rebaiyin_info: `觉醒技，准备阶段，若“忍”数大于3，你减1点体力上限，然后获得${get.poptip("rejilue")}。`,
+  rejilue: "极略",
+  rejilue_info: `你可以弃1枚“忍”，发动下列一项技能：${get.poptip("rejilue_guicai")}、${get.poptip("rejilue_fangzhu")}、${get.poptip("rejilue_jizhi")}、${get.poptip("rejilue_zhiheng")}或${get.poptip("rejilue_wansha")}。`,
+  rejilue_guicai: "鬼才",
+  rejilue_guicai_info: "当一名角色的判定牌生效前，你可以打出一张牌代替之。",
+  rejilue_fangzhu: "放逐",
+  rejilue_fangzhu_info:
+    "当你受到伤害后，你可以令一名其他角色选择一项：1.弃置X张牌并失去1点体力；2.摸X张牌并翻面（X为你已损失的体力值）。",
+  rejilue_jizhi: "集智",
+  rejilue_jizhi_info:
+    "当你使用非转化的锦囊牌时，你可以摸一张牌。若此牌为基本牌，你可以弃置此牌然后本回合手牌上限+1。",
+  rejilue_zhiheng: "制衡",
+  rejilue_zhiheng_info:
+    "出牌阶段限一次，你可以弃置任意张牌，然后摸等量的牌。若你以此法弃置了所有手牌，则你多摸一张牌。",
+  rejilue_wansha: "完杀",
+  rejilue_wansha_info:
+    "锁定技，你的回合内：除处于濒死状态的角色外的其他角色的红色基本牌均视为【杀】，此【杀】被使用时你摸两张牌。",
+
+  re_shen_zhaoyun: "神赵云",
+  re_shen_zhaoyun_prefix: "神",
+  rejuejing: "绝境",
+  rejuejing_info:
+    "锁定技，你的手牌上限+2；当你进入或脱离濒死状态时，你摸一张牌。",
+  relonghun: "龙魂",
+  longhun1: "龙魂♥︎",
+  longhun2: "龙魂♦︎",
+  longhun3: "龙魂♣︎",
+  longhun4: "龙魂♠︎",
+  relonghun_info:
+    "你可以将至多两张花色相同的牌按以下规则使用或打出：红桃当【桃】；方块当火【杀】；梅花当【闪】；黑桃当【无懈可击】。若你以此法转化了两张：红色牌，此牌回复值或伤害值+1；黑色牌，你弃置当前回合角色一张牌。",
 
   wangji: "王基",
   qizhi: "奇制",
@@ -387,70 +425,6 @@ const translates = {
   weidi_tag: "伪帝",
   weidi_info:
     "主公技，你于弃牌阶段弃置的牌可以交给任意名其他群势力角色各一张。",
-
-  shen_caocao: "神曹操",
-  shen_caocao_prefix: "神",
-  guixin: "归心",
-  guixin_info:
-    "当你受到1点伤害后，你可以各获得每名其他角色所属区域里的一张牌，然后你翻面。",
-  feiying: "飞影",
-  feiying_info: "锁定技，其他角色与你的距离+1。",
-
-  shen_lvbu: "神吕布",
-  shen_lvbu_prefix: "神",
-  kuangbao: "狂暴",
-  kuangbao_bg: "暴",
-  kuangbao_info:
-    "锁定技，游戏开始时，你获得2枚“暴怒”标记；当你造成或受到1点伤害后，你获得1枚“暴怒”标记。",
-  wumou: "无谋",
-  wumou_info:
-    "锁定技，当你使用普通锦囊牌时，你选择一项：1.弃1枚“暴怒”；2.失去1点体力。",
-  wuqian: "无前",
-  wuqian_info: `出牌阶段，你可以弃2枚“暴怒”并选择一名其他角色，然后令其于此回合内防具失效且此回合你获得${get.poptip("wushuang")}。`,
-  shenfen: "神愤",
-  shenfen_info:
-    "出牌阶段限一次，你可以弃6枚“暴怒”标记，对所有其他角色各造成1点伤害，若如此做，这些角色先各弃置装备区里所有的牌，再各弃置四张手牌，然后你翻面。",
-
-  jshen_zhaoyun: "神赵云",
-  jshen_zhaoyun_prefix: "神",
-  jx_juejing: "绝境",
-  jx_juejing_info:
-    "锁定技，你的手牌上限+2；当你进入濒死状态时或当你脱离濒死状态后，你摸一张牌。",
-  jx_longhun: "龙魂",
-  longhun1: "龙魂♥︎",
-  longhun2: "龙魂♦︎",
-  longhun3: "龙魂♣︎",
-  longhun4: "龙魂♠︎",
-  jx_longhun_info:
-    "你可以将至多两张花色相同的牌按以下规则使用或打出：♥牌当【桃】；♦牌当火【杀】；♣牌当【闪】；♠牌当【无懈可击】。若你以此法使用或打出：两张♥牌，则此牌回复的体力+1；两张♦牌，则此牌造成的伤害+1；两张♣或♠牌，则你弃置当前回合角色的一张牌。",
-
-  jshen_simayi: "神司马懿",
-  jshen_simayi_prefix: "神",
-  renjie: "忍戒",
-  renjie2: "忍戒",
-  renjie_info:
-    "锁定技，当你受到伤害后或于弃牌阶段内因弃置而失去手牌后，你获得X枚“忍”标记（X为此伤害值或你此次弃置的手牌数）。",
-  lianpo: "连破",
-  lianpo_info:
-    "每名角色的回合结束时，若你于此回合内杀死过角色，你可以于此回合结束后执行一个额外的回合。",
-  sbaiyin: "拜印",
-  sbaiyin_info: `觉醒技，准备阶段，若“忍”标记数量不小于4，你减1点体力上限，然后获得${get.poptip("jilue")}。`,
-  jilue: "极略",
-  jilue_info: `你可以于能发动技能${get.poptip("jilue_guicai")}、${get.poptip("jilue_fangzhu")}、${get.poptip("jilue_jizhi")}、${get.poptip("jilue_zhiheng")}的时机弃1枚“忍”，然后发动一次相应技能；出牌阶段，你可以弃1枚“忍”，然后你于此回合内拥有${get.poptip("jilue_wansha")}。`,
-  jilue_wansha: "完杀",
-  jilue_wansha_info:
-    "锁定技。①你的回合内，不处于濒死状态的其他角色不能使用【桃】。②当有角色于你的回合内进入濒死状态时，你令其以外的所有其他角色的非锁定技失效直到此濒死状态结算结束。",
-  jilue_zhiheng: "制衡",
-  jilue_zhiheng_info:
-    "出牌阶段限一次，你可以弃置任意张牌并摸等量的牌，若你在发动〖制衡〗时弃置了所有手牌，则你多摸一张牌。",
-  jilue_guicai: "鬼才",
-  jilue_guicai_info: "在任意角色的判定牌生效前，你可以打出一张牌代替之。",
-  jilue_fangzhu: "放逐",
-  jilue_fangzhu_info:
-    "当你受到伤害后，你可以令一名其他角色翻面，然后其摸X张牌（X为你已损失的体力值）。",
-  jilue_jizhi: "集智",
-  jilue_jizhi_info:
-    "当你使用锦囊牌时，你可以摸一张牌。若此牌为基本牌，则你可以弃置之，然后令本回合手牌上限+1。",
 
   le_liubei: "神刘备",
   le_liubei_prefix: "神",

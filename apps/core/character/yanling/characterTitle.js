@@ -5,4 +5,6 @@ export default {
   ylyg_pangtong: "南州冠冕",
   ylyg_xuhuang: "公明大义",
   ylyg_zhurong: "刺美人",
+  ylyg_caiwenji: "别子归汉",
+  ylyg_sunce: "翻江倒海",
 }

@@ -88,7 +88,7 @@ const translates = {
 
   huangyueying: "黄月英",
   jizhi: "集智",
-  jizhi_info: "当你使用普通锦囊牌时，你可以摸一张牌。",
+  jizhi_info: "当你使用非转化的普通锦囊牌时，你可以摸一张牌。",
   qicai: "奇才",
   qicai_info: "锁定技，你使用锦囊牌无距离限制。",
 

@@ -180,4 +180,10 @@ export default {
   "#duanchang_re_caiwenji1": "雁高飞兮邈难寻，空断肠兮思愔愔。",
   "#duanchang_re_caiwenji2": "为天有眼兮，为何使我独飘流？",
   "#re_caiwenji:die": "今别子兮归故乡，旧怨平兮新怨长！",
+
+  "#rejuejing1": "绝望中…仍存有一线生机！",
+  "#rejuejing2": "还不可以认输！",
+  "#relonghun1": "龙战于野，其血玄黄！",
+  "#relonghun2": "潜龙勿用，藏锋守拙。",
+  "#re_shen_zhaoyun:die": "龙磷崩损，坠于九天…",
 }

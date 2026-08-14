@@ -40,4 +40,6 @@ export default {
   re_zhangzhang: "经天纬地",
   re_zuoci: "迷之仙人",
   re_caiwenji: "异乡的孤女",
+  re_shen_simayi: "鉴往知来",
+  re_shen_zhaoyun: "战龙在野",
 }

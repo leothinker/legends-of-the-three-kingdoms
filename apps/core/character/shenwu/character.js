@@ -451,6 +451,8 @@ const characters = {
     hp: 3,
     skills: ["olbeige", "duanchang"],
   },
+  ol_shen_simayi: {},
+  ol_shen_zhaoyun: {},
 }
 
 export default characters

@@ -1389,7 +1389,7 @@ const skills = {
     frequent: true,
     preHidden: true,
     filter(event) {
-      return get.type(event.card) === "trick"
+      return get.type(event.card) === "trick" && event.card.isCard
     },
     async content(event, trigger, player) {
       await player.draw({ nodelay: true })

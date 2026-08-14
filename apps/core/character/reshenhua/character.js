@@ -252,6 +252,21 @@ const characters = {
     hp: 3,
     skills: ["rebeige", "duanchang"],
   },
+  re_shen_simayi: {
+    sex: "male",
+    group: "shen",
+    hp: 4,
+    skills: ["rerenjie", "rebaiyin", "lianpo"],
+    groupInGuozhan: "wei",
+    names: "司马|懿",
+  },
+  re_shen_zhaoyun: {
+    sex: "male",
+    group: "shen",
+    hp: 2,
+    skills: ["rejuejing", "relonghun"],
+    groupInGuozhan: "shu",
+  },
   // wangji: {
   //   sex: "male",
   //   group: "wei",

@@ -64,6 +64,7 @@ const characters = {
     skills: ["shelie", "gongxin"],
     groupInGuozhan: "wu",
   },
+
   re_dianwei: {
     sex: "male",
     group: "wei",
@@ -133,6 +134,7 @@ const characters = {
     groupInGuozhan: "shu",
     names: "诸葛|亮",
   },
+
   re_caopi: {
     sex: "male",
     group: "wei",
@@ -200,6 +202,7 @@ const characters = {
     skills: ["guixin", "feiying"],
     groupInGuozhan: "wei",
   },
+
   re_dengai: {
     sex: "male",
     group: "wei",
@@ -267,12 +270,20 @@ const characters = {
     skills: ["rejuejing", "relonghun"],
     groupInGuozhan: "shu",
   },
-  // wangji: {
-  //   sex: "male",
-  //   group: "wei",
-  //   hp: 3,
-  //   skills: ["qizhi", "jinqu"],
-  // },
+
+  wangji: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["qizhi", "jinqu"],
+  },
+  kuailiangkuaiyue: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["jianxiang", "shenshi"],
+    names: "蒯|良-蒯|越",
+  },
   // yanyan: {
   //   sex: "male",
   //   group: "shu",
@@ -298,13 +309,6 @@ const characters = {
   //   hp: 3,
   //   skills: ["kuizhu", "zhizheng", "lijun"],
   //   isZhugong: true,
-  // },
-  // kuaiyuekuailiang: {
-  //   sex: "male",
-  //   group: "wei",
-  //   hp: 3,
-  //   skills: ["jianxiang", "shenshi"],
-  //   names: "蒯|良-蒯|越",
   // },
   // xuyou: {
   //   sex: "male",

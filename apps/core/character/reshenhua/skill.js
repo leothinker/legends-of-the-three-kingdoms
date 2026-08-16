@@ -4582,6 +4582,266 @@ const skills = {
       },
     },
   },
+  // 王基
+  // 奇制
+  qizhi: {
+    audio: 2,
+    trigger: { player: "useCardToPlayered" },
+    filter(event, player) {
+      if (!event.targets || !event.isFirstTarget) {
+        return false
+      }
+      if (_status.currentPhase !== player) {
+        return false
+      }
+      var type = get.type(event.card, "trick")
+      if (type !== "basic" && type !== "trick") {
+        return false
+      }
+      if (event.noai) {
+        return false
+      }
+      return game.hasPlayer(
+        (target) =>
+          !event.targets.includes(target) && target.countCards("he") > 0,
+      )
+    },
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseTarget(
+          get.prompt(event.skill),
+          "弃置不是此牌目标的一名角色一张牌，然后其摸一张牌",
+          (card, player, target) =>
+            !_status.event.targets.includes(target) &&
+            target.countCards("he") > 0,
+        )
+        .set("ai", (target) => {
+          var player = _status.event.player
+          if (target === player) {
+            return 2
+          }
+          if (get.attitude(player, target) <= 0) {
+            return 1
+          }
+          return 0.5
+        })
+        .set("targets", trigger.targets)
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      const target = event.targets[0]
+      player.getHistory("custom").push({ [event.name]: true })
+      await player.discardPlayerCard(target, true, "he")
+      await target.draw()
+    },
+  },
+  // 进趋
+  jinqu: {
+    audio: 2,
+    trigger: { player: "phaseJieshuBegin" },
+    check(event, player) {
+      return (
+        player.getHistory("custom", (evt) => evt.qizhi === true).length >=
+        player.countCards("h")
+      )
+    },
+    prompt(event, player) {
+      var num = player.getHistory("custom", (evt) => evt.qizhi === true).length
+      return `进趋：是否摸两张牌，然后将手牌弃置至${get.cnNumber(num)}张？`
+    },
+    content() {
+      "step 0"
+      player.draw(2)
+      ;("step 1")
+      var dh =
+        player.countCards("h") -
+        player.getHistory("custom", (evt) => evt.qizhi === true).length
+      if (dh > 0) {
+        player.chooseToDiscard(dh, true, "allowChooseAll")
+      }
+    },
+    ai: { combo: "qizhi" },
+  },
+  // 蒯良&蒯越
+  // 荐降
+  jianxiang: {
+    audio: 2,
+    trigger: { target: "useCardToTargeted" },
+    filter(event, player) {
+      return (
+        event.player !== player &&
+        game.hasPlayer((current) => current.isMinHandcard())
+      )
+    },
+    async cost(event, trigger, player) {
+      const next = player.chooseTarget(
+        get.prompt(event.skill),
+        "令手牌数最少的一名角色摸一张牌",
+        (card, player, target) => target.isMinHandcard(),
+      )
+      next.ai = (target) => {
+        const player = get.player()
+        return get.attitude(player, target)
+      }
+      event.result = await next.forResult()
+    },
+    async content(event, trigger, player) {
+      await event.targets[0].draw()
+    },
+  },
+  // 审时
+  shenshi: {
+    audio: 2,
+    mark: true,
+    locked: false,
+    zhuanhuanji: true,
+    marktext: "☯",
+    intro: {
+      content(storage, player, skill) {
+        if (storage) {
+          return "当其他角色对你造成伤害后，你可以观看其手牌，然后交给其一张牌；当前回合结束时，若其未失去此牌，你将手牌摸至四张"
+        }
+        return "出牌阶段限一次，你可以将一张牌交给一名除你外手牌数最多的角色，然后对其造成1点伤害；若其因此死亡，你可以令一名角色将手牌摸至四张"
+      },
+    },
+    enable: "phaseUse",
+    trigger: { global: "damageSource" },
+    filter(event, player) {
+      if (!player.countCards("he")) {
+        return false
+      }
+      if (event.name === "chooseToUse") {
+        return (
+          !player.storage.shenshi &&
+          !player.hasSkill("shenshi_used", null, null, false) &&
+          game.hasPlayer((current) =>
+            get.info("shenshi").filterTarget(null, player, current),
+          )
+        )
+      }
+      return (
+        event.source?.isIn() &&
+        event.source !== player &&
+        event.player === player &&
+        player.storage.shenshi
+      )
+    },
+    discard: false,
+    line: true,
+    lose: false,
+    delay: false,
+    position: "he",
+    filterCard: true,
+    filterTarget(card, player, target) {
+      return (
+        target !== player &&
+        !game.hasPlayer(
+          (current) =>
+            current !== player &&
+            current.countCards("h") > target.countCards("h"),
+        )
+      )
+    },
+    check(card) {
+      if (get.position(card) === "h") {
+        return 1
+      }
+      return 5 - get.value(card)
+    },
+    async cost(event, trigger, player) {
+      const { source } = trigger
+      const { bool } = await player
+        .chooseBool(get.prompt(event.name.slice(0, -5), source))
+        .set(
+          "choice",
+          (source.countCards("h") <= source.getHp() &&
+            player.countCards("h") < 4 &&
+            !source.hasSkillTag("nogain")) ||
+            get.attitude(player, source) > 0,
+        )
+        .set(
+          "prompt2",
+          "当其他角色对你造成伤害后，你可以观看其手牌，然后交给其一张牌；当前回合结束时，若其未失去此牌，你将手牌摸至四张",
+        )
+        .forResult()
+      event.result = {
+        bool: bool,
+        targets: [source],
+      }
+    },
+    prompt:
+      "出牌阶段限一次，你可以将一张牌交给一名除你外手牌数最多的角色，然后对其造成1点伤害；若其因此死亡，你可以令一名角色将手牌摸至四张",
+    async content(event, trigger, player) {
+      const target = event.targets[0]
+      player.changeZhuanhuanji(event.name)
+      if (!trigger) {
+        player.addTempSkill(`${event.name}_used`, "phaseUseAfter")
+        await player.give(event.cards, target)
+        await target.damage("nocard")
+        if (
+          !game.getGlobalHistory("everything", (evt) => {
+            if (evt.name !== "die" || evt.player !== target) {
+              return false
+            }
+            return evt.reason?.getParent() === event
+          }).length ||
+          !game.hasPlayer((current) => current.countCards("h") < 4)
+        ) {
+          return
+        }
+        const result = await player
+          .chooseTarget("令一名角色将手牌摸至四张", (card, player, target) => {
+            return target.countCards("h") < 4
+          })
+          .set("ai", (target) => {
+            return get.attitude(player, target)
+          })
+          .forResult()
+        if (result.bool) {
+          player.line(result.targets)
+          await result.targets[0].drawTo(4)
+        }
+      } else {
+        await player.viewHandcards(target)
+        const result = await player
+          .chooseToGive(
+            target,
+            "he",
+            true,
+            `交给${get.translation(target)}一张牌`,
+          )
+          .set("ai", (card) => {
+            return 5 - get.value(card)
+          })
+          .forResult()
+        if (result.bool) {
+          const card = result.cards[0]
+          target.addGaintag(result.cards, event.name)
+          player
+            .when({ global: "phaseJieshuBegin" })
+            .filter(
+              (evt) =>
+                evt.getParent() === trigger.getParent("phase", true) &&
+                target.getCards("he").includes(card) &&
+                player.countCards("h") < 4,
+            )
+            .step(async () => {
+              target.removeGaintag(event.name)
+              await player.drawTo(4)
+            })
+        }
+      }
+    },
+    ai: {
+      order: 1,
+      result: {
+        target(player, target) {
+          return get.damageEffect(target, player, target)
+        },
+      },
+    },
+    subSkill: { used: { charlotte: true } },
+  },
 }
 
 export default skills

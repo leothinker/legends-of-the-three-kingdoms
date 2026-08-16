@@ -49,7 +49,7 @@ const characterSort = {
   ],
   shenhua_yin: [
     "wangji",
-    "kuaiyuekuailiang",
+    "kuailiangkuaiyue",
     "yanyan",
     "wangping",
     "luji",

@@ -186,4 +186,16 @@ export default {
   "#relonghun1": "龙战于野，其血玄黄！",
   "#relonghun2": "潜龙勿用，藏锋守拙。",
   "#re_shen_zhaoyun:die": "龙磷崩损，坠于九天…",
+
+  "#qizhi1": "声东击西，敌寇一网成擒。",
+  "#qizhi2": "吾意不在此地，已遣别部出发。",
+  "#jinqu1": "通川聚粮，伐吴之业，当步步为营。",
+  "#jinqu2": "建上昶水城，以逼夏口。",
+  "#wangji:die": "天下之势，必归大魏。可恨，未能得见哪……",
+
+  "#jianxiang1": "得遇曹公，吾之幸也。",
+  "#jianxiang2": "曹公得荆不喜，喜得吾二人足矣。",
+  "#shenshi1": "深中足智，鉴时审情。",
+  "#shenshi2": "数语之言，审时度势。",
+  "#kuailiangkuaiyue:die": "表不能善用，所憾也。",
 }

@@ -42,4 +42,7 @@ export default {
   re_caiwenji: "异乡的孤女",
   re_shen_simayi: "鉴往知来",
   re_shen_zhaoyun: "战龙在野",
+
+  wangji: "经行合一",
+  kuailiangkuaiyue: "雍论臼谋",
 }

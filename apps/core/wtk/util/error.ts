@@ -134,6 +134,16 @@ export function setOnError({ lib, game, get, _status }) {
     const version = typeof lib.version !== "undefined" ? lib.version : ""
     const match = version.match(/[^\d.]/) != null
     log.push(`${match ? "游戏" : "三国杀"}版本: ${version || "未知版本"}`)
+    if (lib.buildInfo == null) {
+      log.push("构建信息: unknown")
+    } else {
+      const { channel, commit, builtAt } = lib.buildInfo
+      log.push(`构建通道: ${channel}`)
+      log.push(`构建提交: ${commit}`)
+      if (channel === "nightly") {
+        log.push(`构建时间: ${builtAt}`)
+      }
+    }
     log.push(getStatusInfo({ lib, get, _status }))
     log.push("-------------")
     const errorReporter = ErrorManager.getErrorReporter(err)

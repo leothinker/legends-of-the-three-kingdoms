@@ -3724,7 +3724,7 @@ const skills = {
   // 神司马懿
   // 忍戒
   rerenjie: {
-    audio: 2,
+    audio: "renjie",
     trigger: { player: "damageEnd" },
     forced: true,
     group: "rerenjie2",
@@ -3755,7 +3755,7 @@ const skills = {
             return [1, -2]
           }
           if (get.tag(card, "damage")) {
-            if (target.hp === target.maxHp) {
+            if (target.isHealthy() && target.getHp() > 2) {
               if (!target.hasSkill("rejilue")) {
                 return [0, 1]
               }
@@ -3768,10 +3768,15 @@ const skills = {
     },
   },
   rerenjie2: {
-    audio: "rerenjie",
+    audio: "renjie",
     mod: {
       aiOrder: (player, card, num) => {
-        if (num <= 0 || typeof card !== "object" || !player.isPhaseUsing()) {
+        if (
+          num <= 0 ||
+          typeof card !== "object" ||
+          !player.isPhaseUsing() ||
+          player.isDying()
+        ) {
           return num
         }
         if (player.hasSkill("rebaiyin")) {
@@ -3824,7 +3829,7 @@ const skills = {
     juexingji: true,
     trigger: { player: "phaseZhunbeiBegin" },
     forced: true,
-    audio: 2,
+    audio: "sbaiyin",
     filter(event, player) {
       return player.countMark("rerenjie") >= 4
     },
@@ -3845,7 +3850,7 @@ const skills = {
   },
   // 极略
   rejilue: {
-    audio: 2,
+    audio: "jilue",
     group: [
       "rejilue_guicai",
       "rejilue_fangzhu",
@@ -3856,7 +3861,7 @@ const skills = {
     ai: { combo: "rerenjie" },
   },
   rejilue_guicai: {
-    audio: 1,
+    audio: "jilue_guicai",
     trigger: { global: "judge" },
     filter(event, player) {
       return player.countCards("hes") > 0 && player.hasMark("rerenjie")
@@ -3954,7 +3959,7 @@ const skills = {
     },
   },
   rejilue_fangzhu: {
-    audio: 1,
+    audio: "jilue_fangzhu",
     trigger: { player: "damageEnd" },
     //priority:-1,
     filter(event, player) {
@@ -3979,45 +3984,26 @@ const skills = {
         if (target.hasSkillTag("noturn")) {
           return 0
         }
-        const player = get.player()
-        const current = _status.currentPhase
-        const dis = current ? get.distance(current, target, "absolute") : 1
-        const draw = player.getDamagedHp()
-        const att = get.attitude(player, target)
-        if (att === 0) {
-          return target.hasJudge("lebu")
-            ? Math.random() / 3
-            : Math.sqrt(get.threaten(target)) / 5 + Math.random() / 2
+        var player = _status.event.player
+        if (get.attitude(_status.event.player, target) === 0) {
+          return 0
         }
-        if (att > 0) {
-          if (target.isTurnedOver()) {
-            return att + draw
+        if (get.attitude(_status.event.player, target) > 0) {
+          if (target.classList.contains("turnedover")) {
+            return 1000 - target.countCards("h")
           }
-          if (draw < 4) {
+          if (player.getDamagedHp() < 3) {
             return -1
           }
-          if (current && target.getSeatNum() > current.getSeatNum()) {
-            return att + draw / 3
-          }
-          return (
-            (10 * Math.sqrt(Math.max(0.01, get.threaten(target)))) /
-              (3.5 - draw) +
-            dis / (2 * game.countPlayer())
-          )
+          return 100 - target.countCards("h")
         }
-        if (target.isTurnedOver()) {
-          return att - draw
-        }
-        if (draw >= 5) {
+        if (target.classList.contains("turnedover")) {
           return -1
         }
-        if (current && target.getSeatNum() <= current.getSeatNum()) {
-          return -att + draw / 3
+        if (player.getDamagedHp() >= 3) {
+          return -1
         }
-        return (
-          (4.25 - draw) * 10 * Math.sqrt(Math.max(0.01, get.threaten(target))) +
-          (2 * game.countPlayer()) / dis
-        )
+        return 1 + target.countCards("h")
       }
     },
     logTarget: "targets",
@@ -4025,12 +4011,43 @@ const skills = {
       const { targets } = event
       const [target] = targets
       player.removeMark("rerenjie", 1)
-      await target.draw(player.maxHp - player.hp)
-      await target.turnOver()
+      let result
+
+      // step 1
+      if (player.isHealthy()) {
+        result = { bool: false }
+      } else {
+        const next2 = target.chooseToDiscard("he", player.getDamagedHp())
+        next2.set("ai", (card) => {
+          var player = _status.event.player
+          if (
+            player.isTurnedOver() ||
+            _status.event.getTrigger().player.getDamagedHp() > 2
+          ) {
+            return -1
+          }
+          return player.hp * player.hp - get.value(card)
+        })
+        next2.set(
+          "prompt",
+          `弃置${get.cnNumber(player.getDamagedHp())}张牌并失去1点体力；或摸${get.cnNumber(player.getDamagedHp())}张牌并翻面。`,
+        )
+        result = await next2.forResult()
+      }
+
+      // step 2
+      if (result.bool) {
+        await target.loseHp()
+      } else {
+        if (player.isDamaged()) {
+          await target.draw(player.getDamagedHp()).forResult()
+        }
+        await target.turnOver().forResult()
+      }
     },
   },
   rejilue_jizhi: {
-    audio: 1,
+    audio: "jilue_jizhi",
     trigger: { player: "useCard" },
     filter(event, player) {
       return (
@@ -4082,7 +4099,7 @@ const skills = {
     },
   },
   rejilue_zhiheng: {
-    audio: 1,
+    audio: "jilue_zhiheng",
     audioname2: {},
     inherit: "rezhiheng",
     filter(event, player) {
@@ -4140,7 +4157,7 @@ const skills = {
     },
   },
   rejilue_wansha: {
-    audio: 1,
+    audio: "jilue_wansha",
     enable: "phaseUse",
     usable: 1,
     filter(event, player) {
@@ -4149,6 +4166,8 @@ const skills = {
     async content(event, trigger, player) {
       player.removeMark("rerenjie", 1)
       player.addTempSkill("rewansha")
+      const targets = game.filterPlayer((curr) => curr !== player)
+      targets.forEach((target) => target.addTempSkill("rewansha_effect"))
     },
     ai: {
       order: () => {

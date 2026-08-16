@@ -55,7 +55,6 @@ export function clickSwitcher() {
   if (this.classList.contains("disabled")) {
     return
   }
-
   this.classList.add("on")
   if (this._link.menu) {
     var pos1 = this.lastChild.getBoundingClientRect()

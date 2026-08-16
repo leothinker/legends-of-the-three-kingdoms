@@ -76,6 +76,8 @@ const characterSort = {
     "ol_zhangzhang",
     "ol_zuoci",
     "ol_caiwenji",
+    "ol_shen_simayi",
+    "ol_shen_zhaoyun",
   ],
   shenwu_yin: [
     "wangji",

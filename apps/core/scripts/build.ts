@@ -1,9 +1,11 @@
-import { existsSync, readdirSync } from "node:fs"
+import { execFileSync } from "node:child_process"
+import { existsSync, readdirSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import jit from "@wtk/jit"
 import { build } from "vite"
 import { type Target, viteStaticCopy } from "vite-plugin-static-copy"
 import { moderned_characters } from "../game/config.json"
+import type { BuildChannel, BuildInfo } from "../wtk/util/meta"
 import generateImportMap from "./vite-plugin-importmap"
 
 const root = join(import.meta.dirname, "..")
@@ -114,6 +116,8 @@ async function main() {
 
     await buildIndividual(type, target, input, importMap, copies)
   }
+
+  writeBuildInfo()
 }
 
 /**
@@ -221,6 +225,43 @@ async function buildIndividual(
  */
 function getEntryName(file: string): string {
   return file.replace(/\.(js|ts)$/, "")
+}
+
+const buildChannels = [
+  "test",
+  "nightly",
+  "release",
+] as const satisfies readonly BuildChannel[]
+type ArtifactBuildChannel = (typeof buildChannels)[number]
+
+function writeBuildInfo() {
+  const channelValue = process.env.NONAME_BUILD_CHANNEL
+  const channel: ArtifactBuildChannel = buildChannels.includes(
+    channelValue as ArtifactBuildChannel,
+  )
+    ? (channelValue as ArtifactBuildChannel)
+    : "test"
+  let commit = process.env.NONAME_BUILD_COMMIT
+  if (!commit) {
+    try {
+      commit = execFileSync("git", ["-C", root, "rev-parse", "HEAD"], {
+        encoding: "utf8",
+      }).trim()
+    } catch {
+      commit = "local"
+    }
+  }
+
+  const buildInfo: BuildInfo = {
+    channel,
+    commit,
+    builtAt: process.env.NONAME_BUILD_TIME || "unknown",
+  }
+  writeFileSync(
+    join(root, "dist/game/build-info.json"),
+    `${JSON.stringify(buildInfo, null, "\t")}\n`,
+    "utf8",
+  )
 }
 
 /** 支持按包体维度处理的目录类型。 */

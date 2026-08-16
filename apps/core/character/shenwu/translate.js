@@ -424,6 +424,34 @@ const translates = {
   olbeige: "悲歌",
   olbeige_info:
     "当一名角色受到【杀】造成的伤害后，若你有牌，你可以令其进行判定，然后你可以弃置一张牌，根据结果执行：红桃，其回复1点体力；方块，其摸两张牌；梅花，伤害来源弃置两张牌；黑桃，伤害来源翻面；点数相同，你获得你弃置的牌；花色相同，你获得判定牌。",
+
+  ol_shen_simayi: "神司马懿",
+  ol_shen_simayi_prefix: "神",
+  olrenjie: "忍戒",
+  olrenjie2: "忍戒",
+  olrenjie_info:
+    "锁定技，当你受到伤害后/于弃牌阶段内弃置手牌后，你获得伤害值枚/弃置手牌数枚“忍”。",
+  olbaiyin: "拜印",
+  olbaiyin_info: `觉醒技，准备阶段，若“忍”数大于3，你减1点体力上限，然后获得${get.poptip("olrenjie")}。`,
+  oljilue: "极略",
+  oljilue_info: `你可以弃1枚“忍”，发动下列一项技能：${get.poptip("oljilue_guicai")}、${get.poptip("oljilue_fangzhu")}、${get.poptip("oljilue_jizhi")}、${get.poptip("oljilue_zhiheng")}或${get.poptip("oljilue_wansha")}。`,
+  oljilue_guicai: "鬼才",
+  oljilue_guicai_info: "当一名角色的判定牌生效前，你可以打出一张牌代替之。",
+  oljilue_fangzhu: "放逐",
+  oljilue_fangzhu_info:
+    "当你受到伤害后，你可以令一名其他角色选择一项：1.弃置X张牌并失去1点体力；2.摸X张牌并翻面（X为你已损失的体力值）。",
+  oljilue_jizhi: "集智",
+  oljilue_jizhi_info:
+    "当你使用非转化的锦囊牌时，你可以摸一张牌。若此牌为基本牌，你可以弃置此牌然后本回合手牌上限+1。",
+  oljilue_zhiheng: "制衡",
+  oljilue_zhiheng_info:
+    "出牌阶段限一次，你可以弃置任意张牌，然后摸等量的牌。若你以此法弃置了所有手牌，则你多摸一张牌。",
+  oljilue_wansha: "完杀",
+  oljilue_wansha_info:
+    "锁定技，你的回合内：除处于濒死状态的角色外的其他角色的红色基本牌均视为【杀】，此【杀】被使用时你摸两张牌。",
+
+  ol_shen_zhaoyun: "神赵云",
+  ol_shen_zhaoyun_prefix: "神",
 }
 
 export default translates

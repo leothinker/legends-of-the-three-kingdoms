@@ -1,6 +1,7 @@
 import { game, lib } from "wtk"
 import { boot } from "@/init/index.js"
 import { device, userAgentLowerCase } from "@/util/index.js"
+import { loadBuildInfo } from "@/util/meta.js"
 import "core-js-bundle"
 // 保证打包时存在(importmap)
 import "vue/dist/vue.esm-browser.js"
@@ -12,6 +13,7 @@ import "vue/dist/vue.esm-browser.js"
     // 预加载脚本
     const { default: preload } = await import("./init/browser.js")
     await preload({ lib, game })
+    lib.buildInfo = await loadBuildInfo((url) => lib.init.promises.json(url))
 
     await boot()
   } catch (e) {

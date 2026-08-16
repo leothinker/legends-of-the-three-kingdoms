@@ -451,8 +451,21 @@ const characters = {
     hp: 3,
     skills: ["olbeige", "duanchang"],
   },
-  ol_shen_simayi: {},
-  ol_shen_zhaoyun: {},
+  ol_shen_simayi: {
+    sex: "male",
+    group: "shen",
+    hp: 4,
+    skills: ["rerenjie", "rebaiyin", "lianpo"],
+    groupInGuozhan: "wei",
+    names: "司马|懿",
+  },
+  ol_shen_zhaoyun: {
+    sex: "male",
+    group: "shen",
+    hp: 2,
+    skills: ["rejuejing", "relonghun"],
+    groupInGuozhan: "shu",
+  },
 }
 
 export default characters

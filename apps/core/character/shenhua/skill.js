@@ -6352,7 +6352,7 @@ const skills = {
             return [1, -2]
           }
           if (get.tag(card, "damage")) {
-            if (target.hp === target.maxHp) {
+            if (target.isHealthy() && target.getHp() > 2) {
               if (!target.hasSkill("jilue")) {
                 return [0, 1]
               }
@@ -6368,7 +6368,12 @@ const skills = {
     audio: "renjie",
     mod: {
       aiOrder: (player, card, num) => {
-        if (num <= 0 || typeof card !== "object" || !player.isPhaseUsing()) {
+        if (
+          num <= 0 ||
+          typeof card !== "object" ||
+          !player.isPhaseUsing() ||
+          player.isDying()
+        ) {
           return num
         }
         if (player.hasSkill("sbaiyin")) {
@@ -6663,6 +6668,7 @@ const skills = {
     prompt: "弃1枚“忍”，弃置任意张牌，然后摸等量的牌。",
     async content(event, trigger, player) {
       player.removeMark("renjie", 1)
+
       await player.draw(event.cards.length)
     },
     ai: {

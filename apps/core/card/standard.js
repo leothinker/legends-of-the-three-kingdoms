@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { _status, ai, game, get, lib, ui } from "wtk"
 
 export const type = "card"
@@ -3456,12 +3457,6 @@ export default {
               )
           }
         }
-        /*
-					event.result={
-						wuxied:true,
-						directHit:evt.directHit||[],
-						nowuxie:evt.nowuxie,
-					};*/
         if (player.isOnline()) {
           player.send((player) => {
             if (ui.tempnowuxie && !player.hasWuxie()) {

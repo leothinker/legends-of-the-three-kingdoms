@@ -1,6 +1,6 @@
 import { _status, game, get, lib, ui } from "wtk"
 
-/** @type { importCharacterConfig['skill'] } */
+/** @type { importCharacterConfig["skill"] } */
 const skills = {
   // 界曹操
   // 护驾
@@ -687,7 +687,7 @@ const skills = {
 
       const result = await player
         .chooseToDiscard({
-          prompt: `是否弃置一张基本牌，若如此做，本回合你的手牌上限+1？`,
+          prompt: `是否弃置一张基本牌然后本回合你的手牌上限+1？`,
           filterCard(card, player) {
             return get.type(card) === "basic"
           },
@@ -6284,6 +6284,506 @@ const skills = {
           player.gain(gains, "gain2")
         }
       }
+    },
+  },
+  // 神司马懿
+  // 忍戒
+  olrenjie: {
+    audio: "renjie",
+    trigger: { player: "damageEnd" },
+    forced: true,
+    group: "olrenjie2",
+    filter(event) {
+      return event.num > 0
+    },
+    async content(event, trigger, player) {
+      player.addMark("olrenjie", trigger.num)
+    },
+    intro: {
+      name2: "忍",
+      content: "mark",
+    },
+    marktext: "忍",
+    ai: {
+      maixie: true,
+      maixie_hp: true,
+      combo: "oljilue",
+      effect: {
+        target(card, player, target) {
+          if (
+            (!target.hasSkill("olbaiyin") && !target.hasSkill("oljilue")) ||
+            !target.hasFriend()
+          ) {
+            return
+          }
+          if (player.hasSkillTag("jueqing", false, target)) {
+            return [1, -2]
+          }
+          if (get.tag(card, "damage")) {
+            if (target.isHealthy() && target.getHp() > 2) {
+              if (!target.hasSkill("oljilue")) {
+                return [0, 1]
+              }
+              return [0.7, 1]
+            }
+            return 0.7
+          }
+        },
+      },
+    },
+  },
+  olrenjie2: {
+    audio: "renjie",
+    mod: {
+      aiOrder: (player, card, num) => {
+        if (
+          num <= 0 ||
+          typeof card !== "object" ||
+          !player.isPhaseUsing() ||
+          player.isDying()
+        ) {
+          return num
+        }
+        if (player.hasSkill("olbaiyin")) {
+          if (
+            player.countMark("olrenjie") < 4 &&
+            player.getUseValue(card) < Math.min(4, (player.hp * player.hp) / 4)
+          ) {
+            return 0
+          }
+        } else if (player.hasSkill("oljilue")) {
+          if (
+            player.countMark("olrenjie") < 3 &&
+            player.getUseValue(card) <
+              Math.min(1.8, 0.18 * player.hp * player.hp)
+          ) {
+            return 0
+          }
+        }
+      },
+    },
+    trigger: {
+      player: "loseAfter",
+      global: "loseAsyncAfter",
+    },
+    forced: true,
+    sourceSkill: "olrenjie",
+    filter(event, player) {
+      if (event.type !== "discard" || event.getlx === false) {
+        return false
+      }
+      var evt = event.getParent("phaseDiscard"),
+        evt2 = event.getl(player)
+      return (
+        evt &&
+        evt2 &&
+        evt.name === "phaseDiscard" &&
+        evt.player === player &&
+        evt2.cards2 &&
+        evt2.cards2.length > 0
+      )
+    },
+    async content(event, trigger, player) {
+      player.addMark("olrenjie", trigger.getl(player).cards2.length)
+    },
+  },
+  // 拜印
+  olbaiyin: {
+    skillAnimation: "epic",
+    animationColor: "thunder",
+    juexingji: true,
+    trigger: { player: "phaseZhunbeiBegin" },
+    forced: true,
+    audio: "sbaiyin",
+    filter(event, player) {
+      return player.countMark("olrenjie") >= 4
+    },
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      await player.loseMaxHp()
+      await player.addSkills("oljilue")
+    },
+    derivation: [
+      "oljilue",
+      "oljilue_guicai",
+      "oljilue_fangzhu",
+      "oljilue_jizhi",
+      "oljilue_zhiheng",
+      "oljilue_wansha",
+    ],
+    ai: { combo: "olrenjie" },
+  },
+  // 极略
+  oljilue: {
+    audio: "jilue",
+    group: [
+      "oljilue_guicai",
+      "oljilue_fangzhu",
+      "oljilue_jizhi",
+      "oljilue_zhiheng",
+      "oljilue_wansha",
+    ],
+    ai: { combo: "olrenjie" },
+  },
+  oljilue_guicai: {
+    audio: "jilue_guicai",
+    trigger: { global: "judge" },
+    filter(event, player) {
+      return player.countCards("hes") > 0 && player.hasMark("olrenjie")
+    },
+    async cost(event, trigger, player) {
+      const next = player.chooseCard(
+        "是否弃1枚“忍”，发动〖鬼才〗？",
+        "hes",
+        filterCard,
+      )
+      next.set("ai", processAI)
+
+      event.result = await next.forResult()
+
+      return
+
+      /**
+       * @param {Card} card
+       * @returns {boolean}
+       */
+      function filterCard(card) {
+        const player = get.player()
+        const mod2 = game.checkMod(
+          card,
+          player,
+          "unchanged",
+          "cardEnabled2",
+          player,
+        )
+        if (mod2 !== "unchanged") {
+          return mod2
+        }
+        const mod = game.checkMod(
+          card,
+          player,
+          "unchanged",
+          "cardRespondable",
+          player,
+        )
+        if (mod !== "unchanged") {
+          return mod
+        }
+        return true
+      }
+
+      /**
+       * @param {Card} card
+       * @returns {number}
+       */
+      function processAI(card) {
+        const trigger = get.event().parent._trigger
+        const player = get.event().player
+        const result =
+          trigger.judge(card) - trigger.judge(trigger.player.judging[0])
+        const attitude = get.attitude(player, trigger.player)
+        let val = get.value(card)
+        if (get.subtype(card) === "equip2") {
+          val /= 2
+        } else {
+          val /= 4
+        }
+        if (attitude === 0 || result === 0) {
+          return 0
+        }
+        if (attitude > 0) {
+          return result - val
+        }
+        return -result - val
+      }
+    },
+    async content(event, trigger, player) {
+      const { cards } = event
+      const [card] = cards
+      player.removeMark("olrenjie", 1)
+      await player.respond(cards, "highlight", "noOrdering")
+      if (trigger.player.judging[0].clone) {
+        trigger.player.judging[0].clone.delete()
+        game.addVideo(
+          "deletenode",
+          player,
+          get.cardsInfo([trigger.player.judging[0].clone]),
+        )
+      }
+      await game.cardsDiscard(trigger.player.judging[0])
+      trigger.player.judging[0] = card
+      trigger.orderingCards.addArray(cards)
+      game.log(trigger.player, "的判定牌改为", card)
+      await game.delay(2)
+    },
+    ai: {
+      rejudge: true,
+      tag: {
+        rejudge: 1,
+      },
+    },
+  },
+  oljilue_fangzhu: {
+    audio: "jilue_fangzhu",
+    trigger: { player: "damageEnd" },
+    //priority:-1,
+    filter(event, player) {
+      return player.hasMark("olrenjie")
+    },
+    async cost(event, trigger, player) {
+      const next = player.chooseTarget(
+        "是否弃1枚“忍”，发动【放逐】？",
+        (card, player, target) => player !== target,
+      )
+      next.set("ai", processAI)
+
+      event.result = await next.forResult()
+
+      return
+
+      /**
+       * @param {Player} target
+       * @returns {number}
+       */
+      function processAI(target) {
+        if (target.hasSkillTag("noturn")) {
+          return 0
+        }
+        var player = _status.event.player
+        if (get.attitude(_status.event.player, target) === 0) {
+          return 0
+        }
+        if (get.attitude(_status.event.player, target) > 0) {
+          if (target.classList.contains("turnedover")) {
+            return 1000 - target.countCards("h")
+          }
+          if (player.getDamagedHp() < 3) {
+            return -1
+          }
+          return 100 - target.countCards("h")
+        }
+        if (target.classList.contains("turnedover")) {
+          return -1
+        }
+        if (player.getDamagedHp() >= 3) {
+          return -1
+        }
+        return 1 + target.countCards("h")
+      }
+    },
+    logTarget: "targets",
+    async content(event, trigger, player) {
+      const { targets } = event
+      const [target] = targets
+      player.removeMark("olrenjie", 1)
+      let result
+
+      // step 1
+      if (player.isHealthy()) {
+        result = { bool: false }
+      } else {
+        const next2 = target.chooseToDiscard("he", player.getDamagedHp())
+        next2.set("ai", (card) => {
+          var player = _status.event.player
+          if (
+            player.isTurnedOver() ||
+            _status.event.getTrigger().player.getDamagedHp() > 2
+          ) {
+            return -1
+          }
+          return player.hp * player.hp - get.value(card)
+        })
+        next2.set(
+          "prompt",
+          `弃置${get.cnNumber(player.getDamagedHp())}张牌并失去1点体力；或摸${get.cnNumber(player.getDamagedHp())}张牌并翻面。`,
+        )
+        result = await next2.forResult()
+      }
+
+      // step 2
+      if (result.bool) {
+        await target.loseHp()
+      } else {
+        if (player.isDamaged()) {
+          await target.draw(player.getDamagedHp()).forResult()
+        }
+        await target.turnOver().forResult()
+      }
+    },
+  },
+  oljilue_jizhi: {
+    audio: "jilue_jizhi",
+    trigger: { player: "useCard" },
+    filter(event, player) {
+      return (
+        get.type(event.card, "trick") === "trick" &&
+        event.card.isCard &&
+        player.hasMark("olrenjie")
+      )
+    },
+    async content(event, trigger, player) {
+      player.removeMark("olrenjie", 1)
+      await player.draw("nodelay")
+
+      if (
+        !player.hasCards("h", (card) => {
+          return (
+            get.type(card) === "basic" &&
+            lib.filter.cardDiscardable(card, player)
+          )
+        })
+      ) {
+        return
+      }
+
+      const result = await player
+        .chooseToDiscard({
+          prompt: `是否弃置一张基本牌然后本回合你的手牌上限+1？`,
+          filterCard(card, player) {
+            return get.type(card) === "basic"
+          },
+          ai(card) {
+            if (!_status.event.check) {
+              return -1
+            }
+            return 6 - get.value(card, player)
+          },
+        })
+        .set(
+          "check",
+          _status.currentPhase === player && player.needsToDiscard(-3),
+        )
+        .forResult()
+
+      if (result.bool) {
+        player.addTempSkill("oljilue_jizhi_clear")
+        player.addMark("oljilue_jizhi_clear", 1, false)
+      }
+    },
+    subSkill: {
+      clear: {
+        charlotte: true,
+        onremove: true,
+        mod: {
+          maxHandcard(player, num) {
+            return num + player.countMark("oljilue_jizhi_clear")
+          },
+        },
+        intro: { content: "手牌上限+#" },
+      },
+    },
+  },
+  oljilue_zhiheng: {
+    audio: "jilue_zhiheng",
+    audioname2: {},
+    inherit: "rezhiheng",
+    filter(event, player) {
+      return player.hasMark("olrenjie")
+    },
+    prompt:
+      "弃1枚“忍”，弃置任意张牌，然后摸等量的牌。若你以此法弃置了所有手牌，则你多摸一张牌。",
+    async content(event, trigger, player) {
+      const { cards } = event
+
+      player.removeMark("olrenjie", 1)
+      const hs = player.getCards("h")
+      const num =
+        hs.length > 0 && hs.every((card) => cards.includes(card)) ? 1 : 0
+
+      await player.discard({ cards })
+      await player.draw(num + cards.length)
+    },
+    ai: {
+      order(item, player) {
+        if (
+          player.hasCard((i) => get.value(i) > Math.max(6, 9 - player.hp), "he")
+        ) {
+          return 1
+        }
+        return 10
+      },
+      result: {
+        player(player) {
+          var num = 0
+          var cards = player.getCards("he")
+          for (var i = 0; i < cards.length; i++) {
+            if (get.value(cards[i]) < 6) {
+              num++
+            }
+          }
+          if (cards.length > 2) {
+            return 1
+          }
+          // if (cards.length == 2 && player.storage.oljilue > 1) {
+          // }
+          return 0
+        },
+      },
+      nokeep: true,
+      skillTagFilter(player, tag, arg) {
+        if (tag === "nokeep") {
+          return (
+            player.isPhaseUsing() &&
+            !player.getStat().skill.oljilue_zhiheng &&
+            player.hasCard((card) => get.name(card) !== "tao", "h")
+          )
+        }
+      },
+    },
+  },
+  oljilue_wansha: {
+    audio: "jilue_wansha",
+    enable: "phaseUse",
+    usable: 1,
+    filter(event, player) {
+      return player.hasMark("olrenjie")
+    },
+    async content(event, trigger, player) {
+      player.removeMark("olrenjie", 1)
+      player.addTempSkill("olwansha")
+    },
+    ai: {
+      order: () => {
+        const player = _status.event.player
+        if (
+          game.hasPlayer((current) => {
+            if (
+              player === current ||
+              current.hp > 1 ||
+              get.attitude(player, current) >= 0
+            ) {
+              return false
+            }
+            return (
+              (player.inRange(current) &&
+                player.countCards("hs", "sha") &&
+                player.getCardUsable("sha")) ||
+              player.countCards(
+                "hs",
+                (card) => get.name(card) !== "sha" && get.tag(card, "damage"),
+              ) > 1
+            )
+          })
+        ) {
+          return 9.2
+        }
+        return 0
+      },
+      result: {
+        player: 1,
+      },
+      effect: {
+        player(card, player, target) {
+          if (
+            target &&
+            player.hasSkill("olwansha") &&
+            target.hp <= 1 &&
+            get.tag(card, "damage")
+          ) {
+            return [1, 0, 1.5, -1.5]
+          }
+        },
+      },
     },
   },
 }

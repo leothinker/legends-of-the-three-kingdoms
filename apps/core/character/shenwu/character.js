@@ -455,7 +455,7 @@ const characters = {
     sex: "male",
     group: "shen",
     hp: 4,
-    skills: ["rerenjie", "rebaiyin", "lianpo"],
+    skills: ["olrenjie", "olbaiyin", "lianpo"],
     groupInGuozhan: "wei",
     names: "司马|懿",
   },

@@ -4916,6 +4916,181 @@ const skills = {
       },
     },
   },
+  // 王平
+  // 飞军
+  feijun: {
+    init: (player) => {
+      if (!Array.isArray(player.storage.feijun)) {
+        player.storage.feijun = []
+      }
+    },
+    intro: {
+      content(storage) {
+        if (!storage?.length) {
+          return "尚未发动"
+        }
+        const str = get.translation(storage)
+        return `已对${str}发动过〖飞军〗`
+      },
+    },
+    mark: true,
+    enable: "phaseUse",
+    usable: 1,
+    position: "he",
+    audio: 2,
+    filter(event, player) {
+      return (
+        game.hasPlayer(
+          (current) => current.countCards("h") >= player.countCards("h"),
+        ) ||
+        game.hasPlayer(
+          (current) => current.countCards("e") >= player.countCards("e"),
+        ) > 0
+      )
+    },
+    filterCard: true,
+    check(card) {
+      return 5 - get.value(card)
+    },
+    async content(event, trigger, player) {
+      const list = []
+      if (
+        game.hasPlayer(
+          (current) => current.countCards("h") > player.countCards("h"),
+        )
+      ) {
+        list.push("令一名手牌数大于你的角色交给你一张牌")
+      }
+      if (
+        game.hasPlayer(
+          (current) => current.countCards("e") > player.countCards("e"),
+        ) > 0
+      ) {
+        list.push("令一名装备区里牌数大于你的角色弃置一张装备牌")
+      }
+      if (list.length === 0) {
+        return
+      }
+      let index
+      if (list.length < 2) {
+        if (
+          game.hasPlayer(
+            (current) => current.countCards("h") > player.countCards("h"),
+          )
+        ) {
+          index = 0
+        } else {
+          index = 1
+        }
+      } else {
+        ;({ index } = await player
+          .chooseControl()
+          .set("ai", () => {
+            if (
+              game.hasPlayer(
+                (current) =>
+                  current.countCards("h") > player.countCards("h") &&
+                  get.attitude(player, current) < 0,
+              )
+            ) {
+              return 0
+            }
+            return 1
+          })
+          .set("choiceList", list)
+          .forResult())
+      }
+      let result
+      if (index === 0) {
+        result = await player
+          .chooseTarget(
+            (card, player, target) =>
+              target !== player &&
+              target.countCards("h") > player.countCards("h"),
+            "选择一名手牌数大于你的角色",
+          )
+          .set("ai", (target) => -get.attitude(player, target))
+          .forResult()
+      } else {
+        const next = player.chooseTarget(
+          (card, player, target) =>
+            target.countCards("e") > player.countCards("e") &&
+            target !== player,
+          "选择一名装备区里牌数大于你的角色",
+        )
+        next.ai = (target) => -get.attitude(player, target)
+        result = await next.forResult()
+      }
+      if (!result.bool) {
+        return
+      }
+      const target = result.targets[0]
+      const list2 = player.getStorage("feijun")
+      if (!list2.includes(target)) {
+        event._binglve = true
+        player.markAuto("feijun", [target])
+      }
+      player.line(target, "green")
+      if (index === 0) {
+        const result = await target
+          .chooseCard("he", true, `将一张牌交给${get.translation(player)}`)
+          .set("ai", (card) => 6 - get.value(card))
+          .forResult()
+        if (result.bool) {
+          target.give(result.cards, player)
+        }
+      } else {
+        await target.chooseToDiscard(
+          "he",
+          true,
+          { type: "equip" },
+          "弃置一张装备牌",
+        )
+      }
+    },
+    ai: {
+      order: 11,
+      result: {
+        player(player) {
+          if (
+            game.hasPlayer(
+              (current) =>
+                (current.countCards("h") > player.countCards("h") ||
+                  current.countCards("e") > player.countCards("e")) &&
+                get.attitude(player, current) < 0 &&
+                player.getStorage("feijun").includes(current),
+            ) ||
+            game.hasPlayer(
+              (current) =>
+                current.countCards("h") > player.countCards("h") &&
+                get.attitude(player, current) < 0,
+            ) ||
+            (player.countCards("h") >= 2 &&
+              game.hasPlayer(
+                (current) =>
+                  current.countCards("e") > player.countCards("e") &&
+                  get.attitude(player, current) < 0,
+              ))
+          ) {
+            return 1
+          }
+        },
+      },
+    },
+  },
+  // 兵略
+  binglve: {
+    audio: 2,
+    trigger: { player: "feijunAfter" },
+    forced: true,
+    filter(event, player) {
+      return event._binglve === true
+    },
+    async content(event, trigger, player) {
+      await player.draw(2)
+    },
+    ai: { combo: "feijun" },
+  },
 }
 
 export default skills

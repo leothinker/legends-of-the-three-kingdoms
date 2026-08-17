@@ -290,12 +290,12 @@ const characters = {
     hp: 4,
     skills: ["juzhan"],
   },
-  // wangping: {
-  //   sex: "male",
-  //   group: "shu",
-  //   hp: 4,
-  //   skills: ["feijun", "binglve"],
-  // },
+  wangping: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["feijun", "binglve"],
+  },
   // luji: {
   //   sex: "male",
   //   group: "wu",

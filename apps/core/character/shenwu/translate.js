@@ -454,6 +454,11 @@ const translates = {
 
   ol_shen_zhaoyun: "神赵云",
   ol_shen_zhaoyun_prefix: "神",
+
+  ol_wangping: "王平",
+  refeijun: "飞军",
+  refeijun_info:
+    "出牌阶段限一次，你可以弃置一张牌，然后选择一项：1.令一名手牌数大于你的角色交给你一张牌；2.令一名装备区里牌数大于你的角色弃置装备区里的一张牌。",
 }
 
 export default translates

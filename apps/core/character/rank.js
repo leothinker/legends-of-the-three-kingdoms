@@ -63,6 +63,7 @@ window.wtk_character_rank = {
     "re_luxun",
     "ol_luxun",
     "yanyan",
+    "wangping",
   ],
   c: [
     "zhangliao",
@@ -164,6 +165,7 @@ window.wtk_character_rank = {
       "ol_diaochan",
       "ol_huaxiong",
       "yanyan",
+      "wangping",
     ],
     junk: [
       "caocao",

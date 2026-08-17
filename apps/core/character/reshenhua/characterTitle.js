@@ -46,4 +46,5 @@ export default {
   wangji: "经行合一",
   kuailiangkuaiyue: "雍论臼谋",
   yanyan: "断头将军",
+  wangping: "兵谋以致用",
 }

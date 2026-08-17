@@ -4662,7 +4662,7 @@ const skills = {
     },
     ai: { combo: "qizhi" },
   },
-  // 蒯良&蒯越
+  // 蒯良蒯越
   // 荐降
   jianxiang: {
     audio: 2,
@@ -4841,6 +4841,80 @@ const skills = {
       },
     },
     subSkill: { used: { charlotte: true } },
+  },
+  // 严颜
+  // 拒战
+  juzhan: {
+    audio: 2,
+    mark: true,
+    zhuanhuanji: true,
+    marktext: "☯",
+    intro: {
+      content(storage, player, skill) {
+        if (storage) {
+          return "当你使用【杀】指定一名角色为目标后，你可以获得其一张牌，然后你本回合不能再对其使用牌"
+        }
+        return "当你成为其他角色使用【杀】的目标后，你可以与其各摸一张牌，然后其本回合不能再对你使用牌"
+      },
+    },
+    trigger: {
+      player: "useCardToPlayered",
+      target: "useCardToTargeted",
+    },
+    filter(event, player) {
+      if (event.card.name !== "sha") {
+        return false
+      }
+      if (!player.storage.juzhan) {
+        return player !== event.player
+      }
+      return (
+        player === event.player && event.target.countGainableCards(player, "he")
+      )
+    },
+    logTarget(event, player) {
+      return player.storage.juzhan ? event.target : event.player
+    },
+    check(event, player) {
+      const target = get.info("juzhan").logTarget(event, player)
+      return get.attitude(player, target) < 0
+    },
+    prompt2(event, player) {
+      const target = get.info("juzhan").logTarget(event, player)
+      return player.storage.juzhan
+        ? `获得${get.translation(target)}一张牌，然后你本回合不能再对其使用牌`
+        : `与${get.translation(target)}各摸一张牌，然后其本回合不能再对你使用牌`
+    },
+    async content(event, trigger, player) {
+      const { name: skill } = event,
+        target = get.info(skill).logTarget(trigger, player)
+      player.changeZhuanhuanji(skill)
+      const storage = player.storage[skill]
+      const list = [player, target]
+      if (storage) {
+        await game.asyncDraw([player, target].sortBySeat())
+        await game.delayx()
+        list.reverse()
+      } else {
+        await player.gainPlayerCard(target, "he", true)
+      }
+      list[0].addTempSkill(`${skill}_effect`)
+      list[0].markAuto(`${skill}_effect`, [list[1]])
+    },
+    subSkill: {
+      effect: {
+        charlotte: true,
+        onremove: true,
+        mod: {
+          playerEnabled(card, player, target) {
+            if (player.getStorage("juzhan_effect").includes(target)) {
+              return false
+            }
+          },
+        },
+        intro: { content: "本回合不能再对$使用牌" },
+      },
+    },
   },
 }
 

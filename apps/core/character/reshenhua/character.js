@@ -284,12 +284,12 @@ const characters = {
     skills: ["jianxiang", "shenshi"],
     names: "蒯|良-蒯|越",
   },
-  // yanyan: {
-  //   sex: "male",
-  //   group: "shu",
-  //   hp: 4,
-  //   skills: ["juzhan"],
-  // },
+  yanyan: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["juzhan"],
+  },
   // wangping: {
   //   sex: "male",
   //   group: "shu",

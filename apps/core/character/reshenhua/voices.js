@@ -198,4 +198,8 @@ export default {
   "#shenshi1": "深中足智，鉴时审情。",
   "#shenshi2": "数语之言，审时度势。",
   "#kuailiangkuaiyue:die": "表不能善用，所憾也。",
+
+  "#juzhan1": "砍头便砍头，何为怒邪。",
+  "#juzhan2": "我州但有断头将军，无降将军也。",
+  "#yanyan:die": "宁可断头死，安能屈膝降？",
 }

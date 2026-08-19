@@ -15899,7 +15899,7 @@ export class Player extends HTMLDivElement {
     if (lib.config.card_animation_info) {
       const node = arguments[0]
       let eventInfo = arguments[2]
-      if (eventInfo !== false) {
+      if (eventInfo == null) {
         eventInfo = get.cardsetion(this)
       }
       if (eventInfo?.length) {

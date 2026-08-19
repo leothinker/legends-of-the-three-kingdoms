@@ -5091,6 +5091,366 @@ const skills = {
     },
     ai: { combo: "feijun" },
   },
+  // 陆绩
+  // 怀橘
+  huaiju_ai: {
+    charlotte: true,
+    ai: {
+      filterDamage: true,
+      skillTagFilter(player, tag, arg) {
+        if (!player.hasMark("huaiju")) {
+          return false
+        }
+        if (
+          !game.hasPlayer((current) => current.hasSkill("tachibana_effect"))
+        ) {
+          return false
+        }
+        if (arg?.player) {
+          if (arg.player.hasSkillTag("jueqing", false, player)) {
+            return false
+          }
+        }
+      },
+    },
+  },
+  huaiju: {
+    marktext: "橘",
+    intro: {
+      name: "怀橘",
+      name2: "橘",
+      content: "当前有#个“橘”",
+    },
+    audio: 2,
+    trigger: {
+      global: "phaseBefore",
+      player: "enterGame",
+    },
+    forced: true,
+    filter(event, player) {
+      return event.name !== "phase" || game.phaseNumber === 0
+    },
+    async content(event, trigger, player) {
+      player.addMark("huaiju", 3)
+      player.addSkill("huaiju_ai")
+    },
+    group: ["tachibana_effect"],
+  },
+  //没错 这是个橘
+  tachibana_effect: {
+    audio: "huaiju",
+    sourceSkill: "huaiju",
+    trigger: {
+      global: ["damageBegin4", "phaseDrawBegin2"],
+    },
+    forced: true,
+    filter(event, player) {
+      return (
+        event.player.hasMark("huaiju") &&
+        (event.name === "damage" || !event.numFixed)
+      )
+    },
+    async content(event, trigger, player) {
+      player.line(trigger.player, "green")
+      if (trigger.name === "damage") {
+        trigger.cancel()
+        trigger.player.removeMark("huaiju", 1)
+      } else {
+        trigger.num++
+      }
+    },
+  },
+  // 遗礼
+  yili: {
+    audio: 2,
+    trigger: { player: "phaseUseBegin" },
+    async cost(event, trigger, player) {
+      const next = player.chooseTarget(
+        get.prompt(event.skill),
+        "失去1点体力或弃1枚“橘”，令一名其他角色获得1枚“橘”",
+        (card, player, target) => target !== player,
+      )
+      next.ai = (target) => {
+        const player = _status.event.player
+        if (player.storage.huaiju > 2 || player.hp > 2) {
+          return get.attitude(player, target)
+        }
+        return -1
+      }
+      event.result = await next.forResult()
+    },
+    async content(event, trigger, player) {
+      const target = event.targets[0]
+      let index = 0
+      if (player.hasMark("huaiju")) {
+        ;({ index } = await player
+          .chooseControl()
+          .set("choiceList", ["失去1点体力", "弃1枚“橘”"])
+          .set("ai", () => {
+            if (player.hp > 2) {
+              return 0
+            }
+            return 1
+          })
+          .forResult())
+      }
+      if (index === 1) {
+        player.removeMark("huaiju", 1)
+      } else {
+        await player.loseHp()
+      }
+      target.addMark("huaiju", 1)
+      target.addSkill("huaiju_ai")
+    },
+    ai: {
+      combo: "huaiju",
+    },
+  },
+  // 整论
+  zhenglun: {
+    audio: 2,
+    trigger: {
+      player: "phaseDrawBefore",
+    },
+    filter(event, player) {
+      return !player.hasMark("huaiju")
+    },
+    check(event, player) {
+      return player.countCards("h") >= 2 || player.skipList.includes("phaseUse")
+    },
+    async content(event, trigger, player) {
+      trigger.cancel()
+      player.addMark("huaiju", 1)
+    },
+    ai: {
+      combo: "huaiju",
+    },
+  },
+  // 孙亮
+  // 溃诛
+  kuizhu: {
+    audio: 2,
+    trigger: { player: "phaseDiscardAfter" },
+    filter(event, player) {
+      return player.getHistory(
+        "lose",
+        (evt) =>
+          evt.type === "discard" && evt.getParent("phaseDiscard") === event,
+      ).length
+    },
+    direct: true,
+    content() {
+      "step 0"
+      var cards = []
+      player.getHistory("lose", (evt) => {
+        if (
+          evt.type === "discard" &&
+          evt.getParent("phaseDiscard") === trigger
+        ) {
+          cards.addArray(evt.cards2)
+        }
+      })
+      event.num = cards.length
+      event.str1 = `令至多${event.num}名角色各摸一张牌`
+      event.str2 = `对任意名体力值之和为${event.num}的角色各造成1点伤害`
+      player
+        .chooseControl("cancel2")
+        .set("ai", () => {
+          if (
+            game.countPlayer(
+              (current) =>
+                get.attitude(player, current) < 0 && current.hp === event.num,
+            ) > 0 &&
+            event.num <= 3
+          ) {
+            return 1
+          }
+          return 0
+        })
+        .set("choiceList", [event.str1, event.str2])
+        .set("prompt", "是否发动【溃诛】？")
+      ;("step 1")
+      if (result.control === "cancel2") {
+        event.finish()
+      }
+      event.control = [event.str1, event.str2][result.index]
+      ;("step 2")
+      var str = "请选择〖溃诛〗的目标"
+      if (event.bool === false) {
+        str = `<br>所选目标体力值之和不足${event.num}，请重选`
+      }
+      if (event.control === event.str2) {
+        player
+          .chooseTarget(str, (card, player, target) => {
+            var targets = ui.selected.targets
+            var num = 0
+            for (var i = 0; i < targets.length; i++) {
+              num += targets[i].hp
+            }
+            return num + target.hp <= _status.event.num
+          })
+          .set("ai", (target) => {
+            if (ui.selected.targets[0] !== undefined) {
+              return -1
+            }
+            return get.attitude(player, target) < 0
+          })
+          .set("promptbar", "none")
+          .set("num", event.num)
+          .set("selectTarget", () => {
+            var targets = ui.selected.targets
+            var num = 0
+            for (var i = 0; i < targets.length; i++) {
+              num += targets[i].hp
+            }
+            if (num === _status.event.num) {
+              return ui.selected.targets.length
+            }
+            return ui.selected.targets.length + 1
+          })
+      } else {
+        player
+          .chooseTarget(
+            "请选择〖溃诛〗的目标",
+            `令至多${get.cnNumber(event.num)}名角色各摸一张牌`,
+            [1, event.num],
+          )
+          .set("ai", (target) => get.attitude(_status.event.player, target))
+      }
+      ;("step 3")
+      if (result.bool) {
+        var targets = result.targets.sortBySeat()
+        if (event.control === event.str1) {
+          player.logSkill("kuizhu", targets)
+          game.asyncDraw(targets)
+        } else {
+          var num = 0
+          for (var i = 0; i < targets.length; i++) {
+            num += targets[i].hp
+          }
+          if (num < event.num) {
+            event.bool = false
+            event.goto(2)
+          } else {
+            player.logSkill("kuizhu", targets)
+            for (var i of targets) {
+              i.damage()
+            }
+            if (targets.length >= 2) {
+              player.loseHp()
+            }
+          }
+        }
+      }
+    },
+  },
+  // 掣政
+  chezheng: {
+    audio: 2,
+    mod: {
+      playerEnabled(card, player, target) {
+        var info = get.info(card)
+        if (
+          target !== player &&
+          (!info?.singleCard || !ui.selected.targets.length) &&
+          player.isPhaseUsing() &&
+          !target.inRange(player)
+        ) {
+          return false
+        }
+      },
+    },
+    trigger: { player: "phaseUseEnd" },
+    filter(event, player) {
+      return (
+        player.getHistory(
+          "useCard",
+          (evt) => evt.getParent("phaseUse") === event,
+        ).length <
+          game.countPlayer(
+            (current) => current !== player && !current.inRange(player),
+          ) &&
+        game.hasPlayer(
+          (target) =>
+            target !== player &&
+            !target.inRange(player) &&
+            target.countDiscardableCards(player, "he"),
+        )
+      )
+    },
+    forced: true,
+    content() {
+      "step 0"
+      player
+        .chooseTarget(
+          "请选择〖掣政〗的目标",
+          "弃置一名攻击范围内不包含你的其他角色一张牌",
+          true,
+          (card, player, target) =>
+            target !== player &&
+            !target.inRange(player) &&
+            target.countDiscardableCards(player, "he"),
+        )
+        .set("ai", (target) => {
+          var player = _status.event.player
+          return get.effect(target, { name: "guohe_copy2" }, player, player)
+        })
+      ;("step 1")
+      if (result.bool) {
+        player.line(result.targets)
+        player.discardPlayerCard(result.targets[0], "he", true)
+      }
+    },
+  },
+  // 立军
+  lijun: {
+    audio: 2,
+    trigger: { global: "useCardAfter" },
+    filter(event, player) {
+      if (event.card.name !== "sha") {
+        return false
+      }
+      if (
+        _status.currentPhase !== event.player ||
+        event.player.group !== "wu"
+      ) {
+        return false
+      }
+      if (
+        !player.hasZhuSkill("lijun", event.player) ||
+        player === event.player
+      ) {
+        return false
+      }
+      return event.cards.filterInD().length
+    },
+    zhuSkill: true,
+    direct: true,
+    content() {
+      "step 0"
+      trigger.player
+        .chooseBool(
+          get.prompt("lijun"),
+          `将${get.translation(trigger.cards)}交给${get.translation(player)}`,
+        )
+        .set("choice", get.attitude(trigger.player, player) > 0)
+      ;("step 1")
+      if (result.bool) {
+        player.logSkill("lijun", trigger.player)
+        player.gain(trigger.cards.filterInD(), "gain2")
+        player
+          .chooseBool()
+          .set("prompt", `是否令${get.translation(trigger.player)}摸一张牌？`)
+          .set("choice", get.attitude(player, trigger.player) > 0)
+      } else {
+        event.finish()
+      }
+      ;("step 2")
+      if (result.bool) {
+        trigger.player.draw()
+      }
+    },
+  },
 }
 
 export default skills

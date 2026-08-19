@@ -47,4 +47,6 @@ export default {
   kuailiangkuaiyue: "雍论臼谋",
   yanyan: "断头将军",
   wangping: "兵谋以致用",
+  luji: "瑚琏之器",
+  sunliang: "寒江枯木",
 }

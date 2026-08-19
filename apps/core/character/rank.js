@@ -15,6 +15,8 @@ window.wtk_character_rank = {
 
     "re_guojia",
     "ol_guojia",
+
+    "luji",
   ],
   b: [
     "wangji",
@@ -64,6 +66,8 @@ window.wtk_character_rank = {
     "ol_luxun",
     "yanyan",
     "wangping",
+    "sunliang",
+    "ol_sunliang",
   ],
   c: [
     "zhangliao",
@@ -166,6 +170,8 @@ window.wtk_character_rank = {
       "ol_huaxiong",
       "yanyan",
       "wangping",
+      "luji",
+      "ol_sunliang",
     ],
     junk: [
       "caocao",
@@ -219,6 +225,8 @@ window.wtk_character_rank = {
       "re_luxun",
       "ol_luxun",
       "re_huaxiong",
+
+      "sunliang",
     ],
   },
 }

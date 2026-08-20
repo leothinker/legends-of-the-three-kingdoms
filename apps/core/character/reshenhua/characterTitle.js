@@ -53,4 +53,7 @@ export default {
   luzhi: "国之桢干",
   shen_liubei: "誓守桃园义",
   shen_luxun: "红莲业火",
+
+  shen_zhangliao: "雁门之刑天",
+  shen_ganning: "江表之力牧",
 }

@@ -8,6 +8,7 @@ window.wtk_character_rank = {
 
     "re_lvbu",
     "ol_lvbu",
+    "shen_ganning",
   ],
   bp: [
     "re_huanggai",
@@ -71,6 +72,7 @@ window.wtk_character_rank = {
     "wangping",
     "sunliang",
     "ol_sunliang",
+    "shen_zhangliao",
   ],
   c: [
     "zhangliao",
@@ -126,7 +128,7 @@ window.wtk_character_rank = {
     "re_huaxiong",
   ],
   rarity: {
-    legend: ["re_machao", "ol_machao"],
+    legend: ["re_machao", "ol_machao", "shen_ganning"],
     epic: ["old_xiahoudun", "shen_liubei", "shen_luxun"],
     rare: [
       "zhangliao",
@@ -176,6 +178,7 @@ window.wtk_character_rank = {
       "wangping",
       "luji",
       "ol_sunliang",
+      "shen_zhangliao",
     ],
     junk: [
       "caocao",

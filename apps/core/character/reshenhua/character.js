@@ -388,21 +388,21 @@ const characters = {
   //   skills: ["yongsi", "weidi"],
   //   isZhugong: true,
   // },
-  // shen_zhangliao: {
-  //   sex: "male",
-  //   group: "shen",
-  //   hp: 4,
-  //   skills: ["duorui", "zhiti"],
-  //   groupInGuozhan: "wei",
-  // },
-  // shen_ganning: {
-  //   sex: "male",
-  //   group: "shen",
-  //   hp: 3,
-  //   maxHp: 6,
-  //   skills: ["poxi", "ljieying"],
-  //   groupInGuozhan: "wu",
-  // },
+  shen_zhangliao: {
+    sex: "male",
+    group: "shen",
+    hp: 4,
+    skills: ["duorui", "zhiti"],
+    groupInGuozhan: "wei",
+  },
+  shen_ganning: {
+    sex: "male",
+    group: "shen",
+    hp: 3,
+    maxHp: 6,
+    skills: ["poxi", "gn_jieying"],
+    groupInGuozhan: "wu",
+  },
 }
 
 export default characters

@@ -49,4 +49,8 @@ export default {
   wangping: "兵谋以致用",
   luji: "瑚琏之器",
   sunliang: "寒江枯木",
+  xuyou: "朝秦暮楚",
+  luzhi: "国之桢干",
+  shen_liubei: "誓守桃园义",
+  shen_luxun: "红莲业火",
 }

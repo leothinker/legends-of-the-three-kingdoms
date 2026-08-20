@@ -310,18 +310,33 @@ const characters = {
     skills: ["kuizhu", "chezheng", "lijun"],
     isZhugong: true,
   },
-  // xuyou: {
-  //   sex: "male",
-  //   group: "qun",
-  //   hp: 3,
-  //   skills: ["chenglve", "shicai", "cunmu"],
-  // },
-  // luzhi: {
-  //   sex: "male",
-  //   group: "qun",
-  //   hp: 3,
-  //   skills: ["mingren", "zhenliang"],
-  // },
+  xuyou: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["chenglve", "shicai", "cunmu"],
+  },
+  luzhi: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["mingren", "zhenliang"],
+  },
+  shen_liubei: {
+    sex: "male",
+    group: "shen",
+    hp: 6,
+    skills: ["longnu", "jieying"],
+    groupInGuozhan: "shu",
+  },
+  shen_luxun: {
+    sex: "male",
+    group: "shen",
+    hp: 4,
+    skills: ["junlve", "cuike", "zhanhuo"],
+    groupInGuozhan: "wu",
+    clans: ["吴郡陆氏"],
+  },
   // guanqiujian: {
   //   sex: "male",
   //   group: "wei",
@@ -373,28 +388,14 @@ const characters = {
   //   skills: ["yongsi", "weidi"],
   //   isZhugong: true,
   // },
-  // le_liubei: {
-  //   sex: "male",
-  //   group: "shen",
-  //   hp: 6,
-  //   skills: ["longnu", "jieying"],
-  //   groupInGuozhan: "shu",
-  // },
-  // le_luxun: {
-  //   sex: "male",
-  //   group: "shen",
-  //   hp: 4,
-  //   skills: ["junlve", "cuike", "zhanhuo"],
-  //   groupInGuozhan: "wu",
-  // },
-  // le_zhangliao: {
+  // shen_zhangliao: {
   //   sex: "male",
   //   group: "shen",
   //   hp: 4,
   //   skills: ["duorui", "zhiti"],
   //   groupInGuozhan: "wei",
   // },
-  // le_ganning: {
+  // shen_ganning: {
   //   sex: "male",
   //   group: "shen",
   //   hp: 3,

@@ -56,8 +56,8 @@ const characterSort = {
     "sunliang",
     "xuyou",
     "luzhi",
-    "le_liubei",
-    "le_luxun",
+    "shen_liubei",
+    "shen_luxun",
   ],
   shenhua_lei: [
     "haozhao",
@@ -68,8 +68,8 @@ const characterSort = {
     "lukang",
     "yuanshu",
     "zhangxiu",
-    "le_zhangliao",
-    "le_ganning",
+    "shen_zhangliao",
+    "shen_ganning",
   ],
 }
 

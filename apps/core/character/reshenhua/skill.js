@@ -5451,6 +5451,854 @@ const skills = {
       }
     },
   },
+  // 许攸
+  // 成略
+  chenglve: {
+    audio: 2,
+    mark: true,
+    zhuanhuanji: true,
+    marktext: "☯",
+    intro: {
+      content(storage, player, skill) {
+        const num = storage ? 2 : 1
+        return `出牌阶段限一次，你可以摸${get.cnNumber(num)}张牌，然后弃置${get.cnNumber(3 - num)}张手牌。若如此做，你本阶段使用与弃置牌花色相同的牌无距离和次数限制`
+      },
+    },
+    enable: "phaseUse",
+    usable: 1,
+    async content(event, trigger, player) {
+      player.changeZhuanhuanji("chenglve")
+      const num = player.storage.chenglve ? 1 : 2
+      await player.draw(num)
+      if (
+        !player.hasCard(
+          (card) => lib.filter.cardDiscardable(card, player, "chenglve"),
+          "h",
+        )
+      ) {
+        return
+      }
+      await game.delayx()
+      const { bool, cards } = await player
+        .chooseToDiscard(true, "h", 3 - num)
+        .set("ai", (card) => {
+          const player = get.player(),
+            effect = player.getStorage("chenglve_effect")
+          const cards = player
+              .getCards("h")
+              .filter(
+                (i) =>
+                  get.tag(i, "damage") &&
+                  get.type(i) !== "delay" &&
+                  player.hasValueTarget(i, true, false),
+              ),
+            map = {}
+          for (const cardx of cards) {
+            const suit = get.suit(cardx, player)
+            if (typeof map[suit] !== "number") {
+              map[suit] = 0
+            }
+            map[suit]++
+          }
+          const list = []
+          for (const i in map) {
+            if (map[i] > 0) {
+              list.push([i, map[i]])
+            }
+          }
+          list.sort((a, b) => b[1] - a[1])
+          if (effect.includes(get.suit(card, player))) {
+            return 0
+          }
+          if (
+            list.some((i) => i[0] === get.suit(card, player)) &&
+            !player.hasUseTarget(card, false)
+          ) {
+            return 10
+          }
+          if (
+            player.storage.chenglve &&
+            ui.selected.cards.length &&
+            !ui.selected.cards.some(
+              (i) => get.suit(i) === get.suit(card, player),
+            )
+          ) {
+            return 2
+          }
+          return 6 - get.value(card)
+        })
+        .forResult()
+      if (bool) {
+        const effect = "chenglve_effect"
+        player.addTempSkill(effect, "phaseChange")
+        player.markAuto(
+          effect,
+          cards.map((card) => get.suit(card, player)).unique(),
+        )
+        player.storage[effect].sort(
+          (a, b) => lib.suits.indexOf(b) - lib.suits.indexOf(a),
+        )
+        player.addTip(
+          effect,
+          get.translation(effect) +
+            player
+              .getStorage(effect)
+              .reduce((str, suit) => str + get.translation(suit), ""),
+        )
+      }
+    },
+    ai: {
+      order(item, player) {
+        if (
+          player.countCards(
+            "h",
+            (card) =>
+              get.tag(card, "damage") &&
+              get.type(card) !== "delay" &&
+              player.hasValueTarget(card, true, false),
+          ) > 2
+        ) {
+          return get.order({ name: "sha" }) + 0.14
+        }
+        return 2.7
+      },
+      result: {
+        player(player) {
+          if (!player.storage.chenglve && player.countCards("h") < 3) {
+            return 0
+          }
+          return 1
+        },
+      },
+    },
+    subSkill: {
+      effect: {
+        charlotte: true,
+        onremove(player, skill) {
+          delete player.storage[skill]
+          player.removeTip(skill)
+        },
+        mod: {
+          cardUsable(card, player) {
+            const suit = get.suit(card)
+            if (
+              suit === "unsure" ||
+              player.getStorage("chenglve_effect").includes(suit)
+            ) {
+              return Infinity
+            }
+          },
+          targetInRange(card, player) {
+            const suit = get.suit(card)
+            if (
+              suit === "unsure" ||
+              player.getStorage("chenglve_effect").includes(suit)
+            ) {
+              return true
+            }
+          },
+        },
+        marktext: "略",
+        intro: { content: `本阶段使用$花色的牌无距离和次数限制` },
+      },
+    },
+  },
+  // 恃才
+  shicai: {
+    audio: 2,
+    trigger: { player: "useCardAfter" },
+    filter(event, player) {
+      if (!event.cards.filterInD("oe").length) {
+        return false
+      }
+      return (
+        player
+          .getHistory(
+            "useCard",
+            (evt) => get.type2(evt.card) === get.type2(event.card),
+          )
+          .indexOf(event) === 0
+      )
+    },
+    prompt2(event, player) {
+      const cards = event.cards.filterInD("oe")
+      return `你可以将${get.translation(cards)}${cards.length > 1 ? "以任意顺序" : ""}置于牌堆顶，然后摸一张牌`
+    },
+    async content(event, trigger, player) {
+      let result
+      let cards = trigger.cards.filterInD("oe")
+      /** @type {[Player, Card[]][]} */
+      const loseList = []
+
+      for (const card of cards) {
+        const owner = get.owner(card)
+        if (!owner) {
+          continue
+        }
+        const existed = loseList.find((item) => item[0] === owner)
+        if (existed) {
+          existed[1].push(card)
+        } else {
+          loseList.push([owner, [card]])
+        }
+      }
+
+      if (loseList.length) {
+        await game
+          .loseAsync({
+            lose_list: loseList,
+          })
+          .setContent("chooseToCompareLose")
+      }
+
+      if (cards.length > 1) {
+        result = await player
+          .chooseToMove({ prompt: "恃才：将牌按顺序置于牌堆顶" })
+          .set("list", [["牌堆顶", cards]])
+          .set(
+            "reverse",
+            _status.currentPhase?.next
+              ? get.attitude(player, _status.currentPhase.next) > 0
+              : false,
+          )
+          .set("processAI", (list) => {
+            const sorted = list[0][1].slice(0)
+            sorted.sort((a, b) => {
+              return (
+                (_status.event.reverse ? 1 : -1) * (get.value(b) - get.value(a))
+              )
+            })
+            return [sorted]
+          })
+          .forResult()
+
+        if (result.bool && result.moved?.[0].length) {
+          cards = result.moved[0].slice(0)
+        }
+      }
+
+      cards.reverse()
+      await game.cardsGotoPile(cards, "insert")
+      game.log(player, "将", cards, "置于牌堆顶")
+      await player.draw()
+    },
+    ai: {
+      reverseOrder: true,
+      skillTagFilter(player) {
+        if (
+          player.getHistory("useCard", (evt) => get.type(evt.card) === "equip")
+            .length > 0
+        ) {
+          return false
+        }
+      },
+    },
+  },
+  // 寸目
+  cunmu: {
+    audio: 2,
+    trigger: {
+      player: "drawBegin",
+    },
+    forced: true,
+    async content(event, trigger, player) {
+      trigger.bottom = true
+    },
+    ai: {
+      abnormalDraw: true,
+      skillTagFilter(player, tag, arg) {
+        if (tag === "abnormalDraw") {
+          return !arg || arg === "bottom"
+        }
+      },
+    },
+  },
+  // 卢植
+  // 明任
+  mingren: {
+    audio: 2,
+    drawNum: 1,
+    trigger: {
+      global: "phaseBefore",
+      player: "enterGame",
+    },
+    forced: true,
+    locked: false,
+    filter(event, player) {
+      return (
+        (event.name !== "phase" || game.phaseNumber === 0) &&
+        !player.getExpansions("mingren").length
+      )
+    },
+    async content(event, trigger, player) {
+      await player.draw(get.info(event.name).drawNum || 2)
+      if (!player.countCards("h")) {
+        return
+      }
+      const result = await player
+        .chooseCard("h", "将一张手牌置于你的武将牌上，称为“任”", true)
+        .set("ai", (card) => 6 - get.value(card))
+        .forResult()
+      if (result.bool) {
+        const next = player.addToExpansion(
+          result.cards[0],
+          player,
+          "give",
+          "log",
+        )
+        next.gaintag.add("mingren")
+        await next
+      }
+    },
+    marktext: "任",
+    intro: {
+      content: "expansion",
+      markcount: "expansion",
+    },
+    onremove(player, skill) {
+      const cards = player.getExpansions(skill)
+      if (cards.length) {
+        player.loseToDiscardpile(cards)
+      }
+    },
+    group: ["mingren_1"],
+    ai: { notemp: true },
+    subSkill: {
+      1: {
+        audio: "mingren",
+        trigger: { player: "phaseJieshuBegin" },
+        filter(event, player) {
+          return (
+            player.countCards("h") > 0 &&
+            player.getExpansions("mingren").length > 0
+          )
+        },
+        async cost(event, trigger, player) {
+          event.result = await player
+            .chooseCard(
+              "h",
+              get.prompt(event.skill),
+              `选择一张手牌替换“任”（${get.translation(player.getExpansions("mingren")[0])}）`,
+            )
+            .set("ai", (card) => {
+              const player = _status.event.player
+              const color = get.color(card)
+              if (color === get.color(player.getExpansions("mingren")[0])) {
+                return false
+              }
+              let num = 0
+              const list = []
+              player.countCards("h", (cardx) => {
+                if (cardx !== card || get.color(cardx) !== color) {
+                  return false
+                }
+                if (list.includes(cardx.name)) {
+                  return false
+                }
+                list.push(cardx.name)
+                switch (cardx.name) {
+                  case "wuxie":
+                    num += game.countPlayer() / 2.2
+                    break
+                  case "caochuan":
+                    num += 1.1
+                    break
+                  case "shan":
+                    num += 1
+                    break
+                }
+              })
+              return num * (30 - get.value(card))
+            })
+            .forResult()
+        },
+        async content(event, trigger, player) {
+          // 考虑到getExpansions的实际执行在addToExpansion之前喵，此处调换顺序
+          const card = player.getExpansions("mingren")[0]
+          const next = player.addToExpansion(
+            event.cards[0],
+            "log",
+            "give",
+            player,
+          )
+          next.gaintag.add("mingren")
+          await next
+          if (card) {
+            await player.gain(card, "gain2")
+          }
+        },
+      },
+    },
+  },
+  // 贞良
+  zhenliang: {
+    audio: 2,
+    drawNum: 1,
+    mark: true,
+    zhuanhuanji: true,
+    marktext: "☯",
+    intro: {
+      content(storage) {
+        if (storage) {
+          return "你的回合外，当你使用或打出的牌结算结束后，若此牌与“任”类别相同，你可以令一名角色摸一张牌。"
+        }
+        return "出牌阶段限一次，你可以选择你攻击范围内的一名其他角色并弃置X张与“任”颜色相同的牌，对其造成1点伤害（X为你与其体力值之差且至少为1）。"
+      },
+    },
+    enable: "phaseUse",
+    trigger: {
+      player: ["useCardAfter", "respondAfter"],
+    },
+    filter(event, player) {
+      const cards = player.getExpansions("mingren")
+      if (!cards.length) {
+        return false
+      }
+      if (event.name === "chooseToUse") {
+        if (
+          player.storage.zhenliang ||
+          player.hasSkill("zhenliang_used", null, null, false)
+        ) {
+          return false
+        }
+        const color = get.color(cards[0])
+        if (!player.countCards("he", (card) => get.color(card) === color)) {
+          return false
+        }
+        return game.hasPlayer((current) => {
+          return (
+            player.inRange(current) &&
+            player.countCards("he", (card) => {
+              return get.color(card) === color
+            }) >= Math.max(1, Math.abs(player.getHp() - current.getHp()))
+          )
+        })
+      }
+      if (_status.currentPhase === player || !player.storage.zhenliang) {
+        return false
+      }
+      return get.type2(event.card) === get.type2(cards[0])
+    },
+    position: "he",
+    filterCard(card, player) {
+      return get.color(card) === get.color(player.getExpansions("mingren")[0])
+    },
+    selectCard: [1, Infinity],
+    complexSelect: true,
+    complexCard: true,
+    filterTarget(card, player, target) {
+      return (
+        player.inRange(target) &&
+        ui.selected.cards.length ===
+          Math.max(1, Math.abs(player.getHp() - target.getHp()))
+      )
+    },
+    check(card) {
+      return 6.5 - get.value(card)
+    },
+    prompt:
+      "选择你攻击范围内的一名其他角色并弃置X张与“任”颜色相同的牌，对其造成1点伤害（X为你与其体力值之差且至少为1）。",
+    async cost(event, trigger, player) {
+      const skillName = event.name.slice(0, -5),
+        num = get.info(skillName).drawNum
+      event.result = await player
+        .chooseTarget(
+          get.prompt(skillName),
+          `令${(num > 1 ? "至多" : "") + get.cnNumber(num)}名角色${num > 1 ? "各" : ""}摸${get.cnNumber(num)}张牌`,
+        )
+        .set("selectTarget", [1, num])
+        .set("ai", (target) => {
+          const player = get.player()
+          return get.effect(target, { name: "draw" }, player, player)
+        })
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      const skill = event.name
+      player.changeZhuanhuanji(skill)
+      if (!trigger) {
+        const target = event.target
+        player.addTempSkill(`${skill}_used`, "phaseUseAfter")
+        await target.damage("nocard")
+      } else {
+        const targets = event.targets
+        if (targets.length === 1) {
+          await targets[0].draw(get.info(skill).drawNum)
+        } else {
+          await game.asyncDraw(targets, get.info(skill).drawNum)
+          await game.delayx()
+        }
+      }
+    },
+    ai: {
+      order: 5,
+      result: {
+        player(player, target) {
+          return get.damageEffect(target, player, player)
+        },
+      },
+      combo: "mingren",
+    },
+    subSkill: { used: { charlotte: true } },
+  },
+  // 神刘备
+  // 龙怒
+  longnu: {
+    audio: 2,
+    zhuanhuanji: true,
+    mark: true,
+    marktext: "☯",
+    intro: {
+      content(storage, player, skill) {
+        if (storage) {
+          return "锁定技，出牌阶段开始时，你减1点体力上限，摸一张牌，你的锦囊牌于此阶段内均视为雷【杀】，你于此阶段内使用雷【杀】无次数限制"
+        }
+        return "锁定技，出牌阶段开始时，你失去1点体力，摸一张牌，你的红色手牌于此阶段内均视为火【杀】，你于此阶段内使用火【杀】无距离限制"
+      },
+    },
+    trigger: {
+      player: "phaseUseBegin",
+    },
+    forced: true,
+    async content(event, trigger, player) {
+      const storage = player.getStorage(event.name, false)
+      player.changeZhuanhuanji(event.name)
+      await player.draw()
+      if (storage) {
+        await player.loseMaxHp()
+        player.addTempSkill("longnu_2", "phaseUseAfter")
+      } else {
+        await player.loseHp()
+        player.addTempSkill("longnu_1", "phaseUseAfter")
+      }
+    },
+    subSkill: {
+      1: {
+        charlotte: true,
+        mod: {
+          cardname(card, player) {
+            if (get.color(card) === "red") {
+              return "sha"
+            }
+          },
+          cardnature(card, player) {
+            if (get.color(card) === "red") {
+              return "fire"
+            }
+          },
+          targetInRange(card) {
+            if (get.color(card) === "red") {
+              return true
+            }
+          },
+        },
+        ai: {
+          effect: {
+            target(card, player, target, current) {
+              if (get.tag(card, "respondSha") && current < 0) {
+                return 0.6
+              }
+            },
+          },
+          respondSha: true,
+        },
+      },
+      2: {
+        charlotte: true,
+        mod: {
+          cardname(card, player) {
+            if (["trick", "delay"].includes(lib.card[card.name].type)) {
+              return "sha"
+            }
+          },
+          cardnature(card, player) {
+            if (["trick", "delay"].includes(lib.card[card.name].type)) {
+              return "thunder"
+            }
+          },
+          cardUsable(card, player) {
+            if (card.name === "sha" && game.hasNature(card, "thunder")) {
+              return Infinity
+            }
+          },
+        },
+        trigger: {
+          player: "useCard",
+        },
+        filter(event, player) {
+          return (
+            event.card.name === "sha" &&
+            game.hasNature(event.card, "thunder") &&
+            event.addCount !== false
+          )
+        },
+        forced: true,
+        silent: true,
+        async content(event, trigger, player) {
+          trigger.addCount = false
+          if (player.stat[player.stat.length - 1].card.sha > 0) {
+            player.stat[player.stat.length - 1].card.sha--
+          }
+        },
+        ai: {
+          effect: {
+            target(card, player, target, current) {
+              if (get.tag(card, "respondSha") && current < 0) {
+                return 0.6
+              }
+            },
+          },
+          respondSha: true,
+        },
+      },
+    },
+    ai: {
+      fireAttack: true,
+      halfneg: true,
+      threaten: 1.05,
+    },
+  },
+  // 结营
+  jieying: {
+    audio: 2,
+    trigger: {
+      player: ["linkBefore", "enterGame"],
+      global: "phaseBefore",
+    },
+    forced: true,
+    filter(event, player) {
+      if (event.name === "link") {
+        return player.isLinked()
+      }
+      return (
+        (event.name !== "phase" || game.phaseNumber === 0) && !player.isLinked()
+      )
+    },
+    async content(event, trigger, player) {
+      if (trigger.name !== "link") {
+        await player.link(true)
+      } else {
+        trigger.cancel()
+      }
+    },
+    group: "jieying_phaseJieshu",
+    global: "jieying_global",
+    subSkill: {
+      phaseJieshu: {
+        audio: "jieying",
+        trigger: {
+          player: "phaseJieshuBegin",
+        },
+        filter(event, player) {
+          return game.hasPlayer(
+            (current) => current !== player && !current.isLinked(),
+          )
+        },
+        async cost(event, trigger, player) {
+          event.result = await player
+            .chooseTarget({
+              prompt: "结营：请选择横置的目标",
+              forced: true,
+              filterTarget(card, player, target) {
+                return target !== player && !target.isLinked()
+              },
+              ai(target) {
+                return get.effect(target, { name: "tiesuo" }, player, player)
+              },
+            })
+            .forResult()
+        },
+        async content(event, trigger, player) {
+          const { targets } = event
+          await targets[0].link(true)
+        },
+      },
+      global: {
+        charlotte: true,
+        mod: {
+          maxHandcard(player, num) {
+            if (
+              game.hasPlayer((current) => current.hasSkill("jieying")) &&
+              player.isLinked()
+            ) {
+              return num + 2
+            }
+          },
+        },
+      },
+    },
+    ai: {
+      noLink: true,
+      effect: {
+        target(card) {
+          if (card.name === "tiesuo") {
+            return "zeroplayertarget"
+          }
+        },
+      },
+    },
+  },
+  // 神陆逊
+  // 军略
+  junlve: {
+    audio: 2,
+    intro: { content: "当前有#个标记" },
+    trigger: {
+      player: "damageEnd",
+      source: "damageSource",
+    },
+    filter(event, player) {
+      return event.num > 0
+    },
+    forced: true,
+    async content(event, trigger, player) {
+      player.addMark(event.name, trigger.num)
+    },
+    ai: { combo: "cuike" },
+  },
+  // 摧克
+  cuike: {
+    audio: 2,
+    trigger: { player: "phaseUseBegin" },
+    async cost(event, trigger, player) {
+      const str =
+        player.countMark("junlve") % 2 === 1
+          ? "对一名角色造成1点伤害"
+          : "横置一名角色并弃置其区域里的一张牌"
+      event.result = await player
+        .chooseTarget(get.prompt(event.skill), str)
+        .set("ai", (target) => {
+          const player = get.player()
+          const num = player.countMark("junlve") % 2
+          if (num === 1) {
+            return get.damageEffect(target, player, player)
+          }
+          return (
+            get.effect(target, { name: "guohe_copy" }, player, player) +
+            (!target.isLinked() ? 2 : 0)
+          )
+        })
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      const { targets } = event
+      const [target] = targets
+      if (player.countMark("junlve") % 2 === 1) {
+        await target.damage()
+      } else {
+        await target.link(true)
+        await player.discardPlayerCard(target, 1, "hej", true)
+      }
+      if (player.countMark("junlve") <= 7) {
+        return
+      }
+      const targetsx = game.filterPlayer((target) => target !== player)
+      const result = await player
+        .chooseBool(
+          `是否弃所有“军略”${targetsx.length ? `并对${get.translation(targetsx)}各造成1点伤害` : ""}？`,
+        )
+        .set(
+          "choice",
+          targetsx.reduce(
+            (num, target) => num + get.damageEffect(target, player, player),
+            0,
+          ) > 0,
+        )
+        .forResult()
+      if (result?.bool) {
+        player.line(targetsx)
+        player.clearMark("junlve")
+        await game.doAsyncInOrder(targetsx, (target) => target.damage())
+      }
+    },
+    ai: {
+      notemp: true,
+    },
+  },
+  // 绽火
+  zhanhuo: {
+    audio: 2,
+    limited: true,
+    skillAnimation: true,
+    animationColor: "metal",
+    enable: "phaseUse",
+    filter(event, player) {
+      return (
+        player.countMark("junlve") > 0 &&
+        game.hasPlayer((current) => current.isLinked())
+      )
+    },
+    check(event, player) {
+      const targets = game.filterPlayer(
+        (current) => get.attitude(player, current) < 0 && current.isLinked(),
+      )
+      const num = targets.length
+      return (
+        player.countMark("junlve") >= num &&
+        (num ===
+          game.countPlayer((current) => get.attitude(player, current) < 0) ||
+          (num <= 2 &&
+            targets.filter((current) => current.countCards("e") > 0).length >
+              0))
+      )
+    },
+    filterTarget(card, player, target) {
+      return target.isLinked()
+    },
+    selectTarget() {
+      return [1, _status.event.player.countMark("junlve")]
+    },
+    multiline: true,
+    multitarget: true,
+    async content(event, trigger, player) {
+      let { targets } = event
+      player.awakenSkill(event.name)
+      player.clearMark("junlve")
+      for (const target of targets.sortBySeat()) {
+        await target.discard(target.getCards("e"))
+      }
+      targets = targets.filter((current) => current.isIn())
+      if (!targets.length) {
+        return
+      }
+      const result = await player
+        .chooseTarget(
+          true,
+          "对其中一名角色造成1点火焰伤害",
+          (card, player, target) => {
+            return _status.event.targets.includes(target)
+          },
+        )
+        .set("targets", targets)
+        .set("ai", (target) => {
+          const player = get.player()
+          return get.damageEffect(target, player, player, "fire")
+        })
+        .forResult()
+      if (result?.bool) {
+        await result.targets[0].damage("fire")
+      }
+    },
+    ai: {
+      order: 1,
+      fireAttack: true,
+      combo: "junlve",
+      result: {
+        target(player, target) {
+          if (target.hasSkillTag("nofire")) {
+            return 0
+          }
+          if (lib.config.mode === "versus") {
+            return -1
+          }
+          if (player.hasUnknown()) {
+            return 0
+          }
+          return get.damageEffect(target, player) - target.countCards("e")
+        },
+      },
+    },
+  },
 }
 
 export default skills

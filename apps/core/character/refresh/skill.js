@@ -1769,7 +1769,7 @@ const skills = {
     async content(event, trigger, player) {
       await player.draw(3)
       if (player.isPhaseUsing()) {
-        player.addTempSkill(`${event.name}_effect`, "phaseUseAfter")
+        player.addTempSkill(`${event.name}_effect`, "phaseChange")
         player.addMark(`${event.name}_effect`, 1, false)
       }
     },

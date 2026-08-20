@@ -54,6 +54,14 @@ export default {
   shen_liubei: "誓守桃园义",
   shen_luxun: "红莲业火",
 
+  haozhao: "扣弦的豪将",
+  guanqiujian: "镌功铭征荣",
+  chendao: "白毦督",
+  zhugezhan: "临难死义",
+  zhoufei: "软玉温香",
+  lukang: "孤柱扶厦",
+  yuanshu: "仲家帝",
+  zhangxiu: "北地枪王",
   shen_zhangliao: "雁门之刑天",
   shen_ganning: "江表之力牧",
 }

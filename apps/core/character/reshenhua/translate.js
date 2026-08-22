@@ -381,7 +381,6 @@ const translates = {
 
   haozhao: "郝昭",
   zhengu: "镇骨",
-  zhengu2: "镇骨",
   zhengu_info:
     "结束阶段，你可以选择一名其他角色，你的回合结束时和该角色的下个回合结束时，其将手牌摸至或弃置至与你手牌数相同（至多摸至五张）。",
 
@@ -392,7 +391,6 @@ const translates = {
   hongju: "鸿举",
   hongju_info: `觉醒技，准备阶段，若“荣”的数量不小于3且场上有角色死亡，你用任意张手牌替换等量的“荣”，减1点体力上限，获得${get.poptip("qingce")}。`,
   qingce: "清侧",
-  qingce_backup: "清侧",
   qingce_info:
     "出牌阶段，若场上有牌，你可以移去一张“荣”，然后弃置场上的一张牌。",
 

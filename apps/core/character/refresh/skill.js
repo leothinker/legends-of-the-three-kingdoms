@@ -1407,6 +1407,7 @@ const skills = {
   // 集智
   rejizhi: {
     audio: 2,
+    audioname: ["lukang"],
     locked: false,
     trigger: { player: "useCard" },
     frequent: true,

@@ -59,7 +59,7 @@ export default {
   chendao: "白毦督",
   zhugezhan: "临难死义",
   zhoufei: "软玉温香",
-  lukang: "孤柱扶厦",
+  lukang: "社稷之瑰宝",
   yuanshu: "仲家帝",
   zhangxiu: "北地枪王",
   shen_zhangliao: "雁门之刑天",

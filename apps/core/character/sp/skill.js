@@ -77,6 +77,54 @@ const skills = {
       player.addSkills("tiaoxin")
     },
   },
+  // 张春华
+  // 绝情
+  jueqing: {
+    audio: 2,
+    trigger: { source: "damageBefore" },
+    forced: true,
+    async content(event, trigger, player) {
+      trigger.cancel()
+      trigger.player.loseHp(trigger.num)
+    },
+    ai: {
+      jueqing: true,
+    },
+  },
+  // 伤逝
+  shangshi: {
+    audio: 2,
+    trigger: {
+      player: ["loseAfter", "changeHp", "gainMaxHpAfter", "loseMaxHpAfter"],
+      global: [
+        "equipAfter",
+        "addJudgeAfter",
+        "gainAfter",
+        "loseAsyncAfter",
+        "addToExpansionAfter",
+      ],
+    },
+    frequent: true,
+    filter(event, player) {
+      if (event.getl && !event.getl(player)) {
+        return false
+      }
+      return player.countCards("h") < player.getDamagedHp()
+    },
+    async content(event, trigger, player) {
+      player.draw(player.getDamagedHp() - player.countCards("h"))
+    },
+    ai: {
+      noh: true,
+      freeSha: true,
+      freeShan: true,
+      skillTagFilter(player, tag) {
+        if (player.maxHp - player.hp < player.countCards("h")) {
+          return false
+        }
+      },
+    },
+  },
 }
 
 export default skills

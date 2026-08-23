@@ -13,6 +13,12 @@ const translates = {
   shangshi: "伤逝",
   shangshi_info:
     "当你的手牌数小于X时，你可以将手牌摸至X张（X为你已损失的体力值）。",
+
+  ol_zhangchunhua: "界张春华",
+  ol_zhangchunhua_prefix: "界",
+  jianmie: "翦灭",
+  jianmie_info:
+    "出牌阶段限一次，你可以与一名其他角色同时选择一种颜色，你与其展示所有手牌并弃置各自选择颜色的手牌，然后弃置牌较多的角色视为对另一名角色使用一张【决斗】。",
 }
 
 export default translates

@@ -1335,7 +1335,10 @@ export default {
               return 0
             }
             return player.countCards("hs", (card) => {
-              if (ui.selected.cards.includes(card)) {
+              if (
+                ui.selected.cards.includes(card) ||
+                get.name(card) === "diaohulishan"
+              ) {
                 return false
               }
               const cardx = get.autoViewAs(

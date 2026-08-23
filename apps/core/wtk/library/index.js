@@ -1992,9 +1992,12 @@ export class Library {
             const text = e.target
             const zoom = Number.parseInt(text.innerText, 10)
             const originalValue = lib.config.ui_zoom
+            const originalZoom = Number.parseInt(originalValue, 10)
 
             if (Number.isNaN(zoom)) {
               alert("请填写数值！")
+              text.innerText = originalValue
+              return
             }
             if (zoom < 50 || zoom > 300) {
               alert("请填入50~300以内的整数！")
@@ -2012,18 +2015,70 @@ export class Library {
               return
             }
 
-            text.innerText = zoomText
-            game.saveConfig("ui_zoom", zoomText)
-            game.documentZoom = (game.deviceZoom * zoom) / 100
-
-            ui.updatez()
-            if (Array.isArray(lib.onresize)) {
-              lib.onresize.forEach((fun) => {
-                if (typeof fun === "function") {
-                  fun()
-                }
-              })
+            const applyZoom = (value) => {
+              game.documentZoom = (game.deviceZoom * value) / 100
+              ui.updatez()
+              if (Array.isArray(lib.onresize)) {
+                lib.onresize.forEach((fun) => {
+                  if (typeof fun === "function") {
+                    fun()
+                  }
+                })
+              }
             }
+
+            text.innerText = zoomText
+            applyZoom(zoom)
+
+            const popupContainer = ui.create.div(".popup-container", ui.window)
+            const dialogContainer = ui.create.div(
+              ".prompt-container",
+              popupContainer,
+            )
+            const dialog = ui.create.div(
+              ".menubg",
+              ui.create.div(dialogContainer),
+            )
+            const countdownNode = ui.create.div("", dialog)
+            const controls = ui.create.div(dialog)
+            const deadline = Date.now() + 10000
+            let settled = false
+            let countdownInterval
+            let rollbackTimeout
+
+            const finish = (keep) => {
+              if (settled) return
+              settled = true
+              clearInterval(countdownInterval)
+              clearTimeout(rollbackTimeout)
+              popupContainer.remove()
+
+              if (keep) {
+                game.saveConfig("ui_zoom", zoomText)
+              } else {
+                text.innerText = originalValue
+                applyZoom(originalZoom)
+              }
+            }
+            const updateCountdown = () => {
+              const remaining = Math.max(
+                0,
+                Math.ceil((deadline - Date.now()) / 1000),
+              )
+              countdownNode.innerHTML = `是否保留 ${zoomText} 的界面缩放？<br>若不操作，将在 ${remaining} 秒后自动恢复。`
+            }
+
+            ui.create.div(".menubutton.large", "保留设置", controls, () =>
+              finish(true),
+            )
+            ui.create.div(".menubutton.large", "撤销", controls, () =>
+              finish(false),
+            )
+            dialog.addEventListener("click", (event) => event.stopPropagation())
+            popupContainer.addEventListener("click", () => finish(false))
+            updateCountdown()
+            countdownInterval = setInterval(updateCountdown, 250)
+            rollbackTimeout = setTimeout(() => finish(false), 10000)
           },
         },
         image_background: {
@@ -4465,6 +4520,36 @@ export class Library {
       },
     },
   }
+  setDoudizhuConfigIntro(node, link, _value, config) {
+    let info = ""
+    if (config.name === "加强地主") {
+      info =
+        link !== "disabled" && Object.hasOwn(config.item, link)
+          ? get.translation(`${link}_info`)
+          : ""
+    } else if (config.name === "〖飞扬〗版本") {
+      const skill = {
+        online: "feiyang",
+        mobile: "mbfeiyang",
+        decade: "dcfeiyang",
+      }[link]
+      info = skill ? get.translation(`${skill}_info`) : ""
+    } else if (config.name === "农民遗产") {
+      info =
+        {
+          online: "一名农民死亡后，另一名农民摸一张牌。",
+          mobile: "一名农民死亡后，另一名农民选择摸两张牌或回复1点体力。",
+          decade: "一名农民死亡后，另一名农民不获得额外效果。",
+        }[link] || ""
+    }
+    if (info) {
+      lib.setIntro(node, (uiintro) => {
+        uiintro._place_text = uiintro.add(
+          `<div class="text" style="display:inline">${info}</div>`,
+        )
+      })
+    }
+  }
   mode = {
     identity: {
       name: "身份",
@@ -6690,6 +6775,7 @@ export class Library {
           name: "加强地主",
           init: "disabled",
           restart: true,
+          textMenu: this.setDoudizhuConfigIntro,
           item: {
             disabled: "禁用",
             yinfu: "获得〖殷富〗",
@@ -6703,6 +6789,7 @@ export class Library {
           name: "农民遗产",
           init: "mobile",
           restart: true,
+          textMenu: this.setDoudizhuConfigIntro,
           item: {
             online: "OL版本",
             mobile: "手杀版本",
@@ -6713,6 +6800,7 @@ export class Library {
           name: "〖飞扬〗版本",
           init: "online",
           restart: true,
+          textMenu: this.setDoudizhuConfigIntro,
           item: {
             online: "OL版本",
             mobile: "手杀版本",
@@ -6968,6 +7056,7 @@ export class Library {
           name: "加强地主",
           init: "disabled",
           restart: true,
+          textMenu: this.setDoudizhuConfigIntro,
           item: {
             disabled: "禁用",
             yinfu: "获得〖殷富〗",
@@ -6981,6 +7070,7 @@ export class Library {
           name: "农民遗产",
           init: "mobile",
           restart: true,
+          textMenu: this.setDoudizhuConfigIntro,
           item: {
             online: "OL版本",
             mobile: "手杀版本",
@@ -6991,6 +7081,7 @@ export class Library {
           name: "〖飞扬〗版本",
           init: "online",
           restart: true,
+          textMenu: this.setDoudizhuConfigIntro,
           item: {
             online: "OL版本",
             mobile: "手杀版本",

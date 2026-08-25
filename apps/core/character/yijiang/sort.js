@@ -88,7 +88,9 @@ const characterSort = {
   yijiang_doukou: [
     "re_xinxianying",
     "xuelingyun",
+    "duanqiaoxiao",
     "tianshangyi",
+    "bailingyun",
     "huaman",
     "zhugeguo",
     "dc_ruiji",

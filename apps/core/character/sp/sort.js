@@ -4,6 +4,7 @@ const characterSort = {
     "zhangchunhua",
     "ol_zhangchunhua",
     "ol_xuelingyun",
+    "wolongfengchu",
   ],
 }
 

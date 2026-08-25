@@ -3,4 +3,5 @@ export default {
   zhangchunhua: "冷血皇后",
   ol_zhangchunhua: "冷血皇后",
   ol_xuelingyun: "红烛垂泪",
+  wolongfengchu: "一匡天下",
 }

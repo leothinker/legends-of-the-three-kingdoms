@@ -26,4 +26,10 @@ export default {
   "#qiaozhi1": "皓齿断银丝，轻吻公子衣上雪。",
   "#qiaozhi2": "玉指拈锦线，今日织君身上衣。",
   "#ol_xuelingyun:die": "宫墙阻春柳，此心藏玉壶。",
+
+  "#youlong1": "赤壁献策，再谱春秋！",
+  "#youlong2": "卧龙出山，谋定万古！",
+  "#luanfeng1": "凤栖枯木，浴火涅槃！",
+  "#luanfeng2": "青鸾归羽，雏凤还巢！",
+  "#wolongfengchu:die": "铁链，东风，也难困这魏军……",
 }

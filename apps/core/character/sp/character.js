@@ -23,6 +23,14 @@ const characters = {
     hp: 3,
     skills: ["siqi", "qiaozhi"],
   },
+  wolongfengchu: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["youlong", "luanfeng"],
+    names: "诸葛|亮-庞|统",
+    clans: ["琅琊诸葛氏"],
+  },
 }
 
 export default characters

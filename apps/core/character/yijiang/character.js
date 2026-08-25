@@ -11,11 +11,23 @@ const characters = {
     hp: 3,
     skills: ["xialei", "anzhi"],
   },
+  duanqiaoxiao: {
+    sex: "female",
+    group: "wei",
+    hp: 3,
+    skills: ["caizhuang", "huayi"],
+  },
   tianshangyi: {
     sex: "female",
     group: "wei",
     hp: 3,
     skills: ["posuo", "xiaoren"],
+  },
+  bailingyun: {
+    sex: "female",
+    group: "wei",
+    hp: 3,
+    skills: ["linghui", "xiace", "yuxin"],
   },
   huaman: {
     sex: "female",

@@ -453,6 +453,218 @@ const skills = {
       result: { player: 1 },
     },
   },
+  // 段巧笑
+  // 彩妆
+  caizhuang: {
+    audio: 2,
+    enable: "phaseUse",
+    usable: 1,
+    filter(event, player) {
+      return player.hasCard(
+        (card) => lib.filter.cardDiscardable(card, player, "caizhuang"),
+        "he",
+      )
+    },
+    complexCard: true,
+    selectCard: [1, Infinity],
+    position: "he",
+    filterCard: lib.filter.cardDiscardable,
+    check(card) {
+      const cache = lib.skill.caizhuang.tempCache()
+      if (!cache || cache.no) {
+        return 0
+      }
+      const player = _status.event.player,
+        suit = get.suit(card)
+      if (
+        ui.selected.cards.filter((i) => {
+          return get.suit(i) === suit
+        }).length < (cache[suit] || 0)
+      ) {
+        if (get.position(card) === "h") {
+          return 15 - get.value(card)
+        }
+        return 9 - get.value(card)
+      }
+      return 0
+    },
+    tempCache() {
+      let cache = _status.event.getTempCache("caizhuang", "dsuits")
+      if (cache) {
+        return cache
+      }
+      cache = { no: true }
+      _status.event.putTempCache("caizhuang", "dsuits", cache)
+      const player = _status.event.player,
+        suits = {}
+      lib.suit.forEach((i) => {
+        suits[i] = 0
+      })
+      player.getCards("h", (i) => {
+        const suit = get.suit(i)
+        if (lib.suit.includes(suit)) {
+          suits[suit]++
+        }
+      })
+      const sortedSuits = Object.fromEntries(
+        Object.entries(suits).sort((a, b) => b[1] - a[1]),
+      )
+      let dis = 0,
+        idx = 0,
+        dsuits = 0,
+        leave = 0
+      for (const i in sortedSuits) {
+        idx++
+        if (!sortedSuits[i]) {
+          continue
+        }
+        let num = 1
+        if (idx > 2 || sortedSuits[i] < 3) {
+          num = sortedSuits[i]
+        }
+        cache[i] = num
+        dis += num
+        suits[i] -= num
+        dsuits++
+      }
+      for (const i in suits) {
+        if (suits[i]) {
+          leave++
+        }
+      }
+      player.getCards("e", (i) => {
+        const suit = get.suit(i)
+        if (!cache[suit]) {
+          dsuits++
+          cache[suit] = 1
+          dis++
+        }
+      })
+      let draw = 0,
+        e = [0, 1, 4 / 3, 2, 4]
+      if (dsuits <= leave) {
+        return false
+      }
+      do {
+        draw += e[dsuits--]
+      } while (dsuits > leave)
+      if (draw > dis) {
+        delete cache.no
+        _status.event.putTempCache("caizhuang", "dsuits", cache)
+        return cache
+      }
+      return false
+    },
+    async content(event, trigger, player) {
+      const num = event.cards
+        .map((card) => get.suit(card, player))
+        .toUniqued().length
+      await player
+        .showCards(player.getCards("h"), "彩妆", true, false)
+        .set("clearArena", false)
+      while (true) {
+        const result = await player.draw().forResult()
+        if (!result.cards?.length) {
+          break
+        }
+        await player
+          .showCards(result.cards, "彩妆", true, false)
+          .set("clearArena", false)
+        if (
+          player
+            .getCards("h")
+            .map((card) => get.suit(card, player))
+            .toUniqued().length >= num
+        ) {
+          break
+        }
+      }
+      game.broadcastAll(ui.clear)
+    },
+    ai: {
+      order: 2,
+      result: { player: 1 },
+    },
+  },
+  // 华衣
+  huayi: {
+    audio: 2,
+    trigger: { player: "phaseJieshuBegin" },
+    frequent: true,
+    async content(event, trigger, player) {
+      const next = player.judge(() => 1)
+      next.judge2 = (result) => result.bool
+      const result = await next.forResult()
+      if (result?.color && ["red", "black"].includes(result.color)) {
+        player.addTempSkill(`${event.name}_${result.color}`, {
+          player: "phaseBegin",
+        })
+      }
+    },
+    subSkill: {
+      red: {
+        audio: "huayi",
+        trigger: { global: "phaseEnd" },
+        charlotte: true,
+        forced: true,
+        content() {
+          player.draw()
+        },
+        mark: true,
+        intro: {
+          name: "华衣·红",
+          content: "你于每回合结束时摸一张牌",
+        },
+      },
+      black: {
+        audio: "huayi",
+        trigger: { player: "damageEnd" },
+        charlotte: true,
+        forced: true,
+        content() {
+          player.draw(2)
+        },
+        mark: true,
+        intro: {
+          name: "华衣·黑",
+          content: "你于受到伤害后摸两张牌",
+        },
+        ai: {
+          maixie: true,
+          maixie_hp: true,
+          effect: {
+            target(card, player, target) {
+              if (get.tag(card, "damage")) {
+                if (player.hasSkillTag("jueqing", false, target)) {
+                  return [1, -2]
+                }
+                if (!target.hasFriend()) {
+                  return
+                }
+                var num = 1
+                if (get.attitude(player, target) > 0) {
+                  if (player.needsToDiscard()) {
+                    num = 0.5
+                  } else {
+                    num = 0.3
+                  }
+                }
+                if (target.hp >= 4) {
+                  return [1, num * 2]
+                }
+                if (target.hp === 3) {
+                  return [1, num * 1.5]
+                }
+                if (target.hp === 2) {
+                  return [1, num * 0.5]
+                }
+              }
+            },
+          },
+        },
+      },
+    },
+  },
   // 田尚衣
   // 婆娑
   posuo: {
@@ -719,6 +931,186 @@ const skills = {
           player.storage.xiaoren_dying = true
         },
       },
+    },
+  },
+  // 柏灵筠
+  // 灵慧
+  linghui: {
+    audio: 2,
+    trigger: { global: "phaseJieshuBegin" },
+    filter(event, player) {
+      if (_status.currentPhase === player) {
+        return true
+      }
+      return game.getGlobalHistory("everything", (evt) => evt.name === "dying")
+        .length
+    },
+    frequent: true,
+    async content(event, trigger, player) {
+      let cards = get.cards(3)
+      await game.cardsGotoOrdering(cards)
+      const { bool, links } = await player
+        .chooseButton(["灵慧：是否使用其中一张牌并获得剩余的一张？", cards])
+        .set("filterButton", (button) => {
+          return get.player().hasUseTarget(button.link)
+        })
+        .set("ai", (button) => {
+          return get.event().player.getUseValue(button.link)
+        })
+        .forResult()
+      if (bool) {
+        const card = links[0]
+        cards.remove(card)
+        player.$gain2(card, false)
+        await game.delayx()
+        await player.chooseUseTarget(true, card, false)
+        cards = cards.filterInD()
+        if (cards.length) {
+          const result = await player
+            .chooseCardButton({
+              cards,
+              prompt: "灵慧：获得剩余的一张",
+              forced: true,
+              ai(button) {
+                return get.player().getUseValue(button.link)
+              },
+            })
+            .forResult()
+          await player.gain(result.links[0], "gain2")
+        }
+      }
+      if (cards.length) {
+        cards.reverse()
+        game.cardsGotoPile(cards.filterInD(), "insert")
+        game.log(player, "将", get.cnNumber(cards.length), "张牌置于了牌堆顶")
+      }
+    },
+  },
+  // 黠策
+  xiace: {
+    audio: 2,
+    trigger: {
+      player: "damageEnd",
+      source: "damageSource",
+    },
+    filter(event, player) {
+      const bool1 =
+        event.player === player &&
+        !player.getStorage("xiace_used").includes("player") &&
+        game.hasPlayer(
+          (target) => target !== player && !target.hasSkill("fengyin"),
+        )
+      const bool2 =
+        event.source &&
+        event.source === player &&
+        !player.getStorage("xiace_used").includes("source") &&
+        player.isDamaged() &&
+        player.countCards("he", (card) => {
+          if (_status.connectMode && get.position(card) === "h") {
+            return true
+          }
+          return lib.filter.cardDiscardable(card, player)
+        })
+      return bool1 || bool2
+    },
+    direct: true,
+    async content(event, trigger, player) {
+      if (
+        trigger.player === player &&
+        !player.getStorage("xiace_used").includes("player") &&
+        game.hasPlayer(
+          (target) => target !== player && !target.hasSkill("fengyin"),
+        )
+      ) {
+        const { bool, targets } = await player
+          .chooseTarget((card, player, target) => {
+            return target !== player && !target.hasSkill("fengyin")
+          })
+          .set("prompt", get.prompt("xiace"))
+          .set("prompt2", "令一名其他角色的所有非锁定技失效直到回合结束")
+          .set("ai", (target) => {
+            const player = get.event().player
+            return (
+              -get.sgn(get.attitude(player, target)) *
+              (target.getSkills(null, false, false).filter((skill) => {
+                return !get.is.locked(skill)
+              }).length +
+                1) *
+              (target === _status.currentPhase ? 10 : 1)
+            )
+          })
+          .forResult()
+        if (bool) {
+          const target = targets[0]
+          player.logSkill("xiace", target)
+          player.addTempSkill("xiace_used")
+          player.markAuto("xiace_used", "player")
+          target.addTempSkill("fengyin")
+        }
+      }
+      if (
+        trigger.source &&
+        trigger.source === player &&
+        !player.getStorage("xiace_used").includes("source") &&
+        player.isDamaged() &&
+        player.countCards("he", (card) => {
+          if (_status.connectMode && get.position(card) === "h") {
+            return true
+          }
+          return lib.filter.cardDiscardable(card, player)
+        }) &&
+        player.hasSkill("xiace")
+      ) {
+        const { bool } = await player
+          .chooseToDiscard("he", get.prompt("xiace"), "弃置一张牌并回复1点体力")
+          .set("ai", (card) => {
+            const player = get.event().player
+            if (get.recoverEffect(player, player, player) <= 0) {
+              return 0
+            }
+            return 7 - get.value(card)
+          })
+          .set("logSkill", "xiace")
+          .forResult()
+        if (bool) {
+          player.addTempSkill("xiace_used")
+          player.markAuto("xiace_used", "source")
+          await player.recover()
+        }
+      }
+    },
+    subSkill: {
+      used: {
+        charlotte: true,
+        onremove: true,
+      },
+    },
+  },
+  // 御心
+  yuxin: {
+    limited: true,
+    audio: 2,
+    trigger: { global: "dying" },
+    filter(event, player) {
+      return event.player.hp < (event.player === player ? 1 : player.getHp())
+    },
+    prompt2(event, player) {
+      return `令其回复体力至${event.player === player ? 1 : player.getHp()}点`
+    },
+    check(event, player) {
+      if (get.recoverEffect(event.player, player, player) <= 0) {
+        return false
+      }
+      return lib.skill.luanfeng.check(event, player)
+    },
+    logTarget: "player",
+    skillAnimation: true,
+    animationColor: "thunder",
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      trigger.player.recover(
+        (trigger.player === player ? 1 : player.getHp()) - trigger.player.hp,
+      )
     },
   },
   // 花鬘
@@ -1236,6 +1628,7 @@ const skills = {
       markcount: "expansion",
     },
   },
+  // 铃音
   lingyin: {
     audio: 2,
     trigger: { player: "phaseUseBegin" },
@@ -1342,6 +1735,7 @@ const skills = {
       },
     },
   },
+  // 俐影
   liying: {
     audio: 2,
     usable: 1,

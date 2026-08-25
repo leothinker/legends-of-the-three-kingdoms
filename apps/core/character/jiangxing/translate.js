@@ -279,14 +279,6 @@ const translates = {
   jili: "蒺藜",
   jili_info: "每回合你使用或打出第X张牌时，你可以摸X张牌（X为你的攻击范围）。",
 
-  wolongfengchu: "卧龙凤雏",
-  youlong: "游龙",
-  youlong_info:
-    "转换技，每轮各限一次，你可以废除一个装备栏并视为使用一张，①普通锦囊牌；②基本牌。（每种牌名限一次）",
-  luanfeng: "鸾凤",
-  luanfeng_info:
-    "限定技，一名角色进入濒死状态时，若其体力上限不小于你，你可以令其恢复所有已废除装备栏，然后该角色将体力回复至3点并将手牌摸至6-X（X为其恢复的装备栏数），若该角色为你，你重置“游龙”。",
-
   md_guanping: "谋关平",
   md_guanping_prefix: "谋",
   wuwei: "武威",

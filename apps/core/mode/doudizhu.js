@@ -3118,7 +3118,7 @@ export default {
           .set("logSkill", event.skill)
           .set("ai", (card) => {
             if (_status.event.goon) {
-              return 7 - get.value(card)
+              return 9 - get.value(card)
             }
             return 0
           })
@@ -3126,6 +3126,12 @@ export default {
             "goon",
             (() => {
               if (player.hasSkillTag("rejudge") && player.countCards("j") < 2) {
+                return false
+              }
+              if (
+                player.hasSkill("dckanyu", null, false, false) &&
+                !player.hasCards("j", (card) => card.name === "lebu")
+              ) {
                 return false
               }
               return player.hasCard((card) => {
@@ -3190,7 +3196,7 @@ export default {
           .set("logSkill", event.skill)
           .set("ai", (card) => {
             if (_status.event.goon) {
-              return 7 - get.value(card)
+              return 9 - get.value(card)
             }
             return 0
           })
@@ -3198,6 +3204,12 @@ export default {
             "goon",
             (() => {
               if (player.hasSkillTag("rejudge") && player.countCards("j") < 2) {
+                return false
+              }
+              if (
+                player.hasSkill("dckanyu", null, false, false) &&
+                !player.hasCards("j", (card) => card.name === "lebu")
+              ) {
                 return false
               }
               return player.hasCard((card) => {
@@ -3262,7 +3274,7 @@ export default {
           .set("logSkill", event.skill)
           .set("ai", (card) => {
             if (_status.event.goon) {
-              return 7 - get.value(card)
+              return 9 - get.value(card)
             }
             return 0
           })
@@ -3270,6 +3282,12 @@ export default {
             "goon",
             (() => {
               if (player.hasSkillTag("rejudge")) {
+                return false
+              }
+              if (
+                player.hasSkill("dckanyu", null, false, false) &&
+                !player.hasCards("j", (card) => card.name === "lebu")
+              ) {
                 return false
               }
               return player.hasCard((card) => {

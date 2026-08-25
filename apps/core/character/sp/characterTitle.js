@@ -2,4 +2,5 @@ export default {
   sp_jiangwei: "幼麒",
   zhangchunhua: "冷血皇后",
   ol_zhangchunhua: "冷血皇后",
+  ol_xuelingyun: "红烛垂泪",
 }

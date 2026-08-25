@@ -1,5 +1,10 @@
 const characterSort = {
-  sbfm_mouding: ["sp_jiangwei", "zhangchunhua", "ol_zhangchunhua"],
+  sbfm_mouding: [
+    "sp_jiangwei",
+    "zhangchunhua",
+    "ol_zhangchunhua",
+    "ol_xuelingyun",
+  ],
 }
 
 const characterSortTranslate = {

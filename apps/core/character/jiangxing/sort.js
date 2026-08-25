@@ -1,7 +1,7 @@
 const characterSort = {
   // jiangxing_22: ["le_diaochan"],
   // jiangxing_24: ["le_dianwei", "le_jiaxu"],
-  jiangxing_26: ["caoang", "xuelingyun", "xiahouxuan"],
+  jiangxing_26: ["caoang", "ol_xuelingyun", "xiahouxuan"],
 }
 
 const characterSortTranslate = {

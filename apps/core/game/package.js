@@ -14,7 +14,7 @@ window.wtk_package = {
     sb: "谋攻篇",
     // shiji: "始计篇",
 
-    // yijiang: "一将成名",
+    yijiang: "一将成名",
     // mouding: "谋定天下",
 
     shenwu: "神武再世",

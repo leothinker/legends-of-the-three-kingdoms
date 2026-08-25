@@ -2695,15 +2695,15 @@ const skills = {
       const result = await player
         .chooseCard({
           prompt: "展示任意张锦囊牌，令这些牌此阶段不计入手牌上限",
+          position: "h",
           filterCard(card) {
             return get.type(card, "trick") === "trick"
           },
           selectCard: [1, Infinity],
-          position: "h",
           allowChooseAll: true,
           ai(card) {
-            const { player, tricks } = get.event()
-            return tricks.includes(card) ? 10 - get.value(card, player) : 0
+            const { tricks } = get.event()
+            return tricks.includes(card) ? 1 : 0
           },
         })
         .set(
@@ -2717,17 +2717,14 @@ const skills = {
             ),
         )
         .forResult()
-      if (result.bool) {
-        player.showCards(result.cards, "藏拙")
+      if (result.bool && result.cards?.length) {
+        await player.showCards(result.cards, "藏拙")
         player.addGaintag(result.cards, "cangzhuo")
         player.addTempSkill("cangzhuo2")
       }
     },
   },
   cangzhuo2: {
-    onremove(player) {
-      player.removeGaintag("cangzhuo")
-    },
     mod: {
       ignoredHandcard(card, player) {
         if (card.hasGaintag("cangzhuo")) {
@@ -2739,6 +2736,9 @@ const skills = {
           return false
         }
       },
+    },
+    onremove(player) {
+      player.removeGaintag("cangzhuo")
     },
   },
   // 界庞统

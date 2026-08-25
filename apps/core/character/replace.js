@@ -34,4 +34,6 @@ window.wtk_character_replace = {
 
   caoren: ["caoren", "re_caoren", "ol_caoren"],
   xiahouyuan: ["xiahouyuan", "re_xiahouyuan", "ol_xiahouyuan"],
+
+  tianshangyi: ["tianshangyi", "re_tianshangyi"],
 }

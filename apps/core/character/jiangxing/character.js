@@ -5,7 +5,7 @@ const characters = {
     hp: 4,
     skills: ["kangkai"],
   },
-  xuelingyun: {
+  ol_xuelingyun: {
     sex: "female",
     group: "wei",
     hp: 3,

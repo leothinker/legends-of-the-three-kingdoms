@@ -85,6 +85,15 @@ const characterSort = {
     "caiyong",
     "caojie",
   ],
+  yijiang_doukou: [
+    "re_xinxianying",
+    "xuelingyun",
+    "tianshangyi",
+    "huaman",
+    "zhugeguo",
+    "dc_ruiji",
+    "re_tianshangyi",
+  ],
 }
 
 const characterSortTranslate = {
@@ -93,10 +102,10 @@ const characterSortTranslate = {
   yijiang_2013: "一将成名2013",
   yijiang_2014: "一将成名2014",
   yijiang_2015: "一将成名2015",
-  yijiang_2022: "一将成名2022",
-  yijiang_2023: "一将成名2023",
+  yijiang_doukou: "一将成名·豆蔻梢头",
   yijiang_zhengyin: "一将成名·正音雅乐",
   yijiang_jinse: "一将成名·锦瑟良缘",
+  yijiang_caizijiaren: "一将成名·才子佳人",
 }
 
 export { characterSort, characterSortTranslate }

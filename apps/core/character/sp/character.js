@@ -17,6 +17,12 @@ const characters = {
     hp: 3,
     skills: ["jueqing", "shangshi", "jianmie"],
   },
+  ol_xuelingyun: {
+    sex: "female",
+    group: "wei",
+    hp: 3,
+    skills: ["siqi", "qiaozhi"],
+  },
 }
 
 export default characters

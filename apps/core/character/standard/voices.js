@@ -135,6 +135,12 @@ export default {
   "#xiaoguo2": "看我先登城头，立下首功！",
   "#yuejin:die": "箭疮发作，吾命休矣。",
 
+  "#shenzhi1": "子龙将军，一切都托付给你了。",
+  "#shenzhi2": "阿斗，相信妈妈，没事的。",
+  "#shushen1": "船到桥头自然直。",
+  "#shushen2": "妾身无恙，相公请安心征战。",
+  "#ganfuren:die": "请替我照顾好阿斗……",
+
   "#kuangfu1": "大斧到处，片甲不留！",
   "#kuangfu2": "你可接得住我一斧？",
   "#panfeng:die": "来者……可是魔将？",

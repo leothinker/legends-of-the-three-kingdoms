@@ -151,6 +151,7 @@ const characters = {
     hp: 4,
     skills: ["wushuang"],
   },
+
   diaochan: {
     sex: "female",
     group: "qun",
@@ -164,6 +165,7 @@ const characters = {
     hp: 6,
     skills: ["yaowu"],
   },
+
   gongsunzan: {
     sex: "male",
     group: "qun",
@@ -171,11 +173,19 @@ const characters = {
     skills: ["yicong"],
     names: "公孙|瓒",
   },
+
   yuejin: {
     sex: "male",
     group: "wei",
     hp: 4,
     skills: ["xiaoguo"],
+  },
+  ganfuren: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["shenzhi", "shushen"],
+    names: "甘|null",
   },
   panfeng: {
     sex: "male",
@@ -183,6 +193,7 @@ const characters = {
     hp: 4,
     skills: ["kuangfu"],
   },
+
   kongrong: {
     sex: "male",
     group: "qun",

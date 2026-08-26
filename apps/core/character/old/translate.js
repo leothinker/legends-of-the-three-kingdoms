@@ -22,14 +22,6 @@ const translates = {
   tongji_info:
     "锁定技，若你的手牌数大于体力值，攻击范围含有你的角色使用【杀】只能以你为目标。",
 
-  ganfuren: "甘夫人",
-  shenzhi: "神智",
-  shenzhi_info:
-    "准备阶段，你可以弃置所有手牌，若你以此法弃置的手牌数大于X（X为你的体力值），你回复1点体力。",
-  shushen: "淑慎",
-  shushen_info:
-    "当你回复1点体力后，你可以令一名其他角色摸一张牌，若其没有手牌，改为摸两张牌。",
-
   old_guanyu: "界关羽",
   old_guanyu_prefix: "界",
   oldyijue: "义绝",
@@ -50,8 +42,8 @@ const translates = {
   oldyajiao_info:
     "当你于回合外使用或打出手牌时，你可以展示牌堆顶的一张牌。若这两张牌的类别：相同，你可以将此牌交给一名角色；不同，你可以将此牌置入弃牌堆。",
 
-  xushu: "SP徐庶",
-  xushu_prefix: "SP",
+  re_xushu: "界徐庶",
+  re_xushu_prefix: "界",
   zhuhai: "诛害",
   zhuhai_info:
     "其他角色的结束阶段，若其本回合造成过伤害，你可以对其使用一张【杀】。",

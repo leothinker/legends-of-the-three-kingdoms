@@ -111,6 +111,8 @@ const characterSortTranslate = {
   shenwu_huo: "神武再世·火",
   shenwu_lin: "神武再世·林",
   shenwu_shan: "神武再世·山",
+  shenwu_yin: "神话再临·阴",
+  shenwu_lei: "神话再临·雷",
 }
 
 export { characterSort, characterSortTranslate }

@@ -5,12 +5,10 @@ export default {
   old_huangyueying: "归隐的杰女",
   old_yuanshu: "野心渐增",
 
-  ganfuren: "昭烈皇后",
-
   old_guanyu: "美髯公",
   old_zhangfei: "万夫不当",
   old_zhaoyun: "虎威将军",
-  xushu: "化剑为犁",
+  re_xushu: "化剑为犁",
 
   old_caocao: "魏武帝",
   old_xiahoudun: "独眼的罗刹",

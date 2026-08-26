@@ -3,12 +3,12 @@ const characterSort = {
     "caozhi",
     "yujin",
     "zhangchunhua",
-    "xin_fazheng",
-    "xin_masu",
-    "xin_xushu",
-    "xusheng",
+    "fazheng",
+    "masu",
+    "xushu",
     "lingtong",
     "wuguotai",
+    "xusheng",
     "chengong",
     "gaoshun",
   ],
@@ -65,7 +65,7 @@ const characterSort = {
     "gongsunyuan",
     "guotufengji",
   ],
-  yijiang_2022: [
+  yijiang_2016: [
     "guohuanghou",
     "sunziliufang",
     "huanghao",
@@ -75,7 +75,7 @@ const characterSort = {
     "zhangrang",
     "liuyu",
   ],
-  yijiang_2023: [
+  yijiang_2017: [
     "xinxianying",
     "jikang",
     "wuxian",
@@ -85,21 +85,6 @@ const characterSort = {
     "caiyong",
     "caojie",
   ],
-  yijiang_doukou: [
-    "re_xinxianying",
-    "xuelingyun",
-    "duanqiaoxiao",
-    "tianshangyi",
-    "bailingyun",
-    "moqiongshu",
-    "huaman",
-    "zhugeguo",
-    "malingli",
-    "dc_ruiji",
-    "lingju",
-    "caoyuan",
-    "re_tianshangyi",
-  ],
 }
 
 const characterSortTranslate = {
@@ -108,10 +93,8 @@ const characterSortTranslate = {
   yijiang_2013: "一将成名2013",
   yijiang_2014: "一将成名2014",
   yijiang_2015: "一将成名2015",
-  yijiang_doukou: "一将成名·豆蔻梢头",
-  yijiang_zhengyin: "一将成名·正音雅乐",
-  yijiang_jinse: "一将成名·锦瑟良缘",
-  yijiang_caizijiaren: "一将成名·才子佳人",
+  yijiang_2016: "原创之魂2016",
+  yijiang_2017: "原创之魂2017",
 }
 
 export { characterSort, characterSortTranslate }

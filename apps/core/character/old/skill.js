@@ -213,68 +213,6 @@ const skills = {
       },
     },
   },
-  // 甘夫人
-  // 神智
-  shenzhi: {
-    audio: 2,
-    trigger: { player: "phaseZhunbeiBegin" },
-    check(event, player) {
-      if (player.hp > 2) {
-        return false
-      }
-      var cards = player.getCards("h")
-      if (cards.length <= player.hp) {
-        return false
-      }
-      if (cards.length > 3) {
-        return false
-      }
-      for (var i = 0; i < cards.length; i++) {
-        if (get.value(cards[i]) > 7 || get.tag(cards[i], "recover") >= 1) {
-          return false
-        }
-      }
-      return true
-    },
-    filter(event, player) {
-      return player.countCards("h") > 0
-    },
-    preHidden: true,
-    content() {
-      "step 0"
-      var cards = player.getCards("h")
-      event.bool = cards.length > player.hp
-      player.discard(cards)
-      ;("step 1")
-      if (event.bool) {
-        player.recover()
-      }
-    },
-  },
-  // 淑慎
-  shushen: {
-    audio: 2,
-    trigger: { player: "recoverEnd" },
-    getIndex(event) {
-      return event.num || 1
-    },
-    async cost(event, trigger, player) {
-      event.result = await player
-        .chooseTarget({
-          prompt: get.prompt2(event.skill),
-          filterTarget: lib.filter.notMe,
-          ai(target) {
-            return get.attitude(get.player(), target)
-          },
-        })
-        .forResult()
-    },
-    async content(event, trigger, player) {
-      const target = event.targets[0]
-      await target.draw(target.hasCards("h") ? 1 : 2)
-    },
-    ai: { threaten: 0.8, expose: 0.1 },
-  },
   // 界关羽
   // 义绝
   oldyijue: {

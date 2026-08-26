@@ -173,6 +173,14 @@ const translates = {
   xiaoguo_info:
     "其他角色的结束阶段，你可以弃置一张基本牌，然后该角色选择一项：1.弃置一张装备牌；2.受到你造成的1点伤害。",
 
+  ganfuren: "甘夫人",
+  shenzhi: "神智",
+  shenzhi_info:
+    "准备阶段，你可以弃置所有手牌，若你以此法弃置的手牌数大于X（X为你的体力值），你回复1点体力。",
+  shushen: "淑慎",
+  shushen_info:
+    "当你回复1点体力后，你可以令一名其他角色摸一张牌，若其没有手牌，改为摸两张牌。",
+
   panfeng: "潘凤",
   kuangfu: "狂斧",
   kuangfu_info:

@@ -7,12 +7,6 @@ export default {
   "#tiaoxin_sp_jiangwei2": "贼将无胆，何不早降！",
   "#sp_jiangwei:die": "伯约已尽力而为，奈何大汉，国运衰微……",
 
-  "#jueqing1": "你的死活，与我何干？",
-  "#jueqing2": "无来无去，不悔不怨。",
-  "#shangshi1": "无情者伤人，有情者自伤。",
-  "#shangshi2": "自损八百，可伤敌一千。",
-  "#zhangchunhua:die": "怎能如此对我！",
-
   "#jueqing_ol_zhangchunhua1": "情丝如雪，难当暖阳。",
   "#jueqing_ol_zhangchunhua2": "有情总被无情负，绝情方无软肋生。",
   "#shangshi_ol_zhangchunhua1": "伤我最深的，竟是你司马懿。",
@@ -32,4 +26,10 @@ export default {
   "#luanfeng1": "凤栖枯木，浴火涅槃！",
   "#luanfeng2": "青鸾归羽，雏凤还巢！",
   "#wolongfengchu:die": "铁链，东风，也难困这魏军……",
+
+  "#yingyuan1": "接好嘞！",
+  "#yingyuan2": "好牌只用一次怎么够？",
+  "#zishu1": "慢着，让我来！",
+  "#zishu2": "身外之物，不要也罢！",
+  "#maliang:die": "我的使命……完成了吗……",
 }

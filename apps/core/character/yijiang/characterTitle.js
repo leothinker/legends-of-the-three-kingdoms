@@ -4,8 +4,12 @@ export default {
   duanqiaoxiao: "柔荑点绛唇",
   tianshangyi: "婀娜盈珠袖",
   bailingyun: "玲珑心窍",
+  moqiongshu: "琼黛鬓墨雪",
   huaman: "芳踪载馨",
   zhugeguo: "凤阁乘烟",
+  malingli: "火树银花",
   ruiji: "柔荑弄钺",
+  lingju: "情随梦逝",
+  caoyuan: "千娇百媚",
   re_tianshangyi: "翩跹曼妙",
 }

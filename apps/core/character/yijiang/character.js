@@ -29,6 +29,12 @@ const characters = {
     hp: 3,
     skills: ["linghui", "xiace", "yuxin"],
   },
+  moqiongshu: {
+    sex: "female",
+    group: "wei",
+    hp: 3,
+    skills: ["wanchan", "jiangzhi"],
+  },
   huaman: {
     sex: "female",
     group: "shu",
@@ -44,12 +50,31 @@ const characters = {
     names: "诸葛|果",
     clans: ["琅琊诸葛氏"],
   },
+  malingli: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["lima", "xiaoyin", "huahuo"],
+  },
   dc_ruiji: {
     sex: "female",
     group: "wu",
     hp: 4,
     skills: ["wangyuan", "lingyin", "liying"],
     names: "芮|null",
+  },
+  lingju: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["jieyuan", "fenxin"],
+    names: "吕|null",
+  },
+  caoyuan: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["dcwuyan", "zhanyu"],
   },
   re_tianshangyi: {
     sex: "female",

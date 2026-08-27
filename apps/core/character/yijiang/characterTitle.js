@@ -21,4 +21,11 @@ export default {
   chengpu: "三朝虎臣",
   handang: "石城侯",
   liubiao: "跨蹈汉南",
+
+  caochong: "仁爱的神童",
+  guohuai: "垂问秦雍",
+  manchong: "政法兵谋",
+  guanping: "忠臣孝子",
+  jianyong: "优游风议",
+  liufeng: "骑虎之殇",
 }

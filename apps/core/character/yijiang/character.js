@@ -131,6 +131,43 @@ const characters = {
     hp: 3,
     skills: ["zishou", "zongshi"],
   },
+
+  caochong: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["chengxiang", "renxin"],
+  },
+  guohuai: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["jingce"],
+  },
+  manchong: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["junxing", "yuce"],
+  },
+  guanping: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["longyin"],
+  },
+  jianyong: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["qiaoshui", "jyzongshi"],
+  },
+  liufeng: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["xiansi"],
+  },
 }
 
 export default characters

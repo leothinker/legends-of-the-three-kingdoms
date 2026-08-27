@@ -67,6 +67,70 @@ const characters = {
     hp: 4,
     skills: ["xianzhen", "jinjiu"],
   },
+
+  zhonghui: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["quanji", "zili"],
+    clans: ["颍川钟氏"],
+  },
+  wangyi: {
+    sex: "female",
+    group: "wei",
+    hp: 3,
+    skills: ["zhenlie", "miji"],
+  },
+  xunyou: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["qice", "zhiyu"],
+    clans: ["颍川荀氏"],
+  },
+  guanzhang: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["fuhun"],
+    names: "关|兴-张|苞",
+  },
+  liaohua: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["dangxian", "fuli"],
+  },
+  madai: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["mashu", "qianxi"],
+  },
+  bulianshi: {
+    sex: "female",
+    group: "wu",
+    hp: 3,
+    skills: ["anxu", "zhuiyi"],
+  },
+  chengpu: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["lihuo", "chunlao"],
+  },
+  handang: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["gongqi", "jiefan"],
+  },
+  liubiao: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["zishou", "zongshi"],
+  },
 }
 
 export default characters

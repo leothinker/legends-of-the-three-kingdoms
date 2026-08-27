@@ -10,4 +10,15 @@ export default {
   xusheng: "江东的铁壁",
   chengong: "刚直壮烈",
   gaoshun: "攻无不克",
+
+  zhonghui: "桀骜的野心家",
+  wangyi: "决意的巾帼",
+  xunyou: "曹魏的谋主",
+  guanzhang: "将门虎子",
+  liaohua: "历尽沧桑",
+  madai: "临危受命",
+  bulianshi: "无冕之后",
+  chengpu: "三朝虎臣",
+  handang: "石城侯",
+  liubiao: "跨蹈汉南",
 }

@@ -916,6 +916,7 @@ const skills = {
     },
     locked: false,
     audio: 2,
+    audioname: ["guanzhang"],
     enable: ["chooseToRespond", "chooseToUse"],
     filterCard(card, player) {
       if (get.zhu(player, "shouyue")) {
@@ -1126,6 +1127,7 @@ const skills = {
   repaoxiao: {
     audio: 2,
     firstDo: true,
+    audioname: ["guanzhang"],
     trigger: { player: "useCard1" },
     forced: true,
     filter(event, player) {

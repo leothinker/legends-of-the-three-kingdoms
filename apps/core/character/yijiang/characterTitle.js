@@ -46,5 +46,17 @@ export default {
   caifuren: "襄江的蒲苇",
   yj_jushou: "监军谋国",
 
+  caorui: "天姿的明君",
+  caoxiu: "千里骐骥",
+  zhongyao: "正楷萧曹",
+  liuchen: "血荐轩辕",
+  xiahoushi: "采缘撷睦",
+  zhangyi: "通壮逾古",
+  quancong: "慕势耀族",
+  sunxiu: "弥殇的景君",
+  zhuzhi: "王事靡盬",
+  gongsunyuan: "狡徒悬海",
+  guotufengji: "凶蛇两端",
+
   qinmi: "彻天之舌",
 }

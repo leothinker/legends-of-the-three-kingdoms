@@ -28,4 +28,11 @@ export default {
   guanping: "忠臣孝子",
   jianyong: "优游风议",
   liufeng: "骑虎之殇",
+  panzhangmazhong: "擒龙伏虎",
+  yufan: "狂直之士",
+  zhuran: "不动之督",
+  fuhuanghou: "孤注一掷",
+  liru: "魔仕",
+
+  qinmi: "彻天之舌",
 }

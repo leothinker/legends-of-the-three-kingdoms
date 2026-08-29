@@ -168,6 +168,45 @@ const characters = {
     hp: 4,
     skills: ["xiansi"],
   },
+  panzhangmazhong: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["duodao", "anjian"],
+    names: "潘|璋-马|忠",
+  },
+  yufan: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["zongxuan", "zhiyan"],
+  },
+  zhuran: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["danshou"],
+  },
+  fuhuanghou: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["zhuikong", "qiuyuan"],
+  },
+  liru: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["juece", "mieji", "fencheng"],
+    dieAudios: ["liru"],
+  },
+
+  qinmi: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["jianzheng", "zhuandui", "tianbian"],
+  },
 }
 
 export default characters

@@ -34,5 +34,17 @@ export default {
   fuhuanghou: "孤注一掷",
   liru: "魔仕",
 
+  caozhen: "荷国天督",
+  chenqun: "万世臣表",
+  hanhaoshihuan: "中军之主",
+  wuyi: "建兴鞍辔",
+  zhangsong: "怀璧待凤仪",
+  zhoucang: "披肝沥胆",
+  guyong: "庙堂的玉磬",
+  sunluban: "为虎作伥",
+  zhuhuan: "中洲拒天人",
+  caifuren: "襄江的蒲苇",
+  yj_jushou: "监军谋国",
+
   qinmi: "彻天之舌",
 }

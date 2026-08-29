@@ -201,6 +201,77 @@ const characters = {
     dieAudios: ["liru"],
   },
 
+  caozhen: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["sidi"],
+  },
+  chenqun: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["pindi", "faen"],
+    clans: ["颍川陈氏"],
+  },
+  hanhaoshihuan: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["shenduan", "yonglve"],
+    names: "韩|浩-史|涣",
+  },
+  wuyi: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["benxi"],
+    clans: ["陈留吴氏"],
+  },
+  zhangsong: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["qiangzhi", "xiantu"],
+  },
+  zhoucang: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["zhongyong"],
+  },
+  guyong: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["shenxing", "bingyi"],
+  },
+  sunluban: {
+    sex: "female",
+    group: "wu",
+    hp: 3,
+    skills: ["chanhui", "jiaojin"],
+  },
+  zhuhuan: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["fenli", "pingkou"],
+  },
+  caifuren: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["qieting", "xianzhou"],
+    names: "蔡|null",
+  },
+  yj_jushou: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["jianying", "shibei"],
+  },
+
   qinmi: {
     sex: "male",
     group: "shu",

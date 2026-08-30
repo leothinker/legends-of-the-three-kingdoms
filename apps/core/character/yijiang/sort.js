@@ -66,22 +66,22 @@ const characterSort = {
   yijiang_2016: [
     "guohuanghou",
     "sunziliufang",
-    "huanghao",
     "liyan",
+    "huanghao",
     "sundeng",
     "cenhun",
-    "zhangrang",
     "liuyu",
+    "zhangrang",
   ],
   yijiang_2017: [
     "xinxianying",
     "jikang",
     "wuxian",
     "qinmi",
-    "xuezong",
     "xushi",
-    "caiyong",
+    "xuezong",
     "caojie",
+    "caiyong",
   ],
 }
 

@@ -58,5 +58,12 @@ export default {
   gongsunyuan: "狡徒悬海",
   guotufengji: "凶蛇两端",
 
+  xinxianying: "名门智女",
+  jikang: "峻峰孤松",
+  wuxian: "穆皇后",
   qinmi: "彻天之舌",
+  xushi: "节义双全",
+  xuezong: "彬彬之玊",
+  caojie: "献穆皇后",
+  caiyong: "大鸿儒",
 }

@@ -3360,130 +3360,130 @@ const skills = {
   //     },
   //   },
   // },
-  // // 界张春华
-  // // 翦灭
-  // jianmie: {
-  //   audio: 2,
-  //   enable: "phaseUse",
-  //   filterTarget: lib.filter.notMe,
-  //   usable: 1,
-  //   async content(event, trigger, player) {
-  //     const target = event.target,
-  //       targets = [player, target]
-  //     const map = await game
-  //       .chooseAnyOL(targets, get.info(event.name).chooseControl, [targets])
-  //       .forResult()
-  //     const getColor = (result) => {
-  //         return result.control === "none2" ? "none" : result.control
-  //       },
-  //       cards_player = player.getDiscardableCards(
-  //         player,
-  //         "h",
-  //         (card) => get.color(card) === getColor(map.get(player)),
-  //       ),
-  //       cards_target = target.getDiscardableCards(
-  //         target,
-  //         "h",
-  //         (card) => get.color(card) === getColor(map.get(target)),
-  //       )
-  //     if (cards_player.length && cards_target.length) {
-  //       await game
-  //         .loseAsync({
-  //           lose_list: [
-  //             [player, cards_player],
-  //             [target, cards_target],
-  //           ],
-  //         })
-  //         .setContent("discardMultiple")
-  //     } else if (cards_player.length) {
-  //       await player.discard(cards_player)
-  //     } else if (cards_target.length) {
-  //       await target.discard(cards_target)
-  //     }
-  //     if (cards_player.length !== cards_target.length) {
-  //       const user = cards_player.length > cards_target.length ? player : target
-  //       const aim = user === player ? target : player
-  //       const juedou = new lib.element.VCard({ name: "juedou", isCard: true })
-  //       if (user.canUse(juedou, aim, false)) {
-  //         await user.useCard(juedou, aim, false)
-  //       }
-  //     }
-  //   },
-  //   ai: {
-  //     order: 1,
-  //     result: {
-  //       player(player, target) {
-  //         const num =
-  //           (player.hasSkill("shangshi")
-  //             ? Math.max(0, player.getDamagedHp() - player.countCards("h") / 2)
-  //             : 0) -
-  //           player.countDiscardableCards(player, "h") / 2
-  //         return (
-  //           get.effect(player, { name: "juedou" }, target, player) +
-  //           get.effect(player, { name: "draw" }, player, player) * num
-  //         )
-  //       },
-  //       target(player, target) {
-  //         return (
-  //           get.effect(target, { name: "juedou" }, player, target) -
-  //           (get.effect(target, { name: "draw" }, target, target) *
-  //             target.countDiscardableCards(target, "h")) /
-  //             2
-  //         )
-  //       },
-  //     },
-  //   },
-  //   chooseControl(player, targets, eventId) {
-  //     const colors = ["red", "black"]
-  //     if (
-  //       player
-  //         .getDiscardableCards(player, "h")
-  //         .some((card) => get.color(card) === "none")
-  //     ) {
-  //       colors.push("none2")
-  //     }
-  //     const str = get.translation(
-  //       targets[0] === player ? targets[1] : targets[0],
-  //     )
-  //     return player
-  //       .chooseControl(colors)
-  //       .set("prompt", "翦灭：请选择一个颜色")
-  //       .set(
-  //         "prompt2",
-  //         "弃置选择颜色的手牌，然后若你/" +
-  //           str +
-  //           "弃置的牌更多，则你/" +
-  //           str +
-  //           "视为对" +
-  //           str +
-  //           "/你使用【决斗】",
-  //       )
-  //       .set("ai", () => {
-  //         const player = get.event().player
-  //         const controls = get.event().controls.slice()
-  //         return controls.sort((a, b) => {
-  //           return (
-  //             player
-  //               .getDiscardableCards(player, "h")
-  //               .filter((card) => {
-  //                 return get.color(card) === (a === "none2" ? "none" : a)
-  //               })
-  //               .reduce((sum, card) => sum + get.value(card, player), 0) -
-  //             player
-  //               .getDiscardableCards(player, "h")
-  //               .filter((card) => {
-  //                 return get.color(card) === (b === "none2" ? "none" : b)
-  //               })
-  //               .reduce((sum, card) => sum + get.value(card, player), 0)
-  //           )
-  //         })[0]
-  //       })
-  //       .set("id", eventId)
-  //       .set("_global_waiting", true)
-  //   },
-  // },
-  // // 王元姬
-  // // 谦冲
+  // 界张春华
+  // 翦灭
+  jianmie: {
+    audio: 2,
+    enable: "phaseUse",
+    filterTarget: lib.filter.notMe,
+    usable: 1,
+    async content(event, trigger, player) {
+      const target = event.target,
+        targets = [player, target]
+      const map = await game
+        .chooseAnyOL(targets, get.info(event.name).chooseControl, [targets])
+        .forResult()
+      const getColor = (result) => {
+          return result.control === "none2" ? "none" : result.control
+        },
+        cards_player = player.getDiscardableCards(
+          player,
+          "h",
+          (card) => get.color(card) === getColor(map.get(player)),
+        ),
+        cards_target = target.getDiscardableCards(
+          target,
+          "h",
+          (card) => get.color(card) === getColor(map.get(target)),
+        )
+      if (cards_player.length && cards_target.length) {
+        await game
+          .loseAsync({
+            lose_list: [
+              [player, cards_player],
+              [target, cards_target],
+            ],
+          })
+          .setContent("discardMultiple")
+      } else if (cards_player.length) {
+        await player.discard(cards_player)
+      } else if (cards_target.length) {
+        await target.discard(cards_target)
+      }
+      if (cards_player.length !== cards_target.length) {
+        const user = cards_player.length > cards_target.length ? player : target
+        const aim = user === player ? target : player
+        const juedou = new lib.element.VCard({ name: "juedou", isCard: true })
+        if (user.canUse(juedou, aim, false)) {
+          await user.useCard(juedou, aim, false)
+        }
+      }
+    },
+    ai: {
+      order: 1,
+      result: {
+        player(player, target) {
+          const num =
+            (player.hasSkill("shangshi")
+              ? Math.max(0, player.getDamagedHp() - player.countCards("h") / 2)
+              : 0) -
+            player.countDiscardableCards(player, "h") / 2
+          return (
+            get.effect(player, { name: "juedou" }, target, player) +
+            get.effect(player, { name: "draw" }, player, player) * num
+          )
+        },
+        target(player, target) {
+          return (
+            get.effect(target, { name: "juedou" }, player, target) -
+            (get.effect(target, { name: "draw" }, target, target) *
+              target.countDiscardableCards(target, "h")) /
+              2
+          )
+        },
+      },
+    },
+    chooseControl(player, targets, eventId) {
+      const colors = ["red", "black"]
+      if (
+        player
+          .getDiscardableCards(player, "h")
+          .some((card) => get.color(card) === "none")
+      ) {
+        colors.push("none2")
+      }
+      const str = get.translation(
+        targets[0] === player ? targets[1] : targets[0],
+      )
+      return player
+        .chooseControl(colors)
+        .set("prompt", "翦灭：请选择一个颜色")
+        .set(
+          "prompt2",
+          "弃置选择颜色的手牌，然后若你/" +
+            str +
+            "弃置的牌更多，则你/" +
+            str +
+            "视为对" +
+            str +
+            "/你使用【决斗】",
+        )
+        .set("ai", () => {
+          const player = get.event().player
+          const controls = get.event().controls.slice()
+          return controls.sort((a, b) => {
+            return (
+              player
+                .getDiscardableCards(player, "h")
+                .filter((card) => {
+                  return get.color(card) === (a === "none2" ? "none" : a)
+                })
+                .reduce((sum, card) => sum + get.value(card, player), 0) -
+              player
+                .getDiscardableCards(player, "h")
+                .filter((card) => {
+                  return get.color(card) === (b === "none2" ? "none" : b)
+                })
+                .reduce((sum, card) => sum + get.value(card, player), 0)
+            )
+          })[0]
+        })
+        .set("id", eventId)
+        .set("_global_waiting", true)
+    },
+  },
+  // 王元姬
+  // 谦冲
   // qianchong: {
   //   audio: 1,
   //   init(player, skill) {

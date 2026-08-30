@@ -346,11 +346,55 @@ const characters = {
     names: "郭|图-逢|纪",
   },
 
+  xinxianying: {
+    sex: "female",
+    group: "wei",
+    hp: 3,
+    skills: ["zhongjian", "caishi"],
+  },
+  jikang: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["qingxian", "juexiang"],
+  },
+  wuxian: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["fumian", "daiyan"],
+    clans: ["陈留吴氏"],
+  },
   qinmi: {
     sex: "male",
     group: "shu",
     hp: 3,
     skills: ["jianzheng", "zhuandui", "tianbian"],
+  },
+  xushi: {
+    sex: "female",
+    group: "wu",
+    hp: 3,
+    skills: ["wengua", "fuzhu"],
+    names: "徐|null",
+  },
+  xuezong: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["funan", "jiexun"],
+  },
+  caojie: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["shouxi", "huimin"],
+  },
+  caiyong: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["bizhuan", "tongbo"],
   },
 }
 

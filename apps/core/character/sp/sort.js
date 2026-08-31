@@ -1,13 +1,24 @@
 const characterSort = {
-  sp1: ["caoang"],
-  sp2: ["sp_jiangwei"],
+  sp_2020: [
+    "yuejin",
+    "lidian",
+    "sp_caiwenji",
+    "caoang",
+    "simalang",
+
+    "guanyinping",
+    "sp_sunshangxiang",
+    "dongyun",
+    "sunqian",
+  ],
+  sp_2022: ["sp_jiangwei"],
   sbfm_mouding: ["ol_zhangchunhua", "ol_xuelingyun", "wolongfengchu"],
 }
 
 const characterSortTranslate = {
-  sp_2019: "SP·武将组1",
-  sp_2022: "SP·武将组2",
-  sp_default: "星火燎原·天同",
+  sp_2020: "珍藏版（2020）",
+  sp_2022: "珍藏版（2022）",
+  sp_default: "SP",
 }
 
 export { characterSort, characterSortTranslate }

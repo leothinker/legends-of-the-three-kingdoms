@@ -18,7 +18,6 @@ const characterSort = {
     "old_zhangliao",
     "old_xuzhu",
     "old_guojia",
-    "lidian",
 
     "old_lvbu",
   ],

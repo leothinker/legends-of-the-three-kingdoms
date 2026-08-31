@@ -1908,6 +1908,7 @@ const skills = {
   // 枭姬
   xiaoji: {
     audio: 2,
+    audioname: ["sp_sunshangxiang"],
     audioname2: { ol_sunshangxiang: "rexiaoji" },
     trigger: {
       player: "loseAfter",
@@ -2258,8 +2259,8 @@ const skills = {
   },
   // 乐进
   // 骁果
-  xiaoguo: {
-    audio: 2,
+  stdxiaoguo: {
+    audio: "xiaoguo",
     trigger: { global: "phaseJieshuBegin" },
     filter(event, player) {
       return (

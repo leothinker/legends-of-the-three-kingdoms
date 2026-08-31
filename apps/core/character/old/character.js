@@ -101,12 +101,6 @@ const characters = {
     img: "image/character/re_guojia.jpg",
     dieAudios: ["re_guojia"],
   },
-  lidian: {
-    sex: "male",
-    group: "wei",
-    hp: 3,
-    skills: ["xunxun", "wangxi"],
-  },
   old_lvbu: {
     sex: "male",
     group: "qun",

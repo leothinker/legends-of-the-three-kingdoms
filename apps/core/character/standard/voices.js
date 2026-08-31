@@ -131,10 +131,6 @@ export default {
   "#reyicong2": "冲啊！",
   "#gongsunzan:die": "我军将败，我已无颜苟活于世。",
 
-  "#xiaoguo1": "三军听我号令，不得撤退！",
-  "#xiaoguo2": "看我先登城头，立下首功！",
-  "#yuejin:die": "箭疮发作，吾命休矣。",
-
   "#shenzhi1": "子龙将军，一切都托付给你了。",
   "#shenzhi2": "阿斗，相信妈妈，没事的。",
   "#shushen1": "船到桥头自然直。",

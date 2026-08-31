@@ -15,7 +15,6 @@ export default {
   old_zhangliao: "前将军",
   old_xuzhu: "虎痴",
   old_guojia: "早终的先知",
-  lidian: "深明大义",
 
   old_lvbu: "武的化身",
 }

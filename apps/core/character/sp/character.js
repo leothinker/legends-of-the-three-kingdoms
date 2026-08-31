@@ -1,4 +1,60 @@
 const characters = {
+  yuejin: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["xiaoguo"],
+  },
+  lidian: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["xunxun", "wangxi"],
+  },
+  sp_caiwenji: {
+    sex: "female",
+    group: "wei",
+    hp: 3,
+    skills: ["chenqing", "mozhi"],
+  },
+  caoang: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["kangkai"],
+  },
+  simalang: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["junbing", "quji"],
+    names: "司马|朗",
+  },
+  guanyinping: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["xueji", "huxiao", "wuji"],
+  },
+  sp_sunshangxiang: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["liangzhu", "fanxiang"],
+  },
+  dongyun: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["bingzheng", "sheyan"],
+  },
+  sunqian: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["qianya", "shuimeng"],
+  },
+
   sp_jiangwei: {
     sex: "male",
     group: "wei",
@@ -12,12 +68,6 @@ const characters = {
     skills: ["jueqing", "shangshi", "jianmie"],
   },
 
-  // caoang: {
-  //   sex: "male",
-  //   group: "wei",
-  //   hp: 4,
-  //   skills: ["kangkai"],
-  // },
   // ol_xuelingyun: {
   //   sex: "female",
   //   group: "wei",

@@ -32,7 +32,7 @@ export default {
 
   gongsunzan: "白马将军",
 
-  yuejin: "奋强突固",
+  std_yuejin: "奋强突固",
   ganfuren: "昭烈皇后",
   panfeng: "联军上将",
 

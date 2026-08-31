@@ -174,11 +174,12 @@ const characters = {
     names: "公孙|瓒",
   },
 
-  yuejin: {
+  std_yuejin: {
     sex: "male",
     group: "wei",
     hp: 4,
-    skills: ["xiaoguo"],
+    skills: ["stdxiaoguo"],
+    dieAudios: ["yuejin"],
   },
   ganfuren: {
     sex: "female",

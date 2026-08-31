@@ -346,6 +346,58 @@ const characters = {
     names: "郭|图-逢|纪",
   },
 
+  guohuanghou: {
+    sex: "female",
+    group: "wei",
+    hp: 3,
+    skills: ["jiaozhao", "danxin"],
+    names: "郭|null",
+  },
+  sunziliufang: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["guizao", "jiyu"],
+    names: "孙|资-刘|放",
+  },
+  liyan: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["duliang", "fulin"],
+  },
+  huanghao: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["qinqing", "huisheng"],
+  },
+  sundeng: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["kuangbi"],
+  },
+  cenhun: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["jishe", "lianhuo"],
+  },
+  liuyu: {
+    sex: "male",
+    group: "qun",
+    hp: 2,
+    skills: ["zhige", "zongzuo"],
+  },
+  zhangrang: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["taoluan"],
+    trashBin: ["sex:male_castrated"],
+  },
+
   xinxianying: {
     sex: "female",
     group: "wei",

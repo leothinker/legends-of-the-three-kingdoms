@@ -58,6 +58,15 @@ export default {
   gongsunyuan: "狡徒悬海",
   guotufengji: "凶蛇两端",
 
+  guohuanghou: "月华驱霾",
+  sunziliufang: "服谗搜慝",
+  liyan: "矜风流务",
+  huanghao: "便辟佞慧",
+  sundeng: "才高德茂",
+  cenhun: "伐梁倾瓴",
+  liuyu: "甘棠永固",
+  zhangrang: "窃幸绝禋",
+
   xinxianying: "名门智女",
   jikang: "峻峰孤松",
   wuxian: "穆皇后",

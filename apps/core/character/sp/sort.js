@@ -10,6 +10,18 @@ const characterSort = {
     "sp_sunshangxiang",
     "dongyun",
     "sunqian",
+
+    "dingfeng",
+    "zhugejin",
+    "zhugeke",
+    "sp_pangtong",
+    "yanjun",
+
+    "hetaihou",
+    "liuxie",
+    "sp_huangyueying",
+    "tadun",
+    "liuyao",
   ],
   sp_2022: ["sp_jiangwei"],
   sbfm_mouding: ["ol_zhangchunhua", "ol_xuelingyun", "wolongfengchu"],

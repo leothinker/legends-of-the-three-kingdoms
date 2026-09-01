@@ -152,7 +152,7 @@
   "right_click": "pause",
   "sort": "type_sort",
   "cards": ["standard", "extra", "refresh"],
-  "characters": ["refresh", "reshenhua", "sp", "offline"],
+  "characters": ["refresh", "reshenhua", "yijiang", "sp"],
   "moderned_characters": [
     "standard",
     "shenhua",

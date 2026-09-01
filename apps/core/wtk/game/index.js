@@ -6176,7 +6176,7 @@ export class Game {
    * @param { Card | string } name
    * @param { string } suit
    * @param { number } number
-   * @param { string } nature
+   * @param { string } [nature]
    */
   createCard2() {
     const card = game.createCard.apply(this, arguments)

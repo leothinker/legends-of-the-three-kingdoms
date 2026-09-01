@@ -6398,8 +6398,8 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
                 if (dist.attackFrom) {
                   added = true
                   uiintro.add(
-                    `<div class="text center">攻击范围：${-dist.attackFrom + 1}</div>`,
-                  )
+                    `<div class="text center">攻击范围：${get.owner(node)?.getEquipRange([node[node.cardSymbol]])}</div>`,
+                  ) //(-dist.attackFrom + 1)
                 }
               }
               if (!added) {

@@ -90,6 +90,53 @@ const translates = {
   oldliyu: "利驭",
   oldliyu_info:
     "当你使用【杀】对一名其他角色造成伤害后，其可以令你获得其一张牌，然后你视为对其选择的另一名角色使用一张【决斗】。",
+
+  old_yujin: "旧于禁",
+  old_yujin_prefix: "旧",
+  yizhong: "毅重",
+  yizhong_info: "锁定技，若你的装备区里没有防具牌，黑色【杀】对你无效。",
+
+  old_fazheng: "旧法正",
+  old_fazheng_prefix: "旧",
+  oldenyuan: "恩怨",
+  oldenyuan1: "恩怨",
+  oldenyuan2: "恩怨",
+  oldenyuan_info:
+    "锁定技，当其他角色令你回复1点体力后，其摸一张牌；当你受到其他角色对你造成的伤害后，其选择一项：1.交给你一张红桃手牌；2.失去1点体力。",
+  oldxuanhuo: "眩惑",
+  oldxuanhuo_info:
+    "出牌阶段限一次，你可以将一张红桃手牌交给一名其他角色，然后你获得其一张牌并可以交给另一名其他角色。",
+
+  old_masu: "旧马谡",
+  old_masu_prefix: "旧",
+  xinzhan: "心战",
+  xinzhan_gain: "获得",
+  xinzhan_place: "牌堆顶",
+  xinzhan_info:
+    "出牌阶段限一次，若你的手牌数大于体力上限，你可以观看牌堆顶的三张牌，然后展示并获得其中任意张红桃牌，最后将其余牌以任意顺序置于牌堆顶。",
+  huilei: "挥泪",
+  huilei_info: "锁定技，当你死亡时，杀死你的角色弃置所有牌。",
+
+  old_xushu: "旧徐庶",
+  old_xushu_prefix: "旧",
+  oldwuyan: "无言",
+  oldwuyan_info:
+    "锁定技，你使用的普通锦囊牌对其他角色无效，其他角色使用的普通锦囊牌对你无效。",
+  oldjujian: "举荐",
+  oldjujian_info:
+    "出牌阶段限一次，你可以弃置至多三张牌，然后令一名其他角色摸等量的牌。若你以此法弃置三张相同类别的牌，你回复1点体力。",
+
+  old_lingtong: "旧凌统",
+  old_lingtong_prefix: "旧",
+  oldxuanfeng: "旋风",
+  oldxuanfeng_info:
+    "当你失去装备区里的牌后，你可以选择一项：1.视为使用一张无距离限制的【杀】（此【杀】不计入次数限制）；2.对与你距离1以内的一名其他角色造成1点伤害。",
+
+  old_xusheng: "旧徐盛",
+  old_xusheng_prefix: "旧",
+  oldpojun: "破军",
+  oldpojun_info:
+    "当你使用【杀】对目标角色造成伤害后，你可以令其摸X张牌（X为其体力值且至多为5），然后其翻面。",
 }
 
 export default translates

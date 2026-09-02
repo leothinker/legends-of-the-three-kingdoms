@@ -18,4 +18,27 @@ export default {
   "#jianyan1": "如此如此，敌军自破！",
   "#jianyan2": "开言纳谏，社稷之福！",
   "#re_xushu:die": "母亲……孩儿……尽孝来了。",
+
+  "#yizhong1": "不先为备，何以待敌？",
+  "#yizhong2": "稳重行军，百战不殆！",
+  "#old_yujin:die": "我，无颜面对丞相了……",
+
+  "#oldenyuan1": "滴水之恩，涌泉以报。",
+  "#oldenyuan2": "得人恩果千年记。",
+  "#oldenyuan3": "睚眦之怨，无不报复。",
+  "#oldenyuan4": "谁敢得罪我？",
+  "#oldxuanhuo1": "给你的，十倍奉还给我。",
+  "#oldxuanhuo2": "重用许靖，以眩远近。",
+  "#old_fazheng:die": "蜀翼既折，蜀汉哀矣……",
+
+  "#xinzhan1": "吾通晓兵法，世人皆知。",
+  "#xinzhan2": "用兵之道，攻心为上。",
+  "#huilei1": "丞相视某如子，某以丞相为父。",
+  "#huilei2": "谡愿以死安大局。",
+
+  "#oldwuyan1": "嘘，言多必失啊。",
+  "#oldwuyan2": "唉，一切尽在不言中。",
+  "#oldjujian1": "我看好你！",
+  "#oldjujian2": "将军岂愿抓牌乎？",
+  "#old_xushu:die": "娘……孩儿不孝……向您……请罪……",
 }

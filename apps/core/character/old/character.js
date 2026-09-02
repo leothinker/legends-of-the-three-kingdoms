@@ -109,6 +109,48 @@ const characters = {
     img: "image/character/re_lvbu.jpg",
     dieAudios: ["re_lvbu"],
   },
+
+  old_yujin: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["yizhong"],
+  },
+  old_fazheng: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["oldenyuan", "oldxuanhuo"],
+  },
+  old_masu: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["xinzhan", "huilei"],
+    dieAudios: ["masu"],
+  },
+  old_xushu: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["oldwuyan", "oldjujian"],
+    groupBorder: "wei",
+  },
+  old_lingtong: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["oldxuanfeng"],
+    dieAudios: ["lingtong"],
+  },
+  old_xusheng: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["oldpojun"],
+    img: "image/character/dc_xusheng.jpg",
+    dieAudios: ["xusheng"],
+  },
 }
 
 export default characters

@@ -17,4 +17,11 @@ export default {
   old_guojia: "早终的先知",
 
   old_lvbu: "武的化身",
+
+  old_yujin: "魏武之刚",
+  old_fazheng: "蜀汉的辅翼",
+  old_masu: "怀才自负",
+  old_xushu: "忠孝的侠士",
+  old_lingtong: "豪情烈胆",
+  old_xusheng: "江东的铁壁",
 }

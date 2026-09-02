@@ -6,12 +6,11 @@ const characterSort = {
     "old_huangyueying",
     "old_yuanshu",
   ],
-  old_shenhua: [],
   old_refresh: [
     "old_guanyu",
     "old_zhangfei",
     "old_zhaoyun",
-    "xushu",
+    "re_xushu",
 
     "old_caocao",
     "old_xiahoudun",
@@ -21,12 +20,20 @@ const characterSort = {
 
     "old_lvbu",
   ],
+  old_yijiang: [
+    "old_yujin",
+    "old_fazheng",
+    "old_masu",
+    "old_xushu",
+    "old_lingtong",
+    "old_xusheng",
+  ],
 }
 
 const characterSortTranslate = {
   old_standard: "标准版",
-  old_shenhua: "神话再临",
   old_refresh: "界限突破",
+  old_yijiang: "一将成名",
 }
 
 export { characterSort, characterSortTranslate }

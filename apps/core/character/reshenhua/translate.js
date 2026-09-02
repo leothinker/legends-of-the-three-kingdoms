@@ -384,14 +384,14 @@ const translates = {
   zhengu_info:
     "结束阶段，你可以选择一名其他角色，你的回合结束时和该角色的下个回合结束时，其将手牌摸至或弃置至与你手牌数相同（至多摸至五张）。",
 
-  guanqiujian: "毌丘俭",
-  zhengrong: "征荣",
-  zhengrong_info:
-    "当你对其他角色造成伤害后，若其手牌数大于你，你可以将其一张牌置于你的武将牌上，称为“荣”。",
-  hongju: "鸿举",
-  hongju_info: `觉醒技，准备阶段，若“荣”的数量不小于3且场上有角色死亡，你用任意张手牌替换等量的“荣”，减1点体力上限，获得${get.poptip("qingce")}。`,
-  qingce: "清侧",
-  qingce_info:
+  re_guanqiujian: "毌丘俭",
+  rezhengrong: "征荣",
+  rezhengrong_info:
+    "当你于出牌阶段内对其他角色使用偶数张牌后，你可以将一名其他角色的一张牌置于你的武将牌上，称为“荣”。",
+  rehongju: "鸿举",
+  rehongju_info: `觉醒技，准备阶段，若“荣”的数量不小于3且场上有角色死亡，你摸等同于“荣”数量的牌，然后用任意张手牌替换等量的“荣”，减1点体力上限，获得${get.poptip("reqingce")}。`,
+  reqingce: "清侧",
+  reqingce_info:
     "出牌阶段，若场上有牌，你可以移去一张“荣”，然后弃置场上的一张牌。",
 
   chendao: "陈到",

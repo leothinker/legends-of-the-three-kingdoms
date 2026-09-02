@@ -7033,6 +7033,142 @@ const skills = {
       }
     },
   },
+  // 毌丘俭
+  // 征荣
+  zhengrong: {
+    marktext: "荣",
+    intro: {
+      content: "expansion",
+      markcount: "expansion",
+    },
+    audio: 2,
+    trigger: { source: "damageSource" },
+    filter(event, player) {
+      return (
+        event.player !== player &&
+        event.player.countCards("h") > player.countCards("h")
+      )
+    },
+    async cost(event, trigger, player) {
+      const result = await player
+        .choosePlayerCard("hej", get.prompt(event.skill), trigger.player)
+        .set("ai", (button) => {
+          const { player, target } = get.event()
+          return -get.attitude(player, target) + 1
+        })
+        .forResult()
+      if (result?.bool && result.links?.length) {
+        event.result = result
+        event.result.cards = result.links
+      }
+    },
+    async content(event, trigger, player) {
+      const next = player.addToExpansion(
+        event.cards,
+        trigger.player,
+        "give",
+        "log",
+      )
+      next.gaintag.add("zhengrong")
+      await next
+    },
+  },
+  // 鸿举
+  hongju: {
+    skillAnimation: true,
+    animationColor: "thunder",
+    audio: 2,
+    trigger: {
+      player: "phaseZhunbeiBegin",
+    },
+    forced: true,
+    unique: true,
+    juexingji: true,
+    derivation: ["qingce"],
+    filter(event, player) {
+      return (
+        player.getExpansions("zhengrong").length >= 3 && game.dead.length > 0
+      )
+    },
+    async content(event, trigger, player) {
+      player.awakenSkill(event.name)
+      const cards = player.getExpansions("zhengrong")
+      if (cards.length && player.countCards("h")) {
+        const next = player.chooseToMove(
+          "征荣：是否用任意张手牌替换等量的“荣”？",
+        )
+        next.set("list", [
+          [`${get.translation(player)}（你）的“荣”`, cards],
+          ["手牌区", player.getCards("h")],
+        ])
+        next.set("filterMove", (from, to) => typeof to !== "number")
+        next.set("processAI", (list) => {
+          const player = _status.event.player,
+            cards = list[0][1]
+              .concat(list[1][1])
+              .sort((a, b) => get.value(a) - get.value(b)),
+            cards2 = cards.splice(0, player.getExpansions("zhengrong").length)
+          return [cards2, cards]
+        })
+        const result = await next.forResult()
+        if (result.bool) {
+          const pushs = result.moved[0],
+            gains = result.moved[1]
+          pushs.removeArray(player.getExpansions("zhengrong"))
+          gains.removeArray(player.getCards("h"))
+          if (pushs.length && pushs.length === gains.length) {
+            const next = player.addToExpansion(pushs)
+            next.gaintag.add("zhengrong")
+            await next
+            await player.gain(gains, "gain2", "log")
+          }
+        }
+      }
+      await player.addSkills("qingce")
+      await player.loseMaxHp()
+    },
+    ai: {
+      combo: "zhengrong",
+    },
+  },
+  // 清侧
+  qingce: {
+    audio: 2,
+    enable: "phaseUse",
+    filter(event, player) {
+      return player.getExpansions("zhengrong").length > 0
+    },
+    filterTarget(card, player, target) {
+      return target.countDiscardableCards(player, "ej") > 0
+    },
+    async content(event, trigger, player) {
+      const next = player.chooseCardButton(
+        player.getExpansions("zhengrong"),
+        1,
+        "请选择需要移去的“荣”",
+        true,
+      )
+      next.ai = (button) => 6 - get.value(button.link)
+      const result = await next.forResult()
+      if (result.bool) {
+        const cards = result.links
+        await player.loseToDiscardpile(cards)
+        await player.discardPlayerCard(event.target, "ej", 1, true)
+      }
+    },
+    ai: {
+      combo: "zhengrong",
+      order: 13,
+      result: {
+        target(player, target) {
+          if (get.attitude(player, target) > 0 && target.countCards("j") > 0) {
+            return 1
+          }
+          return -1
+        },
+      },
+    },
+  },
 }
 
 export default skills

@@ -42,4 +42,6 @@ export default {
   caiwenji: "异乡的孤女",
   shen_simayi: "晋国之祖",
   shen_zhaoyun: "神威如龙",
+
+  guanqiujian: "镌功铭征荣",
 }

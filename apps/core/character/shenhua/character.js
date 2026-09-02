@@ -64,6 +64,7 @@ const characters = {
     skills: ["shelie", "gongxin"],
     groupInGuozhan: "wu",
   },
+
   dianwei: {
     sex: "male",
     group: "wei",
@@ -132,6 +133,7 @@ const characters = {
     groupInGuozhan: "shu",
     names: "诸葛|亮",
   },
+
   caopi: {
     sex: "male",
     group: "wei",
@@ -197,6 +199,7 @@ const characters = {
     skills: ["guixin", "feiying"],
     groupInGuozhan: "wei",
   },
+
   dengai: {
     sex: "male",
     group: "wei",
@@ -262,6 +265,14 @@ const characters = {
     hp: 2,
     skills: ["juejing", "longhun"],
     groupInGuozhan: "shu",
+  },
+
+  guanqiujian: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["zhengrong", "hongju"],
+    names: "毌丘|俭",
   },
 }
 

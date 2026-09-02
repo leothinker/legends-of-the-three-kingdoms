@@ -345,6 +345,16 @@ const translates = {
   longhun: "龙魂",
   longhun_info:
     "你可以将花色相同的X张牌按以下规则使用或打出：红桃当【桃】；方块当火【杀】；梅花当【闪】；黑桃当【无懈可击】（X为你的体力值且至少为1）。",
+
+  guanqiujian: "毌丘俭",
+  zhengrong: "征荣",
+  zhengrong_info:
+    "当你对其他角色造成伤害后，若其手牌数大于你，你可以将其一张牌置于你的武将牌上，称为“荣”。",
+  hongju: "鸿举",
+  hongju_info: `觉醒技，准备阶段，若“荣”的数量不小于3且场上有角色死亡，你用任意张手牌替换等量的“荣”，减1点体力上限，获得${get.poptip("qingce")}。`,
+  qingce: "清侧",
+  qingce_info:
+    "出牌阶段，若场上有牌，你可以移去一张“荣”，然后弃置场上的一张牌。",
 }
 
 export default translates

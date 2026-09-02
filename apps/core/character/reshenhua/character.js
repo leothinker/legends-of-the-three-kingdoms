@@ -337,17 +337,20 @@ const characters = {
     groupInGuozhan: "wu",
     clans: ["吴郡陆氏"],
   },
+
   haozhao: {
     sex: "male",
     group: "wei",
     hp: 4,
     skills: ["zhengu"],
   },
-  guanqiujian: {
+  re_guanqiujian: {
     sex: "male",
     group: "wei",
     hp: 4,
-    skills: ["zhengrong", "hongju"],
+    skills: ["rezhengrong", "rehongju"],
+    dieAudios: ["guanqiujian"],
+    img: "image/character/guanqiujian.jpg",
     names: "毌丘|俭",
   },
   chendao: {

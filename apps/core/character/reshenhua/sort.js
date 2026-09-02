@@ -61,7 +61,7 @@ const characterSort = {
   ],
   shenhua_lei: [
     "haozhao",
-    "guanqiujian",
+    "re_guanqiujian",
     "chendao",
     "zhugezhan",
     "zhoufei",

@@ -55,7 +55,7 @@ export default {
   shen_luxun: "红莲业火",
 
   haozhao: "扣弦的豪将",
-  guanqiujian: "镌功铭征荣",
+  re_guanqiujian: "镌功铭征荣",
   chendao: "白毦督",
   zhugezhan: "临难死义",
   zhoufei: "软玉温香",

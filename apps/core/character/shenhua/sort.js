@@ -47,6 +47,7 @@ const characterSort = {
     "shen_simayi",
     "shen_zhaoyun",
   ],
+  shenhua_yin: ["guanqiujian"],
 }
 
 const characterSortTranslate = {

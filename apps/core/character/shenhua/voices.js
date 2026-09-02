@@ -250,4 +250,12 @@ export default {
   "#longhun1": "常山赵子龙在此！",
   "#longhun2": "能屈能伸，才是大丈夫！",
   "#shen_zhaoyun:die": "龙身虽死，魂魄不灭！",
+
+  "#zhengrong1": "东征高句丽，保辽东安稳。",
+  "#zhengrong2": "跨海东征，家国俱荣。",
+  "#hongju1": "一举拿下，鸿途可得。",
+  "#hongju2": "鸿飞荣升，举重若轻。",
+  "#qingce1": "感明帝之恩，清君侧之贼。",
+  "#qingce2": "得太后手诏，清奸佞乱臣。",
+  "#guanqiujian:die": "峥嵘一生，然被平民所击射！",
 }

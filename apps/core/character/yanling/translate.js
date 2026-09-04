@@ -57,6 +57,28 @@ const translates = {
   ylygjuxiang: "巨象",
   ylygjuxiang_info:
     "锁定技，当【南蛮入侵】被使用时，若使用者不为你，则此牌对你无效且你于此牌结算结束后获得之；否则你可以令此牌对体力值大于你的角色造成的伤害+1。",
+
+  ylyg_caiwenji: "界蔡文姬",
+  ylyg_caiwenji_prefix: "界",
+  ylygduanchang: "断肠",
+  ylygduanchang_info:
+    "锁定技，当你死亡时，你令杀死你的角色失去所有武将技能或弃置所有牌。",
+  ylygbeige: "悲歌",
+  ylygbeige_info: `当一名角色受到【杀】造成的伤害后，你可以弃置一张牌，然后令其进行判定，若结果为：红桃，其回复X点体力（X为其本次受到的伤害值）；方块，其摸三张牌；梅花，伤害来源弃置两张牌；黑桃，伤害来源翻面。因此判定过四种花色后，你获得${get.poptip("ylygquzhong")}。`,
+  ylygquzhong: "曲终",
+  ylygquzhong_info:
+    "一名角色的结束阶段，你可以将你本回合弃置的一张牌当【杀】使用，因此发动的〖悲歌〗交换选项中的其与伤害来源。",
+
+  ylyg_sunce: "界孙策",
+  ylyg_sunce_prefix: "界",
+  ylygjiang: "激昂",
+  ylygjiang_info:
+    "当一名角色使用【决斗】或红色【杀】指定目标后，你可以与其各摸一张牌。你点数为K的牌均视为【杀】。",
+  ylyghunzi: "魂姿",
+  ylyghunzi_info: `觉醒技，当你的体力值首次变为1后，你加1点体力上限，然后获得${get.poptip("reyingzi")}和${get.poptip("yinghun")}。`,
+  ylygzhiba: "制霸",
+  ylygzhiba_info:
+    "主公技，吴势力角色的准备阶段，你可以令其与一名角色拼点，若其赢，其视为使用一张【决斗】。",
 }
 
 export default translates

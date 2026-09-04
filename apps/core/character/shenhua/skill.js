@@ -3645,6 +3645,9 @@ const skills = {
   yinghun: {
     audio: 2,
     audioname: ["sunce", "re_sunjian", "re_sunce", "ol_sunjian", "ol_sunce"],
+    audioname2: {
+      ylyg_sunce: "yinghun_re_sunce",
+    },
     mod: {
       aiOrder(player, card, num) {
         if (
@@ -3840,6 +3843,7 @@ const skills = {
       maixie: true,
     },
   },
+  yinghun_re_sunce: { audio: 2 },
   // 董卓
   // 酒池
   jiuchi: {
@@ -5180,6 +5184,7 @@ const skills = {
     audio: 2,
     preHidden: true,
     audioname: ["re_sunce"],
+    audioname2: { ylyg_sunce: "jiang_re_sunce" },
     mod: {
       aiOrder(player, card, num) {
         if (get.color(card) === "red" && get.name(card) === "sha") {
@@ -5225,6 +5230,7 @@ const skills = {
       },
     },
   },
+  jiang_re_sunce: { audio: 2 },
   // 魂姿
   hunzi: {
     skillAnimation: true,
@@ -5281,6 +5287,9 @@ const skills = {
   zhiba: {
     global: "zhiba_global",
     audioname: ["re_sunce"],
+    audioname2: {
+      ylyg_sunce: "zhiba_re_sunce",
+    },
     audio: 2,
     zhuSkill: true,
     subSkill: {
@@ -5403,6 +5412,7 @@ const skills = {
       },
     },
   },
+  zhiba_re_sunce: { audio: 2 },
   // 张昭张纮
   // 直谏
   zhijian: {
@@ -6283,6 +6293,7 @@ const skills = {
   duanchang: {
     audio: 2,
     audioname: ["re_caiwenji", "ol_caiwenji"],
+    audioname2: { ylyg_caiwenji: "duanchang_re_caiwenji" },
     forbid: ["boss"],
     trigger: { player: "die" },
     forced: true,
@@ -6319,6 +6330,7 @@ const skills = {
       },
     },
   },
+  duanchang_re_caiwenji: { audio: 2 },
   // 神司马懿
   // 忍戒
   renjie: {

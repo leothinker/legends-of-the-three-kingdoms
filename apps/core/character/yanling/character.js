@@ -43,6 +43,21 @@ const characters = {
     names: "null|null",
     dieAudios: ["re_zhurong"],
   },
+  ylyg_caiwenji: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["ylygduanchang", "ylygbeige"],
+    dieAudios: ["re_caiwenji"],
+  },
+  ylyg_sunce: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["ylygjiang", "ylyghunzi", "ylygzhiba"],
+    isZhugong: true,
+    dieAudios: ["re_sunce"],
+  },
 }
 
 export default characters

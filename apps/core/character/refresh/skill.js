@@ -1861,6 +1861,9 @@ const skills = {
   reyingzi: {
     audio: 2,
     audioname: ["re_sunce", "ol_sunce"],
+    audioname2: {
+      ylyg_sunce: "reyingzi_re_sunce",
+    },
     trigger: { player: "phaseDrawBegin2" },
     forced: true,
     preHidden: true,
@@ -1879,6 +1882,7 @@ const skills = {
       },
     },
   },
+  reyingzi_re_sunce: { audio: 2 },
   // 反间
   refanjian: {
     audio: 2,

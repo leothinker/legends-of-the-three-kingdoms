@@ -1946,7 +1946,7 @@ const skills = {
   // 蛊惑
   olguhuo: {
     audio: 2,
-    derivation: "rechanyuan",
+    derivation: ["rechanyuan", "olguhuo_faq"],
     enable: ["chooseToUse", "chooseToRespond"],
     hiddenCard(player, name) {
       return (

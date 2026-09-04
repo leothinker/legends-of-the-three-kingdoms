@@ -726,7 +726,7 @@ const skills = {
   // 蛊惑
   reguhuo: {
     audio: 2,
-    derivation: ["chanyuan"],
+    derivation: ["chanyuan", "reguhuo_faq"],
     enable: ["chooseToUse", "chooseToRespond"],
     hiddenCard(player, name) {
       return (
@@ -7773,8 +7773,8 @@ const skills = {
       "gzbuqu",
       "songci",
       "funan",
-      "xinfu_guhuo",
       "reguhuo",
+      "olguhuo",
       "huashen",
       "rehuashen",
       "old_guhuo",

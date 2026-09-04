@@ -5312,6 +5312,7 @@ const skills = {
   // 强识
   qiangzhi: {
     audio: 2,
+    logAudio: () => 1,
     trigger: { player: "phaseUseBegin" },
     filter(event, player) {
       return game.hasPlayer(
@@ -5356,9 +5357,9 @@ const skills = {
     },
   },
   qiangzhi_draw: {
+    audio: "qiangzhi2.mp3",
     trigger: { player: "useCard" },
     frequent: true,
-    popup: false,
     charlotte: true,
     prompt: "是否执行【强识】的效果摸一张牌？",
     sourceSkill: "qiangzhi",
@@ -5516,8 +5517,8 @@ const skills = {
         result = await player
           .chooseControl({
             choiceList: [
-              `将${get.translation(event.sha)}交给${get.translation(target)}`,
-              `将${get.translation(event.shan)}交给${get.translation(target)}`,
+              `将${get.translation(sha)}交给${get.translation(target)}`,
+              `将${get.translation(shan)}交给${get.translation(target)}`,
             ],
             ai() {
               return _status.event.choice
@@ -5526,7 +5527,7 @@ const skills = {
           .set(
             "choice",
             (() => {
-              if (get.color(event.sha) !== "black") {
+              if (get.color(sha) !== "black") {
                 return 0
               }
               return 1

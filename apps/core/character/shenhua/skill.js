@@ -675,6 +675,7 @@ const skills = {
   // 蛊惑
   guhuo: {
     audio: 2,
+    derivation: "guhuo_faq",
     enable: ["chooseToUse", "chooseToRespond"],
     hiddenCard(player, name) {
       return lib.inpile.includes(name) && player.countCards("hs") > 0

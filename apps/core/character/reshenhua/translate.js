@@ -58,6 +58,13 @@ const translates = {
   re_yuji_prefix: "界",
   reguhuo: "蛊惑",
   reguhuo_info: `每回合限一次，你可以扣置一张手牌，将此牌当任意一张基本牌或普通锦囊牌使用或打出且其他角色可以进行质疑。若有其他角色质疑则翻开此牌，若为假，则此牌作废，否则质疑者获得${get.poptip("chanyuan")}。`,
+  reguhuo_guess: "蛊惑",
+  reguhuo_guess_info: "",
+  reguhuo_phase: "蛊惑",
+  reguhuo_phase_info: "",
+  reguhuo_faq: "关于〖蛊惑〗",
+  reguhuo_faq_info:
+    "<br>其他角色依次选择是否质疑，若有角色质疑，终止质疑的流程。",
   chanyuan: "缠怨",
   chanyuan_info:
     "锁定技，你不能质疑〖蛊惑〗；若你的体力值为1，你的其他技能失效。",

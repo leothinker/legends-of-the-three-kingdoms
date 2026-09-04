@@ -60,8 +60,8 @@ const translates = {
   bizheng: "弼政",
   bizheng_info:
     "摸牌阶段结束时，你可以令一名其他角色摸两张牌，然后你与其之中手牌数大于体力上限的角色弃置两张牌。",
-  bingyi: "秉壹",
-  bingyi_info:
+  olbingyi: "秉壹",
+  olbingyi_info:
     "每阶段限一次，当你的牌因弃置置入弃牌堆后，你可以展示所有手牌：若颜色均相同，你可以与至多X名其他角色各摸一张牌（X为你的手牌数）。",
   shenxing: "慎行",
   shenxing_info: "出牌阶段，你可以弃置两张牌，然后摸一张牌。",

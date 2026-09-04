@@ -2716,13 +2716,13 @@ const skills = {
       const { control } = event.cost_data
 
       if (control === "弃牌") {
-        player.addTempSkill("jiangchi2")
+        player.addTempSkill("jiangchi2", "phaseEnd")
         await player.chooseToDiscard({
           position: "he",
           forced: true,
         })
       } else if (control === "摸牌") {
-        player.addTempSkill("jiangchi3")
+        player.addTempSkill("jiangchi3", "phaseEnd")
         await player.draw()
       }
     },

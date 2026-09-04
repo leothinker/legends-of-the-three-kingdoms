@@ -512,10 +512,6 @@ const translates = {
 
   re_zhangsong: "界张松",
   re_zhangsong_prefix: "界",
-  qiangzhi: "强识",
-  qiangzhi_draw: "强识",
-  qiangzhi_info:
-    "出牌阶段开始时，你可以展示一名其他角色的一张手牌。若如此做，当你于此阶段内使用与此牌类别相同的牌时，你可以摸一张牌。",
   rexiantu: "献图",
   rexiantu_info:
     "其他角色的出牌阶段开始时，你可以摸两张牌，然后将两张牌交给该角色。然后此阶段结束时，若其于此阶段没有造成过伤害，你失去1点体力。",

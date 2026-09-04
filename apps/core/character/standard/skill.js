@@ -1072,6 +1072,7 @@ const skills = {
   wusheng: {
     audio: 2,
     audioname2: { old_guanyu: "rewusheng" },
+    audioname: ["old_guanzhang"],
     enable: ["chooseToRespond", "chooseToUse"],
     filterCard(card, player) {
       if (get.zhu(player, "shouyue")) {
@@ -1120,6 +1121,7 @@ const skills = {
   paoxiao: {
     audio: 2,
     firstDo: true,
+    audioname: ["old_guanzhang"],
     audioname2: { old_zhangfei: "repaoxiao" },
     trigger: { player: "useCard1" },
     forced: true,

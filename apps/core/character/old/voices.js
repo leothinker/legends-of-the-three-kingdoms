@@ -41,4 +41,27 @@ export default {
   "#oldjujian1": "我看好你！",
   "#oldjujian2": "将军岂愿抓牌乎？",
   "#old_xushu:die": "娘……孩儿不孝……向您……请罪……",
+
+  "#oldzhenlie1": "我，绝不屈服！",
+  "#oldzhenlie2": "休要小看妇人志气！",
+  "#oldmiji1": "奇谋，只在绝境中诞生！",
+  "#oldmiji2": "我将尽我所能！",
+  "#old_wangyi:die": "忠义已尽，死又何妨？",
+
+  "#oldfuhun1": "不血父仇，誓不罢休！",
+  "#oldfuhun2": "承父遗志，横扫叛贼！",
+  "#wusheng_old_guanzhang1": "蜀汉重任，后继有人！",
+  "#paoxiao_old_guanzhang1": "哼！",
+  "#old_guanzhang:die": "吾得父亲之遗志，未袭父亲之神勇。",
+
+  "#oldqianxi1": "斩草除根，除恶务尽！",
+  "#oldqianxi2": "伤其十指，不如断其一指！",
+  "#old_madai:die": "反骨贼已除，丞相放心……",
+
+  "#shiyong1": "好大一股酒气啊！",
+  "#shiyong2": "好大一股杀气啊！",
+
+  "#youdi1": "无名小卒，可敢再前进一步！",
+  "#youdi2": "予以小利，必有大获。",
+  "#old_zhuhuan:die": "这巍巍巨城，吾竟无力撼动。",
 }

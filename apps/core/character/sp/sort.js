@@ -23,7 +23,7 @@ const characterSort = {
     "tadun",
     "liuyao",
   ],
-  sp_2022: ["sp_jiangwei"],
+  sp_2022: ["sp_jiangwei", "maliang"],
   sbfm_mouding: ["ol_zhangchunhua", "ol_xuelingyun", "wolongfengchu"],
 }
 

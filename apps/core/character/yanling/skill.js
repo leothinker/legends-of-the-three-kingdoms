@@ -1269,7 +1269,7 @@ const skills = {
   // 悲歌
   ylygbeige: {
     audio: "rebeige",
-    derivation: ["ylygquzhong"],
+    derivation: ["quzhong"],
     trigger: { global: "damageEnd" },
     filter(event, player) {
       return (
@@ -1285,7 +1285,7 @@ const skills = {
           position: "he",
           prompt: get.prompt2(event.skill, trigger.player),
           ai(card) {
-            const victim = trigger.card?.storage?.ylygquzhong
+            const victim = trigger.card?.storage?.quzhong
               ? trigger.source
               : trigger.player
             return get.attitude(player, victim) > 0 ? 8 - get.value(card) : 0
@@ -1295,7 +1295,7 @@ const skills = {
       event.result = result
     },
     async content(event, trigger, player) {
-      const swapped = trigger.card?.storage?.ylygquzhong === true
+      const swapped = trigger.card?.storage?.quzhong === true
       const victim = swapped ? trigger.source : trigger.player
       const source = swapped ? trigger.player : trigger.source
       const result = await victim.judge().forResult()
@@ -1324,7 +1324,7 @@ const skills = {
           suits.includes(suit),
         )
       ) {
-        await player.addSkills("ylygquzhong")
+        await player.addSkills("quzhong")
       }
     },
     mark: true,
@@ -1362,7 +1362,7 @@ const skills = {
     ai: { expose: 0.3 },
   },
   // 曲终
-  ylygquzhong: {
+  quzhong: {
     audio: "olbeige",
     trigger: { global: "phaseJieshuBegin" },
     direct: true,
@@ -1373,24 +1373,24 @@ const skills = {
         .toUniqued()
     },
     filter(event, player) {
-      const cards = lib.skill.ylygquzhong.getDiscardedCards(player)
+      const cards = lib.skill.quzhong.getDiscardedCards(player)
       return cards.some((card) => {
         const sha = get.autoViewAs(
-          { name: "sha", isCard: true, storage: { ylygquzhong: true } },
+          { name: "sha", isCard: true, storage: { quzhong: true } },
           [card],
         )
         return player.hasUseTarget(sha)
       })
     },
     async content(event, trigger, player) {
-      const cards = lib.skill.ylygquzhong.getDiscardedCards(player)
+      const cards = lib.skill.quzhong.getDiscardedCards(player)
       const result = await player
         .chooseButton({
           createDialog: ["曲终：你可以将本回合弃置的一张牌当【杀】使用", cards],
           filterButton(button) {
             const card = button.link
             const sha = get.autoViewAs(
-              { name: "sha", isCard: true, storage: { ylygquzhong: true } },
+              { name: "sha", isCard: true, storage: { quzhong: true } },
               [card],
             )
             return get.player().hasUseTarget(sha)
@@ -1405,7 +1405,7 @@ const skills = {
       }
       const card = result.links[0]
       const sha = get.autoViewAs(
-        { name: "sha", isCard: true, storage: { ylygquzhong: true } },
+        { name: "sha", isCard: true, storage: { quzhong: true } },
         [card],
       )
       await player.chooseUseTarget({

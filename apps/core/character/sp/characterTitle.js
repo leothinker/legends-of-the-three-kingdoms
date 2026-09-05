@@ -19,6 +19,8 @@ export default {
   tadun: "北狄王",
   liuyao: "宗英外镇",
 
+  maliang: "白眉智士",
+
   sp_jiangwei: "幼麒",
   ol_zhangchunhua: "冷血皇后",
   ol_xuelingyun: "红烛垂泪",

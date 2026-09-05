@@ -121,6 +121,13 @@ const characters = {
     skills: ["kannan"],
   },
 
+  maliang: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["zishu", "yingyuan"],
+  },
+
   sp_jiangwei: {
     sex: "male",
     group: "wei",

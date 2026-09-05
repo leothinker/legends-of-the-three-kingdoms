@@ -2736,6 +2736,154 @@ const skills = {
       },
     },
   },
+  // 马良
+  // 自书
+  zishu: {
+    audio: 2,
+    locked: true,
+    subSkill: {
+      discard: {
+        trigger: { global: "phaseJieshuEnd" },
+        audio: "zishu",
+        forced: true,
+        filter(event, player) {
+          if (_status.currentPhase !== player) {
+            const he = player.getCards("h")
+            let bool = false
+            player.getHistory("gain", (evt) => {
+              if (!bool && evt && evt.cards) {
+                for (let i = 0; i < evt.cards.length; i++) {
+                  if (he.includes(evt.cards[i])) {
+                    bool = true
+                  }
+                  break
+                }
+              }
+            })
+            return bool
+          }
+          return false
+        },
+        async content(event, trigger, player) {
+          const he = player.getCards("h")
+          const list = []
+          player.getHistory("gain", (evt) => {
+            if (evt?.cards) {
+              for (let i = 0; i < evt.cards.length; i++) {
+                if (he.includes(evt.cards[i])) {
+                  list.add(evt.cards[i])
+                }
+              }
+            }
+          })
+          player.$throw(list, 1000)
+          await player.lose(list, ui.discardPile, "visible")
+          game.log(player, "将", list, "置入弃牌堆")
+        },
+      },
+      mark: {
+        trigger: {
+          player: "gainBegin",
+          global: "phaseBeginStart",
+        },
+        silent: true,
+        filter(event, player) {
+          return event.name !== "gain" || player !== _status.currentPhase
+        },
+        content() {
+          if (trigger.name === "gain") {
+            trigger.gaintag.add("zishu")
+          } else {
+            player.removeGaintag("zishu")
+          }
+        },
+      },
+      draw: {
+        trigger: {
+          player: "gainAfter",
+          global: "loseAsyncAfter",
+        },
+        audio: "zishu",
+        forced: true,
+        filter(event, player) {
+          if (
+            _status.currentPhase !== player ||
+            event.getg(player).length === 0
+          ) {
+            return false
+          }
+          return event.getParent(2).name !== "zishu_draw"
+        },
+        content() {
+          player.draw("nodelay")
+        },
+      },
+    },
+    ai: {
+      threaten: 1.2,
+      nogain: 1,
+      skillTagFilter(player) {
+        return player !== _status.currentPhase
+      },
+    },
+    group: ["zishu_draw", "zishu_discard", "zishu_mark"],
+  },
+  // 应援
+  yingyuan: {
+    audio: 2,
+    trigger: { player: "useCardAfter" },
+    direct: true,
+    filter(event, player) {
+      if (_status.currentPhase !== player) {
+        return false
+      }
+      if (
+        player.getHistory(
+          "custom",
+          (evt) => evt.yingyuan_name === event.card.name,
+        ).length > 0
+      ) {
+        return false
+      }
+      return event.cards.filterInD().length > 0
+    },
+    content() {
+      "step 0"
+      player
+        .chooseTarget(
+          get.prompt("yingyuan"),
+          `将${get.translation(trigger.cards)}交给一名其他角色`,
+          (card, player, target) => target !== player,
+        )
+        .set("ai", (target) => {
+          if (target.hasJudge("lebu")) {
+            return 0
+          }
+          let att = get.attitude(_status.event.player, target),
+            name = _status.event.cards[0].name
+          if (att < 3) {
+            return 0
+          }
+          if (target.hasSkillTag("nogain")) {
+            att /= 10
+          }
+          if (name === "sha" && target.hasSha()) {
+            att /= 5
+          }
+          if (name === "wuxie" && target.needsToDiscard(_status.event.cards)) {
+            att /= 5
+          }
+          return att / (1 + get.distance(player, target, "absolute"))
+        })
+        .set("cards", trigger.cards)
+      ;("step 1")
+      if (result.bool) {
+        player.logSkill("yingyuan", result.targets[0])
+        result.targets[0].gain(trigger.cards.filterInD(), "gain2")
+        player.getHistory("custom").push({ yingyuan_name: trigger.card.name })
+      }
+    },
+  },
 
   // SP姜维
   // 困奋
@@ -7944,154 +8092,6 @@ const skills = {
   //       },
   //     },
   //   },
-  // },
-  // // 马良
-  // // 应援
-  // yingyuan: {
-  //   audio: 2,
-  //   trigger: { player: "useCardAfter" },
-  //   direct: true,
-  //   filter(event, player) {
-  //     if (_status.currentPhase !== player) {
-  //       return false
-  //     }
-  //     if (
-  //       player.getHistory(
-  //         "custom",
-  //         (evt) => evt.yingyuan_name === event.card.name,
-  //       ).length > 0
-  //     ) {
-  //       return false
-  //     }
-  //     return event.cards.filterInD().length > 0
-  //   },
-  //   content() {
-  //     "step 0"
-  //     player
-  //       .chooseTarget(
-  //         get.prompt("yingyuan"),
-  //         `将${get.translation(trigger.cards)}交给一名其他角色`,
-  //         (card, player, target) => target !== player,
-  //       )
-  //       .set("ai", (target) => {
-  //         if (target.hasJudge("lebu")) {
-  //           return 0
-  //         }
-  //         let att = get.attitude(_status.event.player, target),
-  //           name = _status.event.cards[0].name
-  //         if (att < 3) {
-  //           return 0
-  //         }
-  //         if (target.hasSkillTag("nogain")) {
-  //           att /= 10
-  //         }
-  //         if (name === "sha" && target.hasSha()) {
-  //           att /= 5
-  //         }
-  //         if (name === "wuxie" && target.needsToDiscard(_status.event.cards)) {
-  //           att /= 5
-  //         }
-  //         return att / (1 + get.distance(player, target, "absolute"))
-  //       })
-  //       .set("cards", trigger.cards)
-  //     ;("step 1")
-  //     if (result.bool) {
-  //       player.logSkill("yingyuan", result.targets[0])
-  //       result.targets[0].gain(trigger.cards.filterInD(), "gain2")
-  //       player.getHistory("custom").push({ yingyuan_name: trigger.card.name })
-  //     }
-  //   },
-  // },
-  // // 自书
-  // zishu: {
-  //   audio: 2,
-  //   locked: true,
-  //   subSkill: {
-  //     discard: {
-  //       trigger: { global: "phaseEnd" },
-  //       audio: "zishu",
-  //       forced: true,
-  //       filter(event, player) {
-  //         if (_status.currentPhase !== player) {
-  //           var he = player.getCards("h")
-  //           var bool = false
-  //           player.getHistory("gain", (evt) => {
-  //             if (!bool && evt && evt.cards) {
-  //               for (var i = 0; i < evt.cards.length; i++) {
-  //                 if (he.includes(evt.cards[i])) {
-  //                   bool = true
-  //                 }
-  //                 break
-  //               }
-  //             }
-  //           })
-  //           return bool
-  //         }
-  //         return false
-  //       },
-  //       content() {
-  //         var he = player.getCards("h")
-  //         var list = []
-  //         player.getHistory("gain", (evt) => {
-  //           if (evt?.cards) {
-  //             for (var i = 0; i < evt.cards.length; i++) {
-  //               if (he.includes(evt.cards[i])) {
-  //                 list.add(evt.cards[i])
-  //               }
-  //             }
-  //           }
-  //         })
-  //         player.$throw(list, 1000)
-  //         player.lose(list, ui.discardPile, "visible")
-  //         game.log(player, "将", list, "置入弃牌堆")
-  //       },
-  //     },
-  //     mark: {
-  //       trigger: {
-  //         player: "gainBegin",
-  //         global: "phaseBeginStart",
-  //       },
-  //       silent: true,
-  //       filter(event, player) {
-  //         return event.name !== "gain" || player !== _status.currentPhase
-  //       },
-  //       content() {
-  //         if (trigger.name === "gain") {
-  //           trigger.gaintag.add("zishu")
-  //         } else {
-  //           player.removeGaintag("zishu")
-  //         }
-  //       },
-  //     },
-  //     draw: {
-  //       trigger: {
-  //         player: "gainAfter",
-  //         global: "loseAsyncAfter",
-  //       },
-  //       audio: "zishu",
-  //       forced: true,
-  //       filter(event, player) {
-  //         if (
-  //           _status.currentPhase !== player ||
-  //           event.getg(player).length === 0
-  //         ) {
-  //           return false
-  //         }
-  //         return event.getParent(2).name !== "zishu_draw"
-  //       },
-  //       content() {
-  //         player.draw("nodelay")
-  //       },
-  //     },
-  //   },
-  //   ai: {
-  //     threaten: 1.2,
-  //     nogain: 1,
-  //     skillTagFilter(player) {
-  //       return player !== _status.currentPhase
-  //     },
-  //   },
-  //   group: ["zishu_draw", "zishu_discard", "zishu_mark"],
   // },
   // // 蒋琬
   // // 自若

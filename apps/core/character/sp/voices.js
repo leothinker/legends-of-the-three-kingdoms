@@ -113,6 +113,12 @@ export default {
   "#kannan2": "戡，克也，难，攻之。",
   "#liuyao:die": "伯符小儿，还我子义！",
 
+  "#zishu1": "慢着，让我来！",
+  "#zishu2": "身外之物，不要也罢！",
+  "#yingyuan1": "好牌只用一次怎么够？",
+  "#yingyuan2": "接好嘞！",
+  "#maliang:die": "我的使命完成了吗……",
+
   "#kunfen1": "纵使困顿难行，亦当砥砺奋进！",
   "#kunfen2": "兴蜀需时，众将且勿惫怠！",
   "#fengliang1": "丞相大义，维岂有不从之理？",
@@ -140,10 +146,4 @@ export default {
   "#luanfeng1": "凤栖枯木，浴火涅槃！",
   "#luanfeng2": "青鸾归羽，雏凤还巢！",
   "#wolongfengchu:die": "铁链，东风，也难困这魏军……",
-
-  "#yingyuan1": "接好嘞！",
-  "#yingyuan2": "好牌只用一次怎么够？",
-  "#zishu1": "慢着，让我来！",
-  "#zishu2": "身外之物，不要也罢！",
-  "#maliang:die": "我的使命……完成了吗……",
 }

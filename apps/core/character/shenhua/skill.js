@@ -3920,7 +3920,7 @@ const skills = {
   // 崩坏
   benghuai: {
     audio: 2,
-    audioname: ["re_dongzhuo", "ol_dongzhuo"],
+    audioname: ["re_dongzhuo", "zhugedan", "ol_dongzhuo"],
     trigger: { player: "phaseJieshuBegin" },
     forced: true,
     check() {
@@ -4883,7 +4883,6 @@ const skills = {
   // 挑衅
   tiaoxin: {
     audio: 2,
-    audioname: ["sp_jiangwei"],
     enable: "phaseUse",
     usable: 1,
     filterTarget(card, player, target) {

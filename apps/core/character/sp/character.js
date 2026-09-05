@@ -121,19 +121,100 @@ const characters = {
     skills: ["kannan"],
   },
 
-  maliang: {
+  chenlin: {
     sex: "male",
-    group: "shu",
+    group: "wei",
     hp: 3,
-    skills: ["zishu", "yingyuan"],
+    skills: ["bifa", "songci"],
   },
-
+  zhugedan: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["gongao", "juyi"],
+    names: "诸葛|诞",
+    clans: ["琅琊诸葛氏"],
+  },
   sp_jiangwei: {
     sex: "male",
     group: "wei",
     hp: 4,
     skills: ["kunfen", "fengliang"],
   },
+  litong: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["tuifeng"],
+  },
+  zhuling: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["zhanyi"],
+  },
+  caochun: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["shanjia"],
+  },
+  tangzi: {
+    sex: "male",
+    group: "wei",
+    hp: 4,
+    skills: ["xingzhao"],
+  },
+  jiakui: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["zhongzuo", "wanlan"],
+  },
+  shamoke: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["jili"],
+    names: "null|null",
+  },
+  zhangxingcai: {
+    sex: "female",
+    group: "shu",
+    hp: 3,
+    skills: ["shenxian", "qiangwu"],
+  },
+  maliang: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["zishu", "yingyuan"],
+  },
+  spzhangyi: {
+    sex: "male",
+    group: "shu",
+    hp: 4,
+    skills: ["zhiyi"],
+  },
+  lifeng: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["tunchu", "shuliang"],
+  },
+  dengzhi: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["jimeng", "shuaiyan"],
+  },
+  chenzhen: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["shameng"],
+  },
+
   ol_zhangchunhua: {
     sex: "female",
     group: "wei",
@@ -291,12 +372,6 @@ const characters = {
   //   hp: 4,
   //   skills: ["dunxi"],
   // },
-  // maliang: {
-  //   sex: "male",
-  //   group: "shu",
-  //   hp: 3,
-  //   skills: ["yingyuan", "zishu"],
-  // },
   // jiangwan: {
   //   sex: "male",
   //   group: "shu",
@@ -344,12 +419,6 @@ const characters = {
   //   group: "shu",
   //   hp: 4,
   //   skills: ["shuangrui", "fuxie"],
-  // },
-  // shamoke: {
-  //   sex: "male",
-  //   group: "shu",
-  //   hp: 4,
-  //   skills: ["jili"],
   // },
   // wolongfengchu: {
   //   sex: "male",

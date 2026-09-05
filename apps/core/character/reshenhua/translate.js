@@ -398,6 +398,7 @@ const translates = {
   rehongju: "鸿举",
   rehongju_info: `觉醒技，准备阶段，若“荣”的数量不小于3且场上有角色死亡，你摸等同于“荣”数量的牌，然后用任意张手牌替换等量的“荣”，减1点体力上限，获得${get.poptip("reqingce")}。`,
   reqingce: "清侧",
+  reqingce_backup: "清侧",
   reqingce_info:
     "出牌阶段，若场上有牌，你可以移去一张“荣”，然后弃置场上的一张牌。",
 

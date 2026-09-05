@@ -264,9 +264,9 @@ const skills = {
   },
   // 困奋
   kunfenx: {
-    audio: "kunfen_ol_sb_jiangwei",
+    audio: 1,
+    audioname2: { sp_jiangwei: "kunfen" },
   },
-  kunfen_ol_sb_jiangwei: { audio: 1 },
   // 诈降
   zhaxiang_ol_sb_jiangwei: { audio: 1 },
 }

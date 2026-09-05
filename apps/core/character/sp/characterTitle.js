@@ -19,15 +19,23 @@ export default {
   tadun: "北狄王",
   liuyao: "宗英外镇",
 
-  maliang: "白眉智士",
-
+  chenlin: "破竹之咒",
+  zhugedan: "薤露蒿里",
   sp_jiangwei: "幼麒",
+  litong: "万亿吾独往",
+  zhuling: "良将之亚",
+  caochun: "虎豹骑首",
+  tangzi: "工学之奇才",
+  jiakui: "肃齐万里",
+  shamoke: "五溪蛮夷",
+  zhangxingcai: "敬哀皇后",
+  maliang: "白眉智士",
+  spzhangyi: "亢锐怀忠",
+  lifeng: "继父尽事",
+  dengzhi: "绝境的外交家",
+  chenzhen: "歃盟使节",
+
   ol_zhangchunhua: "冷血皇后",
   ol_xuelingyun: "红烛垂泪",
   wolongfengchu: "一匡天下",
-
-  // le_diaochan: "欲界非天",
-  // le_dianwei: "襢裼暴虎",
-  // le_jiaxu: "文和乱武",
-  // le_huangyueying: "卧龙的点睛人",
 }

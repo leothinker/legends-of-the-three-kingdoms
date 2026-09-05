@@ -2997,6 +2997,7 @@ const skills = {
   // 挑衅
   retiaoxin: {
     audio: 2,
+    audioname: ["sp_jiangwei"],
     enable: "phaseUse",
     usable: 1,
     filterTarget(card, player, target) {

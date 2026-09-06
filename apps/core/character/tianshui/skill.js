@@ -515,7 +515,7 @@ const skills = {
       "diaodu",
       "jiexun",
       "xiashu",
-      "hongyuan",
+      "olhongyuan",
       "anxu",
       "youdi",
       "guanwei",
@@ -1242,104 +1242,6 @@ const skills = {
       expose: 0.1,
     },
   },
-  // 弘援
-  hongyuan: {
-    audio: 2,
-    trigger: { player: "gainAfter", global: "loseAsyncAfter" },
-    filter(event, player) {
-      if (
-        !player.countCards("he") ||
-        player.hasSkill("hongyuan_blocker", null, null, false)
-      ) {
-        return false
-      }
-      return event.getg(player).length >= 2
-    },
-    async content(event, trigger, player) {
-      player.addTempSkill("hongyuan_blocker", [
-        "phaseZhunbeiBefore",
-        "phaseJudgeBefore",
-        "phaseDrawBefore",
-        "phaseUseBefore",
-        "phaseDiscardBefore",
-        "phaseJieshuBefore",
-        "phaseBefore",
-      ])
-      const selectedTargets = []
-      while (
-        selectedTargets.length < 2 &&
-        player.countCards("he") &&
-        game.hasPlayer((target) => {
-          return target !== player && !selectedTargets.includes(target)
-        })
-      ) {
-        const { bool, targets, cards } = await player
-          .chooseCardTarget({
-            prompt: "弘援：将一张牌交给一名其他角色",
-            filterCard: true,
-            position: "he",
-            filterTarget(card, player, target) {
-              return (
-                target !== player &&
-                !get.event().selectedTargets.includes(target)
-              )
-            },
-            complexCard: true,
-            complexTarget: true,
-            complexSelect: true,
-            ai1(card) {
-              const player = get.event().player
-              if (
-                !game.hasPlayer((current) => {
-                  if (get.event().selectedTargets.includes(current)) {
-                    return false
-                  }
-                  return (
-                    current !== player &&
-                    get.attitude(player, current) > 0 &&
-                    !current.hasSkillTag("nogain")
-                  )
-                })
-              ) {
-                return -get.value(card)
-              }
-              return (
-                4 +
-                (player.hasSkill("olmingzhe") && get.color(card) === "red"
-                  ? 2
-                  : 0) -
-                Math.max(player.getUseValue(card), get.value(card, player))
-              )
-            },
-            ai2(target) {
-              const player = _status.event.player,
-                att = get.attitude(player, target)
-              if (!ui.selected.cards.length) {
-                return att
-              }
-              const card = ui.selected.cards[0],
-                val = get.value(card, target)
-              if (val < 0) {
-                return -att * Math.sqrt(-val)
-              }
-              return att * Math.sqrt(val + 2)
-            },
-          })
-          .set("selectedTargets", selectedTargets)
-          .forResult()
-        if (bool) {
-          const target = targets[0]
-          selectedTargets.push(target)
-          player.line(target)
-          await player.give(cards, target)
-        } else {
-          break
-        }
-      }
-    },
-    ai: { threaten: 0.8 },
-    subSkill: { blocker: { charlotte: true } },
-  },
   // 安恤
   anxu: {
     enable: "phaseUse",
@@ -1417,59 +1319,6 @@ const skills = {
         },
         player: 1,
       },
-    },
-  },
-  // 诱敌
-  youdi: {
-    audio: 2,
-    trigger: {
-      player: "phaseJieshuBegin",
-    },
-    direct: true,
-    filter(event, player) {
-      return player.countCards("h") > 0
-    },
-    content() {
-      "step 0"
-      player
-        .chooseTarget(
-          get.prompt2("youdi"),
-          (card, player, target) => player !== target,
-        )
-        .set("ai", (target) => {
-          var player = _status.event.player
-          if (
-            player.countCards("h", "sha") > player.countCards("h") / 3 &&
-            player.countCards("h", { color: "red" }) >
-              player.countCards("h") / 2
-          ) {
-            return 0
-          }
-          if (target.countCards("he") === 0) {
-            return 0.1
-          }
-          return -get.attitude(_status.event.player, target)
-        })
-      ;("step 1")
-      if (result.bool) {
-        game.delay()
-        player.logSkill("youdi", result.targets)
-        event.target = result.targets[0]
-        event.target.discardPlayerCard(player, "h", true)
-      } else {
-        event.finish()
-      }
-      ;("step 2")
-      if (get.color(result.links[0]) !== "black") {
-        player.draw("nodelay")
-      }
-      if (result.links[0].name !== "sha" && event.target.countCards("he")) {
-        player.gainPlayerCard("he", event.target, true)
-      }
-    },
-    ai: {
-      expose: 0.3,
-      threaten: 1.4,
     },
   },
   // 观微

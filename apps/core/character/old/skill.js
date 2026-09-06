@@ -2713,7 +2713,7 @@ const skills = {
   },
   // 旧朱桓
   // 诱敌
-  youdi: {
+  oldyoudi: {
     audio: 2,
     trigger: { player: "phaseJieshuBegin" },
     filter(event, player) {
@@ -2722,7 +2722,7 @@ const skills = {
     async cost(event, trigger, player) {
       event.result = await player
         .chooseTarget({
-          prompt: get.prompt("youdi"),
+          prompt: get.prompt("oldyoudi"),
           filterTarget: lib.filter.notMe,
           ai(target) {
             if (!_status.event.goon) {

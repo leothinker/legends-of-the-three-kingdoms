@@ -214,6 +214,48 @@ const characters = {
     hp: 3,
     skills: ["shameng"],
   },
+  sunluyu: {
+    sex: "female",
+    group: "wu",
+    hp: 3,
+    skills: ["meibu", "mumu"],
+  },
+  buzhi: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["hongde", "dingpan"],
+  },
+  lvdai: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["qinguo"],
+  },
+  zhoufang: {
+    sex: "male",
+    group: "wu",
+    hp: 3,
+    skills: ["duanfa", "youdi"],
+  },
+  sunru: {
+    sex: "female",
+    group: "wu",
+    hp: 3,
+    skills: ["yingjian", "shixin"],
+  },
+  lingcao: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["dujin"],
+  },
+  sufei: {
+    sex: "male",
+    group: "wu",
+    hp: 4,
+    skills: ["lianpian"],
+  },
 
   ol_zhangchunhua: {
     sex: "female",
@@ -641,12 +683,6 @@ const characters = {
   //   group: "wu",
   //   hp: 4,
   //   skills: ["sbgongqi", "sbjiefan"],
-  // },
-  // sunluyu: {
-  //   sex: "female",
-  //   group: "wu",
-  //   hp: 3,
-  //   skills: ["new_meibu", "new_mumu"],
   // },
   // re_bulianshi: {
   //   sex: "female",

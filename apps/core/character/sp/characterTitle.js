@@ -34,6 +34,13 @@ export default {
   lifeng: "继父尽事",
   dengzhi: "绝境的外交家",
   chenzhen: "歃盟使节",
+  sunluyu: "舍身饲虎",
+  buzhi: "积跬靖边",
+  lvdai: "清身奉公",
+  zhoufang: "下发载义",
+  sunru: "出水青莲",
+  lingcao: "激流勇进",
+  sufei: "与子同袍",
 
   ol_zhangchunhua: "冷血皇后",
   ol_xuelingyun: "红烛垂泪",

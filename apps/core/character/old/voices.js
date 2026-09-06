@@ -61,7 +61,7 @@ export default {
   "#shiyong1": "好大一股酒气啊！",
   "#shiyong2": "好大一股杀气啊！",
 
-  "#youdi1": "无名小卒，可敢再前进一步！",
-  "#youdi2": "予以小利，必有大获。",
+  "#oldyoudi1": "无名小卒，可敢再前进一步！",
+  "#oldyoudi2": "予以小利，必有大获。",
   "#old_zhuhuan:die": "这巍巍巨城，吾竟无力撼动。",
 }

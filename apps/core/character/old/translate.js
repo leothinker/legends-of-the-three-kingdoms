@@ -277,8 +277,8 @@ const translates = {
 
   old_zhuhuan: "旧朱桓",
   old_zhuhuan_prefix: "旧",
-  youdi: "诱敌",
-  youdi_info:
+  oldyoudi: "诱敌",
+  oldyoudi_info:
     "结束阶段，你可以令一名其他角色弃置你的一张牌，若弃置的牌不为【杀】，你获得其一张牌。",
 
   old_caorui: "旧曹叡",

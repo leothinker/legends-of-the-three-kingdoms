@@ -283,7 +283,7 @@ const characters = {
     sex: "male",
     group: "wu",
     hp: 4,
-    skills: ["youdi"],
+    skills: ["oldyoudi"],
   },
 
   old_caorui: {

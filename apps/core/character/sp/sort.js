@@ -32,6 +32,7 @@ const characterSort = {
     "caochun",
     "tangzi",
     "jiakui",
+
     "shamoke",
     "zhangxingcai",
     "maliang",
@@ -39,6 +40,14 @@ const characterSort = {
     "lifeng",
     "dengzhi",
     "chenzhen",
+
+    "sunluyu",
+    "buzhi",
+    "lvdai",
+    "zhoufang",
+    "sunru",
+    "lingcao",
+    "sufei",
   ],
   sbfm_mouding: ["ol_zhangchunhua", "ol_xuelingyun", "wolongfengchu"],
 }

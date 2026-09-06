@@ -41,6 +41,9 @@ export default {
   sunru: "出水青莲",
   lingcao: "激流勇进",
   sufei: "与子同袍",
+  panfeng: "联军上将",
+  fuwan: "沉毅的国丈",
+  dongcheng: "沥胆卫汉",
 
   ol_zhangchunhua: "冷血皇后",
   ol_xuelingyun: "红烛垂泪",

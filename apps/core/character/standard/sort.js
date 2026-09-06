@@ -30,7 +30,7 @@ const characterSort = {
   ],
   standard_2013: ["diaochan", "huaxiong"],
   standard_2019: ["gongsunzan"],
-  standard_2023: ["std_yuejin", "ganfuren", "panfeng"],
+  standard_2023: ["std_yuejin", "ganfuren", "std_panfeng"],
   standard_2026: ["kongrong"],
 }
 

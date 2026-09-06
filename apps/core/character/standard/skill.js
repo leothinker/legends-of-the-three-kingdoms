@@ -2398,12 +2398,12 @@ const skills = {
   },
   // 潘凤
   // 狂斧
-  kuangfu: {
-    audio: 2,
+  stdkuangfu: {
+    audio: "kuangfu",
     trigger: { source: "damageSource" },
     forced: true,
     filter(event, player) {
-      if (player.hasSkill("kuangfu_used")) {
+      if (player.hasSkill("stdkuangfu_used")) {
         return false
       }
       return (
@@ -2415,7 +2415,7 @@ const skills = {
       )
     },
     async content(event, trigger, player) {
-      player.addTempSkill("kuangfu_used", "phaseChange")
+      player.addTempSkill("stdkuangfu_used", "phaseChange")
       if (trigger.player.hp < player.hp) {
         await player.draw(2)
       } else {

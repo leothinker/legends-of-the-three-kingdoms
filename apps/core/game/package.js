@@ -16,7 +16,7 @@ window.wtk_package = {
     // mouding: "谋定天下",
 
     // yingbian: "文德武备",
-    // clan: "门阀士族",
+    clan: "门阀士族",
 
     // bingshi: "兵势篇",
     // shiji: "始计篇",

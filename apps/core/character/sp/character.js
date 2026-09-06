@@ -256,6 +256,24 @@ const characters = {
     hp: 4,
     skills: ["lianpian"],
   },
+  panfeng: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["kuangfu"],
+  },
+  fuwan: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["moukui"],
+  },
+  dongcheng: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["chengzhao"],
+  },
 
   ol_zhangchunhua: {
     sex: "female",

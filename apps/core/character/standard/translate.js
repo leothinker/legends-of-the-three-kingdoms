@@ -181,9 +181,9 @@ const translates = {
   shushen_info:
     "当你回复1点体力后，你可以令一名其他角色摸一张牌，若其没有手牌，改为摸两张牌。",
 
-  panfeng: "潘凤",
-  kuangfu: "狂斧",
-  kuangfu_info:
+  std_panfeng: "潘凤",
+  stdkuangfu: "狂斧",
+  stdkuangfu_info:
     "锁定技，出牌阶段内限一次，当你使用【杀】对其他角色造成伤害后，若其体力值小于你，则你摸两张牌，否则你失去1点体力。",
 
   kongrong: "孔融",

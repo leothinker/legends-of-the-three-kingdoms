@@ -1,9 +1,9 @@
 const characterSort = {
-  clan_wu: ["clan_wuxian"],
+  sp2_01: ["zhangzhi"],
 }
 
 const characterSortTranslate = {
-  clan_wu: "陈留·吴氏",
+  sp2_01: "将星归汉·零一",
 }
 
 export { characterSort, characterSortTranslate }

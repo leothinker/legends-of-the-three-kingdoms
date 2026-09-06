@@ -48,6 +48,10 @@ const characterSort = {
     "sunru",
     "lingcao",
     "sufei",
+
+    "panfeng",
+    "fuwan",
+    "dongcheng",
   ],
   sbfm_mouding: ["ol_zhangchunhua", "ol_xuelingyun", "wolongfengchu"],
 }

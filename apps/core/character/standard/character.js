@@ -188,11 +188,12 @@ const characters = {
     skills: ["shenzhi", "shushen"],
     names: "甘|null",
   },
-  panfeng: {
+  std_panfeng: {
     sex: "male",
     group: "qun",
     hp: 4,
-    skills: ["kuangfu"],
+    skills: ["stdkuangfu"],
+    dieAudios: ["panfeng"],
   },
 
   kongrong: {

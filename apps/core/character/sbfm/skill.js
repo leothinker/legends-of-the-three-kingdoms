@@ -63,7 +63,7 @@ const skills = {
           cards = cards.filter((card) => player.hasUseTarget(card))
           if (cards.length) {
             var result3 = await player
-              .chooseButton(["是否使用其中的牌？", cards])
+              .chooseButton(["是否使用一张拼点牌？", cards])
               .set("ai", (button) =>
                 _status.event.player.getUseValue(button.link),
               )
@@ -79,7 +79,7 @@ const skills = {
           var list = lib.skill.olsbranji.getList(trigger)
           var result3 = await player
             .chooseControl("失去体力", "技能失效")
-            .set("prompt", "逐日：失去1点体力，或令此技能于本回合失效")
+            .set("prompt", "逐日：失去1点体力或失去此技能直到回合结束")
             .set("ai", () => {
               var player = _status.event.player
               if (player.getHp() > 2) {
@@ -110,7 +110,7 @@ const skills = {
         charlotte: true,
         mark: true,
         marktext: '<span style="text-decoration: line-through;">日</span>',
-        intro: { content: "追不动太阳了" },
+        intro: { content: "失去〖逐日〗直到回合结束" },
       },
     },
   },
@@ -147,7 +147,7 @@ const skills = {
         }
         str += "，最后"
       }
-      str += "你不能回复体力直到你杀死角色。"
+      str += "你不能回复体力直到杀死角色。"
       return str
     },
     check(event, player) {
@@ -247,7 +247,7 @@ const skills = {
         trigger: { player: "recoverBefore" },
         forced: true,
         firstDo: true,
-        content() {
+        async content(event, trigger, player) {
           trigger.cancel()
         },
         ai: {

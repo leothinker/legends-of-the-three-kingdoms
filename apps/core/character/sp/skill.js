@@ -5173,6 +5173,281 @@ const skills = {
       },
     },
   },
+  // 潘凤
+  // 狂斧
+  kuangfu: {
+    enable: "phaseUse",
+    usable: 1,
+    audio: 2,
+    delay: false,
+    filterTarget(card, player, target) {
+      if (player === target) {
+        return (
+          player.countCards("e", (card) =>
+            lib.filter.cardDiscardable(card, player),
+          ) > 0
+        )
+      }
+      return target.countDiscardableCards(player, "e") > 0
+    },
+    filter(event, player) {
+      return game.hasPlayer((current) => current.countCards("e") > 0)
+    },
+    useShaValue(player) {
+      const cache = _status.event.getTempCache("kuangfu", "useShaValue")
+      if (cache) {
+        return cache
+      }
+      let eff = -Infinity,
+        odds = 0,
+        tar = null
+      game.countPlayer((cur) => {
+        if (!player.canUse("sha", cur, false)) {
+          return
+        }
+        let eff2 = get.effect(cur, { name: "sha" }, player, player)
+        if (eff2 < eff) {
+          return
+        }
+        let directHit = 1 - cur.mayHaveShan(player, "use", true, "odds")
+        if (get.attitude(player, cur) > 0) {
+          directHit = 1
+        } else {
+          eff2 *= directHit
+        }
+        if (eff2 <= eff) {
+          return
+        }
+        tar = cur
+        eff = eff2
+        odds = directHit
+      })
+      _status.event.putTempCache("kuangfu", "useShaValue", {
+        tar,
+        eff,
+        odds,
+      })
+      return { tar, eff, odds }
+    },
+    async content(event, trigger, player) {
+      const target = event.target
+      if (player === target) {
+        await player.chooseToDiscard("e", true)
+      } else {
+        await player.discardPlayerCard(target, "e", true)
+      }
+      await player.chooseUseTarget("sha", true, false, "nodistance")
+      const bool = game.hasPlayer2((current) => {
+        return (
+          current.getHistory(
+            "damage",
+            (evt) => evt.getParent("kuangfu") === event,
+          ).length > 0
+        )
+      })
+      if (player === target && bool) {
+        await player.draw(2)
+      } else if (player !== target && !bool) {
+        await player.chooseToDiscard("h", 2, true)
+      }
+    },
+    ai: {
+      order() {
+        return get.order({ name: "sha" }) - 0.3
+      },
+      result: {
+        player(player, target) {
+          const cache = lib.skill.kuangfu.useShaValue(player),
+            eff = cache.eff / 10
+          if (player === target) {
+            return 2 * cache.odds + eff
+          }
+          return Math.min(2, player.countCards("h")) * (cache.odds - 1) + eff
+        },
+        target(player, target) {
+          let att = get.attitude(player, target),
+            max = 0,
+            min = 1
+          target.countCards("e", (card) => {
+            var val = get.value(card, target)
+            if (val > max) {
+              max = val
+            }
+            if (val < min) {
+              min = val
+            }
+          })
+          if (att <= 0) {
+            if (target.hasSkillTag("noe")) {
+              return 2 - max / 3
+            }
+            if (min <= 0) {
+              return 1
+            }
+            return -max / 3
+          }
+          if (target.hasSkillTag("noe")) {
+            return 2 - min / 4
+          }
+          if (min <= 0) {
+            return 1
+          }
+          if (player === target) {
+            const cache = lib.skill.kuangfu.useShaValue(player)
+            return cache.eff / 10 - 1
+          }
+          return 0
+        },
+      },
+    },
+  },
+  // 伏完
+  // 谋溃
+  moukui: {
+    audio: 2,
+    trigger: { player: "useCardToPlayered" },
+    filter(event, player) {
+      return event.card.name === "sha"
+    },
+    async cost(event, trigger, player) {
+      const controls = ["draw_card"]
+      if (trigger.target.countCards("he") > 0) {
+        controls.push("discard_card")
+      }
+      controls.push("cancel2")
+      const result = await player
+        .chooseControl({
+          prompt: get.prompt2(event.skill, trigger.target),
+          controls,
+          ai() {
+            const trigger = get.event().getTrigger()
+            const player = get.player()
+            if (
+              trigger.target.countCards("he") &&
+              get.attitude(_status.event.player, trigger.target) < 0
+            ) {
+              return "discard_card"
+            }
+            const num = Math.min(
+              player.getCardUsable("sha"),
+              player.countCards("hs", (i) => get.name(i) === "sha") + 1,
+            )
+            if (!player.hasCard((i) => get.value(i) > 6 + num, "e")) {
+              return "draw_card"
+            }
+            return "cancel2"
+          },
+        })
+        .forResult()
+      event.result = {
+        bool: result.control !== "cancel2",
+        targets: [trigger.target],
+        cost_data: result.control,
+      }
+    },
+    async content(event, trigger, player) {
+      const result = event.cost_data
+      if (result === "draw_card") {
+        await player.draw()
+      } else if (trigger.target.countCards("he")) {
+        await player.discardPlayerCard(trigger.target, "he", true)
+      }
+      player.addTempSkill(`${event.name}_conseq`)
+      player.markAuto(`${event.name}_conseq`, [[trigger.card, trigger.target]])
+    },
+    ai: { expose: 0.1 },
+    subSkill: {
+      conseq: {
+        charlotte: true,
+        onremove: true,
+        trigger: { player: "shaMiss" },
+        filter(event, player) {
+          if (
+            !player
+              .getStorage("moukui_conseq")
+              .some(
+                ([card, target]) =>
+                  event.card === card && event.target === target,
+              )
+          ) {
+            return false
+          }
+          return player.countCards("he") > 0
+        },
+        forced: true,
+        popup: false,
+        async content(event, trigger, player) {
+          const list = player
+            .getStorage(event.name)
+            .filter(
+              ([card, target]) =>
+                trigger.card === card && trigger.target === target,
+            )
+          player.unmarkAuto(event.name, list)
+          if (!player.getStorage(event.name).length) {
+            player.removeSkill(event.name)
+          }
+          const { target } = trigger
+          target.line(player, "green")
+          await target.discardPlayerCard(player, true)
+        },
+      },
+    },
+  },
+  // 董承
+  // 承诏
+  chengzhao: {
+    audio: 2,
+    trigger: { global: "phaseJieshuBegin" },
+    filter(event, player) {
+      let num = 0
+      player.checkHistory("gain", (evt) => {
+        num += evt.cards.length
+      })
+      if (num < 2) {
+        return false
+      }
+      return (
+        player.hasCards("h") &&
+        game.hasPlayer((current) => current.canCompare(player))
+      )
+    },
+    async cost(event, trigger, player) {
+      event.result = await player
+        .chooseTarget(get.prompt2(event.skill), (card, player, target) => {
+          return player.canCompare(target)
+        })
+        .set("ai", (target) => {
+          const player = get.player()
+          return -get.attitude(player, target) / target.countCards("h")
+        })
+        .forResult()
+    },
+    async content(event, trigger, player) {
+      const target = event.targets[0]
+      const result = await player.chooseToCompare(target).forResult()
+      if (result?.bool) {
+        const card = { name: "sha", isCard: true, storage: { chengzhao: true } }
+        if (player.canUse(card, target, false)) {
+          player.addTempSkill(`${event.name}_effect`)
+          await player.useCard(card, target, false)
+        }
+      }
+    },
+    subSkill: {
+      effect: {
+        charlotte: true,
+        ai: {
+          unequip: true,
+          skillTagFilter(player, tag, arg) {
+            if (!arg?.card?.storage?.chengzhao) {
+              return false
+            }
+          },
+        },
+      },
+    },
+  },
 
   // 薛灵芸
   // 思泣

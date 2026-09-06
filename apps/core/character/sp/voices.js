@@ -231,6 +231,18 @@ export default {
   "#lianpian2": "需持续投入，方有回报。",
   "#sufei:die": "恐不能再与兴霸兄……并肩奋战了……",
 
+  "#kuangfu1": "大斧到处，片甲不留！",
+  "#kuangfu2": "你可接得住我一斧？",
+  "#panfeng:die": "来者……可是魔将？",
+
+  "#moukui1": "你的死期到了。",
+  "#moukui2": "同归于尽吧。",
+  "#fuwan:die": "后会有期……",
+
+  "#chengzhao1": "此诏字字诛心，岂能不斩曹贼？",
+  "#chengzhao2": "定当为皇上诛杀首害！",
+  "#dongcheng:die": "九泉之下，我等着你曹贼到来！",
+
   "#jueqing_ol_zhangchunhua1": "情丝如雪，难当暖阳。",
   "#jueqing_ol_zhangchunhua2": "有情总被无情负，绝情方无软肋生。",
   "#shangshi_ol_zhangchunhua1": "伤我最深的，竟是你司马懿。",

@@ -262,17 +262,55 @@ const characters = {
     hp: 4,
     skills: ["kuangfu"],
   },
+  ol_hetaihou: {
+    sex: "female",
+    group: "qun",
+    hp: 3,
+    skills: ["olzhendu", "olqiluan"],
+    names: "何|null",
+    dieAudios: ["hetaihou"],
+  },
   fuwan: {
     sex: "male",
     group: "qun",
     hp: 4,
     skills: ["moukui"],
   },
+  sp_machao: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["zhuiji", "shichou"],
+  },
+  zhanglu: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["yishe", "bushi", "midao"],
+  },
+  liuqi: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["wenji", "tunjiang"],
+  },
+  lisu: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["qiaoyan", "xianzhu"],
+  },
   dongcheng: {
     sex: "male",
     group: "qun",
     hp: 4,
     skills: ["chengzhao"],
+  },
+  liangxing: {
+    sex: "male",
+    group: "qun",
+    hp: 4,
+    skills: ["lulve", "zhuixi"],
   },
 
   ol_zhangchunhua: {

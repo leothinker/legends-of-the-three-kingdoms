@@ -2,15 +2,15 @@ window.wtk_package = {
   character: {
     standard: "标准版",
     shenhua: "神话再临",
-    yijiang: "一将之魂",
     // sixiang: "四象封印",
 
     refresh: "界限突破",
     reshenhua: "界神话再临",
+    yijiang: "一将之魂",
+    sp: "将星",
     // reyijiang: "界一将成名",
 
     shenwu: "神武再世",
-    sp: "将星",
     // sb: "谋攻篇",
     sbfm: "上兵伐谋",
     // mouding: "谋定天下",
@@ -21,7 +21,7 @@ window.wtk_package = {
     // bingshi: "兵势篇",
     // shiji: "始计篇",
 
-    // sp2: "将星归汉",
+    sp2: "将星归汉",
     // newjiang: "一将成名",
 
     jsrg: "江山如故",

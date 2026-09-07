@@ -5680,7 +5680,7 @@ const skills = {
 
       cards.reverse()
       await game.cardsGotoPile(cards, "insert")
-      game.log(player, "将", cards, "置于牌堆顶")
+      game.log(player, "将", cards, "置于了牌堆顶")
       await player.draw()
     },
     ai: {

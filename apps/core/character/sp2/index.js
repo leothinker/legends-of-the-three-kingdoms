@@ -1,4 +1,4 @@
-import { game } from "noname"
+import { game } from "wtk"
 import cards from "./card.js"
 import characters from "./character.js"
 import characterFilters from "./characterFilter.js"

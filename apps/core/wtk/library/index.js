@@ -6017,7 +6017,7 @@ export class Library {
         },
         connect_olfeiyang_four: {
           name: "四号位获得【飞扬】",
-          init: true,
+          init: false,
           frequent: true,
           intro:
             "最后行动的角色获得技能【飞扬】（限定技，准备阶段，你可以弃置两张牌，然后弃置判定区的一张牌）",
@@ -6331,7 +6331,7 @@ export class Library {
         },
         olfeiyang_four: {
           name: "四号位获得【飞扬】",
-          init: true,
+          init: false,
           frequent: true,
           intro:
             "最后行动的角色获得技能【飞扬】（限定技，准备阶段，你可以弃置两张牌，然后弃置判定区的一张牌）",

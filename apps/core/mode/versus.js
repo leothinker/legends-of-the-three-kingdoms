@@ -11,26 +11,28 @@ export default () => {
         lib.characterPack.mode_versus = lib.jiangeboss
       } else if (get.config("versus_mode") === "siguo") {
         lib.characterPack.mode_versus = {
-          tangzi: {
+          tz_tangzi: {
             sex: "male",
             group: ["wei", "wu"].randomGet(),
             hp: 4,
-            skills: ["xingzhao"],
-            dieAudios: ["xf_tangzi"],
+            skills: ["tzxingzhao"],
+            img: "image/character/tangzi.jpg",
+            dieAudios: ["tangzi"],
           },
-          liuqi: {
+          tz_liuqi: {
             sex: "male",
             group: ["shu", "qun"].randomGet(),
             hp: 3,
-            skills: ["wenji", "tunjiang"],
-            dieAudios: ["sp_liuqi"],
+            skills: ["tzwenji", "tztunjiang"],
+            img: "image/character/liuqi.jpg",
+            dieAudios: ["liuqi"],
           },
         }
         for (var i in lib.characterPack.mode_versus) {
           lib.character[i] = lib.characterPack.mode_versus[i]
         }
-        delete lib.character.sp_liuqi
-        delete lib.character.xf_tangzi
+        delete lib.character.liuqi
+        delete lib.character.tangzi
         lib.cardPack.mode_versus = [
           "zong",
           "xionghuangjiu",
@@ -6308,7 +6310,7 @@ export default () => {
       "caifuren",
       "gongsunyuan",
       "yj_jushou",
-      "sp_liuqi",
+      "liuqi",
       "quyi",
       "caiyong",
       "key_yuzuru",
@@ -6419,11 +6421,11 @@ export default () => {
       "sunqian",
       "sunhao",
       "xiahouba",
-      "liuqi",
+      "tz_liuqi",
       "luzhi",
       "zhugeguo",
       "guosi",
-      "xf_tangzi",
+      "tangzi",
       "xf_sufei",
       "caohong",
       "mazhong",
@@ -6457,22 +6459,22 @@ export default () => {
       mode_versus_character_config: "剑阁武将",
       mode_versus_card_config: "同舟共济",
 
-      tangzi: "唐咨",
-      liuqi: "刘琦",
+      tz_tangzi: "唐咨",
+      tzxingzhao: "兴棹",
+      tzxingzhao2: "兴棹",
+      tzxingzhao3: "兴棹",
+      tzxingzhao_bg: "棹",
+      tzxingzhao_info:
+        "锁定技，若你和队友的“龙船至宝”数之和：大于0，你拥有〖恂恂〗；大于1，你和队友使用装备牌时摸一张牌；大于2，你和队友跳过判定阶段。",
 
-      wenji: "问计",
-      wenji2: "问计",
-      wenji_info:
-        "队友的出牌阶段开始时，你可令其交给你一张手牌，若此牌为锦囊牌，则非队友角色计算与你的距离+1直到你的下个回合开始。",
-      tunjiang: "屯江",
-      tunjiang_info:
-        "结束阶段开始时，若你于本回合的出牌阶段使用过至少两张牌且未造成过伤害，你可以选择一项：1.你摸两张牌；2.队友摸两张牌。",
-      xingzhao: "兴棹",
-      xingzhao2: "兴棹",
-      xingzhao3: "兴棹",
-      xingzhao_bg: "棹",
-      xingzhao_info:
-        "锁定技，若你和队友持有的龙船至宝数合计为：1个以上，你具有技能“恂恂”；2个以上，当你或队友使用装备牌时，其摸一张牌；3个以上，你和队友跳过判定阶段。",
+      tz_liuqi: "刘琦",
+      tzwenji: "问计",
+      tzwenji2: "问计",
+      tzwenji_info:
+        "队友的出牌阶段开始时，你可以令其交给你一张手牌，若此牌为锦囊牌，所有敌方角色计算与你的距离+1直到你的下个回合开始。",
+      tztunjiang: "屯江",
+      tztunjiang_info:
+        "结束阶段，若你于出牌阶段内使用过至少两张牌且未造成过伤害，你可以选择一项：1.摸两张牌；2.队友摸两张牌。",
 
       boss_liedixuande: "烈帝玄德",
       boss_gongshenyueying: "工神月英",
@@ -7088,7 +7090,92 @@ export default () => {
           }
         },
       },
-      wenji: {
+      // 唐咨
+      // 兴棹
+      tzxingzhao: {
+        inherit: "xz_xunxun",
+        mark: true,
+        intro: {
+          content: (storage, player) => {
+            var num = 0
+            for (var i = 0; i < game.players.length; i++) {
+              if (game.players[i].side === player.side) {
+                num += game.players[i].storage.longchuanzhibao
+              }
+            }
+            var str = "无技能"
+            if (num >= 1) {
+              str = "拥有〖恂恂〗"
+            }
+            if (num >= 2) {
+              str += "；你和队友使用装备牌时摸一张牌"
+            }
+            if (num >= 3) {
+              str += "；你和队友跳过判定阶段"
+            }
+            return str
+          },
+        },
+        filter: (event, player) => {
+          var num = 0
+          for (var i = 0; i < game.players.length; i++) {
+            if (game.players[i].side === player.side) {
+              if (game.players[i].storage.longchuanzhibao) {
+                return true
+              }
+            }
+          }
+          return false
+        },
+        global: ["tzxingzhao2", "tzxingzhao3"],
+      },
+      tzxingzhao2: {
+        trigger: { player: "useCard" },
+        forced: true,
+        filter: (event, player) => {
+          if (get.type(event.card) !== "equip") {
+            return false
+          }
+          var num = 0,
+            bool = false
+          for (var i = 0; i < game.players.length; i++) {
+            if (game.players[i].side === player.side) {
+              num += game.players[i].storage.longchuanzhibao
+              if (game.players[i].hasSkill("tzxingzhao")) {
+                bool = true
+              }
+            }
+          }
+          return bool && num >= 2
+        },
+        content: () => {
+          player.draw()
+        },
+      },
+      tzxingzhao3: {
+        trigger: { player: "phaseJudgeBefore" },
+        forced: true,
+        filter: (event, player) => {
+          var num = 0,
+            bool = false
+          for (var i = 0; i < game.players.length; i++) {
+            if (game.players[i].side === player.side) {
+              num += game.players[i].storage.longchuanzhibao
+              if (game.players[i].hasSkill("tzxingzhao")) {
+                bool = true
+              }
+            }
+          }
+          return bool && num >= 3
+        },
+        content: () => {
+          trigger.cancel()
+          game.log(player, "跳过了判定阶段")
+        },
+      },
+      // 刘琦
+      // 问计
+      tzwenji: {
         trigger: { global: "phaseUseBegin" },
         filter: (event, player) =>
           event.player.side === player.side &&
@@ -7102,7 +7189,7 @@ export default () => {
         content: () => {
           "step 0"
           trigger.player.chooseCard(
-            `将一张手牌交给${get.translation(player)}`,
+            `交给${get.translation(player)}一张手牌`,
             true,
           ).ai = (card) => {
             if (get.type(card) === "trick") {
@@ -7114,15 +7201,15 @@ export default () => {
           if (result.bool && result.cards.length) {
             player.gain(result.cards, trigger.player, "give")
             if (get.type(result.cards[0]) === "trick") {
-              player.addTempSkill("wenji2", { player: "phaseBegin" })
+              player.addTempSkill("tzwenji2", { player: "phaseBegin" })
             }
           }
         },
       },
-      wenji2: {
+      tzwenji2: {
         mark: true,
         intro: {
-          content: "非队友角色计算与你的距离+1",
+          content: "所有敌方角色计算与你的距离+1",
         },
         mod: {
           globalTo: (from, to, distance) => {
@@ -7132,7 +7219,8 @@ export default () => {
           },
         },
       },
-      tunjiang: {
+      // 屯江
+      tztunjiang: {
         trigger: { player: "phaseEnd" },
         direct: true,
         filter: (event, player) =>
@@ -7158,110 +7246,29 @@ export default () => {
                 }
                 return 0
               })
-              .set("prompt", get.prompt("xingzhao"))
+              .set("prompt", get.prompt("tzxingzhao"))
               .set("choiceList", [
                 "摸两张牌",
                 `令${get.translation(target)}摸两张牌`,
               ])
           } else {
-            player.chooseBool(get.prompt("xingzhao"))
+            player.chooseBool(get.prompt("tzxingzhao"))
           }
           ;("step 1")
           if (event.target) {
             if (result.index === 0) {
-              player.logSkill("xingzhao")
+              player.logSkill("tzxingzhao")
               player.draw(2)
             } else if (result.index === 1) {
-              player.logSkill("xingzhao", event.target)
+              player.logSkill("tzxingzhao", event.target)
               event.target.draw(2)
             }
           } else {
             if (result.bool) {
-              player.logSkill("xingzhao")
+              player.logSkill("tzxingzhao")
               player.draw(2)
             }
           }
-        },
-      },
-      xingzhao: {
-        inherit: "xunxun",
-        mark: true,
-        intro: {
-          content: (storage, player) => {
-            var num = 0
-            for (var i = 0; i < game.players.length; i++) {
-              if (game.players[i].side === player.side) {
-                num += game.players[i].storage.longchuanzhibao
-              }
-            }
-            var str = "无技能"
-            if (num >= 1) {
-              str = "具有技能“恂恂”"
-            }
-            if (num >= 2) {
-              str += "；当你或队友使用装备牌时，其摸一张牌"
-            }
-            if (num >= 3) {
-              str += "；你和队友跳过判定阶段"
-            }
-            return str
-          },
-        },
-        filter: (event, player) => {
-          var num = 0
-          for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side === player.side) {
-              if (game.players[i].storage.longchuanzhibao) {
-                return true
-              }
-            }
-          }
-          return false
-        },
-        global: ["xingzhao2", "xingzhao3"],
-      },
-      xingzhao2: {
-        trigger: { player: "useCard" },
-        forced: true,
-        filter: (event, player) => {
-          if (get.type(event.card) !== "equip") {
-            return false
-          }
-          var num = 0,
-            bool = false
-          for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side === player.side) {
-              num += game.players[i].storage.longchuanzhibao
-              if (game.players[i].hasSkill("xingzhao")) {
-                bool = true
-              }
-            }
-          }
-          return bool && num >= 2
-        },
-        content: () => {
-          player.draw()
-        },
-      },
-      xingzhao3: {
-        trigger: { player: "phaseJudgeBefore" },
-        forced: true,
-        filter: (event, player) => {
-          var num = 0,
-            bool = false
-          for (var i = 0; i < game.players.length; i++) {
-            if (game.players[i].side === player.side) {
-              num += game.players[i].storage.longchuanzhibao
-              if (game.players[i].hasSkill("xingzhao")) {
-                bool = true
-              }
-            }
-          }
-          return bool && num >= 3
-        },
-        content: () => {
-          trigger.cancel()
-          game.log(player, "跳过了判定阶段")
         },
       },
       xionghuangjiu: {
@@ -9840,7 +9847,6 @@ export default () => {
 
           if (source && source.side !== this.side) {
             this.draw(num, "nodelay")
-
             var friend = game.findPlayer(
               (current) => current.side === this.side && current !== this,
             )

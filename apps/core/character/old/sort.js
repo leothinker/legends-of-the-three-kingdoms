@@ -55,6 +55,8 @@ const characterSort = {
     "old_zhuhuan",
   ],
   old_yijiang5: ["old_caorui", "old_caoxiu", "old_quancong"],
+  old_yijiang6: ["old_huanghao", "old_liuyu", "old_zhangrang"],
+  old_yijiang7: ["old_xinxianying", "old_jikang"],
 }
 
 const characterSortTranslate = {
@@ -66,6 +68,8 @@ const characterSortTranslate = {
   old_yijiang3: "一将成名2013",
   old_yijiang4: "一将成名2014",
   old_yijiang5: "一将成名2015",
+  old_yijiang6: "原创之魂2016",
+  old_yijiang7: "原创之魂2017",
 }
 
 export { characterSort, characterSortTranslate }

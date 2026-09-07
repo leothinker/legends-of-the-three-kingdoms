@@ -50,4 +50,11 @@ export default {
   old_caorui: "天姿的明君",
   old_caoxiu: "千里骐骥",
   old_quancong: "慕势耀族",
+
+  old_huanghao: "便辟佞慧",
+  old_liuyu: "甘棠永固",
+  old_zhangrang: "窃幸绝禋",
+
+  old_xinxianying: "名门智女",
+  old_jikang: "峻峰孤松",
 }

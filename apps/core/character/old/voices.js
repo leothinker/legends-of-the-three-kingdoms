@@ -64,4 +64,9 @@ export default {
   "#oldyoudi1": "无名小卒，可敢再前进一步！",
   "#oldyoudi2": "予以小利，必有大获。",
   "#old_zhuhuan:die": "这巍巍巨城，吾竟无力撼动。",
+
+  "#juexiang_ji1": "一弹一拨，铿锵有力！",
+  "#juexiang_lie1": "一壶烈云烧，一曲人皆醉。",
+  "#juexiang_rou1": "君子以琴会友，以瑟辅人。",
+  "#juexiang_he1": "悠悠琴音，人人自醉。",
 }

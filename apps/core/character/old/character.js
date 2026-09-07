@@ -249,6 +249,7 @@ const characters = {
     skills: ["oldjuece", "oldmieji", "oldfencheng"],
     dieAudios: ["liru"],
   },
+
   old_caozhen: {
     sex: "male",
     group: "wei",
@@ -307,6 +308,44 @@ const characters = {
     hp: 4,
     skills: ["zhenshan"],
     dieAudios: ["quancong"],
+  },
+
+  old_huanghao: {
+    sex: "male",
+    group: "shu",
+    hp: 3,
+    skills: ["oldqinqing", "oldhuisheng"],
+    img: "image/character/huanghao.jpg",
+    dieAudios: ["huanghao"],
+  },
+  old_liuyu: {
+    sex: "male",
+    group: "qun",
+    hp: 2,
+    skills: ["oldzhige", "oldzongzuo"],
+    dieAudios: ["liuyu"],
+  },
+  old_zhangrang: {
+    sex: "male",
+    group: "qun",
+    hp: 3,
+    skills: ["oldtaoluan"],
+    trashBin: ["sex:male_castrated"],
+    dieAudios: ["zhangrang"],
+  },
+
+  old_xinxianying: {
+    sex: "female",
+    group: "wei",
+    hp: 3,
+    skills: ["oldzhongjian", "oldcaishi"],
+  },
+  old_jikang: {
+    sex: "male",
+    group: "wei",
+    hp: 3,
+    skills: ["oldqingxian", "oldjuexiang"],
+    dieAudios: ["jikang"],
   },
 }
 

@@ -300,6 +300,67 @@ const translates = {
   zhenshan: "振赡",
   zhenshan_info:
     "每回合限一次，当你需要使用或打出一张基本牌时，你可以与手牌数小于你的一名角色交换手牌，视为使用或打出此牌。",
+
+  old_huanghao: "旧黄皓",
+  old_huanghao_prefix: "旧",
+  oldqinqing: "寝情",
+  oldqinqing_info:
+    "结束阶段，你可以选择一名攻击范围内含有主公的其他角色，然后你弃置其一张牌（无牌则不弃），并令其摸一张牌。若其手牌数大于主公，你摸一张牌。",
+  oldhuisheng: "贿生",
+  oldhuisheng_info:
+    "当你受到其他角色造成的伤害时（每名角色限一次），你可以令其观看你任意张牌（你选择）并令其选择一项：1.获得其中一张，防止此伤害；2.弃置等量的牌。",
+
+  old_liuyu: "旧刘虞",
+  old_liuyu_prefix: "旧",
+  oldzhige: "止戈",
+  oldzhige_info:
+    "出牌阶段限一次，若你的手牌数大于体力值，你可以令一名攻击范围内包含你的其他角色选择一项：1.使用一张【杀】；2.将装备区里的一张牌交给你。",
+  oldzongzuo: "宗祚",
+  oldzongzuo_info:
+    "锁定技，游戏开始时，你加X点体力上限并回复X点体力（X为全场势力数）；当每个势力的最后一名角色死亡后，你减1点体力上限。",
+
+  old_zhangrang: "旧张让",
+  old_zhangrang_prefix: "旧",
+  oldtaoluan: "滔乱",
+  oldtaoluan_backup: "滔乱",
+  oldtaoluan_info:
+    "当你需要使用一张基本牌或普通锦囊牌时，你可以视为使用此牌（每种牌名每局游戏限一次），然后你令一名其他角色选择一项：1.交给你一张与你以此法使用的牌类别不同的牌；2.令你失去1点体力。",
+
+  old_xinxianying: "旧辛宪英",
+  old_xinxianying_prefix: "旧",
+  oldzhongjian: "忠鉴",
+  oldzhongjian_bg: "鉴",
+  oldzhongjian_info:
+    "出牌阶段限一次，你可以展示一张手牌，然后展示手牌数大于体力值的一名其他角色X张手牌（X为其手牌数与体力值之差）。若你与其展示的牌：包含颜色相同的牌，你摸一张牌或弃置其一张牌；包含点数相同的牌，本回合此技能改为“限两次”；颜色点数均不同，你的手牌上限-1。",
+  oldcaishi: "才识",
+  oldcaishix: "才识/忠鉴",
+  oldcaishi_info:
+    "摸牌阶段开始时，你可以选择一项：1.令你的手牌上限+1，然后本回合你不能对其他角色使用牌；2.回复1点体力，然后本回合你不能对自己使用牌。",
+
+  old_jikang: "旧嵇康",
+  old_jikang_prefix: "旧",
+  oldqingxian: "清弦",
+  oldqingxian_info:
+    "当你受到伤害/回复体力后，你可以令伤害来源/一名其他角色执行一项：1.失去1点体力，从牌堆中随机使用一张装备牌；2.回复1点体力，弃置一张装备牌。若其以此法使用或弃置的牌为梅花，你回复1点体力。",
+  oldjuexiang: "绝响",
+  oldjuexiang_info:
+    "当你死亡后，你可以令一名角色随机获得〖和弦〗、〖柔弦〗、〖烈弦〗和〖激弦〗其中一个技能。然后直到其下回合开始，其不能成为除其外的角色使用梅花牌的目标。",
+  oldjuexiang_club: "绝响",
+  oldjuexiang_club_bg: "响",
+  oldjuexiang_club_info:
+    "直到其下回合开始，其不能成为除其外的角色使用梅花牌的目标。",
+  juexiang_ji: "激弦",
+  juexiang_ji_info:
+    "当你受到伤害后，你可以令伤害来源失去1点体力，随机使用一张装备牌。",
+  juexiang_lie: "烈弦",
+  juexiang_lie_info:
+    "当你回复体力后，你可以令一名其他角色失去1点体力，随机使用一张装备牌。",
+  juexiang_rou: "柔弦",
+  juexiang_rou_info:
+    "当你受到伤害后，你可以令伤害来源回复1点体力，弃置一张装备牌。",
+  juexiang_he: "和弦",
+  juexiang_he_info:
+    "当你回复体力后，你可以令一名其他角色回复1点体力，弃置一张装备牌。",
 }
 
 export default translates

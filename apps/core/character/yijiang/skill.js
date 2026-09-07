@@ -9664,7 +9664,7 @@ const skills = {
     usable: 1,
     position: "he",
     filter(event, player) {
-      return player.getDamagedHp()
+      return player.getDamagedHp() > 0
     },
     filterTarget(card, player, target) {
       return target !== player
